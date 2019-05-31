@@ -1,0 +1,31 @@
+<p>
+	<mat-form-field>
+	  	<mat-label>Display Options</mat-label>
+		<mat-select [(value)]="displayOption">
+			<mat-option [value]="'error'">Errors</mat-option>
+			<mat-option [value]="'warning'">Warning</mat-option>
+			<mat-option [value]="'info'">Info</mat-option>
+			<mat-option [value]="'success'">Success</mat-option>
+			<mat-option [value]="'all'">All</mat-option>
+		</mat-select>
+	</mat-form-field>
+	<br><br>
+	<span *ngFor="let validation of studyValidation.validations ; let i = index">
+			<nav class="panel">
+				<p class="panel-heading">
+					{{ validation['section'] }}
+				</p>
+				<span *ngFor="let detail of validation.details">
+					<span *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
+						<a [ngClass]="[detail.status, 'panel-block']">
+					    	<span class="panel-icon">
+					      		<i class="fas fa-book" aria-hidden="true"></i>
+					    	</span>
+					    	{{ detail.message }}
+						</a>
+					</span>
+				</span>
+			</nav>
+			<span>&nbsp;</span>
+	</span>
+</p>

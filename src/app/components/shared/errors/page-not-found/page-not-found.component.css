@@ -1,0 +1,21 @@
+.is-vertical-center {
+  display: flex;
+  align-items: center;
+}
+
+.display-message-wrapper{
+	padding: 5em;
+}
+
+.display-message-title{
+	font-size: 8em;
+	display: block;
+	margin-bottom: 0;
+	line-height: 1em;
+}
+
+.display-message-content{
+	font-size: 1em;
+	text-transform:	uppercase;
+	letter-spacing: 0.5em;
+}

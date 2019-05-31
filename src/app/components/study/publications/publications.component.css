@@ -1,0 +1,17 @@
+.mb10{
+	margin-bottom: 15px;
+}
+
+.mt5{
+	margin-top: 10px;
+}
+
+.publications-wrapper{
+	overflow-x: auto;
+}
+
+.section-border{
+	border: 1px dashed #f1f1f4;
+	padding-top: 50px;
+	padding-bottom: 50px;
+}

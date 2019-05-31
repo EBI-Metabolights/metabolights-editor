@@ -1,0 +1,65 @@
+<div class="modal is-active bg1">
+  <form *ngIf="form" [formGroup]="form">
+    <nav class="panel bg-white vw40">
+      <div class="panel-heading bg-white">
+        <img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+        <span style="margin-top: -25px; margin-left: 10px;">MetaboLights - Study Editor</span>
+      </div>
+      <div class="panel-block np">
+        <div class="column np">
+          <div *ngIf="isFormBusy" class="load-bar">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+          </div>
+          <section class="modal-card-body">
+            <div class="field is-horizontal">
+              <div class="field-body">
+                <div class="field">
+                  <div class="control">
+                    <mat-form-field class="full-width">
+                      <input class="no-scroll" 
+                      formControlName="email"
+                      placeholder="Email address"
+                      matInput>
+                      <mat-error>
+                        Email field is required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <div class="control">
+                    <mat-form-field class="full-width">
+                      <input class="no-scroll" 
+                      type="password" 
+                      formControlName="secret"
+                      placeholder="Password"
+                      matInput>
+                      <mat-hint></mat-hint>
+                      <mat-error>
+                        Password field required
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                  <mat-error *ngIf="invalidCredentials && form.dirty">
+                    <small>Email or password is incorrect. </small>
+                  </mat-error>
+                  <div>&nbsp;</div>
+                  <div class="control">
+                    <button [disabled]="!form.valid || isFormBusy" (keyup.enter)="login($event)" (click)="login($event)" class="button is-info">
+                     Login
+                   </button>
+                   <a class="button is-white forgot-button is-pulled-right" target="_blank" [href]="domain + 'forgotPassword'">Forgot Your Password?</a>
+                 </div>
+               </div>
+             </div>
+           </div>
+         </section>
+       </div>
+     </div>
+   </nav>
+   <p class="has-text-centered">
+    <br>
+    <a target="_blank" [href]="domain + 'newAccount'"> <mat-icon>person</mat-icon> Create a new account</a>
+  </p>
+</form>
+</div>

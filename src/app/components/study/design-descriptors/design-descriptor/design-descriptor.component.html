@@ -1,0 +1,72 @@
+<div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
+  <a class="button is-light is-pulled-right is-small" (click)='openModal()'>+ Add</a>
+</div>
+<ng-template #showDescriptorDetails>
+	<div class="control">
+		<div class="tags has-addons">
+      <span class="tag is-primary clickable" (click)='openModal()'>
+        <i class="material-icons">
+          edit
+        </i>
+      </span>
+      <span class="tag is-default is-small">
+       <ontology-details [value]="descriptor"></ontology-details>
+     </span>
+   </div>
+ </div>	
+</ng-template>
+
+<div class="modal" [ngClass]="{'is-active': isDeleteModalOpen}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>Are you sure you want to delete?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)='closeDelete()' class="button is-info">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isModalOpen}">
+  <form *ngIf="form" [formGroup]="form">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <div *ngIf="isFormBusy" class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <section class="modal-card-body">
+        <span *ngIf="descriptor != null; else noDescriptor">
+          <mtbls-ontology #descriptorComponent [validations]="validation" (changed)="onChanges($event)" [values]='[descriptor]' [inline]="true"></mtbls-ontology>  
+        </span>
+        <ng-template #noDescriptor>
+          <mtbls-ontology #descriptorComponent [validations]="validation" (changed)="onChanges($event)" [values]='[]' [inline]="true"></mtbls-ontology>  
+        </ng-template>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
+          </div>
+          <div class="column is-half has-text-right">
+            <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
+              Save
+            </button>
+            <button *ngIf="form.pristine" (click)='closeModal()' class="button is-info">OK</button>
+            <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>Cancel</button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </form>
+</div>

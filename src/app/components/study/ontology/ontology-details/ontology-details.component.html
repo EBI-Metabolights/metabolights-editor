@@ -1,0 +1,38 @@
+ <span *ngIf="value.termSource && value.termSource.name == 'MTBLS'; else displayExtOnt">
+ 	{{ value.annotationValue }}
+ </span>
+ <ng-template #displayExtOnt>
+ 	<span class="clickable" (click)="displayOntologyInfo()">
+	 	{{ value.annotationValue }} <mat-spinner style="display: inline;" [diameter]="16" [strokeWidth]="2" *ngIf="isLoading"></mat-spinner>
+	 </span>
+ </ng-template>
+ <div *ngIf="details" class="modal" [ngClass]="{'is-active': isModalOpen}">
+    <div class="modal-background"></div>
+    <div class="modal-card vw80">
+		<section class="modal-card-body">
+			<div class="ont-description">
+				<h4><span class="modal-card-title">{{ details.label }}</span></h4>
+				<p> <b>Ontology Details</b> <br>
+					Name: {{ details.ontology_name }} <br>
+					Prefix: {{ details.ontology_prefix}} <br>
+					Short form: {{ details.short_form}} <br>
+					IRI: {{ details.iri}}
+				</p>
+				<p><b>Term details:</b>
+					<span *ngIf="details.description">
+					<br><b>Definition</b> <br>
+					{{ details.description.join(" ") }}
+					</span>
+				</p>
+				<span *ngFor="let key of getObjectKeys(details.annotation)">
+					<span *ngIf="details.annotation && details.annotation[key]">
+						<b style="text-transform: capitalize;">{{key.replace("_", " ")}}</b> : {{ details.annotation[key].join(" ") }} <br>
+					</span>
+				</span>
+			</div>
+		</section>
+		<footer class="modal-card-foot buttons is-right">
+			<button (click)='closeModal()' class="button is-info">OK</button>
+		</footer>
+	</div>
+</div>

@@ -1,0 +1,23 @@
+<div class="hover-highlight px-20">
+    <div class="mtbls-section">
+		<h6 class="mb10">
+			<a><b><small class="has-text-grey">PUBLICATIONS</small></b></a>
+			<mtbls-publication [value]="null"></mtbls-publication>
+		</h6>
+		<div *ngIf="publications && publications.length > 0; else noPublicationsFound;">
+			<div class="publications-wrapper tile is-ancestor mt1">
+				<div class="is-parent column is-4" *ngFor="let publication of publications; let i = index">
+					<mtbls-publication [value]="publication"></mtbls-publication>
+				</div>
+			</div>
+		</div>
+		<ng-template #noPublicationsFound>
+			<p class="has-text-centered section-border">
+		    	<small>The study does not contain any publication information. <br>
+		    		Please use the <a class="button is-light is-small">+ Add Publication</a> button above to add details.
+		    	</small>
+		    </p>
+		    <div>&nbsp;</div>
+		</ng-template>
+	</div>
+</div>

@@ -1,0 +1,82 @@
+<div class="field">
+	<button (click)="openUploadModal()" class="button is-link is-fullwidth">Aspera Upload</button>
+</div>
+<small class="had-text-dark is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help</a>&emsp;</small>
+<div class="modal" [ngClass]="{'is-active': displayHelpModal}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+  <section class="modal-card-body">
+    <p>
+    	<b>Aspera Upload</b><br><br>
+    	Aspera is a fast way of transferring files. Aspera lets you control the transfer rate to better suit your internet connection. You can also stop the transfer, and later resume where you left off. <br><br>
+		Note that Aspera is a plugin that you have to install in your browser. Please make sure you have privileges to install the Aspera plugin, contact your local IT support if you can not install this plugin.</p>
+  </section>
+  	<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-full has-text-right">
+					<button (click)='toggleHelp()' class="button is-default">Close</button>
+				</div>
+			</div>
+		</footer>
+	</div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isAsperaUploadModalOpen}">
+	<div class="modal-background"></div>
+	<div class="modal-card">
+		<section class="modal-card-body">
+			<div class="tabs is-toggle is-fullwidth">
+			  <ul>
+			     <li (click)="changeTab('plugin')" [ngClass]="selectedTab == 'plugin' ? 'is-active' : ''"><a>Aspera Connect transfer plug-in</a></li>
+			    <li (click)="changeTab('commandline')"  [ngClass]="selectedTab != 'plugin' ? 'is-active' : ''"><a>Aspera Command line client</a></li>
+			  </ul>
+			</div>
+			<span *ngIf="selectedTab == 'plugin'; else showCommandLine">
+				<div class="content-wrapper has-text-centered vc">
+					<div><br>
+						<img src="assets/img/aspera.jpeg" style="height: 100px"><br><br>
+						<button (click)="asperaUpload()" class="button is-success">Upload now</button>
+						<br><br><br>
+						<small class="has-text-grey">
+							<b><a target="_blank" href="https://downloads.asperasoft.com/connect2/">Install plugin</a></b>&emsp;|&emsp;<b><a target="_blank" href="https://www.asperasoft.com/company/support/transfer-clients/">Platform support</a> </b>
+						</small>
+					</div>
+				</div>
+			</span>
+			<ng-template #showCommandLine>
+				<div class="content-wrapper">
+					<code>
+						$ ascp -QT -P 33001 -L- -l 300M < your_local_data_folder > mtblight@hx-fasp-1.ebi.ac.uk:{{ uploadLocation | async }}
+					</code>
+					<small>
+						<br>
+						<b>Step 1: Install Aspera ascp command line client</b><br>
+						The Aspera ascp command line client can be downloaded <i><a href="http://downloads.asperasoft.com/downloads" target="_blank">here</a></i>. Please select *Aspera Connect*. The ascp command line client is distributed as part of the aspera connect high-performance transfer browser plug-in and is free to use.<br><br>
+						<b>Step 2: Navigate to the folder where the Aspera command line client program ascp is installed.</b><br>
+						The location of the 'ascp' program in the filesystem:<br>
+						<span class="col-md-12">
+							<p><b>Mac:</b> on the desktop go <code>cd /Applications/Aspera\ Connect.app/Contents/Resources/</code> there you'll see the command line utilities where you're going to use 'ascp'.</p>
+							<p><b>Windows:</b> the downloaded files are a bit hidden. For instance in Windows7 the ascp.exe is located in the users home directory in: <code>AppData\Local\Programs\Aspera\Aspera Connect\bin\ascp.exe</code></p>
+							<p><b>Linux:</b> should be in your user's home directory, <code>cd /home/username/.aspera/connect/bin/</code> there you'll see the command line utilities where you're going to use 'ascp'.</p>
+						</span>
+					</small>
+				</div>
+			</ng-template>	
+			<div style="margin-top: 20px;" class="panel-block notification is-primary">
+				<small class="is-tiny">
+					<i><mat-icon>info</mat-icon> You may close this modal and proceed to the next steps while the files are being uploaded</i>
+				</small>
+			</div>
+		</section>
+		<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-two-third">
+			       <mtbls-help target="aspera"></mtbls-help>
+			    </div>
+				<div class="column is-one-third has-text-right">
+					<button (click)='closeUploadModal()' class="button is-default">Close</button>
+				</div>
+			</div>
+		</footer>
+	</div>
+</div>

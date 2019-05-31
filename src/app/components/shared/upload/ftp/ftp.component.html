@@ -1,0 +1,63 @@
+<div class="field">
+	<button (click)="openUploadModal()" class="button is-link is-fullwidth">Private FTP Upload</button>
+</div>
+<small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small>
+<div class="modal" [ngClass]="{'is-active': displayHelpModal}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+  <section class="modal-card-body">
+    <p>
+    	<b>FTP Upload</b><br><br>
+    	FTP can be used on any computer, either directly from the command line or through a graphical user interface. <br>
+However, on must computers you have to install an FTP client first. If you are not familiar with using FTP from the command line, we can recommend the free <a href="https://filezilla-project.org/" target="_blank">FileZilla tool</a>. Please see the FAQ section on the FileZilla pages for specific details about how this software works.</p>
+  </section>
+  	<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-full has-text-right">
+					<button (click)='toggleHelp()' class="button is-default">Close</button>
+				</div>
+			</div>
+		</footer>
+	</div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isFTPUploadModalOpen}">
+	<div class="modal-background"></div>
+	<div class="modal-card">
+		<section class="modal-card-body">
+			Using FTP Client:
+			<table *ngIf="(validations | async)" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+		      <tbody>
+		        <tr>
+		         	<th>User</th>
+		         	<td>{{ (validations | async)[this.validationsId]['ftp']['user'] }}</td>
+		        </tr>
+		        <tr>
+		          <th>Password</th>
+		          <td>{{ (validations | async)[this.validationsId]['ftp']['secret'] }}</td>
+		        </tr>
+		        <tr>
+		          <th>Server</th>
+		          <td>{{ (validations | async)[this.validationsId]['ftp']['server'] }}</td>
+		        </tr>
+		        <tr>
+		          <th>Remote folder</th>
+		          <td>{{ uploadLocation | async }}</td>
+		        </tr>
+		      </tbody>
+		    </table>
+		    <div style="margin-top: 20px;" class="panel-block notification is-primary">
+				<small>
+					<i><mat-icon>info</mat-icon> You may close this modal and proceed to the next steps while the files are being uploaded</i>
+				</small>
+			</div>
+		</section>
+		<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-full has-text-right">
+					<button (click)='closeUploadModal()' class="button is-default">Close</button>
+				</div>
+			</div>
+		</footer>
+	</div>
+</div>

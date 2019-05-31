@@ -1,0 +1,36 @@
+<nav class="navbar is-link is-fixed-top" role="navigation" aria-label="dropdown navigation">
+  <div class="navbar-menu">
+    <div class="navbar-start">
+      <a *ngIf="mode != 'light'; else studyStatus" (click)="backToMetabolights()" class="navbar-item">
+        <i class="material-icons">
+			 arrow_back_ios
+			 </i>&nbsp;Back to MetaboLights
+      </a>
+      <ng-template #studyStatus>
+          <a *ngIf="router.url != '/console' && router.url != '/guide/create'" class="navbar-item">
+            {{ studyIdentifier | async }}&emsp;<span *ngIf="(studyIdentifier | async)" class="tag is-normal is-rounded">PRIVATE</span>
+          </a>
+          <a *ngIf="router.url == '/console' || router.url == '/guide/create'"   class="navbar-item">
+            <img height="20px" src="assets/img/MetaboLightsLogo.png">&nbsp;MetaboLights&nbsp;Study Editor
+          </a>
+      </ng-template>
+    </div>
+    <div class="navbar-end">
+    	<a [routerLink]="['/console']" class="navbar-item">
+        <i class="material-icons">
+			   list
+			  </i>&nbsp;My studies
+      	</a>
+      	<a *ngIf="mode != 'light'" target="_blank" [href]="domain + (studyIdentifier | async)" class="navbar-item">
+          	<i class="material-icons">
+			       visibility
+			       </i>&nbsp;Preview
+      	</a>
+      	<a (click)="logOut()" class="navbar-item">
+        	<i class="material-icons">
+			     exit_to_app
+			    </i>&nbsp;Logout
+      	</a>
+    </div>
+  </div>
+</nav>

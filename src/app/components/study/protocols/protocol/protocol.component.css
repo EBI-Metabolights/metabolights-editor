@@ -1,0 +1,26 @@
+.card-footer {
+    padding: 10px 20px;
+}
+
+label{
+	font-size: 0.73em;
+    color: #666;
+}
+
+.dd-element{
+	display: inline-block; 
+	padding-right: 1em; 
+	width: 1.4em
+}
+
+.bt{
+	border-top: 1px solid #f1f1f4;
+}
+
+.p1{
+	padding: 10px 20px;
+}
+
+.mat-input-element {
+    width: calc(100% - 30px); 
+}

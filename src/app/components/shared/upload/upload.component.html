@@ -1,0 +1,22 @@
+<a (click)="openUploadModal()" class="button is-light" [ngClass]="size">
+	<mat-icon>cloud_upload</mat-icon> Upload
+</a>
+<div class="modal" [ngClass]="{'is-active': isUploadModalOpen}">
+	<div class="modal-background"></div>
+	<div class="modal-card">
+		<header class="modal-card-head">
+        	<p class="modal-card-title">Upload folders / files</p>
+      	</header>
+		<section class="modal-card-body" v-if="validations">
+			<mtbls-aspera></mtbls-aspera>
+			<mtbls-ftp></mtbls-ftp>
+		</section>
+		<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-full has-text-right">
+					<button (click)='closeUploadModal()' class="button is-default">Close</button>
+				</div>
+			</div>
+		</footer>
+	</div>
+</div>

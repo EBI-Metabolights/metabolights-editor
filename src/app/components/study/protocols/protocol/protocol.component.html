@@ -1,0 +1,286 @@
+<span *ngIf='protocol == null || addNewProtocol; else showProtocolDetails'>
+  <a class="button is-primary is-pulled-right is-small" (click)='openModal(protocol)'>+ Add New Protocol</a>
+</span>
+<br>
+<ng-template #showProtocolDetails>
+  <div class="card">
+    <header class="card-heading hover-highlight">
+      <span>
+        <p class="is-pulled-left">
+          {{ protocol.name }}
+        </p>
+        <span *ngIf="getAssaysWithProtocol().length > 0 && !hasAllSectionsEmpty()">
+          <span *ngIf="!isBulkEditModalOpen; else hideSection">
+            <a (click)='toggleBulkEditSection()' class="button is-light is-pulled-right is-small"><mat-icon>toggle_off</mat-icon> Show Specifications</a>
+          </span>
+          <ng-template #hideSection>
+            <a (click)='toggleBulkEditSection()' class="button is-light is-pulled-right is-small"><mat-icon>toggle_on</mat-icon> Hide Specifications</a>
+          </ng-template>
+        </span>
+        <a style="margin-right: 10px;" (click)='openModal(protocol)' class="button is-light is-pulled-right is-small"><mat-icon>edit</mat-icon> Edit Description</a>
+      </span>
+    </header>
+    <div class="card-content">
+      <div class="content" >
+        <mtbls-content (editContent)='openModal(protocol)' [count]="500" [message]="'Protocol description not found.'" [value]="protocol.description"></mtbls-content>
+      </div>
+    </div>
+    <div *ngIf="isBulkEditModalOpen && getAssaysWithProtocol().length > 0" class="card-content bt">
+      <div class="content">
+        <div class="columns is-multiline">
+          <span class="column is-half" *ngFor="let assay of getAssaysWithProtocol()">
+            <div *ngIf="!hasAssaySectionsEmpty(assay)">
+                <div class="has-background-light p1">
+                  <p style="border-bottom: 1px dotted #d0d0d0; padding-bottom: 10px;">Assay: <b>{{ assay }}</b></p>
+                  <div *ngFor="let col of protocol.meta[assay]">
+                    <span *ngIf="!col['is-hidden']">
+                      <span *ngIf="col.isOntology; else inputField">
+                        <small>{{ formatTitle(col.name) }}</small>
+                        <div class="columns is-gapless">
+                          <div class="column is-11">
+                            <mtbls-ontology  [validations]="fieldValidation('parameterName')" (changed)="col.values[0] = $event" [inline]="true"></mtbls-ontology>
+                          </div>
+                          <div class="column is-1">
+                            <a (click)="saveColumnValue(col, assay)" class="clickable">
+                              <mat-icon>save</mat-icon>
+                            </a>
+                          </div>
+                        </div>
+                      </span>
+                      <ng-template #inputField>
+                        <small>{{ formatTitle(col.name) }}</small>
+                          <div class="control">
+                            <mat-form-field class="full-width">
+                              <input class="no-scroll" 
+                                [(ngModel)]="col.values[0]"
+                                matInput>
+                                <a (click)="saveColumnValue(col, assay)" class="clickable is-pulled-right">
+                                  <mat-icon>save</mat-icon>
+                                </a>
+                            </mat-form-field>
+                          </div>
+                      </ng-template>
+                    </span>
+                  </div>
+                </div>
+            </div>
+          </span>
+        </div>
+      </div>
+    </div>
+    <footer *ngIf="protocol.parameters.length > 0 && protocol.parameters[0].parameterName.annotationValue != ''" class="card-footer">
+      <span>
+        <div id="meta" class="field is-grouped is-grouped-multiline">
+          <div *ngFor="let parameter of protocol.parameters">
+            <div *ngIf="parameter.parameterName.annotationValue != ''" class="control">
+              <div class="tags is-info has-addons">
+                <span class="tag">{{ parameter.parameterName.annotationValue }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </span>
+      <br>
+    </footer>
+  </div>  
+</ng-template>
+
+<div class="modal" [ngClass]="{'is-active': isDeleteModalOpen}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>Are you sure you want to delete?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)='closeDelete()' class="button is-info">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isModalOpen}">
+  <form *ngIf="form" [formGroup]="form">
+    <div class="modal-background"></div>
+    <div class="modal-card vw80">
+      <div *ngIf="isFormBusy" class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <section class="modal-card-body">
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <mat-form-field class="full-width">
+                        <textarea class="no-scroll" 
+                        formControlName="name"
+                        [placeholder]="fieldValidation('name').placeholder" 
+                        matInput
+                        cdkAutosizeMinRows="1"
+                        cdkAutosizeMaxRows="4"
+                        cdkTextareaAutosize>
+                      </textarea>
+                      <mat-hint>{{ fieldValidation('name').description }}</mat-hint>
+                      <mat-error
+                      *ngIf="form.get('name').errors &&
+                      form.get('name').dirty &&
+                      form.get('name').errors.name">
+                      {{ form.get('name').errors.name.error }}
+                    </mat-error>
+                  </mat-form-field>
+                  <div>&nbsp;</div>
+                  <span *ngIf="form.get('description')">
+                    <div *ngIf="form.get('description').value != ''" class="is-clearfix">
+                    <span class="is-pulled-right" style="margin-left: 10px;">
+                      <div  class="dropdown is-right" [ngClass]="{'is-active': isSymbolDropdownActive}">
+                        <div class="dropdown-trigger">
+                          <button (click)="toggleSymbolDropdown()" class="button is-light is-small"><span>Symbol</span></button>
+                        </div>
+                        <div class="dropdown-menu has-text-left" role="menu">
+                          <div class="dropdown-content">
+                                <a (click)="addSymbol('°')" class="dropdown-item dd-element">
+                                  °
+                                </a>
+                                <a (click)="addSymbol('α')" class="dropdown-item dd-element">
+                                  α
+                                </a>
+                                <a (click)="addSymbol('β')" class="dropdown-item dd-element">
+                                  β
+                                </a>
+                                <a (click)="addSymbol('γ')" class="dropdown-item dd-element">
+                                  γ
+                                </a>
+                                <a (click)="addSymbol('←')" class="dropdown-item dd-element">
+                                  ←
+                                </a>
+                                <a (click)="addSymbol('→')" class="dropdown-item dd-element">
+                                  →
+                                </a>
+                                <a (click)="addSymbol('↔')" class="dropdown-item dd-element">
+                                  ↔
+                                </a>
+                                 <a (click)="addSymbol('↑')" class="dropdown-item dd-element">
+                                  ↑
+                                </a>
+                                 <a (click)="addSymbol('↓')" class="dropdown-item dd-element">
+                                  ↓
+                                </a>
+                                <a (click)="addSymbol('≥')" class="dropdown-item dd-element">
+                                 ≥
+                               </a>
+                                 <a (click)="addSymbol('≤')" class="dropdown-item dd-element">
+                                 ≤
+                               </a>
+                                <a (click)="addSymbol('≠')" class="dropdown-item dd-element">
+                               ≠
+                             </a>
+                                <a (click)="addSymbol('±')" class="dropdown-item dd-element">
+                               ±
+                             </a>
+                              <a (click)="addSymbol('µ')" class="dropdown-item dd-element">
+                                µ
+                              </a>
+                              <a (click)="addSymbol('Å')" class="dropdown-item dd-element">
+                                Å
+                              </a>
+                          </div>
+                        </div>
+                      </div>
+                    </span>
+                    <small class="is-pulled-right"><a (click)="clearFormatting('description')">Clear formatting</a></small>
+                    </div>
+                    <ngx-wig
+                    formControlName="description"
+                    matInput
+                    (blur)="captureCursor()"
+                    [placeholder]="fieldValidation('description').placeholder" 
+                    >
+                    </ngx-wig>
+                    <mat-hint>{{ fieldValidation('description').description }}</mat-hint>
+                    <mat-error
+                    *ngIf="form.get('description').errors &&
+                    form.get('description').dirty &&
+                    form.get('description').errors.description">
+                    {{ form.get('description').errors.description.error }}
+                    </mat-error> 
+                    </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span *ngIf="!required">
+            <div *ngIf="form && form.get('parameters').value && form.get('parameters').value.length > 0 && form.get('parameters').value[0].parameterName.annotationValue != ''; else newParameter">
+              <span>
+                <div>
+                   <label>Protocol parameters</label>
+                </div>
+                <div class="field is-grouped is-grouped-multiline">
+                  <div *ngFor="let parameter of form.get('parameters').value">
+                    <div *ngIf="parameter.parameterName.annotationValue != ''" class="control">
+                      <div class="tags is-info has-addons">
+                        <span class="tag is-link">{{ parameter.parameterName.annotationValue }}</span>
+                        <a (click)="deleteParameter(parameter)" class="tag is-delete"></a>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tags is-info has-addons">
+                    <span class="tag">Add parameter</span>
+                    <a (click)="openParameterModal()" class="tag is-success"> 
+                        <mat-icon class="mat-icon material-icons" role="img" aria-hidden="true">library_add</mat-icon>
+                    </a>
+                  </div>
+                </div>
+              </span>
+            </div>
+            <ng-template #newParameter>
+              <div class="tags is-info has-addons">
+                <span class="tag">Add parameter</span>
+                <a (click)="openParameterModal()" class="tag is-success"> <mat-icon class="mat-icon material-icons" role="img" aria-hidden="true">library_add</mat-icon> </a>
+              </div>
+            </ng-template>
+          </span>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button *ngIf="!addNewProtocol && !required" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
+          </div>
+          <div class="column is-half has-text-right">
+            <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
+              Save
+            </button>
+            <button *ngIf="form.pristine" (click)='closeModal()' class="button is-info">OK</button>
+            <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>Cancel</button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </form>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isParameterModalOpen}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <mtbls-ontology #parameterName [validations]="fieldValidation('parameterName')" [values]='[]' [inline]="true"></mtbls-ontology>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)='closeParameterModal()' class="button is-default">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button [disabled]="!(parameterName.values.length > 0)" (click)='addParameter()' class="button is-success">Add parameter</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

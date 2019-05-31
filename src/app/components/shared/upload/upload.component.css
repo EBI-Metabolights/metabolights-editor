@@ -1,0 +1,29 @@
+.upload-zone{
+	min-height: 10vh;
+	background-color: #f1f1f4;
+	border: 2px dotted #cecece;
+	border-radius: 4px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.upload-zone:hover{
+	border: 2px dotted #333;
+	cursor: pointer;
+}
+
+.upload-zone p{
+	padding-top: 20vh;
+	text-align: center;
+	color: #cecece;
+}
+
+.is-divider, .is-divider-vertical {
+    display: block;
+    position: relative;
+    border-top: .1rem solid #dbdbdb;
+    height: .1rem;
+    margin: 0 0 2rem 0;
+    text-align: center;
+}

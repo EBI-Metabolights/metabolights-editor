@@ -1,0 +1,39 @@
+.publication-title{
+	min-height: 3.5em;
+	font-size: 1em;
+	line-height: 1.55em;
+    margin-top: 15px;
+}
+
+.publication-authors{
+    min-height: 2.6em;
+}
+
+.custom-button{
+	float: right;
+    right: 0;
+    height: 30px;
+    background-color: transparent !important;
+    border-color: transparent;
+    margin-right: -8px;
+}
+
+.box {
+    padding: 1.2rem 1.9rem 1.2rem 1.2rem;
+}
+
+.mat-icon {
+    height: 1em; 
+}
+
+a {
+    color: #000;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #3273dc;
+    cursor: pointer;
+    text-decoration: none;
+}

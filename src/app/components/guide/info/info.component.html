@@ -1,0 +1,40 @@
+<nav-bar :mode="light"></nav-bar>
+<mtbls-progress [study]="requestedStudy" [step]="1"></mtbls-progress>
+<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
+<div class="columns">
+	<div class="column is-half is-offset-one-quarter mb-5">
+		<div>&nbsp;</div>
+		<nav class="panel has-background-white">
+			<div class="panel-heading">
+				<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+				<span style="margin-left: 10px">MetaboLights Study - {{ requestedStudy }}</span>
+			</div>
+			<div class="panel-block">
+				<div class="column">
+					<h3><b>Your MetaboLights study</b></h3>
+					<p>
+						Your study has been assigned the unique identifier <span class="has-text-link"><b>{{ requestedStudy }}</b></span> <br>
+						Please refer to this identifier in any communication with the MetaboLights team.
+					</p><br>
+					<h3><b>How to reference your MetaboLights study</b></h3>
+					<p>
+						Please use {{ requestedStudy }} when referencing this study in manuscripts etc. together with the URL <a href="www.ebi.ac.uk/metabolights/{{ requestedStudy }}"><b><span class="has-text-link">www.ebi.ac.uk/metabolights/{{ requestedStudy }}</span></b></a> <br><br>
+						<b>Please also cite the following MetaboLights paper</b> <br>
+						Haug et al. MetaboLights-- an open-access general-purpose repository for metabolomics studies and associated meta-data. Nucl. Acids Res. (2013) doi: 10.1093/nar/gks1004
+						<br><br>
+						<span class="has-text-grey">
+							<small><mat-icon>info</mat-icon>&emsp;<i>The above information is sent to you by email.</i></small>
+						</span>
+					</p>
+				</div>
+			</div>
+			<div class="panel-block">
+				<div class="column">
+					<button (click)='proceedToNextStep()' class="button is-success is-fullwidth">
+						<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
+					</button>
+				</div>
+			</div>
+		</nav>		
+	</div>
+</div>

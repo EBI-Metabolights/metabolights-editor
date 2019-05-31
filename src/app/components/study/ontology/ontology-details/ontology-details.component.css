@@ -1,0 +1,7 @@
+.ont-description{
+    max-width: 100%;
+    overflow: visible;
+    line-height: initial;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}

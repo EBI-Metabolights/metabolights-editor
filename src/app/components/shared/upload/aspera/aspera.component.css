@@ -1,0 +1,33 @@
+button.is-fullwidth{
+	padding-top: 1rem;
+	padding-bottom: 1rem;
+	height: auto !important;
+}
+
+.notification.is-primary {
+    background-color: #b4d1d626;
+    color: #000;
+}
+
+.content-wrapper{
+	min-height: 40vh;
+}
+
+.vc{
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+p{
+	padding: 10px 15px;
+}
+
+code{
+	display: block;
+	border-radius: 4px;
+	background-color: #333;
+	padding: 10px;
+	letter-spacing: 0.1px;
+	color: #ecf319;
+}

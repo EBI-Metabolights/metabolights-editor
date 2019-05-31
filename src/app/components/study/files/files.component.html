@@ -1,0 +1,270 @@
+<span *ngIf="filesLoading; else showContent;">
+  <div class="vc vh30">
+    <span class="has-text-centered">
+      <img src="assets/img/loading.svg"><br>
+      <small class="has-text-grey">LOADING FILES</small>
+    </span>
+  </div>
+</span>
+<ng-template #showContent>
+  <mtbls-upload [mode]="'button'" [size]="'is'" ></mtbls-upload>&nbsp;
+  <a (click)="loadFilesPassively()" class="button is-light">
+    <mat-icon>refresh</mat-icon> Refresh
+  </a>
+  <span>
+    <span *ngIf="refreshingData">
+      <img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
+    </span>
+  </span>
+  <div>&nbsp;</div>
+  <nav class="panel">
+    <span #spacer></span>
+    <p class="panel-heading"  style="z-index: 1000;  padding: 10px;" stickyThing [spacer]="spacer" marginTop="33">
+      <label>
+        <input [checked]="filteredMetaFiles.length == selectedMetaFiles.length" (change)="selectFiles($event, 'meta', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>ISA METADATA</small>
+      </label>
+      <span class="is-pulled-right">
+        <mtbls-download [value]="'metadata'"></mtbls-download>
+      </span>
+      <span  *ngIf="selectedMetaFiles.length > 0" class="is-pulled-right"> 
+        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete files</small>   
+      </span>
+    </p>
+    <div class="panel-block">
+      <p class="control has-icons-left">
+        <input (keyup)="applyFilter($event, 'meta')"  class="input is-small" type="text" placeholder="search meta data">
+        <span class="icon is-small is-left">
+          <mat-icon>search</mat-icon>
+        </span>
+      </p>
+    </div>
+    <span *ngIf="filteredMetaFiles.length > 0; else noMetaData">
+      <span *ngFor="let file of filteredMetaFiles">
+        <a class="panel-block" [ngClass]="file.status == 'active' ? 'is-active-file' : ''">
+          <div class="columns w100">
+            <div class="column is-four-fifths">
+              <label>
+                <input  (change)="selectFiles($event, 'meta', file, false)" [checked]="isChecked(file.file, 'meta')" type="checkbox" name="">
+                <span  class="panel-icon">
+                  <span *ngIf="isFolder(file); else fileIcon">
+                    <img class="file-img" src="assets/img/folder.png">
+                  </span>
+                  <ng-template #fileIcon>
+                    <img class="file-img" src="assets/img/file.png">
+                  </ng-template>
+                </span>
+                {{ file.file }} 
+              </label>
+            </div>
+            <div class="column is-one-fifths has-text-right">
+              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+            </div>
+          </div>
+        </a>
+      </span>
+    </span>
+    <ng-template #noMetaData>
+      <a class="panel-block">
+        No metadata files
+      </a>
+    </ng-template>
+  </nav>
+  <nav class="panel">
+    <span #spacer1></span>
+    <span *ngIf="rawFilesLoading; else rawFilesLoaded">
+      <img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
+    </span>
+    <ng-template #rawFilesLoaded>
+      <p class="panel-heading"  style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer1" marginTop="35">
+        <label>
+          <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>RAW FILES</small>
+        </label>
+        <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right"> 
+          <span *ngIf="containsZipFiles(selectedRawFiles)">
+              <small (click)="decompresssFiles(selectedRawFiles)" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip files</small>&nbsp;
+          </span>
+          <small (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+        </span>
+      </p>
+      <div class="panel-block">
+        <p class="control has-icons-left">
+          <input (keyup)="applyFilter($event, 'raw')" class="input is-small" type="text" placeholder="search raw files">
+          <span class="icon is-small is-left">
+            <mat-icon>search</mat-icon>
+          </span>
+        </p>
+      </div>
+      <span *ngIf="filteredRawFiles.length > 0; else noRawFiles">
+        <span *ngFor="let file of filteredRawFiles">
+          <a class="panel-block" [ngClass]="file.status == 'active' ? 'is-active-file' : ''">
+            <div class="columns w100">
+              <div class="column is-four-fifths">
+                <input (change)="selectFiles($event, 'raw', file, false)" [checked]="isChecked(file.file, 'raw')" type="checkbox" name="">
+                <span class="panel-icon">
+                  <span *ngIf="isFolder(file); else fileIcon">
+                    <img class="file-img" src="assets/img/folder.png">
+                  </span>
+                  <ng-template #fileIcon>
+                    <img class="file-img" src="assets/img/file.png">
+                  </ng-template>
+                </span>
+                {{ file.file }} 
+              </div>
+              <div class="column is-one-fifths has-text-right">
+                <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+              </div>
+            </div>
+          </a>
+        </span>
+      </span>
+      <ng-template #noRawFiles>
+        <a class="panel-block">
+          No raw files
+        </a>
+      </ng-template>
+    </ng-template>
+  </nav>
+  <nav *ngIf="auditFiles.length > 0" class="panel">
+    <span #spacer2></span>
+    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer2" marginTop="37">
+      <label>
+        <small>AUDIT FILES</small>
+      </label>
+    </p>
+    <span *ngIf="filteredAuditFiles.length > 0">
+      <span *ngFor="let file of filteredAuditFiles">
+        <a class="panel-block">
+          <div class="columns w100">
+            <div class="column is-four-fifths">
+              <span class="panel-icon">
+                <span *ngIf="isFolder(file); else fileIcon">
+                  <img class="file-img" src="assets/img/folder.png">
+                </span>
+                <ng-template #fileIcon>
+                  <img class="file-img" src="assets/img/file.png">
+                </ng-template>
+              </span>
+              {{ file.file }}
+            </div>
+            <div class="column is-one-fifths has-text-right">
+              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'')  }}</small></span>
+            </div>
+          </div>
+        </a>
+      </span>
+    </span>
+  </nav>
+  <nav *ngIf="derivedFiles.length > 0" class="panel">
+    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer" marginTop="35">
+      <label>
+        <input [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length" (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>DERIVED DATA</small>
+      </label>
+      <span  *ngIf="selectedDerivedFiles.length > 0" class="is-pulled-right"> 
+        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+      </span>
+    </p>
+    <div class="panel-block">
+      <p class="control has-icons-left">
+        <input (keyup)="applyFilter($event, 'derived')" class="input is-small" type="text" placeholder="search derived files">
+        <span class="icon is-small is-left">
+          <mat-icon>search</mat-icon>
+        </span>
+      </p>
+    </div>
+    <span *ngIf="filteredDerivedFiles.length > 0">
+      <span *ngFor="let file of filteredDerivedFiles">
+        <a class="panel-block">
+          <div class="columns w100">
+            <div class="column is-four-fifths">
+              <label>
+                <input (change)="selectFiles($event, 'derived', file, false)" [checked]="isChecked(file.file, 'derived')" type="checkbox" name="">
+                <span class="panel-icon">
+                  <span *ngIf="isFolder(file); else fileIcon">
+                    <img class="file-img" src="assets/img/folder.png">
+                  </span>
+                  <ng-template #fileIcon>
+                    <img class="file-img" src="assets/img/file.png">
+                  </ng-template>
+                </span>
+                {{ file.file }} 
+              </label>
+            </div>
+            <div class="column is-one-fifths has-text-right">
+              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+            </div>
+          </div>
+        </a>
+      </span>
+    </span>
+  </nav>
+  <nav *ngIf="uploadFiles.length > 0" class="panel">
+    <span #spacer3></span>
+    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer3" marginTop="35">
+      <label>
+        <input [checked]="filteredUploadFiles.length == selectedUploadFiles.length" (change)="selectFiles($event, 'upload', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>UPLOADED FILES</small>
+      </label>
+        <span class="is-pulled-right">
+          <a target="_blank" (click)="copyFiles()" class="button is-small is-light">
+            <mat-icon>refresh</mat-icon> Copy files to study folder
+          </a>
+        </span>
+        <span  *ngIf="selectedUploadFiles.length > 0" class="is-pulled-right"> 
+          <small (click)="openDeleteConfirmation('upload', 'upload')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+        </span>
+    </p>
+    <div class="panel-block">
+      <p class="control has-icons-left">
+        <input (keyup)="applyFilter($event, 'upload')" class="input is-small" type="text" placeholder="search uploaded files">
+        <span class="icon is-small is-left">
+          <mat-icon>search</mat-icon>
+        </span>
+      </p>
+    </div>
+    <span *ngIf="filteredUploadFiles.length > 0">
+      <span *ngFor="let file of filteredUploadFiles">
+        <a class="panel-block">
+          <div class="columns w100">
+            <div class="column is-four-fifths">
+              <label>
+                <input (change)="selectFiles($event, 'upload', file, false)" [checked]="isChecked(file.file, 'upload')"  type="checkbox" name="">
+                <span class="panel-icon">
+                  <span *ngIf="isFolder(file); else fileIcon">
+                    <img class="file-img" src="assets/img/folder.png">
+                  </span>
+                  <ng-template #fileIcon>
+                    <img class="file-img" src="assets/img/file.png">
+                  </ng-template>
+                </span>
+                {{ file.file }}
+              </label> 
+            </div>
+            <div class="column is-one-fifths has-text-right">
+              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+            </div>
+          </div>
+        </a>
+      </span>
+    </span>
+  </nav>
+</ng-template>
+<div class="modal" [ngClass]="{'is-active': isDeleteModalOpen}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>Are you sure you want to delete?</p>
+      <label>
+        <input type="checkbox" [checked]="forceMetaDataDelete" (change)="changeforceMetaDataDeleteValue($event)"> <small>&nbsp;Force delete meta data</small>
+      </label>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)='closeDeleteConfirmation()' class="button is-info">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)='deleteSelected()' class="button is-danger">OK! Delete Permanently</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

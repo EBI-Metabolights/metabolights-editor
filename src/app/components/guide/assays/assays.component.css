@@ -1,0 +1,31 @@
+.br{
+    border-right: 1px solid #dbdbdb;
+}
+
+.bl{
+    border-left: 1px solid #dbdbdb;
+}
+
+.panel-tabs a {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.border-dashed{
+	border: 1px dashed #f1f1f4;
+}
+
+.add-assays-wrapper{
+	height: 50px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.noassays-wrapper{
+	margin: 10px;
+	height: 200px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

@@ -1,0 +1,116 @@
+<nav-bar :mode="light"></nav-bar>
+<mtbls-progress [step]="1"></mtbls-progress>
+<div class="columns" style="min-height: 100vh; margin: 40px 0;">
+	<div class="column is-half is-offset-one-quarter">
+		<div *ngIf="currentSubStep == 0">
+			<nav class="panel has-background-white">
+				<div class="panel-heading">
+					<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+					<span style="margin-left: 10px">New Study - Get started</span>
+				</div>
+				<div class="panel-block">
+					<div class="column">
+						<h3>The following steps will guide you through creating your metabolomics study. Once submitted you can view and edit your study through the MetaboLights website.</h3>
+						<br>
+						<br>
+						<div class="columns is-centered">
+							<div class="column is-four-fifths cborder cborder-radius has-text-grey">
+								<div class="column">
+									<p class="has-text-centered">
+										<mat-icon>info</mat-icon> Once you create your study, you can switch between the guided submission and full study view where you see these buttons.
+									</p>
+								</div>
+								<div class="column">
+									<div class="has-text-centered">
+									  <button class="button is-rounded no-pointer has-text-grey">
+									    <small>
+									      <mat-icon>view_carousel</mat-icon> Guided submission
+									    </small>
+									  </button>&nbsp;
+									  <a class="button is-rounded no-pointer has-text-grey">
+									    <small>
+									      <mat-icon>chrome_reader_mode</mat-icon> Switch to study overview
+									    </small>
+									  </a>
+									</div>
+								</div>
+							</div>
+						</div>
+						<br>
+					</div>
+				</div>
+				<div class="panel-block">
+					<div class="column">
+						<button (click)='nextSubStep()' class="button is-success is-fullwidth">
+					      <mat-icon>chevron_right</mat-icon> Let's get started 
+					    </button>
+					</div>
+				</div>
+			</nav>
+		</div>
+		<div *ngIf="currentSubStep == 1">
+			<nav class="panel has-background-white">
+				<div class="panel-heading">
+					<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+					<span style="margin-left: 10px">New Study - Raw data files</span>
+				</div>
+				<div class="panel-block">
+					<div class="column">
+						<h3>MetaboLights studies require raw data files. These can be added at any stage during the submission process.
+							Additionally, including mzML / nmrML processed files enables automatic extraction of some required information into your study.
+						</h3>
+						<div style="padding-top: 10px;">
+							<small class="has-text-grey-lighter">Please select</small>
+							<mat-button-toggle-group class="mat-button-toggle-group-vertical is-fullwidth" [(ngModel)]="selectedCreateOption" #group="matButtonToggleGroup">
+							  <mat-button-toggle [disabled]="option.disabled" class="is-fullwidth mb5" *ngFor="let option of options"  [value]="option.value">
+							    {{ option.text }}
+							  </mat-button-toggle>
+							</mat-button-toggle-group>
+						</div>
+					</div>
+				</div>
+				<div class="panel-block">
+					<div class="column">
+						<button [disabled]="!selectedCreateOption || isLoading" (click)='createStudy()' class="button is-success is-fullwidth">
+					      <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
+					    </button>
+					</div>
+				</div>
+			</nav>
+		</div>
+		<div *ngIf="currentSubStep == 3">
+			<nav class="panel has-background-white">
+				<div class="panel-heading">
+					<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+					<span style="margin-left: 10px">New Study - Identifier</span>
+				</div>
+				<div class="panel-block">
+					<div class="column">
+						<h3><b>MetaboLights study</b></h3>
+						<p>
+							Your study has been assigned the unique identifier <span class="has-text-link"><b>{{ newStudy }}</b></span> <br>
+							Please refer to this identifier in any communication with the MetaboLights team.
+						</p><br>
+						<h3><b>How to reference your MetaboLights study</b></h3>
+						<p>
+							Please use {{ newStudy }} when referencing this study in manuscripts etc. together with the URL <a href="www.ebi.ac.uk/metabolights/{{ newStudy }}"><b><span class="has-text-link">www.ebi.ac.uk/metabolights/{{ newStudy }}</span></b></a> <br><br>
+							<b>Please also cite the following MetaboLights paper</b> <br>
+							Haug et al. MetaboLights-- an open-access general-purpose repository for metabolomics studies and associated meta-data. Nucl. Acids Res. (2013) doi: 10.1093/nar/gks1004
+							<br><br>
+							<span class="has-text-grey">
+								<small><mat-icon>info</mat-icon>&emsp;<i>The above information will also be sent to you by email.</i></small>
+							</span>
+						</p>
+					</div>
+				</div>
+				<div class="panel-block">
+					<div class="column">
+						<button [disabled]="isLoading" (click)='proceedToNextStep()' class="button is-success is-fullwidth">
+					      <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
+					    </button>
+					</div>
+				</div>
+			</nav>
+		</div>
+	</div>
+</div>

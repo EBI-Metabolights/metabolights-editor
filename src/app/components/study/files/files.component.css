@@ -1,0 +1,29 @@
+img{
+	height: auto;
+}
+
+.panel-heading {
+    font-size: 1em;
+}
+
+.panel-block {
+    font-size: 0.9em;
+}
+
+.panel-block.is-active-file {
+    border-left: 2px solid #3273dc;
+}
+
+.w100{
+	width: 100%;
+}
+
+.vh30{
+	min-height: 50vh;
+}
+
+.file-img{
+	margin-top: 3px;
+	height: 20px !important;
+    max-width: none !important;
+}
