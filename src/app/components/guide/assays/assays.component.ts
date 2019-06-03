@@ -35,8 +35,8 @@ export class GuidedAssaysComponent implements OnInit {
 	selectedMAFDataArray: any[] = [];
 	selectedAssay: any = null;
 	selectedAssayData: any = null;
-	samplesNames: any = [];
-	controlsNames: any = [];
+	samplesNames: any = "";
+	controlsNames: any = "";
 
 	isEditAssayModalOpen: boolean = false;
 	subStep: number = 1;
@@ -101,7 +101,6 @@ export class GuidedAssaysComponent implements OnInit {
 	}
 
 	saveSamples(){
-		console.log(this.samples);
 		let exisitingSamples = []
 		if(this.controlsNames && this.samplesNames){
 			let finalControls = this.controlsNames.replace(/,/g, "\n").split("\n")

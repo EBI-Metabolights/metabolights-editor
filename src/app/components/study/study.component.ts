@@ -30,6 +30,7 @@ export class StudyComponent implements OnInit {
     tab: string = "descriptors";	
 	requestedStudy: string = null;
     status: string = "submitted";
+    validation: any = {};
 
 	constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private route: ActivatedRoute,  private editorService: EditorService) { 
 		this.editorService.initialiseStudy(this.route)
@@ -41,6 +42,9 @@ export class StudyComponent implements OnInit {
 		});
         this.studyStatus.subscribe(value => {
             this.status = value
+        })
+        this.studyValidation.subscribe(value => {
+            this.validation = value
         })
 		this.route.params.subscribe( params => {
             this.requestedStudy = params['id'];
