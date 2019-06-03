@@ -1,7 +1,6 @@
 <div class="hover-highlight px-20">
     <div class="mtbls-section bb">
 		<h6>
-			<mat-icon>people</mat-icon>
 			<span *ngFor="let person of (people | async); let i = index">
 				<span *ngIf="i!=0">,&nbsp;</span>
 				<mtbls-person [value]="person"></mtbls-person>

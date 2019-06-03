@@ -9,7 +9,7 @@ import { NgRedux, select } from '@angular-redux/store';
 export class ProtocolsComponent implements OnInit, OnChanges {
 
 	@select(state => state.study.protocols) studyProtocols;
-	@select(state => state.study.validations) studyValidations: any
+	@select(state => state.study.validations) studyValidations;
 
 	@Input('assay') assay: any;
 
@@ -22,29 +22,33 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
 	validationsId = 'protocols';
 
-	constructor() { }
-	
-	ngOnInit() {
+	constructor() {
 		this.customProtocols = []
 		this.defaultProtocols = []
 		this.protocols = []
+		
 		this.studyProtocols.subscribe(value => { 
 			this.initialiseProtocols(value)
 			this.allProtocols = value;
 		});
 
 		this.studyValidations.subscribe(value => { 
-	      	this.validations = value;
-	      	this.validation.default.sort(function(a, b){
-			    return a['sort-order']-b['sort-order']
-			})
-			this.defaultProtocols = this.validation.default.map( protocol => protocol.title)
-			this.protocols.forEach( p => {
-				if (this.defaultProtocols.indexOf(p.name) < 0){
-					this.customProtocols.push(p.name)
-				}
-			})
+			if(value){
+				this.validations = value;
+		      	this.validation.default.sort(function(a, b){
+				    return a['sort-order']-b['sort-order']
+				})
+				this.defaultProtocols = this.validation.default.map( protocol => protocol.title)
+				this.protocols.forEach( p => {
+					if (this.defaultProtocols.indexOf(p.name) < 0){
+						this.customProtocols.push(p.name)
+					}
+				})
+			}
 	    });
+	}
+	
+	ngOnInit() {
 	}
 
 	initialiseProtocols(value){

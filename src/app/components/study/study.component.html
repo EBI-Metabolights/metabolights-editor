@@ -26,7 +26,7 @@
 	        <mtbls-status></mtbls-status>
 	        <mtbls-release-date></mtbls-release-date>&emsp;
 	        <div class="is-pulled-right">
-	          <span class="pointer" *ngIf="studyValidation.status == 'error'">
+	          <span class="clickable" *ngIf="validation.status == 'error'">
 	            <div (click)="selectCurrentTab(6, 'validations')" class="control">
 	            <div class="tags has-addons">
 	              <span class="tag is-dark">Validation</span>
@@ -39,6 +39,7 @@
 	        </div>
 	      </div>
 	      <mtbls-title></mtbls-title>
+	      <mtbls-people></mtbls-people> 
 	      <mtbls-description></mtbls-description>
     	  <mtbls-organisms></mtbls-organisms>
     	  <mtbls-publications></mtbls-publications>

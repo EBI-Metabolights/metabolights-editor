@@ -2,9 +2,19 @@
 	<div class="column"  style="width: 100%; overflow-x: auto">
 		<div class="panel-block-wrapper">
 			<span *ngIf="assay">
+	  			<span class="column is-12 nprl nmrl fadeIn">
+					<!-- <a (click)="openAddSamplesModal()" class="button is-small is-light">
+						<mat-icon>add</mat-icon> Samples
+					</a>
+					&nbsp; -->
+					<a (click)="deleteSelectedAssay(assayName)" class="button is-small is-light"><mat-icon>delete</mat-icon> Delete 	Assay
+					</a>
+				</span>
 				<mtbls-table [tableData]="assay" validationsId="assays"></mtbls-table>
 			</span>
 		</div>
 	</div>
 </div>
+
+
 

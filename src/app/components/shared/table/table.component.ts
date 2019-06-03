@@ -895,6 +895,43 @@ export class TableComponent implements OnInit {
 		return Object.keys(object)
 	}
 
+	autoPopulate(col, key, val){
+    	let cellsToUpdate = []
+    	let accIndex = this.getHeaderIndex(this.data.header[col['accession']])
+    	let refIndex = this.getHeaderIndex(this.data.header[col['ref']])
+		let columnIndex = this.getHeaderIndex(this.data.header[key])
+		this.data.rows.forEach( row => {
+			if(row[key] == val){
+				cellsToUpdate.push(
+		    		{
+		    			"row": row.index,
+		    			"column": refIndex,
+		    			"value"	: col['values'][val][0]
+		    		},
+		    		{
+		    			"row": row.index,
+		    			"column": accIndex ,
+		    			"value"	: col['values'][val][1]
+		    		}
+	    		)
+			}
+    	})
+
+    	this.editorService.updateCells(this.data.file, { "data" : cellsToUpdate }, this.validationsId, null).subscribe(res => {
+            toastr.success( "Cells updated successfully", "Success", {
+                "timeOut": "2500",
+                "positionClass": "toast-top-center",
+                "preventDuplicates": true,
+                "extendedTimeOut": 0,
+                "tapToDismiss": false
+            });
+            this.isEditColumnModalOpen = false;
+            }, err => {
+                console.error(err)
+            }
+        );
+	}
+
 	get validation() {
 		if(this.validationsId.includes(".")){
 			var arr = this.validationsId.split(".");
