@@ -10,6 +10,7 @@ import { MTBLSPublication } from './../../../models/mtbl/mtbls/mtbls-publication
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript"
 import { MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import { DOIService } from '../../../services/publications/doi.service';
+import { TableComponent } from './../../shared/table/table.component';
 import { EuropePMCService } from '../../../services/publications/europePMC.service';
 import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
@@ -25,6 +26,7 @@ export class GuidedAssaysComponent implements OnInit {
 	@select(state => state.study.identifier) studyIdentifier; 
 	@select(state => state.study.files) studyFiles; 
 	@select(state => state.study.assays) studyAssays; 
+	@select(state => state.study.samples) studySamples; 
 
 	requestedStudy: string = null;
 	loading: boolean = false;
@@ -33,10 +35,13 @@ export class GuidedAssaysComponent implements OnInit {
 	selectedMAFDataArray: any[] = [];
 	selectedAssay: any = null;
 	selectedAssayData: any = null;
+	samplesNames: any = [];
+	controlsNames: any = [];
 
 	isEditAssayModalOpen: boolean = false;
 	subStep: number = 1;
 	files: any = [];
+	samples: any = {};
 
 	constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router) {
 		this.editorService.initialiseStudy(this.route)
@@ -54,6 +59,16 @@ export class GuidedAssaysComponent implements OnInit {
 		});
 		this.studyAssays.subscribe(value => { 
 			this.assays = Object.values(value)
+			if(this.assays.length > 0){
+				this.assays.sort(function(a, b){
+				    if(a.name < b.name) { return -1; }
+				    if(a.name > b.name) { return 1; }
+				    return 0;
+				})	
+			}
+		});
+		this.studySamples.subscribe(value => { 
+			this.samples = value
 		});
 	}
 
@@ -83,6 +98,110 @@ export class GuidedAssaysComponent implements OnInit {
 			})
 		  }
 		});
+	}
+
+	saveSamples(){
+		console.log(this.samples);
+		let exisitingSamples = []
+		if(this.controlsNames && this.samplesNames){
+			let finalControls = this.controlsNames.replace(/,/g, "\n").split("\n")
+			let finalSamples = this.samplesNames.replace(/,/g, "\n").split("\n")
+			if(finalSamples.length <= 0){
+				Swal.fire({
+					title: 'Please add sample names',
+					text: '',
+					type: 'warning',
+					confirmButtonText: 'OK'
+				})
+			}else{
+				let sRows = []
+				let duplicatedExist = false
+				let duplicates = []
+				finalControls.forEach( s => {
+					if(exisitingSamples.indexOf(s) < 0){
+						let emptyRow = this.getEmptyRow(this.samples.data)
+						emptyRow['Source Name'] = s
+						emptyRow['Sample Name'] = s
+						emptyRow['Protocol REF'] = "Sample collection"
+						sRows.push(emptyRow);
+					}else{
+						duplicates.push(s)
+					}
+				})
+				finalSamples.forEach( s => {
+					if(exisitingSamples.indexOf(s) < 0){
+						let emptyRow = this.getEmptyRow(this.samples.data)
+						emptyRow['Source Name'] = s
+						emptyRow['Sample Name'] = s
+						emptyRow['Protocol REF'] = "Sample collection"
+						sRows.push(emptyRow);
+					}else{
+						duplicates.push(s)
+					}
+				})
+				if(duplicates.length > 0 && sRows.length > 0){
+					Swal.fire({
+						title: 'Duplicate samples found',
+						text: duplicates.join(", ") + ' already exist',
+						type: 'warning',
+						showCancelButton: true,
+					  confirmButtonColor: '#3085d6',
+					  cancelButtonColor: '#d33',
+					  confirmButtonText: 'Ignore duplicates, proceed!'
+					}).then((result) => {
+					  if (result.value) {
+					    this.editorService.addRows(this.samples.name, { "data": sRows}, 'samples', null).subscribe( res => {
+							toastr.success( "Samples added successfully", "Success", {
+				                "timeOut": "2500",
+				                "positionClass": "toast-top-center",
+				                "preventDuplicates": true,
+				                "extendedTimeOut": 0,
+				                "tapToDismiss": false
+				            });
+				            this.controlsNames = ""
+				            this.samplesNames = ""
+							this.changeSubStep(4)
+						}, err => {
+							console.log(err)
+						});
+					  }
+					})
+				}else if(duplicates.length > 0 && sRows.length == 0){
+					this.changeSubStep(4)
+				}else{
+					this.editorService.addRows(this.samples.name, { "data": sRows},'samples', null).subscribe( res => {
+						toastr.success( "Samples added successfully", "Success", {
+			                "timeOut": "2500",
+			                "positionClass": "toast-top-center",
+			                "preventDuplicates": true,
+			                "extendedTimeOut": 0,
+			                "tapToDismiss": false
+			            });
+			            this.controlsNames = ""
+				        this.samplesNames = ""
+						this.changeSubStep(4)
+					}, err => {
+						console.log(err)
+					});
+				}
+			}
+		}else{
+			toastr.error( "Please add sample names", "Success", {
+                "timeOut": "2500",
+                "positionClass": "toast-top-center",
+                "preventDuplicates": true,
+                "extendedTimeOut": 0,
+                "tapToDismiss": false
+            });
+		}
+	}
+
+	getEmptyRow(data){
+		let obj = tassign({}, data.rows[0]);
+		Object.keys(obj).forEach(function (prop) {
+			obj[prop] = "";
+		});
+		return obj;
 	}
 
 	changeSubStep(i){

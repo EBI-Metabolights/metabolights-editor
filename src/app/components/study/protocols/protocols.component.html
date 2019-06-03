@@ -1,19 +1,21 @@
-<div>
-	<div class="mtbls-section">
-		<h6 class="mb10">
-			<span style="font-size: 0.8em;"><mtbls-help target="protocols"></mtbls-help></span>&nbsp;<mtbls-protocol [value]="null" [validations]="validations"></mtbls-protocol>
-		</h6>
+<span *ngIf="validation">
+	<div>
+		<div class="mtbls-section">
+			<h6 class="mb10">
+				<span style="font-size: 0.8em;"><mtbls-help target="protocols"></mtbls-help></span>&nbsp;<mtbls-protocol [value]="null" [validations]="validations"></mtbls-protocol>
+			</h6>
+		</div>
 	</div>
-</div>
 
-<div *ngFor="let protocol of defaultProtocols">
-	<span *ngIf="getProtocol(protocol) != null">
-		<mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"></mtbls-protocol>
-	</span>
-</div>
+	<div *ngFor="let protocol of defaultProtocols">
+		<span *ngIf="getProtocol(protocol) != null">
+			<mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"></mtbls-protocol>
+		</span>
+	</div>
 
-<div *ngFor="let protocol of customProtocols">
-	<span *ngIf="getProtocol(protocol) != null">
-		<mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>
-	</span>
-</div>
+	<div *ngFor="let protocol of customProtocols">
+		<span *ngIf="getProtocol(protocol) != null">
+			<mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>
+		</span>
+	</div>
+</span>

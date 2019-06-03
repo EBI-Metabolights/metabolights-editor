@@ -15,6 +15,13 @@ export class AssaysComponent implements OnInit {
   	constructor() { 
   		this.studyAssays.subscribe(value => { 
 			this.assays = Object.values(value)
+      if(this.assays.length > 0){
+        this.assays.sort(function(a, b){
+            if(a.name < b.name) { return -1; }
+            if(a.name > b.name) { return 1; }
+            return 0;
+        })  
+      }
 		});
   	}
 
@@ -22,7 +29,6 @@ export class AssaysComponent implements OnInit {
   	}
 
   	selectCurrentSubTab(i){
-		this.currentSubIndex = i
-	}
-
+		  this.currentSubIndex = i
+	  }
 }

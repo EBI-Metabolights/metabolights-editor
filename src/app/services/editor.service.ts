@@ -510,11 +510,9 @@ export class EditorService {
 
   // Protocols
   getProtocols(id) {
-    return this.dataService.getProtocols(id).pipe(map( resp => { 
-      this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: {
-        resp
-      }})
-      return resp 
+    return this.dataService.getProtocols(id).pipe(map( data => { 
+      this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: data})
+      return data 
     }))
   }
 

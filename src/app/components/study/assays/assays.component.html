@@ -1,5 +1,8 @@
-<span class="">
+<span>
 	<span *ngIf="assays && assays.length > 0; else noAssays">
+	<div>
+		<add-assay></add-assay>
+	</div>
 	<br>
 	<div class="card">
         <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
@@ -24,10 +27,11 @@
 <ng-template #noAssays>
 	<div>&nbsp;</div>
 	<div>&nbsp;</div>
-	<p class="has-text-centered">No Assays Found</p>
-	<add-assay></add-assay>
+	<div class="has-text-centered">
+		<p>No Assays Found</p>
+		<add-assay></add-assay>
+	</div>
 	<div>&nbsp;</div>
 	<div>&nbsp;</div>
 </ng-template>
-
 </span>
