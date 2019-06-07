@@ -1478,7 +1478,7 @@
 										"disabled": false,
 										"template": "LC-MS",
 										"columns": [{
-												"name": "Polarity",
+												"name": "Scan Polarity",
 												"disabled": false,
 												"values": [{
 														"name": "Positive",
@@ -1525,7 +1525,7 @@
 										"disabled": false,
 										"template": "LC-DAD",
 										"columns": [{
-												"name": "Polarity",
+												"name": "Scan Polarity",
 												"disabled": false,
 												"values": [{
 														"name": "Positive",
@@ -1578,7 +1578,7 @@
 										"template": "GC-MS",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 												"name": "Positive",
@@ -1593,7 +1593,7 @@
 										"value": "tandem",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 												"name": "Positive",
@@ -1608,7 +1608,7 @@
 										"template": "GC-FID",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 												"name": "Positive",
@@ -1629,7 +1629,7 @@
 										"template": "DI-MS",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 													"name": "Positive",
@@ -1650,7 +1650,7 @@
 										"template": "FIA-MS",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 													"name": "Positive",
@@ -1671,7 +1671,7 @@
 										"template": "CE-MS",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 													"name": "Positive",
@@ -1692,7 +1692,7 @@
 										"template": "MALDI-MS",
 										"disabled": false,
 										"columns": [{
-											"name": "Polarity",
+											"name": "Scan Polarity",
 											"disabled": false,
 											"values": [{
 													"name": "Positive",
@@ -1740,7 +1740,7 @@
 						}]
 					},
 					{
-						"name": "Company / Institutional Template",
+						"name": "Company/Institutional partner template",
 						"value": "template",
 						"color": "is-danger",
 						"disabled": false,

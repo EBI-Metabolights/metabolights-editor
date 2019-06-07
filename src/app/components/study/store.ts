@@ -46,11 +46,11 @@ export const STUDY_INITIAL_STATE: MTBLSStudy =  new MTBLSStudy();
 function setStudyIdentifier(state, action) {
     if(action.body.study){
         if(action.body.study.isaInvestigation && action.body.study.isaInvestigation.studies[0].identifier){
-            return tassign(state, { identifier: action.body.study.isaInvestigation.studies[0].identifier, assays: [], assayTables: {}, protocols: [], metaboliteAnnotationFiles: [] });    
+            return tassign(state, { identifier: action.body.study.isaInvestigation.studies[0].identifier, assays: {}, samples: {}, protocols: [], mafs: [] });    
         }
-        return tassign(state, { identifier: action.body.study, assays: [], assayTables: {}, protocols: [], metaboliteAnnotationFiles: [] });    
+        return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: [] });    
     }else{
-        return tassign(state, { identifier: action.body.study, assays: [], assayTables: {}, protocols: [], metaboliteAnnotationFiles: []  });    
+        return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: []  });    
     }
     
 }

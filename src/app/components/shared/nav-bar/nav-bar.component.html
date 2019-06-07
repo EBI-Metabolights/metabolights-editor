@@ -16,7 +16,7 @@
       </ng-template>
     </div>
     <div class="navbar-end">
-    	<a [routerLink]="['/console']" class="navbar-item">
+    	<a (click)="redirectToConsole()" class="navbar-item">
         <i class="material-icons">
 			   list
 			  </i>&nbsp;My studies

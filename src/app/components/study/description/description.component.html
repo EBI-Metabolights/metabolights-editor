@@ -23,6 +23,9 @@
             <div class="field">
               <div class="control">
                 <mat-label>Study summary</mat-label>
+                  <div class="is-pulled-right" style="margin-left: 10px;">
+                    <small class="is-pulled-right"><a (click)="clearFormatting('description')">Clear formatting</a></small>
+                  </div>
                 <ngx-wig
                 matInput
                 formControlName="description"

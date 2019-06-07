@@ -29,17 +29,22 @@ export class ConsoleComponent implements OnInit{
     }
 
     ngAfterContentInit() {
+        this.editorService.initialiseStudy(null)
         this.userStudies.subscribe(value => { 
-          if(value == null){
-            this.editorService.getAllStudies()
-          }else{
-            this.studies = value
-            this.studies.sort(function(a,b){
-                return (+new Date(b['releaseDate'])) - (+new Date(a['releaseDate']))
+            if(value == null){
+                this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
+                  'info': 'Loading user studies' 
+                }})
+                this.editorService.getAllStudies()
+            }else{
+                this.editorService.toggleLoading(false);
+                this.studies = value
+                this.studies.sort(function(a,b){
+                    return (+new Date(b['releaseDate'])) - (+new Date(a['releaseDate']))
             })
             this.filteredStudies = this.studies;
             this.loadingStudies = false;
-          }
+            }
         });
     }
 

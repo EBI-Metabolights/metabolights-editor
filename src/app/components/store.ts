@@ -14,7 +14,7 @@ import { TOGGLE_LOADING,
 import { contentHeaders } from './../services/headers';
 
 export const SHARED_INITIAL_STATE: Object =  {
-	"loading" : false,
+	"loading" : true,
 	"info": '',
 	'configuration': '',
 	'isCurator': false,

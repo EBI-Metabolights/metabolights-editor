@@ -8,7 +8,7 @@
         	<p class="modal-card-title">Upload folders / files</p>
       	</header>
 		<section class="modal-card-body" v-if="validations">
-			<mtbls-aspera></mtbls-aspera>
+			<mtbls-aspera (complete)="uploadComplete()"></mtbls-aspera>
 			<mtbls-ftp></mtbls-ftp>
 		</section>
 		<footer class="modal-card-foot">

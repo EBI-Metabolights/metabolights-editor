@@ -1,5 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+import { EditorService } from '../../../../services/editor.service';
 import { NgRedux, select } from '@angular-redux/store';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import * as toastr from 'toastr';
@@ -19,6 +19,10 @@ export class AsperaComponent implements OnInit {
 	@select(state => state.study.uploadLocation) uploadLocation;
     displayHelpModal: boolean = false;
 
+    @Output() complete = new EventEmitter<any>();
+
+    currentTransferId = null;
+
 	validationsId = 'upload';
     @select(state => state.study.validations) validations: any
     validation: any;
@@ -31,7 +35,7 @@ export class AsperaComponent implements OnInit {
     asperaWeb: any; 
     uploadPath: string = '';
 
-	constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService){ 
+	constructor(private fb: FormBuilder, private editorService: EditorService){ 
 		this.uploadLocation.subscribe(value => { 
 			this.uploadPath = value
 		})
@@ -71,11 +75,30 @@ export class AsperaComponent implements OnInit {
                 connectInstaller.showDownload();
             } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.OUTDATED) {
                 connectInstaller.showUpdate();
+                this.uploadComplete()
             } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.RUNNING) {
                 connectInstaller.connected();
             }
         };
+        var transferStatusListener = (function(eventType, data){
+            if (eventType === AW4.Connect.EVENT.TRANSFER) {
+                data.transfers.forEach(transfer => {
+                    if(transfer.uuid == this.currentTransferId){
+                       if(transfer.status == "completed"){
+                           console.log("Upload completed")
+                           console.log("Sync started")
+                           this.editorService.copyStudyFiles().subscribe(data => {
+                               this.closeUploadModal();
+                               this.complete.emit();
+                               console.log("Sync complete")
+                           })
+                       }
+                    }
+                })
+            } 
+        }).bind(this)
         this.asperaWeb.addEventListener(AW4.Connect.EVENT.STATUS, statusEventListener);
+        this.asperaWeb.addEventListener(AW4.Connect.EVENT.TRANSFER, transferStatusListener);
         this.asperaWeb.initSession();
         this.asperaWeb.showSelectFileDialog({
             success: (function(dataTransferObj){
@@ -118,7 +141,6 @@ export class AsperaComponent implements OnInit {
         transferSpecs[0]["transfer_spec"]['paths'] = [];
         var files = dataTransferObj.dataTransfer.files;
         for (var i = 0, length = files.length; i < length; i += 1) {
-            // Local path
             var pathSet = {src : files[i].name};
             var srcPath = pathSet.src || '';
             var destPath = '';
@@ -135,8 +157,9 @@ export class AsperaComponent implements OnInit {
 
         var finalConfig = {};
         finalConfig['transfer_specs'] = transferSpecs;
-        var requestId = this.asperaWeb.startTransfers(finalConfig, {success: function(data){
-            console.log("Upload started");
+        var requestId = this.asperaWeb.startTransfers(finalConfig, {success: data => {
+            this.currentTransferId = data['transfer_specs'][0]['uuid']
+            console.log("Upload Started")
         }});
     }
 }

@@ -27,7 +27,10 @@ export class DescriptionComponent implements OnChanges, OnInit {
   isModalOpen: boolean = false;
   hasChanges: boolean = false;
 
-  constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
+  constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) {
+    this.studyValidations.subscribe(value => { 
+      this.validations = value;
+    }); 
     this.studyDescription.subscribe(value => { 
       if(value == ''){
         this.description = 'Please add your study title here';
@@ -58,6 +61,26 @@ export class DescriptionComponent implements OnChanges, OnInit {
     this.isModalOpen = false
   }
 
+  clearFormatting(target){
+    this.setFieldValue(target, this.strip(this.getFieldValue(target)))
+  }
+
+
+  setFieldValue(name, value){
+    return this.form.get(name).setValue(value);
+  }
+
+  getFieldValue(name){
+    return this.form.get(name).value;
+  }
+
+  strip(html)
+  {
+       var tmp = document.createElement("DIV");
+       tmp.innerHTML = html;
+       return tmp.textContent || tmp.innerText || "";
+  }
+
   save() {
     this.isFormBusy = true;
     this.editorService.saveAbstract(this.compileBody(this.form.get('description').value.replace(new RegExp('\n', 'g'), "<br />"))).subscribe( res => {
@@ -84,14 +107,12 @@ export class DescriptionComponent implements OnChanges, OnInit {
   }
 
   get validation() {
-    return this.studyValidations[this.validationsId];
+    return this.validations[this.validationsId];
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.value != undefined){
       this.description = changes.value.currentValue
     }
-    if (changes.studyValidations != undefined)
-      this.studyValidations = changes.studyValidations.currentValue
   }
 }

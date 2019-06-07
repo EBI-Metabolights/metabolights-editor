@@ -21,6 +21,10 @@ export class UploadComponent implements OnInit {
 	ngOnInit() {
 	}
 
+	uploadComplete(){
+		this.closeUploadModal()
+	}
+
 	openUploadModal(){
 		this.isUploadModalOpen = true;
 	}

@@ -79,6 +79,7 @@ export class EditorService {
         'user': user
       }})
       this.loadValidations();
+      return true;
     }else{
       user = JSON.parse(data)
       contentHeaders.set('user_token', user.apiToken);
@@ -89,12 +90,16 @@ export class EditorService {
         'user': user
       }})
       this.loadValidations();
+      return true;
     }
   }
 
   loadValidations(){
     this.dataService.getValidations().subscribe( 
       validations => {
+        this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
+          'info': 'Loading study validations' 
+        }})
         this.ngRedux.dispatch({ 
           type: 'LOAD_VALIDATION_RULES', 
           body: {
@@ -105,7 +110,7 @@ export class EditorService {
       err => { 
         console.log(err) 
       }
-      );
+    );
   }
 
   getAllStudies(){
@@ -117,7 +122,7 @@ export class EditorService {
   }
 
   loadStudyId(id){
-    this.ngRedux.dispatch({ type: 'SET_STUDY_IDENTIFIER', body: {
+    return this.ngRedux.dispatch({ type: 'SET_STUDY_IDENTIFIER', body: {
       'study': id
     }})          
   }
@@ -126,16 +131,32 @@ export class EditorService {
     return this.dataService.createStudy()
   }
 
+  toggleLoading(status){
+    if(status != null){
+      if(status){
+        this.ngRedux.dispatch({ type: 'ENABLE_LOADING' })
+      }else{
+        this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+      }
+    }else{
+      this.ngRedux.dispatch({ type: 'TOGGLE_LOADING' })  
+    }
+  }
+
   initialiseStudy(route){
     if(route == null){
-      this.loadStudyId(null)
+      return this.loadStudyId(null)
     }else{
       route.params.subscribe( params => {
         let studyID = params['id']
         if(this.currentStudyIdentifier != studyID){
+          this.toggleLoading(true)
           this.loadStudyId(studyID)
           this.dataService.getStudy(studyID).subscribe(
             study => {
+              this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
+                'info': 'Loading investigation details' 
+              }})
               this.ngRedux.dispatch({ type: 'SET_CONFIGURATION', body: {
                 'configuration': study.isaInvestigation.comments
               }})
@@ -169,8 +190,13 @@ export class EditorService {
               this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: {
                 'protocols': study.isaInvestigation.studies[0].protocols
               }})
+              this.loadStudyFiles()
               this.validateStudy()
-            })
+            },
+            error => {
+              this.toggleLoading(true)
+            }
+          )
         }
       });  
     }
@@ -178,9 +204,12 @@ export class EditorService {
 
   validateStudy(){
     this.dataService.validateStudy(null, null).subscribe(response => {
-         this.ngRedux.dispatch({ type: 'SET_STUDY_VALIDATION', body: {
+        this.toggleLoading(false)
+        this.ngRedux.dispatch({ type: 'SET_STUDY_VALIDATION', body: {
             'validation': response.validation
         }})
+    }, error => {
+      this.toggleLoading(false)
     })
   }
 
@@ -194,8 +223,8 @@ export class EditorService {
       }})
       data = this.deleteProperties(data)
       this.ngRedux.dispatch({ type: 'SET_STUDY_FILES', body: data })
-      this.loadStudyAssays(data)
       this.loadStudySamples()
+      this.loadStudyAssays(data)
     }, error => {
       this.dataService.getStudyFilesList(null).subscribe(data => {
         this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
@@ -245,6 +274,9 @@ export class EditorService {
     }else{
       this.files.study.forEach(file => {
         if(file.file.indexOf("s_") == 0 && file.status == 'active'){
+          this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
+            'info': 'Loading Samples data' 
+          }})
           this.updateSamples(file.file)
         }
       })
@@ -252,6 +284,9 @@ export class EditorService {
   }
 
   loadStudyAssays(files){
+    this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
+      'info': 'Loading assays information' 
+    }})
     files.study.forEach(file => {
       if(file.file.indexOf("a_") == 0 && file.status == 'active'){      
         this.updateAssay(file.file)

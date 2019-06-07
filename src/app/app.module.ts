@@ -74,6 +74,7 @@ import { PublicationComponent } from './components/study/publications/publicatio
 import { FilesComponent } from './components/study/files/files.component';
 import { QuickLinkComponent } from './components/shared/quick-link/quick-link.component';
 import { ValidationsComponent } from './components/study/validations/validations.component';
+import { LoadingComponent } from './components/shared/loading/loading.component';
 
 @NgModule({
   declarations: [
@@ -122,7 +123,8 @@ import { ValidationsComponent } from './components/study/validations/validations
     PublicationComponent,
     FilesComponent,
     QuickLinkComponent,
-    ValidationsComponent
+    ValidationsComponent,
+    LoadingComponent
   ],
   imports: [
     BrowserModule,

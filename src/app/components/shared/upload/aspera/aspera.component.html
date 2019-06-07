@@ -48,8 +48,12 @@
 					<code>
 						$ ascp -QT -P 33001 -L- -l 300M < your_local_data_folder > mtblight@hx-fasp-1.ebi.ac.uk:{{ uploadLocation | async }}
 					</code>
+					<div style="margin-top: 10px; margin-bottom: 10px;" class="panel-block notification is-primary">
+						<small class="is-tiny">
+							Aspera Password: <b>{{ validation.aspera.secret }}</b>
+						</small>
+					</div>
 					<small>
-						<br>
 						<b>Step 1: Install Aspera ascp command line client</b><br>
 						The Aspera ascp command line client can be downloaded <i><a href="http://downloads.asperasoft.com/downloads" target="_blank">here</a></i>. Please select *Aspera Connect*. The ascp command line client is distributed as part of the aspera connect high-performance transfer browser plug-in and is free to use.<br><br>
 						<b>Step 2: Navigate to the folder where the Aspera command line client program ascp is installed.</b><br>

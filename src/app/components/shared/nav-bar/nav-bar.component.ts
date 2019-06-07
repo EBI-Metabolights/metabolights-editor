@@ -26,7 +26,10 @@ export class NavBarComponent implements OnInit {
 	}
 
 	backToMetabolights() {
-		// this.authService.logout();
 		window.location.href = this.domain;
+	}
+
+	redirectToConsole(){
+		this.router.navigate(['/console'])
 	}
 }

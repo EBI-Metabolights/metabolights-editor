@@ -11,6 +11,7 @@ import { Ontology } from './../../models/mtbl/mtbls/common/mtbls-ontology';
 import { MTBLSPublication } from './../../models/mtbl/mtbls/mtbls-publication';
 import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript";
 import { EditorService } from './../../services/editor.service';
+import { MetaboLightsWSURL } from './../../services/globals';
 import * as toastr from 'toastr';
 import {Router} from "@angular/router";
 
@@ -25,21 +26,27 @@ export class StudyComponent implements OnInit {
 	@select(state => state.study.validation) studyValidation;
 	@select(state => state.status.currentTabIndex) currentIndex: number;
     @select(state => state.study.status) studyStatus;
+    @select(state => state.study.obfuscationCode) studyObfuscationCode;
 	
 	requestedTab: number = 0;
     tab: string = "descriptors";	
 	requestedStudy: string = null;
     status: string = "submitted";
     validation: any = {};
+    obfuscationCode: string = null;
+    domain: string = null;
 
 	constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private route: ActivatedRoute,  private editorService: EditorService) { 
 		this.editorService.initialiseStudy(this.route)
-		this.editorService.loadStudySamples()
+        this.studyObfuscationCode.subscribe(value => { 
+            this.obfuscationCode = value
+        })
 		this.studyIdentifier.subscribe(value => { 
 			if(value != null){
 				this.requestedStudy = value
 			}
 		});
+        this.domain = MetaboLightsWSURL['domain']
         this.studyStatus.subscribe(value => {
             this.status = value
         })

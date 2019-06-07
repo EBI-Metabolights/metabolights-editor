@@ -17,8 +17,8 @@ import { GuidedAssaysComponent } from './components/guide/assays/assays.componen
 
 const routes: Routes = [
 	{ path: 'login', component: LoginComponent },
-	{ path: 'console', canActivate: [AuthGuard], component: ConsoleComponent },
 	{ path: '', redirectTo: 'console', pathMatch: 'full'},
+	{ path: 'console', canActivate: [AuthGuard], component: ConsoleComponent },
 
 	{ path: 'guide/create', canActivate: [AuthGuard], component: CreateComponent },
 	{ path: 'guide/info/:id', canActivate: [AuthGuard], component: InfoComponent },

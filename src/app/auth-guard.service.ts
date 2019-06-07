@@ -21,29 +21,33 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     return this.canActivate(route, state);
   }
 
-  checkLogin(url: string): boolean {
+  checkLogin(url: string) {
     let isInitialised = this.ngRedux.getState().status['isInitialised']; 
     if(!isInitialised){
       let localUser = localStorage.getItem('user');
       if(localUser != null && this.isJSON(localUser)){
-        this.editorService.initialise(localUser, false);
-        return true; 
+        return this.editorService.initialise(localUser, false);
       }else{
         if(localUser != null){
-          this.editorService.authenticateAPIToken({ "token" : localUser }).subscribe( res => {           
-              this.editorService.initialise(this.editorService.getValidatedJWTUser(res), true);
-              return true; 
-            }, err => {
-              console.error(err)
-          });  
+          this.editorService.authenticateAPIToken({ "token" : localUser }).subscribe( res => {
+            this.editorService.getValidatedJWTUser(res).subscribe( response => {
+              this.editorService.initialise(response, true)
+              return true;
+            });
+          }, err => {
+            if(err.status == 403){
+              return false;
+            }
+          })
+        }else{
+          this.editorService.redirectUrl = url;
+          this.router.navigate(['/login']);
+          return false;
         }
       }
     }else{
       return true;
     }
-    this.editorService.redirectUrl = url;
-    this.router.navigate(['/login']);
-    return false;
   }
 
   isJSON(data) {

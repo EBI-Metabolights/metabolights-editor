@@ -41,6 +41,14 @@
   z-index: 999;
 }
 
+.nw-button {
+  padding: 10px;
+}
+
+.smt{
+  margin-top: 10px !important;
+}
+
 html, body{
 	background-color: whitesmoke;
 }
