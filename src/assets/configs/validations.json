@@ -299,7 +299,7 @@
 					"rules": [{
 						"condition": "min",
 						"value": "25",
-						"error": "Please provide the (tentaive) title of your publication. This should be a minimum of 25 characters long",
+						"error": "Please provide the (tentative) title of your publication. This should be a minimum of 25 characters long",
 						"type": "string"
 					}]
 				},
@@ -1143,8 +1143,8 @@
 					"placeholder": "Protocol description",
 					"rules": [{
 						"condition": "min",
-						"value": "60",
-						"error": "Study protocol description should be at least 60 characters long. Please using the protocol reported in the publication",
+						"value": "40",
+						"error": "Study protocol description should be at least 40 characters long. Please using the protocol reported in the publication",
 						"type": "string"
 					}]
 				},
