@@ -37,9 +37,7 @@ export class EditorService {
 
   constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private doiService: DOIService, private authService: AuthService, private europePMCService: EuropePMCService, private dataService: MetabolightsService) {
     this.studyIdentifier.subscribe(value => { 
-      if(value != null){
         this.currentStudyIdentifier = value 
-      }
     });
     this.studyValidations.subscribe(value => { 
       this.validations = value;
@@ -149,7 +147,7 @@ export class EditorService {
     }else{
       route.params.subscribe( params => {
         let studyID = params['id']
-        if(this.currentStudyIdentifier != studyID){
+        if(this.currentStudyIdentifier != studyID ){
           this.toggleLoading(true)
           this.loadStudyId(studyID)
           this.dataService.getStudy(studyID).subscribe(
