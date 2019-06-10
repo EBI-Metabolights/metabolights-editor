@@ -505,4 +505,12 @@ export class MetabolightsService extends DataService{
       catchError(this.handleError)
       );
   }
+
+  // Status
+  changeStatus(status){
+     return this.http.post(this.url.studiesList + "/" + this.id + "/status", { 'status' : status}, { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+      );
+  }
 }

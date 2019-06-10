@@ -3,16 +3,49 @@
 		<div class="panel-block-wrapper">
 			<span *ngIf="assay">
 	  			<span class="column is-12 nprl nmrl fadeIn">
-					<!-- <a (click)="openAddSamplesModal()" class="button is-small is-light">
+					<a (click)="openAddSamplesModal()" class="button is-small is-light">
 						<mat-icon>add</mat-icon> Samples
 					</a>
-					&nbsp; -->
-					<a (click)="deleteSelectedAssay(assayName)" class="button is-small is-light"><mat-icon>delete</mat-icon> Delete 	Assay
-					</a>
+					&nbsp;
+					<a (click)="deleteSelectedAssay(assayName)" class="button is-small is-light"><mat-icon>delete</mat-icon> Delete Assay</a>
 				</span>
 				<mtbls-table [tableData]="assay" validationsId="assays"></mtbls-table>
 			</span>
 		</div>
+	</div>
+</div>
+<div class="modal" [ngClass]="{'is-active': addSamplesModalOpen}">
+	<div class="modal-background"></div>
+	<div class="modal-card">
+		<section class="modal-card-body">
+			<div class="columns mb0 is-vcentered is-hcentered">
+				<div class="column is-12">
+					<mat-form-field class="full-width bback">
+						<input (keydown)="onSamplesFilterKeydown($event, $event.target.value)" autocomplete="off" matInput (keyup)="applySamplesFilter($event.target.value)" placeholder="Filter sample names">
+					</mat-form-field>
+				</div>
+			</div>
+			<ul>
+				<li *ngFor="let s of filteredSampleNames">
+					{{ s }}
+				</li>
+			</ul>
+		</section>
+		<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-half">
+					<span *ngIf="duplicateSampleNamesInAssay.length > 0">
+						<mat-icon>info</mat-icon> <small>Sample rows already exist in assay sheet</small>
+					</span>
+				</div>
+				<div class="column is-half has-text-right">
+					<button class="button is-default" (click)='closeAddSamplesModal()'>Cancel</button>
+					<button (click)="addSamples()" [disabled]="filteredSampleNames.length < 1" class="button is-info">
+						Add&nbsp;<span *ngIf="filteredSampleNames.length > 0">{{ filteredSampleNames.length }} Samples</span>
+					</button>
+				</div>
+			</div>
+		</footer>
 	</div>
 </div>
 

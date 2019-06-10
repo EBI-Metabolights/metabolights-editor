@@ -76,6 +76,9 @@ export class EditorService {
       this.ngRedux.dispatch({ type: 'SET_USER', body: {
         'user': user
       }})
+      this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
+        'studies': null
+      }})
       this.loadValidations();
       return true;
     }else{
@@ -86,6 +89,9 @@ export class EditorService {
       })
       this.ngRedux.dispatch({ type: 'SET_USER', body: {
         'user': user
+      }})
+      this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
+        'studies': null
       }})
       this.loadValidations();
       return true;
@@ -148,7 +154,14 @@ export class EditorService {
       route.params.subscribe( params => {
         let studyID = params['id']
         if(this.currentStudyIdentifier != studyID ){
-          this.toggleLoading(true)
+          this.loadStudy(studyID)
+        }
+      });  
+    }
+  }
+
+  loadStudy(studyID){
+    this.toggleLoading(true)
           this.loadStudyId(studyID)
           this.dataService.getStudy(studyID).subscribe(
             study => {
@@ -195,9 +208,6 @@ export class EditorService {
               this.toggleLoading(true)
             }
           )
-        }
-      });  
-    }
   }
 
   validateStudy(){
@@ -632,5 +642,10 @@ export class EditorService {
 
   deletePublication(title) {
     return this.dataService.deletePublication(title)
+  }
+
+  //Status change
+  changeStatus(status) {
+    return this.dataService.changeStatus(status)
   }
 }

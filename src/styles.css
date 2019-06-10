@@ -41,6 +41,17 @@
   z-index: 999;
 }
 
+.tags .tag {
+  margin-bottom: 0.5rem !important; 
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active  {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+}
+
 .nw-button {
   padding: 10px;
 }
@@ -148,7 +159,7 @@ html, body{
 .modal-card-foot {
      border-bottom-left-radius: 0px; 
      border-bottom-right-radius: 0px; 
-     border-top: none; 
+     /*border-top: none; */
 }
 
 .second-bottom-right{

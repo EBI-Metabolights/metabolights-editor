@@ -56,9 +56,38 @@
 					Check your study passes the validation checks (see the validation tab in your study). Once you have completed your study and it has met the validation criteria, please change the study status to ‘Curation’ / ‘Submission complete’
 				</p>
 			</span>
+			<br>
+			<span *ngIf="curator; else submitter">
+				<mat-form-field>
+				  <mat-label>Change study status</mat-label>
+				  <mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
+				    <mat-option value="Submitted">Submitted</mat-option>
+				    <mat-option value="In Curation">In Curation</mat-option>
+				    <mat-option value="In Review">In Review</mat-option>
+				    <mat-option value="Public">Public</mat-option>
+				  </mat-select>
+				</mat-form-field>
+			</span>
+			<ng-template #submitter>
+				<span *ngIf="status == 'Submitted'">
+					<mat-form-field>
+					  <mat-label>Change study status</mat-label>
+					  <mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
+					    <mat-option value="Submitted">Submitted</mat-option>
+					    <mat-option value="In Curation">In Curation</mat-option>
+					  </mat-select>
+					</mat-form-field>
+				</span>
+			</ng-template>
 		</section>
-		<footer class="modal-card-foot buttons is-center">
-			<button class="button" [disabled]="isFormBusy" (click)='closeModal()'>OK</button>
+		<footer class="modal-card-foot buttons is-right">
+			<div class="columns is-gapless full-width">
+		      <div class="column is-two-third">
+		      </div>
+		      <div class="column is-one-third has-text-right">
+		        <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>OK</button>
+		      </div>
+		    </div>
 		</footer>
 	</div>
 </div>

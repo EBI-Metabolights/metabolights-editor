@@ -407,6 +407,13 @@
     "@types/source-list-map" "*"
     source-map "^0.6.1"
 
+"@w11k/angular-sticky-things@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@w11k/angular-sticky-things/-/angular-sticky-things-1.1.2.tgz#0d1eecfaccb0d5b1a0cb26101a7487da195aa05f"
+  integrity sha512-wgBU6+lFijlz9zx0S8oyM14jEoLO73VHrO5WhTr4dBqi6dREXiGULfGq4sb1eEguN4lezprjNj9zaqoEfqPnOg==
+  dependencies:
+    tslib "^1.9.0"
+
 "@webassemblyjs/ast@1.7.11":
   version "1.7.11"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.7.11.tgz#b988582cafbb2b095e8b556526f30c90d057cace"
@@ -5764,7 +5771,7 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
-rxjs@6.3.3, rxjs@~6.3.3:
+rxjs@6.3.3:
   version "6.3.3"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.3.3.tgz#3c6a7fa420e844a81390fb1158a9ec614f4bad55"
   integrity sha512-JTWmoY9tWCs7zvIk/CvRjhjGaOd+OVBM987mxFo+OW66cGpdKjZcpmc74ES1sB//7Kl/PAe8+wEakuhG4pcgOw==
@@ -5775,6 +5782,13 @@ rxjs@^6.1.0:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.1.tgz#f7a005a9386361921b8524f38f54cbf80e5d08f4"
   integrity sha512-y0j31WJc83wPu31vS1VlAFW5JGrnGC+j+TtGAa1fRQphy48+fDYiDmX8tjGloToEsMkxnouOg/1IzXGKkJnZMg==
+  dependencies:
+    tslib "^1.9.0"
+
+rxjs@^6.3.3:
+  version "6.5.2"
+  resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.5.2.tgz#2e35ce815cd46d84d02a209fb4e5921e051dbec7"
+  integrity sha512-HUb7j3kvb7p7eCUHE3FqjoDsC1xfZQ4AHFWfTKSpZ+sAhhz5X1WX0ZuUqWbzB2QhSLp3DoLUG+hMdEDKqWo2Zg==
   dependencies:
     tslib "^1.9.0"
 
@@ -6586,10 +6600,10 @@ supports-color@^6.1.0:
   dependencies:
     has-flag "^3.0.0"
 
-sweetalert2@^8.10.2:
-  version "8.10.2"
-  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-8.10.2.tgz#f2c14d361722ad3da8b3c71c9d334ff66aad1441"
-  integrity sha512-1Td1KJingzd883j5KH94VMZq2GzDNXh/A4ftyiqWILIhRIYlNaBNF+jAJ/im4De8J2mk2E3C18OIMQX8sMFwQQ==
+sweetalert2@^8.11.7:
+  version "8.12.0"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-8.12.0.tgz#61d0cbfa7eed4e9ff3293d6d3bbe7c399a4c6128"
+  integrity sha512-xeNzODYGPf+btzibAKmKyzRVSDVsdqwk9h7a1bXTLOIbhAvPmkRF1e8Ys17/ZNqr9Cl46wxlVZ9ByUbDkayq+g==
 
 symbol-observable@1.2.0, symbol-observable@^1.2.0:
   version "1.2.0"

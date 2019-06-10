@@ -413,16 +413,17 @@ export class TableComponent implements OnInit {
 	}
 
 	addRows(rows){
-		this.editorService.addRows(this.data.file, { "data": rows}, this.validationsId, null).subscribe( res => {
-				toastr.success( "Rows added successfully to the end of the assay sheet", "Success", {
-					"timeOut": "2500",
-					"positionClass": "toast-top-center",
-					"preventDuplicates": true,
-					"extendedTimeOut": 0,
-					"tapToDismiss": false
-				});
+	   	this.editorService.addRows(this.data.file, { "data": rows}, this.validationsId, null).subscribe( res => {
+			toastr.success( "Rows added successfully to the end of the assay sheet", "Success", {
+				"timeOut": "2500",
+				"positionClass": "toast-top-center",
+				"preventDuplicates": true,
+				"extendedTimeOut": 0,
+				"tapToDismiss": false
+			});
 			}, err => {
 		});
+
 	}
 
 	getEmptyRow(){
