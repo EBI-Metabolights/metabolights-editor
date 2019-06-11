@@ -1,23 +1,23 @@
 .panel-block.success {
     border-left-color: #23D160;
-    border-width: 2px;
+    border-left-width: 7px;
     color: #363636;
 }
 
 .panel-block.info {
     border-left-color: #3273dc;
-    border-width: 2px;
+    border-left-width: 7px;
     color: #363636;
 }
 
 .panel-block.warning {
     border-left-color: #FFDD56;
-    border-width: 2px;
+    border-left-width: 7px;
     color: #363636;
 }
 
 .panel-block.error {
     border-left-color: #FF3760;
-    border-width: 2px;
+    border-left-width: 7px;
     color: #363636;
 }

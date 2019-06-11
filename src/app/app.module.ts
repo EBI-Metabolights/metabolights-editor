@@ -28,7 +28,8 @@ import { InfoComponent } from './components/guide/info/info.component';
 import { RawUploadComponent } from './components/guide/upload/upload.component';
 import { PageNotFoundComponent } from './components/shared/errors/page-not-found/page-not-found.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material';
 import { ProgressComponent } from './components/guide/progress/progress.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { UploadComponent } from './components/shared/upload/upload.component';
@@ -142,6 +143,8 @@ import { LoadingComponent } from './components/shared/loading/loading.component'
     MatSelectModule,
     MatIconModule,
     MatChipsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     MatButtonToggleModule,
     MatCheckboxModule,
     MatTableModule,

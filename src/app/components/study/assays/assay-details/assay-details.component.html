@@ -9,7 +9,7 @@
 					&nbsp;
 					<a (click)="deleteSelectedAssay(assayName)" class="button is-small is-light"><mat-icon>delete</mat-icon> Delete Assay</a>
 				</span>
-				<mtbls-table [tableData]="assay" validationsId="assays"></mtbls-table>
+				<mtbls-table (rowsUpdated)="validateAssaySheet()" [tableData]="assay" validationsId="assays"></mtbls-table>
 			</span>
 		</div>
 	</div>

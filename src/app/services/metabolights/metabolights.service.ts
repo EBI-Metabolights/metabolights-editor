@@ -428,6 +428,13 @@ export class MetabolightsService extends DataService{
       );
   }
 
+  validateMAF(assay_file){
+    return this.http.post(this.url.studiesList + "/" + this.id + "/maf/validate", {"data": [{ "assay_file_name": assay_file }]},{ headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
   search(term, type) {
     return this.http.get(this.url.studiesList.replace("/studies", "") + "/search/" + type + "?search_value=" + term , { headers: contentHeaders }).pipe(
       map(res => res.json()),
@@ -508,9 +515,17 @@ export class MetabolightsService extends DataService{
 
   // Status
   changeStatus(status){
-     return this.http.post(this.url.studiesList + "/" + this.id + "/status", { 'status' : status}, { headers: contentHeaders }).pipe(
+     return this.http.put(this.url.studiesList + "/" + this.id + "/status", { 'status' : status}, { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
       );
+  }
+
+  // Release date
+  changeReleasedate(releaseDate){
+     return this.http.put(this.url.studiesList + "/" + this.id + "/release-date", { 'release_date' : releaseDate}, { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
   }
 }

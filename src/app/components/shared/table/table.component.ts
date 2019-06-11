@@ -28,6 +28,7 @@ export class TableComponent implements OnInit {
     @select(state => state.study.files) studyFiles: any;
 
     @Output() updated = new EventEmitter<any>();
+    @Output() rowsUpdated = new EventEmitter<any>();
 
     validations: any = {};
 
@@ -421,6 +422,7 @@ export class TableComponent implements OnInit {
 				"extendedTimeOut": 0,
 				"tapToDismiss": false
 			});
+			this.rowsUpdated.emit();
 			}, err => {
 		});
 
@@ -452,6 +454,7 @@ export class TableComponent implements OnInit {
 				"extendedTimeOut": 0,
 				"tapToDismiss": false
 			});
+			this.rowsUpdated.emit();
 		}, err => {
 
 		});

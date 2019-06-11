@@ -397,6 +397,13 @@ export class EditorService {
     })
   }
 
+
+  validateMAF(f){
+    return this.dataService.validateMAF(f).pipe(map( data => {
+      return data
+    }))
+  }
+
   updateSamples(file){
     let samples = {}
     samples["name"] = file;
@@ -647,5 +654,11 @@ export class EditorService {
   //Status change
   changeStatus(status) {
     return this.dataService.changeStatus(status)
+  }
+
+
+  // Release date change
+  changeReleasedate(releaseDate){
+    return this.dataService.changeReleasedate(releaseDate)
   }
 }

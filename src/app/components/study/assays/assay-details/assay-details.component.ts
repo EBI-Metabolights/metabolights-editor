@@ -75,6 +75,11 @@ export class AssayDetailsComponent implements OnInit {
     this.assayTable.addRows(dataToWrite)
   }
 
+  validateAssaySheet(){
+    this.editorService.validateMAF(this.assayName).subscribe(data => {
+      console.log("MAF updated")
+    })
+  }
 
   openAddSamplesModal(){
     this.addSamplesModalOpen = true
