@@ -141,18 +141,29 @@ export class TableComponent implements OnInit {
 		})
 		if (this.selectedCells.length > 0 || this.selectedColumns.length > 0){
 			if(this.selectedCells.length > 0){
+				let i = 0
 				this.selectedCells.forEach( cell =>{
-					content = content + this.data.rows[cell[1]][cell[0]] + "\n" 
+					i = i + 1
+					if(i < this.selectedCells.length){
+						content = content + this.data.rows[cell[1]][cell[0]] + "\n" 	
+					}else{
+						content = content + this.data.rows[cell[1]][cell[0]] 
+					}
 				})
 			}else if(this.selectedColumns.length > 0){
 				if(this.selectedColumns.length == 1){
+					let i = 0
 					this.data.rows.forEach(row => {
-						content = content + row[this.selectedColumns[0]] + "\n" 
+						i = i + 1
+						if(i < this.data.rows.length){
+							content = content + row[this.selectedColumns[0]] + "\n" 
+						}else{
+							content = content + row[this.selectedColumns[0]]
+						}
+						
 					})
 				}
-				
 			}
-
 			let navigator: any
 			navigator = window.navigator
 			navigator.clipboard.writeText(content).then(function() {
