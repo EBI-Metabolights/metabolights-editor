@@ -18,13 +18,13 @@ Please report the issues here - https://github.com/EBI-Metabolights/metabolights
 
 ## Development
 
-### Development server
+### Development server (Front end)
 
-- Install angular CLI to get started
+- [Install angular CLI](https://angular.io/cli) to get started
 
 - Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-Editor by default connects to [MetaboLights DEV](https://wwwdev.ebi.ac.uk/metabolights) webservices (development server to test new features). You may need to create a DEV account inorder to login and test.
+Editor by default connects to [MetaboLights DEV](https://wwwdev.ebi.ac.uk/metabolights) webservices (a development server to test new features). You may need to create a DEV account inorder to login and test.
 
 If you would like run your own server, update the origin in /src/app/services/globals.ts file (by default this points to the MetaboLights development server)
 
@@ -41,3 +41,9 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 ## Running end-to-end tests
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+
+---
+
+### Development server (Back end)
+
+[Code base](https://github.com/EBI-Metabolights/MtblsWS-Py) - Python-based REST service
