@@ -24,13 +24,25 @@ export class EuropePMCService extends DataService{
 
 	extractArticleDetails(data, doi){
 		let article = data.resultList.result[0];
-		return {
-			'title': article.title,
-			'authorList': article.authorString,
-			'authorDetails': article.authorList.author,
-			'pubMedID': article.pmid,
-			'doi': article.doi,
-			'abstract': article.abstractText
+		if(article){
+			return {
+				'title': article.title,
+				'authorList': article.authorString,
+				'authorDetails': article.authorList.author,
+				'pubMedID': article.pmid,
+				'doi': article.doi,
+				'abstract': article.abstractText
+			}
+		}else{
+			return  {
+				'title': "",
+				'authorList': "",
+				'authorDetails': "",
+				'pubMedID': "",
+				'doi': "",
+				'abstract': ""
+			}
 		}
+		
 	}
 }

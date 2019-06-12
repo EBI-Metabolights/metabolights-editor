@@ -104,6 +104,7 @@ export class StudyComponent implements OnInit {
         }
         window.history.pushState("", "", window.location.origin + "/" + urlSplit.join("/") + "/" + tab);
         if(index == 6){
+            this.editorService.validateStudy();
             document.getElementById("tab-content-wrapper").scrollIntoView();
         }
     }

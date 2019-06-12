@@ -5,7 +5,7 @@
 	<a class="button is-small custom-button hover-button" (click)='openModal()'>
 		<mat-icon>edit</mat-icon>
 	</a>
-	<div>
+	<div *ngIf="publication">
 		<article class="tile is-child box">
 			<div class="content">
 				<h4 class="publication-title">

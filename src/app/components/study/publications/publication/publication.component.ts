@@ -104,7 +104,7 @@ export class PublicationComponent implements OnInit {
 	}
 
 	updateStudyTitle(){
-		this.editorService.saveTitle( { 'title': this.publication.title }).subscribe( res => {
+		this.editorService.saveTitle( { 'title': this.getFieldValue('title')}).subscribe( res => {
 			this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: res})
 			toastr.success('Title updated.', "Success", {
 				"timeOut": "2500",
