@@ -33,7 +33,7 @@ export class ReleaseDateComponent implements OnInit {
 
 	updateReleaseDate(op, e){
 		let selectedValue = new Date(e.value)
-		let dateTo = selectedValue.getFullYear() + "-" + this.str_pad(selectedValue.getMonth()) +  "-" + this.str_pad(selectedValue.getDate())
+		let dateTo = selectedValue.getFullYear() + "-" + this.str_pad(selectedValue.getMonth()+1) +  "-" + this.str_pad(selectedValue.getDate())
 		if(selectedValue != null){
 			Swal.fire({
 			  	title: "Are you sure? Would you like to change your study release date to " + dateTo,
