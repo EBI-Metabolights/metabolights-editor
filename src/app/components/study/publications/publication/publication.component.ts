@@ -124,12 +124,16 @@ export class PublicationComponent implements OnInit {
 	      		if(article.doi == doi){
 	      			this.publicationAbstract = article.abstract;
 	      		}
+	      	}, error => {
+	      		this.isFormBusy = false
 	      	})
 		}else{
 			let pubMedID = this.getFieldValue('pubMedID')
 			if(pubMedID != ''){
 				this.europePMCService.getArticleInfo('(SRC:MED AND EXT_ID:' + pubMedID + ")").subscribe( article => {
 					this.publicationAbstract = article.abstract;
+	      		}, error => {
+	      			this.isFormBusy = false
 	      		})
 			}
 		}
@@ -195,6 +199,8 @@ export class PublicationComponent implements OnInit {
 				"tapToDismiss": false
 			});
 			this.closeUpdateAbstractModal();
+		}, error => {
+			this.isFormBusy = false
 		})
 	}
 

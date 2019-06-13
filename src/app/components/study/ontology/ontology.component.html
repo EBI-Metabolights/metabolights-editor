@@ -38,10 +38,10 @@
 					<div class="columns">
 						<small class="tiny">{{ value.termAccession }}</small>
 					</div>
-					<div class="columns">
+					<div *ngIf="value.termSource.description && value.termSource.description != ''" class="columns">
 						<small class="tiny">SOURCE: {{ value.termSource.description}} </small>
 					</div>
-					<div class="columns">
+					<div *ngIf="value.termSource.file && value.termSource.file != ''" class="columns">
 						<small class="tiny">FILE: {{ value.termSource.file }} <span ></span> </small>
 					</div>
 					<div class="columns">

@@ -512,7 +512,7 @@ export class EditorService {
 
   // Ontology
   getOntologyTermDescription(value){
-    return this.dataService.getOntologyDetails(value)
+    return this.dataService.getOntologyTermDescription(value)
   }
 
   getOntologyTerms(url){
