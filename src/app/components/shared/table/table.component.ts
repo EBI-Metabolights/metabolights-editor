@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
 import { OntologySourceReference } from './../../../models/mtbl/mtbls/common/mtbls-ontology-reference';
 import { MatAutocompleteSelectedEvent, MatChipInputEvent } from '@angular/material';
@@ -107,26 +107,31 @@ export class TableComponent implements OnInit {
 
 	ngAfterViewInit() {
     	this.dataSource.paginator = this.paginator;
-    	document.querySelector('body').addEventListener('paste', (e) => {
-		  this.savePastedCellContent(e, null)
-		});
-		document.querySelector('body').addEventListener('cut', (e) => {
-		  this.cutCellContent(e)
-		});
-		document.querySelector('body').addEventListener('copy', (e) => {
-		  this.copyCellContent(e)
-		});
-		document.querySelector('body').addEventListener("click", (e: any) => {
-			let allClasses = []
-			e.path.forEach(ele => {
-				if(ele && ele.classList){
-					allClasses = allClasses.concat(ele.classList.value.split(" "))
-				}
-			})
-			if(allClasses.indexOf("prevent-deselect") < 0){
-				this.deSelect()
+	}
+
+	onCopy(e){
+		this.copyCellContent(e)
+	}
+
+	onCut(e){
+		this.cutCellContent(e)
+	}
+
+	onPaste(e){
+		this.savePastedCellContent(e, null)
+	}
+
+	onClick(e){
+		let allClasses = []
+		e.path.forEach(ele => {
+			if(ele && ele.classList){
+				allClasses = allClasses.concat(ele.classList.value.split(" "))
 			}
-		});
+		})
+		if(allClasses.indexOf("prevent-deselect") < 0){
+			this.deSelect()
+		}
+		e.stopPropagation();
 	}
 
 	cutCellContent(e){

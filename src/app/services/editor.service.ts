@@ -358,7 +358,6 @@ export class EditorService {
       })    
       mafFiles.forEach( f => {
         this.updateMAF(f);
-
       })
       assay['mafs'] = mafFiles
       this.ngRedux.dispatch({ type: 'SET_STUDY_ASSAY', body: assay});
@@ -372,7 +371,7 @@ export class EditorService {
       Object.keys(mdata.header).forEach( key => {
         let fn = "element['"+ key +"']"
         mcolumns.push({
-          "columnDef": key.toLowerCase().split(" ").join("_"),
+          "columnDef": key, //.toLowerCase().split(" ").join("_")
           "sticky": "false",
           "header": key,
           "cell": (element) => eval(fn)
@@ -386,6 +385,7 @@ export class EditorService {
       mdisplayedColumns = mdisplayedColumns.filter( key => {
         return (key.indexOf("Term Accession Number") < 0 && key.indexOf("Term Source REF") < 0)
       })
+
       mdata['columns'] = mcolumns;
       mdata['displayedColumns'] = mdisplayedColumns;
       mdata['rows'] = mdata.data.rows;

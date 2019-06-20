@@ -100,7 +100,7 @@
 </div>
 <span *ngIf="tableData">
 	<div class="wrapper mat-elevation-z1 prevent-deselect">
-		<table class="mat-elevation-z1" [dataSource]="dataSource" matSort mat-table>
+		<table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)" class="mat-elevation-z1" [dataSource]="dataSource" matSort mat-table>
 			<ng-container matColumnDef="Select" sticky>
 				<th (click)="deSelect()" class="clickable table-selector" mat-header-cell *matHeaderCellDef></th>
 				<td (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell *matCellDef="let row"></td>

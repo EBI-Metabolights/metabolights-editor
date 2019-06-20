@@ -76,6 +76,7 @@ import { FilesComponent } from './components/study/files/files.component';
 import { QuickLinkComponent } from './components/shared/quick-link/quick-link.component';
 import { ValidationsComponent } from './components/study/validations/validations.component';
 import { LoadingComponent } from './components/shared/loading/loading.component';
+import { EditTableDirective } from './directives/edit-table.directive';
 
 @NgModule({
   declarations: [
@@ -125,7 +126,8 @@ import { LoadingComponent } from './components/shared/loading/loading.component'
     FilesComponent,
     QuickLinkComponent,
     ValidationsComponent,
-    LoadingComponent
+    LoadingComponent,
+    EditTableDirective
   ],
   imports: [
     BrowserModule,
