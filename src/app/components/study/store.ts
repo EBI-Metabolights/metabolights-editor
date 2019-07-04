@@ -170,10 +170,13 @@ function setStudyAssay(state, action){
 
 function deleteStudyAssay(state, action){
     let tempAssays = Object.assign({}, state.assays);
+    let tempMAFS = Object.assign({}, state.mafs);
+    tempAssays[action.body].mafs.forEach( maf => {
+        delete tempMAFS[maf]
+    })
     delete tempAssays[action.body]
-    return tassign(state, { assays: tempAssays });
+    return tassign(state, { assays: tempAssays, mafs: tempMAFS });
 }
-
 
 function setStudyMAF(state, action){
     let tempMAFS = Object.assign({}, state.mafs);

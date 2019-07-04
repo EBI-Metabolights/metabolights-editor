@@ -9,6 +9,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { ValidateRules } from './protocol.validator';
 import { OntologyComponent } from './../../ontology/ontology.component';
 import * as toastr from 'toastr';
+import { JsonConvert } from "json2typescript";
 
 @Component({
 	selector: 'mtbls-protocol',
@@ -84,10 +85,6 @@ export class ProtocolComponent implements OnInit {
                 console.log(err)
             }
         );
-    }
-
-    onValueChanges(event, target){
-    	target = event
     }
 
     formatTitle(term){
@@ -175,17 +172,6 @@ export class ProtocolComponent implements OnInit {
 		this.isModalOpen = true
 	}
 
-	openModal(protocol) {
-		this.initialiseForm()
-		if(this.protocol.parameters.length > 0){
-			this.form.get('parameters').setValue(this.protocol.parameters);
-		}else{
-			this.form.get('parameters').setValue([]);
-		}
-		this.selectedProtocol = protocol;
-		this.isModalOpen = true
-	}
-
 	closeModal() {
 		this.isModalOpen = false
 		this.form.removeControl('description');
@@ -226,21 +212,6 @@ export class ProtocolComponent implements OnInit {
 		this.isParameterModalOpen = false;
 		this.form.markAsDirty();
 	}
-
-	initialiseForm() {
-      this.isFormBusy = false;
-      this.form = null;
-      if(this.protocol == null){
-			let mtblsProtocol = new MTBLSProtocol();
-			mtblsProtocol.parameters = [];
-			this.protocol = mtblsProtocol
-	  }
-      this.form = this.fb.group({
-      	name:  [ { value: this.protocol.name, disabled: this.required }, ValidateRules('name', this.fieldValidation('name'))],
-      	parameters:  [ this.protocol.parameters ],
-      	description:  [ this.protocol.description, ValidateRules('description', this.fieldValidation('description'))]
-      });
-    }
 	
 	save() {
 		this.isFormBusy = true;
@@ -248,7 +219,7 @@ export class ProtocolComponent implements OnInit {
 			this.editorService.updateProtocol(this.protocol.name, this.compileBody()).subscribe( res => {
 				this.updateProtocols(res, 'Protocol updated.')
 				this.form.removeControl('description')
-				this.isModalOpen = false;
+				// this.isModalOpen = false;
 			}, err => {
 				this.isFormBusy = false
 			});
@@ -256,7 +227,7 @@ export class ProtocolComponent implements OnInit {
 			this.editorService.saveProtocol(this.compileBody()).subscribe( res => {
 				this.updateProtocols(res, 'Protocol saved.')
 				this.form.removeControl('description')
-				this.isModalOpen = false
+				// this.isModalOpen = false
 			}, err => {
 				this.isFormBusy = false
 			});
@@ -282,15 +253,47 @@ export class ProtocolComponent implements OnInit {
 				"tapToDismiss": false
 			});
 		}
-		
+	}
+
+	initialiseForm() {
+		this.isFormBusy = false;
+		this.form = null;
+		if(this.protocol == null){
+			  let mtblsProtocol = new MTBLSProtocol();
+			  mtblsProtocol.parameters = [];
+			  this.protocol = mtblsProtocol
+		}
+		this.form = this.fb.group({
+			name:  [ { value: this.protocol.name, disabled: this.required }, ValidateRules('name', this.fieldValidation('name'))],
+			parameters:  [ this.protocol.parameters ],
+			description:  [ this.protocol.description, ValidateRules('description', this.fieldValidation('description'))]
+		});
+	}
+
+	openModal(protocol) {
+		this.initialiseForm()
+		if(this.protocol.parameters.length > 0){
+			this.form.get('parameters').setValue(this.protocol.parameters);
+		}else{
+			this.form.get('parameters').setValue([]);
+		}
+		this.selectedProtocol = protocol;
+		this.isModalOpen = true
 	}
 
 	updateProtocols(data, message){
 		this.editorService.getProtocols(null).subscribe( res => {
+
+			// 
+			let jsonConvert: JsonConvert = new JsonConvert();
+			this.protocol = jsonConvert.deserialize(res.protocols.filter( p => {
+				return p.name == this.protocol.name
+			})[0], MTBLSProtocol);
+			   
 			this.form.reset()
 			this.form.markAsPristine()
 			this.initialiseForm();
-			this.isModalOpen = true;
+			this.openModal(this.protocol)
 			toastr.success( message, "Success", {
 				"timeOut": "2500",
 				"positionClass": "toast-top-center",

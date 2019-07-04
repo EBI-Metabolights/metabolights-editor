@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
+import { Component, OnInit, Input, Output, ViewChild, EventEmitter } from '@angular/core';
+import { select } from '@angular-redux/store';
 import Swal from 'sweetalert2';
 import { EditorService } from '../../../../services/editor.service';
 import { TableComponent } from './../../../shared/table/table.component';
@@ -23,6 +23,8 @@ export class AssayDetailsComponent implements OnInit {
   sampleNames: any = []
   existingSampleNamesInAssay: any = []
   duplicateSampleNamesInAssay: any = []
+
+  @Output() assayDelete = new EventEmitter<any>();
   
   constructor(private editorService: EditorService) {}
 
@@ -101,6 +103,7 @@ export class AssayDetailsComponent implements OnInit {
     .then((willDelete) => {
       if (willDelete.value) {
         this.editorService.deleteAssay(name).subscribe( resp => {
+          this.assayDelete.emit(name)
           this.editorService.loadStudyFiles();
           Swal.fire({
             title: 'Assay deleted!',

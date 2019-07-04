@@ -16,7 +16,7 @@
       	</div>
 	  	<span *ngFor="let assay of assays; let i = index">
 	  		<span *ngIf="currentSubIndex == i">
-	  			<assay-details [assayName]="assay.name"></assay-details>
+	  			<assay-details (assayDelete)="assayDeleted($event)" [assayName]="assay.name"></assay-details>
 	  		</span>
 	  	</span>
 	</div>

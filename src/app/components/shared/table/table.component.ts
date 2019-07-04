@@ -28,7 +28,8 @@ export class TableComponent implements OnInit {
     @select(state => state.study.files) studyFiles: any;
 
     @Output() updated = new EventEmitter<any>();
-    @Output() rowsUpdated = new EventEmitter<any>();
+	@Output() rowsUpdated = new EventEmitter<any>();
+	@Output() rowEdit = new EventEmitter<any>();
 
     validations: any = {};
 
@@ -85,28 +86,34 @@ export class TableComponent implements OnInit {
 	      	this.validations = value;
 	    });
 	    this.studyFiles.subscribe(value => { 
-	      	this.files = value.study.filter(file => !file.directory);
+	      	if(value){
+				this.files = value.study.filter(file => !file.directory);
+			}
 	    });
 	}
 
 	initialise(){
 		this.deSelect()
 		this.data = this.tableData['data']
-		this.displayedTableColumns = this.data.displayedColumns
-		this.dataSource = new MatTableDataSource<any>(this.data.rows)
-		this.dataSource.filterPredicate = ((data, filter) => {
-		  	return this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
-		})	
-		this.dataSource.sort = this.sort;
-		this.detectFileColumns()
-		this.validateTableOntologyColumns()
-		if(this.view == 'expanded'){
-			this.displayedTableColumns = Object.keys(this.data.header)
+		if(this.data ){
+			this.displayedTableColumns = this.data.displayedColumns
+			this.dataSource = new MatTableDataSource<any>(this.data.rows)
+			this.dataSource.filterPredicate = ((data, filter) => {
+				return this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
+			})	
+			this.dataSource.sort = this.sort;
+			this.detectFileColumns()
+			this.validateTableOntologyColumns()
+			if(this.view == 'expanded'){
+				this.displayedTableColumns = Object.keys(this.data.header)
+			}
 		}
 	}
 
 	ngAfterViewInit() {
-    	this.dataSource.paginator = this.paginator;
+		if(this.dataSource){
+			this.dataSource.paginator = this.paginator;
+		}
 	}
 
 	onCopy(e){
@@ -429,9 +436,22 @@ export class TableComponent implements OnInit {
 		this.addRows([this.getEmptyRow()]);
 	}
 
+	updateRows(rows){
+		this.editorService.updateRows(this.data.file, { "data": rows}, this.validationsId, null).subscribe( res => {
+			toastr.success( "Row updated successfully", "Success", {
+				"timeOut": "2500",
+				"positionClass": "toast-top-center",
+				"preventDuplicates": true,
+				"extendedTimeOut": 0,
+				"tapToDismiss": false
+			});
+			}, err => {
+		});
+	}
+
 	addRows(rows){
 	   	this.editorService.addRows(this.data.file, { "data": rows}, this.validationsId, null).subscribe( res => {
-			toastr.success( "Rows added successfully to the end of the assay sheet", "Success", {
+			toastr.success( "Rows added successfully to the end of the sheet", "Success", {
 				"timeOut": "2500",
 				"positionClass": "toast-top-center",
 				"preventDuplicates": true,
@@ -707,9 +727,28 @@ export class TableComponent implements OnInit {
 	saveColumnSelectedMissingRowsValues(){
 		let selectedMissingOntology = this.getOntologyComponentValue('editMissingOntology').values[0]
 		let cellsToUpdate = []
-    	let accIndex = this.data.header[this.selectedMissingCol['accession']]
-    	let refIndex = this.data.header[this.selectedMissingCol['ref']]
+		let accIndex = this.data.header[this.selectedMissingCol['accession']]
+		if(this.isObject(accIndex)){
+			if(accIndex.index != null){
+				accIndex = accIndex.index
+			}
+		}
+
+		let refIndex = this.data.header[this.selectedMissingCol['ref']]
+		if(this.isObject(refIndex)){
+			if(refIndex.index != null){
+				refIndex = refIndex.index
+			}
+		}
+
 		let columnIndex = this.getHeaderIndex(this.data.header[this.selectedMissingKey])
+		
+		if(this.isObject(columnIndex)){
+			if(columnIndex.index != null){
+				columnIndex = columnIndex.index
+			}
+		}
+    	
 		this.data.rows.forEach( row => {
 			if(row[this.selectedMissingKey] == this.selectedMissingVal){
 				cellsToUpdate.push(
@@ -1008,6 +1047,10 @@ export class TableComponent implements OnInit {
 
 	triggerChanges(){
 		this.updated.emit();
+	}
+
+	editRow(row){
+		this.rowEdit.emit(row)
 	}
 
 	ngOnChanges(changes: SimpleChanges) {

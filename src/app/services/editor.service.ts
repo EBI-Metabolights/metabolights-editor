@@ -397,6 +397,11 @@ export class EditorService {
     })
   }
 
+  search(term, type) {
+    return this.dataService.search(term, type).pipe(map( data => {
+      return data
+    }))
+  }
 
   validateMAF(f){
     return this.dataService.validateMAF(f).pipe(map( data => {
@@ -610,6 +615,13 @@ export class EditorService {
 
   addRows(filename, body, tableType, metaInfo) {
     return this.dataService.addRows(filename, body).pipe(map(data => {
+      this.updateTableState(filename, tableType, metaInfo)
+      return data
+    }))
+  }
+
+  updateRows(filename, body, tableType, metaInfo) {
+    return this.dataService.updateRows(filename, body).pipe(map(data => {
       this.updateTableState(filename, tableType, metaInfo)
       return data
     }))

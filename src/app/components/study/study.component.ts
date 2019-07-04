@@ -1,19 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { DOIService } from '../../services/publications/doi.service';
-import { EuropePMCService } from '../../services/publications/europePMC.service';
-import { MetabolightsService } from '../../services/metabolights/metabolights.service';
 import { NgRedux, select } from '@angular-redux/store';
 import { IAppState } from '../../store';
-import { MTBLSPerson } from './../../models/mtbl/mtbls/mtbls-person';
-import { Ontology } from './../../models/mtbl/mtbls/common/mtbls-ontology';
-import { MTBLSPublication } from './../../models/mtbl/mtbls/mtbls-publication';
-import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript";
 import { EditorService } from './../../services/editor.service';
 import { MetaboLightsWSURL } from './../../services/globals';
-import * as toastr from 'toastr';
-import {Router} from "@angular/router";
+import { Router } from "@angular/router";
+import { MafsComponent } from "./../study/mafs/mafs.component"
 
 @Component({
 	selector: 'mtbls-study',
@@ -27,7 +19,7 @@ export class StudyComponent implements OnInit {
 	@select(state => state.status.currentTabIndex) currentIndex: number;
     @select(state => state.study.status) studyStatus;
     @select(state => state.study.obfuscationCode) studyObfuscationCode;
-	
+
 	requestedTab: number = 0;
     tab: string = "descriptors";	
 	requestedStudy: string = null;

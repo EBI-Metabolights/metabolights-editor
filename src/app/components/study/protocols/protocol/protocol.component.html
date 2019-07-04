@@ -71,10 +71,10 @@
     <footer *ngIf="protocol.parameters.length > 0 && protocol.parameters[0].parameterName.annotationValue != ''" class="card-footer">
       <span>
         <div id="meta" class="field is-grouped is-grouped-multiline">
-          <div *ngFor="let parameter of protocol.parameters">
-            <div *ngIf="parameter.parameterName.annotationValue != ''" class="control">
-              <div class="tags is-info has-addons">
-                <span class="tag">{{ parameter.parameterName.annotationValue }}</span>
+            <div class="tags is-info has-addons">
+              <div *ngFor="let parameter of protocol.parameters">
+                <div *ngIf="parameter.parameterName.annotationValue != ''" class="control">
+                  <span class="tag">{{ parameter.parameterName.annotationValue }}</span>
               </div>
             </div>
           </div>

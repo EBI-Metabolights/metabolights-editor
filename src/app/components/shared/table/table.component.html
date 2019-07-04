@@ -1,3 +1,13 @@
+<div *ngIf="data" class="columns is-vcentered">
+	<span class="column is-6 fadeIn nmrl">
+		<span class="has-text-grey">
+			<small>File: {{ data.file }}</small>
+		</span>
+	</span>
+	<span class="column is-6 fadeIn has-text-right nmrl">
+		<mat-paginator [pageSizeOptions]="[1000, 2000]" showFirstLastButtons></mat-paginator>
+	</span>
+</div>
 <div class="my-2">
 	<div *ngIf="hasAnyMissingValues()" class="notification is-warning">
       <small>The terms below are provided in your table but do not have associated ontologies. If you wish to add ontology terms please use <i class="material-icons">edit</i> to edit or <i class="material-icons">compare_arrows</i> to autofill using existing values.</small> <br><br>
@@ -29,17 +39,7 @@
       </span>
     </div>
 </div>
-<div class="columns is-vcentered">
-	<span class="column is-6 fadeIn nmrl">
-		<span class="has-text-grey">
-			<small>File: {{ data.file }}</small>
-		</span>
-	</span>
-	<span class="column is-6 fadeIn has-text-right nmrl">
-		<mat-paginator [pageSizeOptions]="[1000, 2000]" showFirstLastButtons></mat-paginator>
-	</span>
-</div>
-<div class="columns mb0 is-vcentered prevent-deselect">
+<div class="columns mb0 is-vcentered prevent-deselect my-2">
 	<span class="column is-12 fadeIn nmrl">
 		<a class="button is-small is-light" (click)="toggleView()">
 			<span *ngIf="view == 'compact'; else expandedTable">
@@ -56,7 +56,7 @@
 		&nbsp;
 		<mtbls-upload></mtbls-upload>
 		&nbsp;
-		<span *ngIf="data.file">
+		<span *ngIf="data && data.file">
 			<mtbls-download [value]="data.file"></mtbls-download>
 		</span>
 			&nbsp;
@@ -98,12 +98,12 @@
 	  	</div>
 	</span>
 </div>
-<span *ngIf="tableData">
+<span *ngIf="tableData && data">
 	<div class="wrapper mat-elevation-z1 prevent-deselect">
 		<table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)" class="mat-elevation-z1" [dataSource]="dataSource" matSort mat-table>
 			<ng-container matColumnDef="Select" sticky>
 				<th (click)="deSelect()" class="clickable table-selector" mat-header-cell *matHeaderCellDef></th>
-				<td (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell *matCellDef="let row"></td>
+				<td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell *matCellDef="let row"></td>
 			</ng-container>
 			<ng-container *ngFor="let column of data.columns" [sticky]="column.sticky" [matColumnDef]="column.columnDef">
 				<th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)" class="clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header> 

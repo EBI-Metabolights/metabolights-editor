@@ -7,5 +7,8 @@
 			</span>
 			<mtbls-person [value]="null"></mtbls-person>
 		</h6>
+		<span *ngIf="(people | async) && (people | async).length == 0">
+			<small class="has-text-grey-light"><i>No study persons/authors found</i></small>
+		</span>
 	</div>
 </div>

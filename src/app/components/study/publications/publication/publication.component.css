@@ -2,7 +2,7 @@
 	min-height: 3.5em;
 	font-size: 1em;
 	line-height: 1.55em;
-    margin-top: 15px;
+    margin-top: 0px;
 }
 
 .publication-authors{
@@ -10,12 +10,7 @@
 }
 
 .custom-button{
-	float: right;
-    right: 0;
-    height: 30px;
-    background-color: transparent !important;
-    border-color: transparent;
-    margin-right: -8px;
+    margin-top: 10px;
 }
 
 .box {
@@ -23,7 +18,8 @@
 }
 
 .mat-icon {
-    height: 1em; 
+    font-size: 14px;
+    width: 20px;
 }
 
 a {

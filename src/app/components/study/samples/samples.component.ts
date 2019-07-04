@@ -15,7 +15,7 @@ import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
 	templateUrl: './samples.component.html',
 	styleUrls: ['./samples.component.css']
 })
-export class SamplesComponent implements OnInit {
+export class SamplesComponent {
 
 	@select(state => state.study.samples) studySamples;
 	@select(state => state.study.validations) studyValidations: any;
@@ -54,13 +54,22 @@ export class SamplesComponent implements OnInit {
 			this.factors = value;
 		});
         this.studyFiles.subscribe(f => { 
-            f.study.forEach( file => {
-              if(file.type == "raw")  {
-                  let name = file.file.split(".")[0]
-                  this.rawFileNames.push(name)
-              }
-            })
+            if(f){
+                f.study.forEach( file => {
+                    if(file.type == "raw")  {
+                        let name = file.file.split(".")[0]
+                        this.rawFileNames.push(name)
+                    }
+                })
+            }
         });
+        this.studySamples.subscribe(value => { 
+			if(value == null){
+				this.editorService.loadStudySamples();
+			}else{
+				this.samples = value;
+			}
+		});
 	}
 
     refresh(){
@@ -71,41 +80,45 @@ export class SamplesComponent implements OnInit {
         let uniqueSamples = []
         this.duplicateSamples = []
         this.emptySamplesExist = false;
-        this.sampleTable.data.rows.forEach(row => {
-            let sampleName = row['Sample Name']
-            if(uniqueSamples.indexOf(sampleName) > -1){
-                this.duplicateSamples.push(sampleName)
-            }else{
-                uniqueSamples.push(sampleName)
-            }
-            if( sampleName == ''){
-                this.emptySamplesExist = true
-            }            
-        });
+        if(this.sampleTable.data){
+            this.sampleTable.data.rows.forEach(row => {
+                let sampleName = row['Sample Name']
+                if(uniqueSamples.indexOf(sampleName) > -1){
+                    this.duplicateSamples.push(sampleName)
+                }else{
+                    uniqueSamples.push(sampleName)
+                }
+                if( sampleName == ''){
+                    this.emptySamplesExist = true
+                }            
+            });
+        }
     }
 
 	get unSelectedFactors() {
-		let uniqueSelectedFactors = []
-		let unselectedFactors: any = [];
-        if(!this.sampleTable){
-            return unselectedFactors;
+        let uniqueSelectedFactors = []
+        if(this.factors){
+            let usf: any = [];
+            if(!this.sampleTable){
+                return usf;
+            }
+            if(this.sampleTable.data && this.sampleTable.data.header){
+                this.keys(this.sampleTable.data.header).forEach( header => {
+                    if(header.indexOf('Factor Value') > -1){
+                        let factorName = header.replace("Factor Value", "").replace("[","").replace("]","").replace(/^[ ]+|[ ]+$/g,'')
+                        if(uniqueSelectedFactors.indexOf(factorName) < 0){
+                            uniqueSelectedFactors.push(factorName)
+                        }
+                    }
+                })
+            }
+            this.factors.forEach(f=>{
+                if(uniqueSelectedFactors.indexOf(f.factorName) < 0){
+                    usf.push(f)
+                }
+            })
         }
-		if(this.sampleTable.data && this.sampleTable.data.header){
-			this.keys(this.sampleTable.data.header).forEach( header => {
-				if(header.indexOf('Factor Value') > -1){
-					let factorName = header.replace("Factor Value", "").replace("[","").replace("]","").replace(/^[ ]+|[ ]+$/g,'')
-					if(uniqueSelectedFactors.indexOf(factorName) < 0){
-						uniqueSelectedFactors.push(factorName)
-					}
-				}
-			})
-		}
-		this.factors.forEach(f=>{
-			if(uniqueSelectedFactors.indexOf(f.factorName) < 0){
-				unselectedFactors.push(f)
-			}
-		})
-        return unselectedFactors;
+        return []
     }
 
     addSamples(){
@@ -137,18 +150,6 @@ export class SamplesComponent implements OnInit {
         })
         this.form.get('samples').setValue(this.rawFileNames.join("\n"))
     }
-
-	onChanges(){}
-
-	ngOnInit() {
-		this.studySamples.subscribe(value => { 
-			if(value == null){
-				this.editorService.loadStudySamples();
-			}else{
-				this.samples = value;
-			}
-		});
-	}
 
 	addColumn(type){
 		console.log();		

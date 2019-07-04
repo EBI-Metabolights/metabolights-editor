@@ -1,0 +1,27 @@
+.noImg{
+    display: flex; 
+    height: 300px; 
+    width: 312px; 
+    justify-content: center; 
+    align-items: center
+}
+
+.mat-form-field-appearance-legacy .mat-form-field-prefix .mat-icon-button, .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-icon-button {
+    font: inherit;
+    vertical-align: baseline;
+}
+
+.mat-form-field-prefix .mat-icon-button, .mat-form-field-suffix .mat-icon-button {
+    height: 1.5em;
+    width: 1.5em;
+}
+
+.mat-icon-button {
+    padding: 0;
+    min-width: 0;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    line-height: 40px;
+    border-radius: 50%;
+}
