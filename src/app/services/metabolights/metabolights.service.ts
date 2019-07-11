@@ -99,6 +99,13 @@ export class MetabolightsService extends DataService{
       );
   }
 
+  syncFiles(data){
+    return this.http.post(this.url.studiesList + "/" + this.id + "/sync?include_raw_data=true", data, { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+      );
+  }
+
 
   // Study title
   getTitle(id) {

@@ -7,7 +7,7 @@
   </div>
 </span>
 <ng-template #showContent>
-  <mtbls-upload [mode]="'button'" [size]="'is'" ></mtbls-upload>&nbsp;
+  <mtbls-upload  [type]="'any'" [multiple]="true" [mode]="'button'" [size]="'is'" ></mtbls-upload>&nbsp;
   <a (click)="loadFilesPassively()" class="button is-light">
     <mat-icon>refresh</mat-icon> Refresh
   </a>

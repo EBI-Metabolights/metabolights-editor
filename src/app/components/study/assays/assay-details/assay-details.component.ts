@@ -16,6 +16,13 @@ export class AssayDetailsComponent implements OnInit {
   @select(state => state.study.samples) studySamples;
   @ViewChild(TableComponent) assayTable: TableComponent;
 
+  fileTypes: any = [
+		{
+			filter_name : "MetaboLights assay sheet type",
+			extensions : ["txt"]
+		}
+  ];
+
 	assay: any = null;
   addSamplesModalOpen = false;
   filteredSampleNames: any = []

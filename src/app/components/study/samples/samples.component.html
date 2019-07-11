@@ -39,7 +39,7 @@
 		<mat-icon>add</mat-icon> Samples
 	</a>
 </span>
-<mtbls-table (updated)="refresh()" [tableData]="samples" validationsId="samples"></mtbls-table>
+<mtbls-table [fileTypes]="fileTypes" (updated)="refresh()" [tableData]="samples" validationsId="samples"></mtbls-table>
 
 <div class="modal" [ngClass]="{'is-active': addColumnModalOpen}">
   <div class="modal-background"></div>

@@ -31,6 +31,14 @@ export class TableComponent implements OnInit {
 	@Output() rowsUpdated = new EventEmitter<any>();
 	@Output() rowEdit = new EventEmitter<any>();
 
+	@Input('fileTypes') fileTypes: any = [
+		{
+			filter_name : "All types",
+			extensions : ["*"]
+		}
+	];
+	  
+
     validations: any = {};
 
     dataSource: MatTableDataSource<any>;
@@ -98,6 +106,7 @@ export class TableComponent implements OnInit {
 		if(this.data ){
 			this.displayedTableColumns = this.data.displayedColumns
 			this.dataSource = new MatTableDataSource<any>(this.data.rows)
+			this.dataSource.paginator = this.paginator;
 			this.dataSource.filterPredicate = ((data, filter) => {
 				return this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
 			})	

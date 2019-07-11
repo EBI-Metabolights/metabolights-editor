@@ -19,6 +19,12 @@ export class AsperaComponent implements OnInit {
 	@select(state => state.study.uploadLocation) uploadLocation;
     displayHelpModal: boolean = false;
 
+    @Input('file') file: string = null;
+    @Input('allowMultipleSelection') allowMultipleSelection: boolean = true;
+    @Input('type') type: string = 'file';
+
+    @Input('fileTypes') fileTypes: any = null;
+
     @Output() complete = new EventEmitter<any>();
 
     currentTransferId = null;
@@ -63,9 +69,13 @@ export class AsperaComponent implements OnInit {
 
 	closeUploadModal(){
 		this.isAsperaUploadModalOpen = false;	
-	}
+    }
+    
+    upload(type){
+        this.asperaUpload(type)
+    }
 
-	asperaUpload(){
+	asperaUpload(type){
         this.asperaWeb = new AW4.Connect({sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION, minVersion: this.MIN_CONNECT_VERSION});
         var connectInstaller = new AW4.ConnectInstaller({sdkLocation : this.CONNECT_AUTOINSTALL_LOCATION});
         var statusEventListener = function (eventType, data) {
@@ -87,11 +97,27 @@ export class AsperaComponent implements OnInit {
                        if(transfer.status == "completed"){
                            console.log("Upload completed")
                            console.log("Sync started")
-                           this.editorService.copyStudyFiles().subscribe(data => {
-                               this.closeUploadModal();
-                               this.complete.emit();
-                               console.log("Sync complete")
-                           })
+                           console.log()
+                           console.log(this.file)
+                            if(this.allowMultipleSelection){
+                                this.editorService.copyStudyFiles().subscribe(data => {
+                                    this.closeUploadModal();
+                                    this.complete.emit();
+                                    console.log("Sync complete")
+                                })
+                            }else{
+                                this.editorService.syncStudyFiles({
+                                    files: [ {
+                                            from: transfer['transfer_spec'].paths[0].source.split('\\').pop().split('/').pop(),
+                                            to : this.file
+                                        }
+                                    ]
+                                }).subscribe(data => {
+                                    this.closeUploadModal();
+                                    this.complete.emit();
+                                    console.log("Sync complete")
+                                })
+                            }
                        }
                     }
                 })
@@ -100,14 +126,31 @@ export class AsperaComponent implements OnInit {
         this.asperaWeb.addEventListener(AW4.Connect.EVENT.STATUS, statusEventListener);
         this.asperaWeb.addEventListener(AW4.Connect.EVENT.TRANSFER, transferStatusListener);
         this.asperaWeb.initSession();
-        this.asperaWeb.showSelectFileDialog({
-            success: (function(dataTransferObj){
-                this.buildUploadSpec(dataTransferObj)
-            }).bind(this),
-            error: function (error) {
-                console.error(error);
-            }
-        });
+        if(type == 'folder'){
+            this.asperaWeb.showSelectFolderDialog({
+                success: (function(dataTransferObj){
+                    this.buildUploadSpec(dataTransferObj)
+                }).bind(this),
+                error: function (error) {
+                    console.error(error);
+                }
+            }, {
+                allowMultipleSelection : this.allowMultipleSelection
+            });
+        }else{
+            console.log(this.fileTypes)
+            this.asperaWeb.showSelectFileDialog({
+                success: (function(dataTransferObj){
+                    this.buildUploadSpec(dataTransferObj)
+                }).bind(this),
+                error: function (error) {
+                    console.error(error);
+                }
+            }, {
+                allowMultipleSelection : this.allowMultipleSelection,
+                allowedFileTypes : this.fileTypes
+            });
+        }
     }
 
     buildUploadSpec(dataTransferObj) {

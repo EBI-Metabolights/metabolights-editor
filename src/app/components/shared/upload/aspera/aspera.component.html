@@ -35,7 +35,17 @@
 				<div class="content-wrapper has-text-centered vc">
 					<div><br>
 						<img src="assets/img/aspera.jpeg" style="height: 100px"><br><br>
-						<button (click)="asperaUpload()" class="button is-success">Upload now</button>
+						<span *ngIf="type == 'file' || type == 'any'">
+							<button (click)="upload('file')" class="button is-success">Upload file
+								<span *ngIf="allowMultipleSelection">s</span>
+							</button>
+						</span>
+						&nbsp;
+						<span *ngIf="type == 'folder' || type == 'any'">
+							<button (click)="upload('folder')" class="button is-success">Upload folder
+								<span *ngIf="allowMultipleSelection">s</span>
+							</button>
+						</span>
 						<br><br><br>
 						<small class="has-text-grey">
 							<b><a target="_blank" href="https://downloads.asperasoft.com/connect2/">Install plugin</a></b>&emsp;|&emsp;<b><a target="_blank" href="https://www.asperasoft.com/company/support/transfer-clients/">Platform support</a> </b>

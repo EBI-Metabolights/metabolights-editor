@@ -23,6 +23,13 @@ export class MafComponent {
 	selectedRow = {};
 	form: FormGroup;
 
+	fileTypes: any = [
+		{
+			filter_name : "MetaboLights maf sheet type",
+			extensions : ["tsv"]
+		}
+  ];
+
 	@ViewChild(TableComponent) mafTable: TableComponent;
 
   	constructor(private fb: FormBuilder, private editorService: EditorService) {}

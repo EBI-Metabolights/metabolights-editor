@@ -7,7 +7,7 @@
 			<div class="content">
 				<h4 class="publication-title">
 					<b>
-						<a [href]="'//dx.doi.org/' + publication.doi" target="_blank">{{ publication.title | slice : 0 : 90 }}<span *ngIf="publication.title.length > 90">...</span>
+						<a (click)='openModal()' target="_blank">{{ publication.title | slice : 0 : 90 }}<span *ngIf="publication.title.length > 90">...</span>
 						</a>
 					</b>
 				</h4>
@@ -39,6 +39,32 @@
 				</div>
 				<div class="column is-half has-text-right">
 					<button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
+				</div>
+			</div>
+		</footer>
+	</div>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isImportAuthorsModalOpen}">
+	<div class="modal-background"></div>
+	<div class="modal-card vw80">
+		<section class="modal-card-body">
+			<p>Please select the authors you would like to import</p>
+			<br>
+			<div *ngIf="manuscriptAuthors">
+				<span *ngFor="let author of manuscriptAuthors">
+					<mat-checkbox class="example-margin" [(ngModel)]="author.checked"> <b>{{ author.fullName }}</b> <span *ngIf="author.authorId != null && author.authorId.type == 'ORCID'"> <small> (ORCID: {{ author.authorId.value }})</small> </span> <br> <small *ngIf="author.affiliation">{{ author.affiliation }}</small> </mat-checkbox>
+					<br><br>
+				</span>
+			</div>
+		</section>
+		<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-half">
+					
+				</div>
+				<div class="column is-half has-text-right">
+					<button (click)='closeImportAuthor()' class="button is-default">Done</button><button (click)="saveAuthors()" class="button is-info">Import Selected</button>
 				</div>
 			</div>
 		</footer>
@@ -168,9 +194,9 @@
 	<div class="columns is-gapless full-width">
 		<div class="column is-two-third">
 			<button *ngIf="!addNewPublication" [tabIndex]="-1" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
-			<!-- <button class="button is-light is-pulled-left" (click)='showHistory()' ><mat-icon>history</mat-icon></button> -->
 			<button *ngIf="!addNewPublication && form.get('title').value != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='confirmTitleUpdate()'><small>Update title</small></button>
 			<button *ngIf="!addNewPublication && publicationAbstract != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='confirmAbstractUpdate()'><small>Update abstract</small></button>
+			<button *ngIf="!addNewPublication && form.get('doi').value != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='openImportAuthorsModal()'><small>Import Authors</small></button>
 		</div>
 		<div class="column is-one-third has-text-right">
 			<button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">

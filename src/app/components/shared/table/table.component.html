@@ -54,7 +54,9 @@
 			<mat-icon>add</mat-icon> Row
 		</a>
 		&nbsp;
-		<mtbls-upload></mtbls-upload>
+		<span *ngIf="data">
+			<mtbls-upload [fileTypes]="fileTypes" [type]="'file'" [multiple]="false" [file]="data.file"></mtbls-upload>
+		</span>
 		&nbsp;
 		<span *ngIf="data && data.file">
 			<mtbls-download [value]="data.file"></mtbls-download>

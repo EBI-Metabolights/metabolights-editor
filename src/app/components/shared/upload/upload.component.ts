@@ -14,6 +14,14 @@ export class UploadComponent implements OnInit {
 	@Input('mode') mode: string = 'button';
 	@Input('size') size: string = 'is-small';
 
+	@Input('file') file: string = null;
+	@Input('multiple') allowMultipleSelection: boolean = true;
+	@Input('type') type: string = 'file';
+	@Input('fileTypes') fileTypes: any = {
+        filter_name : "All types",
+        extensions : ["*"]
+    };
+
 	isUploadModalOpen: boolean = false;
 
 	constructor(private fb: FormBuilder) { }

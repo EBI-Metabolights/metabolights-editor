@@ -479,6 +479,12 @@ export class EditorService {
     }))
   }
 
+  syncStudyFiles(data){
+    return this.dataService.syncFiles(data).pipe( map( () => {
+      return this.loadStudyFiles()
+    }))
+  }
+
   deleteProperties(data){
     delete data.obfuscationCode
     delete data.uploadPath
@@ -495,16 +501,18 @@ export class EditorService {
   }
 
   savePerson(body){
-    return this.dataService.savePerson(body); 
+    return this.dataService.savePerson(body).pipe( map(data => { this.ngRedux.dispatch({ type: 'UPDATE_STUDY_PEOPLE', body: {
+      'people': data.contacts
+      }});
+    }));
   }
 
   // People
   getPeople(){
     return this.dataService.getPeople().pipe( map(data => { this.ngRedux.dispatch({ type: 'UPDATE_STUDY_PEOPLE', body: {
       'people': data.contacts
-    }}); 
-    return data 
-  }));
+      }});
+    }));
   }
 
   updatePerson(email, name, body){

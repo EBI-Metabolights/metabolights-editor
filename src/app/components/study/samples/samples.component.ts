@@ -26,8 +26,15 @@ export class SamplesComponent {
 	@ViewChild(TableComponent) sampleTable: TableComponent;
 
 	selectedFactor: MTBLSFactor = null;
-	isFactorDropdownActive: boolean = false;
-
+    isFactorDropdownActive: boolean = false;
+    
+    fileTypes: any = [
+		{
+			filter_name : "MetaboLights sample sheet type",
+			extensions : ["txt"]
+		}
+    ];
+    
 	samples: any = null;
 	factors: any = null;
 	validations: any = null;

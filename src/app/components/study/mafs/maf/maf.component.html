@@ -8,7 +8,7 @@
 	<div class="column"  style="width: 100%; overflow-x: auto">
 		<div class="panel-block-wrapper">
 			<span *ngIf="mafData">
-				<mtbls-table (rowEdit)="openRowEditModal($event)" [tableData]="mafData" validationsId="maf"></mtbls-table>
+				<mtbls-table [fileTypes]="fileTypes" (rowEdit)="openRowEditModal($event)" [tableData]="mafData" validationsId="maf"></mtbls-table>
 			</span>
 		</div>
 	</div>

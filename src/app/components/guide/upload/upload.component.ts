@@ -57,7 +57,7 @@ export class RawUploadComponent implements OnInit {
 
   	copyFilesAndProceed(){
   		this.isLoading = true
-  		this.editorService.copyStudyFiles().subscribe( resp => {
+  		this.editorService.syncStudyFiles({files: []}).subscribe( resp => {
 			this.isLoading = false
 			this.router.navigate(['/guide/meta', this.requestedStudy])
 		})

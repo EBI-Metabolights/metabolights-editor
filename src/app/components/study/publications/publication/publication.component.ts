@@ -13,6 +13,7 @@ import { IAppState } from '../../../../store';
 import { OntologyComponent } from './../../ontology/ontology.component';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from 'toastr';
+import { MTBLSPerson } from './../../../../models/mtbl/mtbls/mtbls-person';
 
 @Component({
 	selector: 'mtbls-publication',
@@ -37,6 +38,9 @@ export class PublicationComponent implements OnInit {
 	isDeleteModalOpen: boolean = false;
 	isUpdateTitleModalOpen: boolean = false;
 	isUpdateAbstractModalOpen: boolean = false;
+	isImportAuthorsModalOpen: boolean = false;
+
+	manuscriptAuthors: any = null;
 
 	publicationAbstract: string = '';
 
@@ -44,6 +48,73 @@ export class PublicationComponent implements OnInit {
 		this.studyValidations.subscribe(value => { 
       		this.validations = value;
     	});
+	}
+
+	openImportAuthorsModal(){
+		this.getAuthorsFromDOI()
+		this.isModalOpen = false;
+		this.isImportAuthorsModalOpen = true;
+	}
+
+	closeImportAuthor(){
+		this.isModalOpen = true;
+		this.isImportAuthorsModalOpen = false;
+	}
+
+	saveAuthors(){
+		let authorsA = []
+		this.manuscriptAuthors.forEach( author => {
+			if(author.checked){
+				authorsA.push(this.compileAuthor(author))
+			}
+		})
+
+		this.editorService.savePerson({'contacts': authorsA}).subscribe( res => {
+			toastr.success('Authors imported.', "Success", {
+				"timeOut": "2500",
+				"positionClass": "toast-top-center",
+				"preventDuplicates": true,
+				"extendedTimeOut": 0,
+				"tapToDismiss": false
+			})
+		}, err => {
+			toastr.error('Failed to import authors.', "Error", {
+				"timeOut": "2500",
+				"positionClass": "toast-top-center",
+				"preventDuplicates": true,
+				"extendedTimeOut": 0,
+				"tapToDismiss": false
+			})
+		});
+	}
+
+	compileAuthor(author){
+		let jsonConvert: JsonConvert = new JsonConvert();
+		let mtblPerson = new MTBLSPerson();
+		mtblPerson.lastName = author.lastName
+		mtblPerson.firstName = author.firstName
+		mtblPerson.midInitials = ""
+		mtblPerson.email = ""
+		mtblPerson.phone = ""
+		mtblPerson.fax = ""
+		mtblPerson.address = ""
+		mtblPerson.affiliation = author.affiliation ? author.affiliation : "";
+		let role = jsonConvert.deserializeObject(JSON.parse('{"annotationValue":"Author","comments":[],"termAccession":"http://purl.obolibrary.org/obo/NCIT_C42781","termSource":{"comments":[],"description":"NCI Thesaurus OBO Edition","file":"http://purl.obolibrary.org/obo/ncit.owl","ontology_name":"NCIT","provenance_name":"NCIT","version":"18.10e"}}'), Ontology)
+		mtblPerson.roles.push(role)
+		return mtblPerson.toJSON()
+	  }
+	
+
+	getAuthorsFromDOI() {
+		this.publicationAbstract = '';
+		let doi = this.getFieldValue('doi').replace('http://dx.doi.org/','')
+		this.setFieldValue('doi', doi);
+		let doiURL = 'http://dx.doi.org/' + doi
+		if(doi != ''){
+			this.europePMCService.getArticleInfo('DOI:' + doi.replace('http://dx.doi.org/','')).subscribe( article => {
+				this.manuscriptAuthors = article['authorDetails']
+	      	})
+		}
 	}
 
 	ngOnInit() {

@@ -331,14 +331,13 @@ export class FilesComponent implements OnInit {
         this.rawFilesLoading = true;
         this.metabolightsService.getStudyFilesList(null).subscribe( data => {
             data.study.forEach( file => {
-            if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
-                this.rawFiles.push(file)
-                this.filteredRawFiles.push(file)
-            }
+                if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' || file.type == "raw" ){
+                    this.rawFiles.push(file)
+                    this.filteredRawFiles.push(file)
+                }
             })
             this.rawFilesLoading = false;
         })
-
     }
 
     applyFilter(event, target){
