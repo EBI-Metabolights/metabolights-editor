@@ -21,6 +21,8 @@ export class DescriptionComponent implements OnChanges, OnInit {
   isFormBusy: boolean = false;
   description: string = '';
   validations: any;
+  isSymbolDropdownActive: boolean = false;
+  editor: any;
 
   validationsId = 'description';
 
@@ -39,6 +41,33 @@ export class DescriptionComponent implements OnChanges, OnInit {
       }
     });
   }
+
+  toggleSymbolDropdown(){
+    this.isSymbolDropdownActive = !this.isSymbolDropdownActive
+  }
+
+  addSymbol(content){
+		this.editor.focus()
+    var caretPosition = this.editor.getSelection(true);
+    this.editor.insertText(caretPosition, content, 'user');
+		this.toggleSymbolDropdown()
+  }
+
+  setEditor(editor: any) {
+		this.editor = editor
+		this.editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+			let ops = []
+			delta.ops.forEach(op => {
+				if (op.insert && typeof op.insert === 'string') {
+					ops.push({
+						insert: op.insert
+					})
+				}
+			})
+			delta.ops = ops
+			return delta
+		})
+	}
 
   ngOnInit() {
   }

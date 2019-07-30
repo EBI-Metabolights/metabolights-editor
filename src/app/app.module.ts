@@ -78,6 +78,8 @@ import { ValidationsComponent } from './components/study/validations/validations
 import { LoadingComponent } from './components/shared/loading/loading.component';
 import { EditTableDirective } from './directives/edit-table.directive';
 
+import { QuillModule } from 'ngx-quill'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -151,7 +153,8 @@ import { EditTableDirective } from './directives/edit-table.directive';
     MatCheckboxModule,
     MatTableModule,
     AngularStickyThingsModule,
-    NgReduxRouterModule.forRoot()
+    NgReduxRouterModule.forRoot(),
+    QuillModule.forRoot()
   ],
   providers: [
     AuthGuard

@@ -100,7 +100,9 @@ export class AsperaComponent implements OnInit {
                            console.log()
                            console.log(this.file)
                             if(this.allowMultipleSelection){
-                                this.editorService.copyStudyFiles().subscribe(data => {
+                                this.editorService.syncStudyFiles({
+                                    files: []
+                                }).subscribe(data => {
                                     this.closeUploadModal();
                                     this.complete.emit();
                                     console.log("Sync complete")

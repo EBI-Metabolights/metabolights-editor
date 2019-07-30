@@ -33,7 +33,7 @@ export class OntologyDetailsComponent implements OnInit {
 
   	displayOntologyInfo(){
       this.isLoading = true;
-  		this.editorService.getOntologyTermDescription(this.value).subscribe( response => {
+  		this.editorService.getOntologyDetails(this.value).subscribe( response => {
   			this.details = response
         this.isLoading = false;
   			this.openModal();

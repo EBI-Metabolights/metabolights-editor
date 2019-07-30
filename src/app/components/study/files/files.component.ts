@@ -369,7 +369,9 @@ export class FilesComponent implements OnInit {
     }
 
     copyFiles(){
-        this.metabolightsService.copyFiles().subscribe( data => {
+        this.metabolightsService.syncFiles({
+            files: []
+        }).subscribe( data => {
             toastr.success('Files synced successfully', "Success", {
                   "timeOut": "2500",
                   "positionClass": "toast-top-center",

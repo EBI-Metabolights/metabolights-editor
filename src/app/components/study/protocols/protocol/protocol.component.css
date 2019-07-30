@@ -2,6 +2,10 @@
     padding: 10px 10px;
 }
 
+:host /deep/ .ql-container {
+	min-height: 250px;
+}
+
 label{
 	font-size: 0.73em;
     color: #666;

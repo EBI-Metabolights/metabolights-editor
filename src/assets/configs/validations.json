@@ -230,7 +230,7 @@
 						"is-forced-ontology": "false",
 						"ontology": {
 							"url": "ws/ebi-internal/ontology?branch=role&term=",
-							"allowFreeText": true
+							"allowFreeText": false
 						}
 					}
 				}

@@ -34,7 +34,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
  	searchedMore: boolean = false;
  	url: string = '';
  	endPoints: any[] = [];
- 	addOnBlur = true;
+ 	addOnBlur = false;
  	inputValue: string = '';
  	form: FormGroup;
  	isFormBusy: boolean = false;
@@ -110,7 +110,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
  			if(this.validations['recommended-ontologies']){
  				this.isforcedOntology = this.validations['recommended-ontologies']['is-forced-ontology']
  				this.url = this.validations['recommended-ontologies']['ontology']['url']
- 				this.addOnBlur = this.validations['recommended-ontologies']['ontology']['allowFreeText']
+				 this.addOnBlur = this.validations['recommended-ontologies']['ontology']['allowFreeText']
  				this.endPoints = this.validations['recommended-ontologies']['ontology']
  				if(this.url != ''){
  					this.editorService.getOntologyTerms(this.domain + this.url).subscribe( terms => {

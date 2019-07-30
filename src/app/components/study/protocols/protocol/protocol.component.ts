@@ -31,6 +31,8 @@ export class ProtocolComponent implements OnInit {
 	isFormBusy: boolean = false;
 	isSymbolDropdownActive: boolean = false;
 
+	editor: any;
+
 	selectedProtocol: any = null;
 
 	addNewProtocol: boolean = false;
@@ -112,7 +114,23 @@ export class ProtocolComponent implements OnInit {
 			}
 		})
 		return isEmpty;
-    }
+	}
+	
+	setEditor(editor: any) {
+		this.editor = editor
+		this.editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+			let ops = []
+			delta.ops.forEach(op => {
+				if (op.insert && typeof op.insert === 'string') {
+					ops.push({
+						insert: op.insert
+					})
+				}
+			})
+			delta.ops = ops
+			return delta
+		})
+	}
 
     toggleBulkEditSection(){
     	this.isBulkEditModalOpen = !this.isBulkEditModalOpen
@@ -123,7 +141,10 @@ export class ProtocolComponent implements OnInit {
     }
 
     addSymbol(content){
-    	this.copyToClipboard(content)
+		this.editor.focus()
+    	var caretPosition = this.editor.getSelection(true);
+		this.editor.insertText(caretPosition, content, 'user');
+		this.toggleSymbolDropdown()
     }
 
     getAssaysWithProtocol(){
@@ -214,23 +235,27 @@ export class ProtocolComponent implements OnInit {
 	}
 	
 	save() {
-		this.isFormBusy = true;
-		if(!this.addNewProtocol){
-			this.editorService.updateProtocol(this.protocol.name, this.compileBody()).subscribe( res => {
-				this.updateProtocols(res, 'Protocol updated.')
-				this.form.removeControl('description')
-				// this.isModalOpen = false;
-			}, err => {
-				this.isFormBusy = false
-			});
+		if(this.getFieldValue('description')){
+			this.isFormBusy = true;
+			if(!this.addNewProtocol){
+				this.editorService.updateProtocol(this.protocol.name, this.compileBody()).subscribe( res => {
+					this.updateProtocols(res, 'Protocol updated.')
+					this.form.removeControl('description')
+					// this.isModalOpen = false;
+				}, err => {
+					this.isFormBusy = false
+				});
+			}else{
+				this.editorService.saveProtocol(this.compileBody()).subscribe( res => {
+					this.updateProtocols(res, 'Protocol saved.')
+					this.form.removeControl('description')
+					// this.isModalOpen = false
+				}, err => {
+					this.isFormBusy = false
+				});
+			}
 		}else{
-			this.editorService.saveProtocol(this.compileBody()).subscribe( res => {
-				this.updateProtocols(res, 'Protocol saved.')
-				this.form.removeControl('description')
-				// this.isModalOpen = false
-			}, err => {
-				this.isFormBusy = false
-			});
+			alert("Protocol description cannot be empty")
 		}
 	}
 
