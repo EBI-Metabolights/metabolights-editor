@@ -75,9 +75,11 @@ export class MetabolightsService extends DataService{
     let query = this.url.studiesList + "/" + studyId + "/files/tree?"
     if(includeSubDir){
       query = query + "include_sub_dir=" + includeSubDir
+    }else{
+      query = query + "include_sub_dir=false"
     }
     if(directory){
-      query = query + "directory=" + directory
+      query = query + "&directory=" + directory.file
     }
     return this.http.get(query, { headers: contentHeaders }).pipe(
       map(res => res.json()),

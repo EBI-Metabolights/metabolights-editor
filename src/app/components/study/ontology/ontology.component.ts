@@ -241,7 +241,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 			} else {
 				if(val.annotationValue &&  value.annotationValue && (val.annotationValue.toLowerCase() == value.annotationValue.toLowerCase())){
 					termExists = true
-					this.values = [val]
+					this.values = [value]
 				}
 			}
 		})

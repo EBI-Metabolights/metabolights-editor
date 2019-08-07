@@ -98,7 +98,7 @@
         <span *ngFor="let file of filteredRawFiles">
           <a class="panel-block" [ngClass]="file.status == 'active' ? 'is-active-file' : ''">
             <div class="columns w100">
-              <div class="column is-four-fifths">
+              <div (dblclick)="expandDirectory(file)" class="column is-four-fifths">
                 <input (change)="selectFiles($event, 'raw', file, false)" [checked]="isChecked(file.file, 'raw')" type="checkbox" name="">
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
@@ -115,6 +115,26 @@
               </div>
             </div>
           </a>
+          <span *ngFor="let sfile of file.files">
+            <a style="padding-left: 30px" class="panel-block">
+              <div class="columns w100">
+                <div class="column is-four-fifths">
+                  <span class="panel-icon">
+                    <span *ngIf="isFolder(sfile); else fileIcon">
+                      <img class="file-img" src="assets/img/folder.png">
+                    </span>
+                    <ng-template #fileIcon>
+                      <img class="file-img" src="assets/img/file.png">
+                    </ng-template>
+                  </span>
+                  {{ sfile.file }} 
+                </div>
+                <div class="column is-one-fifths has-text-right">
+                  <span class="is-pulled-right has-text-grey"><small>{{ sfile.createdAt.replace("'",'').replace("'",'') }}</small></span>
+                </div>
+              </div>
+            </a>
+          </span>
         </span>
       </span>
       <ng-template #noRawFiles>
@@ -135,7 +155,7 @@
       <span *ngFor="let file of filteredAuditFiles">
         <a class="panel-block">
           <div class="columns w100">
-            <div class="column is-four-fifths">
+            <div (dblclick)="expandDirectory(file)" class="column is-four-fifths">
               <span class="panel-icon">
                 <span *ngIf="isFolder(file); else fileIcon">
                   <img class="file-img" src="assets/img/folder.png">
@@ -151,6 +171,26 @@
             </div>
           </div>
         </a>
+        <span *ngFor="let sfile of file.files">
+          <a style="padding-left: 30px" class="panel-block">
+            <div class="columns w100">
+              <div class="column is-four-fifths">
+                <span class="panel-icon">
+                  <span *ngIf="isFolder(sfile); else fileIcon">
+                    <img class="file-img" src="assets/img/folder.png">
+                  </span>
+                  <ng-template #fileIcon>
+                    <img class="file-img" src="assets/img/file.png">
+                  </ng-template>
+                </span>
+                {{ sfile.file }} 
+              </div>
+              <div class="column is-one-fifths has-text-right">
+                <span class="is-pulled-right has-text-grey"><small>{{ sfile.createdAt.replace("'",'').replace("'",'') }}</small></span>
+              </div>
+            </div>
+          </a>
+        </span>
       </span>
     </span>
   </nav>

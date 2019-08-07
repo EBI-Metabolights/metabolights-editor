@@ -375,8 +375,9 @@ export class FilesComponent implements OnInit {
 
     expandDirectory(directory){
         console.log(directory)
-        let data = this.editorService.loadStudyDirectory(directory)
-        console.log(data)
+        this.editorService.loadStudyDirectory(directory).subscribe( data => {
+            directory.files = data.study
+        })
     }
 
     copyFiles(){
