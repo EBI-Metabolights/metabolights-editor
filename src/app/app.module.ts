@@ -78,7 +78,7 @@ import { ValidationsComponent } from './components/study/validations/validations
 import { LoadingComponent } from './components/shared/loading/loading.component';
 import { EditTableDirective } from './directives/edit-table.directive';
 
-import { QuillModule } from 'ngx-quill'
+import { QuillModule } from 'ngx-quill';
 
 @NgModule({
   declarations: [
@@ -154,7 +154,13 @@ import { QuillModule } from 'ngx-quill'
     MatTableModule,
     AngularStickyThingsModule,
     NgReduxRouterModule.forRoot(),
-    QuillModule.forRoot()
+    QuillModule.forRoot({
+      modules: {
+        clipboard: {
+          matchVisual: false
+        }
+      }
+    })
   ],
   providers: [
     AuthGuard

@@ -28,7 +28,6 @@ const routes: Routes = [
 	{ path: 'guide/assays/:id/:step', canActivate: [AuthGuard], component: GuidedAssaysComponent },
 	{ path: 'guide/assays/:id/:step/:substep', canActivate: [AuthGuard], component: GuidedAssaysComponent },
 
-	
 	{ path: 'study/:id', canActivate: [AuthGuard], component: StudyComponent },
 	{ path: 'study/:id/:tab', canActivate: [AuthGuard], component: StudyComponent },
 	{ path: 'study', redirectTo: 'console', pathMatch: 'full'},

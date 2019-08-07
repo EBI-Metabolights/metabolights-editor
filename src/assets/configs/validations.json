@@ -105,12 +105,12 @@
 					"is-read-only": "false",
 					"is-hidden": "false",
 					"technique": "mass spectrometry|NMR spectroscopy",
-					"description": "The first name/forename of the contact",
+					"description": "The first name of the contact",
 					"placeholder": "Joe",
 					"rules": [{
 						"condition": "min",
 						"value": "2",
-						"error": "The first name/forename of the contact. This should be a minimum of 2 characters long",
+						"error": "The first name of the contact. This should be a minimum of 2 characters long",
 						"type": "string"
 					}]
 				},
@@ -227,7 +227,7 @@
 						"type": "string"
 					}],
 					"recommended-ontologies": {
-						"is-forced-ontology": "false",
+						"is-forced-ontology": "true",
 						"ontology": {
 							"url": "ws/ebi-internal/ontology?branch=role&term=",
 							"allowFreeText": false

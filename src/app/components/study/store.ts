@@ -39,7 +39,8 @@ import {  SET_STUDY_IDENTIFIER,
     SET_STUDY_ASSAY,
     SET_STUDY_FILES,
     DELETE_STUDY_ASSAY,
-    SET_STUDY_MAF } from './actions'; 
+    SET_STUDY_MAF,
+    SET_STUDY_ERROR } from './actions'; 
 
 export const STUDY_INITIAL_STATE: MTBLSStudy =  new MTBLSStudy();
 
@@ -251,6 +252,10 @@ function setObfuscationCode(state, action){
     return tassign(state, { obfuscationCode: action.body.obfuscationCode})   
 }
 
+function setStudyInvestigationFailedError(state, action){
+    return tassign(state, { investigationFailed: action.body.investigationFailed})   
+}
+
 export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): MTBLSStudy {
     switch (action.type) {
         case SET_STUDY_IDENTIFIER: return setStudyIdentifier(state, action);
@@ -298,6 +303,8 @@ export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): M
         case DELETE_STUDY_ASSAY: return deleteStudyAssay(state, action);
 
         case SET_STUDY_MAF: return setStudyMAF(state, action);
+
+        case SET_STUDY_ERROR: return setStudyInvestigationFailedError(state, action);
     }
 
     return state; 

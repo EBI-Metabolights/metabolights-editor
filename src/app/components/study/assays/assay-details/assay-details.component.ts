@@ -81,7 +81,7 @@ export class AssayDetailsComponent implements OnInit {
       tempRow['Sample Name'] = n
       dataToWrite.push(tempRow)
     })
-    this.assayTable.addRows(dataToWrite)
+    this.assayTable.addRows(dataToWrite, 0)
   }
 
   validateAssaySheet(){

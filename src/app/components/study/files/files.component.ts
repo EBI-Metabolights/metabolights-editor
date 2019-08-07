@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
 import * as toastr from 'toastr';
-
+import { EditorService } from '../../../services/editor.service';
 @Component({
     selector: 'mtbls-files',
     templateUrl: './files.component.html',
@@ -40,7 +40,7 @@ export class FilesComponent implements OnInit {
 
     @Input('validations') validations: any;
 
-    constructor(private metabolightsService: MetabolightsService) {}
+    constructor(private editorService: EditorService) {}
 
     ngOnInit() {
         this.loadFiles()
@@ -92,7 +92,7 @@ export class FilesComponent implements OnInit {
     }
 
     executeDelete(files){
-        this.metabolightsService.deleteStudyFiles(null, this.compileBody(files), this.fileLocation, this.forceMetaDataDelete).subscribe( data => {
+        this.editorService.deleteStudyFiles(null, this.compileBody(files), this.fileLocation, this.forceMetaDataDelete).subscribe( data => {
             this.closeDeleteConfirmation()
             toastr.success('File(s) deleted successfully', "Success", {
                   "timeOut": "2500",
@@ -202,7 +202,7 @@ export class FilesComponent implements OnInit {
         let fileNames = body['files'].map(file => file.name).join(", ")
         
         if(body['files'].length > 0){
-            this.metabolightsService.decompressFiles(body).subscribe(response => {
+            this.editorService.decompressFiles(body).subscribe(response => {
                 toastr.success('Job submitted - Started decompressing files (' + fileNames + ')' , "Success", {
                       "timeOut": "2500",
                       "positionClass": "toast-top-center",
@@ -264,41 +264,42 @@ export class FilesComponent implements OnInit {
 
     loadFilesPassively(){
         this.refreshingData = true;
-        this.metabolightsService.getStudyFiles(null, false).subscribe( data => {
-            this.resetData();
-            this.uploadFiles = data.latest;
-            this.filteredUploadFiles = this.uploadFiles
-            this.rawFiles = []
-            this.metaFiles = []
-            this.auditFiles = []
-            this.derivedFiles = []
-            this.refreshingData = false;
-            data.study.forEach( file => {
-                if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
-                    this.rawFiles.push(file)
-                    this.filteredRawFiles.push(file)
-                }else if(file.type.indexOf('metadata') > -1){
-                    this.metaFiles.push(file)
-                    this.filteredMetaFiles.push(file)
-                }else if(file.type == 'audit'){
-                    this.auditFiles.push(file)
-                    this.filteredAuditFiles.push(file)
-                }else if(file.type == 'internal_mapping' || file.type == 'spreadsheet'){
-                    this.derivedFiles.push(file)
-                    this.filteredDerivedFiles.push(file)
-                }
-            })
-            this.rawFilesLoading = true;
-            this.metabolightsService.getStudyFilesList(null).subscribe( data => {
-                data.study.forEach( file => {
-                    if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
-                        this.rawFiles.push(file)
-                        this.filteredRawFiles.push(file)
-                    }
-                })
-                this.rawFilesLoading = false;
-            })
-        })
+        this.loadFiles()
+        // this.editorService.getStudyFiles(null, false).subscribe( data => {
+        //     this.resetData();
+        //     this.uploadFiles = data.latest;
+        //     this.filteredUploadFiles = this.uploadFiles
+        //     this.rawFiles = []
+        //     this.metaFiles = []
+        //     this.auditFiles = []
+        //     this.derivedFiles = []
+        //     this.refreshingData = false;
+        //     data.study.forEach( file => {
+        //         if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
+        //             this.rawFiles.push(file)
+        //             this.filteredRawFiles.push(file)
+        //         }else if(file.type.indexOf('metadata') > -1){
+        //             this.metaFiles.push(file)
+        //             this.filteredMetaFiles.push(file)
+        //         }else if(file.type == 'audit'){
+        //             this.auditFiles.push(file)
+        //             this.filteredAuditFiles.push(file)
+        //         }else if(file.type == 'internal_mapping' || file.type == 'spreadsheet'){
+        //             this.derivedFiles.push(file)
+        //             this.filteredDerivedFiles.push(file)
+        //         }
+        //     })
+        //     this.rawFilesLoading = true;
+        //     this.editorService.getStudyFilesList(null, null, null).subscribe( data => {
+        //         data.study.forEach( file => {
+        //             if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
+        //                 this.rawFiles.push(file)
+        //                 this.filteredRawFiles.push(file)
+        //             }
+        //         })
+        //         this.rawFilesLoading = false;
+        //     })
+        // })
     }
 
     loadFiles(){
@@ -306,38 +307,42 @@ export class FilesComponent implements OnInit {
         this.filesLoading = true;
         this.rawFilesLoading = true;
         this.refreshingData = true;
-        this.metabolightsService.getStudyFiles(null, false).subscribe( data => {
-            this.uploadFiles = data.latest;
-            this.filteredUploadFiles = this.uploadFiles
-            this.filesLoading = false;
-            this.refreshingData = false;
-            data.study.forEach( file => {
-                if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
-                    this.rawFiles.push(file)
-                    this.filteredRawFiles.push(file)
-                }else if(file.type.indexOf('metadata') > -1){
-                    this.metaFiles.push(file)
-                    this.filteredMetaFiles.push(file)
-                }else if(file.type == 'audit'){
-                    this.auditFiles.push(file)
-                    this.filteredAuditFiles.push(file)
-                }else if(file.type == 'internal_mapping' || file.type == 'spreadsheet'){
-                    this.derivedFiles.push(file)
-                    this.filteredDerivedFiles.push(file)
-                }
-            })
-        })
 
-        this.rawFilesLoading = true;
-        this.metabolightsService.getStudyFilesList(null).subscribe( data => {
-            data.study.forEach( file => {
-                if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' || file.type == "raw" ){
-                    this.rawFiles.push(file)
-                    this.filteredRawFiles.push(file)
-                }
+        this.editorService.getStudyFiles(null, true).subscribe(data => {
+            this.sortFiles(data)
+        }, error => {
+            this.editorService.getStudyFilesList(null, null, null).subscribe(data => {
+                this.sortFiles(data)
             })
-            this.rawFilesLoading = false;
         })
+    }
+
+    sortFiles(data){
+        this.rawFiles = []
+        this.metaFiles = []
+        this.auditFiles = []
+        this.derivedFiles = []
+        this.uploadFiles = data.latest;
+        this.filteredUploadFiles = this.uploadFiles
+        this.filesLoading = false;
+        this.refreshingData = false;
+        
+        data.study.forEach( file => {
+            if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
+                this.rawFiles.push(file)
+                this.filteredRawFiles.push(file)
+            }else if(file.type.indexOf('metadata') > -1){
+                this.metaFiles.push(file)
+                this.filteredMetaFiles.push(file)
+            }else if(file.type == 'audit'){
+                this.auditFiles.push(file)
+                this.filteredAuditFiles.push(file)
+            }else if(file.type == 'internal_mapping' || file.type == 'spreadsheet'){
+                this.derivedFiles.push(file)
+                this.filteredDerivedFiles.push(file)
+            }
+        })
+        this.rawFilesLoading = false;
     }
 
     applyFilter(event, target){
@@ -368,8 +373,14 @@ export class FilesComponent implements OnInit {
         }
     }
 
+    expandDirectory(directory){
+        console.log(directory)
+        let data = this.editorService.loadStudyDirectory(directory)
+        console.log(data)
+    }
+
     copyFiles(){
-        this.metabolightsService.syncFiles({
+        this.editorService.syncFiles({
             files: []
         }).subscribe( data => {
             toastr.success('Files synced successfully', "Success", {
@@ -383,7 +394,7 @@ export class FilesComponent implements OnInit {
     }
 
     isFolder(file){
-        return !(file.file.indexOf(".") > -1)
+        return file.directory
     }
 
     get validation() {

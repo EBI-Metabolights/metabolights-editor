@@ -35,4 +35,5 @@ export class MTBLSStudy{
   obfuscationCode: string  = null;
   validation: any = {};  
   files: any = null;
+  investigationFailed: boolean = false;
 }

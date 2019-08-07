@@ -6,6 +6,19 @@ table {
   user-select: none;
 }
 
+.mat-column-Structure{
+  flex: 0 0 25% !important;
+  min-width: 200px !important;
+  background-color: #fff !important;
+}
+
+.mat-header-row {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  background-color: inherit;
+}
+
 .pointer{
   cursor: pointer;
 }

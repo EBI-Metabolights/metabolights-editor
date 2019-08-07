@@ -45,7 +45,7 @@ export class RawUploadComponent implements OnInit {
   	}
 
   	isFolder(file){
-        return !(file.file.indexOf(".") > -1)
+        return file.directory
     }
 
   	ngAfterViewInit() {

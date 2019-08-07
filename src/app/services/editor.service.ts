@@ -162,52 +162,57 @@ export class EditorService {
 
   loadStudy(studyID){
     this.toggleLoading(true)
-          this.loadStudyId(studyID)
-          this.dataService.getStudy(studyID).subscribe(
-            study => {
-              this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
-                'info': 'Loading investigation details' 
-              }})
-              this.ngRedux.dispatch({ type: 'SET_CONFIGURATION', body: {
-                'configuration': study.isaInvestigation.comments
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: {
-                'title': study.isaInvestigation.studies[0].title
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_ABSTRACT', body: {
-                'description': study.isaInvestigation.studies[0].description
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_SUBMISSION_DATE', body: {
-                'study': study
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_RELEASE_DATE', body: {
-                'study': study
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_STATUS', body: {
-                'study': study
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_PUBLICATIONS', body: {
-                'study': study
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_PEOPLE', body: {
-                'study': study
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_DESIGN_DESCRIPTORS', body: {
-                'studyDesignDescriptors': study.isaInvestigation.studies[0].studyDesignDescriptors
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_FACTORS', body: {
-                'factors': study.isaInvestigation.studies[0].factors
-              }})
-              this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: {
-                'protocols': study.isaInvestigation.studies[0].protocols
-              }})
-              this.loadStudyFiles()
-              this.validateStudy()
-            },
-            error => {
-              this.toggleLoading(true)
-            }
-          )
+    this.loadStudyId(studyID)
+    this.dataService.getStudy(studyID).subscribe(
+      study => {
+        this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
+          'info': 'Loading investigation details' 
+        }})
+        this.ngRedux.dispatch({ type: 'SET_CONFIGURATION', body: {
+          'configuration': study.isaInvestigation.comments
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: {
+          'title': study.isaInvestigation.studies[0].title
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_ABSTRACT', body: {
+          'description': study.isaInvestigation.studies[0].description
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_SUBMISSION_DATE', body: {
+          'study': study
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_RELEASE_DATE', body: {
+          'study': study
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_STATUS', body: {
+          'study': study
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_PUBLICATIONS', body: {
+          'study': study
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_PEOPLE', body: {
+          'study': study
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_DESIGN_DESCRIPTORS', body: {
+          'studyDesignDescriptors': study.isaInvestigation.studies[0].studyDesignDescriptors
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_FACTORS', body: {
+          'factors': study.isaInvestigation.studies[0].factors
+        }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: {
+          'protocols': study.isaInvestigation.studies[0].protocols
+        }})
+        this.loadStudyFiles()
+        this.validateStudy()
+      },
+      error => {
+        this.toggleLoading(false)
+        this.ngRedux.dispatch({ type: 'SET_STUDY_ERROR', body: {
+          'investigationFailed': true
+        }})
+        this.loadStudyFiles()
+        this.validateStudy()
+      }
+    )
   }
 
   validateStudy(){
@@ -234,7 +239,7 @@ export class EditorService {
       this.loadStudySamples()
       this.loadStudyAssays(data)
     }, error => {
-      this.dataService.getStudyFilesList(null).subscribe(data => {
+      this.dataService.getStudyFilesList(null, null, null).subscribe(data => {
         this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
           'uploadLocation': data.uploadPath
         }})
@@ -242,6 +247,30 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'SET_STUDY_FILES', body: data })
       })
     })
+  }
+
+  deleteStudyFiles(id, body, location, force) {
+    return this.dataService.deleteStudyFiles(id, body, location, force)
+  }
+
+  decompressFiles(body) {
+    return this.dataService.decompressFiles(body)
+  }
+
+  getStudyFiles(id, includeRawFiles){
+    return this.dataService.getStudyFiles(id, includeRawFiles)
+  }
+
+  getStudyFilesList(id, include_sub_dir, dir) {
+    return this.dataService.getStudyFilesList(id, include_sub_dir, dir)
+  }
+
+  syncFiles(data){
+    return this.dataService.syncFiles(data)
+  }
+
+  loadStudyDirectory(dir){
+      return this.dataService.getStudyFilesList(null, false, dir)
   }
 
   extractAssayDetails(assay){
@@ -368,6 +397,16 @@ export class EditorService {
     this.dataService.getTable(f).subscribe(mdata => {
       let mcolumns = []
       let maf = {}
+
+
+      mcolumns.push({
+        "columnDef": "Structure",
+        "sticky": "true",
+        "header": "Structure",
+        "structure" : true,
+        "cell": (element) => eval("element['database_identifier']")
+      })
+
       Object.keys(mdata.header).forEach( key => {
         let fn = "element['"+ key +"']"
         mcolumns.push({
@@ -377,6 +416,7 @@ export class EditorService {
           "cell": (element) => eval(fn)
         })
       })
+
       let mdisplayedColumns = mcolumns.map( a => { return a.columnDef } )
       mdisplayedColumns.unshift("Select")
       mdisplayedColumns.sort(function(a, b){  

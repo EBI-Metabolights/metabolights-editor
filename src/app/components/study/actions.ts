@@ -41,3 +41,5 @@ export const SET_STUDY_ASSAY = 'SET_STUDY_ASSAY';
 export const DELETE_STUDY_ASSAY = 'DELETE_STUDY_ASSAY';
 export const SET_STUDY_MAF = 'SET_STUDY_MAF';
 export const SET_ASSAY_MAF = 'SET_ASSAY_MAF';
+
+export const SET_STUDY_ERROR = 'SET_STUDY_ERROR';

@@ -1,11 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgRedux, select } from '@angular-redux/store';
 import { IAppState } from '../../store';
 import { EditorService } from './../../services/editor.service';
 import { MetaboLightsWSURL } from './../../services/globals';
 import { Router } from "@angular/router";
-import { MafsComponent } from "./../study/mafs/mafs.component"
 
 @Component({
 	selector: 'mtbls-study',
@@ -20,6 +19,9 @@ export class StudyComponent implements OnInit {
     @select(state => state.study.status) studyStatus;
     @select(state => state.study.obfuscationCode) studyObfuscationCode;
 
+    @select(state => state.study.investigationFailed) investigationFailed;
+
+    studyError: boolean = false;
 	requestedTab: number = 0;
     tab: string = "descriptors";	
 	requestedStudy: string = null;
@@ -39,13 +41,20 @@ export class StudyComponent implements OnInit {
 			}
 		});
         this.domain = MetaboLightsWSURL['domain']
+
+        this.investigationFailed.subscribe(value => {
+            this.studyError = value
+        })
+        
         this.studyStatus.subscribe(value => {
             this.status = value
         })
+        
         this.studyValidation.subscribe(value => {
             this.validation = value
         })
-		this.route.params.subscribe( params => {
+        
+        this.route.params.subscribe( params => {
             this.requestedStudy = params['id'];
             if(params['tab'] == 'files'){
                 this.requestedTab = 5

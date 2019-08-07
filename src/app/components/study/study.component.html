@@ -1,6 +1,13 @@
 <nav-bar></nav-bar>
 <quick-link path="guide/info" icon="view_carousel" text="Guided submission"></quick-link>
 <div class="container">
+	<div id="status-board" *ngIf="studyError">
+		<article class="message is-danger">
+			<div class="message-body">
+				<p><mat-icon class="mat-icon material-icons">info</mat-icon> Your study ({{ requestedStudy }}) failed to load </p>
+			</div>
+		</article>
+	</div>
 	<div id="status-board" *ngIf="status == 'In Curation'">
 		<article class="message is-warning">
 			<div class="message-body">
@@ -22,7 +29,7 @@
 	</div>
 	<div class="main-wrapper" [ngClass]="{'smt': status != 'Submitted'}">
 		<span *ngIf="requestedStudy != undefined">
-	      <div id="meta" class="field is-grouped is-grouped-multiline px-20 mb-10">
+	      <div *ngIf="!studyError" id="meta" class="field is-grouped is-grouped-multiline px-20 mb-10">
 	        <mtbls-status></mtbls-status>
 	        <mtbls-release-date></mtbls-release-date>&emsp;
 	        <div class="is-pulled-right">
@@ -38,18 +45,20 @@
 	          </span>
 	        </div>
 	      </div>
-	      <mtbls-title></mtbls-title>
-	      <mtbls-people></mtbls-people> 
-	      <mtbls-description></mtbls-description>
-    	  <mtbls-organisms></mtbls-organisms>
-    	  <mtbls-publications></mtbls-publications>
+	      <span *ngIf="!studyError">
+			<mtbls-title></mtbls-title>
+			<mtbls-people></mtbls-people> 
+			<mtbls-description></mtbls-description>
+			<mtbls-organisms></mtbls-organisms>
+			<mtbls-publications></mtbls-publications>
+		  </span>
     	  <div id="tab-content-wrapper" class="px-20 mt-20">
 		      <div class="card">
 		        <div class="columns">
 		          <div class="column is-full tabs npt">
 		           <ul>
-		            <li (click)="selectCurrentTab(0, 'descriptors')" [ngClass]="{'is-active': (currentIndex | async) == 0 }"><a>Descriptors</a></li>
-		            <li (click)="selectCurrentTab(1, 'protocols')" [ngClass]="{'is-active': (currentIndex | async) == 1 }"><a>Protocols</a></li>
+		            <li  *ngIf="!studyError" (click)="selectCurrentTab(0, 'descriptors')" [ngClass]="{'is-active': (currentIndex | async) == 0 }"><a>Descriptors</a></li>
+		            <li  *ngIf="!studyError" (click)="selectCurrentTab(1, 'protocols')" [ngClass]="{'is-active': (currentIndex | async) == 1 }"><a>Protocols</a></li>
 		            <li (click)="selectCurrentTab(2, 'samples')" [ngClass]="{'is-active': (currentIndex | async) == 2 }"><a>Samples</a></li>
 		            <li (click)="selectCurrentTab(3, 'assays')" [ngClass]="{'is-active': (currentIndex | async) == 3 }"><a>Assays</a></li>
 		            <li (click)="selectCurrentTab(4, 'metabolites')" [ngClass]="{'is-active': (currentIndex | async) == 4 }"><a>Metabolites</a></li>
@@ -61,14 +70,18 @@
 		      <div class="card-content npt">
 		        <div class="columns">
 		          <div class="column is-full">
-		            <div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 0">
-		              <mtbls-design-descriptors></mtbls-design-descriptors>
-		              <br>  
-		              <mtbls-factors></mtbls-factors>  
-		            </div>
-		            <div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 1">
-		              <mtbls-protocols></mtbls-protocols>
-		            </div>
+					<span *ngIf="!studyError">
+						<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 0">
+						<mtbls-design-descriptors></mtbls-design-descriptors>
+						<br>  
+						<mtbls-factors></mtbls-factors>  
+						</div>
+					</span>
+					<span *ngIf="!studyError">
+						<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 1">
+						<mtbls-protocols></mtbls-protocols>
+						</div>
+					</span>
 		            <div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 2">
 		              <mtbls-samples></mtbls-samples>
 		            </div>

@@ -68,9 +68,18 @@ export class MetabolightsService extends DataService{
   }
 
   // Study files list
-  getStudyFilesList(id) {
+  getStudyFilesList(id, include_sub_dir, dir) {
     let studyId = id ? id : this.id
-    return this.http.get(this.url.studiesList + "/" + studyId + "/files/tree?include_sub_dir=false", { headers: contentHeaders }).pipe(
+    let includeSubDir = include_sub_dir ? include_sub_dir : null
+    let directory = dir ? dir : null
+    let query = this.url.studiesList + "/" + studyId + "/files/tree?"
+    if(includeSubDir){
+      query = query + "include_sub_dir=" + includeSubDir
+    }
+    if(directory){
+      query = query + "directory=" + directory
+    }
+    return this.http.get(query, { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
       );

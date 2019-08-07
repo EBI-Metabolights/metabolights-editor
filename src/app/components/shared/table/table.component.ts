@@ -204,6 +204,15 @@ export class TableComponent implements OnInit {
 		return columnIndex;
 	}
 
+	isChEBIId(id){
+		if(id && id != ''){
+			if(id.toLowerCase().indexOf("chebi") > -1){
+				return true
+			}
+		}
+		return false
+	}
+
 	savePastedCellContent(e, pvalue){
 		this.loading = true;
 		let cellsToUpdate = []
@@ -442,7 +451,11 @@ export class TableComponent implements OnInit {
 	}
 
 	addRow(){
-		this.addRows([this.getEmptyRow()]);
+		let index = this.data.rows.length - 1
+		if(this.selectedRows.length > 0){
+			index = this.selectedRows[0]
+		}
+		this.addRows([this.getEmptyRow()], index);
 	}
 
 	updateRows(rows){
@@ -458,8 +471,8 @@ export class TableComponent implements OnInit {
 		});
 	}
 
-	addRows(rows){
-	   	this.editorService.addRows(this.data.file, { "data": rows}, this.validationsId, null).subscribe( res => {
+	addRows(rows, index){
+	   	this.editorService.addRows(this.data.file, { "data": { 'rows' : rows, 'index': index ? index : 0 }}, this.validationsId, null).subscribe( res => {
 			toastr.success( "Rows added successfully to the end of the sheet", "Success", {
 				"timeOut": "2500",
 				"positionClass": "toast-top-center",

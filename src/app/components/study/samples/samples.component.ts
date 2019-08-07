@@ -142,7 +142,7 @@ export class SamplesComponent {
             }
         })
 
-        this.sampleTable.addRows(sRows)
+        this.sampleTable.addRows(sRows, null)
         this.closeAddSamplesModal();
     }
 

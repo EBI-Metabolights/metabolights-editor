@@ -39,7 +39,8 @@
       </span>
     </div>
 </div>
-<div class="columns mb0 is-vcentered prevent-deselect my-2">
+<span #spacer></span>
+<div class="columns mb0 is-vcentered prevent-deselect " style="z-index: 1000; background-color: white; padding: 10px; border: 1px solid rgba(0,0,0,0.03);" stickyThing [spacer]="spacer" marginTop="50">
 	<span class="column is-12 fadeIn nmrl">
 		<a class="button is-small is-light" (click)="toggleView()">
 			<span *ngIf="view == 'compact'; else expandedTable">
@@ -111,9 +112,21 @@
 				<th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)" class="clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header> 
 					{{ formatHeader(column.header) }}
 				</th>
-				<td (keydown)="onKeyDown($event)" (dblclick)="editCell(row, column, $event)" (click)="cellClick(row, column, $event)" class="clickable  mlc-table" [ngClass]="{'selected': isSelected(row, column)}" mat-cell *matCellDef="let row"> 
-					{{ row[column.header] }} 
-				</td>
+				<span *ngIf="!column.structure; else isStructure">
+					<td (keydown)="onKeyDown($event)" (dblclick)="editCell(row, column, $event)" (click)="cellClick(row, column, $event)" class="clickable  mlc-table" [ngClass]="{'selected': isSelected(row, column)}" mat-cell *matCellDef="let row"> 
+						{{ row[column.header] }} 
+					</td>
+				</span>
+				<ng-template #isStructure>
+					<td (keydown)="onKeyDown($event)" class="mlc-table" mat-cell *matCellDef="let row"> 
+						<span *ngIf="isChEBIId(row['database_identifier']) else notChEBIId">
+							<img width="200" height="200" [src]="'https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId='+row['database_identifier']+'&dimensions=500&scaleMolecule=false'" alt="">
+						</span>
+						<ng-template #notChEBIId>
+							<small><i>Structure not available</i></small>
+						</ng-template>
+					</td>
+				</ng-template>
 			</ng-container>
 			<tr mat-header-row *matHeaderRowDef="displayedTableColumns"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedTableColumns;"></tr>

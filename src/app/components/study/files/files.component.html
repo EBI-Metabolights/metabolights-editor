@@ -226,7 +226,7 @@
           <div class="columns w100">
             <div class="column is-four-fifths">
               <label>
-                <input (change)="selectFiles($event, 'upload', file, false)" [checked]="isChecked(file.file, 'upload')"  type="checkbox" name="">
+                <input  (change)="selectFiles($event, 'upload', file, false)" [checked]="isChecked(file.file, 'upload')"  type="checkbox" name="">
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
                     <img class="file-img" src="assets/img/folder.png">

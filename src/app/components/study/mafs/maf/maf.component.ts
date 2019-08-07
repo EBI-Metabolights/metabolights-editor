@@ -15,6 +15,8 @@ export class MafComponent {
 
 	@select(state => state.study.mafs) studyMAFs;
 
+	currentID = null;
+
 	mafData : any = null;
 	currentRow = 0;
 	isAutoPopulateModalOpen = false;
@@ -57,7 +59,7 @@ export class MafComponent {
 		let dbId = this.form.get('databaseId').value
 		if(dbId && dbId != ''){
 			if(dbId.toLowerCase().indexOf("chebi") > -1){
-				return dbId.split(":")[1]
+				this.currentID = dbId.split(":")[1]
 			}
 		}
 	}
@@ -90,6 +92,7 @@ export class MafComponent {
 	autoPopulate(){
 		this.openAutoPopulateModal();
 		this.loadAutoPopulateField(this.currentRow)
+		this.getChebiId()
 	}
 
 	openAutoPopulateModal(){
@@ -103,7 +106,7 @@ export class MafComponent {
 	search(type){
 		let term = this.form.get(type).value;
 		this.isFormBusy = true;
-		this.editorService.search(term, type).subscribe( res => {
+		this.editorService.search(term, type.toLowerCase()).subscribe( res => {
 			let resultObj = res.content[0]
 			this.isFormBusy = false;
 			let fields = ['name', 'smiles', 'inchi', 'databaseId']
@@ -112,6 +115,7 @@ export class MafComponent {
 					this.form.get(field).setValue(resultObj[field], {emitEvent: false})
 				}
 			})
+			this.getChebiId()
 			this.form.markAsDirty();
 		}, err => {
 			this.isFormBusy = false;
