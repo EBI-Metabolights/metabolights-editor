@@ -31,8 +31,9 @@ export class EditorService {
     "Characteristics[Organism]": 2,
     "Characteristics[Organism part]": 3,
     "Characteristics[Variant]": 4,
-    "Protocol REF": 5,
-    "Source Name": 6
+    "Characteristics[Sample type]": 5,
+    "Protocol REF": 6,
+    "Source Name": 7
   }
 
   constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private doiService: DOIService, private authService: AuthService, private europePMCService: EuropePMCService, private dataService: MetabolightsService) {
@@ -62,6 +63,10 @@ export class EditorService {
 
   getValidatedJWTUser(body){
     return this.authService.getValidatedJWTUser(body);
+  }
+
+  metaInfo(){
+    return this.dataService.getMetaInfo();
   }
 
   initialise(data, signInRequest){
@@ -165,6 +170,9 @@ export class EditorService {
     this.loadStudyId(studyID)
     this.dataService.getStudy(studyID).subscribe(
       study => {
+        this.ngRedux.dispatch({ type: 'SET_STUDY_ERROR', body: {
+          'investigationFailed': false
+        }})
         this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
           'info': 'Loading investigation details' 
         }})
@@ -239,7 +247,7 @@ export class EditorService {
       this.loadStudySamples()
       this.loadStudyAssays(data)
     }, error => {
-      this.dataService.getStudyFilesList(null, null, null).subscribe(data => {
+      this.dataService.getStudyFilesList(null, null, null, null).subscribe(data => {
         this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
           'uploadLocation': data.uploadPath
         }})
@@ -262,15 +270,15 @@ export class EditorService {
   }
 
   getStudyFilesList(id, include_sub_dir, dir) {
-    return this.dataService.getStudyFilesList(id, include_sub_dir, dir)
+    return this.dataService.getStudyFilesList(id, include_sub_dir, dir, null)
   }
 
   syncFiles(data){
     return this.dataService.syncFiles(data)
   }
 
-  loadStudyDirectory(dir){
-      return this.dataService.getStudyFilesList(null, false, dir)
+  loadStudyDirectory(dir, parent){
+      return this.dataService.getStudyFilesList(null, false, dir, parent)
   }
 
   extractAssayDetails(assay){
@@ -629,6 +637,11 @@ export class EditorService {
 
   deleteProtocol(title) {
     return this.dataService.deleteProtocol(title)
+  }
+
+  // Ontology
+  getExactMatchOntologyTerm(term, branch){
+    return this.dataService.getExactMatchOntologyTerm(term, branch)
   }
 
   // Study factors

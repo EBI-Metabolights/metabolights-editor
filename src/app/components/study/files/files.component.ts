@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
 import * as toastr from 'toastr';
 import { EditorService } from '../../../services/editor.service';
+
 @Component({
     selector: 'mtbls-files',
     templateUrl: './files.component.html',
@@ -308,6 +308,10 @@ export class FilesComponent implements OnInit {
         this.rawFilesLoading = true;
         this.refreshingData = true;
 
+        this.passiveUpdate()
+    }
+
+    passiveUpdate(){
         this.editorService.getStudyFiles(null, true).subscribe(data => {
             this.sortFiles(data)
         }, error => {
@@ -328,7 +332,7 @@ export class FilesComponent implements OnInit {
         this.refreshingData = false;
         
         data.study.forEach( file => {
-            if(file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
+            if(file.type == 'raw' || file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
                 this.rawFiles.push(file)
                 this.filteredRawFiles.push(file)
             }else if(file.type.indexOf('metadata') > -1){
@@ -340,6 +344,9 @@ export class FilesComponent implements OnInit {
             }else if(file.type == 'internal_mapping' || file.type == 'spreadsheet'){
                 this.derivedFiles.push(file)
                 this.filteredDerivedFiles.push(file)
+            }else{
+                this.rawFiles.push(file)
+                this.filteredRawFiles.push(file)
             }
         })
         this.rawFilesLoading = false;
@@ -371,13 +378,6 @@ export class FilesComponent implements OnInit {
             })
             return target
         }
-    }
-
-    expandDirectory(directory){
-        console.log(directory)
-        this.editorService.loadStudyDirectory(directory).subscribe( data => {
-            directory.files = data.study
-        })
     }
 
     copyFiles(){

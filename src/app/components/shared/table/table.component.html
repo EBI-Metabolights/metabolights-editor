@@ -120,7 +120,7 @@
 				<ng-template #isStructure>
 					<td (keydown)="onKeyDown($event)" class="mlc-table" mat-cell *matCellDef="let row"> 
 						<span *ngIf="isChEBIId(row['database_identifier']) else notChEBIId">
-							<img width="200" height="200" [src]="'https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId='+row['database_identifier']+'&dimensions=500&scaleMolecule=false'" alt="">
+							<img appLazyLoad width="200" height="200" [src]="'https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId='+row['database_identifier']+'&dimensions=500&scaleMolecule=false'" alt="">
 						</span>
 						<ng-template #notChEBIId>
 							<small><i>Structure not available</i></small>

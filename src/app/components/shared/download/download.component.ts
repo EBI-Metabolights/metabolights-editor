@@ -2,7 +2,6 @@ import { Component, OnInit, Input } from '@angular/core';
 import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
 import { NgRedux, select } from '@angular-redux/store';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import * as toastr from 'toastr';
 
 @Component({
 	selector: 'mtbls-download',
@@ -12,6 +11,7 @@ import * as toastr from 'toastr';
 export class DownloadComponent implements OnInit {
 
 	@Input('value') file: string;
+	@Input('type') type: string;
 	@select(state => state.study.obfuscationCode) obfuscationCode;
 
 	domain = "";
@@ -27,7 +27,7 @@ export class DownloadComponent implements OnInit {
 	}
 
 	getDownloadLink(){
-		return this.metabolightsService.downloadURL(this.file, this.code)
+		return this.metabolightsService.downloadLink(this.file, this.code)
 	}
 
 }

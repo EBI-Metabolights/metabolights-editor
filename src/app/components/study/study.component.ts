@@ -44,6 +44,7 @@ export class StudyComponent implements OnInit {
 
         this.investigationFailed.subscribe(value => {
             this.studyError = value
+            this.selectCurrentTab(5, 'files')
         })
         
         this.studyStatus.subscribe(value => {

@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { EditorService } from '../../../../services/editor.service';
 import { TableComponent } from './../../../shared/table/table.component';
 import { select } from '@angular-redux/store';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'mtbls-maf',
@@ -24,6 +25,12 @@ export class MafComponent {
 	isFormBusy: boolean	= false;
 	selectedRow = {};
 	form: FormGroup;
+	currentIndex = 0;
+
+	rowsToUpdate = []
+	inProgress = true
+
+	isAutoPopulating: boolean = false;
 
 	fileTypes: any = [
 		{
@@ -89,10 +96,98 @@ export class MafComponent {
 		});
 	}
 
-	autoPopulate(){
-		this.openAutoPopulateModal();
-		this.loadAutoPopulateField(this.currentRow)
-		this.getChebiId()
+	 autoPopulate(manual){
+		if(manual){
+			this.openAutoPopulateModal();
+			this.loadAutoPopulateField(this.currentRow)
+			this.getChebiId()
+		}else{
+			
+			let promises = []
+			this.isAutoPopulating = true
+			this.mafData.data.rows.forEach(row => {
+				
+				let dbIdentifier = row['database_identifier']
+				let smiles = row['smiles']
+				let inchi = row['inchi']
+				let name = row['metabolite_identification']
+
+				if(name && name != ""){
+					const promise = this.getCompound(name, 'name')
+					promises.push(promise)
+				}else{
+					if(dbIdentifier && dbIdentifier != ""){
+						const promise = this.getCompound(dbIdentifier, 'databaseid')
+						promises.push(promise)
+					}else{							
+						if(smiles && smiles != ""){
+							const promise = this.getCompound(smiles, 'smiles')
+							promises.push(promise)
+						}else{
+							if(inchi && inchi != ""){
+								const promise = this.getCompound(inchi, 'inchi')
+								promises.push(promise)
+							}
+						}
+					}
+				}
+			})
+
+			Promise.all(promises).then(data => {
+				data.forEach(d => {
+					if(d){
+						this.mafData.data.rows.forEach( row =>{
+							if( row['database_identifier'] == d.content[0]['databaseId'] || row['smiles'] == d.content[0]['smiles'] || row['inchi'] == d.content[0]['inchi'] || row['metabolite_identification'] == d.content[0]['name'] ){
+								let details = d.content[0]
+								if(details){
+									if(this.isEmpty(row['database_identifier'])){
+										row['database_identifier'] = details['databaseId']
+									}
+									if(this.isEmpty(row['chemical_formula'])){
+										row['chemical_formula'] = details['formula']
+									}
+									if(this.isEmpty(row['inchi'])){
+										row['inchi'] = details['inchi']
+									}
+									if(this.isEmpty(row['metabolite_identification'])){
+										row['metabolite_identification'] = details['name']
+									}
+									if(this.isEmpty(row['smiles'])){
+										row['smiles'] = details['smiles']
+									}
+								}
+								this.rowsToUpdate.push(row)
+							}
+						})
+					}
+				})
+				this.mafTable.updateRows(this.rowsToUpdate)
+			})
+
+			// contents.forEach(data => {
+			// 	if(data){
+			// 		let details = data.content[0]
+			// 		let row = {}
+			// 		if(details){
+			// 			row['database_identifier'] = details['databaseId']
+			// 			row['chemical_formula'] = details['formula']
+			// 			row['inchi'] = details['inchi']
+			// 			row['metabolite_identification'] = details['name']
+			// 			row['smiles'] = details['smiles']
+			// 		}
+			// 		this.mafTable.updateRows([row]);
+			// 	}
+			// })
+			
+		}
+	}
+
+	isEmpty(val){
+		return (!val && val == "") ? true : false
+	}
+
+	async getCompound(id, type){
+		return await this.editorService.search(id, type).toPromise()
 	}
 
 	openAutoPopulateModal(){

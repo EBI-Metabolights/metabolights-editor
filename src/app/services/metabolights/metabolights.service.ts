@@ -45,6 +45,13 @@ export class MetabolightsService extends DataService{
       );
   }
 
+  getMetaInfo(){
+    return this.http.get(this.url.studiesList + "/" + this.id + "/meta-info", { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+      );
+  }
+
   
   // Study ISA object
   getStudy(id) {
@@ -68,7 +75,7 @@ export class MetabolightsService extends DataService{
   }
 
   // Study files list
-  getStudyFilesList(id, include_sub_dir, dir) {
+  getStudyFilesList(id, include_sub_dir, dir, parent) {
     let studyId = id ? id : this.id
     let includeSubDir = include_sub_dir ? include_sub_dir : null
     let directory = dir ? dir : null
@@ -79,7 +86,11 @@ export class MetabolightsService extends DataService{
       query = query + "include_sub_dir=false"
     }
     if(directory){
-      query = query + "&directory=" + directory.file
+      if(parent){
+        query = query + "&directory=" + parent + directory.file
+      }else{
+        query = query + "&directory=" + directory.file
+      }
     }
     return this.http.get(query, { headers: contentHeaders }).pipe(
       map(res => res.json()),
@@ -87,12 +98,10 @@ export class MetabolightsService extends DataService{
       );
   }
 
-
-
   deleteStudyFiles(id, body, location, force) {
     let studyId = id ? id : this.id
     let forcequery = force ? force : false
-    let locationQuery = location ? location : false
+    let locationQuery = location ? location : "study"
     return this.http.post(this.url.studiesList + "/" + studyId + "/files?location=" + locationQuery + '&force=' + forcequery, body, { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
@@ -101,6 +110,10 @@ export class MetabolightsService extends DataService{
 
   downloadURL(name, code) {
     return this.url.download.replace('<study>', this.id) + "/" + name + "?token=" + code
+  }
+
+  downloadLink(name, code) {
+    return this.url.studiesList + "/" + this.id + "/download/" + code + "?file=" + name;
   }
 
   copyFiles(){
@@ -194,6 +207,13 @@ export class MetabolightsService extends DataService{
   // Study Ontology
   getOntologyTerms(url){
     return this.http.get(url, { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+      );
+  }
+
+  getExactMatchOntologyTerm(term, branch){
+    return this.http.get(this.url.studiesList.replace("studies", "ebi-internal") + "/ontology?term=" + term + "&branch=" + branch, { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
       );

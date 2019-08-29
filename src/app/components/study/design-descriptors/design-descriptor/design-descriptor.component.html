@@ -28,7 +28,7 @@
           <button (click)='closeDelete()' class="button is-info">Cancel</button>
         </div>
         <div class="column is-half has-text-right">
-          <button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
+          <button (click)='delete(null)' class="button is-danger">OK! Delete Permanently</button>
         </div>
       </div>
     </footer>
@@ -56,6 +56,7 @@
         <div class="columns is-gapless full-width">
           <div class="column is-half">
             <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
+            <button *ngIf="addNewDescriptor" class="button is-primary is-pulled-left" (click)="openImportModal()"><mat-icon>label</mat-icon> Import</button>
           </div>
           <div class="column is-half has-text-right">
             <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
@@ -64,6 +65,50 @@
             </button>
             <button *ngIf="form.pristine" (click)='closeModal()' class="button is-info">OK</button>
             <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>Cancel</button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </form>
+</div>
+
+<div class="modal" [ngClass]="{'is-active': isImportModalOpen}">
+  <form *ngIf="form" [formGroup]="form">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <div *ngIf="isFormBusy" class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <section class="modal-card-body">
+          <mat-form-field class="full-width">
+            <mat-label>Select Publication</mat-label>
+            <mat-select (selectionChange)="getKeyWords()" [formControl]="selectedPublication" required>
+              <mat-option> Please select </mat-option>
+              <mat-option *ngFor="let publication of publications" [value]="publication.doi">{{ publication.title }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <div class="field is-grouped is-grouped-multiline">
+            <span (click)="toogleSelection(keyword)" style="margin-bottom: 10px;" *ngFor="let keyword of keywords">
+                <div class="tags has-addons pointer">
+                    <span [class]="isSelected(keyword) ? 'tag is-primary pointer' : 'tag pointer'">{{ keyword }}</span>
+                </div>
+            </span>
+          </div>
+          <span *ngIf="!loading; else showStatus">
+            <small *ngIf="keywords.length > 0">Click to select the keywords</small>
+          </span>
+          <ng-template #showStatus>
+            <img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg"> {{ status }}
+          </ng-template>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+          </div>
+          <div class="column is-half has-text-right">
+            <button class="button" [disabled]="isFormBusy" (click)='updateAndClose()'>OK</button>
           </div>
         </div>
       </footer>

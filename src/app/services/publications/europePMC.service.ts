@@ -22,6 +22,13 @@ export class EuropePMCService extends DataService{
 			);
 	}
 
+	getArticleKeyWords(doi) {
+		return this.http.get(this.url.article.replace('<term>', doi)).pipe(
+			map(res => res.json().resultList.result[0].keywordList.keyword),
+			catchError(this.handleError)
+		);
+	}
+
 	extractArticleDetails(data, doi){
 		let article = data.resultList.result[0];
 		if(article){

@@ -149,7 +149,7 @@ export class GuidedAssaysComponent implements OnInit {
 					  confirmButtonText: 'Ignore duplicates, proceed!'
 					}).then((result) => {
 					  if (result.value) {
-					    this.editorService.addRows(this.samples.name, { "data": sRows}, 'samples', null).subscribe( res => {
+					    this.editorService.addRows(this.samples.name, { "data": { "rows": sRows, "index": 0 }}, 'samples', null).subscribe( res => {
 							toastr.success( "Samples added successfully", "Success", {
 				                "timeOut": "2500",
 				                "positionClass": "toast-top-center",
@@ -168,7 +168,7 @@ export class GuidedAssaysComponent implements OnInit {
 				}else if(duplicates.length > 0 && sRows.length == 0){
 					this.changeSubStep(4)
 				}else{
-					this.editorService.addRows(this.samples.name, { "data": sRows},'samples', null).subscribe( res => {
+					this.editorService.addRows(this.samples.name, { "data": { "rows": sRows, "index": 0 } },'samples', null).subscribe( res => {
 						toastr.success( "Samples added successfully", "Success", {
 			                "timeOut": "2500",
 			                "positionClass": "toast-top-center",

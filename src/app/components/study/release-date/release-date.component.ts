@@ -17,11 +17,17 @@ export class ReleaseDateComponent implements OnInit {
 	isFormBusy: boolean = false;
 	requestedStudy: string = null;
 	releaseDate: Date = null;
-
 	constructor(private editorService: EditorService) {
 		this.studyReleaseDate.subscribe(value => { 
 			if(value != null){
-				this.releaseDate = value
+				if(value != ''){
+					this.releaseDate = value
+				}else{
+					this.editorService.metaInfo().subscribe(response => {
+						this.releaseDate = response.data[1].split(":")[1]
+						this.updateReleaseDateSilent(this.releaseDate)
+					})
+				}
 			}
 		});
 		this.studyIdentifier.subscribe(value => { 
@@ -29,6 +35,13 @@ export class ReleaseDateComponent implements OnInit {
 				this.requestedStudy = value
 			}
 		});
+	}
+
+	updateReleaseDateSilent(val){
+		this.editorService.changeReleasedate(val).subscribe( data => {
+			console.log("Release date missing in investigation file. Updated release date in investigation")
+		}, err => {
+		}) 
 	}
 
 	updateReleaseDate(op, e){

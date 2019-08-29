@@ -104,6 +104,9 @@ export class PersonComponent implements OnInit {
 	openModal() {
 		this.initialiseForm();
 		this.isModalOpen = true
+		if(this.rolesComponent){
+			this.rolesComponent.setValues([])
+		}
 	}
 
 	toogleShowAdvanced() {
@@ -189,8 +192,6 @@ export class PersonComponent implements OnInit {
 		this.editorService.getPeople().subscribe(data => {
 			this.form.markAsPristine()
 			this.initialiseForm();
-			this.isModalOpen = true;
-
 			toastr.success(message, "Success", {
 				"timeOut": "2500",
 				"positionClass": "toast-top-center",

@@ -22,6 +22,14 @@ export class DOIService extends DataService{
     );
   }
 
+
+  getArticleKeyWords(doi) {
+    return this.http.get(this.url.article + doi).pipe(
+        map(res => res.json()),
+        catchError(this.handleError)
+    );
+  }
+
   extractArticleDetails(data){
   	return {
   		'title': data.message.title[0],

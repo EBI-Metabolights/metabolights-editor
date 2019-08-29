@@ -47,17 +47,26 @@
                 <input  (change)="selectFiles($event, 'meta', file, false)" [checked]="isChecked(file.file, 'meta')" type="checkbox" name="">
                 <span  class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
-                    <img class="file-img" src="assets/img/folder.png">
+                      <span *ngIf="file.files; else openFolder">
+                          <img class="file-img" src="assets/img/folder.png">
+                      </span>
+                      <ng-template #openFolder>
+                          <img class="file-img" src="assets/img/folder-open.png">
+                      </ng-template>
                   </span>
                   <ng-template #fileIcon>
                     <img class="file-img" src="assets/img/file.png">
                   </ng-template>
                 </span>
-                {{ file.file }} 
+                {{ file.file }} <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
               </label>
             </div>
             <div class="column is-one-fifths has-text-right">
-              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+              <span class="is-pulled-right has-text-grey">
+                <small>
+                  <mtbls-download [type]="'icon'" [value]="file.file"></mtbls-download>
+                </small>
+              </span>
             </div>
           </div>
         </a>
@@ -76,8 +85,9 @@
     </span>
     <ng-template #rawFilesLoaded>
       <p class="panel-heading"  style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer1" marginTop="35">
+          <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
         <label>
-          <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>RAW FILES</small>
+          <small>RAW FILES</small>
         </label>
         <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right"> 
           <span *ngIf="containsZipFiles(selectedRawFiles)">
@@ -96,45 +106,7 @@
       </div>
       <span *ngIf="filteredRawFiles.length > 0; else noRawFiles">
         <span *ngFor="let file of filteredRawFiles">
-          <a class="panel-block" [ngClass]="file.status == 'active' ? 'is-active-file' : ''">
-            <div class="columns w100">
-              <div (dblclick)="expandDirectory(file)" class="column is-four-fifths">
-                <input (change)="selectFiles($event, 'raw', file, false)" [checked]="isChecked(file.file, 'raw')" type="checkbox" name="">
-                <span class="panel-icon">
-                  <span *ngIf="isFolder(file); else fileIcon">
-                    <img class="file-img" src="assets/img/folder.png">
-                  </span>
-                  <ng-template #fileIcon>
-                    <img class="file-img" src="assets/img/file.png">
-                  </ng-template>
-                </span>
-                {{ file.file }} 
-              </div>
-              <div class="column is-one-fifths has-text-right">
-                <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
-              </div>
-            </div>
-          </a>
-          <span *ngFor="let sfile of file.files">
-            <a style="padding-left: 30px" class="panel-block">
-              <div class="columns w100">
-                <div class="column is-four-fifths">
-                  <span class="panel-icon">
-                    <span *ngIf="isFolder(sfile); else fileIcon">
-                      <img class="file-img" src="assets/img/folder.png">
-                    </span>
-                    <ng-template #fileIcon>
-                      <img class="file-img" src="assets/img/file.png">
-                    </ng-template>
-                  </span>
-                  {{ sfile.file }} 
-                </div>
-                <div class="column is-one-fifths has-text-right">
-                  <span class="is-pulled-right has-text-grey"><small>{{ sfile.createdAt.replace("'",'').replace("'",'') }}</small></span>
-                </div>
-              </div>
-            </a>
-          </span>
+          <mtbls-directory (fileDeleted)="loadFilesPassively()" [level]="0" [parent]="''" [file]="file" ></mtbls-directory>
         </span>
       </span>
       <ng-template #noRawFiles>
@@ -153,44 +125,7 @@
     </p>
     <span *ngIf="filteredAuditFiles.length > 0">
       <span *ngFor="let file of filteredAuditFiles">
-        <a class="panel-block">
-          <div class="columns w100">
-            <div (dblclick)="expandDirectory(file)" class="column is-four-fifths">
-              <span class="panel-icon">
-                <span *ngIf="isFolder(file); else fileIcon">
-                  <img class="file-img" src="assets/img/folder.png">
-                </span>
-                <ng-template #fileIcon>
-                  <img class="file-img" src="assets/img/file.png">
-                </ng-template>
-              </span>
-              {{ file.file }}
-            </div>
-            <div class="column is-one-fifths has-text-right">
-              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'')  }}</small></span>
-            </div>
-          </div>
-        </a>
-        <span *ngFor="let sfile of file.files">
-          <a style="padding-left: 30px" class="panel-block">
-            <div class="columns w100">
-              <div class="column is-four-fifths">
-                <span class="panel-icon">
-                  <span *ngIf="isFolder(sfile); else fileIcon">
-                    <img class="file-img" src="assets/img/folder.png">
-                  </span>
-                  <ng-template #fileIcon>
-                    <img class="file-img" src="assets/img/file.png">
-                  </ng-template>
-                </span>
-                {{ sfile.file }} 
-              </div>
-              <div class="column is-one-fifths has-text-right">
-                <span class="is-pulled-right has-text-grey"><small>{{ sfile.createdAt.replace("'",'').replace("'",'') }}</small></span>
-              </div>
-            </div>
-          </a>
-        </span>
+        <mtbls-directory [level]="0" [parent]="''" [file]="file" ></mtbls-directory>
       </span>
     </span>
   </nav>
@@ -220,17 +155,24 @@
                 <input (change)="selectFiles($event, 'derived', file, false)" [checked]="isChecked(file.file, 'derived')" type="checkbox" name="">
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
-                    <img class="file-img" src="assets/img/folder.png">
+                    <span *ngIf="file.files; else openFolder">
+                        <img class="file-img" src="assets/img/folder.png">
+                    </span>
+                    <ng-template #openFolder>
+                        <img class="file-img" src="assets/img/folder-open.png">
+                    </ng-template>
                   </span>
                   <ng-template #fileIcon>
                     <img class="file-img" src="assets/img/file.png">
                   </ng-template>
                 </span>
-                {{ file.file }} 
+                {{ file.file }}  <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
               </label>
             </div>
             <div class="column is-one-fifths has-text-right">
-              <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+                <small>
+                  <mtbls-download [type]="'icon'" [value]="file.file"></mtbls-download>
+                </small>
             </div>
           </div>
         </a>

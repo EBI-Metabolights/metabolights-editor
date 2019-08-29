@@ -1311,6 +1311,35 @@
 					"cell": "(element) => element"
 				},
 				{
+					"columnDef": "sample type",
+					"sticky": "false",
+					"header": "Characteristics[Sample type]",
+					"data-type": "ontology",
+					"ontology-details": {
+						"data-type": "ontology",
+						"is-required": "true",
+						"is-read-only": "false",
+						"is-hidden": "false",
+						"technique": "mass spectrometry|NMR spectroscopy",
+						"description": "",
+						"placeholder": "",
+						"rules": [{
+							"condition": "min",
+							"value": "5",
+							"error": "Please provide a valid ontology term for the factor. This should be a minimum of 5 characters long",
+							"type": "string"
+						}],
+						"recommended-ontologies": {
+							"is-forced-ontology": "false",
+							"ontology": {
+								"url": "ws/ebi-internal/ontology?branch=taxonomy&term=",
+								"allowFreeText": true
+							}
+						}
+					},
+					"cell": "(element) => element"
+				},
+				{
 					"columnDef": "protocol",
 					"sticky": "true",
 					"header": "Protocol REF",

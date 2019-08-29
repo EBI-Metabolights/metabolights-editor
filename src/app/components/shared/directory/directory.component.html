@@ -1,0 +1,30 @@
+<a class="panel-block" [ngClass]="file.status == 'active' ? 'is-active-file' : ''">
+  <div class="columns w100">
+    <div (dblclick)="expandDirectory(file)" [style.margin-left]="level * 30 + 'px'" class="column is-four-fifths">
+      <!-- <input (change)="selectFiles($event, 'raw', file, false)" [checked]="isChecked(file.file, 'raw')" type="checkbox" name=""> -->
+      <span class="panel-icon">
+        <span *ngIf="isFolder(file); else fileIcon">
+            <span *ngIf="!file.files; else openFolder">
+                <img class="file-img" src="assets/img/folder.png">
+            </span>
+            <ng-template #openFolder>
+                <img class="file-img" src="assets/img/folder-open.png">
+            </ng-template>
+        </span>
+        <ng-template #fileIcon>
+          <img class="file-img" src="assets/img/file.png">
+        </ng-template>
+      </span>
+      {{ file.file }} <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+    </div>
+    <div class="column is-one-fifths has-text-right">
+        <span class="has-text-grey-light">
+          <mtbls-download [type]="'icon'" [value]="parent + file.file"></mtbls-download>&emsp;
+          <mtbls-delete (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-delete>
+        </span>
+    </div>
+  </div>
+</a>
+<span *ngFor="let sfile of file.files">
+  <mtbls-directory [level]="level + 1" [parent]="parent + file.file + '/'" [file]="sfile"></mtbls-directory>
+</span>

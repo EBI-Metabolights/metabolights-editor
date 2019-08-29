@@ -79,6 +79,9 @@ import { LoadingComponent } from './components/shared/loading/loading.component'
 import { EditTableDirective } from './directives/edit-table.directive';
 
 import { QuillModule } from 'ngx-quill';
+import { DirectoryComponent } from './components/shared/directory/directory.component';
+import { LazyLoadImagesDirective } from './directives/lazy-load-images.directive';
+import { DeleteComponent } from './components/shared/delete/delete.component';
 
 @NgModule({
   declarations: [
@@ -129,7 +132,10 @@ import { QuillModule } from 'ngx-quill';
     QuickLinkComponent,
     ValidationsComponent,
     LoadingComponent,
-    EditTableDirective
+    EditTableDirective,
+    DirectoryComponent,
+    LazyLoadImagesDirective,
+    DeleteComponent,
   ],
   imports: [
     BrowserModule,

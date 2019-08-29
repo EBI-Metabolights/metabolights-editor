@@ -23,8 +23,8 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
  	@Input('validations') validations: any;
  	@Input('values') values: Ontology[] = [];
  	@Input('inline') isInline: boolean;
- 	@Input('id') id: string;
-
+	@Input('id') id: string;
+	 
  	@Output() changed = new EventEmitter<any>();
 
  	domain: string = '';
@@ -49,7 +49,11 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 
  	@ViewChild('input', {read: MatAutocompleteTrigger}) valueInput: MatAutocompleteTrigger;
 
- 	constructor(private editorService: EditorService) {}
+	constructor(private editorService: EditorService) {}
+	
+	setValues(values){
+		this.values = values;
+	}
 
  	optionSelected(selected: MatAutocompleteSelectedEvent) {
  		if(selected.option.value != null || selected.option.value != undefined){
@@ -136,7 +140,14 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
  					this.inputValue = value
 	 				this.allvalues = [];
 	 				if(this.values.length < 1){
-		 				let term = value
+						let term = ""
+						let ontologyFilter = null
+						if(value.indexOf(":") > -1){
+							term = value.split(":")[1]
+							ontologyFilter = value.split(":")[0]
+						}else{
+							term = value
+						}
 		 				this.termsLoading = false;
 		 				this.searchedMore = false;
 		 				this.loading = true;
@@ -146,7 +157,15 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 							let jsonConvert: JsonConvert = new JsonConvert();
 							if(terms.OntologyTerm){
 								terms.OntologyTerm.forEach( term => {
-									this.allvalues.push(jsonConvert.deserializeObject(term, Ontology))
+									let tempOntTerm = jsonConvert.deserializeObject(term, Ontology)
+									if(ontologyFilter){
+										if(tempOntTerm.termSource.name == ontologyFilter){
+											this.allvalues.push(tempOntTerm)
+										}
+									}else{
+										this.allvalues.push(tempOntTerm)
+									}
+									
 								})
 							}
 							this.fetchOntologyDetails()

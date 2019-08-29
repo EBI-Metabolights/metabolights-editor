@@ -87,6 +87,9 @@
 				<span *ngIf="loading">
 					<img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
 				</span>
+				<span *ngIf="validations['is-required']">
+					<b>(required)</b>
+				</span>
 			</mat-hint>
 		</mat-form-field>
 	</div>

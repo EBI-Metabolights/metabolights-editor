@@ -451,7 +451,7 @@ export class TableComponent implements OnInit {
 	}
 
 	addRow(){
-		let index = this.data.rows.length - 1
+		let index = this.data.rows.length
 		if(this.selectedRows.length > 0){
 			index = this.selectedRows[0]
 		}
@@ -487,19 +487,27 @@ export class TableComponent implements OnInit {
 	}
 
 	getEmptyRow(){
-		let obj = tassign({}, this.data.rows[0]);
-		Object.keys(obj).forEach( key => {
-			let isStableColumn = false
-			this.stableColumns.forEach(col => {
-				if(key.indexOf(col) > -1){
-					isStableColumn = true
+		if(this.data.rows.length > 0){
+			let obj = tassign({}, this.data.rows[0]);
+			Object.keys(obj).forEach( key => {
+				let isStableColumn = false
+				this.stableColumns.forEach(col => {
+					if(key.indexOf(col) > -1){
+						isStableColumn = true
+					}
+				})
+				if(!isStableColumn){
+					obj[key] = ""	
 				}
 			})
-			if(!isStableColumn){
+			return obj;
+		}else{
+			let obj = tassign({}, this.data.header);
+			Object.keys(obj).forEach( key => {
 				obj[key] = ""	
-			}
-		})
-		return obj;
+			})
+			return obj;
+		}
 	}
 
 	deleteSelectedRows(){
