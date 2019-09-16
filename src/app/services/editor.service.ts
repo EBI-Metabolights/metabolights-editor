@@ -13,6 +13,7 @@ import { map, catchError } from 'rxjs/operators';
 
 import { LoginURL, RedirectURL } from './../services/globals';
 import { contentHeaders } from './../services/headers';
+import Swal from 'sweetalert2';
 
 @Injectable({
 	providedIn: 'root'
@@ -257,6 +258,14 @@ export class EditorService {
     })
   }
 
+  loadStudyProtocols(){
+    this.dataService.getProtocols(null).subscribe( data => {
+      this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: {
+        'protocols': data.protocols
+      }})
+    })
+  }
+
   deleteStudyFiles(id, body, location, force) {
     return this.dataService.deleteStudyFiles(id, body, location, force)
   }
@@ -317,14 +326,25 @@ export class EditorService {
     if(this.files == null){
       this.loadStudyFiles()
     }else{
+      let samplesExist =false
       this.files.study.forEach(file => {
         if(file.file.indexOf("s_") == 0 && file.status == 'active'){
           this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
             'info': 'Loading Samples data' 
           }})
+          samplesExist = true
           this.updateSamples(file.file)
         }
       })
+      if(!samplesExist){
+        Swal.fire({
+          title: "Error",
+          text: "Sample sheet missing. Please upload sample sheet.",
+          showCancelButton: false,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "OK",
+        })
+      }
     }
   }
 
@@ -518,6 +538,7 @@ export class EditorService {
       this.ngRedux.dispatch({ type: 'SET_STUDY_ORGANISMS', body: {
           'organisms': organisms
       }})
+    }, err => {
     });
   }
 
@@ -607,7 +628,7 @@ export class EditorService {
       map( data => {
         return data
       })
-      );
+    );
   }
 
   deleteAssay(name) {
