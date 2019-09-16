@@ -85,7 +85,6 @@ export class AsperaComponent implements OnInit {
                 connectInstaller.showDownload();
             } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.OUTDATED) {
                 connectInstaller.showUpdate();
-                this.uploadComplete()
             } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.RUNNING) {
                 connectInstaller.connected();
             }
@@ -97,7 +96,6 @@ export class AsperaComponent implements OnInit {
                        if(transfer.status == "completed"){
                            console.log("Upload completed")
                            console.log("Sync started")
-                           console.log()
                            console.log(this.file)
                             if(this.allowMultipleSelection){
                                 this.editorService.syncStudyFiles({

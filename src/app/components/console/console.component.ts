@@ -3,9 +3,6 @@ import { IAppState } from './../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { Component, OnInit } from '@angular/core';
 import { Http, Response, Headers } from '@angular/http';
-import { contentHeaders } from './../../services/headers';
-import { AuthenticationURL } from './../../services/globals';
-import { AuthService } from '../../services/metabolights/auth.service';
 import { EditorService } from '../../services/editor.service';
 
 @Component({

@@ -142,6 +142,7 @@ export class AddAssayComponent implements OnInit {
 			this.selectedAssayVariantColumnOption = []
 			this.isAddAssayModalOpen = false;
 			this.editorService.loadStudyFiles();
+			this.editorService.loadStudyProtocols();
 			Swal.fire({
 				title: 'Assay added!',
 				text: '',

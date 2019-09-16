@@ -249,7 +249,7 @@ export class ProtocolComponent implements OnInit {
 				this.editorService.saveProtocol(this.compileBody()).subscribe( res => {
 					this.updateProtocols(res, 'Protocol saved.')
 					this.form.removeControl('description')
-					// this.isModalOpen = false
+					this.isModalOpen = false
 				}, err => {
 					this.isFormBusy = false
 				});
@@ -262,6 +262,7 @@ export class ProtocolComponent implements OnInit {
 	delete() {
 		if(!this.required){
 			this.editorService.deleteProtocol(this.protocol.name).subscribe( res => {
+					this.addNewProtocol = true
 					this.updateProtocols(res, 'Protocol deleted.')
 					this.form.removeControl('description')
 					this.isDeleteModalOpen = false
@@ -308,17 +309,18 @@ export class ProtocolComponent implements OnInit {
 
 	updateProtocols(data, message){
 		this.editorService.getProtocols(null).subscribe( res => {
-
-			// 
-			let jsonConvert: JsonConvert = new JsonConvert();
-			this.protocol = jsonConvert.deserialize(res.protocols.filter( p => {
-				return p.name == this.protocol.name
-			})[0], MTBLSProtocol);
-			   
 			this.form.reset()
 			this.form.markAsPristine()
 			this.initialiseForm();
-			this.openModal(this.protocol)
+			if(!this.addNewProtocol){
+				let jsonConvert: JsonConvert = new JsonConvert();
+				this.protocol = jsonConvert.deserialize(res.protocols.filter( p => {
+					return p.name == this.protocol.name
+				})[0], MTBLSProtocol);
+				this.openModal(this.protocol)
+			}
+			   
+			
 			toastr.success( message, "Success", {
 				"timeOut": "2500",
 				"positionClass": "toast-top-center",

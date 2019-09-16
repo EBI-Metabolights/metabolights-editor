@@ -16,6 +16,7 @@ export class MafsComponent implements OnInit {
 	mafs: any = [];
 	mafNames: any = [];
 	currentSubIndex: number = 0; 
+	loading: boolean = false;
 
 	constructor() { }
 
@@ -49,7 +50,6 @@ export class MafsComponent implements OnInit {
 					this.mafs.splice(i, 1)
 				})
 			}
-			
 		});
 
 		this.studyMAFs.subscribe(value => {
@@ -74,6 +74,17 @@ export class MafsComponent implements OnInit {
 					Object.keys(value).forEach( mafFile => {
 						if(this.mafNames.indexOf(mafFile) == -1){
 							this.mafs.push(value[mafFile])
+							this.mafNames.push(mafFile)
+							if(this.mafs.length > 0){
+								this.mafs.sort(function(a, b){
+									if(a.name < b.name) { return -1; }
+									if(a.name > b.name) { return 1; }
+									return 0;
+								})  
+							}
+						}else if(this.mafs.length == 0){
+							this.mafs.push(value[mafFile])
+							this.mafNames = []
 							this.mafNames.push(mafFile)
 							if(this.mafs.length > 0){
 								this.mafs.sort(function(a, b){

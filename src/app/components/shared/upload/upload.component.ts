@@ -1,8 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import * as toastr from 'toastr';
-
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { FormBuilder} from '@angular/forms';
 
 @Component({
 	selector: 'mtbls-upload',
@@ -22,6 +19,7 @@ export class UploadComponent implements OnInit {
         extensions : ["*"]
     };
 
+	@Output() complete = new EventEmitter<any>();
 	isUploadModalOpen: boolean = false;
 
 	constructor(private fb: FormBuilder) { }
@@ -30,6 +28,7 @@ export class UploadComponent implements OnInit {
 	}
 
 	uploadComplete(){
+		this.complete.emit();
 		this.closeUploadModal()
 	}
 

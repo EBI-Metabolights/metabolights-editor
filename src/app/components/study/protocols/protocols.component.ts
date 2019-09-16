@@ -27,11 +27,6 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 		this.defaultProtocols = []
 		this.protocols = []
 		
-		this.studyProtocols.subscribe(value => { 
-			this.initialiseProtocols(value)
-			this.allProtocols = value;
-		});
-
 		this.studyValidations.subscribe(value => { 
 			if(value){
 				this.validations = value;
@@ -39,13 +34,18 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 				    return a['sort-order']-b['sort-order']
 				})
 				this.defaultProtocols = this.validation.default.map( protocol => protocol.title)
-				this.protocols.forEach( p => {
-					if (this.defaultProtocols.indexOf(p.name) < 0){
-						this.customProtocols.push(p.name)
-					}
-				})
 			}
-	    });
+		});
+
+		this.studyProtocols.subscribe(value => { 
+			this.initialiseProtocols(value)
+			this.allProtocols = value;
+			this.protocols.forEach( p => {
+				if (this.defaultProtocols.length > 0 && this.defaultProtocols.indexOf(p.name) < 0){
+					this.customProtocols.push(p.name)
+				}
+			})
+		});
 	}
 	
 	ngOnInit() {
@@ -53,6 +53,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
 	initialiseProtocols(value){
 		this.protocols = []
+		this.customProtocols = []
 		if(this.assay != null){
 			this.assay.protocols.forEach(protocol => {
 				value.forEach( p => {

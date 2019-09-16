@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild, ViewChildren, QueryList } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
+import { Component, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { select } from '@angular-redux/store';
 import { EditorService } from '../../../services/editor.service';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder, FormGroup} from '@angular/forms';
 import { MTBLSFactor } from './../../../models/mtbl/mtbls/mtbls-factor';
 import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
 import { MTBLSFactorValue } from './../../../models/mtbl/mtbls/mtbls-factor-value';
@@ -159,7 +159,6 @@ export class SamplesComponent {
     }
 
 	addColumn(type){
-		console.log();		
         if(type == 'factor'){
             let mtblsFactorValue = new MTBLSFactorValue();
             mtblsFactorValue.category = this.selectedFactor;

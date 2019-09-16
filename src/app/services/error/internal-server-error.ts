@@ -11,7 +11,7 @@ export class InternalServerError {
             "positionClass": "toast-bottom-right",
   			"preventDuplicates": true,
   			"extendedTimeOut": 0
-        })
+		})
         return error;
 	}	
 }

@@ -12,7 +12,6 @@
 			<mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"></mtbls-protocol>
 		</span>
 	</div>
-
 	<div *ngFor="let protocol of customProtocols">
 		<span *ngIf="getProtocol(protocol) != null">
 			<mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>

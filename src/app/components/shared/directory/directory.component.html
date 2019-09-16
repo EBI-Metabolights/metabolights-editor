@@ -19,7 +19,9 @@
     </div>
     <div class="column is-one-fifths has-text-right">
         <span class="has-text-grey-light">
-          <mtbls-download [type]="'icon'" [value]="parent + file.file"></mtbls-download>&emsp;
+          <span *ngIf="level == 0">
+            <mtbls-download [type]="'icon'" [value]="parent + file.file"></mtbls-download>&emsp;
+          </span>
           <mtbls-delete (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-delete>
         </span>
     </div>

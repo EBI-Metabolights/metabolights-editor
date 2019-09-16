@@ -287,7 +287,7 @@ export class MetabolightsService extends DataService{
   }
 
   deleteProtocol(title) {
-    return this.http.delete(this.url.studiesList + "/" + this.id + "/protocols?name=" + title, { headers: contentHeaders }).pipe(
+    return this.http.delete(this.url.studiesList + "/" + this.id + "/protocols?name=" + title + "&force=false", { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
       );
