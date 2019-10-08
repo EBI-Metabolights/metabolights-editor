@@ -283,7 +283,7 @@
 					"rules": [{
 						"condition": "min",
 						"value": "10",
-						"error": "Please only a list of authors, separated by commas",
+						"error": "Please provide a list of authors, separated by commas. As appears in the publication, do not include affiliation",
 						"type": "string"
 					}]
 				},
