@@ -40,7 +40,8 @@ import {  SET_STUDY_IDENTIFIER,
     SET_STUDY_FILES,
     DELETE_STUDY_ASSAY,
     SET_STUDY_MAF,
-    SET_STUDY_ERROR } from './actions'; 
+    SET_STUDY_ERROR, 
+    SET_PROTOCOL_EXPAND} from './actions'; 
 
 export const STUDY_INITIAL_STATE: MTBLSStudy =  new MTBLSStudy();
 
@@ -228,6 +229,10 @@ function updateMAF(state, action) {
     return tassign(state, { metaboliteAnnotationFiles: state.metaboliteAnnotationFiles }); 
 }
 
+function setProtocolExpand(state, action){
+    return tassign( state, { isProtocolsExpanded: !action.body})
+}
+
 function addStudyProcessSequence(state, action){
     return tassign(state, { processSequence:  state.processSequence.concat(action.body.processSequence) });
 }
@@ -305,6 +310,8 @@ export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): M
         case SET_STUDY_MAF: return setStudyMAF(state, action);
 
         case SET_STUDY_ERROR: return setStudyInvestigationFailedError(state, action);
+
+        case SET_PROTOCOL_EXPAND: return setProtocolExpand(state, action);
     }
 
     return state; 

@@ -7,12 +7,12 @@
 				<span style="margin-left: 10px">My Studies <small *ngIf="studies.length > 0">({{ studies.length }})</small></span>
 				<span class="is-pulled-right">
 					<small style="font-size: 0.8em !important"><mtbls-help target="create_study"></mtbls-help></small>&nbsp;
-					<a [class.disabled]="loadingStudies" [routerLink]="['/guide/create']" class="button is-success is-small"><b>+ Create New Study</b></a>
+					<a [class.disabled]="loadingStudies" (click)="createNewStudy()" class="button is-success is-small"><b>+ Create New Study</b></a>
 				</span>
 			</p>
 			<div class="panel-block">
 				<p class="control">
-					<input [disabled]="loadingStudies" (keyup)="applyFilter($event.target.value)" class="input is-small" type="text" placeholder="search">
+					<input [disabled]="loadingStudies" (keyup)="applyFilter($event.target.value)" class="input is-small" type="text" placeholder="Filter my studies">
 				</p>
 			</div>
 			<p class="panel-tabs">
@@ -80,5 +80,23 @@
 			<img src="assets/img/loading.svg"><br>
 			Loading studies
 		</p>
+	</div>
+	<div class="modal" [ngClass]="{'is-active': isConfirmationModalOpen}">
+		<div class="modal-background"></div>
+		<div class="modal-card">
+			<section class="modal-card-body">
+				<p>You have {{ submittedStudies.length }} Studies in progress. Are you sure you want to create another study?</p>
+			</section>
+			<footer class="modal-card-foot">
+			<div class="columns is-gapless full-width">
+				<div class="column is-half">
+				<button (click)='closeConfirmation()' class="button is-info">Cancel</button>
+				</div>
+				<div class="column is-half has-text-right">
+					<a [routerLink]="['/guide/create']" class="button is-success">Create new</a>
+				</div>
+			</div>
+			</footer>
+		</div>
 	</div>
 </div>

@@ -36,4 +36,7 @@ export class MTBLSStudy{
   validation: any = {};  
   files: any = null;
   investigationFailed: boolean = false;
+
+  // settings
+  isProtocolsExpanded: boolean = false;
 }

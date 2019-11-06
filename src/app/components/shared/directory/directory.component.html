@@ -22,7 +22,7 @@
           <span *ngIf="level == 0">
             <mtbls-download [type]="'icon'" [value]="parent + file.file"></mtbls-download>&emsp;
           </span>
-          <mtbls-delete (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-delete>
+          <mtbls-file-delete (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-file-delete>
         </span>
     </div>
   </div>

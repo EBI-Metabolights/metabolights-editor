@@ -2,7 +2,20 @@
 	<div>
 		<div class="mtbls-section">
 			<h6 class="mb10">
-				<span style="font-size: 0.8em;"><mtbls-help target="protocols"></mtbls-help></span>&nbsp;<mtbls-protocol [value]="null" [validations]="validations"></mtbls-protocol>
+				<span style="font-size: 0.8em;"><mtbls-help target="protocols"></mtbls-help></span>&nbsp;
+					<a (click)="toggleExpand()" style="margin-right: 10px; margin-left: 10px"  class="button is-default is-pulled-right is-small">
+						<span *ngIf="!expand; else expandSections">
+							<i class="material-icons">
+								calendar_view_day
+							</i> Expand all
+						</span>
+						<ng-template #expandSections>
+							<i class="material-icons">
+								list
+							</i> Collapse all
+						</ng-template>
+					</a>
+				<mtbls-protocol [value]="null" [validations]="validations"></mtbls-protocol>&nbsp;
 			</h6>
 		</div>
 	</div>

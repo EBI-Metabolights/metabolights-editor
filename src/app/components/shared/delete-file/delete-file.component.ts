@@ -6,11 +6,11 @@ import { EditorService } from '../../../services/editor.service';
 
 
 @Component({
-  selector: 'mtbls-delete',
-  templateUrl: './delete.component.html',
-  styleUrls: ['./delete.component.css']
+  selector: 'mtbls-file-delete',
+  templateUrl: './delete-file.component.html',
+  styleUrls: ['./delete-file.component.css']
 })
-export class DeleteComponent implements OnInit {
+export class DeleteFileComponent implements OnInit {
 
   @Input('value') file: string;
 	@Input('type') type: string;
@@ -32,9 +32,9 @@ export class DeleteComponent implements OnInit {
   }
   
 	confirmDelete(){
-      this.forceMetaDataDelete = false;
-      this.fileLocation = "study";
-      this.isDeleteModalOpen = true;
+    this.forceMetaDataDelete = false;
+    this.fileLocation = "study";
+    this.isDeleteModalOpen = true;
   }
 
   closeDeleteConfirmation(){

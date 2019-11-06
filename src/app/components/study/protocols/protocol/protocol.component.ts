@@ -24,6 +24,8 @@ export class ProtocolComponent implements OnInit {
 
 	@ViewChild(OntologyComponent) parameterName: OntologyComponent;
 
+	@select(state => state.study.isProtocolsExpanded) isProtocolsExpanded;
+
 	isModalOpen: boolean = false;
 	isBulkEditModalOpen: boolean = false;
 	isDeleteModalOpen: boolean = false;
@@ -38,12 +40,21 @@ export class ProtocolComponent implements OnInit {
 	addNewProtocol: boolean = false;
 	caretPos: number = 0;
 
+	expand: boolean = true;
+
 	form: FormGroup;
 
 	validationsId = 'protocols.protocol';
 
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
-    }
+		this.isProtocolsExpanded.subscribe(value => { 
+			this.expand = !value
+		});
+	}
+	
+	toggleExpand(){
+		this.expand = !this.expand
+	}
 
     saveColumnValue(col, assay){
     	let columns = []

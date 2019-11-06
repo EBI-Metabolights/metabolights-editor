@@ -208,14 +208,14 @@
                 <div *ngIf="isCellTypeFile">
                 	<mat-form-field class="full-width">
 					  <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
-					    <mat-option *ngFor="let file of files" [value]="file.file">
+					    <mat-option *ngFor="let file of getFiles(selectedCell['column']['header'])" [value]="file.file">
 					      {{file.file}}
 					    </mat-option>
 					  </mat-select>
 					</mat-form-field>
                 </div>
                 <div *ngIf="!isCellTypeFile && !isCellTypeOntology">
-                	<label>{{ formatHeader(selectedCell['column']['columnDef']) }}</label>
+					<label>{{ formatHeader(selectedCell['column']['columnDef']) }}</label>
                 	<mat-form-field class="full-width">
 	                    <input class="no-scroll" 
 	                    formControlName="cell"

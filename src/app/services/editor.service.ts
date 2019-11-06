@@ -166,6 +166,10 @@ export class EditorService {
     }
   }
 
+  toggleProtocolsExpand(value){
+    this.ngRedux.dispatch({ type: 'SET_PROTOCOL_EXPAND', body: value})
+  }
+
   loadStudy(studyID){
     this.toggleLoading(true)
     this.loadStudyId(studyID)
@@ -268,6 +272,10 @@ export class EditorService {
 
   deleteStudyFiles(id, body, location, force) {
     return this.dataService.deleteStudyFiles(id, body, location, force)
+  }
+
+  deleteStudy(id) {
+    return this.dataService.deleteStudy(id)
   }
 
   decompressFiles(body) {

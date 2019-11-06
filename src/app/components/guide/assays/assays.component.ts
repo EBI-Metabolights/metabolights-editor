@@ -106,12 +106,13 @@ export class GuidedAssaysComponent implements OnInit {
 			let finalControls = this.controlsNames.replace(/,/g, "\n").split("\n")
 			let finalSamples = this.samplesNames.replace(/,/g, "\n").split("\n")
 			if(finalSamples.length <= 0){
-				Swal.fire({
-					title: 'Please add sample names',
-					text: '',
-					type: 'warning',
-					confirmButtonText: 'OK'
-				})
+				toastr.error( "Please add sample names", "Error", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				});
 			}else{
 				let sRows = []
 				let duplicatedExist = false
@@ -185,7 +186,7 @@ export class GuidedAssaysComponent implements OnInit {
 				}
 			}
 		}else{
-			toastr.error( "Please add sample names", "Success", {
+			toastr.error( "Please add experimental controls and sample names", "Error", {
                 "timeOut": "2500",
                 "positionClass": "toast-top-center",
                 "preventDuplicates": true,

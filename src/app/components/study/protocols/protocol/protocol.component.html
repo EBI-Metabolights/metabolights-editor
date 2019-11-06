@@ -6,7 +6,7 @@
   <div class="card">
     <header class="card-heading hover-highlight">
       <span>
-        <p class="is-pulled-left">
+        <p (dblclick)="toggleExpand()" class="is-pulled-left" style="user-select: none">
           {{ protocol.name }}
         </p>
         <span *ngIf="getAssaysWithProtocol().length > 0 && !hasAllSectionsEmpty()">
@@ -20,7 +20,7 @@
         <a style="margin-right: 10px;" (click)='openModal(protocol)' class="button is-light is-pulled-right is-small"><mat-icon>edit</mat-icon> Edit Description</a>
       </span>
     </header>
-    <div class="card-content">
+    <div *ngIf="expand" class="card-content">
       <div class="content" >
         <mtbls-content (editContent)='openModal(protocol)' [count]="500" [message]="'Protocol description not found.'" [value]="protocol.description"></mtbls-content>
       </div>
@@ -68,7 +68,7 @@
         </div>
       </div>
     </div>
-    <footer *ngIf="protocol.parameters.length > 0 && protocol.parameters[0].parameterName.annotationValue != ''" class="card-footer">
+    <footer *ngIf="expand && (protocol.parameters.length > 0 && protocol.parameters[0].parameterName.annotationValue != '')" class="card-footer">
       <span>
         <div id="meta" class="field is-grouped is-grouped-multiline">
             <div class="tags is-info has-addons">

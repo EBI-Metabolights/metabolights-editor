@@ -223,7 +223,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 			if(event.value.replace(" ", '') != ''){
 				if(this.indexOfObject(this.values, 'annotationValue', value ) == -1){
 					let newOntology = new Ontology()
-					newOntology.annotationValue = value;
+					newOntology.annotationValue = value.trim();
 					newOntology.termAccession = "http://www.ebi.ac.uk/metabolights/ontology/placeholder"
 					newOntology.termSource = new OntologySourceReference();
 					newOntology.termSource.description = "User defined terms"

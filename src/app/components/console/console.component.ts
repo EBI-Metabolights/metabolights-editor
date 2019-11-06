@@ -1,4 +1,4 @@
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { IAppState } from './../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { Component, OnInit } from '@angular/core';
@@ -20,9 +20,32 @@ export class ConsoleComponent implements OnInit{
     loadingStudies: boolean = false;
     filterValue: string = null;
 
-    constructor(public router: Router, public http: Http, private ngRedux: NgRedux<IAppState>, private editorService: EditorService) {}
+    submittedStudies: any = [];
+
+    isConfirmationModalOpen: boolean = false;
+
+    constructor(private route: ActivatedRoute, public router: Router, public http: Http, private ngRedux: NgRedux<IAppState>, private editorService: EditorService) {
+        this.route.queryParams.subscribe(params => {
+            if(params['reload']){
+                this.editorService.getAllStudies() 
+            }
+        });
+    }
 
     ngOnInit() {
+    }
+
+    createNewStudy(){
+        this.submittedStudies = this.studies.filter(study => study['status'] == 'Submitted')
+        if(this.submittedStudies.length > 0){
+            this.isConfirmationModalOpen = true
+        }else{
+            this.router.navigate(['/guide/create']);
+        }
+    }
+
+    closeConfirmation(){
+        this.isConfirmationModalOpen = false   
     }
 
     ngAfterContentInit() {

@@ -81,7 +81,9 @@ import { EditTableDirective } from './directives/edit-table.directive';
 import { QuillModule } from 'ngx-quill';
 import { DirectoryComponent } from './components/shared/directory/directory.component';
 import { LazyLoadImagesDirective } from './directives/lazy-load-images.directive';
-import { DeleteComponent } from './components/shared/delete/delete.component';
+import { DeleteFileComponent } from './components/shared/delete-file/delete-file.component';
+import { PublicStudyComponent } from './components/public/study/study.component';
+import { DeleteComponent } from './components/study/delete/delete.component';
 
 @NgModule({
   declarations: [
@@ -91,6 +93,7 @@ import { DeleteComponent } from './components/shared/delete/delete.component';
     ConsoleComponent,
     NavBarComponent,
     HelpComponent,
+    PublicStudyComponent,
     CreateComponent,
     PageNotFoundComponent,
     ProgressComponent,
@@ -135,6 +138,7 @@ import { DeleteComponent } from './components/shared/delete/delete.component';
     EditTableDirective,
     DirectoryComponent,
     LazyLoadImagesDirective,
+    DeleteFileComponent,
     DeleteComponent,
   ],
   imports: [

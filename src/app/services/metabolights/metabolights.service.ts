@@ -108,6 +108,13 @@ export class MetabolightsService extends DataService{
     );
   }
 
+  deleteStudy(id){
+    return this.http.delete(this.url.studiesList + "/" + id + "/delete", { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
   downloadURL(name, code) {
     return this.url.download.replace('<study>', this.id) + "/" + name + "?token=" + code
   }

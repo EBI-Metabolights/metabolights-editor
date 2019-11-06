@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { EditorService } from '../../../services/editor.service';
 
 @Component({
 	selector: 'mtbls-protocols',
@@ -10,6 +11,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
 	@select(state => state.study.protocols) studyProtocols;
 	@select(state => state.study.validations) studyValidations;
+	@select(state => state.study.isProtocolsExpanded) isProtocolsExpanded;
 
 	@Input('assay') assay: any;
 
@@ -21,8 +23,9 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 	defaultProtocols: string[] = []
 
 	validationsId = 'protocols';
+	expand: boolean = true;
 
-	constructor() {
+	constructor(private editorService: EditorService) {
 		this.customProtocols = []
 		this.defaultProtocols = []
 		this.protocols = []
@@ -46,6 +49,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 				}
 			})
 		});
+
+		this.isProtocolsExpanded.subscribe(value => { 
+			this.expand = !value
+		});
 	}
 	
 	ngOnInit() {
@@ -65,6 +72,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 		}else{
 			this.protocols = value;
 		}
+	}
+
+	toggleExpand(){
+		this.editorService.toggleProtocolsExpand(!this.expand);
 	}
 
 	getProtocol(name){

@@ -95,9 +95,21 @@ export class TableComponent implements OnInit {
 	    });
 	    this.studyFiles.subscribe(value => { 
 	      	if(value){
-				this.files = value.study.filter(file => !file.directory);
+				this.files = value.study;
 			}
 	    });
+	}
+
+	getFiles(header){
+		// if(this.fileColumns.indexOf(header) > -1){
+		// 	if(this.data.header[header]){
+		// 		let type = this.data.header[header]['file-type']
+		// 		return this.files.filter(file => {
+		// 			return file.type == type
+		// 		})
+		// 	}
+		// }
+		return this.files;
 	}
 
 	initialise(){
