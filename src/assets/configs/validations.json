@@ -70,12 +70,12 @@
 			"is-read-only": "false",
 			"is-hidden": "false",
 			"technique": "mass spectrometry|NMR spectroscopy",
-			"description": "A brief description of the study aims. Please using the abstract of the publication",
+			"description": "A brief description of the study aims. Please use the abstract of the publication",
 			"placeholder": "Please provide a description of your experiment, why not use the abstract of your paper",
 			"rules": [{
 				"condition": "min",
 				"value": "60",
-				"error": "Study description should be at least 60 characters long. Please using the abstract of the publication",
+				"error": "Study description should be at least 60 characters long. Please use the abstract of the publication",
 				"type": "string"
 			}]
 		},
@@ -1139,12 +1139,12 @@
 					"is-read-only": "false",
 					"is-hidden": "false",
 					"technique": "mass spectrometry|NMR spectroscopy",
-					"description": "A brief description of the protocol. Please using the protocol reported in the publication",
+					"description": "A brief description of the protocol. Please use the protocol reported in the publication",
 					"placeholder": "Protocol description",
 					"rules": [{
 						"condition": "min",
 						"value": "40",
-						"error": "Study protocol description should be at least 40 characters long. Please using the protocol reported in the publication",
+						"error": "Study protocol description should be at least 40 characters long. Please use the protocol reported in the publication",
 						"type": "string"
 					}]
 				},
