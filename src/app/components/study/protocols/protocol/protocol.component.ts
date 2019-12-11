@@ -22,7 +22,7 @@ export class ProtocolComponent implements OnInit {
 	@Input('required') required: boolean = false;
 	@Input('validations') validations: any;
 
-	@ViewChild(OntologyComponent) parameterName: OntologyComponent;
+	@ViewChild(OntologyComponent, { static: false }) parameterName: OntologyComponent;
 
 	@select(state => state.study.isProtocolsExpanded) isProtocolsExpanded;
 

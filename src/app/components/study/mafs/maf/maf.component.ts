@@ -39,7 +39,7 @@ export class MafComponent {
 		}
   ];
 
-	@ViewChild(TableComponent) mafTable: TableComponent;
+	@ViewChild(TableComponent, { static: false }) mafTable: TableComponent;
 
   	constructor(private fb: FormBuilder, private editorService: EditorService) {}
 

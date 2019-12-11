@@ -26,7 +26,7 @@ export class DesignDescriptorComponent implements OnInit {
 	@select(state => state.study.publications) studyPublications;
 	validations: any = {}; 
 
-	@ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
+	@ViewChild(OntologyComponent, { static: false }) descriptorComponent: OntologyComponent;
 
 	@select(state => state.study.studyDesignDescriptors) studyDescriptors;
 

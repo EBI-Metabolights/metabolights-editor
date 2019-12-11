@@ -39,7 +39,7 @@ export class PersonComponent implements OnInit {
 	@Input('value') person: MTBLSPerson;
 	@select(state => state.study.validations) studyValidations;
 
-	@ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
+	@ViewChild(OntologyComponent, { static: false }) rolesComponent: OntologyComponent;
 
 	validations: any = {};
 

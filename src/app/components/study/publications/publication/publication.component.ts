@@ -24,7 +24,7 @@ export class PublicationComponent implements OnInit {
 	@Input('value') publication: any;
 	@select(state => state.study.validations) studyValidations: any
 
-	@ViewChild(OntologyComponent) statusComponent: OntologyComponent;
+	@ViewChild(OntologyComponent, { static: false }) statusComponent: OntologyComponent;
 
 	form: FormGroup;
 	isFormBusy: boolean = false;

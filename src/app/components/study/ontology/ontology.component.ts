@@ -47,7 +47,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
  	allvalues: Array<Ontology> = [];
  	ontologyDetails: any = {};
 
- 	@ViewChild('input', {read: MatAutocompleteTrigger}) valueInput: MatAutocompleteTrigger;
+ 	@ViewChild('input', { read: MatAutocompleteTrigger, static: false }) valueInput: MatAutocompleteTrigger;
 
 	constructor(private editorService: EditorService) {}
 	

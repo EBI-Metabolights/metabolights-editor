@@ -18,8 +18,8 @@ import { tassign } from 'tassign';
 })
 export class TableComponent implements OnInit {
 
-	@ViewChild(MatPaginator) paginator: MatPaginator;
-    @ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
     @Input('tableData') tableData: any;
     @Input('validationsId') validationsId: any;
 

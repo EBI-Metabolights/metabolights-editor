@@ -23,7 +23,7 @@ export class SamplesComponent {
     @select(state => state.study.files) studyFiles: any;
 
 	@ViewChildren(OntologyComponent) private ontologyComponents: QueryList<OntologyComponent>;
-	@ViewChild(TableComponent) sampleTable: TableComponent;
+	@ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
 
 	selectedFactor: MTBLSFactor = null;
     isFactorDropdownActive: boolean = false;

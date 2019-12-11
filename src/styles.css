@@ -1,12 +1,47 @@
 @import "~bulma/css/bulma.css";
 @import '~bulma-extensions/bulma-steps/dist/css/bulma-steps.min.css';
 @import "~toastr/build/toastr.css";
-@import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-@import "https://cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css";
 @import '~quill/dist/quill.core.css';
 @import '~quill/dist/quill.bubble.css';
 @import '~quill/dist/quill.snow.css';
+
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(assets/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+    local('MaterialIcons-Regular'),
+    url(assets/fonts/MaterialIcons-Regular.woff2) format('woff2'),
+    url(assets/fonts/MaterialIcons-Regular.woff) format('woff'),
+    url(assets/fonts/MaterialIcons-Regular.ttf) format('truetype');
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Support for IE. */
+  font-feature-settings: 'liga';
+}
 
 .card-heading{
   min-height: 3em;
