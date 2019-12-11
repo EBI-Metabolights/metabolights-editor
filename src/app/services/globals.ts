@@ -6,6 +6,10 @@ if(origin.indexOf('localhost') > -1){
 	origin = "https://wwwdev.ebi.ac.uk"
 }
 
+if(origin.indexOf('8080') > -1){
+	origin = origin.replace('8080', '5000')
+}
+
 var endpoint = origin + "/metabolights"
 
 var metaboLightsWSDomain = endpoint;
