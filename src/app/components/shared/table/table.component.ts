@@ -115,7 +115,7 @@ export class TableComponent implements OnInit {
 	initialise(){
 		this.deSelect()
 		this.data = this.tableData['data']
-		if(this.data ){
+		if(this.data){
 			this.displayedTableColumns = this.data.displayedColumns
 			this.dataSource = new MatTableDataSource<any>(this.data.rows)
 			this.dataSource.paginator = this.paginator;

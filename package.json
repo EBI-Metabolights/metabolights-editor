@@ -40,6 +40,7 @@
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8",
     "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.5.3",
     "sweetalert2": "^8.11.7",
     "tassign": "^1.0.0",
     "toastr": "^2.1.4",

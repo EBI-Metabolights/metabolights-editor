@@ -167,7 +167,15 @@ html, body{
   width: 80vw;
 }
 
-.modal-background {
+.vw90{
+  width: 90vw;
+}
+
+.vh90{
+  min-height: 90vh;
+}
+
+.mo9al-background {
     background-color: rgba(10, 10, 10, 0.45) !important;
 }
 

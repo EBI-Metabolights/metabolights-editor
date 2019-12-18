@@ -50,6 +50,11 @@ export class MafsComponent implements OnInit {
 					this.mafs.splice(i, 1)
 				})
 			}
+			this.mafs.sort(function(a, b){
+				if(a.name < b.name) { return -1; }
+				if(a.name > b.name) { return 1; }
+				return 0;
+			})
 		});
 
 		this.studyMAFs.subscribe(value => {

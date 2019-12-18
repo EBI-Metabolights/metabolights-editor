@@ -6,6 +6,7 @@ import { IAppState, rootReducer, INITIAL_STATE } from './store';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, isDevMode } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -84,6 +85,7 @@ import { LazyLoadImagesDirective } from './directives/lazy-load-images.directive
 import { DeleteFileComponent } from './components/shared/delete-file/delete-file.component';
 import { PublicStudyComponent } from './components/public/study/study.component';
 import { DeleteComponent } from './components/study/delete/delete.component';
+import { MapperComponent } from './components/study/mapper/mapper.component';
 
 @NgModule({
   declarations: [
@@ -140,6 +142,7 @@ import { DeleteComponent } from './components/study/delete/delete.component';
     LazyLoadImagesDirective,
     DeleteFileComponent,
     DeleteComponent,
+    MapperComponent,
   ],
   imports: [
     BrowserModule,
@@ -163,6 +166,7 @@ import { DeleteComponent } from './components/study/delete/delete.component';
     MatCheckboxModule,
     MatTableModule,
     AngularStickyThingsModule,
+    DragDropModule,
     NgReduxRouterModule.forRoot(),
     QuillModule.forRoot({
       modules: {

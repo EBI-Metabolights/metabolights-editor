@@ -68,6 +68,8 @@ export class MafComponent {
 			if(dbId.toLowerCase().indexOf("chebi") > -1){
 				this.currentID = dbId.split(":")[1]
 			}
+		}else{
+			this.currentID = null
 		}
 	}
 
@@ -94,13 +96,13 @@ export class MafComponent {
 			inchi:  [ row['inchi'] ],
 			databaseId:  [ row['database_identifier'] ]
 		});
+		this.getChebiId()
 	}
 
 	 autoPopulate(manual){
 		if(manual){
 			this.openAutoPopulateModal();
 			this.loadAutoPopulateField(this.currentRow)
-			this.getChebiId()
 		}else{
 			
 			let promises = []

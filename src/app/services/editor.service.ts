@@ -494,7 +494,7 @@ export class EditorService {
         let fn = "element['"+ key +"']"
         columns.push({
           "columnDef": key,
-          "sticky": "false",
+          "sticky": key == "Protocol REF" ? "true" : "false",
           "header": key,
           "cell": (element) => eval(fn)
         })
@@ -508,12 +508,24 @@ export class EditorService {
       if (index > -1) {
         displayedColumns.splice(index, 1);
       }
+
+      var index = displayedColumns.indexOf("Characteristics[Sample type]");
+      if (index > -1) {
+        displayedColumns.splice(index, 1);
+      }
+
       displayedColumns.sort((a,b) => {
         return parseInt(this.samples_columns_order[a]) - parseInt(this.samples_columns_order[b])
       })
-      if(displayedColumns[1] != 'Sample Name'){
+
+      if(displayedColumns[1] != 'Protocol REF'){
+        displayedColumns.splice(displayedColumns.indexOf('Protocol REF'), 1);
+        displayedColumns.splice( 1, 0, 'Protocol REF');
+      }
+      
+      if(displayedColumns[2] != 'Sample Name'){
         displayedColumns.splice(displayedColumns.indexOf('Sample Name'), 1);
-        displayedColumns.splice( 1, 0, 'Sample Name');
+        displayedColumns.splice( 2, 0, 'Sample Name');
       }
       displayedColumns = displayedColumns.filter( key => {
         return (key.indexOf("Term Accession Number") < 0 && key.indexOf("Term Source REF") < 0)
