@@ -1332,7 +1332,7 @@
 				"label": "Characteristic",
 				"is-hidden": "false",
 				"technique": "mass spectrometry|NMR spectroscopy",
-				"description": "Characteristic category type. Example: Organism, Organism part, Variant // this needs different examples",
+				"description": "Characteristic category type. Example: Height, Sex, Geolocation, Toxicity, ...",
 				"placeholder": "Example: Organism, Organism part, Variant",
 				"rules": [],
 				"recommended-ontologies": {
