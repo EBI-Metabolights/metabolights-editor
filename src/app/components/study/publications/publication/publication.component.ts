@@ -88,6 +88,9 @@ export class PublicationComponent implements OnInit {
 					"extendedTimeOut": 0,
 					"tapToDismiss": false
 				})
+				this.manuscriptAuthors.forEach( author => {
+					author.checked = false;
+				})
 			}, err => {
 				toastr.error('Failed to import authors.', "Error", {
 					"timeOut": "2500",

@@ -1,4 +1,4 @@
-import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter } from '@angular/core';
+import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewInit, AfterViewChecked } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -19,7 +19,7 @@ import { tassign } from 'tassign';
 	templateUrl: './table.component.html',
 	styleUrls: ['./table.component.css']
 })
-export class TableComponent implements OnInit {
+export class TableComponent implements OnInit, AfterViewChecked {
 
 	@ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
@@ -46,7 +46,8 @@ export class TableComponent implements OnInit {
 
 	rowsToAdd: any = 1;
 
-    validations: any = {};
+	validations: any = {};
+	mlPageSizeOptions:any = [10, 100];
 
     dataSource: MatTableDataSource<any>;
     data: any = null;
@@ -143,8 +144,15 @@ export class TableComponent implements OnInit {
 		}
 	}
 
-	ngAfterViewInit() {
-		if(this.dataSource){
+	ngAfterViewChecked() {
+		if(this.dataSource && !this.dataSource.paginator){
+			if(this.dataSource.filteredData.length > 500){
+				this.paginator.pageSizeOptions = [50, 100, 500, this.dataSource.filteredData.length]
+				this.paginator.pageSize = 50
+			}else{
+				this.paginator.pageSizeOptions = [10, 100, this.dataSource.filteredData.length]
+				this.paginator.pageSize = this.dataSource.filteredData.length;
+			}
 			this.dataSource.paginator = this.paginator;
 		}
 	}

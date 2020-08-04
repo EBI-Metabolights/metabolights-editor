@@ -35,6 +35,11 @@ export class TitleComponent implements OnInit {
         this.title = 'Please add your study title here';
       }else{
         this.title = value;  
+        if(document.title.indexOf("|") > -1){
+          document.title = document.title.split(" | ")[0]  +  " | " + this.title;
+        }else{
+          document.title = " | " + this.title;
+        }
       }
     });
     this.studyValidations.subscribe(value => { 
@@ -42,7 +47,12 @@ export class TitleComponent implements OnInit {
     });
     this.studyIdentifier.subscribe(value => { 
 			if(value != null){
-				this.requestedStudy = value
+        this.requestedStudy = value
+        if(document.title.indexOf("|") > -1){
+          document.title = this.requestedStudy + " | " + document.title.split(" | ")[1];
+        }else{
+          document.title = this.requestedStudy + " | ";
+        }
 			}
 		});
     this.readonly.subscribe(value => { 
