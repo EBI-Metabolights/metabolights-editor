@@ -20,7 +20,7 @@ export class FactorComponent implements OnInit {
 	@Input('isDropdown') isDropdown: boolean = false;
 	@select(state => state.study.validations) studyValidations: any;
 
-	@ViewChild(OntologyComponent, { static: false }) factorTypeComponent: OntologyComponent;
+	@ViewChild(OntologyComponent) factorTypeComponent: OntologyComponent;
 
 	@Output() addFactorToSampleSheet = new EventEmitter<any>();
 

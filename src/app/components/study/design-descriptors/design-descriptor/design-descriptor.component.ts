@@ -30,7 +30,7 @@ export class DesignDescriptorComponent implements OnInit {
 	
 	validations: any = {}; 
 
-	@ViewChild(OntologyComponent, { static: false }) descriptorComponent: OntologyComponent;
+	@ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
 	@select(state => state.study.studyDesignDescriptors) studyDescriptors;
 

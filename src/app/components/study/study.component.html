@@ -20,7 +20,11 @@
 		<article class="message is-success">
 			<div class="message-body">
 				<p><mat-icon class="mat-icon material-icons">info</mat-icon> Your study ({{ requestedStudy }}) is now approved by our curation team. Please take a close look at the study and share the reviewer link with journals and reviewers. <b>You cannot make changes directly at this stage, but if you have further comments or suggestions, please communicate these to <a [href]="'mailto:metabolights-help@ebi.ac.uk?subject=Regarding study - '+requestedStudy">metabolights-help@ebi.ac.uk</a>.</b></p> <br/><p>If you are happy with the changes, you will be able to share the included read-only link with your reviewers and/or journals. Take care to only share this link with trusted parties: <br>
-				<span *ngIf="obfuscationCode"><a [href]="domain + 'reviewer' + obfuscationCode">{{ domain + "reviewer" + obfuscationCode }}</a></span><br>
+				<span *ngIf="obfuscationCode; else loadingIcon"><a [href]="domain + 'reviewer' + obfuscationCode">{{ domain + "reviewer" + obfuscationCode }}</a></span>
+				<ng-template #loadingIcon>
+					<img src="/metabolights/editor/assets/img/loading.svg">
+				</ng-template>
+				<br>
 				<br>
 				Consider this link as temporary, it will expire after the study goes public.
 				<br><br>

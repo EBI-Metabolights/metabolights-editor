@@ -25,7 +25,7 @@ export class ProtocolComponent implements OnInit {
 	@select(state => state.study.readonly) studyReadonly;
 	isStudyReadOnly: boolean = false;
 
-	@ViewChild(OntologyComponent, { static: false }) parameterName: OntologyComponent;
+	@ViewChild(OntologyComponent) parameterName: OntologyComponent;
 
 	@select(state => state.study.isProtocolsExpanded) isProtocolsExpanded;
 

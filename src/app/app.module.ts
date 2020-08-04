@@ -36,6 +36,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { UploadComponent } from './components/shared/upload/upload.component';
 import { DownloadComponent } from './components/shared/download/download.component';
 import { AsperaComponent } from './components/shared/upload/aspera/aspera.component';
+import { AsperaDownloadComponent } from './components/shared/download/aspera/aspera.component';
 import { FTPComponent } from './components/shared/upload/ftp/ftp.component';
 import { MetaComponent } from './components/guide/meta/meta.component';
 import { DesignDescriptorsComponent } from './components/study/design-descriptors/design-descriptors.component';
@@ -85,12 +86,16 @@ import { LazyLoadImagesDirective } from './directives/lazy-load-images.directive
 import { DeleteFileComponent } from './components/shared/delete-file/delete-file.component';
 import { PublicStudyComponent } from './components/public/study/study.component';
 import { DeleteComponent } from './components/study/delete/delete.component';
-import { MapperComponent } from './components/study/mapper/mapper.component';
+import { HeaderComponent } from './components/public/header/header.component';
+import { FooterComponent } from './components/public/footer/footer.component';
+import { PathwaysComponent } from './components/public/pathways/pathways.component';
+import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     StudyComponent,
+    PublicStudyComponent,
     LoginComponent,
     ConsoleComponent,
     NavBarComponent,
@@ -142,7 +147,11 @@ import { MapperComponent } from './components/study/mapper/mapper.component';
     LazyLoadImagesDirective,
     DeleteFileComponent,
     DeleteComponent,
-    MapperComponent,
+    HeaderComponent,
+    FooterComponent,
+    PathwaysComponent,
+    AsperaDownloadComponent,
+    FtpDownloadComponent,
   ],
   imports: [
     BrowserModule,

@@ -14,7 +14,7 @@ export class AssayDetailsComponent implements OnInit {
 	@Input('assayName') assayName: any;
 	@select(state => state.study.assays) assays;
   @select(state => state.study.samples) studySamples;
-  @ViewChild(TableComponent, { static: false }) assayTable: TableComponent;
+  @ViewChild(TableComponent) assayTable: TableComponent;
 
   @select(state => state.study.readonly) readonly;
 	isReadOnly: boolean = false;

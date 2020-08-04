@@ -1,0 +1,22 @@
+{
+    "languages" : [
+        {
+            "code": "en",
+            "name": "English",
+            "file": "en.json",
+            "default": true
+        },
+        {
+            "code": "zh",
+            "name": "Chinese",
+            "file": "zh.json",
+            "default": false
+        },
+        {
+            "code": "es",
+            "name": "Spanish",
+            "file": "es.json",
+            "default": false
+        }
+    ]
+}

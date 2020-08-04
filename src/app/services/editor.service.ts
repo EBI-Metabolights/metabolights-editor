@@ -283,6 +283,9 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
           'uploadLocation': data.uploadPath
         }})
+        this.ngRedux.dispatch({ type: 'SET_OBFUSCATION_CODE', body: {
+          'obfuscationCode': data.obfuscationCode
+        }})
         data = this.deleteProperties(data)
         this.ngRedux.dispatch({ type: 'SET_STUDY_FILES', body: data })
       })

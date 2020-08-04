@@ -21,7 +21,7 @@ export class GuidedAssaysComponent implements OnInit {
 	@select(state => state.study.assays) studyAssays; 
 	@select(state => state.study.samples) studySamples; 
 
-	@ViewChild(SamplesComponent, { static: false }) sampleTable: SamplesComponent;
+	@ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
 	requestedStudy: string = null;
 	loading: boolean = false;

@@ -24,7 +24,7 @@ export class PublicationComponent implements OnInit {
 	@Input('value') publication: any;
 	@select(state => state.study.validations) studyValidations: any
 
-	@ViewChild(OntologyComponent, { static: false }) statusComponent: OntologyComponent;
+	@ViewChild(OntologyComponent) statusComponent: OntologyComponent;
 	
 	@select(state => state.study.readonly) readonly;
 	isReadOnly: boolean = false;
