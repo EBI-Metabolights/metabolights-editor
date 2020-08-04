@@ -8,7 +8,9 @@ import { MTBLSPerson } from '../../../../models/mtbl/mtbls/mtbls-person';
 import { Ontology } from '../../../../models/mtbl/mtbls/common/mtbls-ontology';
 import { MTBLSPublication } from '../../../../models/mtbl/mtbls/mtbls-publication';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript"
-import { MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { DOIService } from '../../../../services/publications/doi.service';
 import { EuropePMCService } from '../../../../services/publications/europePMC.service';
 import * as toastr from 'toastr';

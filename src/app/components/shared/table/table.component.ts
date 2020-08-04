@@ -1,7 +1,10 @@
 import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 import { OntologySourceReference } from './../../../models/mtbl/mtbls/common/mtbls-ontology-reference';
-import { MatAutocompleteSelectedEvent, MatChipInputEvent } from '@angular/material';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
 import { EditorService } from '../../../services/editor.service';

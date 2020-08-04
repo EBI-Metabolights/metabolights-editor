@@ -30,7 +30,7 @@ import { RawUploadComponent } from './components/guide/upload/upload.component';
 import { PageNotFoundComponent } from './components/shared/errors/page-not-found/page-not-found.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material';
+import { MatNativeDateModule } from '@angular/material/core';
 import { ProgressComponent } from './components/guide/progress/progress.component';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { UploadComponent } from './components/shared/upload/upload.component';
@@ -88,7 +88,6 @@ import { PublicStudyComponent } from './components/public/study/study.component'
 import { DeleteComponent } from './components/study/delete/delete.component';
 import { HeaderComponent } from './components/public/header/header.component';
 import { FooterComponent } from './components/public/footer/footer.component';
-import { PathwaysComponent } from './components/public/pathways/pathways.component';
 import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.component';
 
 @NgModule({
@@ -149,7 +148,6 @@ import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.compo
     DeleteComponent,
     HeaderComponent,
     FooterComponent,
-    PathwaysComponent,
     AsperaDownloadComponent,
     FtpDownloadComponent,
   ],
