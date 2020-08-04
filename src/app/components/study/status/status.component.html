@@ -57,28 +57,30 @@
 				</p>
 			</span>
 			<br>
-			<span *ngIf="curator; else submitter">
-				<mat-form-field>
-				  <mat-label>Change study status</mat-label>
-				  <mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
-				    <mat-option value="Submitted">Submitted</mat-option>
-				    <mat-option value="In Curation">In Curation</mat-option>
-				    <mat-option value="In Review">In Review</mat-option>
-				    <mat-option value="Public">Public</mat-option>
-				  </mat-select>
-				</mat-form-field>
-			</span>
-			<ng-template #submitter>
-				<span *ngIf="status == 'Submitted'">
+			<span *ngIf="!isReadOnly">
+				<span *ngIf="curator; else submitter">
 					<mat-form-field>
-					  <mat-label>Change study status</mat-label>
-					  <mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
-					    <mat-option value="Submitted">Submitted</mat-option>
-					    <mat-option value="In Curation">In Curation</mat-option>
-					  </mat-select>
+					<mat-label>Change study status</mat-label>
+					<mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
+						<mat-option value="Submitted">Submitted</mat-option>
+						<mat-option value="In Curation">In Curation</mat-option>
+						<mat-option value="In Review">In Review</mat-option>
+						<mat-option value="Public">Public</mat-option>
+					</mat-select>
 					</mat-form-field>
 				</span>
-			</ng-template>
+				<ng-template #submitter>
+					<span *ngIf="status == 'Submitted'">
+						<mat-form-field>
+						<mat-label>Change study status</mat-label>
+						<mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
+							<mat-option value="Submitted">Submitted</mat-option>
+							<mat-option value="In Curation">In Curation</mat-option>
+						</mat-select>
+						</mat-form-field>
+					</span>
+				</ng-template>
+			</span>
 		</section>
 		<footer class="modal-card-foot buttons is-right">
 			<div class="columns is-gapless full-width">

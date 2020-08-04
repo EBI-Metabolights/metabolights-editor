@@ -37,6 +37,9 @@ export class MTBLSStudy{
   files: any = null;
   investigationFailed: boolean = false;
 
+  readonly: boolean = null;
+  reviewerLink: any = null;
+  
   // settings
   isProtocolsExpanded: boolean = false;
 }

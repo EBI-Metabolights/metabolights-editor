@@ -70,6 +70,18 @@ export class EditorService {
     return this.dataService.getMetaInfo();
   }
 
+  loadStudyInReview(id){
+    this.loadStudyId(id);
+    this.loadStudy(id, true)
+    this.loadValidations()
+  }
+
+  loadPublicStudy(body){
+    this.loadStudyId(body.id);
+    this.loadStudy(body.id, true)
+    this.loadValidations()
+  }
+
   initialise(data, signInRequest){
     let user = null
     if(signInRequest){
@@ -160,7 +172,7 @@ export class EditorService {
       route.params.subscribe( params => {
         let studyID = params['id']
         if(this.currentStudyIdentifier != studyID ){
-          this.loadStudy(studyID)
+          this.loadStudy(studyID, false)
         }
       });  
     }
@@ -170,7 +182,7 @@ export class EditorService {
     this.ngRedux.dispatch({ type: 'SET_PROTOCOL_EXPAND', body: value})
   }
 
-  loadStudy(studyID){
+  loadStudy(studyID, readonly){
     this.toggleLoading(true)
     this.loadStudyId(studyID)
     this.dataService.getStudy(studyID).subscribe(
@@ -199,6 +211,9 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'SET_STUDY_STATUS', body: {
           'study': study
         }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_REVIEWER_LINK', body: {
+          'study': study
+        }})
         this.ngRedux.dispatch({ type: 'SET_STUDY_PUBLICATIONS', body: {
           'study': study
         }})
@@ -215,7 +230,17 @@ export class EditorService {
           'protocols': study.isaInvestigation.studies[0].protocols
         }})
         this.loadStudyFiles()
-        this.validateStudy()
+        if(!readonly){
+          this.validateStudy()
+          this.ngRedux.dispatch({ type: 'SET_STUDY_READONLY', body: {
+            'readonly': false
+          }})
+        }else{
+          this.ngRedux.dispatch({ type: 'SET_STUDY_READONLY', body: {
+            'readonly': true
+          }})
+          this.toggleLoading(false)
+        }
       },
       error => {
         this.toggleLoading(false)
@@ -223,7 +248,9 @@ export class EditorService {
           'investigationFailed': true
         }})
         this.loadStudyFiles()
-        this.validateStudy()
+        if(!readonly){
+          this.validateStudy()
+        }
       }
     )
   }

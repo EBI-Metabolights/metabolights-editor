@@ -1,8 +1,8 @@
-<div class="panel-block bg-white p2">
+<div  class="panel-block bg-white p2">
 	<div class="column"  style="width: 100%; overflow-x: auto">
 		<div class="panel-block-wrapper">
 			<span *ngIf="assay">
-	  			<span class="column is-12 nprl nmrl fadeIn">
+	  			<span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
 					<a (click)="openAddSamplesModal()" class="button is-small is-light">
 						<mat-icon>add</mat-icon> Samples
 					</a>

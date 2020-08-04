@@ -9,7 +9,9 @@ import { NgRedux, select } from '@angular-redux/store';
 export class FactorsComponent implements OnInit {
 
 	@select(state => state.study.factors) studyFactors;
-
+	@select(state => state.study.readonly) readonly;
+	
+	isReadOnly: boolean = false;
 	factors: any = null;
 	
 	constructor() { 
@@ -19,6 +21,11 @@ export class FactorsComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
 	}
 
 }

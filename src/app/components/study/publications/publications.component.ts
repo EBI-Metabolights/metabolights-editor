@@ -13,14 +13,21 @@ export class PublicationsComponent implements OnInit {
 
 	@select(state => state.study.publications) studyPublications;
 	@Input('validations') studyValidations: any;
-
+	@select(state => state.study.readonly) readonly;
+	
+	isReadOnly: boolean = false;
 	publications: any = null;
 
 
 	constructor() {
 		this.studyPublications.subscribe(value => { 
             this.publications = value;
-        });
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
 	}
 
 	ngOnInit() { }

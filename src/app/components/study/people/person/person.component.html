@@ -1,5 +1,5 @@
 <span *ngIf='person == null || addNewPerson; else showPersonDetails'>
-  <a class="button is-light is-pulled-right is-small hover-button" (click)='openModal()'>+ Add person</a>
+  <a class="button is-light is-pulled-right is-small" [ngClass]="{'hover-button': !isReadOnly}" (click)='openModal()'>+ Add person</a>
 </span>
 <ng-template #showPersonDetails>
   <span class="clickable" (click)='openModal()'>{{person.firstName}} {{person.midInitials}} {{person.lastName}}</span>
@@ -79,6 +79,7 @@
       				<mat-form-field class="full-width">
                 <input class="no-scroll" 
                 formControlName="lastName"
+                [readonly]="isReadOnly"
                 matInput>
                 <mat-hint>{{ fieldValidation('lastName').description }}</mat-hint>
                 <mat-error
@@ -93,6 +94,7 @@
             <mat-form-field class="full-width">
               <input class="no-scroll" 
               formControlName="midInitials"
+              [readonly]="isReadOnly"
               matInput>
               <mat-hint>{{ fieldValidation('midInitials').description }}</mat-hint>
               <mat-error
@@ -107,6 +109,7 @@
           <mat-form-field class="full-width">
             <input class="no-scroll" 
             formControlName="firstName"
+            [readonly]="isReadOnly"
             matInput>
             <mat-hint>{{ fieldValidation('firstName').description }}</mat-hint>
             <mat-error
@@ -122,6 +125,7 @@
   <mat-form-field class="full-width">
     <input class="no-scroll" 
     formControlName="email"
+    [readonly]="isReadOnly"
     matInput>
     <mat-hint>{{ fieldValidation('email').description }}</mat-hint>
     <mat-error
@@ -138,6 +142,7 @@
     <mat-form-field class="full-width">
       <input class="no-scroll" 
       formControlName="phone"
+      [readonly]="isReadOnly"
       matInput>
       <mat-hint>{{ fieldValidation('phone').description }}</mat-hint>
       <mat-error
@@ -152,6 +157,7 @@
   <mat-form-field class="full-width">
     <input class="no-scroll" 
     formControlName="fax"
+    [readonly]="isReadOnly"
     matInput>
     <mat-hint>{{ fieldValidation('fax').description }}</mat-hint>
     <mat-error
@@ -167,6 +173,7 @@
 <mat-form-field class="full-width">
  <textarea class="no-scroll" 
  formControlName="address"
+ [readonly]="isReadOnly"
  matInput
  cdkAutosizeMinRows="1"
  cdkAutosizeMaxRows="4"
@@ -183,6 +190,7 @@ form.get('address').errors.address">
 <mat-form-field class="full-width">
  <input class="no-scroll" 
  formControlName="affiliation"
+ [readonly]="isReadOnly"
  matInput>
  <mat-hint>{{ fieldValidation('affiliation').description }}</mat-hint>
  <mat-error
@@ -192,7 +200,9 @@ form.get('address').errors.address">
  {{ form.get('affiliation').errors.affiliation.error }}
 </mat-error>
 </mat-form-field>
-<mtbls-ontology class="mt-20" #personRoles [validations]="fieldValidation('roles')" (changed)="onChanges($event)" [values]='person.roles' [inline]="true"></mtbls-ontology>
+<span *ngIf="!isReadOnly">
+    <mtbls-ontology class="mt-20" #personRoles [validations]="fieldValidation('roles')" (changed)="onChanges($event)" [values]='person.roles' [inline]="true"></mtbls-ontology>
+</span>
 <mat-error
 *ngIf="form.get('roles').errors &&
 form.get('roles').dirty &&
@@ -200,10 +210,10 @@ form.get('roles').errors.roles">
 <small>{{ form.get('roles').errors.roles.error }}</small>
 </mat-error>
 </section>
-<footer class="modal-card-foot">
+<footer *ngIf="!isReadOnly" class="modal-card-foot">
   <div class="columns is-gapless full-width">
     <div class="column is-half">
-      <button *ngIf="!addNewPerson" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
+      <button *ngIf="!addNewPerson" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete</mat-icon></button>
     </div>
     <div class="column is-half has-text-right">
       <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
@@ -215,6 +225,15 @@ form.get('roles').errors.roles">
     </div>
   </div>
 </footer>
+<footer *ngIf="isReadOnly" class="modal-card-foot">
+    <div class="columns is-gapless full-width">
+      <div class="column is-half">
+      </div>
+      <div class="column is-half has-text-right">
+        <button (click)='closeModal()' class="button is-info">OK</button>
+      </div>
+    </div>
+  </footer>
 </div>
 </form>
 </div>

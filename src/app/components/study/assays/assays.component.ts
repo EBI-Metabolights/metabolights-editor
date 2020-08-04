@@ -9,6 +9,9 @@ import { select } from '@angular-redux/store';
 export class AssaysComponent {
 
 	@select(state => state.study.assays) studyAssays;
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+
 	assays: any = [];
 	currentSubIndex: number = 0; 
 	assaysNames: any = []
@@ -36,6 +39,11 @@ export class AssaysComponent {
 						})
 					}
 				})
+			}
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
 			}
 		});
   	}

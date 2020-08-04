@@ -1,208 +1,197 @@
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { EditorService } from '../../../../services/editor.service';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { EditorService } from '../../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import * as toastr from 'toastr';
-
-declare var $: any;
+import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
 declare var AW4: any;
-
 @Component({
-	selector: 'mtbls-aspera',
-	templateUrl: './aspera.component.html',
-	styleUrls: ['./aspera.component.css']
+  selector: 'mtbls-aspera',
+  templateUrl: './aspera.component.html',
+  styleUrls: ['./aspera.component.css']
 })
 export class AsperaComponent implements OnInit {
 
-	isAsperaUploadModalOpen: boolean = false;
-	selectedTab: string = 'plugin';
-	@select(state => state.study.uploadLocation) uploadLocation;
-    displayHelpModal: boolean = false;
+  @select(state => state.study.uploadLocation) uploadLocation;
+	@select(state => state.study.validations) validations: any;
 
-    @Input('file') file: string = null;
-    @Input('allowMultipleSelection') allowMultipleSelection: boolean = true;
-    @Input('type') type: string = 'file';
 
-    @Input('fileTypes') fileTypes: any = null;
+  @Input('type') type: string  = "file"
+  @Input('allowMultipleSelection') allowMultipleSelection: boolean = false
+  @Input('fileTypes') fileTypes: any = {
+    filter_name : "All types",
+    extensions : ["*"]
+  };
+  @Input('file') file: any = null
 
-    @Output() complete = new EventEmitter<any>();
+  isAsperaUploadModalOpen = false
+  selectedTab = "plugin"
+  displayHelpModal = false
+  @Output() complete = new EventEmitter<any>();
+  currentTransferId = null
+  validationsId = "upload"
+  MIN_CONNECT_VERSION = "3.6.0.0"
+  CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4"
+  uploadPath = ""
+  asperaWeb: any = null;
+  validation: any = null
 
-    currentTransferId = null;
-
-	validationsId = 'upload';
-    @select(state => state.study.validations) validations: any
-    validation: any;
-
-	$: any;
-    MIN_CONNECT_VERSION = "3.6.0.0";
-    CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
-    //CONNECT_LOCATION = "http://asperasoft.com/connect2";
-    //connect_id = "aspera-web";
-    asperaWeb: any; 
-    uploadPath: string = '';
-
-	constructor(private fb: FormBuilder, private editorService: EditorService){ 
+  constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService){ 
 		this.uploadLocation.subscribe(value => { 
 			this.uploadPath = value
+    })
+    this.validations.subscribe(value => { 
+      if(value){
+			this.validation = value[this.validationsId]
+      }
 		})
-        this.validations.subscribe(value => { 
-            if(value){
-                this.validation = value[this.validationsId]
-            }
-        })
 	}
 
-    toggleHelp() {
-        this.displayHelpModal = !this.displayHelpModal;
-    }
+  ngOnInit() {
+  }
 
-	ngOnInit() {
-	}
+  toggleHelp() {
+    this.displayHelpModal = !this.displayHelpModal
+  }
 
-	changeTab(id){
-		this.selectedTab = id;
-	}
+  changeTab(t) {
+    this.selectedTab = t
+  }
 
-	openUploadModal(){
-		this.isAsperaUploadModalOpen = true;
-	}
+  openUploadModal() {
+      this.isAsperaUploadModalOpen = true
+  }
 
-	closeUploadModal(){
-		this.isAsperaUploadModalOpen = false;	
-    }
+  closeUploadModal() {
+      this.isAsperaUploadModalOpen = false
+  }
+
+  upload(t) {
+      this.asperaUpload(t)
+  }
+
+  asperaUpload(t) {
     
-    upload(type){
-        this.asperaUpload(type)
-    }
+    this.asperaWeb = new AW4.Connect({
+      sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
+      minVersion: this.MIN_CONNECT_VERSION
+    });
 
-	asperaUpload(type){
-        this.asperaWeb = new AW4.Connect({sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION, minVersion: this.MIN_CONNECT_VERSION});
-        var connectInstaller = new AW4.ConnectInstaller({sdkLocation : this.CONNECT_AUTOINSTALL_LOCATION});
-        var statusEventListener = function (eventType, data) {
-            if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.INITIALIZING) {
-                connectInstaller.showLaunching();
-            } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.FAILED) {
-                connectInstaller.showDownload();
-            } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.OUTDATED) {
-                connectInstaller.showUpdate();
-            } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.RUNNING) {
-                connectInstaller.connected();
-            }
-        };
-        var transferStatusListener = (function(eventType, data){
-            if (eventType === AW4.Connect.EVENT.TRANSFER) {
-                data.transfers.forEach(transfer => {
-                    if(transfer.uuid == this.currentTransferId){
-                       if(transfer.status == "completed"){
-                           console.log("Upload completed")
-                           console.log("Sync started")
-                           console.log(this.file)
-                            if(this.allowMultipleSelection){
-                                this.editorService.syncStudyFiles({
-                                    files: []
-                                }).subscribe(data => {
-                                    this.closeUploadModal();
-                                    this.complete.emit();
-                                    console.log("Sync complete")
-                                })
-                            }else{
-                                this.editorService.syncStudyFiles({
-                                    files: [ {
-                                            from: transfer['transfer_spec'].paths[0].source.split('\\').pop().split('/').pop(),
-                                            to : this.file
-                                        }
-                                    ]
-                                }).subscribe(data => {
-                                    this.closeUploadModal();
-                                    this.complete.emit();
-                                    console.log("Sync complete")
-                                })
-                            }
-                       }
-                    }
-                })
-            } 
-        }).bind(this)
-        this.asperaWeb.addEventListener(AW4.Connect.EVENT.STATUS, statusEventListener);
-        this.asperaWeb.addEventListener(AW4.Connect.EVENT.TRANSFER, transferStatusListener);
-        this.asperaWeb.initSession();
-        if(type == 'folder'){
-            this.asperaWeb.showSelectFolderDialog({
-                success: (function(dataTransferObj){
-                    this.buildUploadSpec(dataTransferObj)
-                }).bind(this),
-                error: function (error) {
-                    console.error(error);
-                }
-            }, {
-                allowMultipleSelection : this.allowMultipleSelection
-            });
-        }else{
-            console.log(this.fileTypes)
-            this.asperaWeb.showSelectFileDialog({
-                success: (function(dataTransferObj){
-                    this.buildUploadSpec(dataTransferObj)
-                }).bind(this),
-                error: function (error) {
-                    console.error(error);
-                }
-            }, {
-                allowMultipleSelection : this.allowMultipleSelection,
-                allowedFileTypes : this.fileTypes
-            });
+    var asperaInstaller = new AW4.ConnectInstaller({
+        sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION
+    })
+
+    var transferListener = (eventType, data, asperaInstaller) => {
+      if (eventType === AW4.Connect.EVENT.TRANSFER) {
+        data.transfers.forEach(((t) => {
+              t.uuid == this.currentTransferId && "completed" == t.status && (console.log("Upload completed"),
+              console.log("Sync started"),
+              this.allowMultipleSelection ? this.editorService.syncStudyFiles({
+                  files: []
+              }).subscribe((function(t) {
+                  this.closeUploadModal(),
+                  this.complete.emit(),
+                  console.log("Sync complete")
+              }
+              )) : this.editorService.syncStudyFiles({
+                  files: [{
+                      from: t.transfer_spec.paths[0].source.split("\\").pop().split("/").pop(),
+                      to: this.file
+                  }]
+              }).subscribe(((t) => {
+                  this.closeUploadModal(),
+                  this.complete.emit(),
+                  console.log("Sync complete")
+              }
+            )))
+          }
+        ))
+      } 
+    };
+
+    var statusEventListener = function (eventType, data) {
+      if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.INITIALIZING) {
+        asperaInstaller.showLaunching();
+     } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.FAILED) {
+       asperaInstaller.showDownload();
+     } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.OUTDATED) {
+       asperaInstaller.showUpdate();
+     } else if (eventType === AW4.Connect.EVENT.STATUS && data == AW4.Connect.STATUS.RUNNING) {
+       asperaInstaller.connected();
+     }
+    };
+    this.asperaWeb.addEventListener(AW4.Connect.EVENT.STATUS, statusEventListener);
+    this.asperaWeb.addEventListener(AW4.Connect.EVENT.TRANSFER, transferListener)
+    this.asperaWeb.initSession(),
+    "folder" == t ? this.asperaWeb.showSelectFolderDialog({
+        success: (function(t) {
+            this.buildUploadSpec(t)
         }
-    }
-
-    buildUploadSpec(dataTransferObj) {
-        var transferSpecs = [{
-            "aspera_connect_settings": {
-                "allow_dialogs": true,
-                "back_link": location.href
-            },
-            "transfer_spec": {}
-        }]
-
-        var params = {}
-        var asperaSettings = this.validation.aspera;
-        params["remote_user"] = asperaSettings.user;
-        params["remote_password"] = asperaSettings.secret;
-        params['remote_host'] =  asperaSettings.server;
-
-        // params['fasp_port'] = 33001;
-        params['target_rate_kbps'] = 45000;
-        params['min_rate_kbps'] = 0;
-        params['lock_policy'] = false;
-        params['lock_target_rate'] = false;
-        params['direction'] = "send";
-        params['lock_min_rate'] = false;
-        params['rate_policy'] = "fair";
-        params['cipher'] = "aes-128";
-        params['ssh_port'] = 33001;
-
-        transferSpecs[0]["transfer_spec"] = params;
-
-        transferSpecs[0]["transfer_spec"]['paths'] = [];
-        var files = dataTransferObj.dataTransfer.files;
-        for (var i = 0, length = files.length; i < length; i += 1) {
-            var pathSet = {src : files[i].name};
-            var srcPath = pathSet.src || '';
-            var destPath = '';
-            var paths = transferSpecs[0]["transfer_spec"]['paths'];
-            if (!paths) {
-                transferSpecs[0]["transfer_spec"]['paths'] = [];
-            }
-            (transferSpecs[0]["transfer_spec"]['paths']).push({
-                'source': srcPath,
-                'destination': destPath
-            });
+        ).bind(this),
+        error: function(t) {
+            console.error(t)
         }
-        transferSpecs[0]["transfer_spec"]['destination_root'] = this.uploadPath ;
+    }, {
+        allowMultipleSelection: this.allowMultipleSelection
+    }) : (console.log(this.fileTypes),
+    
+    this.asperaWeb.showSelectFileDialog({
+        success: (function(t) {
+            this.buildUploadSpec(t)
+        }
+        ).bind(this),
+        error: function(t) {
+            console.error(t)
+        }
+    }, {
+        allowMultipleSelection: this.allowMultipleSelection,
+        allowedFileTypes: this.fileTypes
+    }))
+}
 
-        var finalConfig = {};
-        finalConfig['transfer_specs'] = transferSpecs;
-        var requestId = this.asperaWeb.startTransfers(finalConfig, {success: data => {
-            this.currentTransferId = data['transfer_specs'][0]['uuid']
+buildUploadSpec(t) {
+    var e = [{
+        aspera_connect_settings: {
+            allow_dialogs: !0,
+            back_link: location.href
+        },
+        transfer_spec: {}
+    }]
+
+    var i = this.validation.aspera;
+
+    var l = {};
+    l['remote_user'] = i.user
+    l['remote_password'] = i.secret
+    l['remote_host'] = i.server
+    l['target_rate_kbps'] = 5000
+    l['min_rate_kbps'] = 0
+    l['lock_policy'] = false
+    l['lock_target_rate'] = false
+    l['direction'] = "send"
+    l['lock_min_rate'] = false
+    l['rate_policy'] = "fair"
+    l['cipher'] = "aes-128"
+    l['ssh_port'] = 33001
+
+    e[0].transfer_spec = l,
+    e[0].transfer_spec['paths'] = [];
+    for (var o = t.dataTransfer.files, r = 0, u = o.length; r < u; r += 1) {
+        var a = o[r].name || "";
+        e[0].transfer_spec['paths'] || (e[0].transfer_spec['paths'] = []),
+        e[0].transfer_spec['paths'].push({
+            source: a,
+            destination: ""
+        })
+    }
+    e[0].transfer_spec['destination_root'] = this.uploadPath;
+    var s = {};
+    s['transfer_specs'] = e,
+    this.asperaWeb.startTransfers(s, {
+        success: (t) => {
+            this.currentTransferId = t.transfer_specs[0].uuid,
             console.log("Upload Started")
-        }});
-    }
+        }
+    })
+  }
+
 }

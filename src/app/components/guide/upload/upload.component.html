@@ -6,7 +6,7 @@
 		<div>&nbsp;</div>
 		<nav class="panel has-background-white">
 			<div class="panel-heading">
-				<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+				<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
 				<span style="margin-left: 10px">{{ requestedStudy }}</span>: Upload files
 			</div>
 			<div class="panel-block bg-white">
@@ -36,7 +36,7 @@
 				</span>
 			</p>
 			<div class="panel-block has-background-white">
-				<span *ngIf="files && files.latest && files.latest.length > 0; else noUploadFiles" class="w100">
+				<span *ngIf="files && ((files.latest && files.latest.length > 0) || (files.study && files.study.length > 0)) ; else noUploadFiles" class="w100">
 					<span *ngIf="files.latest.length > 0">
 						<small class="has-text-grey">RECENTLY UPDATED FILES</small>
 						<span *ngFor="let file of files.latest">
@@ -45,10 +45,10 @@
 									<div class="column is-three-fifths">
 										<span class="panel-icon">
 											<span *ngIf="isFolder(file); else fileIcon">
-												<img src="assets/img/folder.png">
+												<img src="/metabolights/editor/assets/img/folder.png">
 											</span>
 											<ng-template #fileIcon>
-												<img src="assets/img/file.png">
+												<img src="/metabolights/editor/assets/img/file.png">
 											</ng-template>
 										</span>
 										<span>
@@ -71,10 +71,10 @@
 									<div class="column is-three-fifths">
 										<span class="panel-icon">
 											<span *ngIf="isFolder(file); else fileIcon">
-												<img src="assets/img/folder.png">
+												<img src="/metabolights/editor/assets/img/folder.png">
 											</span>
 											<ng-template #fileIcon>
-												<img src="assets/img/file.png">
+												<img src="/metabolights/editor/assets/img/file.png">
 											</ng-template>
 										</span>
 										<span>

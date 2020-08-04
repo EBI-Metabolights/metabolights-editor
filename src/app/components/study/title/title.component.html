@@ -1,7 +1,7 @@
-<div class="hover-highlight px-20 mtbls-section">
+<div [ngClass]="{'hover-highlight': !isReadOnly}" class="px-20 mtbls-section">
   <h2 class="title is-3">
     <b>
-      <span [innerHTML]='title' class="clickable" (click)='openModal()'></span>
+      <span>{{ requestedStudy }}: </span><span [innerHTML]='title' class="clickable" (click)='openModal()'></span>
     </b>
   </h2>
 </div>

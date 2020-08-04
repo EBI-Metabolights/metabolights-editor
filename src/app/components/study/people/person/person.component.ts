@@ -41,6 +41,9 @@ export class PersonComponent implements OnInit {
 
 	@ViewChild(OntologyComponent, { static: false }) rolesComponent: OntologyComponent;
 
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+
 	validations: any = {};
 
 	form: FormGroup;
@@ -60,6 +63,15 @@ export class PersonComponent implements OnInit {
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
 		this.studyValidations.subscribe(value => { 
 			this.validations = value;
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				if(value){
+					this.isReadOnly = value
+				}else{
+					this.isReadOnly = false
+				}
+			}
 		});
 	}
 
@@ -162,44 +174,48 @@ export class PersonComponent implements OnInit {
 	}
 
 	save() {
-		this.isFormBusy = true;
-		if(!this.addNewPerson){
-			if(this.getFieldValue('email') != this.person.email && this.person.email != ''){
-				this.editorService.updatePerson(this.person.email, null, this.compileBody()).subscribe( res => {
-					this.updateContacts(res, "Person updated")
+		if(!this.isReadOnly){
+			this.isFormBusy = true;
+			if(!this.addNewPerson){
+				if(this.getFieldValue('email') != this.person.email && this.person.email != ''){
+					this.editorService.updatePerson(this.person.email, null, this.compileBody()).subscribe( res => {
+						this.updateContacts(res, "Person updated")
+					}, err => {
+						this.isFormBusy = false
+					});
+				}else{
+					this.editorService.updatePerson(null, this.person.firstName + this.person.lastName, this.compileBody()).subscribe( res => {
+						this.updateContacts(res, "Person updated")
+					}, err => {
+						this.isFormBusy = false
+					});	
+				}
+				
+			}else{
+				this.editorService.savePerson(this.compileBody()).subscribe( res => {
+					this.updateContacts(res, "Person saved")
+					this.closeModal();
 				}, err => {
 					this.isFormBusy = false
 				});
-			}else{
-				this.editorService.updatePerson(null, this.person.firstName + this.person.lastName, this.compileBody()).subscribe( res => {
-					this.updateContacts(res, "Person updated")
-				}, err => {
-					this.isFormBusy = false
-				});	
 			}
-			
-		}else{
-			this.editorService.savePerson(this.compileBody()).subscribe( res => {
-				this.updateContacts(res, "Person saved")
-				this.closeModal();
-			}, err => {
-				this.isFormBusy = false
-			});
 		}
 	}
 
 	updateContacts(res, message){
-		this.editorService.getPeople().subscribe(data => {
-			this.form.markAsPristine()
-			this.initialiseForm();
-			toastr.success(message, "Success", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			});	
-		});
+		if(!this.isReadOnly){
+			this.editorService.getPeople().subscribe(data => {
+				this.form.markAsPristine()
+				this.initialiseForm();
+				toastr.success(message, "Success", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				});	
+			});
+		}
 	}
 
 	onChanges(){

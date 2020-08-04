@@ -75,7 +75,7 @@
 				<span *ngIf="!searchedMore">
 					<span *ngIf="termsLoading; else showMore">
 						<mat-option>
-							<img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
+							<img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
 						</mat-option>
 					</span>
 					<ng-template #showMore>
@@ -85,7 +85,7 @@
 			</mat-autocomplete>
 			<mat-hint>{{ validations.description }}
 				<span *ngIf="loading">
-					<img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
+					<img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
 				</span>
 				<span *ngIf="validations['is-required']">
 					<b>(required)</b>

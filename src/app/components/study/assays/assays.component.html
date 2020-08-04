@@ -1,6 +1,6 @@
 <span>
 	<span *ngIf="assays && assays.length > 0; else noAssays">
-	<div>
+	<div *ngIf="!isReadOnly">
 		<add-assay></add-assay>
 	</div>
 	<br>

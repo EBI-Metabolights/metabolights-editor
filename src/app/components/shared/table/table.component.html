@@ -8,7 +8,7 @@
 		<mat-paginator [pageSizeOptions]="[1000, 2000]" showFirstLastButtons></mat-paginator>
 	</span>
 </div>
-<div class="my-2">
+<div *ngIf="!isReadOnly" class="my-2">
 	<div *ngIf="hasAnyMissingValues()" class="notification is-warning">
       <small>The terms below are provided in your table but do not have associated ontologies. If you wish to add ontology terms please use <i class="material-icons">edit</i> to edit or <i class="material-icons">compare_arrows</i> to autofill using existing values.</small> <br><br>
       <span *ngFor="let key of getKeys(ontologyCols)">
@@ -39,8 +39,8 @@
       </span>
     </div>
 </div>
-<span #spacer></span>
-<div class="columns mb0 is-vcentered prevent-deselect " style="z-index: 1000; background-color: white; padding: 10px; border: 1px solid rgba(0,0,0,0.03);" stickyThing [spacer]="spacer" marginTop="50">
+<span *ngIf="!isReadOnly" #spacer></span>
+<div *ngIf="!isReadOnly"  class="columns mb0 is-vcentered prevent-deselect " style="z-index: 1000; background-color: white; padding: 10px; border: 1px solid rgba(0,0,0,0.03);" stickyThing [spacer]="spacer" marginTop="50">
 	<span class="column is-12 fadeIn nmrl">
 		<a class="button is-small is-light" (click)="toggleView()">
 			<span *ngIf="view == 'compact'; else expandedTable">
@@ -51,9 +51,16 @@
 			</ng-template>
 		</a>
 		&nbsp;
-		<a (click)="addRow()" class="button is-small is-light">
-			<mat-icon>add</mat-icon> Row
-		</a>
+		<div style="display: inline-flex; width: 13%" class="field has-addons">
+			<p class="control ">
+				<input [(ngModel)]="rowsToAdd" class="input is-small" type="text">
+			</p>
+			<p class="control">
+				<a (click)="addNRows()" class="button is-small is-light">
+					<mat-icon>add</mat-icon> Rows
+				</a>
+			</p>
+		</div>
 		&nbsp;
 		<span *ngIf="data">
 			<mtbls-upload [fileTypes]="fileTypes" [type]="'file'" [multiple]="false" [file]="data.file"></mtbls-upload>
@@ -72,7 +79,7 @@
 			<small class="has-text-grey-light"><mat-icon>info</mat-icon> items selected</small>
 		</span>
 		<span *ngIf="loading">
-			<small class="has-text-grey-lighter">Saving</small><img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg"> 
+			<small class="has-text-grey-lighter">Saving</small><img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg"> 
 		</span>
 		<span *ngIf="selectedCells.length > 0 && selectedOntologyCell">
 			&nbsp;<span *ngIf="selectedOntologyCell.termSource.name != '' && selectedOntologyCell.termAccession != ''">
@@ -93,8 +100,8 @@
 	    <div style="margin-bottom: 0.75rem;" *ngIf="filters.length > 0" class="field is-grouped is-grouped-multiline">
 	    	<div *ngFor="let filter of filters" class="control">
 	       		<div class="tags has-addons">
-	        	<span class="tag is-link">{{ filter }}</span>
-	        		<a (click)="highlightFilteredRows(filter)" class="tag addon-tag"><mat-icon class="prevent-deselect">control_camera</mat-icon></a>
+	        		<span class="tag is-link">{{ filter }}</span>
+	        		<a (click)="highlightFilteredRows(filter)" class="tag addon-tag"><mat-icon class="prevent-deselect">center_focus_strong</mat-icon></a>
 	        		<a (click)="removeFilter(filter)" class="tag is-delete"></a>
 	      		</div>
 	    	</div>

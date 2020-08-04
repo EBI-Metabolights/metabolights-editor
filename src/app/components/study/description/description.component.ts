@@ -16,6 +16,9 @@ export class DescriptionComponent implements OnChanges, OnInit {
   @select(state => state.study.validations) studyValidations: any
 
   @select(state => state.study.studyDesignDescriptors) studyDesignDescriptors: any[]
+  @select(state => state.study.readonly) readonly;
+  
+  isReadOnly: boolean = false;
 
   form: FormGroup;
   isFormBusy: boolean = false;
@@ -40,6 +43,11 @@ export class DescriptionComponent implements OnChanges, OnInit {
         this.description = value;  
       }
     });
+    this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
   }
 
   toggleSymbolDropdown(){
@@ -73,16 +81,20 @@ export class DescriptionComponent implements OnChanges, OnInit {
   }
 
   openModal() {
-    this.initialiseForm()
-    this.isModalOpen = true
+    if(!this.isReadOnly){
+      this.initialiseForm()
+      this.isModalOpen = true
+    }
   }
 
   initialiseForm() {
-    // this.description = this.description.replace(new RegExp("<br />", 'g'), '\n')
-    this.isFormBusy = false;
-    this.form = this.fb.group({
-      description:  [ this.description, ValidateStudyDescription(this.validation) ]
-    });
+    if(!this.isReadOnly){
+      // this.description = this.description.replace(new RegExp("<br />", 'g'), '\n')
+      this.isFormBusy = false;
+      this.form = this.fb.group({
+        description:  [ this.description, ValidateStudyDescription(this.validation) ]
+      });
+    }
   }
 
   closeModal() {
@@ -111,22 +123,24 @@ export class DescriptionComponent implements OnChanges, OnInit {
   }
 
   save() {
-    this.isFormBusy = true;
-    this.editorService.saveAbstract(this.compileBody(this.form.get('description').value.replace(new RegExp('\n', 'g'), "<br />"))).subscribe( res => {
-      this.form.get('description').setValue(res.description)
-      this.form.markAsPristine()
-      this.isFormBusy = false;
+    if(!this.isReadOnly){
+      this.isFormBusy = true;
+      this.editorService.saveAbstract(this.compileBody(this.form.get('description').value.replace(new RegExp('\n', 'g'), "<br />"))).subscribe( res => {
+        this.form.get('description').setValue(res.description)
+        this.form.markAsPristine()
+        this.isFormBusy = false;
 
-      toastr.success('Abstract updated.', "Success", {
-        "timeOut": "2500",
-        "positionClass": "toast-top-center",
-        "preventDuplicates": true,
-        "extendedTimeOut": 0,
-        "tapToDismiss": false
-      })
-    }, err => {
-      this.isFormBusy = false
-    });
+        toastr.success('Abstract updated.', "Success", {
+          "timeOut": "2500",
+          "positionClass": "toast-top-center",
+          "preventDuplicates": true,
+          "extendedTimeOut": 0,
+          "tapToDismiss": false
+        })
+      }, err => {
+        this.isFormBusy = false
+      });
+    }
   }
 
   compileBody(description) {

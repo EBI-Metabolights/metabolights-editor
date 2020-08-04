@@ -22,6 +22,9 @@ export class ProtocolComponent implements OnInit {
 	@Input('required') required: boolean = false;
 	@Input('validations') validations: any;
 
+	@select(state => state.study.readonly) studyReadonly;
+	isStudyReadOnly: boolean = false;
+
 	@ViewChild(OntologyComponent, { static: false }) parameterName: OntologyComponent;
 
 	@select(state => state.study.isProtocolsExpanded) isProtocolsExpanded;
@@ -49,6 +52,12 @@ export class ProtocolComponent implements OnInit {
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
 		this.isProtocolsExpanded.subscribe(value => { 
 			this.expand = !value
+		});
+
+		this.studyReadonly.subscribe(value => { 
+			if(value != null){
+				this.isStudyReadOnly = value
+			}
 		});
 	}
 	
@@ -246,49 +255,53 @@ export class ProtocolComponent implements OnInit {
 	}
 	
 	save() {
-		if(this.getFieldValue('description')){
-			this.isFormBusy = true;
-			if(!this.addNewProtocol){
-				this.editorService.updateProtocol(this.protocol.name, this.compileBody()).subscribe( res => {
-					this.updateProtocols(res, 'Protocol updated.')
-					this.form.removeControl('description')
-					// this.isModalOpen = false;
-				}, err => {
-					this.isFormBusy = false
-				});
+		if(!this.isStudyReadOnly){
+			if(this.getFieldValue('description')){
+				this.isFormBusy = true;
+				if(!this.addNewProtocol){
+					this.editorService.updateProtocol(this.protocol.name, this.compileBody()).subscribe( res => {
+						this.updateProtocols(res, 'Protocol updated.')
+						this.form.removeControl('description')
+						// this.isModalOpen = false;
+					}, err => {
+						this.isFormBusy = false
+					});
+				}else{
+					this.editorService.saveProtocol(this.compileBody()).subscribe( res => {
+						this.updateProtocols(res, 'Protocol saved.')
+						this.form.removeControl('description')
+						this.isModalOpen = false
+					}, err => {
+						this.isFormBusy = false
+					});
+				}
 			}else{
-				this.editorService.saveProtocol(this.compileBody()).subscribe( res => {
-					this.updateProtocols(res, 'Protocol saved.')
-					this.form.removeControl('description')
-					this.isModalOpen = false
-				}, err => {
-					this.isFormBusy = false
-				});
+				alert("Protocol description cannot be empty")
 			}
-		}else{
-			alert("Protocol description cannot be empty")
 		}
 	}
 
 	delete() {
-		if(!this.required){
-			this.editorService.deleteProtocol(this.protocol.name).subscribe( res => {
-					this.addNewProtocol = true
-					this.updateProtocols(res, 'Protocol deleted.')
-					this.form.removeControl('description')
-					this.isDeleteModalOpen = false
-					this.isModalOpen = false
-				}, err => {
-					this.isFormBusy = false
-			});
-		}else{
-			toastr.error( "Cannot delete a default protocol", "Error", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			});
+		if(!this.isStudyReadOnly){
+			if(!this.required){
+				this.editorService.deleteProtocol(this.protocol.name).subscribe( res => {
+						this.addNewProtocol = true
+						this.updateProtocols(res, 'Protocol deleted.')
+						this.form.removeControl('description')
+						this.isDeleteModalOpen = false
+						this.isModalOpen = false
+					}, err => {
+						this.isFormBusy = false
+				});
+			}else{
+				toastr.error( "Cannot delete a default protocol", "Error", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				});
+			}
 		}
 	}
 
@@ -308,38 +321,42 @@ export class ProtocolComponent implements OnInit {
 	}
 
 	openModal(protocol) {
-		this.initialiseForm()
-		if(this.protocol.parameters.length > 0){
-			this.form.get('parameters').setValue(this.protocol.parameters);
-		}else{
-			this.form.get('parameters').setValue([]);
+		if(!this.isStudyReadOnly){
+			this.initialiseForm()
+			if(this.protocol.parameters.length > 0){
+				this.form.get('parameters').setValue(this.protocol.parameters);
+			}else{
+				this.form.get('parameters').setValue([]);
+			}
+			this.selectedProtocol = protocol;
+			this.isModalOpen = true
 		}
-		this.selectedProtocol = protocol;
-		this.isModalOpen = true
 	}
 
 	updateProtocols(data, message){
-		this.editorService.getProtocols(null).subscribe( res => {
-			this.form.reset()
-			this.form.markAsPristine()
-			this.initialiseForm();
-			if(!this.addNewProtocol){
-				let jsonConvert: JsonConvert = new JsonConvert();
-				this.protocol = jsonConvert.deserialize(res.protocols.filter( p => {
-					return p.name == this.protocol.name
-				})[0], MTBLSProtocol);
-				this.openModal(this.protocol)
-			}
-			   
-			
-			toastr.success( message, "Success", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			});
-		})
+		if(!this.isStudyReadOnly){
+			this.editorService.getProtocols(null).subscribe( res => {
+				this.form.reset()
+				this.form.markAsPristine()
+				this.initialiseForm();
+				if(!this.addNewProtocol){
+					let jsonConvert: JsonConvert = new JsonConvert();
+					this.protocol = jsonConvert.deserialize(res.protocols.filter( p => {
+						return p.name == this.protocol.name
+					})[0], MTBLSProtocol);
+					this.openModal(this.protocol)
+				}
+				
+				
+				toastr.success( message, "Success", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				});
+			})
+		}
 	}
 
 	compileBody() {
@@ -353,17 +370,19 @@ export class ProtocolComponent implements OnInit {
 	}
 
 	get validation() {
-		if(this.validationsId.includes(".")){
-			var arr = this.validationsId.split(".");
-			let tempValidations = JSON.parse(JSON.stringify(this.validations));;
-			while (arr.length && (tempValidations = tempValidations[arr.shift()]));
-			return tempValidations;
+		if(this.validations){
+			if(this.validationsId.includes(".")){
+				var arr = this.validationsId.split(".");
+				let tempValidations = JSON.parse(JSON.stringify(this.validations));;
+				while (arr.length && (tempValidations = tempValidations[arr.shift()]));
+				return tempValidations;
+			}
+			return this.validations[this.validationsId];
 		}
-		return this.validations[this.validationsId];
 	}
 
 	fieldValidation(fieldId) {
-		return this.validation[fieldId]
+		return this.validation ? this.validation[fieldId] : false;
 	}
 
 	getFieldValue(name){

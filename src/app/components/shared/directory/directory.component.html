@@ -5,14 +5,14 @@
       <span class="panel-icon">
         <span *ngIf="isFolder(file); else fileIcon">
             <span *ngIf="!file.files; else openFolder">
-                <img class="file-img" src="assets/img/folder.png">
+                <img class="file-img" src="/metabolights/editor/assets/img/folder.png">
             </span>
             <ng-template #openFolder>
-                <img class="file-img" src="assets/img/folder-open.png">
+                <img class="file-img" src="/metabolights/editor/assets/img/folder-open.png">
             </ng-template>
         </span>
         <ng-template #fileIcon>
-          <img class="file-img" src="assets/img/file.png">
+          <img class="file-img" src="/metabolights/editor/assets/img/file.png">
         </ng-template>
       </span>
       {{ file.file }} <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
@@ -22,7 +22,7 @@
           <span *ngIf="level == 0">
             <mtbls-download [type]="'icon'" [value]="parent + file.file"></mtbls-download>&emsp;
           </span>
-          <mtbls-file-delete (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-file-delete>
+          <mtbls-file-delete *ngIf="!isReadOnly" (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-file-delete>
         </span>
     </div>
   </div>

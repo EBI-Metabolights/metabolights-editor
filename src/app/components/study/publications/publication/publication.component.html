@@ -16,7 +16,7 @@
 						<mat-icon>people</mat-icon> {{ publication.authorList | slice : 0 : 60 }}<span *ngIf="publication.authorList.length > 60">...</span>
 					</small>
 				</h6>
-				<a class="button is-small custom-button" (click)='openModal()'>
+				<a *ngIf="!isReadOnly" class="button is-small custom-button" (click)='openModal()'>
 					<mat-icon>edit</mat-icon> Edit
 				</a>&nbsp;
 				<a class="button is-small custom-button" [href]="'//dx.doi.org/' + publication.doi" target="_blank">
@@ -193,7 +193,7 @@
 <footer class="modal-card-foot">
 	<div class="columns is-gapless full-width">
 		<div class="column is-two-third">
-			<button *ngIf="!addNewPublication" [tabIndex]="-1" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
+			<button *ngIf="!addNewPublication" [tabIndex]="-1" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete</mat-icon></button>
 			<button *ngIf="!addNewPublication && form.get('title').value != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='confirmTitleUpdate()'><small>Update title</small></button>
 			<button *ngIf="!addNewPublication && publicationAbstract != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='confirmAbstractUpdate()'><small>Update abstract</small></button>
 			<button *ngIf="!addNewPublication && form.get('doi').value != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='openImportAuthorsModal()'><small>Import Authors</small></button>

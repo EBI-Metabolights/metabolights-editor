@@ -1,20 +1,13 @@
-import { Component, ViewChild, OnInit, Input, Inject, ViewChildren, AfterContentInit, QueryList, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { FormBuilder } from '@angular/forms';
 import { EditorService } from '../../../services/editor.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from '../../../store';
-import { MTBLSPerson } from './../../../models/mtbl/mtbls/mtbls-person';
-import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
-import { MTBLSPublication } from './../../../models/mtbl/mtbls/mtbls-publication';
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript"
-import { MatPaginator, MatTableDataSource, MatSort} from '@angular/material';
-import { DOIService } from '../../../services/publications/doi.service';
-import { TableComponent } from './../../shared/table/table.component';
-import { EuropePMCService } from '../../../services/publications/europePMC.service';
+import { select } from '@angular-redux/store';
+import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
 import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
 import { tassign } from 'tassign'; 
+import { SamplesComponent } from './../../study/samples/samples.component';
 
 @Component({
 	selector: 'guide-assays',
@@ -27,6 +20,8 @@ export class GuidedAssaysComponent implements OnInit {
 	@select(state => state.study.files) studyFiles; 
 	@select(state => state.study.assays) studyAssays; 
 	@select(state => state.study.samples) studySamples; 
+
+	@ViewChild(SamplesComponent, { static: false }) sampleTable: SamplesComponent;
 
 	requestedStudy: string = null;
 	loading: boolean = false;
@@ -206,6 +201,63 @@ export class GuidedAssaysComponent implements OnInit {
 
 	changeSubStep(i){
 		this.subStep = i
+		if(i == 2){
+			this.checkSampleTypeColumnExists()
+		}
+	}
+
+	checkSampleTypeColumnExists(){
+		let sampleTypeColumn = this.samples.data.columns.filter( col => col.columnDef == "Characteristics[Sample type]")
+		if(sampleTypeColumn.length > 0){
+			console.log("Sample type column exist. Extraction sample types.")
+		}else{
+			Swal.fire({
+				title: "Sample type column doesnt exist. Would you like to capture sample types data?",
+				showCancelButton: true,
+				confirmButtonColor: "#DD6B55",
+				confirmButtonText: "Yes",
+				cancelButtonText: "No"
+			})
+				.then((selection) => {
+				if(selection.value){
+					this.addSampleTypeColumn()
+				}
+			});
+		}
+	}
+
+	addSampleTypeColumn(){
+		let characteristicsCount = 0;
+		this.keys(this.samples.data.header).forEach( key => {
+		    if(key.indexOf("Characteristics") > -1){
+		        characteristicsCount = characteristicsCount+1
+		    }
+		})
+		
+		let protocolRefIndex = this.samples.data.header['Protocol REF']
+		
+		let columns = []
+		let characteristicsColumn = new MTBLSColumn("Characteristics[Sample type]", '', protocolRefIndex);
+		let characteristicsSourceColumn = new MTBLSColumn("Term Source REF", '', protocolRefIndex+1);
+		let characteristicsAccessionColumn = new MTBLSColumn("Term Accession Number", '', protocolRefIndex+2);
+		columns.push(characteristicsColumn.toJSON())
+		columns.push(characteristicsSourceColumn.toJSON())
+		columns.push(characteristicsAccessionColumn.toJSON())
+		this.addColumns(columns)
+	}
+
+	addColumns(columns){
+		this.editorService.addColumns(this.samples.name, { "data" : columns }, "samples", null).subscribe(res => {
+				return true;
+			}, err => {
+			    console.log(err)
+			    return false;
+			}
+		);
+	}
+
+	keys(object){
+		return Object.keys(object);
 	}
 
 	openEditAssayModal(assay, substep){

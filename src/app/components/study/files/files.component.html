@@ -1,32 +1,38 @@
 <span *ngIf="filesLoading; else showContent;">
   <div class="vc vh30">
     <span class="has-text-centered">
-      <img src="assets/img/loading.svg"><br>
+      <img src="/metabolights/editor/assets/img/loading.svg"><br>
       <small class="has-text-grey">LOADING FILES</small>
     </span>
   </div>
 </span>
 <ng-template #showContent>
-  <mtbls-upload  [type]="'any'" [multiple]="true" [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" ></mtbls-upload>&nbsp;
-  <a (click)="loadFilesPassively()" class="button is-light">
-    <mat-icon>refresh</mat-icon> Refresh
-  </a>
-  <span>
-    <span *ngIf="refreshingData">
-      <img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
+  <span *ngIf="!isReadOnly">
+    <mtbls-upload  [type]="'any'" [multiple]="true" [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" ></mtbls-upload>&nbsp;
+    <a (click)="loadFilesPassively()" class="button is-light">
+      <mat-icon>refresh</mat-icon> Refresh
+    </a> 
+    <span>
+      <span *ngIf="refreshingData">
+        <img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
+      </span>
     </span>
+  </span>
+  <span *ngIf="status == 'Public'">
+    <mtbls-download-ftp></mtbls-download-ftp>
+    <mtbls-download-aspera></mtbls-download-aspera>
   </span>
   <div>&nbsp;</div>
   <nav class="panel">
     <span #spacer></span>
-    <p class="panel-heading"  style="z-index: 1000;  padding: 10px;" stickyThing [spacer]="spacer" marginTop="33">
+    <p class="panel-heading"  style="z-index: 1000;  padding: 7px 10px;" stickyThing [spacer]="spacer" [attr.marginTop]="!isReadOnly ? '35' : '0'" isReadOnly >
       <label>
         <input [checked]="filteredMetaFiles.length == selectedMetaFiles.length" (change)="selectFiles($event, 'meta', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>ISA METADATA</small>
       </label>
       <span class="is-pulled-right">
-        <mtbls-download [value]="'metadata'"></mtbls-download>
+        <mtbls-download [value]="selectedDownloadFiles()"></mtbls-download>
       </span>
-      <span  *ngIf="selectedMetaFiles.length > 0" class="is-pulled-right"> 
+      <span  *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
         <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete files</small>   
       </span>
     </p>
@@ -44,18 +50,18 @@
           <div class="columns w100">
             <div class="column is-four-fifths">
               <label>
-                <input  (change)="selectFiles($event, 'meta', file, false)" [checked]="isChecked(file.file, 'meta')" type="checkbox" name="">
+                <input (change)="selectFiles($event, 'meta', file, false)" [checked]="isChecked(file.file, 'meta')" type="checkbox" name="">
                 <span  class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
                       <span *ngIf="file.files; else openFolder">
-                          <img class="file-img" src="assets/img/folder.png">
+                          <img class="file-img" src="/metabolights/editor/assets/img/folder.png">
                       </span>
                       <ng-template #openFolder>
-                          <img class="file-img" src="assets/img/folder-open.png">
+                          <img class="file-img" src="/metabolights/editor/assets/img/folder-open.png">
                       </ng-template>
                   </span>
                   <ng-template #fileIcon>
-                    <img class="file-img" src="assets/img/file.png">
+                    <img class="file-img" src="/metabolights/editor/assets/img/file.png">
                   </ng-template>
                 </span>
                 {{ file.file }} <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
@@ -78,13 +84,16 @@
       </a>
     </ng-template>
   </nav>
+  <div *ngIf="!isReadOnly" class="notification is-warning">
+    <small><mat-icon>info</mat-icon> Uploaded ISA Investigation file (i_Investigation.txt) will not be automatically synced with your study, contact us <a [href]="'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - '+requestedStudy">metabolights-help@ebi.ac.uk</a> for help.</small>
+  </div>
   <nav class="panel">
     <span #spacer1></span>
     <span *ngIf="rawFilesLoading; else rawFilesLoaded">
-      <img style="height: 10px; margin-left:10px;" src="assets/img/loading.svg">
+      <img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
     </span>
     <ng-template #rawFilesLoaded>
-      <p class="panel-heading"  style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer1" marginTop="35">
+      <p class="panel-heading"  style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer1" [attr.marginTop]="!isReadOnly ? '35' : '0'">
           <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
         <label>
           <small>RAW FILES</small>
@@ -93,7 +102,7 @@
           <span *ngIf="containsZipFiles(selectedRawFiles)">
               <small (click)="decompresssFiles(selectedRawFiles)" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip files</small>&nbsp;
           </span>
-          <small (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
         </span>
       </p>
       <div class="panel-block">
@@ -118,7 +127,7 @@
   </nav>
   <nav *ngIf="auditFiles.length > 0" class="panel">
     <span #spacer2></span>
-    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer2" marginTop="37">
+    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer2" [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label>
         <small>AUDIT FILES</small>
       </label>
@@ -130,11 +139,11 @@
     </span>
   </nav>
   <nav *ngIf="derivedFiles.length > 0" class="panel">
-    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer" marginTop="35">
+    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer" [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label>
         <input [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length" (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>DERIVED DATA</small>
       </label>
-      <span  *ngIf="selectedDerivedFiles.length > 0" class="is-pulled-right"> 
+      <span  *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
         <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
       </span>
     </p>
@@ -156,14 +165,14 @@
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
                     <span *ngIf="file.files; else openFolder">
-                        <img class="file-img" src="assets/img/folder.png">
+                        <img class="file-img" src="/metabolights/editor/assets/img/folder.png">
                     </span>
                     <ng-template #openFolder>
-                        <img class="file-img" src="assets/img/folder-open.png">
+                        <img class="file-img" src="/metabolights/editor/assets/img/folder-open.png">
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
-                    <img class="file-img" src="assets/img/file.png">
+                    <img class="file-img" src="/metabolights/editor/assets/img/file.png">
                   </ng-template>
                 </span>
                 {{ file.file }}  <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
@@ -179,9 +188,9 @@
       </span>
     </span>
   </nav>
-  <nav *ngIf="uploadFiles.length > 0" class="panel">
+  <nav *ngIf="uploadFiles.length > 0 && !isReadOnly" class="panel">
     <span #spacer3></span>
-    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer3" marginTop="35">
+    <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer3" [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label>
         <input [checked]="filteredUploadFiles.length == selectedUploadFiles.length" (change)="selectFiles($event, 'upload', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>UPLOADED FILES</small>
       </label>
@@ -190,7 +199,7 @@
             <mat-icon>refresh</mat-icon> Copy files to study folder
           </a>
         </span>
-        <span  *ngIf="selectedUploadFiles.length > 0" class="is-pulled-right"> 
+        <span  *ngIf="selectedUploadFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
           <small (click)="openDeleteConfirmation('upload', 'upload')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
         </span>
     </p>
@@ -211,10 +220,10 @@
                 <input  (change)="selectFiles($event, 'upload', file, false)" [checked]="isChecked(file.file, 'upload')"  type="checkbox" name="">
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
-                    <img class="file-img" src="assets/img/folder.png">
+                    <img class="file-img" src="/metabolights/editor/assets/img/folder.png">
                   </span>
                   <ng-template #fileIcon>
-                    <img class="file-img" src="assets/img/file.png">
+                    <img class="file-img" src="/metabolights/editor/assets/img/file.png">
                   </ng-template>
                 </span>
                 {{ file.file }}

@@ -1,19 +1,21 @@
-<div class="notification is-primary">
+<div *ngIf="!isReadOnly" class="notification is-primary">
 	Please complete the table below to include organism & organism part. You may also add further details relating to the sample characteristics <a class="button border is-small is-light">
 		<span><mat-icon>add</mat-icon>characteristic</span>
 	</a> or metadata such as gender or drug treatment <button class="button border is-light is-small"><span><mat-icon>add</mat-icon>Factor</span></button> <br><span style="font-size: 0.8em;"><mtbls-help target="samples"></mtbls-help></span>
 </div>
-<div *ngIf="duplicateSamples.length > 0" class="notification is-warning">
+<div *ngIf="duplicateSamples.length > 0 && !isReadOnly" class="notification is-warning">
   <small><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br>
     <span *ngFor="let sample of duplicateSamples">
       <span (click)="sampleTable.filterDuplicate(sample)" class="pointer tag is-white">{{ sample }}</span>&nbsp;
     </span>
   </small>
 </div>
-<!-- <div *ngIf="emptySamplesExist" class="notification is-warning">
-  <small><mat-icon>info</mat-icon>Empty samples exist in the sample sheet</small>
-</div> -->
-<span class="column is-12 nprl nmrl fadeIn">
+<!-- 
+  <div *ngIf="emptySamplesExist" class="notification is-warning">
+    <small><mat-icon>info</mat-icon>Empty samples exist in the sample sheet</small>
+  </div> 
+-->
+<span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
 	<div class="dropdown" [ngClass]="{'is-active': isFactorDropdownActive}">
 		<div class="dropdown-trigger">
 			<button (click)="toggleDropdown()" class="button is-light is-small add-factor-button"><span><mat-icon>add</mat-icon>Factor</span></button>

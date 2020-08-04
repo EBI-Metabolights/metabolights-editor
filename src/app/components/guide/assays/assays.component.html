@@ -6,7 +6,7 @@
 		<div>&nbsp;</div>
 		<div>&nbsp;</div>
 		<div class="panel-heading">
-			<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">&emsp;&emsp;
+			<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">&emsp;&emsp;
 			<span style="margin-top: -25px;"><span class="is-link">{{ requestedStudy }}</span>: Study samples and assay details</span>
 			<span style="font-size: 0.8em;" class="is-pulled-right"><mtbls-help target="create_assay"></mtbls-help></span>
 		</div>
@@ -14,7 +14,7 @@
 			<span *ngIf="loading" style="flex: 0 0 100%;">
 				<div class="vc vh50 has-text-centered">
 					<span class="has-text-centered">
-						<img src="assets/img/loading.svg"><br>
+						<img src="/metabolights/editor/assets/img/loading.svg"> <br>
 						<small class="has-text-grey">LOADING ASSAY DETAILS</small>
 					</span>
 				</div>
@@ -51,9 +51,6 @@
 					<span class="is-centered column add-assays-wrapper border-dashed" style="margin-bottom: 10px;">
 						<div class="add-assays-wrapper">
 							<add-assay></add-assay>
-							<!-- <span *ngIf="assays.length > 0 && !loading" >
-								<study-mapper></study-mapper>
-							</span> -->
 						</div>
 					</span>
 					<div>
@@ -200,7 +197,7 @@
 					</span>
 					<span *ngIf="subStep == 4">
 						<div class="panel-block bg-white">
-							<div class="column"  style="width: 100%; overflow-x: auto">
+							<div class="column" style="width: 100%; overflow-x: auto">
 								<div class="panel-block-wrapper">
 									<mtbls-samples></mtbls-samples>
 								</div>

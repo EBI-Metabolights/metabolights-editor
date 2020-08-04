@@ -15,6 +15,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
 	@Input('assay') assay: any;
 
+	@select(state => state.study.readonly) studyReadonly;
+	isStudyReadOnly: boolean = false;
+
+
 	validations: any;
 
 	protocols: any[] = [];
@@ -29,6 +33,12 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 		this.customProtocols = []
 		this.defaultProtocols = []
 		this.protocols = []
+
+		this.studyReadonly.subscribe(value => { 
+			if(value != null){
+				this.isStudyReadOnly = value
+			}
+		});
 		
 		this.studyValidations.subscribe(value => { 
 			if(value){

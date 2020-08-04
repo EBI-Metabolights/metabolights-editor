@@ -138,7 +138,11 @@ import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
  			(value) => {
  				if(value && value != ''){
  					this.inputValue = value
-	 				this.allvalues = [];
+					this.allvalues = [];
+					this.values = this.values.filter(function (el) {
+						return el != null;
+					});
+					 
 	 				if(this.values.length < 1){
 						let term = ""
 						let ontologyFilter = null

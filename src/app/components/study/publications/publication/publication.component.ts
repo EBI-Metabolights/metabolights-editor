@@ -25,6 +25,9 @@ export class PublicationComponent implements OnInit {
 	@select(state => state.study.validations) studyValidations: any
 
 	@ViewChild(OntologyComponent, { static: false }) statusComponent: OntologyComponent;
+	
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
 
 	form: FormGroup;
 	isFormBusy: boolean = false;
@@ -47,13 +50,20 @@ export class PublicationComponent implements OnInit {
 	constructor( private fb: FormBuilder, private doiService: DOIService, private europePMCService: EuropePMCService, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
 		this.studyValidations.subscribe(value => { 
       		this.validations = value;
-    	});
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
 	}
 
 	openImportAuthorsModal(){
-		this.getAuthorsFromDOI()
-		this.isModalOpen = false;
-		this.isImportAuthorsModalOpen = true;
+		if(!this.isReadOnly){
+			this.getAuthorsFromDOI()
+			this.isModalOpen = false;
+			this.isImportAuthorsModalOpen = true;
+		}
 	}
 
 	closeImportAuthor(){
@@ -62,30 +72,32 @@ export class PublicationComponent implements OnInit {
 	}
 
 	saveAuthors(){
-		let authorsA = []
-		this.manuscriptAuthors.forEach( author => {
-			if(author.checked){
-				authorsA.push(this.compileAuthor(author))
-			}
-		})
+		if(!this.isReadOnly){
+			let authorsA = []
+			this.manuscriptAuthors.forEach( author => {
+				if(author.checked){
+					authorsA.push(this.compileAuthor(author))
+				}
+			})
 
-		this.editorService.savePerson({'contacts': authorsA}).subscribe( res => {
-			toastr.success('Authors imported.', "Success", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			})
-		}, err => {
-			toastr.error('Failed to import authors.', "Error", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			})
-		});
+			this.editorService.savePerson({'contacts': authorsA}).subscribe( res => {
+				toastr.success('Authors imported.', "Success", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				})
+			}, err => {
+				toastr.error('Failed to import authors.', "Error", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				})
+			});
+		}
 	}
 
 	compileAuthor(author){
@@ -138,10 +150,12 @@ export class PublicationComponent implements OnInit {
 	}
 
 	openModal() {
-		this.initialiseForm()
-		this.isModalOpen = true
-		this.publicationAbstract = '';
-		this.getAbstract()
+		if(!this.isReadOnly){
+			this.initialiseForm()
+			this.isModalOpen = true
+			this.publicationAbstract = '';
+			this.getAbstract()
+		}
 	}
 
 	confirmDelete(){
@@ -175,17 +189,19 @@ export class PublicationComponent implements OnInit {
 	}
 
 	updateStudyTitle(){
-		this.editorService.saveTitle( { 'title': this.getFieldValue('title')}).subscribe( res => {
-			this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: res})
-			toastr.success('Title updated.', "Success", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
+		if(!this.isReadOnly){
+			this.editorService.saveTitle( { 'title': this.getFieldValue('title')}).subscribe( res => {
+				this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: res})
+				toastr.success('Title updated.', "Success", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				})
+				this.closeUpdateTitleModal();
 			})
-			this.closeUpdateTitleModal();
-		})
+		}
 	}
 
 	getAbstract(){
@@ -244,89 +260,99 @@ export class PublicationComponent implements OnInit {
 	}
 
 	initialiseForm() {
-		this.isFormBusy = false;
+		if(!this.isReadOnly){
+			this.isFormBusy = false;
 
-		if(this.publication == null){
-			let mtblsPublication = new MTBLSPublication();
-			this.publication = mtblsPublication
+			if(this.publication == null){
+				let mtblsPublication = new MTBLSPublication();
+				this.publication = mtblsPublication
+			}
+
+			this.form = this.fb.group({
+				pubMedID:  [ this.publication.pubMedID, ValidateRules('pubMedID', this.fieldValidation('pubMedID'))],
+				doi:  [ this.publication.doi, ValidateRules('doi', this.fieldValidation('doi'))],
+				authorList:  [ this.publication.authorList, ValidateRules('authorList', this.fieldValidation('authorList'))],
+				title:  [ this.publication.title, ValidateRules('title', this.fieldValidation('title'))]
+			});
 		}
-
-		this.form = this.fb.group({
-			pubMedID:  [ this.publication.pubMedID, ValidateRules('pubMedID', this.fieldValidation('pubMedID'))],
-			doi:  [ this.publication.doi, ValidateRules('doi', this.fieldValidation('doi'))],
-			authorList:  [ this.publication.authorList, ValidateRules('authorList', this.fieldValidation('authorList'))],
-			title:  [ this.publication.title, ValidateRules('title', this.fieldValidation('title'))]
-		});
 	}
 
 	updateStudyAbstract(){
-		this.editorService.saveAbstract( { 'description': this.publicationAbstract }).subscribe( res => {
-			this.ngRedux.dispatch({ type: 'SET_STUDY_ABSTRACT', body: res})
-			toastr.success('Study abstract updated.', "Success", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			});
-			this.closeUpdateAbstractModal();
-		}, error => {
-			this.isFormBusy = false
-		})
+		if(!this.isReadOnly){
+			this.editorService.saveAbstract( { 'description': this.publicationAbstract }).subscribe( res => {
+				this.ngRedux.dispatch({ type: 'SET_STUDY_ABSTRACT', body: res})
+				toastr.success('Study abstract updated.', "Success", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				});
+				this.closeUpdateAbstractModal();
+			}, error => {
+				this.isFormBusy = false
+			})
+		}
 	}
 
 	save() {
-		if(this.statusComponent.values[0] == undefined){
-			toastr.warning('Publication status cannot be empty', "Warning", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			});
-		}else{
-			this.isFormBusy = true;
-			if(!this.addNewPublication){
-				this.editorService.updatePublication(this.publication.title, this.compileBody()).subscribe( res => {
-					this.updatePublications(res, 'Publication updated.')
-				}, err => {
-					this.isFormBusy = false
+		if(!this.isReadOnly){
+			if(this.statusComponent.values[0] == undefined){
+				toastr.warning('Publication status cannot be empty', "Warning", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
 				});
 			}else{
-				this.editorService.savePublication(this.compileBody()).subscribe( res => {
-					this.updatePublications(res, 'Publication saved.')
-					this.isModalOpen = false
-				}, err => {
-					this.isFormBusy = false
-				});
+				this.isFormBusy = true;
+				if(!this.addNewPublication){
+					this.editorService.updatePublication(this.publication.title, this.compileBody()).subscribe( res => {
+						this.updatePublications(res, 'Publication updated.')
+					}, err => {
+						this.isFormBusy = false
+					});
+				}else{
+					this.editorService.savePublication(this.compileBody()).subscribe( res => {
+						this.updatePublications(res, 'Publication saved.')
+						this.isModalOpen = false
+					}, err => {
+						this.isFormBusy = false
+					});
+				}
 			}
 		}
 	}
 
 	delete() {
-		this.editorService.deletePublication(this.publication.title).subscribe( res => {
-				this.updatePublications(res, 'Publication deleted.')
-				this.isDeleteModalOpen = false
-				this.isModalOpen = false
-			}, err => {
-				this.isFormBusy = false
-		});
+		if(!this.isReadOnly){
+			this.editorService.deletePublication(this.publication.title).subscribe( res => {
+					this.updatePublications(res, 'Publication deleted.')
+					this.isDeleteModalOpen = false
+					this.isModalOpen = false
+				}, err => {
+					this.isFormBusy = false
+			});
+		}
 	}
 
 	updatePublications(data, message){
-		this.editorService.getPublications().subscribe(data => {
-			this.form.markAsPristine()
-			this.initialiseForm();
-			this.isModalOpen = false;
+		if(!this.isReadOnly){
+			this.editorService.getPublications().subscribe(data => {
+				this.form.markAsPristine()
+				this.initialiseForm();
+				this.isModalOpen = false;
 
-			toastr.success( message, "Success", {
-				"timeOut": "2500",
-				"positionClass": "toast-top-center",
-				"preventDuplicates": true,
-				"extendedTimeOut": 0,
-				"tapToDismiss": false
-			});
-		})		
+				toastr.success( message, "Success", {
+					"timeOut": "2500",
+					"positionClass": "toast-top-center",
+					"preventDuplicates": true,
+					"extendedTimeOut": 0,
+					"tapToDismiss": false
+				});
+			})		
+		}
 	}
 
 	compileBody() {

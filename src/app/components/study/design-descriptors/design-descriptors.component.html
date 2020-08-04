@@ -9,12 +9,12 @@
 </span>
 <ng-template #showCard>
   <div class="card">
-    <header class="card-heading hover-highlight">
+    <header class="card-heading" [ngClass]="{'hover-highlight': isReadOnly}">
       <span>
         <p class="is-pulled-left">
           <small>KEYWORDS</small>
         </p>
-        <mtbls-design-descriptor [readOnly]="readOnly" [value]="null"></mtbls-design-descriptor>
+        <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"></mtbls-design-descriptor>
       </span>
     </header>
     <div class="card-content">
@@ -27,7 +27,12 @@
           </div>
         </div>
         <ng-template #emptyMessage>
-          <p class="has-text-grey-light has-text-centered"><small>Add terms that define your study eg. technique, disease, targeted / untargeted metabolities </small><br></p>
+          <span *ngIf="!isReadOnly; else emptyReadOnlyMessage">
+            <p class="has-text-grey-light has-text-centered"><small>Add terms that define your study eg. technique, disease, targeted / untargeted metabolities </small><br></p>
+          </span>
+          <ng-template #emptyReadOnlyMessage>
+              <p class="has-text-grey-light has-text-centered"><small>No design descriptors defined.</small><br></p>
+          </ng-template>
         </ng-template>
       </div>
     </div>

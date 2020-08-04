@@ -24,6 +24,10 @@ export class DesignDescriptorComponent implements OnInit {
 
 	@select(state => state.study.validations) studyValidations;
 	@select(state => state.study.publications) studyPublications;
+
+	@select(state => state.study.readonly) studyReadonly;
+	isStudyReadOnly: boolean = false;
+	
 	validations: any = {}; 
 
 	@ViewChild(OntologyComponent, { static: false }) descriptorComponent: OntologyComponent;
@@ -57,7 +61,12 @@ export class DesignDescriptorComponent implements OnInit {
 		});
 		this.studyDescriptors.subscribe(value => { 
             this.descriptors = value;
-        });
+		});
+		this.studyReadonly.subscribe(value => { 
+			if(value != null){
+				this.isStudyReadOnly = value
+			}
+		});
 	}
 
 	getKeyWords(){
@@ -155,12 +164,13 @@ export class DesignDescriptorComponent implements OnInit {
 	}
 
 	openImportModal(){
+
 		this.closeModal()
 		this.isImportModalOpen = true
 	}
 
 	openModal() {
-		if(!this.readOnly){			
+		if(!this.readOnly && !this.isStudyReadOnly){			
 			this.isModalOpen = true
 			this.initialiseForm()
 			if(this.addNewDescriptor){
@@ -178,8 +188,7 @@ export class DesignDescriptorComponent implements OnInit {
 
 	initialiseForm() {
 		this.isFormBusy = false;
-		this.form = this.fb.group({
-		});
+		this.form = this.fb.group({});
 	}
 
 	confirmDelete(){
@@ -201,22 +210,24 @@ export class DesignDescriptorComponent implements OnInit {
 	}
 
 	save() {
-		if(this.descriptorComponent.values[0]){
-			this.isFormBusy = true;
-			if(!this.addNewDescriptor){
-				this.editorService.updateDesignDescriptor(this.descriptor.annotationValue, this.compileBody()).subscribe( res => {
-					this.updateDesignDescriptors(res, 'Design descriptor updated.')
-				}, err => {
-					this.isFormBusy = false
-				});
-			}else{
-				this.editorService.saveDesignDescriptor(this.compileBody()).subscribe( res => {
-					this.updateDesignDescriptors(res, 'Design descriptor saved.')
-					this.descriptorComponent.values = []
-					this.isModalOpen = false
-				}, err => {
-					this.isFormBusy = false
-				});
+		if(!this.isStudyReadOnly){
+			if(this.descriptorComponent.values[0]){
+				this.isFormBusy = true;
+				if(!this.addNewDescriptor){
+					this.editorService.updateDesignDescriptor(this.descriptor.annotationValue, this.compileBody()).subscribe( res => {
+						this.updateDesignDescriptors(res, 'Design descriptor updated.')
+					}, err => {
+						this.isFormBusy = false
+					});
+				}else{
+					this.editorService.saveDesignDescriptor(this.compileBody()).subscribe( res => {
+						this.updateDesignDescriptors(res, 'Design descriptor saved.')
+						this.descriptorComponent.values = []
+						this.isModalOpen = false
+					}, err => {
+						this.isFormBusy = false
+					});
+				}
 			}
 		}
 	}
@@ -232,6 +243,8 @@ export class DesignDescriptorComponent implements OnInit {
 		this.initialiseForm();
 		this.isModalOpen = true;
 
+		this.descriptorComponent.reset()
+
 		toastr.success( message, "Success", {
 			"timeOut": "2500",
 			"positionClass": "toast-top-center",
@@ -242,16 +255,18 @@ export class DesignDescriptorComponent implements OnInit {
 	}
 
 	delete(value) {
-		if(!value){
-			value = this.descriptor.annotationValue 
+		if(!this.isStudyReadOnly){
+			if(!value){
+				value = this.descriptor.annotationValue 
+			}
+			this.editorService.deleteDesignDescriptor(value).subscribe( res => {
+				this.updateDesignDescriptors(res, 'Design descriptor deleted.')
+				this.isDeleteModalOpen = false
+				this.isModalOpen = false
+			}, err => {
+				this.isFormBusy = false
+			});
 		}
-		this.editorService.deleteDesignDescriptor(value).subscribe( res => {
-			this.updateDesignDescriptors(res, 'Design descriptor deleted.')
-			this.isDeleteModalOpen = false
-			this.isModalOpen = false
-		}, err => {
-			this.isFormBusy = false
-		});
 	}
 
 	compileBody() {

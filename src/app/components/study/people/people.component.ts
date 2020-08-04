@@ -13,7 +13,16 @@ import * as toastr from 'toastr';
 export class PeopleComponent implements OnInit {
 
 	@select(state => state.study.people) people;
-  	validationsId = 'people';
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+	validationsId = 'people';
+	  
 	constructor( private fb: FormBuilder, private metabolightsService: MetabolightsService, private ngRedux: NgRedux<IAppState>) { }
-	ngOnInit() { }
+	ngOnInit() { 
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
+	}
 }

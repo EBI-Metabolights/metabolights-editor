@@ -1,4 +1,4 @@
-<div class="hover-highlight px-20 mtbls-section">
+<div [ngClass]="{'hover-highlight': !isReadOnly}" class="px-20 mtbls-section">
   <div *ngIf="description != undefined">
     <span *ngIf="description != ''; else emptyDescription">
       <p [innerHTML]="description" class="clickable" (click)='openModal()'></p>
@@ -8,7 +8,7 @@
     </ng-template>
   </div>
 </div>
-<div class="modal" [ngClass]="{'is-active': isModalOpen}">
+<div class="modal" [ngClass]="{'is-active': isModalOpen && !isReadOnly}">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card vw80">

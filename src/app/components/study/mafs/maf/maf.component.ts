@@ -15,6 +15,9 @@ export class MafComponent {
 	@Input('value') value: any;
 
 	@select(state => state.study.mafs) studyMAFs;
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+
 
 	currentID = null;
 
@@ -37,7 +40,7 @@ export class MafComponent {
 			filter_name : "MetaboLights maf sheet type",
 			extensions : ["tsv"]
 		}
-  ];
+  	];
 
 	@ViewChild(TableComponent, { static: false }) mafTable: TableComponent;
 
@@ -47,6 +50,11 @@ export class MafComponent {
 		this.studyMAFs.subscribe(mafs => {
 			if(mafs){
 				this.mafData = mafs[this.value.data.file]
+			}
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
 			}
 		});
 	}
@@ -206,10 +214,17 @@ export class MafComponent {
 		this.editorService.search(term, type.toLowerCase()).subscribe( res => {
 			let resultObj = res.content[0]
 			this.isFormBusy = false;
-			let fields = ['name', 'smiles', 'inchi', 'databaseId']
+			let fields = [ 'name', 'smiles', 'inchi', 'databaseId']
 			fields.forEach(field =>{
 				if(field != term){
-					this.form.get(field).setValue(resultObj[field], {emitEvent: false})
+					if(field == 'name'){
+						if(this.form.get(field).value == ''){
+							this.form.get(field).setValue(resultObj[field], {emitEvent: false})
+						}
+					}else{
+						this.form.get(field).setValue(resultObj[field], {emitEvent: false})
+					}
+					
 				}
 			})
 			this.getChebiId()

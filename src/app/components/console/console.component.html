@@ -1,9 +1,10 @@
 <nav-bar :mode="light"></nav-bar>
+<a href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!" id="fixedbutton"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us </a>
 <div class="columns" style="min-height: 100vh; margin: 60px 0;">
 	<div class="column is-8 is-offset-2">
 		<nav class="panel has-background-white">
 			<p class="panel-heading">
-				<img style="height: 32px;" class="is-pulled-left" src="assets/img/MetaboLightsLogo.png">
+				<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
 				<span style="margin-left: 10px">My Studies <small *ngIf="studies.length > 0">({{ studies.length }})</small></span>
 				<span class="is-pulled-right">
 					<small style="font-size: 0.8em !important"><mtbls-help target="create_study"></mtbls-help></small>&nbsp;
@@ -77,7 +78,7 @@
 			</ng-template>
 		</nav>	
 		<p *ngIf="loadingStudies" class="has-text-centered">
-			<img src="assets/img/loading.svg"><br>
+				<img src="/metabolights/editor/assets/img/loading.svg"> <br>
 			Loading studies
 		</p>
 	</div>

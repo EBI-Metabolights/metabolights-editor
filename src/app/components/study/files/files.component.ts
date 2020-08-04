@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import * as toastr from 'toastr';
 import { EditorService } from '../../../services/editor.service';
+import { NgRedux, select } from '@angular-redux/store';
 
 @Component({
     selector: 'mtbls-files',
@@ -34,9 +35,16 @@ export class FilesComponent implements OnInit {
 
     selectedCategory: string = null;
     fileLocation: string = null;
+    status: string = null;
+
+    requestedStudy: string = null;
 
     refreshingData: boolean = false;
 
+    @select(state => state.study.readonly) readonly;
+    @select(state => state.study.status) studyStatus;
+    @select(state => state.study.identifier) studyIdentifier: any;
+	isReadOnly: boolean = false;
 
     @Input('validations') validations: any;
 
@@ -44,6 +52,17 @@ export class FilesComponent implements OnInit {
 
     ngOnInit() {
         this.loadFiles()
+        this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+        });
+        this.studyStatus.subscribe(value => {
+            this.status = value
+        })
+        this.studyIdentifier.subscribe(value => { 
+            this.requestedStudy = value
+          })
     }
 
     changeforceMetaDataDeleteValue(event){
@@ -59,6 +78,22 @@ export class FilesComponent implements OnInit {
 
     closeDeleteConfirmation(){
         this.isDeleteModalOpen = false;
+    }
+
+    selectedDownloadFiles(){
+        if(this.selectedMetaFiles.length > 0){
+            let files = ''
+            this.selectedMetaFiles.forEach(f => {
+                if(files == ''){
+                    files = f.file
+                }else{
+                    files = files + "," + f.file
+                }
+            })
+            return files
+        }else{
+            return 'metadata'
+        }
     }
 
     deleteSelected(){

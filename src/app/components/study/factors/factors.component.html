@@ -1,10 +1,12 @@
 <div class="card">
-  <header class="card-heading hover-highlight">
+  <header class="card-heading" [ngClass]="{'hover-highlight': !isReadOnly}">
     <span>
       <p class="is-pulled-left">
         Factors
       </p>
-      <mtbls-factor [value]="null"></mtbls-factor>
+      <span *ngIf="!isReadOnly">
+        <mtbls-factor [value]="null"></mtbls-factor>
+      </span>
     </span>
   </header>
   <div class="card-content">

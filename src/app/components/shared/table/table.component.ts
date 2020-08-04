@@ -31,13 +31,17 @@ export class TableComponent implements OnInit {
 	@Output() rowsUpdated = new EventEmitter<any>();
 	@Output() rowEdit = new EventEmitter<any>();
 
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = true;
+
 	@Input('fileTypes') fileTypes: any = [
 		{
 			filter_name : "All types",
 			extensions : ["*"]
 		}
 	];
-	  
+
+	rowsToAdd: any = 1;
 
     validations: any = {};
 
@@ -97,7 +101,12 @@ export class TableComponent implements OnInit {
 	      	if(value){
 				this.files = value.study;
 			}
-	    });
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
 	}
 
 	getFiles(header){
@@ -200,7 +209,6 @@ export class TableComponent implements OnInit {
 			let navigator: any
 			navigator = window.navigator
 			navigator.clipboard.writeText(content).then(function() {
-			  // console.log('Async: Copying to clipboard was successful!');
 			}, function(err) {
 			  console.error('Async: Could not copy text: ', err);
 			});	
@@ -462,6 +470,22 @@ export class TableComponent implements OnInit {
 		);
 	}
 
+	addNRows(){
+		if(this.rowsToAdd > 0){
+			let index = this.data.rows.length
+			if(this.selectedRows.length > 0){
+				index = this.selectedRows[0] + 1
+			}
+			let rows = []
+			let emptyRow = this.getEmptyRow();
+			for(var i = 0; i < this.rowsToAdd; i += 1) {
+				rows[i] = emptyRow;
+			}
+			this.rowsToAdd = 1;
+			this.addRows(rows, index);
+		}
+	}
+
 	addRow(){
 		let index = this.data.rows.length
 		if(this.selectedRows.length > 0){
@@ -675,24 +699,26 @@ export class TableComponent implements OnInit {
 	}
 
 	editCell(row: any, column: any, event){
-		this.isCellTypeFile = false;
-		this.isCellTypeOntology = false;
-		this.isEditModalOpen = true;
-		this.selectedCell['row'] = row
-		this.selectedCell['column'] = column
+		if(!this.isReadOnly){
+			this.isCellTypeFile = false;
+			this.isCellTypeOntology = false;
+			this.isEditModalOpen = true;
+			this.selectedCell['row'] = row
+			this.selectedCell['column'] = column
 
-		if(this.fileColumns.indexOf(column.header) > -1){
-			this.isCellTypeFile = true;
+			if(this.fileColumns.indexOf(column.header) > -1){
+				this.isCellTypeFile = true;
+			}
+
+			if(this.ontologyColumns.indexOf(column.header) > -1){
+				this.isCellTypeOntology = true;
+				this.cellOntologyValue();
+			}
+
+			this.editCellform = this.fb.group({
+				cell: [ row[column.columnDef] ]
+			});
 		}
-
-		if(this.ontologyColumns.indexOf(column.header) > -1){
-			this.isCellTypeOntology = true;
-			this.cellOntologyValue();
-		}
-
-		this.editCellform = this.fb.group({
-			cell: [ row[column.columnDef] ]
-		});
 	}
 
 	getOntologyComponentValue(id){
@@ -946,25 +972,27 @@ export class TableComponent implements OnInit {
 	}
 
 	editColumn(column, e){
-		this.isCellTypeFile = false;
-		this.isCellTypeOntology = false;
-		this.isEditColumnModalOpen = true;
+		if(!this.isReadOnly){
+			this.isCellTypeFile = false;
+			this.isCellTypeOntology = false;
+			this.isEditColumnModalOpen = true;
 
-		this.selectedColumn = column;
+			this.selectedColumn = column;
 
-		if(this.fileColumns.indexOf(column.header) > -1){
-			this.isCellTypeFile = true;
+			if(this.fileColumns.indexOf(column.header) > -1){
+				this.isCellTypeFile = true;
+			}
+
+			if(this.ontologyColumns.indexOf(column.header) > -1){
+				this.isCellTypeOntology = true;
+			}
+
+			this.editColumnform = this.fb.group({
+				cell:  []
+			});
+
+			this.editColumnform.markAsDirty();
 		}
-
-		if(this.ontologyColumns.indexOf(column.header) > -1){
-			this.isCellTypeOntology = true;
-		}
-
-    	this.editColumnform = this.fb.group({
-            cell:  []
-        });
-
-        this.editColumnform.markAsDirty();
     }
 
     closeEditColumnModal(){

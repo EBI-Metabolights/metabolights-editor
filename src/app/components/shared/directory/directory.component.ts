@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { EditorService } from '../../../services/editor.service';
+import { NgRedux, select } from '@angular-redux/store';
 
 @Component({
   selector: 'mtbls-directory',
@@ -18,11 +19,20 @@ export class DirectoryComponent implements OnInit {
   selectedDerivedFiles: any[] = [];
   selectedUploadFiles: any[] = [];
 
+  @select(state => state.study.readonly) readonly;
+  isReadOnly: boolean = false;
+
+
   constructor(private editorService: EditorService) {}
 
   @Output() fileDeleted = new EventEmitter<any>();
 
   ngOnInit() {
+    this.readonly.subscribe(value => { 
+        if(value != null){
+            this.isReadOnly = value
+        }
+    });
   }
 
   isFolder(file){

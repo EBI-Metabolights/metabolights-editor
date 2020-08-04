@@ -1,4 +1,4 @@
-<span class="column is-12 nprl nmrl fadeIn p2">
+<span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn p2">
 	<a (click)="autoPopulate(true)" class="button is-small is-light">
 		<span><mat-icon>add</mat-icon>Compound Search</span>
 	</a>&nbsp;

@@ -11,7 +11,7 @@
 <ng-template #showFactorDetails>
 	<div class="control">
 		<div class="tags has-addons">
-      <span class="tag is-primary clickable" (click)='openModal()'>
+      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)='openModal()'>
         <i class="material-icons">
           edit
         </i>
@@ -121,7 +121,7 @@
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
-            <button *ngIf="!addNewFactor" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete_outline</mat-icon></button>
+            <button *ngIf="!addNewFactor" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete</mat-icon></button>
             <mtbls-help target="factors"></mtbls-help>
             <!-- <button *ngIf="!addNewFactor" class="button is-light is-pulled-left" (click)='showHistory()' ><mat-icon>history</mat-icon></button> -->
           </div>

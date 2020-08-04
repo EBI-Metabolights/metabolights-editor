@@ -16,6 +16,9 @@ export class AssayDetailsComponent implements OnInit {
   @select(state => state.study.samples) studySamples;
   @ViewChild(TableComponent, { static: false }) assayTable: TableComponent;
 
+  @select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+
   fileTypes: any = [
 		{
 			filter_name : "MetaboLights assay sheet type",
@@ -33,7 +36,13 @@ export class AssayDetailsComponent implements OnInit {
 
   @Output() assayDelete = new EventEmitter<any>();
   
-  constructor(private editorService: EditorService) {}
+  constructor(private editorService: EditorService) {
+    this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
+  }
 
   ngOnInit() {
     this.assays.subscribe(value => { 

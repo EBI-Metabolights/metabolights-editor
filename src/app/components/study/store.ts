@@ -2,12 +2,9 @@ import { tassign } from 'tassign';
 import { MTBLSStudy } from '../../models/mtbl/mtbls/mtbls-study';
 import { MTBLSProtocol } from '../../models/mtbl/mtbls/mtbls-protocol';
 import { MTBLSFactor } from '../../models/mtbl/mtbls/mtbls-factor';
-import { MTBLSComment } from '../../models/mtbl/mtbls/common/mtbls-comment';
-import { MTBLSSample } from '../../models/mtbl/mtbls/mtbls-sample';
-import { MTBLSAssay } from '../../models/mtbl/mtbls/mtbls-assay';
 import { Ontology } from '../../models/mtbl/mtbls/common/mtbls-ontology';
 import { MTBLSProcessSequence } from '../../models/mtbl/mtbls/mtbls-process-sequence';
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { JsonConvert } from "json2typescript";
 import {  SET_STUDY_IDENTIFIER, 
     SET_STUDY_TITLE, 
     SET_STUDY_ABSTRACT, 
@@ -16,6 +13,7 @@ import {  SET_STUDY_IDENTIFIER,
     SET_STUDY_SUBMISSION_DATE, 
     SET_STUDY_RELEASE_DATE, 
     SET_STUDY_STATUS,
+    SET_STUDY_REVIEWER_LINK,
     SET_STUDY_PUBLICATIONS, 
     SET_STUDY_PEOPLE,
     SET_STUDY_FACTORS,
@@ -41,6 +39,7 @@ import {  SET_STUDY_IDENTIFIER,
     DELETE_STUDY_ASSAY,
     SET_STUDY_MAF,
     SET_STUDY_ERROR, 
+    SET_STUDY_READONLY,
     SET_PROTOCOL_EXPAND} from './actions'; 
 
 export const STUDY_INITIAL_STATE: MTBLSStudy =  new MTBLSStudy();
@@ -55,6 +54,10 @@ function setStudyIdentifier(state, action) {
         return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: []  });    
     }
     
+}
+
+function setStudyReadOnly(state, action){
+    return tassign(state, { readonly: action.body.readonly })
 }
 
 function setStudyTitle(state, action) {
@@ -75,6 +78,10 @@ function setStudyReleaseDate(state, action) {
 
 function setStudyStatus(state, action) {
     return tassign(state, { status: action.body.study.mtblsStudy.studyStatus });
+}
+
+function setStudyReviewerLink(state, action) {
+    return tassign(state, { reviewerLink: action.body.study.mtblsStudy.reviewer_link });
 }
 
 function setStudyPublications(state, action){
@@ -268,6 +275,7 @@ export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): M
         case SET_STUDY_ABSTRACT: return setStudyAbstract(state, action);
 
         case SET_STUDY_STATUS: return setStudyStatus(state, action);
+        case SET_STUDY_REVIEWER_LINK: return setStudyReviewerLink(state, action);
 
         case SET_STUDY_SUBMISSION_DATE: return setStudySubmissionDate(state, action);
         case SET_STUDY_RELEASE_DATE: return setStudyReleaseDate(state, action);
@@ -312,6 +320,8 @@ export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): M
         case SET_STUDY_ERROR: return setStudyInvestigationFailedError(state, action);
 
         case SET_PROTOCOL_EXPAND: return setProtocolExpand(state, action);
+
+        case SET_STUDY_READONLY: return setStudyReadOnly(state, action);
     }
 
     return state; 

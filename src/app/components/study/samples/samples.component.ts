@@ -22,6 +22,9 @@ export class SamplesComponent {
 	@select(state => state.study.factors) studyFactors;
     @select(state => state.study.files) studyFiles: any;
 
+    @select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+
 	@ViewChildren(OntologyComponent) private ontologyComponents: QueryList<OntologyComponent>;
 	@ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
 
@@ -75,6 +78,11 @@ export class SamplesComponent {
 				this.editorService.loadStudySamples();
 			}else{
 				this.samples = value;
+			}
+        });
+        this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
 			}
 		});
 	}
@@ -150,6 +158,7 @@ export class SamplesComponent {
     importFileNamesFromRawData(){
         this.duplicateNames = []
         let sampleNames = this.sampleTable.data.rows.map( r => r['Sample Name'])
+        console.log(this.rawFileNames)
         this.rawFileNames.forEach( rName => {
             if(sampleNames.indexOf(rName) > -1){
                 this.duplicateNames.push(rName)

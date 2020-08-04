@@ -16,12 +16,17 @@ export class StatusComponent implements OnInit {
 	@select(state => state.status.isCurator) isCurator;
 	@select(state => state.study.identifier) studyIdentifier;
 
+	@select(state => state.study.readonly) readonly;
+	isReadOnly: boolean = false;
+
 	isModalOpen: boolean = false;
 	isFormBusy: boolean = false;
 	status: string = null
 	curator: boolean = false;
 	toStatus: string = 'Submitted';
 	requestedStudy: string = null;
+
+	
 
 	constructor(private editorService: EditorService, private route: ActivatedRoute){ 
 		this.studyStatus.subscribe(value => { 
@@ -40,40 +45,47 @@ export class StatusComponent implements OnInit {
 				this.requestedStudy = value
 			}
 		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
 	}
 
 	changeStatus(toStatus){
-		if(toStatus == null){
-			toStatus = this.toStatus
+		if(!this.isReadOnly){
+			if(toStatus == null){
+				toStatus = this.toStatus
+			}
+			Swal.fire({
+				  title: "Are you sure?",
+				  showCancelButton: true,
+				  confirmButtonColor: "#DD6B55",
+				  confirmButtonText: "Confirm",
+				  cancelButtonText: "Back"
+			})
+			.then((willChange) => {
+			  if (willChange.value) {
+				 this.editorService.changeStatus(toStatus).subscribe( data => {
+					 this.closeModal()
+					 toastr.success('Study status updated.', "Success", {
+						"timeOut": "2500",
+						"positionClass": "toast-top-center",
+						"preventDuplicates": true,
+						"extendedTimeOut": 0,
+						"tapToDismiss": false
+					})
+					this.editorService.loadStudy(this.requestedStudy, false)
+				 }, err => {
+					 this.closeModal()
+					 this.toStatus = this.status
+					 Swal.fire({
+						  title: err.json().message
+					});
+				 }) 
+			  }
+			});
 		}
-		Swal.fire({
-		  	title: "Are you sure?",
-		  	showCancelButton: true,
-      		confirmButtonColor: "#DD6B55",
-      		confirmButtonText: "Confirm",
-      		cancelButtonText: "Back"
-		})
-		.then((willChange) => {
-		  if (willChange.value) {
-		 	this.editorService.changeStatus(toStatus).subscribe( data => {
-		 		this.closeModal()
-		 		toastr.success('Study status updated.', "Success", {
-			        "timeOut": "2500",
-			        "positionClass": "toast-top-center",
-			        "preventDuplicates": true,
-			        "extendedTimeOut": 0,
-			        "tapToDismiss": false
-			    })
-			    this.editorService.loadStudy(this.requestedStudy)
-		 	}, err => {
-		 		this.closeModal()
-		 		this.toStatus = this.status
-		 		Swal.fire({
-				  	title: err.json().message
-				});
-		 	}) 
-		  }
-		});
 	}
 
 	ngOnInit() {}

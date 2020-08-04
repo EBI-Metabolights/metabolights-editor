@@ -13,6 +13,10 @@ import * as toastr from 'toastr';
 export class ReleaseDateComponent implements OnInit {
 	@select(state => state.study.releaseDate) studyReleaseDate;
 	@select(state => state.study.identifier) studyIdentifier;
+	@select(state => state.study.readonly) readonly;
+	
+	isReadOnly: boolean = false;
+
 	isModalOpen: boolean = false;
 	isFormBusy: boolean = false;
 	requestedStudy: string = null;
@@ -35,46 +39,55 @@ export class ReleaseDateComponent implements OnInit {
 				this.requestedStudy = value
 			}
 		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
 	}
 
 	updateReleaseDateSilent(val){
-		this.editorService.changeReleasedate(val).subscribe( data => {
-			console.log("Release date missing in investigation file. Updated release date in investigation")
-		}, err => {
-		}) 
+		if(!this.isReadOnly){
+			this.editorService.changeReleasedate(val).subscribe( data => {
+				console.log("Release date missing in investigation file. Updated release date in investigation")
+			}, err => {
+			}) 
+		}
 	}
 
 	updateReleaseDate(op, e){
-		let selectedValue = new Date(e.value)
-		let dateTo = selectedValue.getFullYear() + "-" + this.str_pad(selectedValue.getMonth()+1) +  "-" + this.str_pad(selectedValue.getDate())
-		if(selectedValue != null){
-			Swal.fire({
-			  	title: "Are you sure? Would you like to change your study release date to " + dateTo,
-			  	showCancelButton: true,
-	      		confirmButtonColor: "#DD6B55",
-	      		confirmButtonText: "Confirm",
-	      		cancelButtonText: "Back"
-			})
-			.then((willChange) => {
-			  if (willChange.value) {
-			 	this.editorService.changeReleasedate(dateTo).subscribe( data => {
-			 		this.closeModal()
-			 		toastr.success('Study release date updated.', "Success", {
-				        "timeOut": "2500",
-				        "positionClass": "toast-top-center",
-				        "preventDuplicates": true,
-				        "extendedTimeOut": 0,
-				        "tapToDismiss": false
-				    })
-				    this.editorService.loadStudy(this.requestedStudy)
-			 	}, err => {
-			 		this.closeModal()
-			 		Swal.fire({
-					  	title: err.json().message
-					});
-			 	}) 
-			  }
-			});
+		if(!this.isReadOnly){
+			let selectedValue = new Date(e.value)
+			let dateTo = selectedValue.getFullYear() + "-" + this.str_pad(selectedValue.getMonth()+1) +  "-" + this.str_pad(selectedValue.getDate())
+			if(selectedValue != null){
+				Swal.fire({
+					title: "Are you sure? Would you like to change your study release date to " + dateTo,
+					showCancelButton: true,
+					confirmButtonColor: "#DD6B55",
+					confirmButtonText: "Confirm",
+					cancelButtonText: "Back"
+				})
+				.then((willChange) => {
+				if (willChange.value) {
+					this.editorService.changeReleasedate(dateTo).subscribe( data => {
+						this.closeModal()
+						toastr.success('Study release date updated.', "Success", {
+							"timeOut": "2500",
+							"positionClass": "toast-top-center",
+							"preventDuplicates": true,
+							"extendedTimeOut": 0,
+							"tapToDismiss": false
+						})
+						this.editorService.loadStudy(this.requestedStudy, false)
+					}, err => {
+						this.closeModal()
+						Swal.fire({
+							title: err.json().message
+						});
+					}) 
+				}
+				});
+			}
 		}
 	}
 
@@ -86,7 +99,9 @@ export class ReleaseDateComponent implements OnInit {
 	}
 
 	openModal() {
-		this.isModalOpen = true
+		if(!this.isReadOnly){
+			this.isModalOpen = true
+		}
 	}
 
 	closeModal() {

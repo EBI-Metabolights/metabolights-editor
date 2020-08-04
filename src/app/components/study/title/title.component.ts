@@ -14,8 +14,12 @@ import * as toastr from 'toastr';
 export class TitleComponent implements OnInit {
 
   @select(state => state.study.title) studyTitle;
-  @select(state => state.study.validations) studyValidations: any
-
+  @select(state => state.study.identifier) studyIdentifier;
+  @select(state => state.study.validations) studyValidations: any;
+  @select(state => state.study.readonly) readonly;
+  
+  isReadOnly: boolean = false;
+  requestedStudy: string = null;
   title: string = '';
   validations: any;
   form: FormGroup;
@@ -36,14 +40,26 @@ export class TitleComponent implements OnInit {
     this.studyValidations.subscribe(value => { 
       this.validations = value;
     });
+    this.studyIdentifier.subscribe(value => { 
+			if(value != null){
+				this.requestedStudy = value
+			}
+		});
+    this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
+			}
+		});
   }
 
   ngOnInit() {
   }
 
   openModal() {
-    this.initialiseForm()
-    this.isModalOpen = true
+    if(!this.isReadOnly){
+      this.initialiseForm()
+      this.isModalOpen = true
+    }
   }
 
   initialiseForm() {
@@ -58,21 +74,23 @@ export class TitleComponent implements OnInit {
   }
 
   save() {
-    this.isFormBusy = true;
-    this.editorService.saveTitle(this.compileBody(this.form.get('title').value)).subscribe( res => {
-      this.form.get('title').setValue(res.title)
-      this.form.markAsPristine()
-      this.isFormBusy = false;
-      toastr.success('Title updated.', "Success", {
-        "timeOut": "2500",
-        "positionClass": "toast-top-center",
-        "preventDuplicates": true,
-        "extendedTimeOut": 0,
-        "tapToDismiss": false
-      })
-    }, err => {
-      this.isFormBusy = false
-    });
+    if(!this.isReadOnly){
+      this.isFormBusy = true;
+      this.editorService.saveTitle(this.compileBody(this.form.get('title').value)).subscribe( res => {
+        this.form.get('title').setValue(res.title)
+        this.form.markAsPristine()
+        this.isFormBusy = false;
+        toastr.success('Title updated.', "Success", {
+          "timeOut": "2500",
+          "positionClass": "toast-top-center",
+          "preventDuplicates": true,
+          "extendedTimeOut": 0,
+          "tapToDismiss": false
+        })
+      }, err => {
+        this.isFormBusy = false
+      });
+    }
   }
 
   compileBody(title) {

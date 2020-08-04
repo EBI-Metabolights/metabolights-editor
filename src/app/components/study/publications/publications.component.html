@@ -1,8 +1,8 @@
-<div class="hover-highlight px-20">
+<div class="px-20" [ngClass]="{'hover-highlight': !isReadOnly}">
     <div class="mtbls-section">
 		<h6 class="mb10">
 			<a><b><small class="has-text-grey">PUBLICATIONS</small></b></a>
-			<mtbls-publication [value]="null"></mtbls-publication>
+			<mtbls-publication *ngIf="!isReadOnly" [value]="null"></mtbls-publication>
 		</h6>
 		<div *ngIf="publications && publications.length > 0; else noPublicationsFound;">
 			<div class="publications-wrapper tile is-ancestor mt1">
