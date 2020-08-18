@@ -158,7 +158,6 @@ export class SamplesComponent {
     importFileNamesFromRawData(){
         this.duplicateNames = []
         let sampleNames = this.sampleTable.data.rows.map( r => r['Sample Name'])
-        console.log(this.rawFileNames)
         this.rawFileNames.forEach( rName => {
             if(sampleNames.indexOf(rName) > -1){
                 this.duplicateNames.push(rName)

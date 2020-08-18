@@ -21,7 +21,6 @@ export class ProgressComponent implements OnInit {
 			if(step){
 				this.router.navigate(['/guide/' + step + "/" + component, this.study])	
 			}else{
-				console.log(this.study)
 				this.router.navigate(['/guide/' + component, this.study])
 			}
 		}

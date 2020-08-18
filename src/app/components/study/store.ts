@@ -96,7 +96,6 @@ function setStudyPeople(state, action){
     if(action.body.study.isaInvestigation.studies[0].people){
         return tassign(state, { people: action.body.study.isaInvestigation.studies[0].people });
     }else{
-        console.log(action)
         // return tassign(state, { people: action.body.study.isaInvestigation.studies[0].people });
     }
 }
