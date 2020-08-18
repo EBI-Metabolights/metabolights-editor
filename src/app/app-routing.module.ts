@@ -16,6 +16,7 @@ import { RawUploadComponent } from './components/guide/upload/upload.component';
 import { InfoComponent } from './components/guide/info/info.component';
 import { MetaComponent } from './components/guide/meta/meta.component';
 import { GuidedAssaysComponent } from './components/guide/assays/assays.component';
+import { GuidesComponent } from './components/public/guides/guides.component';
 
 export function StudyMatcher ( url: UrlSegment[] ): UrlMatchResult {
 	if (url.length === 0) {
@@ -49,6 +50,10 @@ export function StudyMatcher ( url: UrlSegment[] ): UrlMatchResult {
 
 const routes: Routes = [
 	{ path: 'login', component: LoginComponent },
+	{ path: 'guides', component: GuidesComponent },
+	{ path: 'guides/:tab', component: GuidesComponent },
+	{ path: 'guides/:tab/:section', component: GuidesComponent },
+
 	{ path: '', redirectTo: 'console', pathMatch: 'full'},
 	{ path: 'console', canActivate: [AuthGuard], component: ConsoleComponent },
 

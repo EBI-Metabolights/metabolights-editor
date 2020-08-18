@@ -10,6 +10,9 @@ import { TOGGLE_LOADING,
 		 SET_TAB_INDEX,
 		 INITIALISE,
 		 SET_USER_STUDIES,
+		 SET_GUIDES_MAPPINGS,
+		 SET_SELECTED_LANGUAGE,
+		 SET_GUIDES,
 		 SET_USER } from './actions'; 
 import { contentHeaders } from './../services/headers';
 
@@ -23,7 +26,10 @@ export const SHARED_INITIAL_STATE: Object =  {
 	'message': '',
 	'currentTabIndex': '0',
 	'isInitialised': false,
-	'userStudies': null
+	'userStudies': null,
+	'mappings': null,
+	'selectedLanguage': 'en',
+	'guides': null
 };
 
 function toggleLoading(state) {
@@ -66,6 +72,18 @@ function setUserStudies(state, action){
 	return tassign(state, { userStudies: action.body.studies })
 }
 
+function setGuidesMappings(state, action){
+	return tassign(state, { mappings: action.body.mappings })
+}
+
+function setSelectedLanguage(state, action){
+	return tassign(state, { selectedLanguage: action.body.language })
+}
+
+function setGuides (state, action){
+	return tassign(state, { guides: action.body.guides })
+}
+
 function setLoadingConfiguration(state, action) {
 	let configurationValue = {}
 	action.body.configuration.forEach( config => {
@@ -96,7 +114,10 @@ export function sharedReducer(state: Object = SHARED_INITIAL_STATE, action): Obj
     case SET_TAB_INDEX : return setCurrentTabIndex(state, action);
     case SET_USER : return setCurrentUser(state, action);
     case INITIALISE: return setInitilised(state, action);
-    case SET_USER_STUDIES: return setUserStudies(state, action);
+	case SET_USER_STUDIES: return setUserStudies(state, action);
+	case SET_GUIDES_MAPPINGS: return setGuidesMappings(state, action);
+	case SET_SELECTED_LANGUAGE: return setSelectedLanguage(state, action);
+	case SET_GUIDES: return setGuides(state, action);
   }
 
   return state; 

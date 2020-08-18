@@ -3,19 +3,19 @@
         {
             "code": "en",
             "name": "English",
-            "file": "en.json",
+            "file": "I10n/en.json",
             "default": true
         },
         {
             "code": "zh",
-            "name": "Chinese",
-            "file": "zh.json",
+            "name": "中文",
+            "file": "I10n/zh.json",
             "default": false
         },
         {
             "code": "es",
             "name": "Spanish",
-            "file": "es.json",
+            "file": "I10n/es.json",
             "default": false
         }
     ]

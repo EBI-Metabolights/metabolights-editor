@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /src/assets/videos/*
+/src/assets/guides/*
 
 # Only exists if Bazel was run
 /bazel-out

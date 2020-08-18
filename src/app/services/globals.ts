@@ -1,9 +1,17 @@
 import { isDevMode } from '@angular/core';
 
 var origin = window.location.origin;
+var branch = 'development';
 
 if(origin.indexOf('localhost') > -1){
 	origin = "https://wwwdev.ebi.ac.uk"
+}
+
+var host = window.location.host
+var subdomain = host.split('.')[0]
+
+if(subdomain == 'www'){
+	branch = 'master';
 }
 
 if(origin.indexOf('8080') > -1){
@@ -24,10 +32,16 @@ MetaboLightsWSURL['baseURL']			= metaboLightsWSDomain + "/ws"
 MetaboLightsWSURL['studiesList'] 		= MetaboLightsWSURL['baseURL'] + '/studies';
 MetaboLightsWSURL['study'] 				= MetaboLightsWSURL['baseURL'] + '/studies';
 MetaboLightsWSURL['validations'] 		= "assets/configs/validations.json";
+
+if(window.location.origin.indexOf('localhost') > -1){
+	MetaboLightsWSURL['guides']			= "assets/guides/";
+}else{
+	MetaboLightsWSURL['guides']			= "https://raw.githubusercontent.com/EBI-Metabolights/guides/"+branch+"/"
+}
+
 MetaboLightsWSURL['download']			= metaboLightsDomain + "/<study>/files"
 MetaboLightsWSURL['ontologyDetails']	= 'https://www.ebi.ac.uk/ols/api/ontologies/'
  
-
 export const DOIWSURL 					= {};
 DOIWSURL['article']						= "https://api.crossref.org/works/"
 

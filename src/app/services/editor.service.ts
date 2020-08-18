@@ -135,6 +135,60 @@ export class EditorService {
     );
   }
 
+  loadGuides(){
+    this.dataService.getLanguageMappings().subscribe( 
+      mappings => {
+        this.ngRedux.dispatch({ type: 'SET_GUIDES_MAPPINGS', body: {
+          'mappings': mappings 
+        }})
+        var selected_language = localStorage.getItem('selected_language');
+        mappings['languages'].forEach( language => {
+          if((selected_language && language['code'] == selected_language) || (!selected_language && language['default'])){
+            this.ngRedux.dispatch({ 
+              type: 'SET_SELECTED_LANGUAGE', 
+              body: {
+                'language': language['code']
+              }
+            })
+
+            this.dataService.getGuides(language['code']).subscribe( 
+              guides => {
+                this.ngRedux.dispatch({ 
+                  type: 'SET_GUIDES', 
+                  body: {
+                    'guides': guides['data']
+                  }
+                })
+            })
+          }
+        })
+        
+      }, 
+      err => { 
+        console.log(err) 
+      }
+    );
+  }
+
+  loadLanguage(language){
+    this.dataService.getGuides(language).subscribe( 
+      guides => {
+        localStorage.setItem('selected_language', language);
+        this.ngRedux.dispatch({ 
+          type: 'SET_SELECTED_LANGUAGE', 
+          body: {
+            'language': language
+          }
+        })
+        this.ngRedux.dispatch({ 
+          type: 'SET_GUIDES', 
+          body: {
+            'guides': guides['data']
+          }
+        })
+    })
+  }
+
   getAllStudies(){
     this.dataService.getAllStudies().subscribe( response => {
       this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {

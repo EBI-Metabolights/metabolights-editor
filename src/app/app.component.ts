@@ -41,5 +41,6 @@ export class AppComponent {
       }else{
         localStorage.removeItem('isCurator');
       }
+      this.editorService.loadGuides();
     }
 }

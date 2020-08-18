@@ -30,6 +30,22 @@ export class MetabolightsService extends DataService{
     );
   }
 
+  // Study validation details
+  getLanguageMappings() {
+    return this.http.get( this.url.guides + "mapping.json" ).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
+  // Study validation details
+  getGuides(language) {
+    return this.http.get( this.url.guides + "I10n/" + language + ".json" ).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
   // Studies list
   getAllStudies() {
     return this.http.get(this.url.studiesList + "/user", { headers: contentHeaders }).pipe(

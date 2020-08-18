@@ -14,16 +14,16 @@ export class EditTableDirective {
 
   @HostListener('window:copy', ['$event'])
   onCopy(e: any) {
-  	this.copy.emit(e);
+  	// this.copy.emit(e);
   }	
 
   @HostListener('window:paste', ['$event'])
   onPaste(e: any) {
-  	this.paste.emit(e);
+  	// this.paste.emit(e);
   }
 
   @HostListener('window:cut', ['$event'])
   onCut(e: any) {
-  	this.cut.emit(e);
+  	// this.cut.emit(e);
   }
 }

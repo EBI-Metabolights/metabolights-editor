@@ -89,6 +89,7 @@ import { DeleteComponent } from './components/study/delete/delete.component';
 import { HeaderComponent } from './components/public/header/header.component';
 import { FooterComponent } from './components/public/footer/footer.component';
 import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.component';
+import { GuidesComponent } from './components/public/guides/guides.component';
 
 @NgModule({
   declarations: [
@@ -150,6 +151,7 @@ import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.compo
     FooterComponent,
     AsperaDownloadComponent,
     FtpDownloadComponent,
+    GuidesComponent,
   ],
   imports: [
     BrowserModule,
