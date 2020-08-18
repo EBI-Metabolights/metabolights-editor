@@ -47,14 +47,18 @@ export class MafComponent {
   	constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
 	ngAfterContentInit(){
-		this.studyMAFs.subscribe(mafs => {
-			if(mafs){
-				this.mafData = mafs[this.value.data.file]
-			}
-		});
+		this.load()
 		this.readonly.subscribe(value => { 
 			if(value != null){
 				this.isReadOnly = value
+			}
+		});
+	}
+
+	load(){
+		this.studyMAFs.subscribe(mafs => {
+			if(mafs){
+				this.mafData = mafs[this.value.data.file]
 			}
 		});
 	}
