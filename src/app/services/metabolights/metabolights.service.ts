@@ -214,6 +214,26 @@ export class MetabolightsService extends DataService{
     );
   }
 
+  makePersonSubmitter(email, study) {
+    let body = null
+    if(email && email!= '' && email != null){
+      body  = { 
+        "submitters": [
+          {
+            "email": email
+          }
+        ]
+      }
+    }
+
+    if(body){
+      return this.http.post(this.url.studiesList + "/" + this.id + "/submitters", body, { headers: contentHeaders }).pipe(
+        map(res => res.json()),
+        catchError(this.handleError)
+      );
+    }
+  }
+
   deletePerson(email, name) {
     let query = ""
     if(email && email!= '' && email != null){

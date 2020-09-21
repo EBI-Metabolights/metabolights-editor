@@ -13,7 +13,7 @@
 	<div class="column"  style="width: 100%; overflow-x: auto">
 		<div class="panel-block-wrapper">
 			<span *ngIf="mafData">
-				<mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateAssaySheet()" (rowEdit)="openRowEditModal($event)" [tableData]="mafData" validationsId="maf"></mtbls-table>
+				<mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateMAFSheet()" (rowEdit)="openRowEditModal($event)" [tableData]="mafData" validationsId="maf"></mtbls-table>
 			</span>
 		</div>
 	</div>
@@ -64,6 +64,17 @@
 													</button>
 												</mat-form-field>
 											</div>
+											<div class="control">
+													<label><small>Chemical Formula</small></label>
+													<mat-form-field class="full-width">
+														<input class="no-scroll" 
+														formControlName="formula"
+														matInput>
+														<button style="border: none;" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="search('formula')">
+															<mat-icon>search</mat-icon>
+														</button>
+													</mat-form-field>
+												</div>
 											<div class="control">
 												<label><small>InChI</small></label>
 												<mat-form-field class="full-width">
@@ -175,6 +186,17 @@
 											</button>
 										</mat-form-field>
 									</div>
+									<div class="control">
+											<label><small>Chemical Formula</small></label>
+											<mat-form-field class="full-width">
+												<input class="no-scroll" 
+												formControlName="formula"
+												matInput>
+												<button style="border: none;" mat-button matSuffix mat-icon-button aria-label="Clear" (click)="search('formula')">
+													<mat-icon>search</mat-icon>
+												</button>
+											</mat-form-field>
+										</div>
 									<div class="control">
 										<label><small>Database Identifier</small></label>
 										<mat-form-field class="full-width">

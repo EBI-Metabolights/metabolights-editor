@@ -24,6 +24,26 @@
   </div>
 </div>
 
+<div class="modal" [ngClass]="{'is-active': isApproveSubmitterModalOpen}">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>Are you sure you want to add this user as submitter of this study?</p><br/>
+      <p><small><mat-icon>info</mat-icon>User should already have a MetaboLights account to grant the submitter role. Please create, confirm and then assign the role.</small></p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)='closeSubmitterAproval()' class="button is-info">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)='grantSubmitter()' class="button is-danger">Proceed</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
 <div class="modal" *ngIf="person" [ngClass]="{'is-active': isTimeLineModalOpen}">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -214,6 +234,7 @@ form.get('roles').errors.roles">
   <div class="columns is-gapless full-width">
     <div class="column is-half">
       <button *ngIf="!addNewPerson" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete</mat-icon></button>
+      <button *ngIf="!addNewPerson && person.email" class="button is-secondary is-pulled-left" (click)="approveGrantSubmitterRole()"><mat-icon>person</mat-icon> Make Submitter</button>
     </div>
     <div class="column is-half has-text-right">
       <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">

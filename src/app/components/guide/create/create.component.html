@@ -52,13 +52,14 @@
 			<nav class="panel has-background-white">
 				<div class="panel-heading">
 					<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
-					<span style="margin-left: 10px">New Study - Raw data files</span>
+					<span style="margin-left: 10px">New Study - Raw / Derived data files</span>
 				</div>
 				<div class="panel-block">
 					<div class="column">
-						<h3>MetaboLights studies require raw data files. These can be added at any stage during the submission process.
-							Additionally, including mzML / nmrML processed files enables automatic extraction of some required information into your study.
-						</h3>
+						<h3>MetaboLights studies require raw data files. These can be added at any stage to the RAW_FILES folder with in the study during the submission process.
+							Additionally, including mzML / nmrML processed files to the DERIVED_FILES folder enables automatic extraction of some required information into your study.
+						</h3> <br/>
+						<small><mat-icon>info</mat-icon> RAW_FILES and DERIVED_FILES folders will be automatically added to your study upon creation.</small>
 						<div style="padding-top: 10px;">
 							<small class="has-text-grey-lighter">Please select</small>
 							<mat-button-toggle-group class="mat-button-toggle-group-vertical is-fullwidth" [(ngModel)]="selectedCreateOption" #group="matButtonToggleGroup">

@@ -70,8 +70,13 @@ export class MafComponent {
 			name:  [ row['metabolite_identification'] ],
 			smiles:  [ row['smiles'] ],
 			inchi:  [ row['inchi'] ],
-			databaseId:  [ row['database_identifier'] ]
+			databaseId:  [ row['database_identifier'] ],
+			formula:  [ row['chemical_formula'] ]
 		});
+	}
+
+	validateMAFSheet(){
+		this.load()
 	}
 
 	getChebiId(){
@@ -106,7 +111,8 @@ export class MafComponent {
 			name:  [ row['metabolite_identification'] ],
 			smiles:  [ row['smiles'] ],
 			inchi:  [ row['inchi'] ],
-			databaseId:  [ row['database_identifier'] ]
+			databaseId:  [ row['database_identifier'] ],
+			formula: [ row['chemical_formula']]
 		});
 		this.getChebiId()
 	}
@@ -218,7 +224,7 @@ export class MafComponent {
 		this.editorService.search(term, type.toLowerCase()).subscribe( res => {
 			let resultObj = res.content[0]
 			this.isFormBusy = false;
-			let fields = [ 'name', 'smiles', 'inchi', 'databaseId']
+			let fields = [ 'name', 'smiles', 'inchi', 'formula', 'databaseId']
 			fields.forEach(field =>{
 				if(field != term){
 					if(field == 'name'){
@@ -244,6 +250,7 @@ export class MafComponent {
 		this.selectedRow['inchi'] = this.form.get('inchi').value
 		this.selectedRow['database_identifier'] = this.form.get('databaseId').value
 		this.selectedRow['smiles'] = this.form.get('smiles').value
+		this.selectedRow['chemical_formula'] = this.form.get('formula').value
 		this.mafTable.updateRows([this.selectedRow]);
 	}
 

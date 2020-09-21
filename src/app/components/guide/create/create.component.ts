@@ -34,6 +34,7 @@ export class CreateComponent implements OnInit {
 	}
 
 	ngOnInit() {
+		this.ngRedux.dispatch({ type: 'DISABLE_LOADING' });
 	}
 
 	nextSubStep(){

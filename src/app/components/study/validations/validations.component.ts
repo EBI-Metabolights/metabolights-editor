@@ -9,7 +9,7 @@ import { NgRedux, select } from '@angular-redux/store';
 export class ValidationsComponent implements OnInit {
 
   studyValidation: any = null;
-  displayOption: string = 'all';
+  displayOption: string = 'error';
   @select(state => state.study.validation) validation: any
 
   constructor() { }

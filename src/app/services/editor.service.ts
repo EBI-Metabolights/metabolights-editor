@@ -692,6 +692,10 @@ export class EditorService {
     return this.dataService.updatePerson(email, name, body);
   }
 
+  makePersonSubmitter(email, study){
+    return this.dataService.makePersonSubmitter(email, study);
+  }
+
   deletePerson(email, name){
     return this.dataService.deletePerson(email, name);
   }

@@ -96,7 +96,7 @@
       <p class="panel-heading"  style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer1" [attr.marginTop]="!isReadOnly ? '35' : '0'">
           <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
         <label>
-          <small>RAW FILES</small>
+          <small>RAW / DERIVED FILES</small>
         </label>
         <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right"> 
           <span *ngIf="containsZipFiles(selectedRawFiles)">
@@ -120,7 +120,7 @@
       </span>
       <ng-template #noRawFiles>
         <a class="panel-block">
-          No raw files
+          No raw or derived files found in the study
         </a>
       </ng-template>
     </ng-template>
@@ -189,10 +189,13 @@
     </span>
   </nav>
   <nav *ngIf="uploadFiles.length > 0 && !isReadOnly" class="panel">
+    <div *ngIf="!isReadOnly" class="notification is-info">
+      <small><mat-icon>info</mat-icon> Upload folder is a temporary location where we store a copy of your uploaded files and sync them to your study (listed above). We display (below) only those files which are either not present or latest than the files in your study, contact us <a [href]="'mailto:metabolights-help@ebi.ac.uk?subject=Regarding upload folder - '+requestedStudy">metabolights-help@ebi.ac.uk</a> for help.</small>
+    </div>
     <span #spacer3></span>
     <p class="panel-heading" style="z-index: 1000; padding: 10px;" stickyThing [spacer]="spacer3" [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label>
-        <input [checked]="filteredUploadFiles.length == selectedUploadFiles.length" (change)="selectFiles($event, 'upload', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>UPLOADED FILES</small>
+        <input [checked]="filteredUploadFiles.length == selectedUploadFiles.length" (change)="selectFiles($event, 'upload', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>UPLOAD FOLDER</small>
       </label>
         <span class="is-pulled-right">
           <a target="_blank" (click)="copyFiles()" class="button is-small is-light">

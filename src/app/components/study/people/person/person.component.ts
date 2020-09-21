@@ -38,6 +38,7 @@ export class PersonComponent implements OnInit {
 
 	@Input('value') person: MTBLSPerson;
 	@select(state => state.study.validations) studyValidations;
+	@select(state => state.study.identifier) studyIdentifier;
 
 	@ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
 
@@ -46,9 +47,14 @@ export class PersonComponent implements OnInit {
 
 	validations: any = {};
 
+	requestedStudy: string = null;
+
 	form: FormGroup;
 	showAdvanced: boolean = false;
 	isFormBusy: boolean = false;
+
+	isApproveSubmitterModalOpen: boolean = false;
+
 	isModalOpen: boolean = false;
 	addNewPerson: boolean = false;
 	isTimeLineModalOpen: boolean = false;
@@ -71,6 +77,11 @@ export class PersonComponent implements OnInit {
 				}else{
 					this.isReadOnly = false
 				}
+			}
+		});
+		this.studyIdentifier.subscribe(value => { 
+			if(value != null){
+				this.requestedStudy = value
 			}
 		});
 	}
@@ -171,6 +182,32 @@ export class PersonComponent implements OnInit {
 
 	fieldValidation(fieldId) {
 		return this.validation[fieldId]
+	}
+
+	approveGrantSubmitterRole(){
+		this.isModalOpen = false
+		this.isApproveSubmitterModalOpen = true
+	}
+
+	closeSubmitterAproval(){
+		this.isModalOpen = true
+		this.isApproveSubmitterModalOpen = false
+	}
+
+	grantSubmitter(){
+		this.editorService.makePersonSubmitter(this.person.email, this.requestedStudy).subscribe( res => {
+			toastr.success("Added user as submitter", "Success", {
+				"timeOut": "2500",
+				"positionClass": "toast-top-center",
+				"preventDuplicates": true,
+				"extendedTimeOut": 0,
+				"tapToDismiss": false
+			});	
+			this.isModalOpen = true
+			this.isApproveSubmitterModalOpen = false
+		}, err => {
+			this.isFormBusy = false
+		});
 	}
 
 	save() {
