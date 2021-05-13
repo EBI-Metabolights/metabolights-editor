@@ -29,6 +29,7 @@ export class StudyComponent implements OnInit {
     validation: any = {};
     obfuscationCode: string = null;
     domain: string = null;
+    messageExpanded: boolean = false;
 
 	constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private route: ActivatedRoute,  private editorService: EditorService) { 
 		this.editorService.initialiseStudy(this.route)
@@ -92,7 +93,11 @@ export class StudyComponent implements OnInit {
 	}
 
 	ngAfterViewInit() {
-	}
+    }
+    
+    toggleMessage(){
+        this.messageExpanded = !this.messageExpanded
+    }
 
 	selectCurrentTab(index, tab){
         this.ngRedux.dispatch({ type: 'SET_TAB_INDEX', body: {

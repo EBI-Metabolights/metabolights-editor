@@ -30,9 +30,37 @@ export class MetabolightsService extends DataService{
     );
   }
 
+  refreshValidations() {
+    return this.http.post(this.url.baseURL + "/ebi-internal/" + this.id + "/validate-study/update-file", {}, { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
+  overrideValidations(data){
+    return this.http.post(this.url.baseURL + "/ebi-internal/" + this.id + "/validate-study/override", data, { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
   // Study validation details
   getLanguageMappings() {
     return this.http.get( this.url.guides + "mapping.json" ).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
+  getStudyPrivateFolderAccess(){
+    return this.http.get(this.url.studiesList + "/" + this.id + "/access", { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
+  }
+
+  toggleFolderAccess(){
+    return this.http.put(this.url.studiesList + "/" + this.id + "/access/toggle", {}, { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
     );

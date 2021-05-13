@@ -17,6 +17,14 @@
         <img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
       </span>
     </span>
+    <span *ngIf="curator" class="is-pulled-right">
+        <a *ngIf="access == 'Read'" (click)="toggleFolderAccess()" class="button is-light">
+            <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
+        </a> 
+        <a *ngIf="access == 'Write'" (click)="toggleFolderAccess()" class="button is-light">
+            <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
+        </a> 
+    </span>
   </span>
   <span *ngIf="status == 'Public'">
     <mtbls-download-ftp></mtbls-download-ftp>

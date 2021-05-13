@@ -37,12 +37,16 @@ export class FilesComponent implements OnInit {
     fileLocation: string = null;
     status: string = null;
 
+    access:string = null;
+    curator: boolean = false;
+
     requestedStudy: string = null;
 
     refreshingData: boolean = false;
 
     @select(state => state.study.readonly) readonly;
     @select(state => state.study.status) studyStatus;
+    @select(state => state.status.isCurator) isCurator;
     @select(state => state.study.identifier) studyIdentifier: any;
 	isReadOnly: boolean = false;
 
@@ -52,6 +56,7 @@ export class FilesComponent implements OnInit {
 
     ngOnInit() {
         this.loadFiles()
+        this.loadAccess()
         this.readonly.subscribe(value => { 
 			if(value != null){
 				this.isReadOnly = value
@@ -62,7 +67,12 @@ export class FilesComponent implements OnInit {
         })
         this.studyIdentifier.subscribe(value => { 
             this.requestedStudy = value
-          })
+        })
+        this.isCurator.subscribe(value => { 
+			if(value != null){
+				this.curator = value
+			}
+		});
     }
 
     changeforceMetaDataDeleteValue(event){
@@ -344,6 +354,22 @@ export class FilesComponent implements OnInit {
         this.refreshingData = true;
 
         this.passiveUpdate()
+    }
+
+    loadAccess(){
+        this.editorService.getStudyPrivateFolderAccess().subscribe(data => {
+            this.access = data.Access;
+        }, error => {
+            console.log(error)
+        });
+    }
+
+    toggleFolderAccess(){
+        this.editorService.toggleFolderAccess().subscribe(data => {
+            this.access = data.Access;
+        }, error => {
+            console.log(error)
+        });
     }
 
     passiveUpdate(){

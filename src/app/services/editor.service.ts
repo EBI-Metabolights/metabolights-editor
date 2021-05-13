@@ -135,6 +135,14 @@ export class EditorService {
     );
   }
 
+  refreshValidations(){
+    return this.dataService.refreshValidations()
+  }
+
+  overrideValidations(data){
+    return this.dataService.overrideValidations(data);
+  }
+
   loadGuides(){
     this.dataService.getLanguageMappings().subscribe( 
       mappings => {
@@ -858,6 +866,13 @@ export class EditorService {
     return this.dataService.changeStatus(status)
   }
 
+  getStudyPrivateFolderAccess(){
+    return this.dataService.getStudyPrivateFolderAccess()
+  }
+
+  toggleFolderAccess(){
+    return this.dataService.toggleFolderAccess()
+  }
 
   // Release date change
   changeReleasedate(releaseDate){
