@@ -32,7 +32,24 @@
 			</div>
 		</article>
 	</div>
+
 	<div class="main-wrapper" [ngClass]="{'smt': status != 'Submitted'}">
+		<div style="margin: 20px">
+			<article class="message is-small has-shadow">
+				<div (click)="toggleMessage()" class="message-header">
+					<p><span class="material-icons">info</span>&nbsp;We're experiencing longer than usual review times</p>
+					<button *ngIf="!messageExpanded" style="background-color: transparent; border: 0">
+						<span class="material-icons">keyboard_arrow_down</span>
+					</button>
+					<button *ngIf="messageExpanded" style="background-color: transparent; border: 0">
+						<span class="material-icons">keyboard_arrow_up</span>
+					</button>
+				</div>
+				<div *ngIf="messageExpanded" class="message-body">
+					Due to increased data submissions, the curation stage may be longer than our standard 28 days. We apologise for any inconvenience and please contact us if you have any specific requirements.
+				</div>
+			</article>
+		</div>
 		<span *ngIf="requestedStudy != undefined">
 	      <div *ngIf="!studyError" id="meta" class="field is-grouped is-grouped-multiline px-20 mb-10">
 	        <mtbls-status></mtbls-status>

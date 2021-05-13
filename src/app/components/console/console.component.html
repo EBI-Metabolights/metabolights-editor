@@ -2,6 +2,22 @@
 <a href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!" id="fixedbutton"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us </a>
 <div class="columns" style="min-height: 100vh; margin: 60px 0;">
 	<div class="column is-8 is-offset-2">
+		<div style="margin: 0 0 20px 0">
+			<article class="message is-small has-shadow">
+				<div (click)="toggleMessage()" class="message-header">
+					<p><span class="material-icons">info</span>&nbsp;We're experiencing longer than usual review times</p>
+					<button *ngIf="!messageExpanded" style="background-color: transparent; border: 0">
+						<span class="material-icons">keyboard_arrow_down</span>
+					</button>
+					<button *ngIf="messageExpanded" style="background-color: transparent; border: 0">
+						<span class="material-icons">keyboard_arrow_up</span>
+					</button>
+				</div>
+				<div *ngIf="messageExpanded" class="message-body">
+					Due to increased data submissions, the curation stage may be longer than our standard 28 days. We apologise for any inconvenience and please contact us if you have any specific requirements.
+				</div>
+			</article>
+		</div>
 		<nav class="panel has-background-white">
 			<p class="panel-heading">
 				<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
@@ -52,7 +68,7 @@
 							<div class="full-width">
 								<p *ngIf="study.description.replace(' ','') != ''" style="padding-bottom: 10px;"><small style="font-size: 0.7em">SUMMARY</small> <br><small [innerHTML]="study.description"></small></p>
 							</div>
-							<div *ngIf="study.status == 'Submitted' || (isCurator | async)">
+							<div>
 								<a [routerLink]="['/guide/info', study.accession]"  class="button is-rounded">
 								    <small>
 								      <mat-icon>view_carousel</mat-icon> Guided submission

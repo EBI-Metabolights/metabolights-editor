@@ -19,7 +19,7 @@
     </div>
     <div class="column is-one-fifths has-text-right">
         <span class="has-text-grey-light">
-          <span *ngIf="level == 0">
+          <span>
             <mtbls-download [type]="'icon'" [value]="parent + file.file"></mtbls-download>&emsp;
           </span>
           <mtbls-file-delete *ngIf="!isReadOnly" (fileDeleted)="emitFileDeleted()" [type]="'icon'" [value]="parent + file.file"></mtbls-file-delete>

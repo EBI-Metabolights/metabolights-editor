@@ -19,6 +19,7 @@ export class ConsoleComponent implements OnInit{
     filteredStudies: string[] = []
     loadingStudies: boolean = false;
     filterValue: string = null;
+    messageExpanded: boolean = false;
 
     submittedStudies: any = [];
 
@@ -33,6 +34,10 @@ export class ConsoleComponent implements OnInit{
     }
 
     ngOnInit() {
+    }
+
+    toggleMessage(){
+        this.messageExpanded = !this.messageExpanded
     }
 
     createNewStudy(){
