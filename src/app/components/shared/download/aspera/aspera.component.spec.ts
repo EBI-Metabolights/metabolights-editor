@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AsperaComponent } from './aspera.component';
+import { AsperaDownloadComponent } from './aspera.component';
 
-describe('AsperaComponent', () => {
-  let component: AsperaComponent;
-  let fixture: ComponentFixture<AsperaComponent>;
+describe('AsperaDownloadComponent', () => {
+  let component: AsperaDownloadComponent;
+  let fixture: ComponentFixture<AsperaDownloadComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AsperaComponent ]
+      declarations: [ AsperaDownloadComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(AsperaComponent);
+    fixture = TestBed.createComponent(AsperaDownloadComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

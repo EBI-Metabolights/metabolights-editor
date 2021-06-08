@@ -106,14 +106,14 @@
 								<mtbls-samples></mtbls-samples>
 							</div>
 							<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 3">
-								<mtbls-assays></mtbls-assays>
+								<app-assays-container></app-assays-container>
 							</div>
 							<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 4">
 								<mtbls-mafs></mtbls-mafs>
 							</div>
 							<span *ngIf="files != null">
 								<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 5">
-									<mtbls-files></mtbls-files>
+									<mtbls-files></mtbls-files>	
 								</div>
 							</span>
 							<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 6 && (isOwner || isCurator)">

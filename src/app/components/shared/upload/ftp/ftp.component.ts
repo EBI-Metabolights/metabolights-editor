@@ -1,8 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import * as toastr from 'toastr';
+import { select } from '@angular-redux/store';
+import { FormBuilder} from '@angular/forms';
 
 @Component({
 	selector: 'mtbls-ftp',
