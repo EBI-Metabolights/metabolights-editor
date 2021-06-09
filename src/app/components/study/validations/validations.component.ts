@@ -34,7 +34,7 @@ export class ValidationsComponent implements OnInit {
   });
   }
 
-  refreshValidations(){
+  refreshValidations() {
     this.editorService.refreshValidations().subscribe( res => {
       this.editorService.loadValidations()
       toastr.success(res.success, "Success", {
