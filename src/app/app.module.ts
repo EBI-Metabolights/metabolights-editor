@@ -90,6 +90,7 @@ import { HeaderComponent } from './components/public/header/header.component';
 import { FooterComponent } from './components/public/footer/footer.component';
 import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.component';
 import { GuidesComponent } from './components/public/guides/guides.component';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -156,6 +157,7 @@ import { GuidesComponent } from './components/public/guides/guides.component';
   imports: [
     BrowserModule,
     NgxWigModule,
+    HttpClientModule,
     HttpModule,
     AppRoutingModule,
     NgReduxModule,
