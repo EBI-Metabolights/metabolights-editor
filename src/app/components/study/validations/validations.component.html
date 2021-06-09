@@ -1,6 +1,6 @@
-<p>
+<p *ngIf="studyValidation">
 	<mat-form-field>
-	  	<mat-label>Display Options</mat-label>
+		<mat-label>Display Options</mat-label>
 		<mat-select [(value)]="displayOption">
 			<mat-option [value]="'error'">Errors</mat-option>
 			<mat-option [value]="'warning'">Warning</mat-option>
@@ -11,30 +11,29 @@
 	</mat-form-field>
 	<br><br>
 	<span *ngFor="let validation of studyValidation.validations ; let i = index">
-			<nav class="panel">
-				<p class="panel-heading">
-					{{ validation['section'] }}
-				</p>
-				<span *ngFor="let detail of validation.details">
-					<span *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
-						<a [ngClass]="[detail.status, 'panel-block']">
-					    	<span class="panel-icon">
-					      		<i class="fas fa-book" aria-hidden="true"></i>
-					    	</span>
-					    	{{ detail.message }}
-							<ng-template [ngIf]="detail.description && detail.status === 'error'">
-								<br>
-								<div class="error">
-								{{ detail.description }}
+		<nav class="panel">
+			<p class="panel-heading">
+				{{ validation['section'] }}
+			</p>
+			<span *ngFor="let detail of validation.details">
+				<span *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
+					<a [ngClass]="[detail.status, 'panel-block']">
+						<span class="panel-icon">
+							<i class="fas fa-book" aria-hidden="true"></i>
+						</span>
+						{{ detail.message }}
+						<ng-template [ngIf]="detail.description && detail.status === 'error'">
+							<br>
+							<div class="error">
+								. {{ detail.description }}
 							</div>
-							</ng-template>
-							
+						</ng-template>
 
-						</a>
-					</span>
+
+					</a>
 				</span>
-			</nav>
-			<span>&nbsp;</span>
+			</span>
+		</nav>
+		<span>&nbsp;</span>
 	</span>
 </p>
-

@@ -20,14 +20,18 @@ export class ValidationsComponent implements OnInit {
   constructor(private editorService: EditorService) { }
 
   ngOnInit() {
-  	this.validation.subscribe(value => { 
-        this.studyValidation = value;
-    });
-    this.isCurator.subscribe(value => { 
-			if(value != null){
-				this.curator = value
-			}
-		});
+    this.openStateSubscriptions();
+  }
+
+  openStateSubscriptions() {
+    this.validation.subscribe(value => { 
+      this.studyValidation = value;
+  });
+  this.isCurator.subscribe(value => { 
+    if(value != null){
+      this.curator = value
+    }
+  });
   }
 
   refreshValidations(){
