@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
+import { select } from '@angular-redux/store';
 import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
 

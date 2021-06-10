@@ -8,7 +8,7 @@ import { ValidationsComponent } from './validations.component';
 
 
 
-fdescribe('ValidationsComponent', () => {
+describe('ValidationsComponent', () => {
   let component: ValidationsComponent;
   let fixture: ComponentFixture<ValidationsComponent>;
   let editorService: EditorService;

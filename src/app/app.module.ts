@@ -53,9 +53,6 @@ import { TitleComponent } from './components/study/title/title.component';
 
 import { NgxWigModule } from 'ngx-wig';
 import { GuidedAssaysComponent } from './components/guide/assays/assays.component';
-import { AddAssayComponent } from './components/study/assays/add-assay/add-assay.component';
-import { AssaysComponent } from './components/study/assays/assays.component';
-import { AssayDetailsComponent } from './components/study/assays/assay-details/assay-details.component';
 import { ProtocolsComponent } from './components/study/protocols/protocols.component';
 import { ProtocolComponent } from './components/study/protocols/protocol/protocol.component';
 import { ContentComponent } from './components/shared/content/content.component';
@@ -91,6 +88,7 @@ import { FooterComponent } from './components/public/footer/footer.component';
 import { FtpDownloadComponent } from './components/shared/download/ftp/ftp.component';
 import { GuidesComponent } from './components/public/guides/guides.component';
 import { HttpClientModule } from '@angular/common/http';
+import { AssaysModule } from './components/study/assays/assays.module';
 
 @NgModule({
   declarations: [
@@ -121,9 +119,6 @@ import { HttpClientModule } from '@angular/common/http';
     MetaComponent,
     TitleComponent,
     GuidedAssaysComponent,
-    AssaysComponent,
-    AddAssayComponent,
-    AssayDetailsComponent,
     ProtocolsComponent,
     ProtocolComponent,
     ContentComponent,
@@ -185,7 +180,8 @@ import { HttpClientModule } from '@angular/common/http';
           matchVisual: false
         }
       }
-    })
+    }),
+    AssaysModule
   ],
   providers: [
     AuthGuard
