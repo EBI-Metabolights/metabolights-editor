@@ -68,7 +68,7 @@ export class MetabolightsService extends DataService{
       );
   }
 
-  
+
   // Study ISA object
   getStudy(id) {
     return this.http.get(this.url.studiesList + "/" + id, { headers: contentHeaders }).pipe(
@@ -88,6 +88,15 @@ export class MetabolightsService extends DataService{
       map(res => res.json()),
       catchError(this.handleError)
      );
+  }
+
+  // Study files fetch
+  getStudyFilesFetch() {
+    let studyId = this.id
+    return this.http.get(this.url.studiesList + "/" + studyId + "/files-fetch" , { headers: contentHeaders }).pipe(
+      map(res => res.json()),
+      catchError(this.handleError)
+    );
   }
 
   // Study files list
@@ -156,7 +165,7 @@ export class MetabolightsService extends DataService{
 
   // Study title
   getTitle(id) {
-    let studyId = id ? id : this.id 
+    let studyId = id ? id : this.id
     return this.http.get(this.url.studiesList + "/" + studyId + "/title", { headers: contentHeaders }).pipe(
       map(res => res.json().title),
       catchError(this.handleError)
@@ -179,7 +188,7 @@ export class MetabolightsService extends DataService{
   }
 
   getAbstract(id) {
-    let studyId = id ? id : this.id 
+    let studyId = id ? id : this.id
     return this.http.get(this.url.studiesList + "/" + studyId + "/description", { headers: contentHeaders }).pipe(
       map(res => res.json().description),
       catchError(this.handleError)
@@ -217,7 +226,7 @@ export class MetabolightsService extends DataService{
   makePersonSubmitter(email, study) {
     let body = null
     if(email && email!= '' && email != null){
-      body  = { 
+      body  = {
         "submitters": [
           {
             "email": email
@@ -308,7 +317,7 @@ export class MetabolightsService extends DataService{
 
   // Study Protocols
   getProtocols(id) {
-    let studyId = id ? id : this.id 
+    let studyId = id ? id : this.id
     return this.http.get(this.url.studiesList + "/" + studyId + "/protocols", { headers: contentHeaders }).pipe(
       map(res => res.json()),
       catchError(this.handleError)
