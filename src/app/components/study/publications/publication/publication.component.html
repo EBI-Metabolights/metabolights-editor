@@ -7,8 +7,7 @@
 			<div class="content">
 				<h4 class="publication-title">
 					<b>
-						<a (click)='openModal()' target="_blank">{{ publication.title | slice : 0 : 90 }}<span *ngIf="publication.title.length > 90">...</span>
-						</a>
+						{{ publication.title | slice : 0 : 90 }}<span *ngIf="publication.title.length > 90">...</span>
 					</b>
 				</h4>
 				<h6 class="publication-authors" style="margin-bottom: 0">
@@ -61,7 +60,7 @@
 		<footer class="modal-card-foot">
 			<div class="columns is-gapless full-width">
 				<div class="column is-half">
-					
+
 				</div>
 				<div class="column is-half has-text-right">
 					<button (click)='closeImportAuthor()' class="button is-default">Done</button><button (click)="saveAuthors()" class="button is-info">Import Selected</button>
@@ -120,7 +119,7 @@
 			</div>
 			<section class="modal-card-body">
 				<mat-form-field class="full-width">
-					<textarea class="no-scroll" 
+					<textarea class="no-scroll"
 					formControlName="title"
 					matInput
 					[tabIndex]="1"
@@ -137,7 +136,7 @@
 			</mat-error>
 		</mat-form-field>
 		<mat-form-field class="full-width">
-			<textarea class="no-scroll" 
+			<textarea class="no-scroll"
 			formControlName="authorList"
 			matInput
 			[tabIndex]="2"
@@ -154,7 +153,7 @@
 	</mat-error>
 </mat-form-field>
 <mat-form-field class="full-width">
-	<input class="no-scroll" 
+	<input class="no-scroll"
 	formControlName="doi"
 	[tabIndex]="3"
 	(blur)="getArticleFromDOI()"
@@ -168,7 +167,7 @@
 </mat-error>
 </mat-form-field>
 <mat-form-field class="full-width">
-	<input class="no-scroll" 
+	<input class="no-scroll"
 	[tabIndex]="4"
 	formControlName="pubMedID"
 	(blur)="getArticleFromPubMedID()"
