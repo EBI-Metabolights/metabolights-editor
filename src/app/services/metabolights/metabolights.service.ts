@@ -91,12 +91,19 @@ export class MetabolightsService extends DataService{
   }
 
   // Study files fetch
-  getStudyFilesFetch() {
+  getStudyFilesFetch(force) {
     let studyId = this.id
-    return this.http.get(this.url.studiesList + "/" + studyId + "/files-fetch" , { headers: contentHeaders }).pipe(
-      map(res => res.json()),
-      catchError(this.handleError)
-    );
+    if(force){
+      return this.http.get(this.url.studiesList + "/" + studyId + "/files-fetch?force=true" , { headers: contentHeaders }).pipe(
+        map(res => res.json()),
+        catchError(this.handleError)
+      );
+    }else{
+      return this.http.get(this.url.studiesList + "/" + studyId + "/files-fetch" , { headers: contentHeaders }).pipe(
+        map(res => res.json()),
+        catchError(this.handleError)
+      );
+    }
   }
 
   // Study files list
