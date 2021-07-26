@@ -330,7 +330,7 @@ export class EditorService {
 
   loadStudyFiles(){
     console.log("Loading Study files from static list except first time -")
-    this.dataService.getStudyFilesFetch().subscribe(data => {
+    this.dataService.getStudyFilesFetch(false).subscribe(data => {
       console.log("Got the files list  !")
       this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
         'uploadLocation': data.uploadPath
