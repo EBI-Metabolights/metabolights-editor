@@ -21,13 +21,14 @@
 						<span class="panel-icon">
 							<i class="fas fa-book" aria-hidden="true"></i>
 						</span>
-						{{ detail.message }}
+						<p>
+						{{ detail.message }}.
 						<ng-template [ngIf]="detail.description && detail.status === 'error'">
-							<br>
 							<div class="error">
-								. {{ detail.description }}
+							 {{ detail.description }}
 							</div>
 						</ng-template>
+						</p>
 
 
 					</a>
