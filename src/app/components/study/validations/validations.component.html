@@ -9,7 +9,15 @@
 			<mat-option [value]="'all'">All</mat-option>
 		</mat-select>
 	</mat-form-field>
-	<br><br>
+<div class='is-pulled-right'>
+  <a (click)="refreshValidations()" class="button is-light">
+    <mat-icon>refresh</mat-icon> Refresh
+  </a>
+</div>
+<br><br>
+<div>
+  &nbsp;
+</div>
 	<span *ngFor="let validation of studyValidation.validations ; let i = index">
 			<nav class="panel">
 				<p class="panel-heading">
@@ -28,7 +36,12 @@
 								{{ detail.description }}
 							</div>
 							</ng-template>
-							
+              <span *ngIf="curator">
+                &nbsp;
+                <a (click)="overrideValidation(detail)">
+                  <mat-icon>info</mat-icon>Override
+                </a>
+              </span>
 
 						</a>
 					</span>
@@ -36,5 +49,3 @@
 			</nav>
 			<span>&nbsp;</span>
 	</span>
-</p>
-
