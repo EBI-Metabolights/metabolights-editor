@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import * as toastr from 'toastr';
 import { EditorService } from '../../../services/editor.service';
 import { NgRedux, select } from '@angular-redux/store';
+import {MetabolightsService} from '../../../services/metabolights/metabolights.service';
 
 @Component({
     selector: 'mtbls-files',
@@ -52,12 +53,12 @@ export class FilesComponent implements OnInit {
 
     @Input('validations') validations: any;
 
-    constructor(private editorService: EditorService) {}
+    constructor(private editorService: EditorService,  private dataService: MetabolightsService) {}
 
     ngOnInit() {
         this.loadFiles()
         this.loadAccess()
-        this.readonly.subscribe(value => { 
+        this.readonly.subscribe(value => {
 			if(value != null){
 				this.isReadOnly = value
 			}
@@ -65,10 +66,10 @@ export class FilesComponent implements OnInit {
         this.studyStatus.subscribe(value => {
             this.status = value
         })
-        this.studyIdentifier.subscribe(value => { 
+        this.studyIdentifier.subscribe(value => {
             this.requestedStudy = value
         })
-        this.isCurator.subscribe(value => { 
+        this.isCurator.subscribe(value => {
 			if(value != null){
 				this.curator = value
 			}
@@ -240,12 +241,12 @@ export class FilesComponent implements OnInit {
         let body =  { "files": [] }
         files.forEach(file => {
             if(file.type == "compressed"){
-                body['files'].push({"name": file.file})   
+                body['files'].push({"name": file.file})
             }
         })
 
         let fileNames = body['files'].map(file => file.name).join(", ")
-        
+
         if(body['files'].length > 0){
             this.editorService.decompressFiles(body).subscribe(response => {
                 toastr.success('Job submitted - Started decompressing files (' + fileNames + ')' , "Success", {
@@ -256,9 +257,9 @@ export class FilesComponent implements OnInit {
                       "tapToDismiss": true
                 })
                 this.loadFilesPassively()
-            })    
+            })
         }
-        
+
     }
 
     containsZipFiles(files){
@@ -373,7 +374,7 @@ export class FilesComponent implements OnInit {
     }
 
     passiveUpdate(){
-        this.editorService.getStudyFiles(null, true).subscribe(data => {
+        this.dataService.getStudyFilesFetch(true).subscribe(data => {
             this.sortFiles(data)
         }, error => {
             this.editorService.getStudyFilesList(null, null, null).subscribe(data => {
@@ -391,7 +392,7 @@ export class FilesComponent implements OnInit {
         this.filteredUploadFiles = this.uploadFiles
         this.filesLoading = false;
         this.refreshingData = false;
-        
+
         data.study.forEach( file => {
             if(file.type == 'raw' || file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
                 this.rawFiles.push(file)
