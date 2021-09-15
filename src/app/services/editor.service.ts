@@ -19,9 +19,9 @@ import Swal from 'sweetalert2';
 	providedIn: 'root'
 })
 export class EditorService {
-  @select(state => state.study.identifier) studyIdentifier; 
-  @select(state => state.study.validations) studyValidations; 
-  @select(state => state.study.files) studyFiles; 
+  @select(state => state.study.identifier) studyIdentifier;
+  @select(state => state.study.validations) studyValidations;
+  @select(state => state.study.files) studyFiles;
 
   redirectUrl: string = RedirectURL;
   currentStudyIdentifier: string = null;
@@ -38,13 +38,13 @@ export class EditorService {
   }
 
   constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private doiService: DOIService, private authService: AuthService, private europePMCService: EuropePMCService, private dataService: MetabolightsService) {
-    this.studyIdentifier.subscribe(value => { 
-        this.currentStudyIdentifier = value 
+    this.studyIdentifier.subscribe(value => {
+        this.currentStudyIdentifier = value
     });
-    this.studyValidations.subscribe(value => { 
+    this.studyValidations.subscribe(value => {
       this.validations = value;
     });
-    this.studyFiles.subscribe(value => { 
+    this.studyFiles.subscribe(value => {
       this.files = value;
     });
   }
@@ -85,11 +85,11 @@ export class EditorService {
   initialise(data, signInRequest){
     let user = null
     if(signInRequest){
-      user = JSON.parse(data.content).owner; 
+      user = JSON.parse(data.content).owner;
       localStorage.setItem('user', JSON.stringify(user));
       contentHeaders.set('user_token', user.apiToken);
-      this.ngRedux.dispatch({ 
-        type: 'INITIALISE' 
+      this.ngRedux.dispatch({
+        type: 'INITIALISE'
       })
       this.ngRedux.dispatch({ type: 'SET_USER', body: {
         'user': user
@@ -102,8 +102,8 @@ export class EditorService {
     }else{
       user = JSON.parse(data)
       contentHeaders.set('user_token', user.apiToken);
-      this.ngRedux.dispatch({ 
-        type: 'INITIALISE' 
+      this.ngRedux.dispatch({
+        type: 'INITIALISE'
       })
       this.ngRedux.dispatch({ type: 'SET_USER', body: {
         'user': user
@@ -117,20 +117,20 @@ export class EditorService {
   }
 
   loadValidations(){
-    this.dataService.getValidations().subscribe( 
+    this.dataService.getValidations().subscribe(
       validations => {
         this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
-          'info': 'Loading study validations' 
+          'info': 'Loading study validations'
         }})
-        this.ngRedux.dispatch({ 
-          type: 'LOAD_VALIDATION_RULES', 
+        this.ngRedux.dispatch({
+          type: 'LOAD_VALIDATION_RULES',
           body: {
             'validations': validations
           }
         })
-      }, 
-      err => { 
-        console.log(err) 
+      },
+      err => {
+        console.log(err)
       }
     );
   }
@@ -144,25 +144,25 @@ export class EditorService {
   }
 
   loadGuides(){
-    this.dataService.getLanguageMappings().subscribe( 
+    this.dataService.getLanguageMappings().subscribe(
       mappings => {
         this.ngRedux.dispatch({ type: 'SET_GUIDES_MAPPINGS', body: {
-          'mappings': mappings 
+          'mappings': mappings
         }})
         var selected_language = localStorage.getItem('selected_language');
         mappings['languages'].forEach( language => {
           if((selected_language && language['code'] == selected_language) || (!selected_language && language['default'])){
-            this.ngRedux.dispatch({ 
-              type: 'SET_SELECTED_LANGUAGE', 
+            this.ngRedux.dispatch({
+              type: 'SET_SELECTED_LANGUAGE',
               body: {
                 'language': language['code']
               }
             })
 
-            this.dataService.getGuides(language['code']).subscribe( 
+            this.dataService.getGuides(language['code']).subscribe(
               guides => {
-                this.ngRedux.dispatch({ 
-                  type: 'SET_GUIDES', 
+                this.ngRedux.dispatch({
+                  type: 'SET_GUIDES',
                   body: {
                     'guides': guides['data']
                   }
@@ -170,26 +170,26 @@ export class EditorService {
             })
           }
         })
-        
-      }, 
-      err => { 
-        console.log(err) 
+
+      },
+      err => {
+        console.log(err)
       }
     );
   }
 
   loadLanguage(language){
-    this.dataService.getGuides(language).subscribe( 
+    this.dataService.getGuides(language).subscribe(
       guides => {
         localStorage.setItem('selected_language', language);
-        this.ngRedux.dispatch({ 
-          type: 'SET_SELECTED_LANGUAGE', 
+        this.ngRedux.dispatch({
+          type: 'SET_SELECTED_LANGUAGE',
           body: {
             'language': language
           }
         })
-        this.ngRedux.dispatch({ 
-          type: 'SET_GUIDES', 
+        this.ngRedux.dispatch({
+          type: 'SET_GUIDES',
           body: {
             'guides': guides['data']
           }
@@ -208,7 +208,7 @@ export class EditorService {
   loadStudyId(id){
     return this.ngRedux.dispatch({ type: 'SET_STUDY_IDENTIFIER', body: {
       'study': id
-    }})          
+    }})
   }
 
   createStudy(){
@@ -223,7 +223,7 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
       }
     }else{
-      this.ngRedux.dispatch({ type: 'TOGGLE_LOADING' })  
+      this.ngRedux.dispatch({ type: 'TOGGLE_LOADING' })
     }
   }
 
@@ -236,7 +236,7 @@ export class EditorService {
         if(this.currentStudyIdentifier != studyID ){
           this.loadStudy(studyID, false)
         }
-      });  
+      });
     }
   }
 
@@ -253,7 +253,7 @@ export class EditorService {
           'investigationFailed': false
         }})
         this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
-          'info': 'Loading investigation details' 
+          'info': 'Loading investigation details'
         }})
         this.ngRedux.dispatch({ type: 'SET_CONFIGURATION', body: {
           'configuration': study.isaInvestigation.comments
@@ -329,7 +329,9 @@ export class EditorService {
   }
 
   loadStudyFiles(){
-    this.dataService.getStudyFiles(null, true).subscribe(data => {
+    console.log("Loading Study files from static list except first time -")
+    this.dataService.getStudyFilesFetch(false).subscribe(data => {
+      console.log("Got the files list  !")
       this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
         'uploadLocation': data.uploadPath
       }})
@@ -430,7 +432,7 @@ export class EditorService {
       this.files.study.forEach(file => {
         if(file.file.indexOf("s_") == 0 && file.status == 'active'){
           this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
-            'info': 'Loading Samples data' 
+            'info': 'Loading Samples data'
           }})
           samplesExist = true
           this.updateSamples(file.file)
@@ -450,10 +452,10 @@ export class EditorService {
 
   loadStudyAssays(files){
     this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
-      'info': 'Loading assays information' 
+      'info': 'Loading assays information'
     }})
     files.study.forEach(file => {
-      if(file.file.indexOf("a_") == 0 && file.status == 'active'){      
+      if(file.file.indexOf("a_") == 0 && file.status == 'active'){
         this.updateAssay(file.file)
       }
     })
@@ -470,7 +472,7 @@ export class EditorService {
   }
 
   updateAssay(file){
-    this.dataService.getTable(file).subscribe(data => { 
+    this.dataService.getTable(file).subscribe(data => {
       let assay = {}
       assay["name"] = file;
       assay['meta'] = this.extractAssayDetails(assay)
@@ -502,7 +504,7 @@ export class EditorService {
           if(c.header.indexOf("Protocol REF") > -1){
             protocols.push(data['rows'][0][c.header])
           }
-        })  
+        })
       }
       assay['protocols'] = protocols
 
@@ -512,7 +514,7 @@ export class EditorService {
         if(mafFile != "" && mafFiles.indexOf(mafFile) < 0){
           mafFiles.push(mafFile);
         }
-      })    
+      })
       mafFiles.forEach( f => {
         this.updateMAF(f);
       })
@@ -547,7 +549,7 @@ export class EditorService {
 
       let mdisplayedColumns = mcolumns.map( a => { return a.columnDef } )
       mdisplayedColumns.unshift("Select")
-      mdisplayedColumns.sort(function(a, b){  
+      mdisplayedColumns.sort(function(a, b){
         return parseInt(mdata.header[a]) - parseInt(mdata.header[b]);
       });
       mdisplayedColumns = mdisplayedColumns.filter( key => {
@@ -561,7 +563,7 @@ export class EditorService {
       delete mdata['data']
 
       maf['data'] = mdata
-      this.ngRedux.dispatch({ type: 'SET_STUDY_MAF', body: maf});        
+      this.ngRedux.dispatch({ type: 'SET_STUDY_MAF', body: maf});
     })
   }
 
@@ -580,7 +582,7 @@ export class EditorService {
   updateSamples(file){
     let samples = {}
     samples["name"] = file;
-    this.dataService.getTable(file).subscribe(data => { 
+    this.dataService.getTable(file).subscribe(data => {
       let columns = []
       Object.keys(data.header).forEach( key => {
         let fn = "element['"+ key +"']"
@@ -593,7 +595,7 @@ export class EditorService {
       })
       let displayedColumns = columns.map( a => { return a.columnDef } )
       displayedColumns.unshift("Select")
-      displayedColumns.sort(function(a, b){  
+      displayedColumns.sort(function(a, b){
         return parseInt(data.header[a]) - parseInt(data.header[b]);
       });
       var index = displayedColumns.indexOf("Source Name");
@@ -614,7 +616,7 @@ export class EditorService {
         displayedColumns.splice(displayedColumns.indexOf('Protocol REF'), 1);
         displayedColumns.splice( 1, 0, 'Protocol REF');
       }
-      
+
       if(displayedColumns[2] != 'Sample Name'){
         displayedColumns.splice(displayedColumns.indexOf('Sample Name'), 1);
         displayedColumns.splice( 2, 0, 'Sample Name');
@@ -758,9 +760,9 @@ export class EditorService {
 
   // Protocols
   getProtocols(id) {
-    return this.dataService.getProtocols(id).pipe(map( data => { 
+    return this.dataService.getProtocols(id).pipe(map( data => {
       this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: data})
-      return data 
+      return data
     }))
   }
 
@@ -803,7 +805,7 @@ export class EditorService {
     return this.dataService.deleteFactor(factorName)
   }
 
-  // table 
+  // table
   addColumns(filename, body, tableType, metaInfo) {
     return this.dataService.addColumns(filename, body).pipe(map(data => {
       this.updateTableState(filename, tableType, metaInfo)
@@ -848,7 +850,7 @@ export class EditorService {
       return data
     }));
   }
-  
+
   savePublication(body){
     return this.dataService.savePublication(body);
   }

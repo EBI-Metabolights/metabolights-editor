@@ -1,6 +1,6 @@
-<div>
+<p>
 	<mat-form-field>
-		<mat-label>Display Options</mat-label>
+	  	<mat-label>Display Options</mat-label>
 		<mat-select [(value)]="displayOption">
 			<mat-option [value]="'error'">Errors</mat-option>
 			<mat-option [value]="'warning'">Warning</mat-option>
@@ -9,14 +9,15 @@
 			<mat-option [value]="'all'">All</mat-option>
 		</mat-select>
 	</mat-form-field>
-	<div class='is-pulled-right'>
-		<a (click)="refreshValidations()" class="button is-light">
-			<mat-icon>refresh</mat-icon> Refresh
-		</a> 
-	</div>
-	<div>
-		&nbsp;
-	</div>
+<div class='is-pulled-right'>
+  <a (click)="refreshValidations()" class="button is-light">
+    <mat-icon>refresh</mat-icon> Refresh
+  </a>
+</div>
+<br><br>
+<div>
+  &nbsp;
+</div>
 	<span *ngFor="let validation of studyValidation.validations ; let i = index">
 			<nav class="panel">
 				<p class="panel-heading">
@@ -24,21 +25,27 @@
 				</p>
 				<span *ngFor="let detail of validation.details">
 					<span *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
-						<p [ngClass]="[detail.status, 'panel-block']">
+						<a [ngClass]="[detail.status, 'panel-block']">
 					    	<span class="panel-icon">
 					      		<i class="fas fa-book" aria-hidden="true"></i>
 					    	</span>
-							{{ detail.message }}
-							<span *ngIf="curator">
-								&nbsp;
-								<a (click)="overrideValidation(detail)">
-									<mat-icon>info</mat-icon>Override
-								</a> 
-							</span>
-						</p>
+					    	{{ detail.message }}
+							<ng-template [ngIf]="detail.description && detail.status === 'error'">
+								<br>
+								<div class="error">
+								{{ detail.description }}
+							</div>
+							</ng-template>
+              <span *ngIf="curator">
+                &nbsp;
+                <a (click)="overrideValidation(detail)">
+                  <mat-icon>info</mat-icon>Override
+                </a>
+              </span>
+
+						</a>
 					</span>
 				</span>
 			</nav>
 			<span>&nbsp;</span>
 	</span>
-</div>
