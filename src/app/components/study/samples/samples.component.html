@@ -10,10 +10,10 @@
     </span>
   </small>
 </div>
-<!-- 
+<!--
   <div *ngIf="emptySamplesExist" class="notification is-warning">
     <small><mat-icon>info</mat-icon>Empty samples exist in the sample sheet</small>
-  </div> 
+  </div>
 -->
 <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
 	<div class="dropdown" [ngClass]="{'is-active': isFactorDropdownActive}">
@@ -24,8 +24,8 @@
 			<div class="dropdown-content">
 					<span *ngFor="let factor of unSelectedFactors">
 						<a (click)="openAddColumnModal('factor', factor)" class="dropdown-item">
-							{{ factor.factorName }} 
-						</a> 
+							{{ factor.factorName }}
+						</a>
 					</span>
 					<hr class="dropdown-divider">
 				  <mtbls-factor (addFactorToSampleSheet)="openAddColumnModal('factor', $event)" [isDropdown]="true" [value]="null"></mtbls-factor>
@@ -110,11 +110,10 @@
               <div class="control">
                 <mat-form-field class="full-width">
                   <mat-label>{{ validation['samples'].label }}</mat-label>
-                  <textarea class="no-scroll" 
+                  <textarea class="no-scroll"
                   formControlName="samples"
                   matInput
-                  (blur)="formatSampleNames()"
-                  [placeholder]="validation['samples'].placeholder" 
+                  [placeholder]="validation['samples'].placeholder"
                   cdkAutosizeMinRows="20"
                   cdkAutosizeMaxRows="10"
                   cdkTextareaAutosize>

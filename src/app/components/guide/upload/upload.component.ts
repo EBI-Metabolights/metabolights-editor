@@ -18,7 +18,7 @@ import { EditorService } from './../../../services/editor.service';
   styleUrls: ['./upload.component.css']
 })
 export class RawUploadComponent implements OnInit {
-	
+
 	@select(state => state.status.user) studyUser;
 	@select(state => state.study.identifier) studyIdentifier;
 	@select(state => state.study.files) studyFiles;
@@ -27,16 +27,16 @@ export class RawUploadComponent implements OnInit {
 	files: any = {};
 	isLoading: boolean = false;
 
-	constructor(private ngRedux: NgRedux<IAppState>,  private route: ActivatedRoute, private router: Router, private editorService: EditorService) { 
+	constructor(private ngRedux: NgRedux<IAppState>,  private route: ActivatedRoute, private router: Router, private editorService: EditorService) {
 		this.editorService.initialiseStudy(this.route)
-	    this.studyUser.subscribe(value => { 
+	    this.studyUser.subscribe(value => {
 	      this.user = value;
 	      this.user.checked = true;
 	    });
-	    this.studyIdentifier.subscribe(value => { 
+	    this.studyIdentifier.subscribe(value => {
 	      this.requestedStudy = value;
 	    });
-	    this.studyFiles.subscribe(value => { 
+	    this.studyFiles.subscribe(value => {
 	      this.files = value;
 	    });
 	}
@@ -52,7 +52,7 @@ export class RawUploadComponent implements OnInit {
   	}
 
   	refreshFiles(){
-  		this.editorService.loadStudyFiles();
+  		this.editorService.loadStudyFiles(true);
   	}
 
   	copyFilesAndProceed(){

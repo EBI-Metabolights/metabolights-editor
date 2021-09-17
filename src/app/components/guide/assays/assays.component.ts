@@ -6,7 +6,7 @@ import { select } from '@angular-redux/store';
 import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
 import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
-import { tassign } from 'tassign'; 
+import { tassign } from 'tassign';
 import { SamplesComponent } from './../../study/samples/samples.component';
 
 @Component({
@@ -16,10 +16,10 @@ import { SamplesComponent } from './../../study/samples/samples.component';
 })
 export class GuidedAssaysComponent implements OnInit {
 
-	@select(state => state.study.identifier) studyIdentifier; 
-	@select(state => state.study.files) studyFiles; 
-	@select(state => state.study.assays) studyAssays; 
-	@select(state => state.study.samples) studySamples; 
+	@select(state => state.study.identifier) studyIdentifier;
+	@select(state => state.study.files) studyFiles;
+	@select(state => state.study.assays) studyAssays;
+	@select(state => state.study.samples) studySamples;
 
 	@ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
@@ -40,36 +40,36 @@ export class GuidedAssaysComponent implements OnInit {
 
 	constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router) {
 		this.editorService.initialiseStudy(this.route)
-		this.studyIdentifier.subscribe(value => { 
+		this.studyIdentifier.subscribe(value => {
 			if(value != null){
 				this.requestedStudy = value
 			}
 		});
-		this.studyFiles.subscribe(value => { 
+		this.studyFiles.subscribe(value => {
 			if(value != null){
 				this.files = value
 			}else{
-				this.editorService.loadStudyFiles()
+				this.editorService.loadStudyFiles(false)
 			}
 		});
-		this.studyAssays.subscribe(value => { 
+		this.studyAssays.subscribe(value => {
 			this.assays = Object.values(value)
 			if(this.assays.length > 0){
 				this.assays.sort(function(a, b){
 				    if(a.name < b.name) { return -1; }
 				    if(a.name > b.name) { return 1; }
 				    return 0;
-				})	
+				})
 			}
 		});
-		this.studySamples.subscribe(value => { 
+		this.studySamples.subscribe(value => {
 			this.samples = value
 		});
 	}
 
 	ngOnInit() {
 	}
-	
+
 	deleteSelectedAssay(name){
 		Swal.fire({
 		  	title: "Are you sure?",
@@ -233,9 +233,9 @@ export class GuidedAssaysComponent implements OnInit {
 		        characteristicsCount = characteristicsCount+1
 		    }
 		})
-		
+
 		let protocolRefIndex = this.samples.data.header['Protocol REF']
-		
+
 		let columns = []
 		let characteristicsColumn = new MTBLSColumn("Characteristics[Sample type]", '', protocolRefIndex);
 		let characteristicsSourceColumn = new MTBLSColumn("Term Source REF", '', protocolRefIndex+1);
@@ -290,7 +290,7 @@ export class GuidedAssaysComponent implements OnInit {
 
 	extractAssayInfo(reloadFiles){
 		if(reloadFiles){
-			this.editorService.loadStudyFiles();
+			this.editorService.loadStudyFiles(true);
 		}else{
 			this.editorService.loadStudyAssays(this.files);
 		}

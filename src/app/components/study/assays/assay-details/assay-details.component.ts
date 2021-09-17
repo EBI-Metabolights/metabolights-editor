@@ -35,9 +35,9 @@ export class AssayDetailsComponent implements OnInit {
   duplicateSampleNamesInAssay: any = []
 
   @Output() assayDelete = new EventEmitter<any>();
-  
+
   constructor(private editorService: EditorService) {
-    this.readonly.subscribe(value => { 
+    this.readonly.subscribe(value => {
 			if(value != null){
 				this.isReadOnly = value
 			}
@@ -45,10 +45,10 @@ export class AssayDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.assays.subscribe(value => { 
+    this.assays.subscribe(value => {
       this.assay = value[this.assayName];
     });
-    this.studySamples.subscribe(value => { 
+    this.studySamples.subscribe(value => {
       this.sampleNames = value.data.rows.map( r => r['Sample Name'])
       this.filteredSampleNames = this.sampleNames
     });
@@ -120,7 +120,7 @@ export class AssayDetailsComponent implements OnInit {
       if (willDelete.value) {
         this.editorService.deleteAssay(name).subscribe( resp => {
           this.assayDelete.emit(name)
-          this.editorService.loadStudyFiles();
+          this.editorService.loadStudyFiles(true);
           Swal.fire({
             title: 'Assay deleted!',
             text: '',

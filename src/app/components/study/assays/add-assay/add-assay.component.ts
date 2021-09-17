@@ -15,7 +15,7 @@ import { DOIService } from '../../../../services/publications/doi.service';
 import { EuropePMCService } from '../../../../services/publications/europePMC.service';
 import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
-import { tassign } from 'tassign'; 
+import { tassign } from 'tassign';
 
 @Component({
 	selector: 'add-assay',
@@ -23,8 +23,8 @@ import { tassign } from 'tassign';
 	styleUrls: ['./add-assay.component.css']
 })
 export class AddAssayComponent implements OnInit {
-	@select(state => state.study.identifier) studyIdentifier; 
-	@select(state => state.study.validations) studyValidations; 
+	@select(state => state.study.identifier) studyIdentifier;
+	@select(state => state.study.validations) studyValidations;
 
 	requestedStudy: string = null;
 	validations: any = null;
@@ -40,16 +40,16 @@ export class AddAssayComponent implements OnInit {
 	assaySetup : any = null;
 
 	constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router) {
-		this.studyIdentifier.subscribe(value => { 
+		this.studyIdentifier.subscribe(value => {
 			if(value != null){
 				this.requestedStudy = value
 			}
 		});
-		this.studyValidations.subscribe(value => { 
+		this.studyValidations.subscribe(value => {
 			if(value){
 				this.validations = value;
 	      		this.assaySetup = value['assays']['assaySetup']
-			}	      
+			}
 	    });
 	}
 
@@ -61,7 +61,7 @@ export class AddAssayComponent implements OnInit {
 	}
 
 	closeAddAssayModal(){
-		this.isAddAssayModalOpen = false;	
+		this.isAddAssayModalOpen = false;
 	}
 
 	assayTechnologyChange(){
@@ -121,8 +121,8 @@ export class AddAssayComponent implements OnInit {
 	}
 
 	addAssay(){
-		let body = { 
-			"assay": {        
+		let body = {
+			"assay": {
 				"type": this.selectedAssayVariantOption.template,
 				"columns": []
 			}
@@ -143,7 +143,7 @@ export class AddAssayComponent implements OnInit {
 			this.selectedAssayVariantOption = null;
 			this.selectedAssayVariantColumnOption = []
 			this.isAddAssayModalOpen = false;
-			this.editorService.loadStudyFiles();
+			this.editorService.loadStudyFiles(true);
 			this.editorService.loadStudyProtocols();
 			Swal.fire({
 				title: 'Assay added!',
