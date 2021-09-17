@@ -291,7 +291,7 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: {
           'protocols': study.isaInvestigation.studies[0].protocols
         }})
-        this.loadStudyFiles()
+        this.loadStudyFiles(false)
         if(!readonly){
           this.validateStudy()
           this.ngRedux.dispatch({ type: 'SET_STUDY_READONLY', body: {
@@ -309,7 +309,7 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'SET_STUDY_ERROR', body: {
           'investigationFailed': true
         }})
-        this.loadStudyFiles()
+        this.loadStudyFiles(false)
         if(!readonly){
           this.validateStudy()
         }
@@ -328,9 +328,10 @@ export class EditorService {
     })
   }
 
-  loadStudyFiles(){
-    console.log("Loading Study files from static list except first time -")
-    this.dataService.getStudyFilesFetch(false).subscribe(data => {
+  loadStudyFiles(fource){
+    console.log("Loading Study files..")
+    console.log("Force files list calculation - "+fource)
+    this.dataService.getStudyFilesFetch(fource).subscribe(data => {
       console.log("Got the files list  !")
       this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
         'uploadLocation': data.uploadPath
@@ -426,7 +427,7 @@ export class EditorService {
 
   loadStudySamples(){
     if(this.files == null){
-      this.loadStudyFiles()
+      this.loadStudyFiles(false)
     }else{
       let samplesExist =false
       this.files.study.forEach(file => {
@@ -658,13 +659,13 @@ export class EditorService {
 
   copyStudyFiles(){
     return this.dataService.copyFiles().pipe( map( () => {
-      return this.loadStudyFiles()
+      return this.loadStudyFiles(true)
     }))
   }
 
   syncStudyFiles(data){
     return this.dataService.syncFiles(data).pipe( map( () => {
-      return this.loadStudyFiles()
+      return this.loadStudyFiles(true)
     }))
   }
 

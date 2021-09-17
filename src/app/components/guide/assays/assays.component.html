@@ -116,7 +116,7 @@
 							</ul>
 						</div>
 					</div>
-				</div>	
+				</div>
 				<div>
 					<span *ngIf="subStep == 1">
 						<div class="panel-block bg-white p2">
@@ -144,15 +144,14 @@
 									<div class="field is-fullwidth">
 										<mat-form-field floatLabel="always" class="full-width">
 											<mat-label>Add names for experimental controls (for example blank, QC, pooled sample). <mat-icon>edit</mat-icon></mat-label>
-											<textarea class="no-scroll" 
+											<textarea class="no-scroll"
 											matInput
 											[(ngModel)]="controlsNames"
-											(blur)="formatSampleNames('controls')"
-											[placeholder]="'Please add names in list or comma separated format.'" 
+											[placeholder]="'Please add names in list or comma separated format.'"
 											cdkAutosizeMinRows="20"
 											cdkAutosizeMaxRows="10"
 											cdkTextareaAutosize></textarea>
-										</mat-form-field> 
+										</mat-form-field>
 									</div>
 								</div>
 							</div>
@@ -173,15 +172,14 @@
 									<div class="field is-fullwidth">
 										<mat-form-field floatLabel="always" class="full-width">
 											<mat-label>Add sample names <mat-icon>edit</mat-icon></mat-label>
-											<textarea class="no-scroll" 
+											<textarea class="no-scroll"
 											matInput
 											[(ngModel)]="samplesNames"
-											(blur)="formatSampleNames('samples')"
-											[placeholder]="'Please add names in list or comma separated format.'" 
+											[placeholder]="'Please add names in list or comma separated format.'"
 											cdkAutosizeMinRows="20"
 											cdkAutosizeMaxRows="10"
 											cdkTextareaAutosize></textarea>
-										</mat-form-field> 
+										</mat-form-field>
 									</div>
 								</div>
 							</div>
@@ -192,7 +190,7 @@
 							</button>
 							<button (click)='saveSamples()' class="button is-success is-fullwidth">
 								<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-							</button>							
+							</button>
 						</div>
 					</span>
 					<span *ngIf="subStep == 4">
@@ -209,7 +207,7 @@
 							</button>
 							<button (click)='changeSubStep(6)' class="button is-success is-fullwidth">
 								<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-							</button>	
+							</button>
 						</div>
 					</span>
 					<span *ngIf="subStep == 6">
@@ -226,7 +224,7 @@
 							</button>
 							<button (click)='changeSubStep(5)' class="button is-success is-fullwidth">
 								<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-							</button>							
+							</button>
 						</div>
 					</span>
 					<span *ngIf="subStep == 5">
@@ -240,7 +238,7 @@
 						<div class="panel-block">
 							<button (click)='closeEditAssayModal()' class="button is-default is-fullwidth">
 								<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
-							</button>							
+							</button>
 						</div>
 					</span>
 				</div>
