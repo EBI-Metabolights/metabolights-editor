@@ -5,7 +5,7 @@
 		</span>
 	</span>
 	<span class="column is-6 fadeIn has-text-right nmrl">
-		<mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
+		<mat-paginator [pageSize]="50" [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
 	</span>
 </div>
 <div *ngIf="!isReadOnly" class="my-2">
