@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FtpComponent } from './ftp.component';
+import { FTPComponent } from './ftp.component';
 
 describe('FtpComponent', () => {
-  let component: FtpComponent;
-  let fixture: ComponentFixture<FtpComponent>;
+  let component: FTPComponent;
+  let fixture: ComponentFixture<FTPComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FtpComponent ]
+      declarations: [ FTPComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FtpComponent);
+    fixture = TestBed.createComponent(FTPComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
