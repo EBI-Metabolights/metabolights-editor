@@ -10,7 +10,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EditorService } from 'src/app/services/editor.service';
 import { MockEditorService } from 'src/app/services/editor.service.mock';
 
-fdescribe('StudyComponent', () => {
+describe('StudyComponent', () => {
   let component: StudyComponent;
   let fixture: ComponentFixture<StudyComponent>;
   let editorService: EditorService;

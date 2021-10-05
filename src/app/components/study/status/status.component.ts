@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { ActivatedRoute } from '@angular/router';
 import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-status',
@@ -29,6 +30,12 @@ export class StatusComponent implements OnInit {
 	
 
 	constructor(private editorService: EditorService, private route: ActivatedRoute){ 
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyStatus.subscribe(value => { 
 			if(value != null){
 				this.status = value

@@ -37,5 +37,9 @@ export class MockEditorService {
         return null;
     }
 
+    loadGuides() {
+        return null;
+    }
+
 
 }

@@ -5,6 +5,7 @@ import { EditorService } from '../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ValidateStudyTitle } from './title.validator';
 import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-title',
@@ -30,6 +31,12 @@ export class TitleComponent implements OnInit {
   isModalOpen: boolean = false;
 
   constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
+    if (!environment.isTesting){
+      this.setUpSubscriptions();
+    }
+  }
+
+  setUpSubscriptions() {
     this.studyTitle.subscribe(value => { 
       if(value == ''){
         this.title = 'Please add your study title here';
