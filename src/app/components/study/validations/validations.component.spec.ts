@@ -1,5 +1,5 @@
 import { NgRedux } from '@angular-redux/store';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -10,7 +10,7 @@ import { MockEditorService } from 'src/app/services/editor.service.mock';
 
 import { ValidationsComponent } from './validations.component';
 
-fdescribe('ValidationsComponent', () => {
+describe('ValidationsComponent', () => {
   let component: ValidationsComponent;
   let fixture: ComponentFixture<ValidationsComponent>;
   let editorService: EditorService;
@@ -18,7 +18,7 @@ fdescribe('ValidationsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ ValidationsComponent ],
-      imports: [RouterTestingModule, HttpClientModule],
+      imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [{provide: EditorService, useClass: MockEditorService}, NgRedux]
     })
     .compileComponents();

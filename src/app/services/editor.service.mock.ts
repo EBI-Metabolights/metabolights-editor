@@ -33,4 +33,9 @@ export class MockEditorService {
         return {success: "Validation 'val' stored in the database"};
     }
 
+    initialiseStudy(route) {
+        return null;
+    }
+
+
 }
