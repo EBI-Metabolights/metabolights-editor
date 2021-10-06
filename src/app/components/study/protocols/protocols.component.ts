@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
 import { EditorService } from '../../../services/editor.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-protocols',
@@ -34,6 +35,13 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 		this.defaultProtocols = []
 		this.protocols = []
 
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+
+	}
+
+	setUpSubscriptions() {
 		this.studyReadonly.subscribe(value => { 
 			if(value != null){
 				this.isStudyReadOnly = value
