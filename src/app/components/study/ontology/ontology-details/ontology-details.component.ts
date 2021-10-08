@@ -9,7 +9,7 @@ import { EditorService } from '../../../../services/editor.service';
 })
 export class OntologyDetailsComponent implements OnInit {
 
-    @Input('value') value: Ontology;
+    @Input(/*'value'*/) value: Ontology;
     details: any = null;
     isModalOpen: boolean = false;
     isLoading: boolean = false;
