@@ -41,5 +41,17 @@ export class MockEditorService {
         return null;
     }
 
+    getStudyPrivateFolderAccess() {
+        return {
+            access: 'Write'
+        }
+    }
+
+    toggleFolderAccess() {
+        return {
+            access: 'Write'
+        }
+    }
+
 
 }
