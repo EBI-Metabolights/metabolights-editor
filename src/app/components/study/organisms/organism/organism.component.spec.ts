@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { OrganismComponent } from './organism.component';
 
-describe('OrganismComponent', () => {
+fdescribe('OrganismComponent', () => {
   let component: OrganismComponent;
   let fixture: ComponentFixture<OrganismComponent>;
 
@@ -16,6 +16,17 @@ describe('OrganismComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(OrganismComponent);
     component = fixture.componentInstance;
+    component.organism = {
+      name: 'organism',
+      variants: [
+        'var1',
+        'another variant'
+      ],
+      parts: [
+        'leaves',
+        'feet'
+      ]
+    }
     fixture.detectChanges();
   });
 
