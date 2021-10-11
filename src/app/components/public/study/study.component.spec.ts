@@ -12,7 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
 import { MockLabsWorkspaceService } from 'src/app/services/labs-workspace.service.mock';
 
-fdescribe('StudyComponent', () => {
+describe('StudyComponent', () => {
   let component: PublicStudyComponent;
   let fixture: ComponentFixture<PublicStudyComponent>;
   let editorService: EditorService;
