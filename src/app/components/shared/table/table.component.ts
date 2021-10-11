@@ -13,6 +13,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { ClipboardService } from 'ngx-clipboard';
 import * as toastr from 'toastr';
 import { tassign } from 'tassign'; 
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-table',
@@ -98,19 +99,25 @@ export class TableComponent implements OnInit, AfterViewChecked {
 	constructor(private _clipboardService: ClipboardService, private fb: FormBuilder, private editorService: EditorService) { }
 
 	ngOnInit() {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyValidations.subscribe(value => { 
-	      	this.validations = value;
-	    });
-	    this.studyFiles.subscribe(value => { 
-	      	if(value){
-				this.files = value.study;
-			}
-		});
-		this.readonly.subscribe(value => { 
-			if(value != null){
-				this.isReadOnly = value
-			}
-		});
+			this.validations = value;
+	  });
+	  this.studyFiles.subscribe(value => { 
+			if(value){
+			  this.files = value.study;
+		  }
+	  });
+	  this.readonly.subscribe(value => { 
+		  if(value != null){
+			  this.isReadOnly = value
+		  }
+	  });
 	}
 
 	getFiles(header){

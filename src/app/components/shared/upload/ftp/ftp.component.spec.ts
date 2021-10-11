@@ -7,7 +7,7 @@ import { MockMetabolightsService } from 'src/app/services/metabolights/metabolig
 
 import { FTPComponent } from './ftp.component';
 
-fdescribe('FtpComponent', () => {
+describe('FtpComponent', () => {
   let component: FTPComponent;
   let fixture: ComponentFixture<FTPComponent>;
 
