@@ -8,7 +8,7 @@ import { MockMetabolightsService } from 'src/app/services/metabolights/metabolig
 
 import { DownloadComponent } from './download.component';
 
-fdescribe('DownloadComponent', () => {
+describe('DownloadComponent', () => {
   let component: DownloadComponent;
   let metabolightsService: MetabolightsService;
   let fixture: ComponentFixture<DownloadComponent>;

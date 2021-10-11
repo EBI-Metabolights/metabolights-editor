@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 declare var AW4: any;
 
 @Component({
@@ -33,6 +34,12 @@ export class AsperaDownloadComponent implements OnInit {
   asperaWeb: any = null
 
   ngOnInit() {
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
+  }
+
+  setUpSubscriptions() {
     this.validations.subscribe(value => { 
 			this.validation = value[this.validationsId]
     })
