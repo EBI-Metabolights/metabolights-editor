@@ -1,6 +1,7 @@
 import { IAppState } from './../../../../store';
 import { Component, OnInit } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-page-not-found',
@@ -12,7 +13,9 @@ export class PageNotFoundComponent implements OnInit {
   constructor(private ngRedux: NgRedux<IAppState>) { }
 
   ngOnInit() {
-  	this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+    if (!environment.isTesting) {
+      this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+    }
   }
 
 }

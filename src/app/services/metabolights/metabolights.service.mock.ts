@@ -12,4 +12,8 @@ export class MockMetabolightsService {
             }
         })
     }
+
+    getDownloadLink(name, code) {
+        return of('download.link')
+    }
 }
