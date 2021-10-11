@@ -1,14 +1,40 @@
+import { NgRedux } from '@angular-redux/store';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgModuleFactoryLoader, Compiler, Injector, Optional } from '@angular/core';
+import { Router, UrlSerializer, ChildrenOutletContexts, ROUTES, ROUTER_CONFIGURATION, UrlHandlingStrategy, RouteReuseStrategy } from '@angular/router';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule, setupTestingRouter } from '@angular/router/testing';
+import { EditorService } from 'src/app/services/editor.service';
+import { MockEditorService } from 'src/app/services/editor.service.mock';
 import { PublicStudyComponent } from './study.component';
+import { SpyLocation } from '@angular/common/testing';
+import { HttpClientModule } from '@angular/common/http';
+import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
+import { MockLabsWorkspaceService } from 'src/app/services/labs-workspace.service.mock';
 
-describe('StudyComponent', () => {
+fdescribe('StudyComponent', () => {
   let component: PublicStudyComponent;
   let fixture: ComponentFixture<PublicStudyComponent>;
+  let editorService: EditorService;
+  let labsWorkspaceService: LabsWorkspaceService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PublicStudyComponent ]
+      declarations: [ PublicStudyComponent ],
+      imports: [ RouterTestingModule, HttpClientTestingModule,],
+      providers: [NgRedux,{
+        provide: Router,
+        useFactory: setupTestingRouter,
+        deps: [
+          UrlSerializer, ChildrenOutletContexts, Location, NgModuleFactoryLoader, Compiler, Injector,
+          ROUTES, ROUTER_CONFIGURATION, [UrlHandlingStrategy, new Optional()],
+          [RouteReuseStrategy, new Optional()]
+        ]
+      },
+      { provide: Location, useClass: SpyLocation },
+      { provide: EditorService, useClass: MockEditorService },
+      { provide: LabsWorkspaceService, useClass: MockLabsWorkspaceService},
+      HttpClientModule]
     })
     .compileComponents();
   }));
@@ -16,6 +42,9 @@ describe('StudyComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PublicStudyComponent);
     component = fixture.componentInstance;
+    editorService = TestBed.inject(EditorService);
+    labsWorkspaceService = TestBed.inject(LabsWorkspaceService);
+
     fixture.detectChanges();
   });
 
