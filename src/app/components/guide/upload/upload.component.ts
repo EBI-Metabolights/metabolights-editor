@@ -11,6 +11,7 @@ import * as toastr from 'toastr';
 import {Router} from "@angular/router";
 
 import { EditorService } from './../../../services/editor.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'raw-upload',
@@ -29,16 +30,22 @@ export class RawUploadComponent implements OnInit {
 
 	constructor(private ngRedux: NgRedux<IAppState>,  private route: ActivatedRoute, private router: Router, private editorService: EditorService) {
 		this.editorService.initialiseStudy(this.route)
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 	    this.studyUser.subscribe(value => {
-	      this.user = value;
-	      this.user.checked = true;
-	    });
-	    this.studyIdentifier.subscribe(value => {
-	      this.requestedStudy = value;
-	    });
-	    this.studyFiles.subscribe(value => {
-	      this.files = value;
-	    });
+			this.user = value;
+			this.user.checked = true;
+		  });
+		  this.studyIdentifier.subscribe(value => {
+			this.requestedStudy = value;
+		  });
+		  this.studyFiles.subscribe(value => {
+			this.files = value;
+		  });
 	}
 
   	ngOnInit() {

@@ -6,6 +6,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { Router } from '@angular/router';
 import { MetaboLightsWSURL } from './../../../services/globals';
 import { ActivatedRoute } from "@angular/router";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-guides',
@@ -36,34 +37,43 @@ export class GuidesComponent implements OnInit {
   constructor(private fb: FormBuilder, private ngRedux: NgRedux<IAppState>, public router: Router, private editorService: EditorService, private route: ActivatedRoute){}
 
   ngOnInit(): void {
-  	this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
     this.domain = MetaboLightsWSURL['domain']
     this.repo = MetaboLightsWSURL['guides']	
 
+
+  }
+
+  setUpSubscriptions() {
+    this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+
     this.mappings.subscribe(value => { 
-        if(value != null){
-            this.languageMappings = value
-        }
-    });
+      if(value != null){
+          this.languageMappings = value
+      }
+  });
 
-    this.guides.subscribe(value => { 
-        if(value != null){
-            this.guidesSelected = value
-            this.tabs = Object.keys(this.guidesSelected)
-            this.tab = this.route.snapshot.paramMap.get("tab")
-            if(this.tabs.indexOf(this.tab) > -1){
-              this.setSelectedTab(this.tab)
-            }else{
-              this.setSelectedTab( this.tabs[0])
-            }
-        }
-    });
+  this.guides.subscribe(value => { 
+      if(value != null){
+          this.guidesSelected = value
+          this.tabs = Object.keys(this.guidesSelected)
+          this.tab = this.route.snapshot.paramMap.get("tab")
+          if(this.tabs.indexOf(this.tab) > -1){
+            this.setSelectedTab(this.tab)
+          }else{
+            this.setSelectedTab( this.tabs[0])
+          }
+      }
+  });
 
-    this.selectedLanguage.subscribe(value => { 
-        if(value != null){
-            this.languageSelected = value
-        }
-    });
+  this.selectedLanguage.subscribe(value => { 
+      if(value != null){
+          this.languageSelected = value
+      }
+  });
   }
 
   open(image: string): void {

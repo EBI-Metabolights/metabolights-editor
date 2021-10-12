@@ -4,7 +4,7 @@ import { TestBed, async } from '@angular/core/testing';
 
 import { LabsWorkspaceService } from './labs-workspace.service';
 
-fdescribe('LabsWorkspaceService', () => {
+describe('LabsWorkspaceService', () => {
   let httpClientSpy: { get: jasmine.Spy };
   let service: LabsWorkspaceService;
   let httpTestingController: HttpTestingController;
