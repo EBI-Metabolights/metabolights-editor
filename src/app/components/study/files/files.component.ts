@@ -402,7 +402,7 @@ export class FilesComponent implements OnInit {
         this.filesLoading = false;
         this.refreshingData = false;
 
-        data.study.forEach( file => {
+        data.study?.forEach( file => {
             if(file.type == 'raw' || file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
                 this.rawFiles.push(file)
                 this.filteredRawFiles.push(file)

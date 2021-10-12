@@ -6,10 +6,13 @@ export class MockMetabolightsService {
     id: string;
 
     getStudyFilesFetch(bool: true) {
+        let obj = { 
+            study: [],
+            latest: 'latest'
+        }
+
         return of({
-            study: {
-                type: 'raw'
-            }
+            obj
         })
     }
 
