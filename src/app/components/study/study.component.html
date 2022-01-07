@@ -34,6 +34,22 @@
 	</div>
 
 	<div class="main-wrapper" [ngClass]="{'smt': status != 'Submitted'}">
+    <div style="margin: 20px">
+      <article class="message is-small has-shadow">
+        <div (click)="toggleMessage()" class="message-header">
+          <p><span class="material-icons">info</span>&nbsp;Technical support unavailable  for the period : <b>22nd December 2021 to 5th January 2022.</b></p>
+          <button *ngIf="!messageExpanded" style="background-color: transparent; border: 0">
+            <span class="material-icons">keyboard_arrow_down</span>
+          </button>
+          <button *ngIf="messageExpanded" style="background-color: transparent; border: 0">
+            <span class="material-icons">keyboard_arrow_up</span>
+          </button>
+        </div>
+        <div *ngIf="messageExpanded" class="message-body">
+          From the <b> 22nd December 2021  </b> through to the <b> 5th of January 2022</b>, the metabolomics team will be on leave. We will respond to any enquiries after that time.
+        </div>
+      </article>
+    </div>
 		<div style="margin: 20px">
 			<article class="message is-small has-shadow">
 				<div (click)="toggleMessage()" class="message-header">
@@ -72,7 +88,7 @@
 	      </div>
 	      <span *ngIf="!studyError">
 			<mtbls-title></mtbls-title>
-			<mtbls-people></mtbls-people> 
+			<mtbls-people></mtbls-people>
 			<mtbls-description></mtbls-description>
 			<mtbls-organisms></mtbls-organisms>
 			<mtbls-publications></mtbls-publications>
@@ -98,8 +114,8 @@
 					<span *ngIf="!studyError">
 						<div class="tab-content fadeIn animated" *ngIf="(currentIndex | async) == 0">
 						<mtbls-design-descriptors></mtbls-design-descriptors>
-						<br>  
-						<mtbls-factors></mtbls-factors>  
+						<br>
+						<mtbls-factors></mtbls-factors>
 						</div>
 					</span>
 					<span *ngIf="!studyError">
@@ -124,7 +140,7 @@
 		            </div>
 		          </div>
 		        </div>
-		      </div>        
+		      </div>
 		    </div>
 		  </div>
 	    </span>

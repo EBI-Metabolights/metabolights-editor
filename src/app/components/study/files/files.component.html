@@ -7,11 +7,15 @@
   </div>
 </span>
 <ng-template #showContent>
+  <div class="notification is-warning">
+    <small><mat-icon>info</mat-icon>  From the <b> 22nd December 2021  </b> through to the <b> 5th of January 2022</b>, the metabolomics team will be on leave. We will respond to any enquiries after that time.
+    </small>
+  </div>
   <span *ngIf="!isReadOnly">
     <mtbls-upload  [type]="'any'" [multiple]="true" [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" ></mtbls-upload>&nbsp;
     <a (click)="loadFilesPassively()" class="button is-light">
       <mat-icon>refresh</mat-icon> Refresh
-    </a> 
+    </a>
     <span>
       <span *ngIf="refreshingData">
         <img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
@@ -20,10 +24,10 @@
     <span *ngIf="curator" class="is-pulled-right">
         <a *ngIf="access == 'Read'" (click)="toggleFolderAccess()" class="button is-light">
             <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
-        </a> 
+        </a>
         <a *ngIf="access == 'Write'" (click)="toggleFolderAccess()" class="button is-light">
             <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
-        </a> 
+        </a>
     </span>
   </span>
   <span *ngIf="status == 'Public'">
@@ -40,8 +44,8 @@
       <span class="is-pulled-right">
         <mtbls-download [value]="selectedDownloadFiles()"></mtbls-download>
       </span>
-      <span  *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
-        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete files</small>   
+      <span  *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete files</small>
       </span>
     </p>
     <div class="panel-block">
@@ -106,11 +110,11 @@
         <label>
           <small>RAW / DERIVED FILES</small>
         </label>
-        <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right"> 
+        <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
               <small (click)="decompresssFiles(selectedRawFiles)" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip files</small>&nbsp;
           </span>
-          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>
         </span>
       </p>
       <div class="panel-block">
@@ -151,8 +155,8 @@
       <label>
         <input [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length" (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>DERIVED DATA</small>
       </label>
-      <span  *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
-        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+      <span  *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>
       </span>
     </p>
     <div class="panel-block">
@@ -210,8 +214,8 @@
             <mat-icon>refresh</mat-icon> Copy files to study folder
           </a>
         </span>
-        <span  *ngIf="selectedUploadFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
-          <small (click)="openDeleteConfirmation('upload', 'upload')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+        <span  *ngIf="selectedUploadFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+          <small (click)="openDeleteConfirmation('upload', 'upload')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>
         </span>
     </p>
     <div class="panel-block">
@@ -238,7 +242,7 @@
                   </ng-template>
                 </span>
                 {{ file.file }}
-              </label> 
+              </label>
             </div>
             <div class="column is-one-fifths has-text-right">
               <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>

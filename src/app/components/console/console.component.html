@@ -3,6 +3,20 @@
 <div class="columns" style="min-height: 100vh; margin: 60px 0;">
 	<div class="column is-8 is-offset-2">
 		<div style="margin: 0 0 20px 0">
+      <article class="message is-small has-shadow">
+        <div (click)="toggleMessage()" class="message-header">
+          <p><span class="material-icons">info</span>&nbsp;Technical support unavailable  for the period : <b>22nd December 2021 to 5th January 2022.</b></p>
+          <button *ngIf="!messageExpanded" style="background-color: transparent; border: 0">
+            <span class="material-icons">keyboard_arrow_down</span>
+          </button>
+          <button *ngIf="messageExpanded" style="background-color: transparent; border: 0">
+            <span class="material-icons">keyboard_arrow_up</span>
+          </button>
+        </div>
+        <div *ngIf="messageExpanded" class="message-body">
+          From the <b> 22nd December 2021  </b> through to the <b> 5th of January 2022</b>, the metabolomics team will be on leave. We will respond to any enquiries after that time.
+        </div>
+      </article>
 			<article class="message is-small has-shadow">
 				<div (click)="toggleMessage()" class="message-header">
 					<p><span class="material-icons">info</span>&nbsp;We're experiencing longer than usual review times</p>
@@ -50,7 +64,7 @@
 								<ng-template #noStudyTitle>
 									{{ study.title }}
 								</ng-template>
-							</b></h2>	
+							</b></h2>
 							<div id="meta" class="field is-grouped is-grouped-multiline py-1">
 							  <div class="control py-0 mb0">
 							    <div class="tags has-addons">
@@ -63,7 +77,7 @@
 							      <span class="tag">Release date</span>
 							        <span class="tag is-info">{{ study['releaseDate'] }}</span>
 							    </div>
-							  </div> 
+							  </div>
 							</div>
 							<div class="full-width">
 								<p *ngIf="study.description.replace(' ','') != ''" style="padding-bottom: 10px;"><small style="font-size: 0.7em">SUMMARY</small> <br><small [innerHTML]="study.description"></small></p>
@@ -92,7 +106,7 @@
 					</span>
 				</span>
 			</ng-template>
-		</nav>	
+		</nav>
 		<p *ngIf="loadingStudies" class="has-text-centered">
 				<img src="/metabolights/editor/assets/img/loading.svg"> <br>
 			Loading studies
