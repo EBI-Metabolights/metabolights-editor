@@ -7,6 +7,7 @@ export interface IOntology {
     annotationValue: string;
     annotationDefinition: string;
     termSource: IOntologySourceReference;
-    name: string;
+    name?: string;
+    wormsID?: string;
 
 }

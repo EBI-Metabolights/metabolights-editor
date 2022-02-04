@@ -510,8 +510,10 @@ export class EditorService {
       assay['protocols'] = protocols
 
       let mafFiles = []
-      data.rows.forEach( row => {
-        let mafFile = row['Metabolite Assignment File'].replace(/^[ ]+|[ ]+$/g,'')
+      data.data.rows.forEach( row => {
+        // assert that this given value in the row is a string, as we _know_ it can only be a string.
+        let assertedRow = row['Metabolite Assignment File'] as string
+        let mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g,'')
         if(mafFile != "" && mafFiles.indexOf(mafFile) < 0){
           mafFiles.push(mafFile);
         }
@@ -551,7 +553,10 @@ export class EditorService {
       let mdisplayedColumns = mcolumns.map( a => { return a.columnDef } )
       mdisplayedColumns.unshift("Select")
       mdisplayedColumns.sort(function(a, b){
-        return parseInt(mdata.header[a]) - parseInt(mdata.header[b]);
+        // assert that the values are numbers, which they have to be as all header values in maf sheet objects are numbers.
+        let assertA = mdata.header[a] as number;
+        let assertB = mdata.header[b] as number;
+        return assertA - assertB;
       });
       mdisplayedColumns = mdisplayedColumns.filter( key => {
         return (key.indexOf("Term Accession Number") < 0 && key.indexOf("Term Source REF") < 0)
@@ -597,7 +602,10 @@ export class EditorService {
       let displayedColumns = columns.map( a => { return a.columnDef } )
       displayedColumns.unshift("Select")
       displayedColumns.sort(function(a, b){
-        return parseInt(data.header[a]) - parseInt(data.header[b]);
+        // assert that the values are numbers, which they have to be as all header values in sample sheet objects are numbers.
+        let assertA = data.header[a] as number;
+        let assertB = data.header[b] as number;
+        return assertA - assertB;
       });
       var index = displayedColumns.indexOf("Source Name");
       if (index > -1) {
