@@ -1,5 +1,5 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, ViewEncapsulation, ElementRef } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
 import { EditorService } from './services/editor.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { EditorService } from './services/editor.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
-    constructor(private elementRef:ElementRef,  public http: Http, private editorService: EditorService ) {
+    constructor(private elementRef:ElementRef,  public http: HttpClient, private editorService: EditorService ) {
       let jwt = this.elementRef.nativeElement.getAttribute('mtblsjwt')
       let user = this.elementRef.nativeElement.getAttribute('mtblsuser')
 

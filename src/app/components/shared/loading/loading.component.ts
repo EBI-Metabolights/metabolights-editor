@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from '../../.././store';
+import { select } from '@angular-redux/store';
 
 @Component({
   selector: 'mtbls-loading',

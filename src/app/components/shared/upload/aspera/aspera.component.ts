@@ -9,7 +9,7 @@ declare var AW4: any;
   templateUrl: './aspera.component.html',
   styleUrls: ['./aspera.component.css']
 })
-export class AsperaComponent implements OnInit {
+export class AsperaUploadComponent implements OnInit {
 
   @select(state => state.study.uploadLocation) uploadLocation;
 	@select(state => state.study.validations) validations: any;

@@ -4,8 +4,8 @@ import { Router } from "@angular/router";
 import { IAppState } from '../../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { ActivatedRoute } from "@angular/router";
-import { Http } from '@angular/http';
 import { MetaboLightsWSURL } from './../../../services/globals';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'study',
@@ -38,7 +38,7 @@ export class PublicStudyComponent implements OnInit {
   domain: string = "";
   reviewerLink: string = null;
 
-  constructor(private ngRedux: NgRedux<IAppState>, public http: Http, private editorService: EditorService, private router: Router, private route: ActivatedRoute) { 
+  constructor(private ngRedux: NgRedux<IAppState>, public http: HttpClient, private editorService: EditorService, private router: Router, private route: ActivatedRoute) { 
     let isInitialised = this.ngRedux.getState().status['isInitialised']; 
     let ObfuscationCode = localStorage.getItem('obfuscationcode')
     let owner = localStorage.getItem('isOwner');
@@ -63,8 +63,9 @@ export class PublicStudyComponent implements OnInit {
         let mtblsUser = localStorage.getItem('mtblsuser');
         let mtblsJWT = localStorage.getItem('mtblsjwt');
         if(mtblsJWT && mtblsJWT != '' && mtblsUser && mtblsUser != ''){
-          this.http.post("webservice/labs-workspace/initialise", { "jwt" : mtblsJWT, "user" : mtblsUser }).subscribe( res => {
-            localStorage.setItem('user', JSON.stringify(JSON.parse(res.json().content).owner));
+          // typing this as any because the metabolightslabs is up in the air currently
+          this.http.post<any>("webservice/labs-workspace/initialise", { "jwt" : mtblsJWT, "user" : mtblsUser }).subscribe( res => {
+            localStorage.setItem('user', JSON.stringify(JSON.parse(res.content).owner));
             let localUser = localStorage.getItem('user');
             this.editorService.initialise(localUser, false);
             this.loadStudy(null);

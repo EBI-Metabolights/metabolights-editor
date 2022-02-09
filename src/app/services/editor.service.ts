@@ -1,15 +1,13 @@
 import { Injectable } from "@angular/core";
-import { Http } from "@angular/http";
 import { MetabolightsService } from './../services/metabolights/metabolights.service';
 import { AuthService } from './../services/metabolights/auth.service';
 import { DOIService } from './../services/publications/doi.service';
 import { EuropePMCService } from './../services/publications/europePMC.service';
 import { IAppState } from './../store';
 import { NgRedux, select } from '@angular-redux/store';
-import { Router, ActivatedRoute} from "@angular/router";
-import { Observable } from 'rxjs';
+import { Router } from "@angular/router";
 
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { LoginURL, RedirectURL } from './../services/globals';
 import { contentHeaders } from './../services/headers';

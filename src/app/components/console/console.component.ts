@@ -2,8 +2,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { IAppState } from './../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { Component, OnInit } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
 import { EditorService } from '../../services/editor.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
 	selector: 'mtbls-console',
@@ -25,7 +25,7 @@ export class ConsoleComponent implements OnInit{
 
     isConfirmationModalOpen: boolean = false;
 
-    constructor(private route: ActivatedRoute, public router: Router, public http: Http, private ngRedux: NgRedux<IAppState>, private editorService: EditorService) {
+    constructor(private route: ActivatedRoute, public router: Router, public http: HttpClient, private ngRedux: NgRedux<IAppState>, private editorService: EditorService) {
         this.route.queryParams.subscribe(params => {
             if(params['reload']){
                 this.editorService.getAllStudies() 

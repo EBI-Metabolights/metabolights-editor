@@ -1,10 +1,7 @@
-import { environment } from './../../../environments/environment';
 import { catchError, map, tap } from 'rxjs/operators';
 import { DOIWSURL } from './../globals';
-import { contentHeaders } from './../headers';
 import { DataService } from './../data.service';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ICrossRefDOI } from 'src/app/models/mtbl/mtbls/interfaces/crossref-doi.interface';

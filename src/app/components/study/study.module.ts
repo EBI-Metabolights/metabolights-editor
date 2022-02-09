@@ -27,8 +27,8 @@ import { SamplesComponent } from './samples/samples.component';
 import { StatusComponent } from './status/status.component';
 import { TitleComponent } from './title/title.component';
 import { ValidationsComponent } from './validations/validations.component';
-import { ValidationComponent } from './validations/validation/validation.component';
-import {MatExpansionModule} from '@angular/material/expansion';
+import { ValidationDetailComponent } from './validations/validation-detail/validation-detail.component';
+import { MatExpansionModule} from '@angular/material/expansion';
 import { NgReduxModule } from '@angular-redux/store';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -40,6 +40,10 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { SharedModule } from '../shared/shared.module';
 import { HttpClientModule } from '@angular/common/http';
+import { MatButtonModule } from '@angular/material/button';
+import { MatInputModule } from '@angular/material/input';
+import { ValidationDetailCommentComponent } from './validations/validation-detail/validation-detail-comment/validation-detail-comment.component';
+import {MatDividerModule} from '@angular/material/divider';
 
 
 
@@ -73,7 +77,8 @@ import { HttpClientModule } from '@angular/common/http';
     StatusComponent,
     TitleComponent,
     ValidationsComponent,
-    ValidationComponent
+    ValidationDetailComponent,
+    ValidationDetailCommentComponent
 ],
   imports: [
     CommonModule,
@@ -85,10 +90,14 @@ import { HttpClientModule } from '@angular/common/http';
     MatOptionModule,
     MatSelectModule,
     NgReduxModule,
+    FormsModule,
     ReactiveFormsModule,
     RouterModule,
     BrowserAnimationsModule,
     SharedModule,
+    MatButtonModule,
+    MatInputModule,
+    MatDividerModule
 
   ],
   exports: [
@@ -119,7 +128,8 @@ import { HttpClientModule } from '@angular/common/http';
     StatusComponent,
     TitleComponent,
     ValidationsComponent,
-    ValidationComponent
+    ValidationDetailComponent,
+    ValidationDetailCommentComponent
   ]
 })
 export class StudyModule { }

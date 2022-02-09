@@ -1,6 +1,6 @@
 import { IAppState } from './../../../../store';
 import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
+import { NgRedux } from '@angular-redux/store';
 
 @Component({
   selector: 'app-page-not-found',
