@@ -105,7 +105,7 @@ export const failedValidation = {
                   status: "success",
                   metadata_file: "i_Investigation.txt",
                   value: "",
-                  description: "",
+                  description: "The investigation file keeps many secrets from the eyes and ears of men.",
                   val_override: "false",
                   val_message: ""
                 },
@@ -154,10 +154,10 @@ export const failedValidation = {
                   val_message: ""
                 },
                 {
-                  message: "Successfully found one or more factors",
+                  message: "Maybe found one or more factors",
                   section: "basic",
                   val_sequence: "basic_14",
-                  status: "success",
+                  status: "warning",
                   metadata_file: "s_MTBLS1898.txt",
                   value: "",
                   description: "",
@@ -165,15 +165,28 @@ export const failedValidation = {
                   val_message: ""
                 },
                 {
-                  message: "Could not find any descriptors",
+                  message: "File 'QC1_NEG.raw' is missing or not correct for column 'Raw Spectral Data File' (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
                   section: "basic",
                   val_sequence: "basic_16",
                   status: "error",
                   metadata_file: "s_MTBLS1898.txt",
                   value: "",
-                  description: "Make sure there are some descriptors.",
+                  description: "File 'QC1_NEG.raw' does not exist (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
                   val_override: "false",
-                  val_message: ""
+                  val_message: "",
+                  comment: "Grabaogoli"
+                },
+                {
+                  message: "File 'QC1_NEG.raw' is missing or not correct for column 'Raw Spectral Data File' (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
+                  section: "basic",
+                  val_sequence: "basic_17",
+                  status: "error",
+                  metadata_file: "s_MTBLS1898.txt",
+                  value: "",
+                  description: "File 'QC1_NEG.raw' does not exist (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
+                  val_override: "false",
+                  val_message: "",
+                  comment: "Grabaogoli"
                 }
               ],
               message: "Unsuccessful validation",

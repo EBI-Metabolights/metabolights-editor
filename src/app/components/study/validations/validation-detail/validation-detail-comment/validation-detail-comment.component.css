@@ -1,0 +1,15 @@
+.comment-box.curator {
+    width: 100%;
+    padding-top: 5px;
+}
+
+.userbox {
+    font: inherit;
+    padding: 5px;
+    background-color: rgb(253, 253, 253);
+    margin-top: 2%;
+}
+
+.wayward-button {
+    transform: translateY(-14px);
+}

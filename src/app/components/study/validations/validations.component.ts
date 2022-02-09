@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
 import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
+import { failedValidation } from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
 
 @Component({
   selector: 'study-validations',
@@ -13,6 +14,11 @@ export class ValidationsComponent implements OnInit {
   studyValidation: any = null;
   displayOption: string = 'error';
 
+    //dummy variable, remove
+    detail = failedValidation.validations[0].details[6]
+
+  
+
   @select(state => state.study.validation) validation: any
   @select(state => state.status.isCurator) isCurator;
 	curator: boolean = false;
@@ -20,14 +26,15 @@ export class ValidationsComponent implements OnInit {
   constructor(private editorService: EditorService) { }
 
   ngOnInit() {
-  	this.validation.subscribe(value => { 
+    this.studyValidation = failedValidation;
+  	/* this.validation.subscribe(value => { 
         this.studyValidation = value;
     });
     this.isCurator.subscribe(value => { 
 			if(value != null){
 				this.curator = value
 			}
-		});
+		});*/
   }
 
   refreshValidations(){

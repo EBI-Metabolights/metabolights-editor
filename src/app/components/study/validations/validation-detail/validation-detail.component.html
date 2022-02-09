@@ -1,0 +1,34 @@
+  <mat-expansion-panel [ngClass]="[validationDetail.status, 'panel-block']" (opened)="panelOpenState = true"
+                       [disabled]="disabled" (closed)="panelOpenState = false">
+    <mat-expansion-panel-header [ngClass]="{'val-header': hasDescription && validationDetail.status !== success}">
+      <div class="wrapper">
+          <div class="val-message">{{ validationDetail.message }}. 
+            <span class="override" *ngIf="isCurator && validationDetail.status === 'error'">
+            &nbsp;
+            <a (click)="overrideValidation(validationDetail)">
+              <mat-icon>info</mat-icon>Override
+            </a>
+          </span></div>
+
+       <ng-template [ngIf]=" validationDetail.description && (validationDetail.status === 'error' || validationDetail.status == 'warning')">
+ 
+          <div class="val-description">
+          ({{ validationDetail.description }}) <br>
+        </div>
+        </ng-template>
+
+        </div>
+
+    </mat-expansion-panel-header>
+    <mat-divider class="divide-longer"></mat-divider>
+
+      <mat-panel-description>
+      </mat-panel-description>
+
+    <ng-container *ngIf="validationDetail.comment else noComment">
+      <app-validation-detail-comment  [curator]="isCurator" [comment]="validationDetail.comment" (commentSaved)="propagateComment($event)"></app-validation-detail-comment>
+    </ng-container>
+    <ng-template #noComment>
+      <app-validation-detail-comment  [curator]="isCurator" (commentSaved)="propagateComment($event)" ></app-validation-detail-comment>
+    </ng-template>
+  </mat-expansion-panel>
