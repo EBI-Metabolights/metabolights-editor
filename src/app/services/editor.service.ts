@@ -141,6 +141,15 @@ export class EditorService {
     return this.dataService.overrideValidations(data);
   }
 
+  /**
+   * Add a new comment via the DataService
+   * @param data - generic json object containing the new comment.
+   * @returns An observable object from the Data Service indicating the success of the operation.
+   */
+  addComment(data) {
+    return this.dataService.addComment(data);
+  }
+
   loadGuides(){
     this.dataService.getLanguageMappings().subscribe(
       mappings => {

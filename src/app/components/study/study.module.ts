@@ -44,6 +44,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { ValidationDetailCommentComponent } from './validations/validation-detail/validation-detail-comment/validation-detail-comment.component';
 import {MatDividerModule} from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 
 
@@ -97,7 +98,8 @@ import {MatDividerModule} from '@angular/material/divider';
     SharedModule,
     MatButtonModule,
     MatInputModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule
 
   ],
   exports: [

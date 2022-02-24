@@ -26,7 +26,12 @@
 
 		<div *ngFor="let detail of validation.details">
 			<ng-container *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
-				<app-validation-detail [isCurator]="curator" [validationDetail]="detail"></app-validation-detail>
+				<app-validation-detail 
+					matTooltip="Click here to view the comment that a curator has left" 
+					[matTooltipDisabled]="!detail.comment || curator"
+					[matTooltipPosition]="'below'"
+					[isCurator]="curator" 
+					[validationDetail]="detail"></app-validation-detail>
 			</ng-container>
 
 		</div>

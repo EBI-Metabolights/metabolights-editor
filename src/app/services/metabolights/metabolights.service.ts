@@ -66,6 +66,16 @@ export class MetabolightsService extends DataService{
       catchError(this.handleError)
     );
   }
+  /**
+   * Post a new comment for a specific validation to the API.
+   * @param data A generic javascript object containing the comment.
+   * @returns A message indicating the success or lack of thereof of saving the comment, via an Observable.
+   */
+  addComment(data): Observable<{success: string}> {
+    return this.http.post<{success: string}>(this.url.baseURL + "/ebi-internal/" + this.id + "/validate-study/comment", data, {headers: contentHeaders }).pipe(
+      catchError(this.handleError)
+    )
+  }
 
   // Study validation details
   getLanguageMappings() {
