@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-organisms',
@@ -14,6 +15,12 @@ export class OrganismsComponent implements OnInit {
 	constructor() { }
 
 	ngOnInit() {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyOrganisms.subscribe(value => { 
 			this.organisms = []
 			Object.keys(value).forEach(key => {

@@ -14,6 +14,7 @@ import * as toastr from 'toastr';
 import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 
 import { OntologyComponent } from './../../ontology/ontology.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-person',
@@ -67,6 +68,12 @@ export class PersonComponent implements OnInit {
 	validationsId = 'people.person';
 	
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyValidations.subscribe(value => { 
 			this.validations = value;
 		});

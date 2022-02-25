@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
 import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
@@ -8,30 +8,42 @@ import * as toastr from 'toastr';
   templateUrl: './validations.component.html',
   styleUrls: ['./validations.component.css']
 })
-export class ValidationsComponent implements OnInit {
+export class ValidationsComponent implements OnInit, AfterViewInit {
 
   studyValidation: any = null;
   displayOption: string = 'error';
 
+  /**Extraordinary bad practice to have a testing flag, but attempts to mock out the select have failed. The state library itself is also long unmaintained. */
+  isTesting: boolean = false;
+
   @select(state => state.study.validation) validation: any
   @select(state => state.status.isCurator) isCurator;
-	curator: boolean = false;
+  curator: boolean = false;
 
   constructor(private editorService: EditorService) { }
 
   ngOnInit() {
-  	this.validation.subscribe(value => { 
-        this.studyValidation = value;
-    });
-    this.isCurator.subscribe(value => { 
-			if(value != null){
-				this.curator = value
-			}
-		});
+    
   }
 
-  refreshValidations(){
-    this.editorService.refreshValidations().subscribe( res => {
+  ngAfterViewInit() {
+    this.setUpSubscriptions();
+
+  }
+
+  setUpSubscriptions() {
+    this.validation.subscribe(value => {
+      this.studyValidation = value;
+    });
+    this.isCurator.subscribe(value => {
+      if (value != null) {
+        this.curator = value
+      }
+    });
+  }
+
+  refreshValidations() {
+    this.editorService.refreshValidations().subscribe(res => {
       this.editorService.loadValidations()
       toastr.success(res.success, "Success", {
         "timeOut": "2500",
@@ -51,8 +63,8 @@ export class ValidationsComponent implements OnInit {
     });
   }
 
-  overrideValidation(validation){
-    let data = { 
+  overrideValidation(validation) {
+    let data = {
       "validations": []
     }
     let val_seq = validation['val_sequence']
@@ -60,7 +72,7 @@ export class ValidationsComponent implements OnInit {
     let payload = {}
     payload[val_seq] = val_description
     data['validations'].push(payload)
-    this.editorService.overrideValidations(data).subscribe( res => {
+    this.editorService.overrideValidations(data).subscribe(res => {
       toastr.success(res.success, "Successfully overriden the validation", {
         "timeOut": "2500",
         "positionClass": "toast-top-center",

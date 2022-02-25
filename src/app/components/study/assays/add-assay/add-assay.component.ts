@@ -16,6 +16,7 @@ import { EuropePMCService } from '../../../../services/publications/europePMC.se
 import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
 import { tassign } from 'tassign';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'add-assay',
@@ -40,6 +41,12 @@ export class AddAssayComponent implements OnInit {
 	assaySetup : any = null;
 
 	constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router) {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyIdentifier.subscribe(value => {
 			if(value != null){
 				this.requestedStudy = value

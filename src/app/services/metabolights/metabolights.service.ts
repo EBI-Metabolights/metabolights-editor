@@ -17,9 +17,11 @@ export class MetabolightsService extends DataService{
   @select(state => state.study.identifier) studyIdentifier;
   id: string;
 
-  constructor(http: Http, ngRedux: NgRedux<IAppState>, router: Router) {
+  constructor(http: Http, ngRedux?: NgRedux<IAppState>) {
   	super(MetaboLightsWSURL, http);
-    this.studyIdentifier.subscribe(value => this.id = value)
+    if (!environment.isTesting) {
+      this.studyIdentifier.subscribe(value => this.id = value)
+    }
   }
 
   // Study validation details

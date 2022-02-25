@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-mafs',
@@ -22,6 +23,13 @@ export class MafsComponent implements OnInit {
 
 	ngOnInit() {
 		this.mafs = []
+		if (!environment.isTesting) {
+			this.setUpSubscriptions()
+		}
+		
+	}
+
+	setUpSubscriptions() {
 		this.studyAssays.subscribe(value => { 
 			this.assays = value
 			let tempMAFs = []
@@ -104,6 +112,7 @@ export class MafsComponent implements OnInit {
 			}
 		});
 	}
+
 	selectCurrentSubTab(i){
 		this.currentSubIndex = i
 	}

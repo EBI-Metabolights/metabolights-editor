@@ -3,6 +3,7 @@ import * as toastr from 'toastr';
 import { EditorService } from '../../../services/editor.service';
 import { NgRedux, select } from '@angular-redux/store';
 import {MetabolightsService} from '../../../services/metabolights/metabolights.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
     selector: 'mtbls-files',
@@ -56,8 +57,16 @@ export class FilesComponent implements OnInit {
     constructor(private editorService: EditorService,  private dataService: MetabolightsService) {}
 
     ngOnInit() {
-        this.loadFiles()
-        this.loadAccess()
+        this.loadFiles();
+        this.loadAccess();
+        if (!environment.isTesting) {
+            this.setUpSubscriptions();
+        }
+
+    }
+
+    setUpSubscriptions() {
+
         this.readonly.subscribe(value => {
 			if(value != null){
 				this.isReadOnly = value
@@ -393,7 +402,7 @@ export class FilesComponent implements OnInit {
         this.filesLoading = false;
         this.refreshingData = false;
 
-        data.study.forEach( file => {
+        data.study?.forEach( file => {
             if(file.type == 'raw' || file.type == 'unknown' || file.type == 'compressed' || file.type == 'derived' ){
                 this.rawFiles.push(file)
                 this.filteredRawFiles.push(file)

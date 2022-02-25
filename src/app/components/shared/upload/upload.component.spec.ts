@@ -1,4 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { UploadComponent } from './upload.component';
 
@@ -8,7 +11,8 @@ describe('UploadComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ UploadComponent ]
+      declarations: [ UploadComponent ],
+      imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule]
     })
     .compileComponents();
   }));

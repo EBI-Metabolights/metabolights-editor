@@ -16,6 +16,7 @@ import { EuropePMCService } from '../../../services/publications/europePMC.servi
 import * as toastr from 'toastr';
 import swal from 'sweetalert2';
 import { tassign } from 'tassign'; 
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'app-meta',
@@ -66,6 +67,12 @@ export class MetaComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router, private doiService: DOIService, private europePMCService: EuropePMCService) {
     this.editorService.initialiseStudy(this.route)
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
+  }
+
+  setUpSubscriptions() {
     this.studyIdentifier.subscribe(value => { 
       if(value != null){
         this.requestedStudy = value
