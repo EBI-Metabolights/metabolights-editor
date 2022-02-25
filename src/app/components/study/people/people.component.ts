@@ -4,6 +4,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-people',
@@ -19,6 +20,12 @@ export class PeopleComponent implements OnInit {
 	  
 	constructor( private fb: FormBuilder, private metabolightsService: MetabolightsService, private ngRedux: NgRedux<IAppState>) { }
 	ngOnInit() { 
+		if (!environment.isTesting) {
+			this.setUpSubscription()
+		}
+	}
+
+	setUpSubscription() {
 		this.readonly.subscribe(value => { 
 			if(value != null){
 				this.isReadOnly = value

@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
-import { select } from '@angular-redux/store';
-import { FormBuilder} from '@angular/forms';
+import { NgRedux, select } from '@angular-redux/store';
+import { FormBuilder, FormGroup, Validators} from '@angular/forms';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-download',
@@ -18,6 +19,12 @@ export class DownloadComponent implements OnInit {
 	code = ""
 	
 	constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService) {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.obfuscationCode.subscribe(value => { 
 			this.code = value
 		})

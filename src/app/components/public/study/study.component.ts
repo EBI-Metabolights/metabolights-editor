@@ -6,6 +6,8 @@ import { NgRedux, select } from '@angular-redux/store';
 import { ActivatedRoute } from "@angular/router";
 import { MetaboLightsWSURL } from './../../../services/globals';
 import { HttpClient } from '@angular/common/http';
+import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'study',
@@ -38,8 +40,17 @@ export class PublicStudyComponent implements OnInit {
   domain: string = "";
   reviewerLink: string = null;
 
-  constructor(private ngRedux: NgRedux<IAppState>, public http: HttpClient, private editorService: EditorService, private router: Router, private route: ActivatedRoute) { 
-    let isInitialised = this.ngRedux.getState().status['isInitialised']; 
+  constructor(
+    private ngRedux: NgRedux<IAppState>,
+    private editorService: EditorService, 
+    private router: Router, 
+    private route: ActivatedRoute,
+    private labsWorkspaceService: LabsWorkspaceService
+    ) { 
+    let isInitialised
+    if (!environment.isTesting) {
+      isInitialised = this.ngRedux.getState().status['isInitialised'];
+    } 
     let ObfuscationCode = localStorage.getItem('obfuscationcode')
     let owner = localStorage.getItem('isOwner');
     if(owner && owner != null && owner != ''){
@@ -56,23 +67,29 @@ export class PublicStudyComponent implements OnInit {
       let studyID = localStorage.getItem('mtblsid');
       if(!isInitialised){
         this.editorService.initialise('{"apiToken":"ocode:' + ObfuscationCode + '"}', false);
-        this.loadStudy(studyID);
+        if (!environment.isTesting) {
+          this.loadStudy(studyID);
+        }
+          
       }
     }else{
       if(!isInitialised){
         let mtblsUser = localStorage.getItem('mtblsuser');
         let mtblsJWT = localStorage.getItem('mtblsjwt');
         if(mtblsJWT && mtblsJWT != '' && mtblsUser && mtblsUser != ''){
-          // typing this as any because the metabolightslabs is up in the air currently
-          this.http.post<any>("webservice/labs-workspace/initialise", { "jwt" : mtblsJWT, "user" : mtblsUser }).subscribe( res => {
-            localStorage.setItem('user', JSON.stringify(JSON.parse(res.content).owner));
+          this.labsWorkspaceService.initialise({ "jwt" : mtblsJWT, "user" : mtblsUser }).subscribe( res => {
+            localStorage.setItem('user', JSON.stringify(JSON.parse(res.json().content).owner));
             let localUser = localStorage.getItem('user');
             this.editorService.initialise(localUser, false);
-            this.loadStudy(null);
+            if (!environment.isTesting) {
+              this.loadStudy(null);
+            }
           });
         }else{
           localStorage.removeItem('user');
-          this.loadStudy(null);
+          if (!environment.isTesting) {
+            this.loadStudy(null);
+          }
         }
       }
     }

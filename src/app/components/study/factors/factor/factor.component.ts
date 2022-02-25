@@ -8,6 +8,7 @@ import * as toastr from 'toastr';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { OntologyComponent } from './../../ontology/ontology.component';
 import { MTBLSFactor } from './../../../../models/mtbl/mtbls/mtbls-factor';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-factor',
@@ -40,14 +41,20 @@ export class FactorComponent implements OnInit {
 	validations: any = null;
 
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyValidations.subscribe(value => { 
-	      	this.validations = value;
-		});
-		this.studyReadonly.subscribe(value => { 
-			if(value != null){
-				this.isStudyReadOnly = value
-			}
-		});
+			this.validations = value;
+	  });
+	  this.studyReadonly.subscribe(value => { 
+		  if(value != null){
+			  this.isStudyReadOnly = value
+		  }
+	  });
 	}
 
 	ngOnInit() {

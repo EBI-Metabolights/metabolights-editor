@@ -4,6 +4,7 @@ import Swal from 'sweetalert2';
 import { ActivatedRoute } from '@angular/router';
 import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-release-date',
@@ -22,6 +23,13 @@ export class ReleaseDateComponent implements OnInit {
 	requestedStudy: string = null;
 	releaseDate: Date = null;
 	constructor(private editorService: EditorService) {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+
+	}
+
+	setUpSubscriptions() {
 		this.studyReleaseDate.subscribe(value => { 
 			if(value != null){
 				if(value != ''){

@@ -19,6 +19,7 @@ import { IFactorsWrapper } from 'src/app/models/mtbl/mtbls/interfaces/factor-wra
 import { IPublicationWrapper } from 'src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface';
 import { IStudyDesignDescriptorWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface';
 import { IOntologyWrapper } from 'src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -27,9 +28,11 @@ export class MetabolightsService extends DataService{
   @select(state => state.study.identifier) studyIdentifier;
   id: string;
 
-  constructor(http: HttpClient, ngRedux: NgRedux<IAppState>, router: Router) {
+  constructor(http: HttpClient, ngRedux?: NgRedux<IAppState>) {
   	super(MetaboLightsWSURL, http);
-    this.studyIdentifier.subscribe(value => this.id = value)
+    if (!environment.isTesting) {
+      this.studyIdentifier.subscribe(value => this.id = value)
+    }
   }
 
 

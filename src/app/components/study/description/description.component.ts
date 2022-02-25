@@ -5,6 +5,7 @@ import { EditorService } from '../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ValidateStudyDescription } from './description.validator';
 import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-description',
@@ -33,6 +34,12 @@ export class DescriptionComponent implements OnChanges, OnInit {
   hasChanges: boolean = false;
 
   constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) {
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
+  }
+
+  setUpSubscriptions() {
     this.studyValidations.subscribe(value => { 
       this.validations = value;
     }); 

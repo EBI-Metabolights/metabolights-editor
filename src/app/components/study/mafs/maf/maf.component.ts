@@ -4,6 +4,7 @@ import { EditorService } from '../../../../services/editor.service';
 import { TableComponent } from './../../../shared/table/table.component';
 import { select } from '@angular-redux/store';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-maf',
@@ -47,18 +48,21 @@ export class MafComponent {
   	constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
 	ngAfterContentInit(){
-		this.load()
-		this.readonly.subscribe(value => { 
-			if(value != null){
-				this.isReadOnly = value
-			}
-		});
+		if (!environment.isTesting) {
+			this.load()
+		}
+
 	}
 
 	load(){
 		this.studyMAFs.subscribe(mafs => {
 			if(mafs){
 				this.mafData = mafs[this.value.data.file]
+			}
+		});
+		this.readonly.subscribe(value => { 
+			if(value != null){
+				this.isReadOnly = value
 			}
 		});
 	}

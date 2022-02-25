@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
-import { select } from '@angular-redux/store';
-import { FormBuilder} from '@angular/forms';
+import { NgRedux, select } from '@angular-redux/store';
+import { FormBuilder, FormGroup, Validators} from '@angular/forms';
+import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-ftp',
@@ -20,6 +22,12 @@ export class FTPUploadComponent implements OnInit {
     uploadPath: string = '';
 
 	constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService){ 
+		if (!environment.isTesting) {
+			this.setUpSubscription();
+		}
+	}
+
+	setUpSubscription() {
 		this.uploadLocation.subscribe(value => { 
 			this.uploadPath = value
 		})

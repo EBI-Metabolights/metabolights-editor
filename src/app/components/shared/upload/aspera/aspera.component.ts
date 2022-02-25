@@ -36,6 +36,10 @@ export class AsperaUploadComponent implements OnInit {
   validation: any = null
 
   constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService){ 
+    
+	}
+
+  setUpSubscriptions() {
 		this.uploadLocation.subscribe(value => { 
 			this.uploadPath = value
     })
@@ -44,7 +48,7 @@ export class AsperaUploadComponent implements OnInit {
 			this.validation = value[this.validationsId]
       }
 		})
-	}
+  }
 
   ngOnInit() {
   }

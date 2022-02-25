@@ -11,6 +11,7 @@ import { DOIService } from '../../../../services/publications/doi.service';
 import { EuropePMCService } from '../../../../services/publications/europePMC.service';
 import {FormControl} from '@angular/forms';
 import { OntologySourceReference } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology-reference';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-design-descriptor',
@@ -53,6 +54,12 @@ export class DesignDescriptorComponent implements OnInit {
 	loading: boolean = false;
 
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>, private doiService: DOIService, private europePMCService: EuropePMCService) {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyValidations.subscribe(value => { 
 			this.validations = value;
 		});

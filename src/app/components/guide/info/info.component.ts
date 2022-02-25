@@ -13,6 +13,7 @@ import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript";
 import { EditorService } from './../../../services/editor.service';
 import * as toastr from 'toastr';
 import {Router} from "@angular/router";
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-info',
@@ -30,6 +31,12 @@ export class InfoComponent implements OnInit {
 
   constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private route: ActivatedRoute,  private editorService: EditorService) { 
     this.editorService.initialiseStudy(this.route)
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
+  }
+
+  setUpSubscriptions() {
     this.studyIdentifier.subscribe(value => { 
       if(value != null){
         this.requestedStudy = value

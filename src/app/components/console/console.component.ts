@@ -4,6 +4,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { Component, OnInit } from '@angular/core';
 import { EditorService } from '../../services/editor.service';
 import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-console',
@@ -53,8 +54,7 @@ export class ConsoleComponent implements OnInit{
         this.isConfirmationModalOpen = false   
     }
 
-    ngAfterContentInit() {
-        this.editorService.initialiseStudy(null)
+    setUpSubscriptions() {
         this.userStudies.subscribe(value => { 
             if(value == null){
                 this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
@@ -71,6 +71,14 @@ export class ConsoleComponent implements OnInit{
             this.loadingStudies = false;
             }
         });
+    }
+
+    ngAfterContentInit() {
+        this.editorService.initialiseStudy(null)
+        if (!environment.isTesting) {
+            this.setUpSubscriptions();
+        }
+        
     }
 
     formatDate(date){

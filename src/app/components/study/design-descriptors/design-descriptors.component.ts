@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Inject, SimpleChanges } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-design-descriptors',
@@ -17,6 +18,12 @@ export class DesignDescriptorsComponent implements OnInit {
 	@Input('readOnly') readOnly: boolean;
 
 	constructor() {
+		if (!environment.isTesting) {
+			this.setUpSubscription()
+		}
+	}
+
+	setUpSubscription() {
 		this.readonly.subscribe(value => { 
 			if(value != null){
 				this.isReadOnly = value
