@@ -31,7 +31,8 @@
 					[matTooltipDisabled]="!detail.comment || curator"
 					[matTooltipPosition]="'below'"
 					[isCurator]="curator" 
-					[validationDetail]="detail"></app-validation-detail>
+					[validationDetail]="detail"
+					(commentSaved)="handleCommentSaved($event, detail)"></app-validation-detail>
 			</ng-container>
 
 		</div>

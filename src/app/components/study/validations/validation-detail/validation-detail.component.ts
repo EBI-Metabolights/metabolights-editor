@@ -1,5 +1,5 @@
 import { StringMap } from '@angular/compiler/src/compiler_facade_interface';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { MatAccordion } from '@angular/material/expansion';
 import { failedValidation } from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
 
@@ -27,6 +27,7 @@ export class ValidationDetailComponent implements OnInit {
 
   @Input() isCurator: boolean;
   @Input() validationDetail: ValidationDetail
+  @Output() commentSaved: EventEmitter<{comment: string}> = new EventEmitter();
 
   /**Validation detail rendering flags */
   panelOpenState: boolean = true;
@@ -58,7 +59,7 @@ export class ValidationDetailComponent implements OnInit {
    * @returns a boolean value indicating whether the comment box is disabled.
    */
   decideIfDisabled(): boolean {
-    if (this.curator) {
+    if (this.isCurator) {
       console.log(this.validationDetail.status)
       if(this.validationDetail.status === 'error' || this.validationDetail.status === 'warning') {
         return false
@@ -75,7 +76,7 @@ export class ValidationDetailComponent implements OnInit {
 
   propagateComment($event) {
     console.log($event);
-    // send it off to the service here
+    this.commentSaved.emit($event)
   }
 
 }

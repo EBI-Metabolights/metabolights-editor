@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
+import { select } from '@angular-redux/store';
 import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
-import { failedValidation } from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
 
 @Component({
   selector: 'study-validations',
@@ -21,30 +20,24 @@ export class ValidationsComponent implements OnInit {
     "tapToDismiss": false
   }
 
-    //dummy variable, remove
-    detail = failedValidation.validations[0].details[6]
 
-  
 
   @select(state => state.study.validation) validation: any
   @select(state => state.status.isCurator) isCurator;
-	curator: boolean = false;
+	curator: boolean = true;
 
   constructor(private editorService: EditorService) { }
 
   ngOnInit() {
-    this.studyValidation = failedValidation;
 
-    /**Uncomment the below or the component will be toast */ 
-
-  	/* this.validation.subscribe(value => { 
+  	this.validation.subscribe(value => { 
         this.studyValidation = value;
     });
     this.isCurator.subscribe(value => { 
 			if(value != null){
 				this.curator = value
 			}
-		});*/
+		});
   }
 
   refreshValidations(){
@@ -73,6 +66,27 @@ export class ValidationsComponent implements OnInit {
     }, err => {
       toastr.error('Validation override failed', "Error", this.defaultToastrOptions)
     });
+  }
+
+  /**
+   * Handle a saved comment 
+   * @param $event - The comment emitted from a child component
+   * @param detail - the validation detail that the comment pertains to
+   */
+  handleCommentSaved($event, detail){
+    console.log($event, detail)
+    let data = {
+      "comments": []
+    }
+    let payload ={}
+    payload[detail.val_sequence] = $event['comment'];
+    data['comments'].push(payload)
+    
+    console.log(data);
+    this.editorService.addComment(data).subscribe (res => {
+      toastr.success(res.success, "Successfully posted the comment", this.defaultToastrOptions);
+      this.refreshValidations();
+    }) 
   }
 
   /**
