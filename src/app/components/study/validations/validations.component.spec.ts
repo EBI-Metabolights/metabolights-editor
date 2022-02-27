@@ -24,14 +24,14 @@ export class MockValidationDetailComponent {
 
 
 
-describe('ValidationsComponent', () => {
+fdescribe('ValidationsComponent', () => {
   let component: ValidationsComponent;
   let fixture: ComponentFixture<ValidationsComponent>;
   let editorService: EditorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ValidationsComponent ],
+      declarations: [ ValidationsComponent, MockValidationDetailComponent ],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [{provide: EditorService, useClass: MockEditorService}, NgRedux]
     })
@@ -53,12 +53,32 @@ describe('ValidationsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should render the validation description if one is present in the event of validation error.', () => {
+  it('should render the correct number of validation detail components based on the config option', () => {
+    component.displayOption = 'error';
+    fixture.detectChanges();
+    let detailList = fixture.debugElement.queryAll(By.directive(MockValidationDetailComponent));
+    expect(detailList.length).toBe(2);
+
+    component.displayOption = 'warning';
+    fixture.detectChanges();
+    detailList = fixture.debugElement.queryAll(By.directive(MockValidationDetailComponent));
+    expect(detailList.length).toBe(1);
+
+    component.displayOption = 'success';
+    fixture.detectChanges();
+    detailList = fixture.debugElement.queryAll(By.directive(MockValidationDetailComponent));
+    expect(detailList.length).toBe(5);
+
+  })
+
+  // this needs to be moved to the validation detail spec file
+
+/*   it('should render the validation description if one is present in the event of validation error.', () => {
     component.studyValidation = failedValidation;
     fixture.detectChanges();
 
     const failureElement = fixture.debugElement.query(By.css('.error')).nativeElement;
     expect(failureElement).toBeTruthy();
     expect(failureElement.innerText).toContain('Make sure there are some descriptors.');
-  })
+  }) */
 });
