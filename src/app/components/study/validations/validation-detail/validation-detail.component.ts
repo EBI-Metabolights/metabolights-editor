@@ -14,7 +14,7 @@ export interface ValidationDetail {
   description: string;
   val_override: string;
   val_message: string;
-  comment: string;
+  comment?: string;
   [key: string]: string
 }
 
@@ -36,8 +36,8 @@ export class ValidationDetailComponent implements OnInit {
   
 
   // dummy variables, remove
-  validation = failedValidation.validations[0].details[6];
-  curator = false;
+  // validation = failedValidation.validations[0].details[6];
+  // curator = false;
 
   constructor() { }
 

@@ -24,7 +24,7 @@ export class MockValidationDetailComponent {
 
 
 
-fdescribe('ValidationsComponent', () => {
+describe('ValidationsComponent', () => {
   let component: ValidationsComponent;
   let fixture: ComponentFixture<ValidationsComponent>;
   let editorService: EditorService;
