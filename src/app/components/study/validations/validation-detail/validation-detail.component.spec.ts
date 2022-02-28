@@ -1,14 +1,20 @@
 import { Directive, EventEmitter, Input, Output } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon/';
+import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { failedValidation } from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
+import { ValidationDetailCommentComponent } from './validation-detail-comment/validation-detail-comment.component';
 
 import {  ValidationDetailComponent } from './validation-detail.component';
 
+
+//ultimately did not have a use for this, but leaving here as it establishes a handy mocking pattern.
 @Directive({
   selector: 'app-validation-detail-comment'
 })
@@ -19,14 +25,14 @@ export class MockValidationDetailCommentComponent {
 }
 
 
-describe('ValidationDetailComponent', () => {
+fdescribe('ValidationDetailComponent', () => {
   let component: ValidationDetailComponent;
   let fixture: ComponentFixture<ValidationDetailComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ValidationDetailComponent, MockValidationDetailCommentComponent ],
-      imports: [BrowserAnimationsModule, MatIconModule, MatExpansionModule, MatDividerModule]
+      declarations: [ ValidationDetailComponent, ValidationDetailCommentComponent ],
+      imports: [BrowserAnimationsModule, MatIconModule, MatInputModule, MatExpansionModule, MatDividerModule,FormsModule, ReactiveFormsModule, MatFormFieldModule]
 
     })
     .compileComponents();
@@ -42,6 +48,20 @@ describe('ValidationDetailComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('Component Logic Tests', () => {
+    it('should call propagateComment when the child components event emitter is activated', () => {
+      spyOn(component, 'propagateComment')
+      const commentComponentElement = fixture.debugElement.query(By.directive(ValidationDetailCommentComponent));
+      const commentComponent = commentComponentElement.componentInstance;
+      commentComponent.commentSaved.emit({comment: 'string'});
+      fixture.detectChanges();
+
+      expect(component.propagateComment).toHaveBeenCalledWith({comment: 'string'});
+      
+
+    })
+  })
 
   describe('Curator View Tests', () => {
 
