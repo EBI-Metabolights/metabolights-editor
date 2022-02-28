@@ -100,21 +100,5 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     }) 
   }
 
-  /**
-   * Add a comment to the database (also doubles up for updating a comment)
-   * @param comment - Comment to persist in the database
-   * @param validation - The validation detail that the comment pertains to
-   */
-  addComment(comment, validation) {
-    let data = {
-      "val_sequence": validation['val_sequence'],
-      "comment": comment
-    }
-
-    this.editorService.addComment(data).subscribe (res => {
-      toastr.success(res.success, "Successfully posted the comment", this.defaultToastrOptions);
-      this.refreshValidations();
-    })
-  }
 
 }

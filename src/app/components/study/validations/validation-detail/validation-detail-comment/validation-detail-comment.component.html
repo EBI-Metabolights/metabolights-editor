@@ -2,15 +2,15 @@
     <form [formGroup]="monoForm" class="example-form">
       <mat-form-field class="example-full-width comment-box curator" appearance="fill">
         <mat-label>{{commentBoxStatus}}</mat-label>
-        <textarea [disabled]="disableCuratorCommentBox == true" formControlName="commentControl" matInput placeholder="This error has occurred because.."></textarea>
+        <textarea class="catch" [disabled]="disableCuratorCommentBox == true" formControlName="commentControl" matInput placeholder="This error has occurred because.."></textarea>
       </mat-form-field>
-    <button *ngIf="disableCuratorCommentBox == false" type="submit" mat-raised-button class="wayward-button" (keyup.enter)="saveComment" (click)="saveComment()">Save</button>
-    <button *ngIf="disableCuratorCommentBox == true" mat-raised-button (click)="onEditCommentClick()">Edit Comment</button>
+    <button *ngIf="disableCuratorCommentBox == false" type="submit" mat-raised-button class="wayward-button" (keyup.enter)="saveComment()" (click)="saveComment()">Save</button>
+    <button class="edit" *ngIf="disableCuratorCommentBox == true" mat-raised-button (click)="onEditCommentClick()">Edit Comment</button>
 </form>
   </div>
 
   <ng-template #user>
-    <div class=" userbox">
+    <div class="userbox">
       <p><i>{{monoForm.value['commentControl']}}</i></p>
       
 

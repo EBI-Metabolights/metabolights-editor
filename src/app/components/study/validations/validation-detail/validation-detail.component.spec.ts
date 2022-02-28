@@ -25,7 +25,7 @@ export class MockValidationDetailCommentComponent {
 }
 
 
-fdescribe('ValidationDetailComponent', () => {
+describe('ValidationDetailComponent', () => {
   let component: ValidationDetailComponent;
   let fixture: ComponentFixture<ValidationDetailComponent>;
 
@@ -41,7 +41,18 @@ fdescribe('ValidationDetailComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(ValidationDetailComponent);
     component = fixture.componentInstance;
-    component.validationDetail = failedValidation.validations[0].details[7]
+    component.validationDetail = {
+      message: "File 'QC1_NEG.raw' is missing or not correct for column 'Raw Spectral Data File' (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
+      section: "basic",
+      val_sequence: "basic_17",
+      status: "error",
+      metadata_file: "s_MTBLS1898.txt",
+      value: "",
+      description: "File 'QC1_NEG.raw' does not exist (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
+      val_override: "false",
+      val_message: "",
+      comment: "a sensible comment"
+    }
     fixture.detectChanges();
   });
 
@@ -67,7 +78,18 @@ fdescribe('ValidationDetailComponent', () => {
 
     beforeEach(() => {
       component.isCurator = true;
-      component.validationDetail = failedValidation.validations[0].details[7]
+      component.validationDetail = {
+        message: "File 'QC1_NEG.raw' is missing or not correct for column 'Raw Spectral Data File' (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
+        section: "basic",
+        val_sequence: "basic_17",
+        status: "error",
+        metadata_file: "s_MTBLS1898.txt",
+        value: "",
+        description: "File 'QC1_NEG.raw' does not exist (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
+        val_override: "false",
+        val_message: "",
+        comment: "Grabaogoli"
+      }
       fixture.detectChanges();
     })
 
@@ -81,7 +103,6 @@ fdescribe('ValidationDetailComponent', () => {
       expect(spanElement).toBeNull();
       
     })
-
 
   })
 

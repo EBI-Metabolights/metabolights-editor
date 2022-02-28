@@ -29,6 +29,11 @@ export class MockEditorService {
         return null;
     }
 
+    addComment(data) {
+        return null;
+
+    }
+
     overrideValidations(data) {
         return {success: "Validation 'val' stored in the database"};
     }
