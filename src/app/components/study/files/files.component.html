@@ -7,10 +7,6 @@
   </div>
 </span>
 <ng-template #showContent>
-  <div class="notification is-warning">
-    <small><mat-icon>info</mat-icon>  From the <b> 22nd December 2021  </b> through to the <b> 5th of January 2022</b>, the metabolomics team will be on leave. We will respond to any enquiries after that time.
-    </small>
-  </div>
   <span *ngIf="!isReadOnly">
     <mtbls-upload  [type]="'any'" [multiple]="true" [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" ></mtbls-upload>&nbsp;
     <a (click)="loadFilesPassively()" class="button is-light">
