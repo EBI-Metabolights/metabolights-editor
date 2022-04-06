@@ -14,7 +14,11 @@ export class AuthService{
 	}
 
 	login(body): any {
-		return this.http.post(AuthenticationURL['login'], body, { headers: contentHeaders }).pipe(map(res => res), catchError(err => throwError(err)));
+		return this.http.post(AuthenticationURL['login'], body, 
+		{ 
+			headers: contentHeaders,
+			observe: 'response'
+		}).pipe(map(res => res), catchError(err => throwError(err)));
 	}
 
 	logout(): void {
