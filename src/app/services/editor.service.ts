@@ -10,7 +10,7 @@ import { Router } from "@angular/router";
 import { map } from 'rxjs/operators';
 
 import { LoginURL, RedirectURL } from './../services/globals';
-import { contentHeaders } from './../services/headers';
+import { httpOptions } from './../services/headers';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -81,11 +81,12 @@ export class EditorService {
   }
 
   initialise(data, signInRequest){
+    console.log('initialise');
     let user = null
     if(signInRequest){
       user = JSON.parse(data.content).owner;
       localStorage.setItem('user', JSON.stringify(user));
-      contentHeaders.set('user_token', user.apiToken);
+      httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
       this.ngRedux.dispatch({
         type: 'INITIALISE'
       })
@@ -98,8 +99,8 @@ export class EditorService {
       this.loadValidations();
       return true;
     }else{
-      user = JSON.parse(data)
-      contentHeaders.set('user_token', user.apiToken);
+      user = JSON.parse(data);
+      httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
       this.ngRedux.dispatch({
         type: 'INITIALISE'
       })
@@ -111,6 +112,7 @@ export class EditorService {
       }})
       this.loadValidations();
       return true;
+
     }
   }
 

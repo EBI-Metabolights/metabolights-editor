@@ -1,6 +1,9 @@
 import { HttpHeaders } from '@angular/common/http';
 
-export const contentHeaders = new HttpHeaders();
-contentHeaders.append('Accept', 'application/json');
-// contentHeaders.append('Content-Type', 'application/json');
-contentHeaders.set('user_token', '');
+export let httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type':  'application/json',
+    Accept: 'application/json',
+    user_token: 'dummy'
+  })
+};

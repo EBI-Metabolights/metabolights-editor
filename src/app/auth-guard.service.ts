@@ -4,7 +4,6 @@ import { AuthService } from './services/metabolights/auth.service';
 import { EditorService } from './services/editor.service';
 import { NgRedux } from '@angular-redux/store';
 import { IAppState } from './store';
-import { contentHeaders } from './services/headers';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +21,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   checkLogin(url: string) {
-    let isInitialised = this.ngRedux.getState().status['isInitialised']; 
+    let isInitialised = this.ngRedux.getState().status['isInitialised'];
     if(!isInitialised){
       let localUser = localStorage.getItem('user');
       if(localUser != null && this.isJSON(localUser)){
