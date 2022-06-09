@@ -22,6 +22,14 @@ import { FTPUploadComponent } from './upload/ftp/ftp.component';
 import { AsperaUploadComponent } from './upload/aspera/aspera.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { DesignDescriptorsComponent } from './design-descriptors/design-descriptors.component';
+import { DesignDescriptorComponent } from './design-descriptors/design-descriptor/design-descriptor.component';
+import { TitleComponent } from './title/title.component';
+import { DescriptionComponent } from './description/description.component';
+import { PeopleComponent } from './people/people.component';
+import { PersonComponent } from './people/person/person.component';
+import { OntologyDetailsComponent } from './ontology-details/ontology-details.component';
+import { MatInputModule } from '@angular/material/input';
 
 
 
@@ -41,7 +49,15 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     TableComponent,
     UploadComponent,
     FTPUploadComponent,
-    AsperaUploadComponent
+    AsperaUploadComponent,
+    DesignDescriptorsComponent,
+    DesignDescriptorComponent,
+    TitleComponent,
+    DescriptionComponent, 
+    PeopleComponent,
+    PersonComponent,
+    OntologyDetailsComponent,
+
 
   ],
   imports: [
@@ -53,7 +69,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     MatPaginatorModule,
     MatSortModule,
     MatIconModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    MatInputModule
 
   ],
   exports: [
@@ -71,7 +88,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     TableComponent,
     UploadComponent,
     FTPUploadComponent,
-    AsperaUploadComponent
+    AsperaUploadComponent,
+    DesignDescriptorsComponent,
+    DesignDescriptorComponent,
+    TitleComponent,
+    DescriptionComponent,
+    PeopleComponent,
+    PersonComponent,
+    OntologyDetailsComponent,
+
+
   ]
 })
 export class SharedModule { }

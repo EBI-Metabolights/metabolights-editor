@@ -51,6 +51,7 @@ import { GuidesComponent } from './components/public/guides/guides.component';
 import { StudyModule } from './components/study/study.module';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './components/shared/shared.module';
+import { GuideModule } from './components/guide/guide.module';
 
 @NgModule({
   declarations: [
@@ -60,12 +61,6 @@ import { SharedModule } from './components/shared/shared.module';
     LoginComponent,
     ConsoleComponent,
     PublicStudyComponent,
-    CreateComponent,
-    ProgressComponent,
-    RawUploadComponent,
-    InfoComponent,
-    MetaComponent,
-    GuidedAssaysComponent,
     EditTableDirective,
     LazyLoadImagesDirective,
     HeaderComponent,
@@ -79,6 +74,7 @@ import { SharedModule } from './components/shared/shared.module';
     NgxWigModule,
     StudyModule,
     SharedModule,
+    GuideModule,
     AppRoutingModule,
     NgReduxModule,
     FormsModule,

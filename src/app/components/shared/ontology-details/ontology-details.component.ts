@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology';
-import { EditorService } from '../../../../services/editor.service';
+import { Ontology } from '../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { EditorService } from '../../../services/editor.service';
 
 @Component({
   selector: 'ontology-details',
