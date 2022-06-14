@@ -14,7 +14,6 @@ import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { SharedModule } from "../shared/shared.module";
-import { StudyModule } from "../study/study.module";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
 import { InfoComponent } from "./info/info.component";

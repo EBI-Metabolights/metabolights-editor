@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AssaysComponent } from './assays/assays.component';
-import { AddAssayComponent } from '../shared/add-assay/add-assay.component';
 import { AssayDetailsComponent } from './assays/assay-details/assay-details.component';
 import { DeleteComponent } from './delete/delete.component';
 import { FactorsComponent } from './factors/factors.component';
@@ -40,7 +39,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
@@ -93,7 +91,6 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatTooltipModule,
     MatChipsModule,
     MatPaginatorModule,
-    //AngularStickyThingsModule,
     MatProgressSpinnerModule,
     MatButtonToggleModule
 
