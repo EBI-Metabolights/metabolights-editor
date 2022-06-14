@@ -7,7 +7,7 @@ import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology'
 import { IAppState } from '../../../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { ValidateRules } from './protocol.validator';
-import { OntologyComponent } from './../../ontology/ontology.component';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
 import * as toastr from 'toastr';
 import { JsonConvert } from "json2typescript";
 import { IProtocol } from 'src/app/models/mtbl/mtbls/interfaces/protocol.interface';

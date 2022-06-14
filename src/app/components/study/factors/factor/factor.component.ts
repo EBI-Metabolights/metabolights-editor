@@ -6,7 +6,7 @@ import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology'
 import { IAppState } from '../../../../store';
 import * as toastr from 'toastr';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import { OntologyComponent } from './../../ontology/ontology.component';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
 import { MTBLSFactor } from './../../../../models/mtbl/mtbls/mtbls-factor';
 import { environment } from 'src/environments/environment';
 

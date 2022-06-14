@@ -104,7 +104,7 @@ import { GuideModule } from './components/guide/guide.module';
     })
   ],
   exports: [
-    TableComponent
+    //TableComponent
   ],
   providers: [
     AuthGuard

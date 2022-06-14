@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AssaysComponent } from './assays/assays.component';
-import { AddAssayComponent } from './assays/add-assay/add-assay.component';
+import { AddAssayComponent } from '../shared/add-assay/add-assay.component';
 import { AssayDetailsComponent } from './assays/assay-details/assay-details.component';
 import { DeleteComponent } from './delete/delete.component';
 import { FactorsComponent } from './factors/factors.component';
@@ -9,7 +9,6 @@ import { FactorComponent } from './factors/factor/factor.component';
 import { FilesComponent } from './files/files.component';
 import { MafsComponent } from './mafs/mafs.component';
 import { MafComponent } from './mafs/maf/maf.component';
-import { OntologyComponent } from './ontology/ontology.component';
 import { OrganismsComponent } from './organisms/organisms.component';
 import { OrganismComponent } from './organisms/organism/organism.component';
 import { ProtocolsComponent } from './protocols/protocols.component';
@@ -29,7 +28,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatOptionModule } from '@angular/material/core';
+import { MatCommonModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { SharedModule } from '../shared/shared.module';
 import { HttpClientModule } from '@angular/common/http';
@@ -39,6 +38,11 @@ import { ValidationDetailCommentComponent } from './validations/validation-detai
 import {MatDividerModule} from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 
 
@@ -46,7 +50,6 @@ import { MatChipsModule } from '@angular/material/chips';
 @NgModule({
   declarations: [
     AssaysComponent,
-    AddAssayComponent, 
     AssayDetailsComponent, 
     DeleteComponent, 
     FactorsComponent,
@@ -54,7 +57,6 @@ import { MatChipsModule } from '@angular/material/chips';
     FilesComponent,
     MafsComponent,
     MafComponent,
-    OntologyComponent,
     OrganismsComponent,
     OrganismComponent,
     ProtocolsComponent,
@@ -77,6 +79,8 @@ import { MatChipsModule } from '@angular/material/chips';
     MatIconModule,
     MatOptionModule,
     MatSelectModule,
+    MatTableModule,
+    MatCommonModule,
     NgReduxModule,
     FormsModule,
     ReactiveFormsModule,
@@ -87,12 +91,15 @@ import { MatChipsModule } from '@angular/material/chips';
     MatInputModule,
     MatDividerModule,
     MatTooltipModule,
-    MatChipsModule
+    MatChipsModule,
+    MatPaginatorModule,
+    //AngularStickyThingsModule,
+    MatProgressSpinnerModule,
+    MatButtonToggleModule
 
   ],
   exports: [
     AssaysComponent,
-    AddAssayComponent, 
     AssayDetailsComponent, 
     DeleteComponent, 
     FactorsComponent,
@@ -100,7 +107,6 @@ import { MatChipsModule } from '@angular/material/chips';
     FilesComponent,
     MafsComponent,
     MafComponent,
-    OntologyComponent,
     OrganismsComponent,
     OrganismComponent,
     ProtocolsComponent,

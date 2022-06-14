@@ -8,10 +8,10 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { Observable, fromEvent } from 'rxjs';
 import { map, filter, debounceTime, distinctUntilChanged, startWith, switchAll, tap } from 'rxjs/operators';
 import { EditorService } from '../../../services/editor.service';
-import { MetaboLightsWSURL } from './../../../services/globals';
+import { MetaboLightsWSURL } from '../../../services/globals';
 
-import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
-import { OntologySourceReference } from './../../../models/mtbl/mtbls/common//mtbls-ontology-reference';
+import { Ontology } from '../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { OntologySourceReference } from '../../../models/mtbl/mtbls/common/mtbls-ontology-reference';
 import { JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 
  @Component({

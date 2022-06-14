@@ -4,7 +4,7 @@ var origin = window.location.origin;
 var branch = 'development';
 
 if(origin.indexOf('localhost') > -1){
-	origin = "https://www.ebi.ac.uk"
+	origin = "https://wwwdev.ebi.ac.uk"
 }
 
 var host = window.location.host

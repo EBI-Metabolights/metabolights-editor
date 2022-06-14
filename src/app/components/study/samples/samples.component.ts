@@ -5,7 +5,7 @@ import { FormBuilder, FormGroup} from '@angular/forms';
 import { MTBLSFactor } from './../../../models/mtbl/mtbls/mtbls-factor';
 import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
 import { MTBLSFactorValue } from './../../../models/mtbl/mtbls/mtbls-factor-value';
-import { OntologyComponent } from './../ontology/ontology.component';
+import { OntologyComponent } from '../../shared/ontology/ontology.component';
 import { TableComponent } from './../../shared/table/table.component';
 import { MTBLSCharacteristic } from './../../../models/mtbl/mtbls/mtbls-characteristic';
 import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';

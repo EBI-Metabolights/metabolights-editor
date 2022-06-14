@@ -13,7 +13,7 @@ import * as toastr from 'toastr';
 
 import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 
-import { OntologyComponent } from '../../../study/ontology/ontology.component';
+import { OntologyComponent } from '../../ontology/ontology.component';
 import { environment } from 'src/environments/environment';
 
 @Component({

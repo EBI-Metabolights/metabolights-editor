@@ -5,9 +5,14 @@ import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatOptionModule } from "@angular/material/core";
+import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
+import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { SharedModule } from "../shared/shared.module";
 import { StudyModule } from "../study/study.module";
 import { GuidedAssaysComponent } from "./assays/assays.component";
@@ -30,6 +35,7 @@ import { RawUploadComponent } from "./upload/upload.component";
     ],
     imports: [
         CommonModule,
+        BrowserModule,
         HttpClientModule,
         MatIconModule,
         FormsModule,
@@ -40,7 +46,11 @@ import { RawUploadComponent } from "./upload/upload.component";
         NgReduxModule,
         MatProgressSpinnerModule,
         MatButtonModule,
-        MatButtonToggleModule
+        MatButtonToggleModule,
+        MatOptionModule,
+        MatFormFieldModule,
+        MatInputModule,
+        AngularStickyThingsModule
     ],
     exports: [
         GuidedAssaysComponent,

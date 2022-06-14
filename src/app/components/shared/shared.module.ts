@@ -28,13 +28,25 @@ import { TitleComponent } from './title/title.component';
 import { DescriptionComponent } from './description/description.component';
 import { PeopleComponent } from './people/people.component';
 import { PersonComponent } from './people/person/person.component';
-import { OntologyDetailsComponent } from './ontology-details/ontology-details.component';
+import { OntologyDetailsComponent } from './ontology/ontology-details/ontology-details.component';
 import { MatInputModule } from '@angular/material/input';
+import { OntologyComponent } from './ontology/ontology.component';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AddAssayComponent } from './add-assay/add-assay.component';
+import { MatTableModule } from '@angular/material/table';
+import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
 
 
-
+/**
+ * TODO: break this shared module out so that it doesnt become bloated. One lot of components that can be broken out are components common to different study views
+ * 
+ */
 @NgModule({
   declarations: [
+    AddAssayComponent, 
     ContentComponent,
     DeleteFileComponent,
     DirectoryComponent,
@@ -56,6 +68,7 @@ import { MatInputModule } from '@angular/material/input';
     DescriptionComponent, 
     PeopleComponent,
     PersonComponent,
+    OntologyComponent,
     OntologyDetailsComponent,
 
 
@@ -70,10 +83,17 @@ import { MatInputModule } from '@angular/material/input';
     MatSortModule,
     MatIconModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatChipsModule,
+    MatAutocompleteModule,
+    MatSelectModule,
+    MatProgressSpinnerModule,
+    MatTableModule,
+    AngularStickyThingsModule
 
   ],
   exports: [
+    AddAssayComponent, 
     ContentComponent,
     DeleteFileComponent,
     DirectoryComponent,
@@ -95,6 +115,7 @@ import { MatInputModule } from '@angular/material/input';
     DescriptionComponent,
     PeopleComponent,
     PersonComponent,
+    OntologyComponent,
     OntologyDetailsComponent,
 
 

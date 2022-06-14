@@ -18,26 +18,29 @@
 <div>
 	&nbsp;
 </div>
-<span *ngFor="let validation of studyValidation.validations ; let i = index">
-	<nav class="panel">
-		<p class="panel-heading">
-			{{ validation['section'] }}
-		</p>
-
-		<div *ngFor="let detail of validation.details">
-			<ng-container *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
-				<app-validation-detail 
-					matTooltip="Click here to view the comment that a curator has left" 
-					[matTooltipDisabled]="!detail.comment || curator"
-					[matTooltipPosition]="'below'"
-					[isCurator]="curator" 
-					[validationDetail]="detail"
-					(commentSaved)="handleCommentSaved($event, detail)"></app-validation-detail>
-			</ng-container>
-
-		</div>
-		<!--end of individual validation cards-->
-
-	</nav>
-	<span>&nbsp;</span>
-</span>
+<ng-container *ngIf="studyValidation; else NoValidationsfound">
+	<span *ngFor="let validation of studyValidation.validations ; let i = index">
+		<nav class="panel">
+			<p class="panel-heading">
+				{{ validation['section'] }}
+			</p>
+	
+			<div *ngFor="let detail of validation.details">
+				<ng-container *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
+					<app-validation-detail 
+						matTooltip="Click here to view the comment that a curator has left" 
+						[matTooltipDisabled]="!detail.comment || curator"
+						[matTooltipPosition]="'below'"
+						[isCurator]="curator" 
+						[validationDetail]="detail"
+						(commentSaved)="handleCommentSaved($event, detail)"></app-validation-detail>
+				</ng-container>
+	
+			</div>
+			<!--end of individual validation cards-->
+	
+		</nav>
+		<span>&nbsp;</span>
+	</span>
+</ng-container>
+<ng-template #NoValidationsFound> No validations returned by webservice.</ng-template>

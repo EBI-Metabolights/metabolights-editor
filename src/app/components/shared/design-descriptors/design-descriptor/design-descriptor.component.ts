@@ -6,7 +6,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { IAppState } from '../../../../store';
 import * as toastr from 'toastr';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import { OntologyComponent } from '../../../study/ontology/ontology.component';
+import { OntologyComponent } from '../../ontology/ontology.component';
 import { DOIService } from '../../../../services/publications/doi.service';
 import { EuropePMCService } from '../../../../services/publications/europePMC.service';
 import {FormControl} from '@angular/forms';

@@ -41,6 +41,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   setUpSubscriptions() {
+    
     this.validation.subscribe(value => {
       this.studyValidation = value;
     });
