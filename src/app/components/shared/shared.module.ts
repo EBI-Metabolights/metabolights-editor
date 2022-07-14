@@ -38,6 +38,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddAssayComponent } from './add-assay/add-assay.component';
 import { MatTableModule } from '@angular/material/table';
 import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatButtonModule } from '@angular/material/button';
 
 
 /**
@@ -89,7 +91,9 @@ import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
     MatSelectModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    AngularStickyThingsModule
+    AngularStickyThingsModule,
+    MatButtonModule,
+    MatButtonToggleModule
 
   ],
   exports: [

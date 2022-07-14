@@ -41,6 +41,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { QuillModule } from 'ngx-quill';
 
 
 
@@ -92,7 +93,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
     MatChipsModule,
     MatPaginatorModule,
     MatProgressSpinnerModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    QuillModule
 
   ],
   exports: [

@@ -1,7 +1,7 @@
 export interface ITableWrapper {
-    //data: {
+    data: {
         rows: ITableRow[]
-    //}
+    }
     header: {
         [key: string]: ITableHeader | number
     }

@@ -504,7 +504,7 @@ export class EditorService {
       data['columns'] = columns;
       data['displayedColumns'] = displayedColumns;
       data['file'] = file;
-      data.rows ? data['rows'] = data.rows : data['rows'] = []
+      data.data.rows ? data['rows'] = data.data.rows : data['rows'] = []
       delete data['data']
       assay['data'] = data
       let protocols = []
@@ -519,7 +519,7 @@ export class EditorService {
       assay['protocols'] = protocols
 
       let mafFiles = []
-      data.rows.forEach( row => {
+      data['rows'].forEach( row => {
         // assert that this given value in the row is a string, as we _know_ it can only be a string.
         let assertedRow = row['Metabolite Assignment File'] as string
         let mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g,'')
@@ -573,7 +573,7 @@ export class EditorService {
 
       mdata['columns'] = mcolumns;
       mdata['displayedColumns'] = mdisplayedColumns;
-      mdata['rows'] = mdata.rows;
+      mdata['rows'] = mdata.data.rows;
       mdata['file'] = f;
       delete mdata['data']
 
@@ -645,7 +645,7 @@ export class EditorService {
       data['columns'] = columns;
       data['displayedColumns'] = displayedColumns;
       data['file'] = file;
-      data.rows ? data['rows'] = data.rows : data['rows'] = [];
+      data.data.rows ? data['rows'] = data.data.rows : data['rows'] = [];
       delete data['data']
       samples['data'] = data
       this.ngRedux.dispatch({ type: 'SET_STUDY_SAMPLES', body: samples});
