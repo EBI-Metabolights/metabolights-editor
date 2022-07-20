@@ -42,6 +42,11 @@ import { StudyModule } from './components/study/study.module';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './components/shared/shared.module';
 import { GuideModule } from './components/guide/guide.module';
+import { EditorService } from './services/editor.service';
+import { MetabolightsService } from './services/metabolights/metabolights.service';
+import { DOIService } from './services/publications/doi.service';
+import { AuthService } from './services/metabolights/auth.service';
+import { EuropePMCService } from './services/publications/europePMC.service';
 
 @NgModule({
   declarations: [
@@ -97,7 +102,12 @@ import { GuideModule } from './components/guide/guide.module';
 
   ],
   providers: [
-    AuthGuard
+    AuthGuard,
+    EditorService,
+    MetabolightsService,
+    EuropePMCService,
+    DOIService,
+    AuthService,
   ],
   bootstrap: [AppComponent]
 })
