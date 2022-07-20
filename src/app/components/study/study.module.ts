@@ -42,6 +42,12 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { QuillModule } from 'ngx-quill';
+import { AuthGuard } from 'src/app/auth-guard.service';
+import { EditorService } from 'src/app/services/editor.service';
+import { AuthService } from 'src/app/services/metabolights/auth.service';
+import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
+import { DOIService } from 'src/app/services/publications/doi.service';
+import { EuropePMCService } from 'src/app/services/publications/europePMC.service';
 
 
 
@@ -118,6 +124,14 @@ import { QuillModule } from 'ngx-quill';
     ValidationsComponent,
     ValidationDetailComponent,
     ValidationDetailCommentComponent
+  ],
+  providers: [
+    AuthGuard,
+    EditorService,
+    MetabolightsService,
+    EuropePMCService,
+    DOIService,
+    AuthService,
   ]
 })
 export class StudyModule { }

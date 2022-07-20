@@ -40,6 +40,12 @@ import { MatTableModule } from '@angular/material/table';
 import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatButtonModule } from '@angular/material/button';
+import { AuthGuard } from 'src/app/auth-guard.service';
+import { EditorService } from 'src/app/services/editor.service';
+import { AuthService } from 'src/app/services/metabolights/auth.service';
+import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
+import { DOIService } from 'src/app/services/publications/doi.service';
+import { EuropePMCService } from 'src/app/services/publications/europePMC.service';
 
 
 /**
@@ -121,8 +127,14 @@ import { MatButtonModule } from '@angular/material/button';
     PersonComponent,
     OntologyComponent,
     OntologyDetailsComponent,
-
-
+  ],
+  providers: [
+    AuthGuard,
+    EditorService,
+    MetabolightsService,
+    EuropePMCService,
+    DOIService,
+    AuthService,
   ]
 })
 export class SharedModule { }
