@@ -4,6 +4,8 @@ import { AuthService } from './services/metabolights/auth.service';
 import { EditorService } from './services/editor.service';
 import { NgRedux } from '@angular-redux/store';
 import { IAppState } from './store';
+import { assert } from 'console';
+import { isInitialised } from './components/store';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
   checkLogin(url: string) {
     let isInitialised = this.ngRedux.getState().status['isInitialised'];
-    if(!isInitialised){
+    // need to log out if evalsession comes back false.
+    if(!isInitialised.ready && this.evaluateSession(isInitialised)){
       let localUser = localStorage.getItem('user');
       if(localUser != null && this.isJSON(localUser)){
         return this.editorService.initialise(localUser, false);
@@ -47,6 +50,14 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     }else{
       return true;
     }
+  }
+
+  evaluateSession(isInitialisedObj: isInitialised) {
+      let now = new Date();
+      let then = isInitialisedObj.time as Date
+      let sixHoursInMs = 21600000
+
+      return (now.getTime() - then.getTime() > sixHoursInMs ? false : true)
   }
 
   isJSON(data) {

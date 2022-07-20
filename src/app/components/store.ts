@@ -1,3 +1,4 @@
+import { strictEqual } from 'assert';
 import { tassign } from 'tassign';
 import { TOGGLE_LOADING,
 		 ENABLE_LOADING,
@@ -15,6 +16,11 @@ import { TOGGLE_LOADING,
 		 SET_GUIDES,
 		 SET_USER } from './actions';
 
+export type isInitialised = {
+	ready: boolean, 
+	time: string | Date
+}
+
 export const SHARED_INITIAL_STATE: Object =  {
 	"loading" : true,
 	"info": '',
@@ -24,7 +30,10 @@ export const SHARED_INITIAL_STATE: Object =  {
 	'error': false,
 	'message': '',
 	'currentTabIndex': '0',
-	'isInitialised': false,
+	'isInitialised': {
+		ready: false,
+		time: ''
+	},
 	'userStudies': null,
 	'mappings': null,
 	'selectedLanguage': 'en',
@@ -63,8 +72,14 @@ function setCurrentTabIndex(state, action) {
   return tassign(state, { currentTabIndex: action.body.currentTabIndex });
 }
 
-function setInitilised(state, action){
-	return tassign(state, {isInitialised: true})
+function setInitialised(state, action){
+	return tassign(state, {isInitialised: 
+		{
+			ready: true,
+			time: new Date()
+			}
+		}
+		)
 }
 
 function setUserStudies(state, action){
@@ -112,7 +127,7 @@ export function sharedReducer(state: Object = SHARED_INITIAL_STATE, action): Obj
     case SET_CONFIGURATION : return setLoadingConfiguration(state, action);
     case SET_TAB_INDEX : return setCurrentTabIndex(state, action);
     case SET_USER : return setCurrentUser(state, action);
-    case INITIALISE: return setInitilised(state, action);
+    case INITIALISE: return setInitialised(state, action);
 	case SET_USER_STUDIES: return setUserStudies(state, action);
 	case SET_GUIDES_MAPPINGS: return setGuidesMappings(state, action);
 	case SET_SELECTED_LANGUAGE: return setSelectedLanguage(state, action);
