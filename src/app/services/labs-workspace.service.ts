@@ -13,10 +13,13 @@ export class LabsWorkspaceService {
 
    }
 
+   /**
+    * Setting the type of the Observable to any is a temporary fix, we should asceertain the type of the response
+    */
   initialise(payload: {
     "jwt": string,
     "user": string
   }) {
-    return this.http.post(this.url, payload)
+    return this.http.post<any>(this.url, payload)
   }
 }
