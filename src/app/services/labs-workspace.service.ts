@@ -1,8 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
-import { Router } from '@angular/router';
-import { DataService } from './data.service';
 import { AuthenticationURL } from './globals';
 
 @Injectable({
@@ -12,7 +9,7 @@ export class LabsWorkspaceService {
 
   url: string = AuthenticationURL['initialise']	
 
-  constructor(public http: Http) {
+  constructor(public http: HttpClient) {
 
    }
 
