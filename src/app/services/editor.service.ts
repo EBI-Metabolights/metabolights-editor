@@ -84,7 +84,7 @@ export class EditorService {
     console.log('initialise');
     let user = null
     if(signInRequest){
-      user = JSON.parse(data.content).owner;
+      user = data.owner;
       localStorage.setItem('user', JSON.stringify(user));
       httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
       this.ngRedux.dispatch({
@@ -99,7 +99,7 @@ export class EditorService {
       this.loadValidations();
       return true;
     }else{
-      user = JSON.parse(data);
+      user = data;
       httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
       this.ngRedux.dispatch({
         type: 'INITIALISE'
