@@ -78,7 +78,7 @@ export class PublicStudyComponent implements OnInit {
         let mtblsJWT = localStorage.getItem('mtblsjwt');
         if(mtblsJWT && mtblsJWT != '' && mtblsUser && mtblsUser != ''){
           this.labsWorkspaceService.initialise({ "jwt" : mtblsJWT, "user" : mtblsUser }).subscribe( res => {
-            localStorage.setItem('user', JSON.stringify(JSON.parse(res.content).owner));
+            localStorage.setItem('user', JSON.stringify(res.owner));
             let localUser = localStorage.getItem('user');
             this.editorService.initialise(localUser, false);
             if (!environment.isTesting) {
