@@ -11,6 +11,7 @@ import * as toastr from 'toastr';
 export class ValidationsComponent implements OnInit, AfterViewInit {
 
   studyValidation: any = null;
+  NoValidationsfound: any = null;
   displayOption: string = 'error';
   defaultToastrOptions: any = {
     "timeOut": "2500",
@@ -32,7 +33,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   constructor(private editorService: EditorService) { }
 
   ngOnInit() {
-    
+
   }
 
   ngAfterViewInit() {
@@ -41,7 +42,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   setUpSubscriptions() {
-    
+
     this.validation.subscribe(value => {
       this.studyValidation = value;
     });
@@ -81,7 +82,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * Handle a saved comment 
+   * Handle a saved comment
    * @param $event - The comment emitted from a child component
    * @param detail - the validation detail that the comment pertains to
    */
@@ -93,12 +94,12 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     let payload ={}
     payload[detail.val_sequence] = $event['comment'];
     data['comments'].push(payload)
-    
+
     console.log(data);
     this.editorService.addComment(data).subscribe (res => {
       toastr.success(res.success, "Successfully posted the comment", this.defaultToastrOptions);
       this.refreshValidations();
-    }) 
+    })
   }
 
 
