@@ -47,6 +47,7 @@ import { MetabolightsService } from './services/metabolights/metabolights.servic
 import { DOIService } from './services/publications/doi.service';
 import { AuthService } from './services/metabolights/auth.service';
 import { EuropePMCService } from './services/publications/europePMC.service';
+import { LabsWorkspaceService } from './services/labs-workspace.service';
 
 @NgModule({
   declarations: [
@@ -108,6 +109,7 @@ import { EuropePMCService } from './services/publications/europePMC.service';
     EuropePMCService,
     DOIService,
     AuthService,
+    LabsWorkspaceService
   ],
   bootstrap: [AppComponent]
 })

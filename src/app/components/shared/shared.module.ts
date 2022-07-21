@@ -46,6 +46,7 @@ import { AuthService } from 'src/app/services/metabolights/auth.service';
 import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
 import { DOIService } from 'src/app/services/publications/doi.service';
 import { EuropePMCService } from 'src/app/services/publications/europePMC.service';
+import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
 
 
 /**
@@ -135,6 +136,7 @@ import { EuropePMCService } from 'src/app/services/publications/europePMC.servic
     EuropePMCService,
     DOIService,
     AuthService,
+    LabsWorkspaceService
   ]
 })
 export class SharedModule { }
