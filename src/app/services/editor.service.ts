@@ -84,7 +84,7 @@ export class EditorService {
     console.log('initialise');
     let user = null
     if(signInRequest){
-      user = JSON.parse(data.content).owner;
+      user = JSON.parse(data);
       localStorage.setItem('user', JSON.stringify(user));
       httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
       this.ngRedux.dispatch({

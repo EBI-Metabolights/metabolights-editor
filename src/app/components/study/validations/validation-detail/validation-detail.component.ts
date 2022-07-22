@@ -54,13 +54,12 @@ export class ValidationDetailComponent implements OnInit {
   } 
 
   /**
-   * Decide whether or not to expose the cooment box to the user or curator. We only want a curator to leave a comment if the validation
+   * Decide whether or not to expose the comment box to the user or curator. We only want a curator to leave a comment if the validation
    *  status is error or warning. We only want the user to be able to 
    * @returns a boolean value indicating whether the comment box is disabled.
    */
   decideIfDisabled(): boolean {
     if (this.isCurator) {
-      console.log(this.validationDetail.status)
       if(this.validationDetail.status === 'error' || this.validationDetail.status === 'warning') {
         return false
       }
@@ -75,7 +74,6 @@ export class ValidationDetailComponent implements OnInit {
 
 
   propagateComment($event) {
-    console.log($event);
     this.commentSaved.emit($event)
   }
 
