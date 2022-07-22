@@ -99,7 +99,7 @@ export class EditorService {
       this.loadValidations();
       return true;
     }else{
-      user = JSON.parse(data);
+      user = data;
       httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
       this.ngRedux.dispatch({
         type: 'INITIALISE'
