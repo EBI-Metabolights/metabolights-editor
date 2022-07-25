@@ -100,7 +100,7 @@ export class EditorService {
       return true;
     }else{
       user = JSON.parse(data);
-      httpOptions.headers = httpOptions.headers.set('user_token', user.owner.apiToken);
+      httpOptions.headers = httpOptions.headers.set('user_token', this.disambiguateUserObj(user));
       this.ngRedux.dispatch({
         type: 'INITIALISE'
       })
@@ -114,6 +114,10 @@ export class EditorService {
       return true;
 
     }
+  }
+
+  disambiguateUserObj(user): string {
+    return user.owner ? user.owner.apiToken : user.apiToken 
   }
 
   loadValidations(){
