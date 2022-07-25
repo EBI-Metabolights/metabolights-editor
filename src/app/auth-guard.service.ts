@@ -6,6 +6,7 @@ import { NgRedux } from '@angular-redux/store';
 import { IAppState } from './store';
 import { assert } from 'console';
 import { isInitialised } from './components/store';
+import { SessionStatus } from './models/mtbl/mtbls/enums/session-status.enum';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,11 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
   checkLogin(url: string) {
     let isInitialised = this.ngRedux.getState().status['isInitialised'];
+
+    // possible paths:
+
+
+
     // need to log out if evalsession comes back false.
     if(!isInitialised.ready && this.evaluateSession(isInitialised)){
       let localUser = localStorage.getItem('user');
@@ -52,12 +58,21 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     }
   }
 
-  evaluateSession(isInitialisedObj: isInitialised) {
+  evaluateSession(isInitialisedObj: isInitialised): SessionStatus {
+      if (isInitialisedObj.ready === false) {
+        return SessionStatus.NotInit
+      }
       let now = new Date();
       let then = isInitialisedObj.time as Date
       let sixHoursInMs = 21600000
 
-      return (now.getTime() - then.getTime() > sixHoursInMs ? false : true)
+      if(now.getTime() - then.getTime() > sixHoursInMs ) {
+        return SessionStatus.Expired
+      } else {
+        return SessionStatus.Active
+      }
+
+
   }
 
   isJSON(data) {
