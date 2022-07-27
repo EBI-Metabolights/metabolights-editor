@@ -4,9 +4,9 @@ import { AuthService } from './services/metabolights/auth.service';
 import { EditorService } from './services/editor.service';
 import { NgRedux } from '@angular-redux/store';
 import { IAppState } from './store';
-import { assert } from 'console';
 import { isInitialised } from './components/store';
 import { SessionStatus } from './models/mtbl/mtbls/enums/session-status.enum';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,32 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   checkLogin(url: string) {
     let isInitialised = this.ngRedux.getState().status['isInitialised'];
 
-    // possible paths:
+    switch (this.evaluateSession(isInitialised)) {
+      case SessionStatus.Active:
+      //do some token verification  
+        return true;
+
+      case SessionStatus.Expired:
+        // do some logging out / deactivating
+        this.editorService.logout()
+        return false;
+        
+      case SessionStatus.NotInit:
+        // do some initialisation
+        return this.editorService.initialise(localStorage.getItem('user'), false)
+
+      case SessionStatus.NoRecord:
+        this.editorService.redirectUrl = url;
+        this.router.navigate(['/login']);
+        return false;
+        
+      default:
+        console.log('hit default case in checkLogin')
+        this.editorService.redirectUrl = url;
+        this.router.navigate(['/login']);
+        return false;
+        
+    }
 
 
 
@@ -59,14 +84,22 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   }
 
   evaluateSession(isInitialisedObj: isInitialised): SessionStatus {
-      if (isInitialisedObj.ready === false) {
+      if (
+        isInitialisedObj.ready === false && 
+        (typeof isInitialisedObj.time === 'string' ) && 
+        localStorage.getItem('user') === null
+        ) {
+        return SessionStatus.NoRecord
+      }
+
+      if (isInitialisedObj.ready === false && this.isJSON(localStorage.getItem('user'))) {
         return SessionStatus.NotInit
       }
       let now = new Date();
       let then = isInitialisedObj.time as Date
-      let sixHoursInMs = 21600000
+      
 
-      if(now.getTime() - then.getTime() > sixHoursInMs ) {
+      if(now.getTime() - then.getTime() > environment.sessionLength ) {
         return SessionStatus.Expired
       } else {
         return SessionStatus.Active

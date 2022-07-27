@@ -14,7 +14,8 @@ import { TOGGLE_LOADING,
 		 SET_GUIDES_MAPPINGS,
 		 SET_SELECTED_LANGUAGE,
 		 SET_GUIDES,
-		 SET_USER } from './actions';
+		 SET_USER, 
+		 RESET} from './actions';
 
 export type isInitialised = {
 	ready: boolean, 
@@ -82,6 +83,14 @@ function setInitialised(state, action){
 		)
 }
 
+function reset(state, action) {
+	return tassign(state, {isInitialised:
+	{
+		ready: false,
+		time: ''
+	}})
+}
+
 function setUserStudies(state, action){
 	return tassign(state, { userStudies: action.body.studies })
 }
@@ -128,6 +137,7 @@ export function sharedReducer(state: Object = SHARED_INITIAL_STATE, action): Obj
     case SET_TAB_INDEX : return setCurrentTabIndex(state, action);
     case SET_USER : return setCurrentUser(state, action);
     case INITIALISE: return setInitialised(state, action);
+	case RESET: return reset(state, action);
 	case SET_USER_STUDIES: return setUserStudies(state, action);
 	case SET_GUIDES_MAPPINGS: return setGuidesMappings(state, action);
 	case SET_SELECTED_LANGUAGE: return setSelectedLanguage(state, action);

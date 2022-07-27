@@ -53,6 +53,9 @@ export class EditorService {
 
   logout(){
     localStorage.removeItem('user');
+    this.ngRedux.dispatch({
+      type: 'RESET'
+    })
     this.router.navigate([LoginURL]);
   }
 
