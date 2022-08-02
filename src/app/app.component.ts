@@ -1,6 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, ViewEncapsulation, ElementRef } from '@angular/core';
 import { EditorService } from './services/editor.service';
+import { NgRedux } from '@angular-redux/store';
+import { IAppState } from './store';
+import { Subscription } from 'rxjs';
+import { NavigationStart, Router, RouterEvent } from '@angular/router';
+
+export let browserRefresh = false;
+
 
 @Component({
   selector: 'app-root',
@@ -9,7 +15,9 @@ import { EditorService } from './services/editor.service';
   encapsulation: ViewEncapsulation.None
 })
 export class AppComponent {
-    constructor(private elementRef:ElementRef,  private editorService: EditorService ) {
+
+  subscription: Subscription;
+    constructor(private router: Router, private elementRef:ElementRef,  private editorService: EditorService, private ngRedux: NgRedux<IAppState> ) {
       let jwt = this.elementRef.nativeElement.getAttribute('mtblsjwt')
       let user = this.elementRef.nativeElement.getAttribute('mtblsuser')
 
@@ -18,6 +26,11 @@ export class AppComponent {
       
       let mtblsid = this.elementRef.nativeElement.getAttribute('mtblsid')
       let obfuscationcode = this.elementRef.nativeElement.getAttribute('obfuscationcode')
+      this.subscription = router.events.subscribe((e) => {
+        if (e instanceof NavigationStart) {
+          browserRefresh = !router.navigated;
+        }
+      })
 
       if(jwt && jwt != '' && user && user != ''){
         localStorage.setItem('mtblsuser', user);

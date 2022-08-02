@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  isTesting: false
+  isTesting: false,
+  //sessionLength: 21600000,
+  sessionLength: 300000
 };
 
 /*

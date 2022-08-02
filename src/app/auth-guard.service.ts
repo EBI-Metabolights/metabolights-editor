@@ -7,6 +7,7 @@ import { IAppState } from './store';
 import { isInitialised } from './components/store';
 import { SessionStatus } from './models/mtbl/mtbls/enums/session-status.enum';
 import { environment } from 'src/environments/environment';
+import { browserRefresh } from './app.component';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,12 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     return this.canActivate(route, state);
   }
 
-  checkLogin(url: string) {
+  /**
+   * Checks whether a user is logged in.
+   * @param url - url to be used a redirect if the user is found to be not logged in.
+   * @returns boolean indicating whether the user is logged in.
+   */
+  checkLogin(url: string): boolean {
     let isInitialised = this.ngRedux.getState().status['isInitialised'];
 
     switch (this.evaluateSession(isInitialised)) {
@@ -83,7 +89,17 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     }
   }
 
+  /**
+   * check whether a user has an open session, and if they do, whether it is still valid
+   * @param isInitialisedObj Initialisation object from the state, which contains a timestamp of the session start.
+   * @returns A SessionStatus enum value, indicating the status of the session. 
+   */
   evaluateSession(isInitialisedObj: isInitialised): SessionStatus {
+
+    // in app.component.ts we are subscribing to all router events, and recording when that event is NavigationStart, 
+    // which will either be arriving at the app for the first time, or refreshing the page.
+    let refreshed = browserRefresh;
+
       if (
         isInitialisedObj.ready === false && 
         (typeof isInitialisedObj.time === 'string' ) && 
@@ -92,13 +108,22 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return SessionStatus.NoRecord
       }
 
-      if (isInitialisedObj.ready === false && this.isJSON(localStorage.getItem('user'))) {
+      if (
+        isInitialisedObj.ready === false && 
+        this.isJSON(localStorage.getItem('user')) &&
+        refreshed === false
+         ) {
         return SessionStatus.NotInit
       }
       let now = new Date();
-      let then = isInitialisedObj.time as Date
-      
+      let then = null
 
+      if (localStorage.getItem('time') !== null){
+        then = new Date(localStorage.getItem('time'))
+      } else {
+        return SessionStatus.NotInit
+      }
+      
       if(now.getTime() - then.getTime() > environment.sessionLength ) {
         return SessionStatus.Expired
       } else {

@@ -53,6 +53,7 @@ export class EditorService {
 
   logout(){
     localStorage.removeItem('user');
+    localStorage.removeItem('state');
     this.ngRedux.dispatch({
       type: 'RESET'
     })
@@ -99,6 +100,7 @@ export class EditorService {
       this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
         'studies': null
       }})
+      localStorage.setItem('time', this.ngRedux.getState().status['isInitialised'].time)
       this.loadValidations();
       return true;
     }else{
