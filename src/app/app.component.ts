@@ -17,7 +17,7 @@ export let browserRefresh = false;
 export class AppComponent {
 
   subscription: Subscription;
-    constructor(private router: Router, private elementRef:ElementRef,  private editorService: EditorService, private ngRedux: NgRedux<IAppState> ) {
+    constructor(private router: Router, private elementRef:ElementRef,  private editorService: EditorService) {
       let jwt = this.elementRef.nativeElement.getAttribute('mtblsjwt')
       let user = this.elementRef.nativeElement.getAttribute('mtblsuser')
 
