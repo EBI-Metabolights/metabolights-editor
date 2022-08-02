@@ -5,13 +5,14 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ICrossRefDOI } from 'src/app/models/mtbl/mtbls/interfaces/crossref-doi.interface';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DOIService extends DataService{
 	constructor(http: HttpClient) {
-  	super(DOIWSURL, http);
+  	super(environment.DOIWSURL, http);
  	}
 
   getArticleInfo(doi): Observable<ICrossRefDOI> {

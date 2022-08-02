@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { IEuropePMCResponseWrapper } from 'src/app/models/mtbl/mtbls/interfaces/europe-pmc-response-wrapper.interface';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +20,7 @@ export class EuropePMCService extends DataService{
 	 * @param http HttpClient module for making the requests.
 	 */
 	constructor(http: HttpClient) {
-		super(EuropePMCURL, http);
+		super(environment.EuropePMCURL, http);
 	}
 
 	/**

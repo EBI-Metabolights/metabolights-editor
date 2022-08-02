@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
 import { LoginURL, RedirectURL } from './../services/globals';
 import { httpOptions } from './../services/headers';
 import Swal from 'sweetalert2';
+import { environment } from "src/environments/environment";
 
 @Injectable({
 	providedIn: 'root'
@@ -21,7 +22,7 @@ export class EditorService {
   @select(state => state.study.validations) studyValidations;
   @select(state => state.study.files) studyFiles;
 
-  redirectUrl: string = RedirectURL;
+  redirectUrl: string = environment.redirectURL;
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];
@@ -57,7 +58,7 @@ export class EditorService {
     this.ngRedux.dispatch({
       type: 'RESET'
     })
-    this.router.navigate([LoginURL]);
+    this.router.navigate([environment.loginURL]);
   }
 
   authenticateAPIToken(body){
