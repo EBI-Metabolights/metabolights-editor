@@ -7,6 +7,9 @@
 /src/assets/videos/*
 /src/assets/guides/*
 
+# Don't expose configs
+/src/assets/configs/*
+
 # Only exists if Bazel was run
 /bazel-out
 
