@@ -2,10 +2,11 @@
 // This is the environent for the development server, not for local development - that environment file is 
 // environment.ts
 export const environment = {
-    production: false,
+    context: 'dev'
+    /*production: false,
     isTesting: false,
     //sessionLength: 21600000,
-    sessionLength: 300000,
+    sessionLength: 300000, // in milliseconds
     origin: 'https://wwwdev.ebi.ac.uk',
     endpoint: origin + "/metabolights",
     loginURL: 'login',
@@ -13,6 +14,8 @@ export const environment = {
     MetabolightsWSURL: {
         domain: 'https://wwwdev.ebi.ac.uk/metabolights/',
         baseURL: 'https://wwwdev.ebi.ac.uk/metabolights/ws',
+        guides: "https://raw.githubusercontent.com/EBI-Metabolights/guides/development/",
+        ontologyDetails: "https://www.ebi.ac.uk/ols/api/ontologies/"
        
     },
     DOIWSURL: {
@@ -26,6 +29,6 @@ export const environment = {
         token: '/webservice/labs/authenticateToken',
         initialise: '/webservice/labs-workspace/initialise',
         studiesList: '/webservice/study/myStudies'
-    }
+    }*/
 
 }

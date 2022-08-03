@@ -5,7 +5,7 @@ import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
 import { IAppState, rootReducer, INITIAL_STATE } from './store';
 
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule, isDevMode, APP_INITIALIZER, Injector } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -42,6 +42,11 @@ import { StudyModule } from './components/study/study.module';
 import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './components/shared/shared.module';
 import { GuideModule } from './components/guide/guide.module';
+import { ConfigurationService } from './configuration.service';
+
+export function ConfigLoader(injector: Injector): () => Promise<any> {
+  return () => injector.get(ConfigurationService).loadConfiguration();
+}
 
 @NgModule({
   declarations: [
@@ -97,7 +102,13 @@ import { GuideModule } from './components/guide/guide.module';
 
   ],
   providers: [
-    AuthGuard
+    AuthGuard,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: ConfigLoader,
+      deps: [Injector],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

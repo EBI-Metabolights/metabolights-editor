@@ -3,11 +3,12 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
+  context: 'development',
   production: false,
   isTesting: false,
-  branch: 'production',
+  branch: 'development',
   //sessionLength: 21600000,
-  sessionLength: 300000,
+  sessionLength: 300000, // in milliseconds
   origin: 'localhost:4200',
   endpoint: origin + "/metabolights",
   loginURL: 'login',

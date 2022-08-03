@@ -2,7 +2,7 @@ export const environment = {
     production: false,
     isTesting: false,
     //sessionLength: 21600000,
-    sessionLength: 300000,
+    sessionLength: 300000, // in milliseconds
     origin: 'https://wwwdev.ebi.ac.uk', //change
     endpoint: origin + "/metabolights",
     loginURL: 'login',
@@ -10,6 +10,8 @@ export const environment = {
     MetabolightsWSURL: {
         domain: 'https://wwwdev.ebi.ac.uk/metabolights/',//change
         baseURL: 'https://wwwdev.ebi.ac.uk/metabolights/ws',//change
+        guides: "https://raw.githubusercontent.com/EBI-Metabolights/guides/prod/",
+        ontologyDetails: "https://www.ebi.ac.uk/ols/api/ontologies/"
        
     },
     DOIWSURL: {
