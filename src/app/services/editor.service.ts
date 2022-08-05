@@ -13,6 +13,7 @@ import { LoginURL, RedirectURL } from './../services/globals';
 import { httpOptions } from './../services/headers';
 import Swal from 'sweetalert2';
 import { environment } from "src/environments/environment";
+import { ConfigurationService } from "../configuration.service";
 
 @Injectable({
 	providedIn: 'root'
@@ -22,7 +23,7 @@ export class EditorService {
   @select(state => state.study.validations) studyValidations;
   @select(state => state.study.files) studyFiles;
 
-  redirectUrl: string = environment.redirectURL;
+  redirectUrl: string = '';
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];
@@ -36,15 +37,21 @@ export class EditorService {
     "Source Name": 7
   }
 
-  constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private doiService: DOIService, private authService: AuthService, private europePMCService: EuropePMCService, private dataService: MetabolightsService) {
-    this.studyIdentifier.subscribe(value => {
-        this.currentStudyIdentifier = value
-    });
-    this.studyValidations.subscribe(value => {
-      this.validations = value;
-    });
-    this.studyFiles.subscribe(value => {
-      this.files = value;
+  constructor(
+    private ngRedux: NgRedux<IAppState>, 
+    private router: Router, 
+    private authService: AuthService, 
+    private dataService: MetabolightsService,
+    private configService: ConfigurationService) {
+      this.redirectUrl = this.configService.config.redirectURL
+      this.studyIdentifier.subscribe(value => {
+          this.currentStudyIdentifier = value
+      });
+      this.studyValidations.subscribe(value => {
+        this.validations = value;
+      });
+      this.studyFiles.subscribe(value => {
+        this.files = value;
     });
   }
 
@@ -58,7 +65,7 @@ export class EditorService {
     this.ngRedux.dispatch({
       type: 'RESET'
     })
-    this.router.navigate([environment.loginURL]);
+    this.router.navigate([this.configService.config.loginURL]);
   }
 
   authenticateAPIToken(body){

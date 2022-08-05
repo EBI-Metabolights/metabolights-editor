@@ -38,7 +38,7 @@ export class AuthService{
 	// Validate JWT token and responds back with a valid user
 	getValidatedJWTUser(response): any {
 		return this.http.post(
-			environment.endpoint + environment.AuthenticationURL.initialise,
+			this.configService.config.endpoint + this.configService.config.AuthenticationURL.initialise,
 			 { "jwt" : response.headers.get("jwt"), "user" : response.headers.get("user")},
 			  httpOptions
 			  )

@@ -8,12 +8,17 @@ import { isInitialised } from './components/store';
 import { SessionStatus } from './models/mtbl/mtbls/enums/session-status.enum';
 import { environment } from 'src/environments/environment';
 import { browserRefresh } from './app.component';
+import { ConfigurationService } from './configuration.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
-  constructor(private editorService: EditorService, private router: Router, private ngRedux: NgRedux<IAppState>) {}
+  constructor(
+    private editorService: EditorService,
+    private configService: ConfigurationService, 
+    private router: Router, 
+    private ngRedux: NgRedux<IAppState>) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     let url: string = state.url;
@@ -99,7 +104,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return SessionStatus.NotInit
       }
       
-      if(now.getTime() - then.getTime() > environment.sessionLength ) {
+      if(now.getTime() - then.getTime() > this.configService.config.sessionLength ) {
         return SessionStatus.Expired
       } else {
         return SessionStatus.Active

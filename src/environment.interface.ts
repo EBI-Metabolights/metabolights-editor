@@ -33,4 +33,19 @@ export interface Environment {
     DOIWSURL: DOIWSURL; // Object containing url for DOI service.
     EuropePMCURL: EuropePMCURL; // Object containing url for europePMC service.
     AuthenticationURL: AuthenticationURL; // Object containing the different authentication and authorization endpoints.
+    VideoURL: VideoURL // Object containing links to all help videos.
+}
+
+export interface VideoURL {
+    all: string;
+    aspera: string;
+    create_account: string;
+    create_study: string;
+    maf: string;
+    factors: string;
+    create_assay: string;
+    protocols: string;
+    samples: string;
+    descriptors: string;
+    editor: string;
 }

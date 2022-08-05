@@ -6,13 +6,18 @@ import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { ICrossRefDOI } from 'src/app/models/mtbl/mtbls/interfaces/crossref-doi.interface';
 import { environment } from 'src/environments/environment';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DOIService extends DataService{
-	constructor(http: HttpClient) {
-  	super(environment.DOIWSURL, http);
+	constructor(
+    http: HttpClient,
+    private configService: ConfigurationService
+    ) {
+      super('', http);
+      this.url = this.configService.config.DOIWSURL
  	}
 
   getArticleInfo(doi): Observable<ICrossRefDOI> {

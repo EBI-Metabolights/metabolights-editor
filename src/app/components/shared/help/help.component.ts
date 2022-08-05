@@ -1,4 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
+import { ConfigurationService } from 'src/app/configuration.service';
+import { VideoURL } from 'src/environment.interface';
 
 @Component({
   selector: 'mtbls-help',
@@ -12,55 +14,15 @@ export class HelpComponent implements OnInit {
   isModalOpen: boolean = false;
   videoLink: string = "201904_ML_ALL.mp4";
 
-  constructor() { }
+  constructor(private configService: ConfigurationService) { }
 
   ngOnInit() {
+    this.videoLink = this.getVideoLink()
+  }
 
-    switch (this.target) {
-      case 'aspera':
-        this.videoLink = '201904_ML_Aspera.mp4' 
-        break;
-      
-      case 'create_account':
-        this.videoLink = '201904_ML_create-acc.mp4'
-        break;
-      
-      case 'create_study':
-        this.videoLink = '201904_ML_create-study.mp4'
-        break;
-
-      case 'maf':
-        this.videoLink = '201904_ML_MAF.mp4'
-        break;
-
-      case 'factors':
-        this.videoLink = '201904_ML_factors.mp4'
-        break;
-      
-      case 'create_assay':
-        this.videoLink = '201904_ML_new-assay.mp4'
-        break;
-    
-      case 'protocols':
-        this.videoLink = '201904_ML_protocols.mp4'
-        break;
-
-      case 'samples':
-        this.videoLink = '201904_ML_samples.mp4'
-        break;
-
-      case 'descriptors':
-        this.videoLink = '201904_ML_study-description.mp4'
-        break;
-      
-      case 'editor':
-        this.videoLink = '201904_ML_Editor.mp4'
-        break;
-
-      default:
-        console.error('invalid video link option')
-        break;
-    }
+  getVideoLink(): string {
+    let accessor = this.target as keyof VideoURL
+    return this.configService.config.VideoURL[accessor]
   }
 
   openModal(){
