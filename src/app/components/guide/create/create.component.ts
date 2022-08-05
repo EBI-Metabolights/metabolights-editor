@@ -4,6 +4,7 @@ import { EditorService } from '../../../services/editor.service';
 import * as toastr from 'toastr';
 import { NgRedux, select } from '@angular-redux/store';
 import { IAppState } from '../../../store';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-create',
@@ -34,7 +35,9 @@ export class CreateComponent implements OnInit {
 	}
 
 	ngOnInit() {
-		this.ngRedux.dispatch({ type: 'DISABLE_LOADING' });
+		if (!environment.isTesting){
+			this.ngRedux.dispatch({ type: 'DISABLE_LOADING' });
+		}
 	}
 
 	nextSubStep(){

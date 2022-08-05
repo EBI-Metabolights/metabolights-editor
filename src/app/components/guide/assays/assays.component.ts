@@ -8,6 +8,7 @@ import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
 import { tassign } from 'tassign';
 import { SamplesComponent } from './../../study/samples/samples.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'guide-assays',
@@ -39,7 +40,14 @@ export class GuidedAssaysComponent implements OnInit {
 	samples: any = {};
 
 	constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router) {
-		this.editorService.initialiseStudy(this.route)
+		this.editorService.initialiseStudy(this.route);
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+
+	}
+
+	setUpSubscriptions() {
 		this.studyIdentifier.subscribe(value => {
 			if(value != null){
 				this.requestedStudy = value

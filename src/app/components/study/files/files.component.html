@@ -196,7 +196,7 @@
       </span>
     </span>
   </nav>
-  <nav *ngIf="uploadFiles.length > 0 && !isReadOnly" class="panel">
+  <nav *ngIf="uploadFiles?.length > 0 && !isReadOnly" class="panel">
     <div *ngIf="!isReadOnly" class="notification is-info">
       <small><mat-icon>info</mat-icon> Upload folder is a temporary location where we store a copy of your uploaded files and sync them to your study (listed above). We display (below) only those files which are either not present or latest than the files in your study, contact us <a [href]="'mailto:metabolights-help@ebi.ac.uk?subject=Regarding upload folder - '+requestedStudy">metabolights-help@ebi.ac.uk</a> for help.</small>
     </div>

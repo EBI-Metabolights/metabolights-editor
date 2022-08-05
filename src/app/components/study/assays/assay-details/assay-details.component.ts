@@ -3,6 +3,7 @@ import { select } from '@angular-redux/store';
 import Swal from 'sweetalert2';
 import { EditorService } from '../../../../services/editor.service';
 import { TableComponent } from './../../../shared/table/table.component';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'assay-details',
@@ -37,6 +38,12 @@ export class AssayDetailsComponent implements OnInit {
   @Output() assayDelete = new EventEmitter<any>();
 
   constructor(private editorService: EditorService) {
+    if (!environment.isTesting) {
+      this.setUpConstructorSubscription();
+    }
+  }
+
+  setUpConstructorSubscription() {
     this.readonly.subscribe(value => {
 			if(value != null){
 				this.isReadOnly = value
@@ -44,7 +51,7 @@ export class AssayDetailsComponent implements OnInit {
 		});
   }
 
-  ngOnInit() {
+  setUpOnInitSubscriptions() {
     this.assays.subscribe(value => {
       this.assay = value[this.assayName];
     });
@@ -52,6 +59,12 @@ export class AssayDetailsComponent implements OnInit {
       this.sampleNames = value.data.rows.map( r => r['Sample Name'])
       this.filteredSampleNames = this.sampleNames
     });
+  }
+
+  ngOnInit() {
+    if (!environment.isTesting) {
+      this.setUpOnInitSubscriptions();
+    }
   }
 
   onSamplesFilterKeydown(event, filterValue:string){

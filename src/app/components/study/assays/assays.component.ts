@@ -1,5 +1,6 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-assays',
@@ -17,7 +18,13 @@ export class AssaysComponent {
 	assaysNames: any = []
 
   	constructor() { 
-  		this.studyAssays.subscribe(value => {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+  	}
+
+	setUpSubscriptions() {
+		this.studyAssays.subscribe(value => {
 			let assayNames = Object.keys(value)
 			if(assayNames.length > 0){
 				assayNames.forEach( assayName => {
@@ -46,7 +53,7 @@ export class AssaysComponent {
 				this.isReadOnly = value
 			}
 		});
-  	}
+	}
 
 	assayDeleted(name){
 		let i = 0

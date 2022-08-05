@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-factors',
@@ -15,12 +16,24 @@ export class FactorsComponent implements OnInit {
 	factors: any = null;
 	
 	constructor() { 
+		if (!environment.isTesting) {
+			this.setUpConstructorSubscription();
+		}
+	}
+
+	ngOnInit() {
+		if (!environment.isTesting) {
+			this.setUpInitSubscription();
+		}
+	}
+
+	setUpConstructorSubscription() {
 		this.studyFactors.subscribe(value => { 
 			this.factors = value;
 		});
 	}
 
-	ngOnInit() {
+	setUpInitSubscription() {
 		this.readonly.subscribe(value => { 
 			if(value != null){
 				this.isReadOnly = value

@@ -3,6 +3,7 @@ import { select } from '@angular-redux/store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { EditorService } from '../../../services/editor.service';
 import { map }                  from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-delete',
@@ -23,6 +24,12 @@ export class DeleteComponent implements OnInit {
 	reload = false;
 
 	constructor(private editorService: EditorService, private route: ActivatedRoute,  private router: Router){ 
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyStatus.subscribe(value => { 
 			if(value != null){
 				this.status = value

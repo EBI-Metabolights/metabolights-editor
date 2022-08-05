@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NgRedux, select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'mtbls-header',
@@ -14,11 +15,17 @@ export class HeaderComponent{
   query: string = '';
 
   constructor() { 
+    if (!environment.isTesting) {
+      this.setUpSubscription();
+    }
+  }
+
+  setUpSubscription() {
     this.user.subscribe(value => { 
-        if(value != null){
-            this.authUser = value
-        }
-    });
+      if(value != null){
+          this.authUser = value
+      }
+  });
   }
 
   sendQuery(){

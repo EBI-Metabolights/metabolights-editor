@@ -6,6 +6,7 @@ import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { NgRedux, select } from '@angular-redux/store';
 import { Router } from '@angular/router';
 import { MetaboLightsWSURL } from './../../../services/globals';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -22,7 +23,9 @@ export class LoginComponent implements OnInit {
   constructor(private fb: FormBuilder, private ngRedux: NgRedux<IAppState>, public router: Router, private editorService: EditorService){}
 
   ngOnInit() {
-  	this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+    if (!environment.isTesting) {
+      this.ngRedux.dispatch({ type: 'DISABLE_LOADING' })
+    }
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       secret: ['', Validators.required]

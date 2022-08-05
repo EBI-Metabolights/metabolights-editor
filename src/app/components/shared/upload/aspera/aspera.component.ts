@@ -9,7 +9,7 @@ declare var AW4: any;
   templateUrl: './aspera.component.html',
   styleUrls: ['./aspera.component.css']
 })
-export class AsperaComponent implements OnInit {
+export class AsperaUploadComponent implements OnInit {
 
   @select(state => state.study.uploadLocation) uploadLocation;
 	@select(state => state.study.validations) validations: any;
@@ -36,6 +36,10 @@ export class AsperaComponent implements OnInit {
   validation: any = null
 
   constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService){ 
+    
+	}
+
+  setUpSubscriptions() {
 		this.uploadLocation.subscribe(value => { 
 			this.uploadPath = value
     })
@@ -44,7 +48,7 @@ export class AsperaComponent implements OnInit {
 			this.validation = value[this.validationsId]
       }
 		})
-	}
+  }
 
   ngOnInit() {
   }

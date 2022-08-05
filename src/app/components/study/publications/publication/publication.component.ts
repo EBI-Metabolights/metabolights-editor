@@ -10,10 +10,11 @@ import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ValidateRules } from './publication.validator';
 import { NgRedux,select } from '@angular-redux/store';
 import { IAppState } from '../../../../store';
-import { OntologyComponent } from './../../ontology/ontology.component';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from 'toastr';
 import { MTBLSPerson } from './../../../../models/mtbl/mtbls/mtbls-person';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-publication',
@@ -48,14 +49,20 @@ export class PublicationComponent implements OnInit {
 	publicationAbstract: string = '';
 
 	constructor( private fb: FormBuilder, private doiService: DOIService, private europePMCService: EuropePMCService, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyValidations.subscribe(value => { 
-      		this.validations = value;
-		});
-		this.readonly.subscribe(value => { 
-			if(value != null){
-				this.isReadOnly = value
-			}
-		});
+			this.validations = value;
+	  });
+	  this.readonly.subscribe(value => { 
+		  if(value != null){
+			  this.isReadOnly = value
+		  }
+	  });
 	}
 
 	openImportAuthorsModal(){

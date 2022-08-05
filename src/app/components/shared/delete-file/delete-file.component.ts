@@ -3,6 +3,7 @@ import { MetabolightsService } from '../../../services/metabolights/metabolights
 import { NgRedux, select } from '@angular-redux/store';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { EditorService } from '../../../services/editor.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -23,10 +24,16 @@ export class DeleteFileComponent implements OnInit {
   forceMetaDataDelete: boolean = false;
 	
 	constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService) {
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
+	}
+
+  setUpSubscriptions() {
 		this.obfuscationCode.subscribe(value => { 
 			this.code = value
 		})
-	}
+  }
 
 	ngOnInit() {
   }

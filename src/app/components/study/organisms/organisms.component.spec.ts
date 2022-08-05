@@ -17,6 +17,19 @@ describe('OrganismsComponent', () => {
     fixture = TestBed.createComponent(OrganismsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    component.organisms = [
+      {
+        name: 'organism',
+        variants: [
+          'var1',
+          'another variant'
+        ],
+        parts: [
+          'leaves',
+          'feet'
+        ]
+      }
+    ]
   });
 
   it('should create', () => {

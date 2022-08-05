@@ -8,11 +8,12 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
 import { EditorService } from '../../../services/editor.service';
-import { OntologyComponent } from '../../study/ontology/ontology.component';
+import { OntologyComponent } from '../ontology/ontology.component';
 import { NgRedux, select } from '@angular-redux/store';
 import { ClipboardService } from 'ngx-clipboard';
 import * as toastr from 'toastr';
 import { tassign } from 'tassign'; 
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-table',
@@ -98,19 +99,25 @@ export class TableComponent implements OnInit, AfterViewChecked {
 	constructor(private _clipboardService: ClipboardService, private fb: FormBuilder, private editorService: EditorService) { }
 
 	ngOnInit() {
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.studyValidations.subscribe(value => { 
-	      	this.validations = value;
-	    });
-	    this.studyFiles.subscribe(value => { 
-	      	if(value){
-				this.files = value.study;
-			}
-		});
-		this.readonly.subscribe(value => { 
-			if(value != null){
-				this.isReadOnly = value
-			}
-		});
+			this.validations = value;
+	  });
+	  this.studyFiles.subscribe(value => { 
+			if(value){
+			  this.files = value.study;
+		  }
+	  });
+	  this.readonly.subscribe(value => { 
+		  if(value != null){
+			  this.isReadOnly = value
+		  }
+	  });
 	}
 
 	getFiles(header){
@@ -145,16 +152,20 @@ export class TableComponent implements OnInit, AfterViewChecked {
 	}
 
 	ngAfterViewChecked() {
-		if(this.dataSource && !this.dataSource.paginator){
-			if(this.dataSource.filteredData.length > 500){
-				this.paginator.pageSizeOptions = [50, 100, 500, this.dataSource.filteredData.length]
-				this.paginator.pageSize = 50
-			}else{
-				this.paginator.pageSizeOptions = [10, 100, this.dataSource.filteredData.length]
-				this.paginator.pageSize = this.dataSource.filteredData.length;
+		setTimeout(() => {
+			if(this.dataSource && !this.dataSource.paginator){
+				if(this.dataSource.filteredData.length > 500){
+					this.paginator.pageSizeOptions = [50, 100, 500, this.dataSource.filteredData.length]
+					this.paginator.pageSize = 50
+				}else{
+					// this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
+					this.paginator.pageSizeOptions = [10, 100, this.dataSource.filteredData.length]
+					this.paginator.pageSize = this.dataSource.filteredData.length;
+				}
+				this.dataSource.paginator = this.paginator;
 			}
-			this.dataSource.paginator = this.paginator;
-		}
+		})
+
 	}
 
 	onCopy(e){

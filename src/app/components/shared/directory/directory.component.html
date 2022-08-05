@@ -15,7 +15,7 @@
           <img class="file-img" src="/metabolights/editor/assets/img/file.png">
         </ng-template>
       </span>
-      {{ file.file }} <span class="has-text-grey-lighter"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
+      {{ file.file }} <span class="has-text-grey-lighter"><small>{{ file.createdAt?.replace("'",'').replace("'",'') }}</small></span>
     </div>
     <div class="column is-one-fifths has-text-right">
         <span class="has-text-grey-light">

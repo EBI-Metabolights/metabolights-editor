@@ -1,4 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { EditorService } from 'src/app/services/editor.service';
+import { MockEditorService } from 'src/app/services/editor.service.mock';
 
 import { ProtocolsComponent } from './protocols.component';
 
@@ -8,7 +10,9 @@ describe('ProtocolsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProtocolsComponent ]
+      declarations: [ ProtocolsComponent ],
+      imports: [],
+      providers: [{provide: EditorService, useClass: MockEditorService}]
     })
     .compileComponents();
   }));

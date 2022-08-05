@@ -7,9 +7,11 @@ import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology'
 import { IAppState } from '../../../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { ValidateRules } from './protocol.validator';
-import { OntologyComponent } from './../../ontology/ontology.component';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
 import * as toastr from 'toastr';
 import { JsonConvert } from "json2typescript";
+import { IProtocol } from 'src/app/models/mtbl/mtbls/interfaces/protocol.interface';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-protocol',
@@ -50,6 +52,12 @@ export class ProtocolComponent implements OnInit {
 	validationsId = 'protocols.protocol';
 
 	constructor( private fb: FormBuilder, private editorService: EditorService, private ngRedux: NgRedux<IAppState>) { 
+		if (!environment.isTesting) {
+			this.setUpSubscriptions();
+		}
+	}
+
+	setUpSubscriptions() {
 		this.isProtocolsExpanded.subscribe(value => { 
 			this.expand = !value
 		});
@@ -341,7 +349,9 @@ export class ProtocolComponent implements OnInit {
 				this.initialiseForm();
 				if(!this.addNewProtocol){
 					let jsonConvert: JsonConvert = new JsonConvert();
-					this.protocol = jsonConvert.deserialize(res.protocols.filter( p => {
+					// assert that the protocols is a list
+					let assertedProtocols = res.protocols as IProtocol[];
+					this.protocol = jsonConvert.deserialize(assertedProtocols.filter( p => {
 						return p.name == this.protocol.name
 					})[0], MTBLSProtocol);
 					this.openModal(this.protocol)

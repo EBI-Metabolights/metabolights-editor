@@ -13,6 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            
             "outputPath": "dist/metabolights-editor",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -75,6 +76,12 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "main": "src/test.ts",
+            "fileReplacements": [
+              {
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.test.ts"
+              }
+            ],
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
@@ -131,5 +138,8 @@
       }
     }
   },
-  "defaultProject": "metabolights-editor"
+  "defaultProject": "metabolights-editor",
+  "cli": {
+    "analytics": "dd3ac279-0bbd-4c5b-9b6b-282fdfee42a3"
+  }
 }

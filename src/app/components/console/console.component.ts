@@ -2,8 +2,9 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { IAppState } from './../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { Component, OnInit } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
 import { EditorService } from '../../services/editor.service';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-console',
@@ -25,7 +26,7 @@ export class ConsoleComponent implements OnInit{
 
     isConfirmationModalOpen: boolean = false;
 
-    constructor(private route: ActivatedRoute, public router: Router, public http: Http, private ngRedux: NgRedux<IAppState>, private editorService: EditorService) {
+    constructor(private route: ActivatedRoute, public router: Router, public http: HttpClient, private ngRedux: NgRedux<IAppState>, private editorService: EditorService) {
         this.route.queryParams.subscribe(params => {
             if(params['reload']){
                 this.editorService.getAllStudies() 
@@ -53,8 +54,7 @@ export class ConsoleComponent implements OnInit{
         this.isConfirmationModalOpen = false   
     }
 
-    ngAfterContentInit() {
-        this.editorService.initialiseStudy(null)
+    setUpSubscriptions() {
         this.userStudies.subscribe(value => { 
             if(value == null){
                 this.ngRedux.dispatch({ type: 'SET_LOADING_INFO', body: {
@@ -71,6 +71,14 @@ export class ConsoleComponent implements OnInit{
             this.loadingStudies = false;
             }
         });
+    }
+
+    ngAfterContentInit() {
+        this.editorService.initialiseStudy(null)
+        if (!environment.isTesting) {
+            this.setUpSubscriptions();
+        }
+        
     }
 
     formatDate(date){

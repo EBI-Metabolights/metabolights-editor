@@ -5,10 +5,11 @@ import { FormBuilder, FormGroup} from '@angular/forms';
 import { MTBLSFactor } from './../../../models/mtbl/mtbls/mtbls-factor';
 import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
 import { MTBLSFactorValue } from './../../../models/mtbl/mtbls/mtbls-factor-value';
-import { OntologyComponent } from './../ontology/ontology.component';
+import { OntologyComponent } from '../../shared/ontology/ontology.component';
 import { TableComponent } from './../../shared/table/table.component';
 import { MTBLSCharacteristic } from './../../../models/mtbl/mtbls/mtbls-characteristic';
 import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { environment } from 'src/environments/environment';
 
 @Component({
 	selector: 'mtbls-samples',
@@ -57,35 +58,43 @@ export class SamplesComponent {
 	validationsId = 'samples';
 
 	constructor(private editorService: EditorService, private fb: FormBuilder) {
-		this.studyValidations.subscribe(value => { 
-	      	this.validations = value;
-	    });
-	    this.studyFactors.subscribe(value => { 
-			this.factors = value;
-		});
-        this.studyFiles.subscribe(f => { 
-            if(f){
-                f.study.forEach( file => {
-                    if(file.type == "raw")  {
-                        let name = file.file.split(".")[0]
-                        this.rawFileNames.push(name)
-                    }
-                })
-            }
-        });
-        this.studySamples.subscribe(value => { 
-			if(value == null){
-				this.editorService.loadStudySamples();
-			}else{
-				this.samples = value;
-			}
-        });
-        this.readonly.subscribe(value => { 
-			if(value != null){
-				this.isReadOnly = value
-			}
-		});
+
+        if (!environment.isTesting) {
+            this.setUpSubscriptions();
+        }
+
 	}
+
+    setUpSubscriptions() {
+        this.studyValidations.subscribe(value => { 
+            this.validations = value;
+      });
+      this.studyFactors.subscribe(value => { 
+          this.factors = value;
+      });
+      this.studyFiles.subscribe(f => { 
+          if(f){
+              f.study.forEach( file => {
+                  if(file.type == "raw")  {
+                      let name = file.file.split(".")[0]
+                      this.rawFileNames.push(name)
+                  }
+              })
+          }
+      });
+      this.studySamples.subscribe(value => { 
+          if(value == null){
+              this.editorService.loadStudySamples();
+          }else{
+              this.samples = value;
+          }
+      });
+      this.readonly.subscribe(value => { 
+          if(value != null){
+              this.isReadOnly = value
+          }
+      });
+    }
 
     refresh(){
        this.parseSamples()

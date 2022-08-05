@@ -1,31 +1,29 @@
-import { environment } from './../../../environments/environment';
 import { catchError, map, tap } from 'rxjs/operators';
 import { DOIWSURL } from './../globals';
-import { contentHeaders } from './../headers';
 import { DataService } from './../data.service';
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { ICrossRefDOI } from 'src/app/models/mtbl/mtbls/interfaces/crossref-doi.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DOIService extends DataService{
-	constructor(http: Http) {
+	constructor(http: HttpClient) {
   	super(DOIWSURL, http);
  	}
 
-  getArticleInfo(doi) {
-    return this.http.get(this.url.article + doi).pipe(
-        map(res => this.extractArticleDetails(res.json())),
+  getArticleInfo(doi): Observable<ICrossRefDOI> {
+    return this.http.get<ICrossRefDOI>(this.url.article + doi).pipe(
+      map(res => this.extractArticleDetails(res)),
         catchError(this.handleError)
     );
   }
 
 
-  getArticleKeyWords(doi) {
-    return this.http.get(this.url.article + doi).pipe(
-        map(res => res.json()),
+  getArticleKeyWords(doi): Observable<ICrossRefDOI> {
+    return this.http.get<ICrossRefDOI>(this.url.article + doi).pipe(
         catchError(this.handleError)
     );
   }
