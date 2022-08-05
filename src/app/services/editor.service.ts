@@ -117,7 +117,7 @@ export class EditorService {
   }
 
   disambiguateUserObj(user): string {
-    return user.owner ? user.owner.apiToken : user.apiToken 
+    return user.owner ? user.owner.apiToken : user.apiToken
   }
 
   loadValidations(){
@@ -342,7 +342,10 @@ export class EditorService {
   }
 
   loadStudyFiles(fource){
+    // console.log("Loading Study files..")
+    // console.log("Force files list calculation - "+fource)
     this.dataService.getStudyFilesFetch(fource).subscribe(data => {
+      // console.log("Got the files list  !")
       this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
         'uploadLocation': data.uploadPath
       }})

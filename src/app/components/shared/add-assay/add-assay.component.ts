@@ -41,12 +41,15 @@ export class AddAssayComponent implements OnInit {
 	assaySetup : any = null;
 
 	constructor(private fb: FormBuilder, private editorService: EditorService, private route: ActivatedRoute, private router: Router) {
+<<<<<<< HEAD:src/app/components/shared/add-assay/add-assay.component.ts
 		if (!environment.isTesting) {
 			this.setUpSubscriptions();
 		}
 	}
 
 	setUpSubscriptions() {
+=======
+>>>>>>> master:src/app/components/study/assays/add-assay/add-assay.component.ts
 		this.studyIdentifier.subscribe(value => {
 			if(value != null){
 				this.requestedStudy = value
