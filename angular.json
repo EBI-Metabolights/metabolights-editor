@@ -77,11 +77,11 @@
                 }
               ]
             },
-            "standalone": {
+            "kubernetes": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.standalone.ts"
+                  "with": "src/environments/environment.kubernetes.ts"
                 }
               ],              
               "optimization": true,
