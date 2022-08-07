@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  isTesting: false
+  isTesting: false,
+  videoBaseURL: 'https://www.ebi.ac.uk/metabolights/editor/assets/videos/'
 };
