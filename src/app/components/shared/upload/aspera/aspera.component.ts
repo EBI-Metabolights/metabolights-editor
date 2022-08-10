@@ -3,6 +3,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { EditorService } from '../../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
+import { environment } from 'src/environments/environment';
 declare var AW4: any;
 @Component({
   selector: 'mtbls-aspera',
@@ -51,6 +52,9 @@ export class AsperaUploadComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
   }
 
   toggleHelp() {

@@ -47,6 +47,7 @@ import { MetabolightsService } from 'src/app/services/metabolights/metabolights.
 import { DOIService } from 'src/app/services/publications/doi.service';
 import { EuropePMCService } from 'src/app/services/publications/europePMC.service';
 import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
+import { QuillModule } from 'ngx-quill';
 
 
 /**
@@ -100,7 +101,9 @@ import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
     MatTableModule,
     AngularStickyThingsModule,
     MatButtonModule,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    QuillModule,
+    
 
   ],
   exports: [
