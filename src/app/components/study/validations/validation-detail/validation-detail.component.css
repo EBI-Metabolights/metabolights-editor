@@ -1,0 +1,53 @@
+.panel-block.success {
+    border-left-color: #23D160;
+    border-left-width: 7px;
+    color: #363636;
+}
+
+.panel-block.info {
+    border-left-color: #3273dc;
+    border-left-width: 7px;
+    color: #363636;
+}
+
+.panel-block.warning {
+    border-left-color: #FFDD56;
+    border-left-width: 7px;
+    color: #363636;
+}
+
+.panel-block.error {
+    border-left-color: #FF3760;
+    border-left-width: 7px;
+    color: #363636;
+}
+
+.val-message {
+    color: #363636 !important;
+    font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-size: medium;
+    font-weight: 300;
+}
+
+.val-description {
+    color: #535353 !important;
+    font-family: BlinkMacSystemFont, -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    font-size: 13;
+    font-weight: 300;
+    border-bottom: medium;
+}
+
+.override {
+    float: right;
+    transform: translateX(150%);
+}
+
+
+.val-header {
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+
+.divide-longer {
+    transform: scaleX(1.5);
+}

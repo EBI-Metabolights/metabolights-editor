@@ -1,6 +1,6 @@
 <p>
 	<mat-form-field>
-	  	<mat-label>Display Options</mat-label>
+		<mat-label>Display Options</mat-label>
 		<mat-select [(value)]="displayOption">
 			<mat-option [value]="'error'">Errors</mat-option>
 			<mat-option [value]="'warning'">Warning</mat-option>
@@ -10,42 +10,37 @@
 		</mat-select>
 	</mat-form-field>
 <div class='is-pulled-right'>
-  <a (click)="refreshValidations()" class="button is-light">
-    <mat-icon>refresh</mat-icon> Refresh
-  </a>
+	<a (click)="refreshValidations()" class="button is-light">
+		<mat-icon>refresh</mat-icon> Refresh
+	</a>
 </div>
 <br><br>
 <div>
-  &nbsp;
+	&nbsp;
 </div>
+<ng-container *ngIf="studyValidation; else NoValidationsFound">
 	<span *ngFor="let validation of studyValidation.validations ; let i = index">
-			<nav class="panel">
-				<p class="panel-heading">
-					{{ validation['section'] }}
-				</p>
-				<span *ngFor="let detail of validation.details">
-					<span *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
-						<a [ngClass]="[detail.status, 'panel-block']">
-					    	<span class="panel-icon">
-					      		<i class="fas fa-book" aria-hidden="true"></i>
-					    	</span>
-					    	{{ detail.message }}
-							<ng-template [ngIf]="detail.description && detail.status === 'error'">
-								<br>
-								<div class="error">
-								{{ detail.description }}
-							</div>
-							</ng-template>
-              <span *ngIf="curator">
-                &nbsp;
-                <a (click)="overrideValidation(detail)">
-                  <mat-icon>info</mat-icon>Override
-                </a>
-              </span>
-
-						</a>
-					</span>
-				</span>
-			</nav>
-			<span>&nbsp;</span>
+		<nav class="panel">
+			<p class="panel-heading">
+				{{ validation['section'] }}
+			</p>
+	
+			<div *ngFor="let detail of validation.details">
+				<ng-container *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
+					<app-validation-detail 
+						matTooltip="Click here to view the comment that a curator has left" 
+						[matTooltipDisabled]="!detail.comment || curator"
+						[matTooltipPosition]="'below'"
+						[isCurator]="curator" 
+						[validationDetail]="detail"
+						(commentSaved)="handleCommentSaved($event, detail)"></app-validation-detail>
+				</ng-container>
+	
+			</div>
+			<!--end of individual validation cards-->
+	
+		</nav>
+		<span>&nbsp;</span>
 	</span>
+</ng-container>
+<ng-template #NoValidationsFound> No validations returned by webservice.</ng-template>

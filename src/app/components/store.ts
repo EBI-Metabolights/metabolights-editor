@@ -1,5 +1,5 @@
-import { tassign } from 'tassign'; 
-import { TOGGLE_LOADING, 
+import { tassign } from 'tassign';
+import { TOGGLE_LOADING,
 		 ENABLE_LOADING,
 		 DISABLE_LOADING,
 		 ENABLE_ERROR,
@@ -13,8 +13,7 @@ import { TOGGLE_LOADING,
 		 SET_GUIDES_MAPPINGS,
 		 SET_SELECTED_LANGUAGE,
 		 SET_GUIDES,
-		 SET_USER } from './actions'; 
-import { contentHeaders } from './../services/headers';
+		 SET_USER } from './actions';
 
 export const SHARED_INITIAL_STATE: Object =  {
 	"loading" : true,
@@ -53,7 +52,7 @@ function enableLoading(state) {
 }
 
 function disableLoading(state){
-	return tassign(state, { loading: false});	
+	return tassign(state, { loading: false});
 }
 
 function setLoadingInfo(state, action) {
@@ -120,5 +119,5 @@ export function sharedReducer(state: Object = SHARED_INITIAL_STATE, action): Obj
 	case SET_GUIDES: return setGuides(state, action);
   }
 
-  return state; 
+  return state;
 }

@@ -1,8 +1,8 @@
 import { EditorService } from '../../../../services/editor.service';
 import { Component, OnInit, Input, Inject, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
-import { MTBLSComment } from './../../../../models/mtbl/mtbls/common/mtbls-comment';
-import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology';
-import { MTBLSPerson } from './../../../../models/mtbl/mtbls/mtbls-person';
+import { MTBLSComment } from '../../../../models/mtbl/mtbls/common/mtbls-comment';
+import { Ontology } from '../../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { MTBLSPerson } from '../../../../models/mtbl/mtbls/mtbls-person';
 import { trigger, style, animate, transition } from '@angular/animations';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ValidateRules } from './person.validator';
@@ -13,7 +13,7 @@ import * as toastr from 'toastr';
 
 import {JsonConvert, OperationMode, ValueCheckingMode} from "json2typescript"
 
-import { OntologyComponent } from './../../ontology/ontology.component';
+import { OntologyComponent } from '../../ontology/ontology.component';
 import { environment } from 'src/environments/environment';
 
 @Component({

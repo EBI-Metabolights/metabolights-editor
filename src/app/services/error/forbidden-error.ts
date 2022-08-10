@@ -1,7 +1,7 @@
 import * as toastr from 'toastr';
 export class ForbiddenError {
 	constructor(error: any){
-		toastr.warning(error.json().message, '', {
+		toastr.warning(error.message, '', {
             "timeOut": "1000",
             "positionClass": "toast-top-center",
   			"preventDuplicates": true,

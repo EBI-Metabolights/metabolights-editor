@@ -86,7 +86,7 @@
             <mat-label>Select Publication</mat-label>
             <mat-select (selectionChange)="getKeyWords()" [formControl]="selectedPublication" required>
               <mat-option> Please select </mat-option>
-              <mat-option *ngFor="let publication of publications" [value]="publication.doi">{{ publication.title }}</mat-option>
+              <mat-option ngDefaultControl *ngFor="let publication of publications" [value]="publication.doi">{{ publication.title }}</mat-option>
             </mat-select>
           </mat-form-field>
           <div class="field is-grouped is-grouped-multiline">

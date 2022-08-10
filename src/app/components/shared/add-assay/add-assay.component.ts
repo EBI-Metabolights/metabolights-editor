@@ -1,18 +1,18 @@
 import { Component, ViewChild, OnInit, Input, Inject, ViewChildren, AfterContentInit, QueryList, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { EditorService } from '../../../../services/editor.service';
+import { EditorService } from '../../../services/editor.service';
 import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from '../../../../store';
-import { MTBLSPerson } from '../../../../models/mtbl/mtbls/mtbls-person';
-import { Ontology } from '../../../../models/mtbl/mtbls/common/mtbls-ontology';
-import { MTBLSPublication } from '../../../../models/mtbl/mtbls/mtbls-publication';
+import { IAppState } from '../../../store';
+import { MTBLSPerson } from '../../../models/mtbl/mtbls/mtbls-person';
+import { Ontology } from '../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { MTBLSPublication } from '../../../models/mtbl/mtbls/mtbls-publication';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript"
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { DOIService } from '../../../../services/publications/doi.service';
-import { EuropePMCService } from '../../../../services/publications/europePMC.service';
+import { DOIService } from '../../../services/publications/doi.service';
+import { EuropePMCService } from '../../../services/publications/europePMC.service';
 import * as toastr from 'toastr';
 import Swal from 'sweetalert2';
 import { tassign } from 'tassign';

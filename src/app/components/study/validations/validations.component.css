@@ -21,3 +21,8 @@
     border-left-width: 7px;
     color: #363636;
 }
+
+.comment {
+    border: #363636 !important;
+    border-width: 0.5px !important;
+}
