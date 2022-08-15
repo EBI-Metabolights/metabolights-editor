@@ -169,14 +169,17 @@ export class TableComponent implements OnInit, AfterViewChecked {
 	}
 
 	onCopy(e){
+		console.log('hit onCopy')
 		this.copyCellContent(e)
 	}
 
 	onCut(e){
+		console.log('hit onCut')
 		this.cutCellContent(e)
 	}
 
 	onPaste(e){
+		console.log('hit onPaste')
 		this.savePastedCellContent(e, null)
 	}
 
@@ -755,6 +758,7 @@ export class TableComponent implements OnInit, AfterViewChecked {
 	}
 
 	saveCell(){
+		console.log('hit save cell')
 		let cellsToUpdate = []
 		let columnIndex = this.data['header'][this.selectedCell['column'].header]
 		if(this.isObject(columnIndex)){
