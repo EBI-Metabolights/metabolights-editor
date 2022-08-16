@@ -23,7 +23,7 @@ export class ValidationDetailCommentComponent implements OnInit {
 
   monoForm = new FormGroup({
     commentControl: new FormControl('')
-  }) 
+  })
 
   constructor() { }
 
@@ -36,7 +36,7 @@ export class ValidationDetailCommentComponent implements OnInit {
     //   console.log('hit');
     //   this.commentControl.setValue(change)
     // });
-
+    console.log('Is Curator : ' + this.curator);
   }
 
   saveComment() {
