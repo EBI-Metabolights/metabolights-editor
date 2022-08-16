@@ -90,12 +90,12 @@
 }
 
 .tags .tag {
-  margin-bottom: 0.5rem !important; 
+  margin-bottom: 0.5rem !important;
 }
 
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active  {
     -webkit-box-shadow: 0 0 0 30px white inset !important;
 }
@@ -127,7 +127,7 @@ html, body{
 
 .nprl{
   padding-right: 0;
-  padding-left: 0; 
+  padding-left: 0;
 }
 
 .notification.is-warning {
@@ -145,7 +145,7 @@ html, body{
 }
 
 .mat-button-toggle-group-appearance-standard, .mat-button-toggle-standalone.mat-button-toggle-appearance-standard {
-    border: none !important; 
+    border: none !important;
 }
 
 .mat-progress-spinner circle, .mat-spinner circle {
@@ -213,8 +213,8 @@ html, body{
 }
 
 .modal-card-foot {
-     border-bottom-left-radius: 0px; 
-     border-bottom-right-radius: 0px; 
+     border-bottom-left-radius: 0px;
+     border-bottom-right-radius: 0px;
      /*border-top: none; */
 }
 
@@ -238,7 +238,7 @@ html, body{
 }
 
 .card-heading{
-  padding: 10px 20px; 
+  padding: 10px 20px;
   min-height: 3em;
   box-shadow: 0 1px 2px rgba(10, 10, 10, 0.1);
 }
@@ -361,7 +361,7 @@ a.disabled {
 
 
 #collapse-button{
-  padding-left: 0.7em !important; 
+  padding-left: 0.7em !important;
   padding-right: 0.7em !important;
 }
 
@@ -404,9 +404,9 @@ a.disabled {
   top: 100%;
   left: 0;
   background-color: white;
-  display: none; 
+  display: none;
   float: left;
-  text-align: left; 
+  text-align: left;
   list-style: none;
   background-clip: padding-box;
   box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
@@ -415,17 +415,17 @@ a.disabled {
 }
 
 .ngx-contextmenu a.dropdown-item, .ngx-contextmenu button.dropdown-item {
-     padding-right: 1rem; 
+     padding-right: 1rem;
 }
 
 .dropdown-item {
   display: block;
-  width: 100%; 
+  width: 100%;
   clear: both;
-  text-align: inherit; 
-  white-space: nowrap; 
-  background-color: transparent; 
-  border: 0; 
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
 
   &.active, &:active {
     text-decoration: none;
@@ -446,8 +446,8 @@ a.disabled {
 
 .dropdown-header {
   display: block;
-  margin-bottom: 0; 
-  white-space: nowrap; 
+  margin-bottom: 0;
+  white-space: nowrap;
 }
 
 
@@ -522,7 +522,7 @@ element.style {
 }
 
 .modal-card-title {
-    font-size: 1rem !important; 
+    font-size: 1rem !important;
     font-weight: bold;
 }
 
@@ -578,7 +578,7 @@ element.style {
 }
 
 .card-heading{
-  padding: 10px 20px; 
+  padding: 10px 20px;
   min-height: 3em;
   box-shadow: 0 1px 2px rgba(10, 10, 10, 0.1);
 }
@@ -803,4 +803,17 @@ element.style {
   from {left: 50%; width: 0;z-index:100;}
   33.3333% {left: 0; width: 100%;z-index: 10;}
   to {left: 0; width: 100%;}
+}
+
+.panel-block-validation {
+  align-items: center;
+  color: #363636;
+  justify-content: flex-start;
+  padding: 0.5em 0.75em;
+}
+
+.panel-block-validation, .panel-heading, .panel-tabs {
+  border-bottom: 1px solid #dbdbdb;
+  border-left: 1px solid #dbdbdb;
+  border-right: 1px solid #dbdbdb;
 }
