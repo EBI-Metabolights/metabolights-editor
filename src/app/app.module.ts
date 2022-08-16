@@ -57,7 +57,6 @@ import { LabsWorkspaceService } from './services/labs-workspace.service';
     LoginComponent,
     ConsoleComponent,
     PublicStudyComponent,
-    EditTableDirective,
     LazyLoadImagesDirective,
     HeaderComponent,
     FooterComponent,
