@@ -47,6 +47,7 @@ import { MetabolightsService } from 'src/app/services/metabolights/metabolights.
 import { DOIService } from 'src/app/services/publications/doi.service';
 import { EuropePMCService } from 'src/app/services/publications/europePMC.service';
 import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
+import { EditTableDirective } from 'src/app/directives/edit-table.directive';
 
 
 /**
@@ -79,6 +80,8 @@ import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
     PersonComponent,
     OntologyComponent,
     OntologyDetailsComponent,
+    EditTableDirective
+
 
 
   ],

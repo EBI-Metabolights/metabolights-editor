@@ -1,4 +1,4 @@
-import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewChecked } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
