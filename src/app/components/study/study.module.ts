@@ -48,6 +48,7 @@ import { AuthService } from 'src/app/services/metabolights/auth.service';
 import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
 import { DOIService } from 'src/app/services/publications/doi.service';
 import { EuropePMCService } from 'src/app/services/publications/europePMC.service';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 
 
@@ -55,8 +56,8 @@ import { EuropePMCService } from 'src/app/services/publications/europePMC.servic
 @NgModule({
   declarations: [
     AssaysComponent,
-    AssayDetailsComponent, 
-    DeleteComponent, 
+    AssayDetailsComponent,
+    DeleteComponent,
     FactorsComponent,
     FactorComponent,
     FilesComponent,
@@ -100,13 +101,14 @@ import { EuropePMCService } from 'src/app/services/publications/europePMC.servic
     MatPaginatorModule,
     MatProgressSpinnerModule,
     MatButtonToggleModule,
-    QuillModule
+    QuillModule,
+    MatCheckboxModule
 
   ],
   exports: [
     AssaysComponent,
-    AssayDetailsComponent, 
-    DeleteComponent, 
+    AssayDetailsComponent,
+    DeleteComponent,
     FactorsComponent,
     FactorComponent,
     FilesComponent,
