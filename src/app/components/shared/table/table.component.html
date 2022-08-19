@@ -110,13 +110,13 @@
 </div>
 <span *ngIf="tableData && data">
 	<div class="wrapper mat-elevation-z1 prevent-deselect">
-		<table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)" class="mat-elevation-z1" [dataSource]="dataSource" matSort mat-table>
+		<table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)" class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
 			<ng-container matColumnDef="Select" sticky>
 				<th (click)="deSelect()" class="clickable table-selector" mat-header-cell *matHeaderCellDef></th>
 				<td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell *matCellDef="let row"></td>
 			</ng-container>
 			<ng-container *ngFor="let column of data.columns" [sticky]="column.sticky" [matColumnDef]="column.columnDef">
-				<th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)" class="clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header> 
+				<th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)" class="headercell clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header> 
 					{{ formatHeader(column.header) }}
 				</th>
 				<span *ngIf="!column.structure; else isStructure">
@@ -135,7 +135,7 @@
 					</td>
 				</ng-template>
 			</ng-container>
-			<tr mat-header-row *matHeaderRowDef="displayedTableColumns"></tr>
+			<tr class="header-row" mat-header-row *matHeaderRowDef="displayedTableColumns"></tr>
 			<tr mat-row *matRowDef="let row; columns: displayedTableColumns;"></tr>
 		</table>
 	</div>
