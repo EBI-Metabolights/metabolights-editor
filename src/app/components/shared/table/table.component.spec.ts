@@ -12,7 +12,7 @@ import valData from './test-data/test-validation.json'
 
 import { TableComponent } from './table.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -21,24 +21,17 @@ import { MockDownloadComponent } from '../download/download.mock.component';
 import { MockOntologyComponent } from '../ontology/ontology.mock.component';
 import { DebugElement } from '@angular/core';
 import { MatSortModule } from '@angular/material/sort';
-import { MatSelect, MatSelectModule } from '@angular/material/select';
-import { CloseScrollStrategy } from '@angular/cdk/overlay';
+import { MatSelectModule } from '@angular/material/select';
+
 import { MatIconModule } from '@angular/material/icon';
 
-fdescribe('TableComponent', () => {
+describe('TableComponent', () => {
   let component: TableComponent;
   let fixture: ComponentFixture<TableComponent>;
   let http: HttpClient;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      /*
-      child component selectors:
-      mtbls-upload
-      mtbls-download
-      mtbls-ontology
-      #editTable / EditTableDirective
-      */
       declarations: [ TableComponent, MockUploadComponent, MockDownloadComponent, MockOntologyComponent ],
       imports: [
         CommonModule, 
@@ -148,39 +141,56 @@ fdescribe('TableComponent', () => {
     })
   })
 
+  describe('table cell event tests', () => {
 
-  it('should capture a copy paste event from first load', () => {
-    component.tableData = sampleData
-    component.data = component.tableData['data']
-    component.initialise();
-    fixture.detectChanges()
-    component.displayedTableColumns = component.data.displayedColumns;
-    let tableRows = fixture.nativeElement.querySelectorAll('tr')
-    let cell = tableRows[1].cells[1]
+    function getCell (): any {
+      return fixture.nativeElement.querySelectorAll('tr')[1].cells[1]
+    }
 
-    cell.addEventListener('paste', (event) => {
-      event.preventDefault();
-      console.log(event)
-      expect(event.type).toBe('paste');
-    })
-    cell.dispatchEvent(new Event('paste'))
-  });
+    function getModal (modalClass: string): DebugElement {
+      return fixture.debugElement.query(By.css(modalClass))
+    }
 
-  // simulating an actual copy / paste event is a big nono, as access to the clipboard is severely restricted.
-  // so will need to work out a way in the future to test this
-  it('should be able to handle a copy and paste of an entire column of values', () => {
+    beforeEach(() => {
+      component.tableData = sampleData
+      component.data = component.tableData['data']
+      component.initialise();
+      fixture.detectChanges()
+      component.displayedTableColumns = component.data.displayedColumns;
+
+    });
+
+    it('should capture a copy paste event from first load', () => {
+
+      let cell = getCell();
+      cell.addEventListener('paste', (event) => {
+        event.preventDefault();
+        console.log(event)
+        expect(event.type).toBe('paste');
+      })
+      cell.dispatchEvent(new Event('paste'))
+
+
+    });
+  
+
+  
+    xit('should open a modal on a double click in a table cell', () => {
+      let cell = getCell();
+      cell.dispatchEvent(new Event('dblclick'))
+
+      let modal = getModal('.editModal');
+      expect(modal).toBeTruthy();
+    });
 
   })
 
-  it('should open a modal on a double click in a table cell', () => {
 
-  });
-
-  it('should select a cell on a single click in a table cell', () => {
+  xit('should select a cell on a single click in a table cell', () => {
 
   })
 
-  it('should make a request to the updateTableState method on the editor service when \'save\' is pressed in the edit modal', () => {
+  xit('should make a request to the updateTableState method on the editor service when \'save\' is pressed in the edit modal', () => {
 
   })
 

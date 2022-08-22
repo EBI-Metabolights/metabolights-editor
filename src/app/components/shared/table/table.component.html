@@ -194,7 +194,7 @@
   </form>
 </div>
 
-<div class="modal prevent-deselect" *ngIf="isEditModalOpen" [ngClass]="{'is-active': isEditModalOpen}">
+<div class="modal editModal prevent-deselect" *ngIf="isEditModalOpen" [ngClass]="{'is-active': isEditModalOpen}">
   <form *ngIf="editCellform" [formGroup]="editCellform">
     <div class="modal-background"></div>
     <div class="modal-card">
