@@ -11,7 +11,7 @@
     <mtbls-upload  [type]="'any'" [multiple]="true" [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" ></mtbls-upload>&nbsp;
     <a (click)="loadFilesPassively()" class="button is-light">
       <mat-icon>refresh</mat-icon> Refresh
-    </a> 
+    </a>
     <span>
       <span *ngIf="refreshingData">
         <img style="height: 10px; margin-left:10px;" src="/metabolights/editor/assets/img/loading.svg">
@@ -20,10 +20,10 @@
     <span *ngIf="curator" class="is-pulled-right">
         <a *ngIf="access == 'Read'" (click)="toggleFolderAccess()" class="button is-light">
             <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
-        </a> 
+        </a>
         <a *ngIf="access == 'Write'" (click)="toggleFolderAccess()" class="button is-light">
             <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
-        </a> 
+        </a>
     </span>
   </span>
   <span *ngIf="status == 'Public'">
@@ -40,8 +40,8 @@
       <span class="is-pulled-right">
         <mtbls-download [value]="selectedDownloadFiles()"></mtbls-download>
       </span>
-      <span  *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
-        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete files</small>   
+      <span  *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete files</small>
       </span>
     </p>
     <div class="panel-block">
@@ -93,7 +93,7 @@
     </ng-template>
   </nav>
   <div *ngIf="!isReadOnly" class="notification is-warning">
-    <small><mat-icon>info</mat-icon> Uploaded ISA Investigation file (i_Investigation.txt) will not be automatically synced with your study, contact us <a [href]="'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - '+requestedStudy">metabolights-help@ebi.ac.uk</a> for help.</small>
+    <small><mat-icon>info</mat-icon> If uploaded ISA Investigation file (i_Investigation.txt) does not automatically sync with your study, contact us <a [href]="'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - '+requestedStudy">metabolights-help@ebi.ac.uk</a> for help.</small>
   </div>
   <nav class="panel">
     <span #spacer1></span>
@@ -106,11 +106,11 @@
         <label>
           <small>RAW / DERIVED FILES</small>
         </label>
-        <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right"> 
+        <span  *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
               <small (click)="decompresssFiles(selectedRawFiles)" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip files</small>&nbsp;
           </span>
-          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>
         </span>
       </p>
       <div class="panel-block">
@@ -151,8 +151,8 @@
       <label>
         <input [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length" (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="">&nbsp;&nbsp;<small>DERIVED DATA</small>
       </label>
-      <span  *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
-        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+      <span  *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>
       </span>
     </p>
     <div class="panel-block">
@@ -210,8 +210,8 @@
             <mat-icon>refresh</mat-icon> Copy files to study folder
           </a>
         </span>
-        <span  *ngIf="selectedUploadFiles.length > 0 && !isReadOnly" class="is-pulled-right"> 
-          <small (click)="openDeleteConfirmation('upload', 'upload')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>   
+        <span  *ngIf="selectedUploadFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+          <small (click)="openDeleteConfirmation('upload', 'upload')" style="font-size: 0.67em;" class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete files</small>
         </span>
     </p>
     <div class="panel-block">
@@ -238,7 +238,7 @@
                   </ng-template>
                 </span>
                 {{ file.file }}
-              </label> 
+              </label>
             </div>
             <div class="column is-one-fifths has-text-right">
               <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt.replace("'",'').replace("'",'') }}</small></span>
