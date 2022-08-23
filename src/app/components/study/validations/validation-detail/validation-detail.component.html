@@ -3,7 +3,7 @@
     <mat-expansion-panel-header [ngClass]="{'val-header': hasDescription && validationDetail.status !== 'success'}">
       <div class="wrapper">
           <div class="val-message">{{ validationDetail.message }}.
-            <span class="override" *ngIf=" validationDetail.status === 'error'">
+            <span class="override" *ngIf="isCurator && validationDetail.status === 'error'">
             &nbsp;
             <a (click)="overrideValidation(validationDetail)">
               <mat-icon>info</mat-icon>Override
