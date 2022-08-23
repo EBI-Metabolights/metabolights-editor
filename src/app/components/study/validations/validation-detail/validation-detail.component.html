@@ -1,9 +1,9 @@
-  <mat-expansion-panel [ngClass]="[validationDetail.status, 'panel-block']" (opened)="panelOpenState = true"
+  <mat-expansion-panel class="validation-detail" [ngClass]="[validationDetail.status, 'panel-block']" (opened)="panelOpenState = true"
                        [disabled]="disabled" (closed)="panelOpenState = false">
     <mat-expansion-panel-header [ngClass]="{'val-header': hasDescription && validationDetail.status !== 'success'}">
       <div class="wrapper">
           <div class="val-message">{{ validationDetail.message }}.
-            <span class="override" *ngIf="isCurator && validationDetail.status === 'error'">
+            <span class="override" *ngIf=" validationDetail.status === 'error'">
             &nbsp;
             <a (click)="overrideValidation(validationDetail)">
               <mat-icon>info</mat-icon>Override
