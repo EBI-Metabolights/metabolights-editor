@@ -1,4 +1,4 @@
-  <mat-expansion-panel class="validation-detail" [ngClass]="[validationDetail.status, 'panel-block']" (opened)="panelOpenState = true"
+  <mat-expansion-panel class="validation-detail" [ngClass]="[validationDetail.status, 'panel-block']" [style.display]="'block'" (opened)="panelOpenState = true"
                        [disabled]="disabled" (closed)="panelOpenState = false">
     <mat-expansion-panel-header [ngClass]="{'val-header': hasDescription && validationDetail.status !== 'success'}">
       <div class="wrapper">
