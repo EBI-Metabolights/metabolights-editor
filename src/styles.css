@@ -805,7 +805,7 @@ element.style {
   to {left: 0; width: 100%;}
 }
 
-.panel-block-validation {
+.validation-detail{
   align-items: center;
   color: #363636;
   justify-content: flex-start;
