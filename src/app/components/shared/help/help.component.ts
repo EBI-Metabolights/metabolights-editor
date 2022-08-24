@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import {Component, OnInit, Input, Inject} from '@angular/core';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -12,7 +12,7 @@ export class HelpComponent implements OnInit {
 
   isModalOpen: boolean = false;
   videoLink: string = '201904_ML_ALL.mp4';
-  videoBaseURL: string = 'https://www.ebi.ac.uk/metabolights/editor/assets/videos/';
+  videoBaseURL: string;
 
   constructor() { }
 

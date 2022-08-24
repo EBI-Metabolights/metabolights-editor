@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   isTesting: false,
-  videoBaseURL: 'https://www.ebi.ac.uk/metabolights/editor/assets/videos/'
+  videoBaseURL: 'https://www.ebi.ac.uk/metabolights/contents/assets/videos/',
 };
 
 /*
