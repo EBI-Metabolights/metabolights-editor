@@ -44,7 +44,7 @@ export const EuropePMCURL 				= {};
 EuropePMCURL['article']					= "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=<term>&format=json&resultType=core"
 
 export const AuthenticationURL 			= {};
-AuthenticationURL['login']				= metaboLightsDomain + "/webservice/labs/authenticate"
-AuthenticationURL['token']				= metaboLightsDomain + "/webservice/labs/authenticateToken"
-AuthenticationURL['initialise']			= metaboLightsDomain + "/webservice/labs-workspace/initialise";
+AuthenticationURL['login']				= metaboLightsDomain + "/ws/auth/login"
+AuthenticationURL['token']				= metaboLightsDomain + "/ws/auth/validate-token"
+AuthenticationURL['initialise']			= metaboLightsDomain + "/ws/auth/user";
 AuthenticationURL['studiesList']		= metaboLightsDomain + "/webservice/study/myStudies";
