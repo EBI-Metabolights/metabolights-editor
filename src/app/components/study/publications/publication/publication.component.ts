@@ -10,7 +10,7 @@ import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { ValidateRules } from './publication.validator';
 import { NgRedux,select } from '@angular-redux/store';
 import { IAppState } from '../../../../store';
-import { OntologyComponent } from './../../ontology/ontology.component';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from 'toastr';
 import { MTBLSPerson } from './../../../../models/mtbl/mtbls/mtbls-person';

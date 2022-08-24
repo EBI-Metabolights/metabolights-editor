@@ -4,8 +4,8 @@ import { Router } from "@angular/router";
 import { IAppState } from '../../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { ActivatedRoute } from "@angular/router";
-import { Http } from '@angular/http';
 import { MetaboLightsWSURL } from './../../../services/globals';
+import { HttpClient } from '@angular/common/http';
 import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
 import { environment } from 'src/environments/environment';
 
@@ -78,7 +78,7 @@ export class PublicStudyComponent implements OnInit {
         let mtblsJWT = localStorage.getItem('mtblsjwt');
         if(mtblsJWT && mtblsJWT != '' && mtblsUser && mtblsUser != ''){
           this.labsWorkspaceService.initialise({ "jwt" : mtblsJWT, "user" : mtblsUser }).subscribe( res => {
-            localStorage.setItem('user', JSON.stringify(JSON.parse(res.json().content).owner));
+            localStorage.setItem('user', JSON.stringify(JSON.parse(res.content).owner));
             let localUser = localStorage.getItem('user');
             this.editorService.initialise(localUser, false);
             if (!environment.isTesting) {

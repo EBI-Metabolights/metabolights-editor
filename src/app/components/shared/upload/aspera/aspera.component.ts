@@ -3,13 +3,14 @@ import { NgRedux, select } from '@angular-redux/store';
 import { EditorService } from '../../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
+import { environment } from 'src/environments/environment';
 declare var AW4: any;
 @Component({
   selector: 'mtbls-aspera',
   templateUrl: './aspera.component.html',
   styleUrls: ['./aspera.component.css']
 })
-export class AsperaComponent implements OnInit {
+export class AsperaUploadComponent implements OnInit {
 
   @select(state => state.study.uploadLocation) uploadLocation;
 	@select(state => state.study.validations) validations: any;
@@ -51,6 +52,9 @@ export class AsperaComponent implements OnInit {
   }
 
   ngOnInit() {
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
   }
 
   toggleHelp() {

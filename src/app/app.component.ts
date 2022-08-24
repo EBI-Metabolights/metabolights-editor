@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, ViewEncapsulation, ElementRef } from '@angular/core';
 import { EditorService } from './services/editor.service';
 

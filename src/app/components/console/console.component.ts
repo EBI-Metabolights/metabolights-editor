@@ -2,7 +2,6 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { IAppState } from './../../store';
 import { NgRedux, select } from '@angular-redux/store';
 import { Component, OnInit } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
 import { EditorService } from '../../services/editor.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';

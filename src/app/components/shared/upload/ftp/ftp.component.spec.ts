@@ -4,16 +4,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
 import { MockMetabolightsService } from 'src/app/services/metabolights/metabolights.service.mock';
+import { FTPUploadComponent } from './ftp.component';
 
-import { FTPComponent } from './ftp.component';
 
-describe('FtpComponent', () => {
-  let component: FTPComponent;
-  let fixture: ComponentFixture<FTPComponent>;
+describe('FtpUploadComponent', () => {
+  let component: FTPUploadComponent;
+  let fixture: ComponentFixture<FTPUploadComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ FTPComponent ],
+      declarations: [ FTPUploadComponent ],
       imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule],
       providers: [{provide: MetabolightsService, useClass: MockMetabolightsService}]
     })
@@ -21,7 +21,7 @@ describe('FtpComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FTPComponent);
+    fixture = TestBed.createComponent(FTPUploadComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

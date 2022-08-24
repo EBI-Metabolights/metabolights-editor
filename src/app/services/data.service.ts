@@ -1,18 +1,13 @@
-import { Observable } from 'rxjs';
 import { throwError } from 'rxjs';
-import { Http } from '@angular/http';
-import { IAppState } from './../store';
-import { Router } from '@angular/router';
 import { AppError } from './error/app-error';
 import { BadInput } from './error/bad-input';
-import { NgRedux } from '@angular-redux/store';
-import { catchError, map, tap } from 'rxjs/operators';
 import { NotFoundError } from './error/not-found-error';
 import { ForbiddenError } from './error/forbidden-error';
 import { InternalServerError } from './error/internal-server-error';
+import { HttpClient } from '@angular/common/http';
 
 export class DataService {
-  constructor(public url: any, public http: Http) { }
+  constructor(public url: any, public http: HttpClient) { }
 
   public handleError(error: Response) {
     if (error.status === 400)

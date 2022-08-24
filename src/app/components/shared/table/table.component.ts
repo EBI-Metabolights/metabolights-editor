@@ -1,4 +1,4 @@
-import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewChecked } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -8,7 +8,7 @@ import { MatChipInputEvent } from '@angular/material/chips';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
 import { EditorService } from '../../../services/editor.service';
-import { OntologyComponent } from '../../study/ontology/ontology.component';
+import { OntologyComponent } from '../ontology/ontology.component';
 import { NgRedux, select } from '@angular-redux/store';
 import { ClipboardService } from 'ngx-clipboard';
 import * as toastr from 'toastr';
@@ -152,16 +152,20 @@ export class TableComponent implements OnInit, AfterViewChecked {
 	}
 
 	ngAfterViewChecked() {
-		if(this.dataSource && !this.dataSource.paginator){
-			if(this.dataSource.filteredData.length > 500){
-				this.paginator.pageSizeOptions = [50, 100, 500, this.dataSource.filteredData.length]
-				this.paginator.pageSize = 50
-			}else{
-				this.paginator.pageSizeOptions = [10, 100, this.dataSource.filteredData.length]
-				this.paginator.pageSize = this.dataSource.filteredData.length;
+		setTimeout(() => {
+			if(this.dataSource && !this.dataSource.paginator){
+				if(this.dataSource.filteredData.length > 500){
+					this.paginator.pageSizeOptions = [50, 100, 500, this.dataSource.filteredData.length]
+					this.paginator.pageSize = 50
+				}else{
+					// this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
+					this.paginator.pageSizeOptions = [10, 100, this.dataSource.filteredData.length]
+					this.paginator.pageSize = this.dataSource.filteredData.length;
+				}
+				this.dataSource.paginator = this.paginator;
 			}
-			this.dataSource.paginator = this.paginator;
-		}
+		})
+
 	}
 
 	onCopy(e){

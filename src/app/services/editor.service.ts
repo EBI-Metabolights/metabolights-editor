@@ -1,18 +1,16 @@
 import { Injectable } from "@angular/core";
-import { Http } from "@angular/http";
 import { MetabolightsService } from './../services/metabolights/metabolights.service';
 import { AuthService } from './../services/metabolights/auth.service';
 import { DOIService } from './../services/publications/doi.service';
 import { EuropePMCService } from './../services/publications/europePMC.service';
 import { IAppState } from './../store';
 import { NgRedux, select } from '@angular-redux/store';
-import { Router, ActivatedRoute} from "@angular/router";
-import { Observable } from 'rxjs';
+import { Router } from "@angular/router";
 
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 import { LoginURL, RedirectURL } from './../services/globals';
-import { contentHeaders } from './../services/headers';
+import { httpOptions } from './../services/headers';
 import Swal from 'sweetalert2';
 
 @Injectable({
@@ -82,38 +80,57 @@ export class EditorService {
     this.loadValidations()
   }
 
+
   initialise(data, signInRequest){
-    let user = null
-    if(signInRequest){
-      user = JSON.parse(data.content).owner;
-      localStorage.setItem('user', JSON.stringify(user));
-      contentHeaders.set('user_token', user.apiToken);
-      this.ngRedux.dispatch({
-        type: 'INITIALISE'
-      })
-      this.ngRedux.dispatch({ type: 'SET_USER', body: {
-        'user': user
-      }})
-      this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
-        'studies': null
-      }})
-      this.loadValidations();
-      return true;
-    }else{
-      user = JSON.parse(data)
-      contentHeaders.set('user_token', user.apiToken);
-      this.ngRedux.dispatch({
-        type: 'INITIALISE'
-      })
-      this.ngRedux.dispatch({ type: 'SET_USER', body: {
-        'user': user
-      }})
-      this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
-        'studies': null
-      }})
-      this.loadValidations();
-      return true;
+    console.log('Initialising !!');
+
+    interface User {
+      updatedAt: number,
+      workspaceLocation: string,
+      settings: object,
+      projects: object,
+      owner: {apiToken: string},
+      message: string,
+      err: string
     }
+
+    if (signInRequest) {
+       const userstr = data.content;
+       const user: User = JSON.parse(userstr);
+       // console.log('user json ' + user);
+       localStorage.setItem('user', JSON.stringify(user.owner));
+       httpOptions.headers = httpOptions.headers.set('user_token', user.owner.apiToken);
+       this.ngRedux.dispatch({
+        type: 'INITIALISE'
+       });
+       this.ngRedux.dispatch({ type: 'SET_USER', body: {
+         'user' : user.owner
+       }})
+       this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
+         'studies': null
+       }});
+       this.loadValidations();
+       return true;
+    } else {
+      const user = JSON.parse(data);
+      httpOptions.headers = httpOptions.headers.set('user_token', this.disambiguateUserObj(user));
+      this.ngRedux.dispatch({
+        type: 'INITIALISE'
+      });
+      this.ngRedux.dispatch({ type: 'SET_USER', body: {
+        'user': user
+      }})
+      this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
+        'studies': null
+      }});
+      this.loadValidations();
+      return true;
+
+    }
+  }
+
+  disambiguateUserObj(user): string {
+    return user.owner ? user.owner.apiToken : user.apiToken
   }
 
   loadValidations(){
@@ -141,6 +158,15 @@ export class EditorService {
 
   overrideValidations(data){
     return this.dataService.overrideValidations(data);
+  }
+
+  /**
+   * Add a new comment via the DataService
+   * @param data - generic json object containing the new comment.
+   * @returns An observable object from the Data Service indicating the success of the operation.
+   */
+  addComment(data) {
+    return this.dataService.addComment(data);
   }
 
   loadGuides(){
@@ -329,10 +355,10 @@ export class EditorService {
   }
 
   loadStudyFiles(fource){
-    console.log("Loading Study files..")
-    console.log("Force files list calculation - "+fource)
+    // console.log("Loading Study files..")
+    // console.log("Force files list calculation - "+fource)
     this.dataService.getStudyFilesFetch(fource).subscribe(data => {
-      console.log("Got the files list  !")
+      // console.log("Got the files list  !")
       this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
         'uploadLocation': data.uploadPath
       }})
@@ -495,7 +521,7 @@ export class EditorService {
       data['columns'] = columns;
       data['displayedColumns'] = displayedColumns;
       data['file'] = file;
-      data['rows'] = data.data.rows;
+      data.data.rows ? data['rows'] = data.data.rows : data['rows'] = []
       delete data['data']
       assay['data'] = data
       let protocols = []
@@ -510,8 +536,10 @@ export class EditorService {
       assay['protocols'] = protocols
 
       let mafFiles = []
-      data.rows.forEach( row => {
-        let mafFile = row['Metabolite Assignment File'].replace(/^[ ]+|[ ]+$/g,'')
+      data['rows'].forEach( row => {
+        // assert that this given value in the row is a string, as we _know_ it can only be a string.
+        let assertedRow = row['Metabolite Assignment File'] as string
+        let mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g,'')
         if(mafFile != "" && mafFiles.indexOf(mafFile) < 0){
           mafFiles.push(mafFile);
         }
@@ -551,7 +579,10 @@ export class EditorService {
       let mdisplayedColumns = mcolumns.map( a => { return a.columnDef } )
       mdisplayedColumns.unshift("Select")
       mdisplayedColumns.sort(function(a, b){
-        return parseInt(mdata.header[a]) - parseInt(mdata.header[b]);
+        // assert that the values are numbers, which they have to be as all header values in maf sheet objects are numbers.
+        let assertA = mdata.header[a] as number;
+        let assertB = mdata.header[b] as number;
+        return assertA - assertB;
       });
       mdisplayedColumns = mdisplayedColumns.filter( key => {
         return (key.indexOf("Term Accession Number") < 0 && key.indexOf("Term Source REF") < 0)
@@ -597,7 +628,10 @@ export class EditorService {
       let displayedColumns = columns.map( a => { return a.columnDef } )
       displayedColumns.unshift("Select")
       displayedColumns.sort(function(a, b){
-        return parseInt(data.header[a]) - parseInt(data.header[b]);
+        // assert that the values are numbers, which they have to be as all header values in sample sheet objects are numbers.
+        let assertA = data.header[a] as number;
+        let assertB = data.header[b] as number;
+        return assertA - assertB;
       });
       var index = displayedColumns.indexOf("Source Name");
       if (index > -1) {
@@ -628,14 +662,16 @@ export class EditorService {
       data['columns'] = columns;
       data['displayedColumns'] = displayedColumns;
       data['file'] = file;
-      data['rows'] = data.data.rows;
+      data.data.rows ? data['rows'] = data.data.rows : data['rows'] = [];
       delete data['data']
       samples['data'] = data
       this.ngRedux.dispatch({ type: 'SET_STUDY_SAMPLES', body: samples});
 
       let organisms = {}
       data['rows'].forEach (row =>{
-          let organismName = row['Characteristics[Organism]'].replace(/^[ ]+|[ ]+$/g,'')
+          let organismName = row['Characteristics[Organism]'] as string;
+          organismName = organismName.replace(/^[ ]+|[ ]+$/g,'');
+
           let organismPart = row['Characteristics[Organism part]']
           let organismVariant = row['Characteristics[Variant]']
           if(organismName != '' && organismName.replace(" ", '') != ''){
