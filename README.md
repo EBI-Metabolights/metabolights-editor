@@ -33,6 +33,11 @@ If you would like run your own server, update the origin in /src/app/services/gl
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
 
 The editor is configured to connect to a server hosted on the same domain, incase if you want to connect to a server on different domain, update the /src/app/services/globals.ts file (origin) and you may need to enable CORS communication across different domains.
+### Configuration
+
+In order to run, there must be at least one configuration file present in the `assets/configs/` directory, and an environment file that defines a few key variables. `context` indicates the deployment context as a string. This variable is used to select the corresponding config file from the `assets/config/` directory. `isTesting` is a flag that is used to prevent the state store being initialized when components are being unit tested. It will be removed in a future release when the store implementation is replaced.
+
+For an example of the values a context.config.json file is supposed to contain, you can consult `src/environment.interface.ts` 
 
 ## Running unit tests
 
