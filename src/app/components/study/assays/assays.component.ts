@@ -10,45 +10,49 @@ import { environment } from 'src/environments/environment';
 export class AssaysComponent {
 
 	@select(state => state.study.assays) studyAssays;
+  @select(state => state.study.studyAssays) assayFiles;
 	@select(state => state.study.readonly) readonly;
 	isReadOnly: boolean = false;
 
 	assays: any = [];
-	currentSubIndex: number = 0; 
+  studyAssayFiles: any = [];
+	currentSubIndex: number = 0;
 	assaysNames: any = []
 
-  	constructor() { 
+  	constructor() {
 		if (!environment.isTesting) {
 			this.setUpSubscriptions();
 		}
   	}
 
 	setUpSubscriptions() {
-		this.studyAssays.subscribe(value => {
-			let assayNames = Object.keys(value)
-			if(assayNames.length > 0){
-				assayNames.forEach( assayName => {
-					if(this.assaysNames.indexOf(assayName) == -1){
-						this.assays.push(value[assayName])
-						this.assaysNames.push(assayName)
-						this.assays.sort(function(a, b){
-							if(a.name < b.name) { return -1; }
-							if(a.name > b.name) { return 1; }
-							return 0;
-						})
-						
-						let cti = 0
-						this.assays.forEach(a => {
-							if(a.name == assayName){
-								this.currentSubIndex = cti
-							}
-							cti = cti + 1
-						})
-					}
-				})
-			}
+    this.assayFiles.subscribe(assayfiles =>{
+      this.studyAssayFiles = assayfiles;
+      if (this.studyAssayFiles) {
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < this.studyAssayFiles.length; i++) {
+          this.assays.push({});
+        }
+      }
+    });
+
+    // tslint:disable-next-line:indent
+		  this.studyAssays.subscribe(value => {
+      if (this.studyAssayFiles) {
+        // @ts-ignore
+        let i = 0;
+        this.studyAssayFiles.forEach( assayFileName => {
+          if (this.assaysNames.indexOf(assayFileName.filename) === -1 && value[assayFileName.filename]) {
+            this.assays[i] = value[assayFileName.filename];
+            this.assaysNames.push(assayFileName.filename);
+          }
+          i++;
+        });
+      }
+      // tslint:disable-next-line:indent
 		});
-		this.readonly.subscribe(value => { 
+
+		this.readonly.subscribe(value => {
 			if(value != null){
 				this.isReadOnly = value
 			}
@@ -65,7 +69,7 @@ export class AssaysComponent {
 			i = i +1
 		})
 		if(i > -1){
-			this.assays.splice(assayIndex, 1) 
+			this.assays.splice(assayIndex, 1)
 		}
 		this.currentSubIndex = 0
 		this.assaysNames.splice(this.assaysNames.indexOf(name), 1)
