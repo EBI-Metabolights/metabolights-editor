@@ -3,7 +3,7 @@
 // environment.ts
 export const environment = {
     production: true,
-    context: 'dev',
+    context: 'development',
     isTesting: false
 
 }
