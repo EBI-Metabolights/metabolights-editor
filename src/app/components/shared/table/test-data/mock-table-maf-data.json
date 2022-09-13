@@ -1,0 +1,190 @@
+{
+    "header": {
+        "database_identifier": 0,
+        "chemical_formula": 1,
+        "smiles": 2,
+        "inchi": 3,
+        "metabolite_identification": 4,
+        "mass_to_charge": 5,
+        "fragmentation": 6,
+        "modifications": 7,
+        "charge": 8,
+        "retention_time": 9,
+        "taxid": 10,
+        "species": 11,
+        "database": 12,
+        "database_version": 13,
+        "reliability": 14,
+        "uri": 15,
+        "search_engine": 16,
+        "search_engine_score": 17,
+        "smallmolecule_abundance_sub": 18,
+        "smallmolecule_abundance_stdev_sub": 19,
+        "smallmolecule_abundance_std_error_sub": 20
+    },
+    "columns": [
+        {
+            "columnDef": "Structure",
+            "sticky": "true",
+            "header": "Structure",
+            "structure": true
+        },
+        {
+            "columnDef": "database_identifier",
+            "sticky": "false",
+            "header": "database_identifier"
+        },
+        {
+            "columnDef": "chemical_formula",
+            "sticky": "false",
+            "header": "chemical_formula"
+        },
+        {
+            "columnDef": "smiles",
+            "sticky": "false",
+            "header": "smiles"
+        },
+        {
+            "columnDef": "inchi",
+            "sticky": "false",
+            "header": "inchi"
+        },
+        {
+            "columnDef": "metabolite_identification",
+            "sticky": "false",
+            "header": "metabolite_identification"
+        },
+        {
+            "columnDef": "mass_to_charge",
+            "sticky": "false",
+            "header": "mass_to_charge"
+        },
+        {
+            "columnDef": "fragmentation",
+            "sticky": "false",
+            "header": "fragmentation"
+        },
+        {
+            "columnDef": "modifications",
+            "sticky": "false",
+            "header": "modifications"
+        },
+        {
+            "columnDef": "charge",
+            "sticky": "false",
+            "header": "charge"
+        },
+        {
+            "columnDef": "retention_time",
+            "sticky": "false",
+            "header": "retention_time"
+        },
+        {
+            "columnDef": "taxid",
+            "sticky": "false",
+            "header": "taxid"
+        },
+        {
+            "columnDef": "species",
+            "sticky": "false",
+            "header": "species"
+        },
+        {
+            "columnDef": "database",
+            "sticky": "false",
+            "header": "database"
+        },
+        {
+            "columnDef": "database_version",
+            "sticky": "false",
+            "header": "database_version"
+        },
+        {
+            "columnDef": "reliability",
+            "sticky": "false",
+            "header": "reliability"
+        },
+        {
+            "columnDef": "uri",
+            "sticky": "false",
+            "header": "uri"
+        },
+        {
+            "columnDef": "search_engine",
+            "sticky": "false",
+            "header": "search_engine"
+        },
+        {
+            "columnDef": "search_engine_score",
+            "sticky": "false",
+            "header": "search_engine_score"
+        },
+        {
+            "columnDef": "smallmolecule_abundance_sub",
+            "sticky": "false",
+            "header": "smallmolecule_abundance_sub"
+        },
+        {
+            "columnDef": "smallmolecule_abundance_stdev_sub",
+            "sticky": "false",
+            "header": "smallmolecule_abundance_stdev_sub"
+        },
+        {
+            "columnDef": "smallmolecule_abundance_std_error_sub",
+            "sticky": "false",
+            "header": "smallmolecule_abundance_std_error_sub"
+        }
+    ],
+    "displayedColumns": [
+        "Select",
+        "Structure",
+        "database_identifier",
+        "chemical_formula",
+        "smiles",
+        "inchi",
+        "metabolite_identification",
+        "mass_to_charge",
+        "fragmentation",
+        "modifications",
+        "charge",
+        "retention_time",
+        "taxid",
+        "species",
+        "database",
+        "database_version",
+        "reliability",
+        "uri",
+        "search_engine",
+        "search_engine_score",
+        "smallmolecule_abundance_sub",
+        "smallmolecule_abundance_stdev_sub",
+        "smallmolecule_abundance_std_error_sub"
+    ],
+    "rows": [
+        {
+            "index": 0,
+            "database_identifier": "CHEBI:16977",
+            "chemical_formula": "",
+            "smiles": "",
+            "inchi": "",
+            "metabolite_identification": "Alanine",
+            "mass_to_charge": "260.1",
+            "fragmentation": "",
+            "modifications": "",
+            "charge": "",
+            "retention_time": "8.75",
+            "taxid": "",
+            "species": "",
+            "database": "",
+            "database_version": "",
+            "reliability": "",
+            "uri": "",
+            "search_engine": "",
+            "search_engine_score": "",
+            "smallmolecule_abundance_sub": "",
+            "smallmolecule_abundance_stdev_sub": "",
+            "smallmolecule_abundance_std_error_sub": ""
+        }
+    ],
+    "file": "m_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling_v2_maf.tsv"
+}

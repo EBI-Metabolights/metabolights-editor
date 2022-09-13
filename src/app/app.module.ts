@@ -43,6 +43,12 @@ import { HttpClientModule } from '@angular/common/http';
 import { SharedModule } from './components/shared/shared.module';
 import { GuideModule } from './components/guide/guide.module';
 import { ConfigurationService } from './configuration.service';
+import { EditorService } from './services/editor.service';
+import { MetabolightsService } from './services/metabolights/metabolights.service';
+import { DOIService } from './services/publications/doi.service';
+import { AuthService } from './services/metabolights/auth.service';
+import { EuropePMCService } from './services/publications/europePMC.service';
+import { LabsWorkspaceService } from './services/labs-workspace.service';
 
 export function ConfigLoader(injector: Injector): () => Promise<any> {
   return () => injector.get(ConfigurationService).loadConfiguration();
@@ -56,7 +62,6 @@ export function ConfigLoader(injector: Injector): () => Promise<any> {
     LoginComponent,
     ConsoleComponent,
     PublicStudyComponent,
-    EditTableDirective,
     LazyLoadImagesDirective,
     HeaderComponent,
     FooterComponent,
@@ -108,7 +113,13 @@ export function ConfigLoader(injector: Injector): () => Promise<any> {
       useFactory: ConfigLoader,
       deps: [Injector],
       multi: true
-    }
+    },
+    EditorService,
+    MetabolightsService,
+    EuropePMCService,
+    DOIService,
+    AuthService,
+    LabsWorkspaceService
   ],
   bootstrap: [AppComponent]
 })

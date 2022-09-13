@@ -12,7 +12,8 @@ export class HelpComponent implements OnInit {
   @Input('target') target: string;
 
   isModalOpen: boolean = false;
-  videoLink: string = "201904_ML_ALL.mp4";
+  videoLink: string = '201904_ML_ALL.mp4';
+  videoBaseURL: string;
 
   constructor(private configService: ConfigurationService) { }
 

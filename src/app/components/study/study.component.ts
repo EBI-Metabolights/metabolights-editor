@@ -24,7 +24,7 @@ export class StudyComponent implements OnInit {
 
     studyError: boolean = false;
 	requestedTab: number = 0;
-    tab: string = "descriptors";	
+    tab: string = "descriptors";
 	requestedStudy: string = null;
     status: string = "submitted";
     validation: any = {};
@@ -32,30 +32,30 @@ export class StudyComponent implements OnInit {
     domain: string = null;
     messageExpanded: boolean = false;
 
-	constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private route: ActivatedRoute,  private editorService: EditorService) { 
-        /**I am conscious that this is extremely bad practice. However, testing with the angular-redux library, which is at this point abandonware, is a 
+	constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private route: ActivatedRoute,  private editorService: EditorService) {
+        /**I am conscious that this is extremely bad practice. However, testing with the angular-redux library, which is at this point abandonware, is a
          * labyrinth of poor documentation and non existent patterns. Until a point in time where we replace the state library ( a sizeable undertaking)
          * this environment context switching to prevent errors in the test bed will have to do.
-         * 
-         * For reference, the errors in the testbed follow the pattern of: 
+         *
+         * For reference, the errors in the testbed follow the pattern of:
          * Chrome 1.1.1.1 (Mac OS ) StudyComponent should create FAILED
          *   TypeError: Cannot read property 'subscribe' of undefined
          * Which is what happens when the init of this (and almost every other) component opens a subscription
          * to one of the @select objects IE studyStatus. Since the state is not initialised in the TestBed, nor is there any easy way to do so,
-         * this .subscribe call fails and throws an error, preventing tests from running. 
+         * this .subscribe call fails and throws an error, preventing tests from running.
          */
         if (!environment.isTesting) {
             this.setUpSubscriptions();
         }
-        
+
 	}
 
     setUpSubscriptions() {
 		this.editorService.initialiseStudy(this.route)
-        this.studyObfuscationCode.subscribe(value => { 
+        this.studyObfuscationCode.subscribe(value => {
             this.obfuscationCode = value
         })
-		this.studyIdentifier.subscribe(value => { 
+		this.studyIdentifier.subscribe(value => {
 			if(value != null){
 				this.requestedStudy = value
 			}
@@ -66,15 +66,15 @@ export class StudyComponent implements OnInit {
             this.studyError = value
             this.selectCurrentTab(5, 'files')
         })
-        
+
         this.studyStatus.subscribe(value => {
             this.status = value
         })
-        
+
         this.studyValidation.subscribe(value => {
             this.validation = value
         })
-        
+
         this.route.params.subscribe( params => {
             this.requestedStudy = params['id'];
             if(params['tab'] == 'files'){
@@ -113,7 +113,7 @@ export class StudyComponent implements OnInit {
 
 	ngAfterViewInit() {
     }
-    
+
     toggleMessage(){
         this.messageExpanded = !this.messageExpanded
     }
@@ -131,7 +131,9 @@ export class StudyComponent implements OnInit {
         window.history.pushState("", "", window.location.origin + "/" + urlSplit.join("/") + "/" + tab);
         if(index == 6){
             this.editorService.validateStudy();
-            document.getElementById("tab-content-wrapper").scrollIntoView();
+            if(document.getElementById("tab-content-wrapper")){
+               document.getElementById("tab-content-wrapper").scrollIntoView();
+            }
         }
     }
 

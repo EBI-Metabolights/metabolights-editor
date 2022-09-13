@@ -1,0 +1,231 @@
+{
+    "name": "s_MTBLS1413.txt",
+    "data": {
+        "header": {
+            "Characteristics[Organism part]": 0,
+            "Characteristics[Organism]": 1,
+            "Characteristics[Sample type]": 2,
+            "Characteristics[Variant]": 3,
+            "Characteristics[nuclear magnetic resonance]": 4,
+            "Term Source REF": 5,
+            "Term Accession Number": 6,
+            "Protocol REF": 7,
+            "Sample Name": 8,
+            "Source Name": 9,
+            "Term Accession Number.1": 10,
+            "Term Accession Number.2": 11,
+            "Term Accession Number.3": 12,
+            "Term Accession Number.4": 13,
+            "Term Source REF.1": 14,
+            "Term Source REF.2": 15,
+            "Term Source REF.3": 16,
+            "Term Source REF.4": 17,
+            "Factor Value[Dose]": 18,
+            "Unit": 19,
+            "Term Source REF.5": 20,
+            "Term Accession Number.5": 21
+        },
+        "columns": [
+            {
+                "columnDef": "Characteristics[Organism part]",
+                "sticky": "false",
+                "header": "Characteristics[Organism part]"
+            },
+            {
+                "columnDef": "Characteristics[Organism]",
+                "sticky": "false",
+                "header": "Characteristics[Organism]"
+            },
+            {
+                "columnDef": "Characteristics[Sample type]",
+                "sticky": "false",
+                "header": "Characteristics[Sample type]"
+            },
+            {
+                "columnDef": "Characteristics[Variant]",
+                "sticky": "false",
+                "header": "Characteristics[Variant]"
+            },
+            {
+                "columnDef": "Characteristics[nuclear magnetic resonance]",
+                "sticky": "false",
+                "header": "Characteristics[nuclear magnetic resonance]"
+            },
+            {
+                "columnDef": "Term Source REF",
+                "sticky": "false",
+                "header": "Term Source REF"
+            },
+            {
+                "columnDef": "Term Accession Number",
+                "sticky": "false",
+                "header": "Term Accession Number"
+            },
+            {
+                "columnDef": "Protocol REF",
+                "sticky": "true",
+                "header": "Protocol REF"
+            },
+            {
+                "columnDef": "Sample Name",
+                "sticky": "false",
+                "header": "Sample Name"
+            },
+            {
+                "columnDef": "Source Name",
+                "sticky": "false",
+                "header": "Source Name"
+            },
+            {
+                "columnDef": "Term Accession Number.1",
+                "sticky": "false",
+                "header": "Term Accession Number.1"
+            },
+            {
+                "columnDef": "Term Accession Number.2",
+                "sticky": "false",
+                "header": "Term Accession Number.2"
+            },
+            {
+                "columnDef": "Term Accession Number.3",
+                "sticky": "false",
+                "header": "Term Accession Number.3"
+            },
+            {
+                "columnDef": "Term Accession Number.4",
+                "sticky": "false",
+                "header": "Term Accession Number.4"
+            },
+            {
+                "columnDef": "Term Source REF.1",
+                "sticky": "false",
+                "header": "Term Source REF.1"
+            },
+            {
+                "columnDef": "Term Source REF.2",
+                "sticky": "false",
+                "header": "Term Source REF.2"
+            },
+            {
+                "columnDef": "Term Source REF.3",
+                "sticky": "false",
+                "header": "Term Source REF.3"
+            },
+            {
+                "columnDef": "Term Source REF.4",
+                "sticky": "false",
+                "header": "Term Source REF.4"
+            },
+            {
+                "columnDef": "Factor Value[Dose]",
+                "sticky": "false",
+                "header": "Factor Value[Dose]"
+            },
+            {
+                "columnDef": "Unit",
+                "sticky": "false",
+                "header": "Unit"
+            },
+            {
+                "columnDef": "Term Source REF.5",
+                "sticky": "false",
+                "header": "Term Source REF.5"
+            },
+            {
+                "columnDef": "Term Accession Number.5",
+                "sticky": "false",
+                "header": "Term Accession Number.5"
+            }
+        ],
+        "displayedColumns": [
+            "Select",
+            "Protocol REF",
+            "Sample Name",
+            "Characteristics[Organism]",
+            "Characteristics[Organism part]",
+            "Characteristics[Variant]",
+            "Characteristics[nuclear magnetic resonance]",
+            "Factor Value[Dose]",
+            "Unit"
+        ],
+        "file": "s_MTBLS1413.txt",
+        "rows": [
+            {
+                "index": 0,
+                "Characteristics[Organism part]": "Cytoplasm",
+                "Characteristics[Organism]": "Saccharomyces cerevisiae",
+                "Characteristics[Sample type]": "",
+                "Characteristics[Variant]": "Experiment",
+                "Characteristics[nuclear magnetic resonance]": "testing 6",
+                "Term Source REF": "",
+                "Term Accession Number": "",
+                "Protocol REF": "Sample collection",
+                "Sample Name": "u0.027_pool1_PS",
+                "Source Name": "skluaerint",
+                "Term Accession Number.1": "",
+                "Term Accession Number.2": "",
+                "Term Accession Number.3": "",
+                "Term Accession Number.4": "",
+                "Term Source REF.1": "",
+                "Term Source REF.2": "",
+                "Term Source REF.3": "",
+                "Term Source REF.4": "",
+                "Factor Value[Dose]": "1",
+                "Unit": "decibels",
+                "Term Source REF.5": "",
+                "Term Accession Number.5": ""
+            },
+            {
+                "index": 1,
+                "Characteristics[Organism part]": "Cytoplasm",
+                "Characteristics[Organism]": "Saccharomyces cerevisiae",
+                "Characteristics[Sample type]": "",
+                "Characteristics[Variant]": "Experiment",
+                "Characteristics[nuclear magnetic resonance]": "testing 5",
+                "Term Source REF": "",
+                "Term Accession Number": "",
+                "Protocol REF": "Sample collection",
+                "Sample Name": "Sample",
+                "Source Name": "Sample",
+                "Term Accession Number.1": "",
+                "Term Accession Number.2": "",
+                "Term Accession Number.3": "",
+                "Term Accession Number.4": "",
+                "Term Source REF.1": "",
+                "Term Source REF.2": "",
+                "Term Source REF.3": "",
+                "Term Source REF.4": "",
+                "Factor Value[Dose]": "1",
+                "Unit": "",
+                "Term Source REF.5": "",
+                "Term Accession Number.5": ""
+            },
+            {
+                "index": 2,
+                "Characteristics[Organism part]": "Cytoplasm",
+                "Characteristics[Organism]": "Saccharomyces cerevisiae",
+                "Characteristics[Sample type]": "",
+                "Characteristics[Variant]": "Experiment",
+                "Characteristics[nuclear magnetic resonance]": "",
+                "Term Source REF": "",
+                "Term Accession Number": "",
+                "Protocol REF": "Sample collection",
+                "Sample Name": " Sample2",
+                "Source Name": " Sample2",
+                "Term Accession Number.1": "",
+                "Term Accession Number.2": "",
+                "Term Accession Number.3": "",
+                "Term Accession Number.4": "",
+                "Term Source REF.1": "",
+                "Term Source REF.2": "",
+                "Term Source REF.3": "",
+                "Term Source REF.4": "",
+                "Factor Value[Dose]": "1",
+                "Unit": "",
+                "Term Source REF.5": "",
+                "Term Accession Number.5": ""
+            }
+        
+        ]
+    }
+}

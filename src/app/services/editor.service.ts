@@ -92,16 +92,43 @@ export class EditorService {
     this.loadValidations()
   }
 
+
   initialise(data, signInRequest){
-    console.log('initialise');
-    let user = null
-    if(signInRequest){
-      user = JSON.parse(data.content).owner;
-      localStorage.setItem('user', JSON.stringify(user));
-      httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
+    console.log('Initialising !!');
+
+    interface User {
+      updatedAt: number,
+      workspaceLocation: string,
+      settings: object,
+      projects: object,
+      owner: {apiToken: string},
+      message: string,
+      err: string
+    }
+
+    if (signInRequest) {
+       const userstr = data.content;
+       const user: User = JSON.parse(userstr);
+       // console.log('user json ' + user);
+       localStorage.setItem('user', JSON.stringify(user.owner));
+       httpOptions.headers = httpOptions.headers.set('user_token', user.owner.apiToken);
+       this.ngRedux.dispatch({
+        type: 'INITIALISE'
+       });
+       this.ngRedux.dispatch({ type: 'SET_USER', body: {
+         'user' : user.owner
+       }})
+       this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
+         'studies': null
+       }});
+       this.loadValidations();
+       return true;
+    } else {
+      const user = JSON.parse(data);
+      httpOptions.headers = httpOptions.headers.set('user_token', this.disambiguateUserObj(user));
       this.ngRedux.dispatch({
         type: 'INITIALISE'
-      })
+      });
       this.ngRedux.dispatch({ type: 'SET_USER', body: {
         'user': user
       }})
@@ -111,22 +138,11 @@ export class EditorService {
       localStorage.setItem('time', this.ngRedux.getState().status['isInitialised'].time)
       this.loadValidations();
       return true;
-    }else{
-      user = JSON.parse(data);
-      httpOptions.headers = httpOptions.headers.set('user_token', user.apiToken);
-      this.ngRedux.dispatch({
-        type: 'INITIALISE'
-      })
-      this.ngRedux.dispatch({ type: 'SET_USER', body: {
-        'user': user
-      }})
-      this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
-        'studies': null
-      }})
-      this.loadValidations();
-      return true;
-
     }
+  }
+
+  disambiguateUserObj(user): string {
+    return user.owner ? user.owner.apiToken : user.apiToken
   }
 
   loadValidations(){
@@ -351,7 +367,10 @@ export class EditorService {
   }
 
   loadStudyFiles(fource){
+    // console.log("Loading Study files..")
+    // console.log("Force files list calculation - "+fource)
     this.dataService.getStudyFilesFetch(fource).subscribe(data => {
+      // console.log("Got the files list  !")
       this.ngRedux.dispatch({ type: 'SET_UPLOAD_LOCATION', body: {
         'uploadLocation': data.uploadPath
       }})

@@ -1,7 +1,7 @@
-import { Directive, HostListener, ElementRef, Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewInit, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, Input, QueryList, SimpleChanges, Output, EventEmitter, AfterViewChecked } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { OntologySourceReference } from './../../../models/mtbl/mtbls/common/mtbls-ontology-reference';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -24,6 +24,7 @@ export class TableComponent implements OnInit, AfterViewChecked {
 
 	@ViewChild(MatPaginator) paginator: MatPaginator;
     @ViewChild(MatSort) sort: MatSort;
+	@ViewChild(MatTable) table: MatTable<any>;
     @Input('tableData') tableData: any;
     @Input('validationsId') validationsId: any;
 
@@ -95,6 +96,8 @@ export class TableComponent implements OnInit, AfterViewChecked {
     isEditColumnMissingModalOpen = false;
 
 	stableColumns: any = [ 'Protocol REF', 'Metabolite Assignment File']
+
+	hit = false;
     
 	constructor(private _clipboardService: ClipboardService, private fb: FormBuilder, private editorService: EditorService) { }
 
@@ -136,6 +139,7 @@ export class TableComponent implements OnInit, AfterViewChecked {
 		this.deSelect()
 		this.data = this.tableData['data']
 		if(this.data){
+			this.hit = true;
 			this.displayedTableColumns = this.data.displayedColumns
 			this.dataSource = new MatTableDataSource<any>(this.data.rows)
 			this.dataSource.paginator = this.paginator;

@@ -3,6 +3,7 @@ import { NgRedux, select } from '@angular-redux/store';
 import { EditorService } from '../../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
+import { environment } from 'src/environments/environment';
 declare var AW4: any;
 @Component({
   selector: 'mtbls-aspera',
@@ -33,17 +34,18 @@ export class AsperaUploadComponent implements OnInit {
   CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4"
   uploadPath = ""
   asperaWeb: any = null;
-  validation: any = null
+  validation: any = null;
+  videoBaseURL: string;
 
-  constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService){ 
-    
+  constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService){
+
 	}
 
   setUpSubscriptions() {
-		this.uploadLocation.subscribe(value => { 
+		this.uploadLocation.subscribe(value => {
 			this.uploadPath = value
     })
-    this.validations.subscribe(value => { 
+    this.validations.subscribe(value => {
       if(value){
 			this.validation = value[this.validationsId]
       }
@@ -51,6 +53,10 @@ export class AsperaUploadComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.videoBaseURL = environment.videoBaseURL;
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
   }
 
   toggleHelp() {
@@ -74,7 +80,7 @@ export class AsperaUploadComponent implements OnInit {
   }
 
   asperaUpload(t) {
-    
+
     this.asperaWeb = new AW4.Connect({
       sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
       minVersion: this.MIN_CONNECT_VERSION
@@ -109,7 +115,7 @@ export class AsperaUploadComponent implements OnInit {
             )))
           }
         ))
-      } 
+      }
     };
 
     var statusEventListener = function (eventType, data) {
@@ -137,7 +143,7 @@ export class AsperaUploadComponent implements OnInit {
     }, {
         allowMultipleSelection: this.allowMultipleSelection
     }) : (console.log(this.fileTypes),
-    
+
     this.asperaWeb.showSelectFileDialog({
         success: (function(t) {
             this.buildUploadSpec(t)
