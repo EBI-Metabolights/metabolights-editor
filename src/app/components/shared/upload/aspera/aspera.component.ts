@@ -4,6 +4,7 @@ import { EditorService } from '../../../../services/editor.service';
 import { FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
 import { environment } from 'src/environments/environment';
+import { ConfigurationService } from 'src/app/configuration.service';
 declare var AW4: any;
 @Component({
   selector: 'mtbls-aspera',
@@ -35,9 +36,13 @@ export class AsperaUploadComponent implements OnInit {
   uploadPath = ""
   asperaWeb: any = null;
   validation: any = null;
-  videoBaseURL: string;
+  videoURL: string;
 
-  constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService, private editorService: EditorService){
+  constructor(
+    private fb: FormBuilder,
+    private metabolightsService: MetabolightsService,
+    private editorService: EditorService,
+    private configService: ConfigurationService  ){
 
 	}
 
@@ -53,7 +58,7 @@ export class AsperaUploadComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.videoBaseURL = environment.videoBaseURL;
+    this.videoURL = this.configService.config.VideoURL.aspera
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
