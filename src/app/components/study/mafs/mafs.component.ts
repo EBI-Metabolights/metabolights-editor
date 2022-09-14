@@ -92,7 +92,6 @@ export class MafsComponent implements OnInit {
     }
 
     this.studyMAFs.subscribe(value => {
-      // console.log(' mafNames  : - ' + JSON.stringify(this.mafNames));
       if (this.mafNames) {
         this.mafNames.forEach( mafFile => {
           this.mafs.push(value[mafFile]);

@@ -83,7 +83,7 @@ export class EditorService {
 
 
   initialise(data, signInRequest){
-    // console.log('Initialising !!');
+
 
     interface User {
       updatedAt: number,
