@@ -20,6 +20,7 @@ export class EditorService {
   @select(state => state.study.identifier) studyIdentifier;
   @select(state => state.study.validations) studyValidations;
   @select(state => state.study.files) studyFiles;
+  @select(state => state.study.studyAssays) studyAssays;
 
   redirectUrl: string = RedirectURL;
   currentStudyIdentifier: string = null;
@@ -82,7 +83,7 @@ export class EditorService {
 
 
   initialise(data, signInRequest){
-    console.log('Initialising !!');
+
 
     interface User {
       updatedAt: number,
@@ -305,6 +306,9 @@ export class EditorService {
         this.ngRedux.dispatch({ type: 'SET_STUDY_PUBLICATIONS', body: {
           'study': study
         }})
+        this.ngRedux.dispatch({ type: 'SET_STUDY_ASSAYS', body: {
+            'study': study
+          }})
         this.ngRedux.dispatch({ type: 'SET_STUDY_PEOPLE', body: {
           'study': study
         }})
