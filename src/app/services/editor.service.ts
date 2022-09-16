@@ -16,7 +16,7 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
 
 export function disambiguateUserObj(user) {
-  if (typeof user === 'string') console.log('idiota!!!')
+  if (typeof user === 'string') console.error('received string when JSON object expected.')
   return user.owner ? user.owner.apiToken : user.apiToken
 }
 

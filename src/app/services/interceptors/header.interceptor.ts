@@ -14,9 +14,6 @@ export class HeaderInterceptor implements HttpInterceptor {
   constructor() {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
-    console.log(request.url)
-    console.log(request.headers)
-    console.log(localStorage.getItem('user'))
     if (request.headers.has('user_token')) {
       if(request.headers.get('user_token') === 'dummy'){
         if(localStorage.getItem('user') !== null) {
