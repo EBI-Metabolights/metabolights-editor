@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed, async } from '@angular/core/testing';
+import { ConfigurationService } from '../configuration.service';
 
 import { LabsWorkspaceService } from './labs-workspace.service';
 
@@ -16,8 +17,9 @@ describe('LabsWorkspaceService', () => {
     TestBed.configureTestingModule({
       imports: [ HttpClientTestingModule]
     })
+    let configService = new ConfigurationService(httpClientSpy as any)
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    service = new LabsWorkspaceService(httpClientSpy as any);
+    service = new LabsWorkspaceService(httpClientSpy as any, configService);
 
   });
 

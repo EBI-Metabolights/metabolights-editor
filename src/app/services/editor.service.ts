@@ -15,6 +15,11 @@ import Swal from 'sweetalert2';
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
 
+export function disambiguateUserObj(user) {
+  if (typeof user === 'string') console.log('idiota!!!')
+  return user.owner ? user.owner.apiToken : user.apiToken
+}
+
 @Injectable({
 	providedIn: 'root'
 })
@@ -121,11 +126,13 @@ export class EditorService {
        this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
          'studies': null
        }});
+       localStorage.setItem('time', this.ngRedux.getState().status['isInitialised'].time)
+
        this.loadValidations();
        return true;
     } else {
       const user = JSON.parse(data);
-      httpOptions.headers = httpOptions.headers.set('user_token', this.disambiguateUserObj(user));
+      httpOptions.headers = httpOptions.headers.set('user_token', disambiguateUserObj(user));
       this.ngRedux.dispatch({
         type: 'INITIALISE'
       });
@@ -141,9 +148,7 @@ export class EditorService {
     }
   }
 
-  disambiguateUserObj(user): string {
-    return user.owner ? user.owner.apiToken : user.apiToken
-  }
+
 
   loadValidations(){
     this.dataService.getValidations().subscribe(

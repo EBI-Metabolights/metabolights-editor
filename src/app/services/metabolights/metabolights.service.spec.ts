@@ -4,6 +4,7 @@ import { IAppState } from 'src/app/store';
 import { NgReduxTestingModule, MockNgRedux } from '@angular-redux/store/testing';
 
 import { MetabolightsService } from './metabolights.service';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 describe('MetabolightsService', () => {
   let httpClientSpy: { get: jasmine.Spy };
@@ -14,7 +15,8 @@ describe('MetabolightsService', () => {
       providers: [MetabolightsService]
     });
     httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
-    service = new MetabolightsService(httpClientSpy as any );
+    let configService = new ConfigurationService(httpClientSpy as any)
+    service = new MetabolightsService(httpClientSpy as any, configService );
   });
 
   it('should be created', () => {

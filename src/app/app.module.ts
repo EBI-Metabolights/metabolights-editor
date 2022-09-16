@@ -39,7 +39,7 @@ import { HeaderComponent } from './components/public/header/header.component';
 import { FooterComponent } from './components/public/footer/footer.component';
 import { GuidesComponent } from './components/public/guides/guides.component';
 import { StudyModule } from './components/study/study.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SharedModule } from './components/shared/shared.module';
 import { GuideModule } from './components/guide/guide.module';
 import { ConfigurationService } from './configuration.service';
@@ -49,6 +49,7 @@ import { DOIService } from './services/publications/doi.service';
 import { AuthService } from './services/metabolights/auth.service';
 import { EuropePMCService } from './services/publications/europePMC.service';
 import { LabsWorkspaceService } from './services/labs-workspace.service';
+import { HeaderInterceptor } from './services/interceptors/header.interceptor';
 
 export function ConfigLoader(injector: Injector): () => Promise<any> {
   return () => injector.get(ConfigurationService).loadConfiguration();
@@ -119,7 +120,8 @@ export function ConfigLoader(injector: Injector): () => Promise<any> {
     EuropePMCService,
     DOIService,
     AuthService,
-    LabsWorkspaceService
+    LabsWorkspaceService,
+    { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true}
   ],
   bootstrap: [AppComponent]
 })
