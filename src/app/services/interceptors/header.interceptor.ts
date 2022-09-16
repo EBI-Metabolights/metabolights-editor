@@ -17,7 +17,6 @@ export class HeaderInterceptor implements HttpInterceptor {
     if (request.headers.has('user_token')) {
       if(request.headers.get('user_token') === 'dummy'){
         if(localStorage.getItem('user') !== null) {
-          console.log(disambiguateUserObj(localStorage.getItem('user')))
           request = request.clone({
             setHeaders: {
               'user_token': disambiguateUserObj(this.getUserObj())}
