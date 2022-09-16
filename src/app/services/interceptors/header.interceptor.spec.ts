@@ -13,7 +13,7 @@ import { MockMetabolightsService } from '../metabolights/metabolights.service.mo
 
 import { HeaderInterceptor } from './header.interceptor';
 
-fdescribe('HeaderInterceptor', () => {
+describe('HeaderInterceptor', () => {
   let metabolightsService: MetabolightsService;
   let configurationService: ConfigurationService;
   let http: HttpClient;
