@@ -99,7 +99,7 @@ export class MetabolightsService extends DataService{
    * @returns A string indicating the Access setting (Read or Write) via the Observable.
    */
   getStudyPrivateFolderAccess(): Observable<{Access: string}>{
-    return this.http.get<{Access: string}>(this.url.baseURL + '/studies' + this.id + "/access", httpOptions).pipe(
+    return this.http.get<{Access: string}>(this.url.baseURL + '/studies/' + this.id + "/access", httpOptions).pipe(
       catchError(this.handleError)
     );
   }
