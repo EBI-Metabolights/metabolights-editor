@@ -123,7 +123,7 @@ export class MetabolightsService extends DataService{
 
   /*Returns a list of all studies, with greater detail, for a given user. */
   getAllStudies(): Observable<IStudyDetailWrapper> {
-    return this.http.get<IStudyDetailWrapper>(this.url.baseURL + '/studies/' + '/user', httpOptions).pipe(
+    return this.http.get<IStudyDetailWrapper>(this.url.baseURL + '/studies' + '/user', httpOptions).pipe(
       catchError(this.handleError)
       );
   }
