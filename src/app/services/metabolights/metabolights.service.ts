@@ -109,7 +109,7 @@ export class MetabolightsService extends DataService{
    * @returns A string indicating the new Access setting (Read or Write) via the Observable.
    */
   toggleFolderAccess(): Observable<{Access: string}>{
-    return this.http.put<{Access: string}>(this.url.baseURL + '/studies' + this.id + "/access/toggle", {}, httpOptions).pipe(
+    return this.http.put<{Access: string}>(this.url.baseURL + '/studies/' + this.id + "/access/toggle", {}, httpOptions).pipe(
       catchError(this.handleError)
     );
   }
@@ -123,7 +123,7 @@ export class MetabolightsService extends DataService{
 
   /*Returns a list of all studies, with greater detail, for a given user. */
   getAllStudies(): Observable<IStudyDetailWrapper> {
-    return this.http.get<IStudyDetailWrapper>(this.url.baseURL + '/studies' + '/user', httpOptions).pipe(
+    return this.http.get<IStudyDetailWrapper>(this.url.baseURL + '/studies/' + '/user', httpOptions).pipe(
       catchError(this.handleError)
       );
   }
