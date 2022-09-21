@@ -80,8 +80,9 @@ export class MafsComponent implements OnInit {
     if (this.studyAssayFiles) {
       this.studyAssayFiles.forEach( assayFileName => {
         if (this.assays) {
-          if (this.assays[assayFileName.filename]['mafs'].length > 0) {
-            this.assays[assayFileName.filename]['mafs'].forEach(mafFile => {
+          const assayName = (assayFileName.filename).trim();
+          if (this.assays[assayName]['mafs'].length > 0) {
+            this.assays[assayName]['mafs'].forEach(mafFile => {
               if (this.mafNames.indexOf(mafFile) === -1 && mafFile.indexOf('m_') === 0) {
                   this.mafNames.push(mafFile);
               }

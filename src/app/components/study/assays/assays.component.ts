@@ -42,9 +42,10 @@ export class AssaysComponent {
         // @ts-ignore
         let i = 0;
         this.studyAssayFiles.forEach( assayFileName => {
-          if (this.assaysNames.indexOf(assayFileName.filename) === -1 && value[assayFileName.filename]) {
-            this.assays[i] = value[assayFileName.filename];
-            this.assaysNames.push(assayFileName.filename);
+          const assayName = (assayFileName.filename).trim();
+          if (this.assaysNames.indexOf(assayName) === -1 && value[assayName]) {
+            this.assays[i] = value[assayName];
+            this.assaysNames.push(assayName);
           }
           i++;
         });
