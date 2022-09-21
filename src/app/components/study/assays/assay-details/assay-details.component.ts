@@ -56,8 +56,10 @@ export class AssayDetailsComponent implements OnInit {
       this.assay = value[this.assayName];
     });
     this.studySamples.subscribe(value => {
-      this.sampleNames = value.data.rows.map( r => r['Sample Name'])
-      this.filteredSampleNames = this.sampleNames
+      if (value.data) {
+        this.sampleNames = value.data.rows.map( r => r['Sample Name']);
+        this.filteredSampleNames = this.sampleNames;
+      }
     });
   }
 
@@ -77,21 +79,21 @@ export class AssayDetailsComponent implements OnInit {
     this.filterSampleNames(filterValue)
   }
 
-  filterSampleNames(filterValue){
-    this.duplicateSampleNamesInAssay = []
-    if(filterValue == ''){
-      this.filteredSampleNames = this.sampleNames
-    }else{
+  filterSampleNames(filterValue) {
+    this.duplicateSampleNamesInAssay = [];
+    if (filterValue === '') {
+      this.filteredSampleNames = this.sampleNames;
+    } else {
       this.filteredSampleNames = this.sampleNames.filter( s => {
-        return (s).toString().indexOf(filterValue) !== -1
-      })
+        return (s).toString().indexOf(filterValue) !== -1;
+      });
     }
 
     this.existingSampleNamesInAssay.forEach( n => {
       if(this.filteredSampleNames.indexOf(n) > -1){
         this.duplicateSampleNamesInAssay.push(n)
       }
-    })
+    });
   }
 
 
@@ -134,6 +136,7 @@ export class AssayDetailsComponent implements OnInit {
         this.editorService.deleteAssay(name).subscribe( resp => {
           this.assayDelete.emit(name)
           this.editorService.loadStudyFiles(true);
+          window.location.reload();
           Swal.fire({
             title: 'Assay deleted!',
             text: '',

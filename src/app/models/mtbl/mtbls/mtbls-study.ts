@@ -30,16 +30,17 @@ export class MTBLSStudy{
   protocols: MTBLSProtocol[];
   samples: any = null;
   assays: any = {};
+  studyAssays: any[];
   mafs: any = {};
   uploadLocation: string = null;
   obfuscationCode: string  = null;
-  validation: any = {};  
+  validation: any = {};
   files: any = null;
   investigationFailed: boolean = false;
 
   readonly: boolean = null;
   reviewerLink: any = null;
-  
+
   // settings
   isProtocolsExpanded: boolean = false;
 }

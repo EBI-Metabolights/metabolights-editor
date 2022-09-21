@@ -1,20 +1,21 @@
-import { tassign } from 'tassign'; 
+import { tassign } from 'tassign';
 import { MTBLSStudy } from '../../models/mtbl/mtbls/mtbls-study';
 import { MTBLSProtocol } from '../../models/mtbl/mtbls/mtbls-protocol';
 import { MTBLSFactor } from '../../models/mtbl/mtbls/mtbls-factor';
 import { Ontology } from '../../models/mtbl/mtbls/common/mtbls-ontology';
 import { MTBLSProcessSequence } from '../../models/mtbl/mtbls/mtbls-process-sequence';
 import { JsonConvert } from "json2typescript";
-import {  SET_STUDY_IDENTIFIER, 
-    SET_STUDY_TITLE, 
-    SET_STUDY_ABSTRACT, 
+import {  SET_STUDY_IDENTIFIER,
+    SET_STUDY_TITLE,
+    SET_STUDY_ABSTRACT,
     SET_STUDY_DESIGN_DESCRIPTORS,
     UPDATE_STUDY_DESIGN_DESCRIPTORS,
-    SET_STUDY_SUBMISSION_DATE, 
-    SET_STUDY_RELEASE_DATE, 
+    SET_STUDY_SUBMISSION_DATE,
+    SET_STUDY_RELEASE_DATE,
     SET_STUDY_STATUS,
     SET_STUDY_REVIEWER_LINK,
-    SET_STUDY_PUBLICATIONS, 
+    SET_STUDY_ASSAYS,
+    SET_STUDY_PUBLICATIONS,
     SET_STUDY_PEOPLE,
     SET_STUDY_FACTORS,
     SET_STUDY_ORGANISMS,
@@ -38,22 +39,22 @@ import {  SET_STUDY_IDENTIFIER,
     SET_STUDY_FILES,
     DELETE_STUDY_ASSAY,
     SET_STUDY_MAF,
-    SET_STUDY_ERROR, 
+    SET_STUDY_ERROR,
     SET_STUDY_READONLY,
-    SET_PROTOCOL_EXPAND} from './actions'; 
+    SET_PROTOCOL_EXPAND} from './actions';
 
 export const STUDY_INITIAL_STATE: MTBLSStudy =  new MTBLSStudy();
 
 function setStudyIdentifier(state, action) {
     if(action.body.study){
         if(action.body.study.isaInvestigation && action.body.study.isaInvestigation.studies[0].identifier){
-            return tassign(state, { identifier: action.body.study.isaInvestigation.studies[0].identifier, assays: {}, samples: {}, protocols: [], mafs: [] });    
+            return tassign(state, { identifier: action.body.study.isaInvestigation.studies[0].identifier, assays: {}, samples: {}, protocols: [], mafs: [] });
         }
-        return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: [] });    
+        return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: [] });
     }else{
-        return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: []  });    
+        return tassign(state, { identifier: action.body.study, assays: {}, samples: {}, protocols: [], mafs: []  });
     }
-    
+
 }
 
 function setStudyReadOnly(state, action){
@@ -86,6 +87,10 @@ function setStudyReviewerLink(state, action) {
 
 function setStudyPublications(state, action){
     return tassign(state, { publications: action.body.study.isaInvestigation.studies[0].publications });
+}
+
+function setStudyAssays(state, action){
+  return tassign(state, { studyAssays: action.body.study.isaInvestigation.studies[0].assays });
 }
 
 function updateStudyPublications(state, action){
@@ -215,7 +220,7 @@ function addMAF(state, action){
     }else{
         tempList.push(action.body.maf)
     }
-    return tassign(state, { metaboliteAnnotationFiles: tempList }); 
+    return tassign(state, { metaboliteAnnotationFiles: tempList });
 }
 
 function updateMAF(state, action) {
@@ -232,7 +237,7 @@ function updateMAF(state, action) {
     if(index != null){
         state.metaboliteAnnotationFiles[index] = action.body.maf
     }
-    return tassign(state, { metaboliteAnnotationFiles: state.metaboliteAnnotationFiles }); 
+    return tassign(state, { metaboliteAnnotationFiles: state.metaboliteAnnotationFiles });
 }
 
 function setProtocolExpand(state, action){
@@ -260,11 +265,11 @@ function setUploadLocation(state, action){
 }
 
 function setObfuscationCode(state, action){
-    return tassign(state, { obfuscationCode: action.body.obfuscationCode})   
+    return tassign(state, { obfuscationCode: action.body.obfuscationCode})
 }
 
 function setStudyInvestigationFailedError(state, action){
-    return tassign(state, { investigationFailed: action.body.investigationFailed})   
+    return tassign(state, { investigationFailed: action.body.investigationFailed})
 }
 
 export function studyReducer(state: MTBLSStudy = checkLocal(), action): MTBLSStudy {
@@ -280,6 +285,7 @@ export function studyReducer(state: MTBLSStudy = checkLocal(), action): MTBLSStu
         case SET_STUDY_RELEASE_DATE: return setStudyReleaseDate(state, action);
 
         case SET_STUDY_PUBLICATIONS: return setStudyPublications(state, action);
+        case SET_STUDY_ASSAYS: return setStudyAssays(state, action);
         case UPDATE_STUDY_PUBLICATIONS: return updateStudyPublications(state, action);
 
         case SET_STUDY_PEOPLE: return setStudyPeople(state, action);
