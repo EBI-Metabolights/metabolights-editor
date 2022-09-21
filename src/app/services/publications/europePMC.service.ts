@@ -5,6 +5,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { IEuropePMCResponseWrapper } from 'src/app/models/mtbl/mtbls/interfaces/europe-pmc-response-wrapper.interface';
+import { environment } from 'src/environments/environment';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,8 +20,12 @@ export class EuropePMCService extends DataService{
 	 * Constructor for the EuropePMC service
 	 * @param http HttpClient module for making the requests.
 	 */
-	constructor(http: HttpClient) {
-		super(EuropePMCURL, http);
+	constructor(
+		http: HttpClient,
+		private configService: ConfigurationService) {
+			// cannot reference 'this.' within a super() call, so need to assign the url after 
+			super('', http);
+			this.url = this.configService.config.EuropePMCURL
 	}
 
 	/**

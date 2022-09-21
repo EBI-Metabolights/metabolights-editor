@@ -56,7 +56,11 @@ export class LoginComponent implements OnInit {
 
     let body = { 'email' : this.form.get('email').value, 'secret' :  this.form.get('secret').value};
     this.editorService.login(body).subscribe( response => {
-      this.editorService.getValidatedJWTUser(response).subscribe( data => { this.editorService.initialise(data, true); this.router.navigate([this.editorService.redirectUrl]); });
+      this.editorService.getValidatedJWTUser(response).subscribe( data => { 
+        this.editorService.initialise(data, true);
+
+        this.router.navigate([this.editorService.redirectUrl]); 
+      });
     }, err => {
       if(err.status == 403){
         this.invalidCredentials = true

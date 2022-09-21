@@ -36,7 +36,6 @@ export class ValidationDetailCommentComponent implements OnInit {
     //   console.log('hit');
     //   this.commentControl.setValue(change)
     // });
-    console.log('Is Curator : ' + this.curator);
   }
 
   saveComment() {

@@ -52,7 +52,6 @@ export class ValidationDetailComponent implements OnInit {
   ngOnInit(): void {
     this.disabled = this.decideIfDisabled();
     this.isNotNaN(this.validationDetail.description) ? this.hasDescription = true : this.hasDescription = false
-    console.log('Is Curator : ' + this.isCurator);
   }
 
   isNotNaN(desc): boolean {

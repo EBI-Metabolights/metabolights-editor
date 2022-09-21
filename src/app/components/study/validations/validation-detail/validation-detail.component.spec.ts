@@ -1,3 +1,6 @@
+import { NgReduxModule } from '@angular-redux/store';
+import { NgReduxTestingModule } from '@angular-redux/store/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Directive, EventEmitter, Input, Output } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -8,37 +11,51 @@ import { MatIconModule } from '@angular/material/icon/';
 import { MatInputModule } from '@angular/material/input';
 import { By } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MockConfigurationService } from 'src/app/configuration.mock.service';
+import { ConfigurationService } from 'src/app/configuration.service';
 import { failedValidation } from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
+import { EditorService } from 'src/app/services/editor.service';
+import { MockEditorService } from 'src/app/services/editor.service.mock';
 import { ValidationDetailCommentComponent } from './validation-detail-comment/validation-detail-comment.component';
 
 import {  ValidationDetailComponent } from './validation-detail.component';
 
 
-//ultimately did not have a use for this, but leaving here as it establishes a handy mocking pattern.
-@Directive({
-  selector: 'app-validation-detail-comment'
-})
-export class MockValidationDetailCommentComponent {
-  @Input() curator: boolean;
-  @Input() comment?: string;
-  @Output() commentSaved: EventEmitter<{comment: string}> = new EventEmitter();
-}
-
 
 describe('ValidationDetailComponent', () => {
   let component: ValidationDetailComponent;
   let fixture: ComponentFixture<ValidationDetailComponent>;
+  let configService: ConfigurationService;
+  let editorService: EditorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ ValidationDetailComponent, ValidationDetailCommentComponent ],
-      imports: [BrowserAnimationsModule, MatIconModule, MatInputModule, MatExpansionModule, MatDividerModule,FormsModule, ReactiveFormsModule, MatFormFieldModule]
+      imports: [
+        BrowserAnimationsModule,
+        MatIconModule,
+        MatInputModule,
+        MatExpansionModule, 
+        MatDividerModule,FormsModule, 
+        ReactiveFormsModule, 
+        MatFormFieldModule,
+        HttpClientTestingModule,
+        NgReduxModule,
+        NgReduxTestingModule  
+      ],
+      providers: [
+        { provide: ConfigurationService, useClass: MockConfigurationService},
+        { provide: EditorService, useClass: MockEditorService}
+      ]
 
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
+    configService = TestBed.inject(ConfigurationService);
+    configService.loadConfiguration();
+    editorService = TestBed.inject(EditorService);
     fixture = TestBed.createComponent(ValidationDetailComponent);
     component = fixture.componentInstance;
     component.validationDetail = {

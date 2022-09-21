@@ -5,7 +5,7 @@ import { AngularStickyThingsModule } from '@w11k/angular-sticky-things';
 import { IAppState, rootReducer, INITIAL_STATE } from './store';
 
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, isDevMode } from '@angular/core';
+import { NgModule, isDevMode, APP_INITIALIZER, Injector } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -39,15 +39,21 @@ import { HeaderComponent } from './components/public/header/header.component';
 import { FooterComponent } from './components/public/footer/footer.component';
 import { GuidesComponent } from './components/public/guides/guides.component';
 import { StudyModule } from './components/study/study.module';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { SharedModule } from './components/shared/shared.module';
 import { GuideModule } from './components/guide/guide.module';
+import { ConfigurationService } from './configuration.service';
 import { EditorService } from './services/editor.service';
 import { MetabolightsService } from './services/metabolights/metabolights.service';
 import { DOIService } from './services/publications/doi.service';
 import { AuthService } from './services/metabolights/auth.service';
 import { EuropePMCService } from './services/publications/europePMC.service';
 import { LabsWorkspaceService } from './services/labs-workspace.service';
+import { HeaderInterceptor } from './services/interceptors/header.interceptor';
+
+export function ConfigLoader(injector: Injector): () => Promise<any> {
+  return () => injector.get(ConfigurationService).loadConfiguration();
+}
 
 @NgModule({
   declarations: [
@@ -103,12 +109,19 @@ import { LabsWorkspaceService } from './services/labs-workspace.service';
   ],
   providers: [
     AuthGuard,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: ConfigLoader,
+      deps: [Injector],
+      multi: true
+    },
     EditorService,
     MetabolightsService,
     EuropePMCService,
     DOIService,
     AuthService,
-    LabsWorkspaceService
+    LabsWorkspaceService,
+    { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true}
   ],
   bootstrap: [AppComponent]
 })

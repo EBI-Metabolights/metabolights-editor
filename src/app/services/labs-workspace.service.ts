@@ -1,16 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthenticationURL } from './globals';
+import { ConfigurationService } from '../configuration.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LabsWorkspaceService {
 
-  url: string = AuthenticationURL['initialise']	
+  url: string = null
 
-  constructor(public http: HttpClient) {
-
+  constructor(public http: HttpClient, private configService: ConfigurationService) {
+    this.url = this.configService.config.endpoint + this.configService.config.AuthenticationURL.initialise
    }
 
    /**

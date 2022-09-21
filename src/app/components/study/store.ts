@@ -272,7 +272,7 @@ function setStudyInvestigationFailedError(state, action){
     return tassign(state, { investigationFailed: action.body.investigationFailed})
 }
 
-export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): MTBLSStudy {
+export function studyReducer(state: MTBLSStudy = checkLocal(), action): MTBLSStudy {
     switch (action.type) {
         case SET_STUDY_IDENTIFIER: return setStudyIdentifier(state, action);
         case SET_STUDY_TITLE: return setStudyTitle(state, action);
@@ -329,5 +329,9 @@ export function studyReducer(state: MTBLSStudy = STUDY_INITIAL_STATE, action): M
         case SET_STUDY_READONLY: return setStudyReadOnly(state, action);
     }
 
-    return state;
+    return state; 
+}
+
+function checkLocal() {
+	return localStorage.getItem('state') === null ? STUDY_INITIAL_STATE : JSON.parse(localStorage.getItem('state')).study
 }

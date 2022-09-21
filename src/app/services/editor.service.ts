@@ -12,6 +12,13 @@ import { map } from 'rxjs/operators';
 import { LoginURL, RedirectURL } from './../services/globals';
 import { httpOptions } from './../services/headers';
 import Swal from 'sweetalert2';
+import { environment } from "src/environments/environment";
+import { ConfigurationService } from "../configuration.service";
+
+export function disambiguateUserObj(user) {
+  if (typeof user === 'string') console.error('received string when JSON object expected.')
+  return user.owner ? user.owner.apiToken : user.apiToken
+}
 
 @Injectable({
 	providedIn: 'root'
@@ -22,7 +29,7 @@ export class EditorService {
   @select(state => state.study.files) studyFiles;
   @select(state => state.study.studyAssays) studyAssays;
 
-  redirectUrl: string = RedirectURL;
+  redirectUrl: string = '';
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];
@@ -36,15 +43,21 @@ export class EditorService {
     "Source Name": 7
   }
 
-  constructor(private ngRedux: NgRedux<IAppState>, private router: Router, private doiService: DOIService, private authService: AuthService, private europePMCService: EuropePMCService, private dataService: MetabolightsService) {
-    this.studyIdentifier.subscribe(value => {
-        this.currentStudyIdentifier = value
-    });
-    this.studyValidations.subscribe(value => {
-      this.validations = value;
-    });
-    this.studyFiles.subscribe(value => {
-      this.files = value;
+  constructor(
+    private ngRedux: NgRedux<IAppState>, 
+    private router: Router, 
+    private authService: AuthService, 
+    private dataService: MetabolightsService,
+    private configService: ConfigurationService) {
+      this.redirectUrl = this.configService.config.redirectURL
+      this.studyIdentifier.subscribe(value => {
+          this.currentStudyIdentifier = value
+      });
+      this.studyValidations.subscribe(value => {
+        this.validations = value;
+      });
+      this.studyFiles.subscribe(value => {
+        this.files = value;
     });
   }
 
@@ -54,7 +67,11 @@ export class EditorService {
 
   logout(){
     localStorage.removeItem('user');
-    this.router.navigate([LoginURL]);
+    localStorage.removeItem('state');
+    this.ngRedux.dispatch({
+      type: 'RESET'
+    })
+    this.router.navigate([this.configService.config.loginURL]);
   }
 
   authenticateAPIToken(body){
@@ -110,11 +127,13 @@ export class EditorService {
        this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
          'studies': null
        }});
+       localStorage.setItem('time', this.ngRedux.getState().status['isInitialised'].time)
+
        this.loadValidations();
        return true;
     } else {
       const user = JSON.parse(data);
-      httpOptions.headers = httpOptions.headers.set('user_token', this.disambiguateUserObj(user));
+      httpOptions.headers = httpOptions.headers.set('user_token', disambiguateUserObj(user));
       this.ngRedux.dispatch({
         type: 'INITIALISE'
       });
@@ -123,16 +142,14 @@ export class EditorService {
       }})
       this.ngRedux.dispatch({ type: 'SET_USER_STUDIES', body: {
         'studies': null
-      }});
+      }})
+      localStorage.setItem('time', this.ngRedux.getState().status['isInitialised'].time)
       this.loadValidations();
       return true;
-
     }
   }
 
-  disambiguateUserObj(user): string {
-    return user.owner ? user.owner.apiToken : user.apiToken
-  }
+
 
   loadValidations(){
     this.dataService.getValidations().subscribe(
