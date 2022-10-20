@@ -7,10 +7,12 @@ export class MockConfigurationService {
         this.configData = {
             production: false,
             isTesting: true,
-            sessionLength: 300000, 
+            sessionLength: 300000,
             origin: 'test',
             endpoint: 'test',
             loginURL: 'login',
+            clearJavaSession : true,
+            JavaLogoutURL: "http://localhost:8080/metabolights/j_spring_security_logout",
             redirectURL: 'console',
             MetabolightsWSURL: {
                 domain: "https://www.ebi.ac.uk/metabolights/",

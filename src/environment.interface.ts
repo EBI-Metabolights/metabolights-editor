@@ -5,7 +5,9 @@ export interface Environment {
     sessionLength: number; // Duration (in milliseconds) of a user session.
     origin: string; // Origin of webservice ie localhost:4200
     endpoint: string; // Root endpoint of metabolights.
-    loginURL: string; // Url to route users who are not logged in in the event they try and access auth guarded pages.
+    loginURL: string; // Url to route users who are not logged in the event they try and access auth guarded pages.logoutURL
+    clearJavaSession: boolean; // Flag to decid whether to clear Java Spring session
+    JavaLogoutURL: string; // Url to route browser to logout from Java spring session
     redirectURL: string; // Holds the url of the page that the user tried to access, in the event of successful authentication.
     MetabolightsWSURL: MWSURL; // Object containing urls for guides, ontologies and etc. This object is passed to the metabolights.service
     DOIWSURL: DOIWSURL; // Object containing url for DOI service.

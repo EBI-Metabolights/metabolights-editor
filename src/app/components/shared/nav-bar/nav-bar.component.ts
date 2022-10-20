@@ -22,7 +22,7 @@ export class NavBarComponent implements OnInit {
 	}
 
 	logOut() {
-		this.editorService.logout();
+		this.editorService.logout(true);
 	}
 
 	backToMetabolights() {

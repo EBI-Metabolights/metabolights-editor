@@ -44,9 +44,9 @@ export class EditorService {
   }
 
   constructor(
-    private ngRedux: NgRedux<IAppState>, 
-    private router: Router, 
-    private authService: AuthService, 
+    private ngRedux: NgRedux<IAppState>,
+    private router: Router,
+    private authService: AuthService,
     private dataService: MetabolightsService,
     private configService: ConfigurationService) {
       this.redirectUrl = this.configService.config.redirectURL
@@ -65,13 +65,18 @@ export class EditorService {
     return this.authService.login(body);
   }
 
-  logout(){
+  logout(redirect){
     localStorage.removeItem('user');
+    localStorage.removeItem('time');
     localStorage.removeItem('state');
     this.ngRedux.dispatch({
       type: 'RESET'
-    })
-    this.router.navigate([this.configService.config.loginURL]);
+    });
+    if (this.configService.config.clearJavaSession && redirect){
+      window.location.href = this.configService.config.JavaLogoutURL;
+    } else {
+      this.router.navigate([this.configService.config.loginURL]);
+    }
   }
 
   authenticateAPIToken(body){

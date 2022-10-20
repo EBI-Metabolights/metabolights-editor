@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 })
 export class ConfigurationService {
   private configData: Environment | undefined;
-  private readonly configPath: string = '/assets/configs/'; // environment.context or something ultimately
+  private readonly configPath: string = environment.contextPath + '/assets/configs/'; // environment.context or something ultimately
 
   constructor(private http: HttpClient) { }
 
