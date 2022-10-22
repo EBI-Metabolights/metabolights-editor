@@ -1,13 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot, CanActivateChild } from '@angular/router';
-import { AuthService } from './services/metabolights/auth.service';
 import { EditorService } from './services/editor.service';
 import { NgRedux } from '@angular-redux/store';
 import { IAppState } from './store';
 import { isInitialised } from './components/store';
 import { SessionStatus } from './models/mtbl/mtbls/enums/session-status.enum';
-import { environment } from 'src/environments/environment';
-import { browserRefresh } from './app.component';
 import { ConfigurationService } from './configuration.service';
 import {HttpResponse} from '@angular/common/http';
 
@@ -47,14 +44,18 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return false;
 
       case SessionStatus.NotInit:
-        let user = JSON.parse(localStorage.getItem('user'));
-        this.editorService.authenticateAPIToken({"token": user.apiToken , "user": user}).subscribe((res: HttpResponse<any>) => {
-          this.editorService.getValidatedJWTUser(res).subscribe(jwtres => {
-            this.editorService.initialise(jwtres, true);
-            return true;
-          })
-        })
-        return this.editorService.initialise(localStorage.getItem('user'), false)
+        const isUserJSON = this.isJSON(localStorage.getItem('user'));
+        if (isUserJSON) {
+          let user = JSON.parse(localStorage.getItem('user'));
+          this.editorService.authenticateAPIToken({"token": user.apiToken , "user": user}).subscribe((res: HttpResponse<any>) => {
+            this.editorService.getValidatedJWTUser(res).subscribe(jwtres => {
+              this.router.navigate([this.editorService.redirectUrl]);
+              return this.editorService.initialise(jwtres, true);
+            });
+          });
+        } else {
+          this.editorService.logout(false);
+        }
 
       case SessionStatus.NoRecord:
         this.editorService.redirectUrl = url;
@@ -80,30 +81,22 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
     // in app.component.ts we are subscribing to all router events, and recording when that event is NavigationStart,
     // which will either be arriving at the app for the first time, or refreshing the page.
-    let refreshed = browserRefresh;
-
-      if (
-        isInitialisedObj.ready === false &&
+    if (
+    isInitialisedObj.ready === false &&
         (typeof isInitialisedObj.time === 'string' ) &&
         localStorage.getItem('user') === null
         ) {
         return SessionStatus.NoRecord
       }
 
-      if (
-        isInitialisedObj.ready === false &&
-        this.isJSON(localStorage.getItem('user')) &&
-        refreshed === false
-         ) {
-        return SessionStatus.NotInit
-      }
       let now = new Date();
       let then = null
 
-      if (localStorage.getItem('time') !== null){
-        then = new Date(localStorage.getItem('time'))
+    const isUserJSON = this.isJSON(localStorage.getItem('user'));
+    if(localStorage.getItem('time') !== null && isUserJSON) {
+        then = new Date(localStorage.getItem('time'));
       } else {
-        return SessionStatus.NotInit
+       return SessionStatus.NotInit
       }
 
       if(now.getTime() - then.getTime() > this.configService.config.sessionLength ) {
