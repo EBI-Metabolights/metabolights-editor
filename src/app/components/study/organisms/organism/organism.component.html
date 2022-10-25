@@ -1,40 +1,56 @@
-<span class="tag is-info" [ngClass]=" (organism.parts.length > 0 || organism.variants.length > 0) ? 'pointer' : ''" (click)="showModal()">
-	<b>{{ organism.name }}</b>
+<span
+  class="tag is-info"
+  [ngClass]="
+    organism.parts.length > 0 || organism.variants.length > 0 ? 'pointer' : ''
+  "
+  (click)="showModal()"
+>
+  <b>{{ organism.name }}</b>
 </span>
-<div class="modal" [ngClass]="{'is-active': isModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-content">
-		<article class="message is-info">
-			<div class="message-header">
-				<p>{{ organism.name }}</p>
-				<button (click)='closeModal()' class="delete is-small" aria-label="delete"></button>
-			</div>
-			<div class="message-body">
-				<table *ngIf="organism.parts.length > 0" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-					<thead>
-						<tr>
-							<th>Part(s)</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr *ngFor="let part of organism.parts">
-							<td>{{ part }}</td>
-						</tr>
-					</tbody>
-				</table>
-				<table *ngIf="organism.variants.length > 0" class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-					<thead>
-						<tr>
-							<th>Variant(s)</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr *ngFor="let variant of organism.variants">
-							<td>{{ variant }}</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</article>
-	</div>
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-content">
+    <article class="message is-info">
+      <div class="message-header">
+        <p>{{ organism.name }}</p>
+        <button
+          (click)="closeModal()"
+          class="delete is-small"
+          aria-label="delete"
+        ></button>
+      </div>
+      <div class="message-body">
+        <table
+          *ngIf="organism.parts.length > 0"
+          class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+        >
+          <thead>
+            <tr>
+              <th>Part(s)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let part of organism.parts">
+              <td>{{ part }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <table
+          *ngIf="organism.variants.length > 0"
+          class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
+        >
+          <thead>
+            <tr>
+              <th>Variant(s)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let variant of organism.variants">
+              <td>{{ variant }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
 </div>

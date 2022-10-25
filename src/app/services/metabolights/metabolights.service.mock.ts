@@ -4,26 +4,29 @@ import { of } from "rxjs";
 import { httpOptions } from "../headers";
 
 export class MockMetabolightsService {
-    @select(state => state.study.identifier) studyIdentifier;
-    id: string;
-    http: HttpClient;
+  @select((state) => state.study.identifier) studyIdentifier;
+  id: string;
+  http: HttpClient;
 
-    getStudyFilesFetch(bool: true) {
-        let obj = { 
-            study: [],
-            latest: 'latest'
-        }
+  getStudyFilesFetch(bool: true) {
+    let obj = {
+      study: [],
+      latest: "latest",
+    };
 
-        return of({
-            obj
-        })
-    }
+    return of({
+      obj,
+    });
+  }
 
-    getDownloadLink(name, code) {
-        return of('download.link')
-    }
+  getDownloadLink(name, code) {
+    return of("download.link");
+  }
 
-    getTitle(id) {
-        return this.http.get("https://www.ebi.ac.uk/metabolights/ws/studies/title", httpOptions)
-    }
+  getTitle(id) {
+    return this.http.get(
+      "https://www.ebi.ac.uk/metabolights/ws/studies/title",
+      httpOptions
+    );
+  }
 }

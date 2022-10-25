@@ -1,5 +1,8 @@
 <div class="steps is-small">
-  <div class="step-item" [ngClass]="{'is-active': step==1, 'is-completed': step > 1}">
+  <div
+    class="step-item"
+    [ngClass]="{ 'is-active': step == 1, 'is-completed': step > 1 }"
+  >
     <div class="step-marker">
       <span class="icon">
         <i class="fa fa-check"></i>
@@ -8,33 +11,58 @@
     <div class="step-details">
       <p *ngIf="!study" class="step-title">Create Study</p>
       <p *ngIf="study" class="step-title">
-        <a [ngClass]="{'has-text-grey': step < 2 }" (click)="redirectTo('info', null, 1)">
-        Study Created <br> {{ study }}</a>
+        <a
+          [ngClass]="{ 'has-text-grey': step < 2 }"
+          (click)="redirectTo('info', null, 1)"
+        >
+          Study Created <br />
+          {{ study }}</a
+        >
       </p>
     </div>
   </div>
-  <div class="step-item" [ngClass]="{'is-active': step==2, 'is-completed': step > 2}">
+  <div
+    class="step-item"
+    [ngClass]="{ 'is-active': step == 2, 'is-completed': step > 2 }"
+  >
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{'has-text-grey': step < 2 }" (click)="redirectTo('upload', null, 2)">Upload files</a>
+        <a
+          [ngClass]="{ 'has-text-grey': step < 2 }"
+          (click)="redirectTo('upload', null, 2)"
+          >Upload files</a
+        >
       </p>
     </div>
   </div>
-  <div class="step-item" [ngClass]="{'is-active': step==3, 'is-completed': step > 3}">
+  <div
+    class="step-item"
+    [ngClass]="{ 'is-active': step == 3, 'is-completed': step > 3 }"
+  >
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{'has-text-grey': step < 3 }" (click)="redirectTo('meta', null, 3)">Study description</a>
+        <a
+          [ngClass]="{ 'has-text-grey': step < 3 }"
+          (click)="redirectTo('meta', null, 3)"
+          >Study description</a
+        >
       </p>
     </div>
   </div>
-  <div class="step-item" [ngClass]="{'is-active': step==4, 'is-completed': step > 4}">
-    <div class="step-marker">
-    </div>
+  <div
+    class="step-item"
+    [ngClass]="{ 'is-active': step == 4, 'is-completed': step > 4 }"
+  >
+    <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{'has-text-grey': step < 4 }" (click)="redirectTo('assays', null, 4)">Sample & assay details</a>
+        <a
+          [ngClass]="{ 'has-text-grey': step < 4 }"
+          (click)="redirectTo('assays', null, 4)"
+          >Sample & assay details</a
+        >
       </p>
     </div>
   </div>

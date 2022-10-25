@@ -1,40 +1,40 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { FormBuilder, FormGroup, Validators} from '@angular/forms';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit, Input } from "@angular/core";
+import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
+import { NgRedux, select } from "@angular-redux/store";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { environment } from "src/environments/environment";
 
 @Component({
-	selector: 'mtbls-download',
-	templateUrl: './download.component.html',
-	styleUrls: ['./download.component.css']
+  selector: "mtbls-download",
+  templateUrl: "./download.component.html",
+  styleUrls: ["./download.component.css"],
 })
 export class DownloadComponent implements OnInit {
+  @Input("value") file: string;
+  @Input("type") type: string;
+  @select((state) => state.study.obfuscationCode) obfuscationCode;
 
-	@Input('value') file: string;
-	@Input('type') type: string;
-	@select(state => state.study.obfuscationCode) obfuscationCode;
+  domain = "";
+  code = "";
 
-	domain = "";
-	code = ""
-	
-	constructor(private fb: FormBuilder, private metabolightsService: MetabolightsService) {
-		if (!environment.isTesting) {
-			this.setUpSubscriptions();
-		}
-	}
+  constructor(
+    private fb: FormBuilder,
+    private metabolightsService: MetabolightsService
+  ) {
+    if (!environment.isTesting) {
+      this.setUpSubscriptions();
+    }
+  }
 
-	setUpSubscriptions() {
-		this.obfuscationCode.subscribe(value => { 
-			this.code = value
-		})
-	}
+  setUpSubscriptions() {
+    this.obfuscationCode.subscribe((value) => {
+      this.code = value;
+    });
+  }
 
-	ngOnInit() {
-	}
+  ngOnInit() {}
 
-	getDownloadLink(){
-		return this.metabolightsService.downloadLink(this.file, this.code)
-	}
-
+  getDownloadLink() {
+    return this.metabolightsService.downloadLink(this.file, this.code);
+  }
 }

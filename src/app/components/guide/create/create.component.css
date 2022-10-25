@@ -1,48 +1,49 @@
-/deep/ .mat-button-toggle-group-vertical{
+/deep/ .mat-button-toggle-group-vertical {
   flex-direction: column !important;
   width: 100%;
 }
 
-/deep/ .mat-button-toggle-group, .mat-button-toggle-standalone {
-    box-shadow: none !important;
+/deep/ .mat-button-toggle-group,
+.mat-button-toggle-standalone {
+  box-shadow: none !important;
 }
 
-/deep/ .mat-button-toggle-label-content{
+/deep/ .mat-button-toggle-label-content {
   width: 100% !important;
   text-align: left;
 }
 
 /deep/ .mat-button-toggle {
-    border: 1px solid rgba(0,0,0,.38) !important;
-    border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.38) !important;
+  border-radius: 4px;
 }
 
-/deep/ .mat-button-toggle-button{
+/deep/ .mat-button-toggle-button {
   width: 100% !important;
 }
 
 /deep/ .mat-button-toggle-checked {
-    background-color: #5193FB;
-    color: white;
+  background-color: #5193fb;
+  color: white;
 }
 
-/deep/ .mat-checkbox{
+/deep/ .mat-checkbox {
   display: block;
 }
 
-.no-pointer{
+.no-pointer {
   cursor: inherit !important;
 }
 
 .mat-button-toggle-checked.mat-button-toggle-appearance-standard {
-  color: white; 
+  color: white;
 }
 
-.cborder{
+.cborder {
   border: 1px solid #f1f1f4;
 }
 
-.cborder-radius{
+.cborder-radius {
   border-radius: 4px;
 }
 
@@ -55,8 +56,8 @@
   margin: 5px;
 }
 
-.mb5{
-	margin-bottom: 5px !important;
+.mb5 {
+  margin-bottom: 5px !important;
 }
 
 .create-selected-value {

@@ -1,23 +1,27 @@
 <span *ngIf="curator">
-    <a class="clickable has-text-danger" (click)='openModal()'>
-      <mat-icon>delete</mat-icon>
-    </a>
-    <div class="modal" [ngClass]="{'is-active': isModalOpen}">
-        <div class="modal-background"></div>
-        <div class="modal-card">
-          <section class="modal-card-body">
-            <p>Are you sure you want to delete the study?</p>
-          </section>
-          <footer class="modal-card-foot">
-            <div class="columns is-gapless full-width">
-              <div class="column is-half">
-                <button (click)='closeModal()' class="button is-info">Cancel</button>
-              </div>
-              <div class="column is-half has-text-right">
-                <button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
-              </div>
-            </div>
-          </footer>
+  <a class="clickable has-text-danger" (click)="openModal()">
+    <mat-icon>delete</mat-icon>
+  </a>
+  <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <section class="modal-card-body">
+        <p>Are you sure you want to delete the study?</p>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button (click)="closeModal()" class="button is-info">
+              Cancel
+            </button>
+          </div>
+          <div class="column is-half has-text-right">
+            <button (click)="delete()" class="button is-danger">
+              OK! Delete Permanently
+            </button>
+          </div>
         </div>
-      </div>
+      </footer>
+    </div>
+  </div>
 </span>

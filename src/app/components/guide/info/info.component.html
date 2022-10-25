@@ -1,42 +1,84 @@
 <nav-bar :mode="light"></nav-bar>
 <mtbls-progress [study]="requestedStudy" [step]="1"></mtbls-progress>
-<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
+<quick-link
+  path="study"
+  icon="chrome_reader_mode"
+  text="Study overview"
+></quick-link>
 <div class="columns">
-	<div class="column is-half is-offset-one-quarter mb-5">
-		<div>&nbsp;</div>
-		<nav class="panel has-background-white">
-			<div class="panel-heading">
-				<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
-				<span style="margin-left: 10px">MetaboLights Study - {{ requestedStudy }}</span>
-			</div>
-			<div class="panel-block">
-				<div class="column">
-					<h3><b>Your MetaboLights study</b></h3>
-					<p>
-						Your study has been assigned the unique identifier <span class="has-text-link"><b>{{ requestedStudy }}</b></span> <br>
-						Please refer to this identifier in any communication with the MetaboLights team.
-					</p><br>
-					<h3><b>How to reference your MetaboLights study</b></h3>
-					<p>
-						Please use {{ requestedStudy }} when referencing this study in manuscripts etc. together with the URL <a href="www.ebi.ac.uk/metabolights/{{ requestedStudy }}"><b><span class="has-text-link">www.ebi.ac.uk/metabolights/{{ requestedStudy }}</span></b></a> <br><br>
-						<b>Please also cite the following MetaboLights paper</b> <br>
-						<a target="_blank" href="https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkz1019/5613675">
-							Haug et al. MetaboLights: a resource evolving in response to the needs of its scientific community. <br/>Nucleic Acids Research, gkz1019, doi:10.1093/nar/gkz1019, PMID:31691833.
-						</a>
-						<br><br>
-						<span class="has-text-grey">
-							<small><mat-icon>info</mat-icon>&emsp;<i>The above information is sent to you by email.</i></small>
-						</span>
-					</p>
-				</div>
-			</div>
-			<div class="panel-block">
-				<div class="column">
-					<button (click)='proceedToNextStep()' class="button is-success is-fullwidth">
-						<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-					</button>
-				</div>
-			</div>
-		</nav>		
-	</div>
+  <div class="column is-half is-offset-one-quarter mb-5">
+    <div>&nbsp;</div>
+    <nav class="panel has-background-white">
+      <div class="panel-heading">
+        <img
+          style="height: 32px"
+          class="is-pulled-left"
+          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+        />
+        <span style="margin-left: 10px"
+          >MetaboLights Study - {{ requestedStudy }}</span
+        >
+      </div>
+      <div class="panel-block">
+        <div class="column">
+          <h3><b>Your MetaboLights study</b></h3>
+          <p>
+            Your study has been assigned the unique identifier
+            <span class="has-text-link"
+              ><b>{{ requestedStudy }}</b></span
+            >
+            <br />
+            Please refer to this identifier in any communication with the
+            MetaboLights team.
+          </p>
+          <br />
+          <h3><b>How to reference your MetaboLights study</b></h3>
+          <p>
+            Please use {{ requestedStudy }} when referencing this study in
+            manuscripts etc. together with the URL
+            <a href="www.ebi.ac.uk/metabolights/{{ requestedStudy }}"
+              ><b
+                ><span class="has-text-link"
+                  >www.ebi.ac.uk/metabolights/{{ requestedStudy }}</span
+                ></b
+              ></a
+            >
+            <br /><br />
+            <b>Please also cite the following MetaboLights paper</b> <br />
+            <a
+              target="_blank"
+              href="https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkz1019/5613675"
+            >
+              Haug et al. MetaboLights: a resource evolving in response to the
+              needs of its scientific community. <br />Nucleic Acids Research,
+              gkz1019, doi:10.1093/nar/gkz1019, PMID:31691833.
+            </a>
+            <br /><br />
+            <span class="has-text-grey">
+              <small
+                ><mat-icon>info</mat-icon>&emsp;<i
+                  >The above information is sent to you by email.</i
+                ></small
+              >
+            </span>
+          </p>
+        </div>
+      </div>
+      <div class="panel-block">
+        <div class="column">
+          <button
+            (click)="proceedToNextStep()"
+            class="button is-success is-fullwidth"
+          >
+            <mat-spinner
+              [diameter]="20"
+              [strokeWidth]="3"
+              *ngIf="isLoading"
+            ></mat-spinner
+            >&nbsp;Next
+          </button>
+        </div>
+      </div>
+    </nav>
+  </div>
 </div>

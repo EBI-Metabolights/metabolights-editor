@@ -1,120 +1,166 @@
 <nav-bar :mode="light"></nav-bar>
 <mtbls-progress [study]="requestedStudy" [step]="2"></mtbls-progress>
-<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
+<quick-link
+  path="study"
+  icon="chrome_reader_mode"
+  text="Study overview"
+></quick-link>
 <div class="columns">
-	<div class="column is-half is-offset-one-quarter mb-5">
-		<div>&nbsp;</div>
-		<nav class="panel has-background-white">
-			<div class="panel-heading">
-				<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
-				<span style="margin-left: 10px">{{ requestedStudy }}</span>: Upload files
-			</div>
-			<div class="panel-block bg-white">
-				<div class="column">
-					<mtbls-aspera [type]="'any'" [allowMultipleSelection]="true" ></mtbls-aspera>
-				</div>
-			</div>
-			<div class="panel-block bg-white">
-				<div class="column">
-					<mtbls-ftp></mtbls-ftp>
-				</div>
-			</div>
-			<div style="border-radius: 0;" class="panel-block notification is-primary">
-				<small class="is-tiny">
-					<mat-icon>info</mat-icon>&nbsp;You can come back to this page and upload files at any time, you do not have to complete the file upload at this stage.
-				</small>
-			</div>
-		</nav>
-		<div>&nbsp;</div>
-		<nav class="panel bg-white">
-			<p class="panel-heading">
-				<small>Study files</small>
-				<span class="is-pulled-right">
-					<a target="_blank" (click)="refreshFiles()" class="button is-small is-light">
-						<mat-icon>refresh</mat-icon> refresh
-					</a>
-				</span>
-			</p>
-			<div class="panel-block has-background-white">
-				<span *ngIf="files && ((files.latest && files.latest.length > 0) || (files.study && files.study.length > 0)) ; else noUploadFiles" class="w100">
-					<span *ngIf="files.latest.length > 0">
-						<small class="has-text-grey">RECENTLY UPDATED FILES</small>
-						<span *ngFor="let file of files.latest">
-							<a class="panel-block">
-								<div class="columns w100">
-									<div class="column is-three-fifths">
-										<span class="panel-icon">
-											<span *ngIf="isFolder(file); else fileIcon">
-												<img src="/metabolights/editor/assets/img/folder.png">
-											</span>
-											<ng-template #fileIcon>
-												<img src="/metabolights/editor/assets/img/file.png">
-											</ng-template>
-										</span>
-										<span>
-											{{ file.file }} 
-										</span>
-									</div>
-									<div class="column is-two-fifths has-text-right">
-										<span class="is-pulled-right has-text-grey"><small>{{ file.createdAt }}</small></span>
-									</div>
-								</div>
-							</a>
-						</span>
-					</span>
-					<br>
-					<span *ngIf="files.study.length > 0">
-						<small class="has-text-grey">STUDY FILES</small>
-						<span *ngFor="let file of files.study">
-							<a class="panel-block">
-								<div class="columns w100">
-									<div class="column is-three-fifths">
-										<span class="panel-icon">
-											<span *ngIf="isFolder(file); else fileIcon">
-												<img src="/metabolights/editor/assets/img/folder.png">
-											</span>
-											<ng-template #fileIcon>
-												<img src="/metabolights/editor/assets/img/file.png">
-											</ng-template>
-										</span>
-										<span>
-											{{ file.file }} 
-										</span>
-									</div>
-									<div class="column is-two-fifths has-text-right">
-										<span class="is-pulled-right has-text-grey"><small>{{ file.createdAt }}</small></span>
-									</div>
-								</div>
-							</a>
-						</span>
-					</span>
-				</span>
-				<ng-template #noUploadFiles>
-					<div class="column">
-						<div class="no-files-placeholder has-text-centered">
-							<span>
-								<small class="has-text-grey"><i>No files</i></small> <br><br>
-								<a target="_blank" (click)="refreshFiles()" class="button is-small is-light">
-									<mat-icon>refresh</mat-icon> refresh
-								</a>
-							</span>
-						</div>
-					</div>
-				</ng-template>
-			</div>
-			<div style="border-radius: 0" class="panel-block notification is-primary">
-				<small class="is-tiny"><mat-icon>info</mat-icon>&nbsp;Please use the <mat-icon>refresh</mat-icon> refresh button on the right to see the files that has been updated.</small>
-			</div>
-		</nav>
-		<nav class="panel has-background-white">
-			<div class="panel-block">
-				<button (click)='copyFilesAndProceed()' class="button is-success is-fullwidth
-				is-fullwidth">
-					<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-				</button>
-			</div>
-		</nav>
-		<div>&nbsp;</div>
-		<div>&nbsp;</div>
-	</div>
+  <div class="column is-half is-offset-one-quarter mb-5">
+    <div>&nbsp;</div>
+    <nav class="panel has-background-white">
+      <div class="panel-heading">
+        <img
+          style="height: 32px"
+          class="is-pulled-left"
+          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+        />
+        <span style="margin-left: 10px">{{ requestedStudy }}</span
+        >: Upload files
+      </div>
+      <div class="panel-block bg-white">
+        <div class="column">
+          <mtbls-aspera
+            [type]="'any'"
+            [allowMultipleSelection]="true"
+          ></mtbls-aspera>
+        </div>
+      </div>
+      <div class="panel-block bg-white">
+        <div class="column">
+          <mtbls-ftp></mtbls-ftp>
+        </div>
+      </div>
+      <div style="border-radius: 0" class="panel-block notification is-primary">
+        <small class="is-tiny">
+          <mat-icon>info</mat-icon>&nbsp;You can come back to this page and
+          upload files at any time, you do not have to complete the file upload
+          at this stage.
+        </small>
+      </div>
+    </nav>
+    <div>&nbsp;</div>
+    <nav class="panel bg-white">
+      <p class="panel-heading">
+        <small>Study files</small>
+        <span class="is-pulled-right">
+          <a
+            target="_blank"
+            (click)="refreshFiles()"
+            class="button is-small is-light"
+          >
+            <mat-icon>refresh</mat-icon> refresh
+          </a>
+        </span>
+      </p>
+      <div class="panel-block has-background-white">
+        <span
+          *ngIf="
+            files &&
+              ((files.latest && files.latest.length > 0) ||
+                (files.study && files.study.length > 0));
+            else noUploadFiles
+          "
+          class="w100"
+        >
+          <span *ngIf="files.latest.length > 0">
+            <small class="has-text-grey">RECENTLY UPDATED FILES</small>
+            <span *ngFor="let file of files.latest">
+              <a class="panel-block">
+                <div class="columns w100">
+                  <div class="column is-three-fifths">
+                    <span class="panel-icon">
+                      <span *ngIf="isFolder(file); else fileIcon">
+                        <img src="/metabolights/editor/assets/img/folder.png" />
+                      </span>
+                      <ng-template #fileIcon>
+                        <img src="/metabolights/editor/assets/img/file.png" />
+                      </ng-template>
+                    </span>
+                    <span>
+                      {{ file.file }}
+                    </span>
+                  </div>
+                  <div class="column is-two-fifths has-text-right">
+                    <span class="is-pulled-right has-text-grey"
+                      ><small>{{ file.createdAt }}</small></span
+                    >
+                  </div>
+                </div>
+              </a>
+            </span>
+          </span>
+          <br />
+          <span *ngIf="files.study.length > 0">
+            <small class="has-text-grey">STUDY FILES</small>
+            <span *ngFor="let file of files.study">
+              <a class="panel-block">
+                <div class="columns w100">
+                  <div class="column is-three-fifths">
+                    <span class="panel-icon">
+                      <span *ngIf="isFolder(file); else fileIcon">
+                        <img src="/metabolights/editor/assets/img/folder.png" />
+                      </span>
+                      <ng-template #fileIcon>
+                        <img src="/metabolights/editor/assets/img/file.png" />
+                      </ng-template>
+                    </span>
+                    <span>
+                      {{ file.file }}
+                    </span>
+                  </div>
+                  <div class="column is-two-fifths has-text-right">
+                    <span class="is-pulled-right has-text-grey"
+                      ><small>{{ file.createdAt }}</small></span
+                    >
+                  </div>
+                </div>
+              </a>
+            </span>
+          </span>
+        </span>
+        <ng-template #noUploadFiles>
+          <div class="column">
+            <div class="no-files-placeholder has-text-centered">
+              <span>
+                <small class="has-text-grey"><i>No files</i></small>
+                <br /><br />
+                <a
+                  target="_blank"
+                  (click)="refreshFiles()"
+                  class="button is-small is-light"
+                >
+                  <mat-icon>refresh</mat-icon> refresh
+                </a>
+              </span>
+            </div>
+          </div>
+        </ng-template>
+      </div>
+      <div style="border-radius: 0" class="panel-block notification is-primary">
+        <small class="is-tiny"
+          ><mat-icon>info</mat-icon>&nbsp;Please use the
+          <mat-icon>refresh</mat-icon> refresh button on the right to see the
+          files that has been updated.</small
+        >
+      </div>
+    </nav>
+    <nav class="panel has-background-white">
+      <div class="panel-block">
+        <button
+          (click)="copyFilesAndProceed()"
+          class="button is-success is-fullwidth is-fullwidth"
+        >
+          <mat-spinner
+            [diameter]="20"
+            [strokeWidth]="3"
+            *ngIf="isLoading"
+          ></mat-spinner
+          >&nbsp;Next
+        </button>
+      </div>
+    </nav>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+  </div>
 </div>

@@ -1,23 +1,25 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { failedValidation, successfulValidation } from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import {
+  failedValidation,
+  successfulValidation,
+} from "src/app/models/mtbl/mtbls/mocks/mock-validation";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { OntologyComponent } from './ontology.component';
+import { OntologyComponent } from "./ontology.component";
 
-describe('OntologyComponent', () => {
+describe("OntologyComponent", () => {
   let component: OntologyComponent;
   let fixture: ComponentFixture<OntologyComponent>;
   let editorService: EditorService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OntologyComponent ],
+      declarations: [OntologyComponent],
       imports: [HttpClientTestingModule],
-      providers: [{provide: EditorService, useClass: MockEditorService}]
-    })
-    .compileComponents();
+      providers: [{ provide: EditorService, useClass: MockEditorService }],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -28,7 +30,7 @@ describe('OntologyComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

@@ -1,42 +1,42 @@
 .mat-option {
-    white-space: nowrap;
-    line-height: inherit;
-    min-height: 48px;
-    height: inherit;
-    display: flex;
-    flex-direction: row;
-    max-width: 600px;
+  white-space: nowrap;
+  line-height: inherit;
+  min-height: 48px;
+  height: inherit;
+  display: flex;
+  flex-direction: row;
+  max-width: 600px;
 }
 
 .mat-option-text {
-    max-width: 570px;
+  max-width: 570px;
 }
 
-.ont-description{
-    max-width: 570px;
-    font-size: 0.9em;
-    margin: 1rem 0;
-    overflow: visible;
-    line-height: initial;
-    word-wrap: break-word;
-    white-space: pre-wrap;
+.ont-description {
+  max-width: 570px;
+  font-size: 0.9em;
+  margin: 1rem 0;
+  overflow: visible;
+  line-height: initial;
+  word-wrap: break-word;
+  white-space: pre-wrap;
 }
 
-.ont-description small{
-    max-width: 570px;
+.ont-description small {
+  max-width: 570px;
 }
 
 ::ng-deep .mat-option-text {
-    display: inline-block;
-    flex-grow: 1;
-    padding: 25px 15px;
-    overflow: visible !important; 
+  display: inline-block;
+  flex-grow: 1;
+  padding: 25px 15px;
+  overflow: visible !important;
 }
 
-.np{
-    padding: 0 !important;
+.np {
+  padding: 0 !important;
 }
 
-::ng-deep .tiny{
-    font-size: 0.7em !important;
+::ng-deep .tiny {
+  font-size: 0.7em !important;
 }

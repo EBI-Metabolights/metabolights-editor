@@ -17,48 +17,45 @@ import { SharedModule } from "../shared/shared.module";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
 import { InfoComponent } from "./info/info.component";
-import { MetaComponent } from "./meta/meta.component"
+import { MetaComponent } from "./meta/meta.component";
 import { ProgressComponent } from "./progress/progress.component";
 import { RawUploadComponent } from "./upload/upload.component";
 
-
 @NgModule({
-    declarations: [
-        GuidedAssaysComponent,
-        CreateComponent,
-        InfoComponent,
-        MetaComponent,
-        ProgressComponent,
-        RawUploadComponent
-
-    ],
-    imports: [
-        CommonModule,
-        BrowserModule,
-        HttpClientModule,
-        MatIconModule,
-        FormsModule,
-        SharedModule,
-        //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-        NgReduxModule,
-        MatProgressSpinnerModule,
-        MatButtonModule,
-        MatButtonToggleModule,
-        MatOptionModule,
-        MatFormFieldModule,
-        MatInputModule,
-        AngularStickyThingsModule
-    ],
-    exports: [
-        GuidedAssaysComponent,
-        CreateComponent,
-        InfoComponent,
-        MetaComponent,
-        ProgressComponent,
-        RawUploadComponent
-
-    ]
+  declarations: [
+    GuidedAssaysComponent,
+    CreateComponent,
+    InfoComponent,
+    MetaComponent,
+    ProgressComponent,
+    RawUploadComponent,
+  ],
+  imports: [
+    CommonModule,
+    BrowserModule,
+    HttpClientModule,
+    MatIconModule,
+    FormsModule,
+    SharedModule,
+    //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    NgReduxModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatOptionModule,
+    MatFormFieldModule,
+    MatInputModule,
+    AngularStickyThingsModule,
+  ],
+  exports: [
+    GuidedAssaysComponent,
+    CreateComponent,
+    InfoComponent,
+    MetaComponent,
+    ProgressComponent,
+    RawUploadComponent,
+  ],
 })
 export class GuideModule {}

@@ -1,210 +1,359 @@
 <nav-bar :mode="light"></nav-bar>
-<mtbls-progress  [study]="requestedStudy" [step]="3"></mtbls-progress>
-<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
+<mtbls-progress [study]="requestedStudy" [step]="3"></mtbls-progress>
+<quick-link
+  path="study"
+  icon="chrome_reader_mode"
+  text="Study overview"
+></quick-link>
 <div class="columns">
-	<div class="column is-8 is-offset-2 mb-5">
-		<div>&nbsp;</div>
-		<nav class="panel has-background-white">
-			<div class="panel-heading">
-				<img style="height: 32px;" class="is-pulled-left" src="/metabolights/editor/assets/img/MetaboLightsLogo.png">
-				<span style="margin-left: 10px">{{ requestedStudy }}</span>: Please tell us about your study
-			</div>
-			<div class="panel-block has-background-white">
-				<span style="flex: 0 0 100%;">
-					<mtbls-design-descriptors></mtbls-design-descriptors>
-				</span>
-			</div>
-		</nav>
-		<div *ngIf="(currentTitle && currentTitle != '') || (currentDescription && currentDescription != '')" class="panel-block has-background-white">
-			<span class="column">
-				<small class="has-text-grey-lighter">Please click to edit or use the options below to import details. You may skip this step and proceed to the next.</small>
-				<div class="notification no-margin-bottom">
-					<span class="is-text-grey"><label><small>TITLE</small></label></span> <br>
-					<mtbls-title></mtbls-title>
-					<div>&nbsp;</div>
-					<span class="is-text-grey"><label><small>SUMMARY</small></label></span><br>
-					<mtbls-description></mtbls-description>
-					<div>&nbsp;</div>
-					<mtbls-people></mtbls-people> 
-				</div>
-			</span>
-		</div>
+  <div class="column is-8 is-offset-2 mb-5">
+    <div>&nbsp;</div>
+    <nav class="panel has-background-white">
+      <div class="panel-heading">
+        <img
+          style="height: 32px"
+          class="is-pulled-left"
+          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+        />
+        <span style="margin-left: 10px">{{ requestedStudy }}</span
+        >: Please tell us about your study
+      </div>
+      <div class="panel-block has-background-white">
+        <span style="flex: 0 0 100%">
+          <mtbls-design-descriptors></mtbls-design-descriptors>
+        </span>
+      </div>
+    </nav>
+    <div
+      *ngIf="
+        (currentTitle && currentTitle != '') ||
+        (currentDescription && currentDescription != '')
+      "
+      class="panel-block has-background-white"
+    >
+      <span class="column">
+        <small class="has-text-grey-lighter"
+          >Please click to edit or use the options below to import details. You
+          may skip this step and proceed to the next.</small
+        >
+        <div class="notification no-margin-bottom">
+          <span class="is-text-grey"
+            ><label><small>TITLE</small></label></span
+          >
+          <br />
+          <mtbls-title></mtbls-title>
+          <div>&nbsp;</div>
+          <span class="is-text-grey"
+            ><label><small>SUMMARY</small></label></span
+          ><br />
+          <mtbls-description></mtbls-description>
+          <div>&nbsp;</div>
+          <mtbls-people></mtbls-people>
+        </div>
+      </span>
+    </div>
 
-		<div class="panel-block has-background-white">
-			<span style="flex: 0 0 100%;">
-				<span *ngIf="(currentTitle && currentTitle != '') || (currentDescription && currentDescription != '')">
-					<h3 class="mb5">Update study details: Do you have a manuscript?</h3>
-				</span>
-				<span *ngIf="(!currentTitle || currentTitle == '') || (!currentDescription || currentDescription == '')">
-					<h3 class="mb5">Do you have a manuscript?</h3>
-				</span>
-				<span>
-					<small class="has-text-grey-lighter">Please select</small>
-					<mat-button-toggle-group (ngModelChange)="manuscriptOptionChange()" class="mat-button-toggle-group-vertical" [(ngModel)]="selectedManuscriptOption" #group="matButtonToggleGroup">
-						<mat-button-toggle style="" [disabled]="option.disabled" class="mb5" *ngFor="let option of manuscriptOptions"  [value]="option.value">
-							{{ option.text }}
-						</mat-button-toggle>
-					</mat-button-toggle-group>
-				</span>
-			</span>
-		</div>
-		<div>&nbsp;</div>
-		<span *ngIf="selectedManuscriptOption == 1">
-			<div class="panel-block has-background-white br4 p-4">
-				<span style="flex: 0 0 100%;">
-					<span>
-						<mat-form-field floatLabel="always" class="full-width">
-							<mat-label>Enter DOI or PMID<mat-icon>edit</mat-icon>	</mat-label>
-							<input autocomplete="off" placeholder="eg. 10.1111/111111" [(ngModel)]="manuscriptIdentifier" class="no-scroll" matInput>
-							<mat-error>
-							</mat-error>
-						</mat-form-field>
-						<button [disabled]="manuscriptIdentifier == ''" (click)='fetchManuscriptInformation()' class="button is-link">
-							<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isManuscriptLoading"></mat-spinner>&nbsp;Import
-						</button>
-					</span>
-				</span>
-			</div>
-			<div *ngIf="manuscript && manuscript.title != ''">
-				<div>&nbsp;</div>
-				<div class="panel-block has-background-white btr4 p-4">
-					<span style="flex: 0 0 100%;">
-						<mat-form-field class="full-width">
-							<mat-label>Title <mat-icon>edit</mat-icon></mat-label>
-							<textarea class="no-scroll mtbls-textarea" 
-							[(ngModel)] = "manuscript.title"
-							matInput
-							autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-							[placeholder]="'Study title'" 
-							cdkAutosizeMinRows="2"
-							cdkAutosizeMaxRows="10"
-							cdkTextareaAutosize>
-						</textarea>
-					</mat-form-field>
-					<mat-form-field class="full-width">
-						<mat-label>Summary <mat-icon>edit</mat-icon></mat-label>
-						<textarea class="no-scroll mtbls-textarea" 
-						[(ngModel)] = "manuscript.abstract"
-						matInput
-						autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-						[placeholder]="'Study summary'" 
-						cdkAutosizeMinRows="5"
-						cdkAutosizeMaxRows="20"
-						cdkTextareaAutosize>
-					</textarea>
-				</mat-form-field>
-				<small>
-					Authors
-				</small>
-				<div>
-					<span *ngFor="let author of manuscript.authorDetails">
-						<mat-checkbox class="example-margin" [(ngModel)]="author.checked"> {{ author.fullName }} <span *ngIf="author.authorId != null && author.authorId.type == 'ORCID'"> <small>(ORCID: {{ author.authorId.value }})</small> </span> </mat-checkbox>
-					</span>
-				</div>
-				<small>
-					Submitter
-				</small>
-				<div>
-					<mat-checkbox class="example-margin" [(ngModel)]="user.checked"> {{ user.firstName }} {{ user.lastName }}  <span *ngIf="user.orcid"> <small>(ORCID: {{ user.orcid }})</small> </span> </mat-checkbox>
-				</div>
-				<br>
-				<div>
-					<p class="has-text-grey"><small><i>Your study will be updated with the above information and you can add/update the information at any time</i></small></p>
-				</div>
-			</span>
-		</div>
-		<div class="panel-block">
-			<button (click)='saveMetaData()' class="button is-success is-fullwidth">
-				<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-			</button>
-		</div>
-	</div>
-</span>
-<span *ngIf="selectedManuscriptOption == 2">
-	<div class="panel-block has-background-white btr4 p-4">
-		<span style="flex: 0 0 100%;">
-			<mat-form-field floatLabel="always" class="full-width">
-				<mat-label>Title <mat-icon>edit</mat-icon></mat-label>
-				<textarea class="no-scroll" 
-				[(ngModel)] = "manuscript.title"
-				matInput
-				autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-				[placeholder]="'Please add your manuscript title'" 
-				cdkAutosizeMinRows="2"
-				cdkAutosizeMaxRows="10"
-				cdkTextareaAutosize>
-			</textarea>
-		</mat-form-field>
-		<mat-form-field floatLabel="always" class="full-width">
-			<mat-label>Summary <mat-icon>edit</mat-icon></mat-label>
-			<textarea class="no-scroll" 
-			[(ngModel)] = "manuscript.abstract"
-			matInput
-			autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-			[placeholder]="'Please add your manuscript abstract'" 
-			cdkAutosizeMinRows="5"
-			cdkAutosizeMaxRows="20"
-			cdkTextareaAutosize>
-		</textarea>
-	</mat-form-field>
-	<br>
-	<div>
-		<p class="has-text-grey"><small><i>Your study will be updated with the above information and you can add/update the information at any time</i></small></p>
-	</div>
-</span>
-</div>
-<div class="panel-block">
-	<button (click)='saveMetaData()' class="button is-success is-fullwidth">
-		<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-	</button>
-</div>
-</span>
+    <div class="panel-block has-background-white">
+      <span style="flex: 0 0 100%">
+        <span
+          *ngIf="
+            (currentTitle && currentTitle != '') ||
+            (currentDescription && currentDescription != '')
+          "
+        >
+          <h3 class="mb5">Update study details: Do you have a manuscript?</h3>
+        </span>
+        <span
+          *ngIf="
+            !currentTitle ||
+            currentTitle == '' ||
+            !currentDescription || currentDescription == ''
+          "
+        >
+          <h3 class="mb5">Do you have a manuscript?</h3>
+        </span>
+        <span>
+          <small class="has-text-grey-lighter">Please select</small>
+          <mat-button-toggle-group
+            (ngModelChange)="manuscriptOptionChange()"
+            class="mat-button-toggle-group-vertical"
+            [(ngModel)]="selectedManuscriptOption"
+            #group="matButtonToggleGroup"
+          >
+            <mat-button-toggle
+              style=""
+              [disabled]="option.disabled"
+              class="mb5"
+              *ngFor="let option of manuscriptOptions"
+              [value]="option.value"
+            >
+              {{ option.text }}
+            </mat-button-toggle>
+          </mat-button-toggle-group>
+        </span>
+      </span>
+    </div>
+    <div>&nbsp;</div>
+    <span *ngIf="selectedManuscriptOption == 1">
+      <div class="panel-block has-background-white br4 p-4">
+        <span style="flex: 0 0 100%">
+          <span>
+            <mat-form-field floatLabel="always" class="full-width">
+              <mat-label>Enter DOI or PMID<mat-icon>edit</mat-icon> </mat-label>
+              <input
+                autocomplete="off"
+                placeholder="eg. 10.1111/111111"
+                [(ngModel)]="manuscriptIdentifier"
+                class="no-scroll"
+                matInput
+              />
+              <mat-error> </mat-error>
+            </mat-form-field>
+            <button
+              [disabled]="manuscriptIdentifier == ''"
+              (click)="fetchManuscriptInformation()"
+              class="button is-link"
+            >
+              <mat-spinner
+                [diameter]="20"
+                [strokeWidth]="3"
+                *ngIf="isManuscriptLoading"
+              ></mat-spinner
+              >&nbsp;Import
+            </button>
+          </span>
+        </span>
+      </div>
+      <div *ngIf="manuscript && manuscript.title != ''">
+        <div>&nbsp;</div>
+        <div class="panel-block has-background-white btr4 p-4">
+          <span style="flex: 0 0 100%">
+            <mat-form-field class="full-width">
+              <mat-label>Title <mat-icon>edit</mat-icon></mat-label>
+              <textarea
+                class="no-scroll mtbls-textarea"
+                [(ngModel)]="manuscript.title"
+                matInput
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                [placeholder]="'Study title'"
+                cdkAutosizeMinRows="2"
+                cdkAutosizeMaxRows="10"
+                cdkTextareaAutosize
+              >
+              </textarea>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+              <mat-label>Summary <mat-icon>edit</mat-icon></mat-label>
+              <textarea
+                class="no-scroll mtbls-textarea"
+                [(ngModel)]="manuscript.abstract"
+                matInput
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+                [placeholder]="'Study summary'"
+                cdkAutosizeMinRows="5"
+                cdkAutosizeMaxRows="20"
+                cdkTextareaAutosize
+              >
+              </textarea>
+            </mat-form-field>
+            <small> Authors </small>
+            <div>
+              <span *ngFor="let author of manuscript.authorDetails">
+                <mat-checkbox
+                  class="example-margin"
+                  [(ngModel)]="author.checked"
+                >
+                  {{ author.fullName }}
+                  <span
+                    *ngIf="
+                      author.authorId != null && author.authorId.type == 'ORCID'
+                    "
+                  >
+                    <small>(ORCID: {{ author.authorId.value }})</small>
+                  </span>
+                </mat-checkbox>
+              </span>
+            </div>
+            <small> Submitter </small>
+            <div>
+              <mat-checkbox class="example-margin" [(ngModel)]="user.checked">
+                {{ user.firstName }} {{ user.lastName }}
+                <span *ngIf="user.orcid">
+                  <small>(ORCID: {{ user.orcid }})</small>
+                </span>
+              </mat-checkbox>
+            </div>
+            <br />
+            <div>
+              <p class="has-text-grey">
+                <small
+                  ><i
+                    >Your study will be updated with the above information and
+                    you can add/update the information at any time</i
+                  ></small
+                >
+              </p>
+            </div>
+          </span>
+        </div>
+        <div class="panel-block">
+          <button
+            (click)="saveMetaData()"
+            class="button is-success is-fullwidth"
+          >
+            <mat-spinner
+              [diameter]="20"
+              [strokeWidth]="3"
+              *ngIf="isLoading"
+            ></mat-spinner
+            >&nbsp;Next
+          </button>
+        </div>
+      </div>
+    </span>
+    <span *ngIf="selectedManuscriptOption == 2">
+      <div class="panel-block has-background-white btr4 p-4">
+        <span style="flex: 0 0 100%">
+          <mat-form-field floatLabel="always" class="full-width">
+            <mat-label>Title <mat-icon>edit</mat-icon></mat-label>
+            <textarea
+              class="no-scroll"
+              [(ngModel)]="manuscript.title"
+              matInput
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              [placeholder]="'Please add your manuscript title'"
+              cdkAutosizeMinRows="2"
+              cdkAutosizeMaxRows="10"
+              cdkTextareaAutosize
+            >
+            </textarea>
+          </mat-form-field>
+          <mat-form-field floatLabel="always" class="full-width">
+            <mat-label>Summary <mat-icon>edit</mat-icon></mat-label>
+            <textarea
+              class="no-scroll"
+              [(ngModel)]="manuscript.abstract"
+              matInput
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              [placeholder]="'Please add your manuscript abstract'"
+              cdkAutosizeMinRows="5"
+              cdkAutosizeMaxRows="20"
+              cdkTextareaAutosize
+            >
+            </textarea>
+          </mat-form-field>
+          <br />
+          <div>
+            <p class="has-text-grey">
+              <small
+                ><i
+                  >Your study will be updated with the above information and you
+                  can add/update the information at any time</i
+                ></small
+              >
+            </p>
+          </div>
+        </span>
+      </div>
+      <div class="panel-block">
+        <button (click)="saveMetaData()" class="button is-success is-fullwidth">
+          <mat-spinner
+            [diameter]="20"
+            [strokeWidth]="3"
+            *ngIf="isLoading"
+          ></mat-spinner
+          >&nbsp;Next
+        </button>
+      </div>
+    </span>
 
-<span *ngIf="selectedManuscriptOption == 3">
-	<div class="panel-block has-background-white btr4 p-4">
-		<span style="flex: 0 0 100%;">
-			<mat-form-field floatLabel="always" class="full-width md-input-has-placeholder">
-				<mat-label>Title <mat-icon>edit</mat-icon></mat-label>
-				<textarea class="no-scroll" 
-				[(ngModel)] = "manuscript.title"
-				matInput
-				autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-				[placeholder]="'Please add your study title'" 
-				cdkAutosizeMinRows="2"
-				cdkAutosizeMaxRows="10"
-				cdkTextareaAutosize>
-			</textarea>
-		</mat-form-field>
-		<mat-form-field floatLabel="always" class="full-width">
-			<mat-label>Summary <mat-icon>edit</mat-icon></mat-label>
-			<textarea class="no-scroll" 
-			[(ngModel)] = "manuscript.abstract"
-			matInput
-			autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-			[placeholder]="'Please add your study summary'" 
-			cdkAutosizeMinRows="5"
-			cdkAutosizeMaxRows="20"
-			cdkTextareaAutosize>
-		</textarea>
-	</mat-form-field>
-	<br>
-	<div>
-		<p class="has-text-grey"><small><i>Your study will be updated with the above information and you can add/update the information at any time</i></small></p>
-	</div>
-</span>
-</div>
-<div class="panel-block">
-	<button (click)='saveMetaData()' class="button is-success is-fullwidth">
-		<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-	</button>
-</div>
-</span>
-<div *ngIf="(currentTitle && currentTitle != '') || (currentDescription && currentDescription != '')">
-	<br>
-	<p class="has-text-centered">
-		<a (click)="skipMetaData()">Skip ></a>
-	</p>
-</div>
-<div>&nbsp;</div>
-</div>
+    <span *ngIf="selectedManuscriptOption == 3">
+      <div class="panel-block has-background-white btr4 p-4">
+        <span style="flex: 0 0 100%">
+          <mat-form-field
+            floatLabel="always"
+            class="full-width md-input-has-placeholder"
+          >
+            <mat-label>Title <mat-icon>edit</mat-icon></mat-label>
+            <textarea
+              class="no-scroll"
+              [(ngModel)]="manuscript.title"
+              matInput
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              [placeholder]="'Please add your study title'"
+              cdkAutosizeMinRows="2"
+              cdkAutosizeMaxRows="10"
+              cdkTextareaAutosize
+            >
+            </textarea>
+          </mat-form-field>
+          <mat-form-field floatLabel="always" class="full-width">
+            <mat-label>Summary <mat-icon>edit</mat-icon></mat-label>
+            <textarea
+              class="no-scroll"
+              [(ngModel)]="manuscript.abstract"
+              matInput
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              [placeholder]="'Please add your study summary'"
+              cdkAutosizeMinRows="5"
+              cdkAutosizeMaxRows="20"
+              cdkTextareaAutosize
+            >
+            </textarea>
+          </mat-form-field>
+          <br />
+          <div>
+            <p class="has-text-grey">
+              <small
+                ><i
+                  >Your study will be updated with the above information and you
+                  can add/update the information at any time</i
+                ></small
+              >
+            </p>
+          </div>
+        </span>
+      </div>
+      <div class="panel-block">
+        <button (click)="saveMetaData()" class="button is-success is-fullwidth">
+          <mat-spinner
+            [diameter]="20"
+            [strokeWidth]="3"
+            *ngIf="isLoading"
+          ></mat-spinner
+          >&nbsp;Next
+        </button>
+      </div>
+    </span>
+    <div
+      *ngIf="
+        (currentTitle && currentTitle != '') ||
+        (currentDescription && currentDescription != '')
+      "
+    >
+      <br />
+      <p class="has-text-centered">
+        <a (click)="skipMetaData()">Skip ></a>
+      </p>
+    </div>
+    <div>&nbsp;</div>
+  </div>
 </div>

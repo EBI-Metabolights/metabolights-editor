@@ -1,46 +1,52 @@
 <p>
-	<mat-form-field>
-		<mat-label>Display Options</mat-label>
-		<mat-select [(value)]="displayOption">
-			<mat-option [value]="'error'">Errors</mat-option>
-			<mat-option [value]="'warning'">Warning</mat-option>
-			<mat-option [value]="'info'">Info</mat-option>
-			<mat-option [value]="'success'">Success</mat-option>
-			<mat-option [value]="'all'">All</mat-option>
-		</mat-select>
-	</mat-form-field>
-<div class='is-pulled-right'>
-	<a (click)="refreshValidations()" class="button is-light">
-		<mat-icon>refresh</mat-icon> Refresh
-	</a>
+  <mat-form-field>
+    <mat-label>Display Options</mat-label>
+    <mat-select [(value)]="displayOption">
+      <mat-option [value]="'error'">Errors</mat-option>
+      <mat-option [value]="'warning'">Warning</mat-option>
+      <mat-option [value]="'info'">Info</mat-option>
+      <mat-option [value]="'success'">Success</mat-option>
+      <mat-option [value]="'all'">All</mat-option>
+    </mat-select>
+  </mat-form-field>
+</p>
+
+<div class="is-pulled-right">
+  <a (click)="refreshValidations()" class="button is-light">
+    <mat-icon>refresh</mat-icon> Refresh
+  </a>
 </div>
-<br><br>
-<div>
-	&nbsp;
-</div>
+<br /><br />
+<div>&nbsp;</div>
 <ng-container *ngIf="studyValidation; else NoValidationsFound">
-	<span *ngFor="let validation of studyValidation.validations ; let i = index">
-		<nav class="panel">
-			<p class="panel-heading">
-				{{ validation['section'] }}
-			</p>
-	
-			<div *ngFor="let detail of validation.details">
-				<ng-container *ngIf="displayOption == 'all' ||  (displayOption != 'all' && displayOption == detail.status)">
-					<app-validation-detail 
-						matTooltip="Click here to view the comment that a curator has left" 
-						[matTooltipDisabled]="!detail.comment || curator"
-						[matTooltipPosition]="'below'"
-						[isCurator]="curator" 
-						[validationDetail]="detail"
-						(commentSaved)="handleCommentSaved($event, detail)"></app-validation-detail>
-				</ng-container>
-	
-			</div>
-			<!--end of individual validation cards-->
-	
-		</nav>
-		<span>&nbsp;</span>
-	</span>
+  <span *ngFor="let validation of studyValidation.validations; let i = index">
+    <nav class="panel">
+      <p class="panel-heading">
+        {{ validation["section"] }}
+      </p>
+
+      <div *ngFor="let detail of validation.details">
+        <ng-container
+          *ngIf="
+            displayOption == 'all' ||
+            (displayOption != 'all' && displayOption == detail.status)
+          "
+        >
+          <app-validation-detail
+            matTooltip="Click here to view the comment that a curator has left"
+            [matTooltipDisabled]="!detail.comment || curator"
+            [matTooltipPosition]="'below'"
+            [isCurator]="curator"
+            [validationDetail]="detail"
+            (commentSaved)="handleCommentSaved($event, detail)"
+          ></app-validation-detail>
+        </ng-container>
+      </div>
+      <!--end of individual validation cards-->
+    </nav>
+    <span>&nbsp;</span>
+  </span>
 </ng-container>
-<ng-template #NoValidationsFound> No validations returned by webservice.</ng-template>
+<ng-template #NoValidationsFound>
+  No validations returned by webservice.</ng-template
+>

@@ -1,60 +1,58 @@
-import { catchError, map } from 'rxjs/operators';
-import { MetaboLightsWSURL } from './../globals';
-import { httpOptions } from './../headers';
-import { DataService } from './../data.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from './../../store';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { IStudySummary } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
-import { IStudyDetailWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-detail.interface';
-import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/validation-summary.interface';
-import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
-import { IProtocolWrapper } from 'src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface';
-import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
-import { IPeopleWrapper } from 'src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface';
-import { IFactorsWrapper } from 'src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface';
-import { IPublicationWrapper } from 'src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface';
-import { IStudyDesignDescriptorWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface';
-import { IOntologyWrapper } from 'src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface';
-import { environment } from 'src/environments/environment';
-import { ConfigurationService } from 'src/app/configuration.service';
+import { catchError, map } from "rxjs/operators";
+import { MetaboLightsWSURL } from "./../globals";
+import { httpOptions } from "./../headers";
+import { DataService } from "./../data.service";
+import { NgRedux, select } from "@angular-redux/store";
+import { IAppState } from "./../../store";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { Router } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
+import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
+import { IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { IProtocolWrapper } from "src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface";
+import { ITableWrapper } from "src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface";
+import { IPeopleWrapper } from "src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface";
+import { IFactorsWrapper } from "src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface";
+import { IPublicationWrapper } from "src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface";
+import { IStudyDesignDescriptorWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface";
+import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
+import { environment } from "src/environments/environment";
+import { ConfigurationService } from "src/app/configuration.service";
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: "root",
 })
-export class MetabolightsService extends DataService{
-  @select(state => state.study.identifier) studyIdentifier;
+export class MetabolightsService extends DataService {
+  @select((state) => state.study.identifier) studyIdentifier;
   id: string;
 
   constructor(
     http: HttpClient,
     private configService: ConfigurationService,
-    ngRedux?: NgRedux<IAppState>,
-    ) {
-      super('', http);
-      this.url = this.configService.config.MetabolightsWSURL
-      if (!environment.isTesting) {
-        this.studyIdentifier.subscribe(value => this.id = value)
+    ngRedux?: NgRedux<IAppState>
+  ) {
+    super("", http);
+    this.url = this.configService.config.MetabolightsWSURL;
+    if (!environment.isTesting) {
+      this.studyIdentifier.subscribe((value) => (this.id = value));
     }
   }
-
-
 
   /**
    * Get our validation config file.
    * @returns Our validations config file via the Observable.
    */
   getValidations(): Observable<any> {
-    return this.http.get( "assets/configs/validations.json" ).pipe(
-      map(res => res),
+    return this.http.get("assets/configs/validations.json").pipe(
+      map((res) => res),
       catchError(this.handleError)
     );
   }
 
-    /**TODO
+  /**TODO
    * Change the two proceeding methods to return an Observable with a defined type / interface when
    * the validation refactor is completed.
    */
@@ -64,74 +62,104 @@ export class MetabolightsService extends DataService{
    * rather than any details of validation.
    * @returns message telling the user the update process has started.
    */
-  refreshValidations(): Observable<{success: string}> {
-    return this.http.post<{success: string}>(this.url.baseURL + "/ebi-internal/" + this.id + "/validate-study/update-file", {}, httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  refreshValidations(): Observable<{ success: string }> {
+    return this.http
+      .post<{ success: string }>(
+        this.url.baseURL +
+          "/ebi-internal/" +
+          this.id +
+          "/validate-study/update-file",
+        {},
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
-  overrideValidations(data): Observable<{success: string}>{
-    return this.http.post<{success: string}>(this.url.baseURL + "/ebi-internal/" + this.id + "/validate-study/override", data, httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  overrideValidations(data): Observable<{ success: string }> {
+    return this.http
+      .post<{ success: string }>(
+        this.url.baseURL +
+          "/ebi-internal/" +
+          this.id +
+          "/validate-study/override",
+        data,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
   /**
    * Post a new comment for a specific validation to the API.
    * @param data A generic javascript object containing the comment.
    * @returns A message indicating the success or lack of thereof of saving the comment, via an Observable.
    */
-  addComment(data): Observable<{success: string}> {
-    return this.http.post<{success: string}>(this.url.baseURL + "/ebi-internal/" + this.id + "/validate-study/comment", data, httpOptions).pipe(
-      catchError(this.handleError)
-    )
+  addComment(data): Observable<{ success: string }> {
+    return this.http
+      .post<{ success: string }>(
+        this.url.baseURL +
+          "/ebi-internal/" +
+          this.id +
+          "/validate-study/comment",
+        data,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Study validation details
   getLanguageMappings() {
-    return this.http.get( this.url.guides + "mapping.json" ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .get(this.url.guides + "mapping.json")
+      .pipe(catchError(this.handleError));
   }
-
 
   /**
    * Gets the current access status of study ftp folder
    * @returns A string indicating the Access setting (Read or Write) via the Observable.
    */
-  getStudyPrivateFolderAccess(): Observable<{Access: string}>{
-    return this.http.get<{Access: string}>(this.url.baseURL + '/studies/' + this.id + "/access", httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  getStudyPrivateFolderAccess(): Observable<{ Access: string }> {
+    return this.http
+      .get<{ Access: string }>(
+        this.url.baseURL + "/studies/" + this.id + "/access",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * Toggles whether the given ftp folder is readonly or not
    * @returns A string indicating the new Access setting (Read or Write) via the Observable.
    */
-  toggleFolderAccess(): Observable<{Access: string}>{
-    return this.http.put<{Access: string}>(this.url.baseURL + '/studies/' + this.id + "/access/toggle", {}, httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  toggleFolderAccess(): Observable<{ Access: string }> {
+    return this.http
+      .put<{ Access: string }>(
+        this.url.baseURL + "/studies/" + this.id + "/access/toggle",
+        {},
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Study validation details
   getGuides(language) {
-    return this.http.get( this.url.guides + "I10n/" + language + ".json" ).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .get(this.url.guides + "I10n/" + language + ".json")
+      .pipe(catchError(this.handleError));
   }
 
   /*Returns a list of all studies, with greater detail, for a given user. */
   getAllStudies(): Observable<IStudyDetailWrapper> {
-    return this.http.get<IStudyDetailWrapper>(this.url.baseURL + '/studies' + '/user', httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<IStudyDetailWrapper>(
+        this.url.baseURL + "/studies" + "/user",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   info() {
-    return this.http.get(this.url.baseURL, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get(this.url.baseURL, httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -140,12 +168,14 @@ export class MetabolightsService extends DataService{
    * Gets the meta-info for a given study.
    * @returns The meta-info object via the observable.
    */
-  getMetaInfo(): Observable<{data: any}>{
-    return this.http.get<{data: any}>(this.url.baseURL + '/studies' + "/" + this.id + "/meta-info", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getMetaInfo(): Observable<{ data: any }> {
+    return this.http
+      .get<{ data: any }>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/meta-info",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
-
 
   /**
    * This method hits our API's IsaInvestigation resource. It does not return a MTBLSStudy object, but instead returns a
@@ -154,21 +184,29 @@ export class MetabolightsService extends DataService{
 
    */
   getStudy(id): Observable<IStudySummary> {
-    return this.http.get<IStudySummary>(this.url.baseURL + '/studies' + "/" + id, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<IStudySummary>(this.url.baseURL + "/studies" + "/" + id, httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
   // Study files
   getStudyFiles(id, includeRawFiles) {
-    let queryRawFiles = false
-    if(includeRawFiles){
-      queryRawFiles = includeRawFiles
+    let queryRawFiles = false;
+    if (includeRawFiles) {
+      queryRawFiles = includeRawFiles;
     }
-    let studyId = id ? id : this.id
-    return this.http.get(this.url.baseURL + '/studies' + "/" + studyId + "/files?include_raw_data=" + queryRawFiles, httpOptions).pipe(
-      catchError(this.handleError)
-     );
+    let studyId = id ? id : this.id;
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          studyId +
+          "/files?include_raw_data=" +
+          queryRawFiles,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -176,15 +214,25 @@ export class MetabolightsService extends DataService{
    * @param force: whether to force the webservice to return the list in cases of large study directories.
    */
   getStudyFilesFetch(force): Observable<IStudyFiles> {
-    let studyId = this.id
-    if(force){
-      return this.http.get<IStudyFiles>(this.url.baseURL + '/studies' + "/" + studyId + "/files-fetch?force=true" , httpOptions).pipe(
-        catchError(this.handleError)
-      );
-    }else{
-      return this.http.get<IStudyFiles>(this.url.baseURL + '/studies' + "/" + studyId + "/files-fetch" , httpOptions).pipe(
-        catchError(this.handleError)
-      );
+    let studyId = this.id;
+    if (force) {
+      return this.http
+        .get<IStudyFiles>(
+          this.url.baseURL +
+            "/studies" +
+            "/" +
+            studyId +
+            "/files-fetch?force=true",
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
+    } else {
+      return this.http
+        .get<IStudyFiles>(
+          this.url.baseURL + "/studies" + "/" + studyId + "/files-fetch",
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
     }
   }
 
@@ -197,69 +245,106 @@ export class MetabolightsService extends DataService{
    * @returns observable of a wrapper containing the studies file information.
    */
   getStudyFilesList(id, include_sub_dir, dir, parent): Observable<IStudyFiles> {
-    let studyId = id ? id : this.id
-    let includeSubDir = include_sub_dir ? include_sub_dir : null
-    let directory = dir ? dir : null
-    let query = this.url.baseURL + '/studies' + "/" + studyId + "/files/tree?"
-    if(includeSubDir){
-      query = query + "include_sub_dir=" + includeSubDir
-    }else{
-      query = query + "include_sub_dir=false"
+    let studyId = id ? id : this.id;
+    let includeSubDir = include_sub_dir ? include_sub_dir : null;
+    let directory = dir ? dir : null;
+    let query = this.url.baseURL + "/studies" + "/" + studyId + "/files/tree?";
+    if (includeSubDir) {
+      query = query + "include_sub_dir=" + includeSubDir;
+    } else {
+      query = query + "include_sub_dir=false";
     }
-    if(directory){
-      if(parent){
-        query = query + "&directory=" + parent + directory.file
-      }else{
-        query = query + "&directory=" + directory.file
+    if (directory) {
+      if (parent) {
+        query = query + "&directory=" + parent + directory.file;
+      } else {
+        query = query + "&directory=" + directory.file;
       }
     }
-    return this.http.get<IStudyFiles>(query, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<IStudyFiles>(query, httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
   deleteStudyFiles(id, body, location, force) {
-    let studyId = id ? id : this.id
-    let forcequery = force ? force : false
-    let locationQuery = location ? location : "study"
-    return this.http.post(this.url.baseURL + '/studies' + "/" + studyId + "/files?location=" + locationQuery + '&force=' + forcequery, body, httpOptions).pipe(
-      catchError(this.handleError)
-    );
+    let studyId = id ? id : this.id;
+    let forcequery = force ? force : false;
+    let locationQuery = location ? location : "study";
+    return this.http
+      .post(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          studyId +
+          "/files?location=" +
+          locationQuery +
+          "&force=" +
+          forcequery,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
-  deleteStudy(id){
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + id + "/delete", httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  deleteStudy(id) {
+    return this.http
+      .delete(this.url.baseURL + "/studies" + "/" + id + "/delete", httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
   downloadURL(name, code) {
-    return this.url.baseURL + this.id + "/" + name + "?token=" + code
+    return this.url.baseURL + this.id + "/" + name + "?token=" + code;
   }
 
   downloadLink(name, code) {
-    return this.url.baseURL + '/studies' + "/" + this.id + "/download/" + code + "?file=" + name;
+    return (
+      this.url.baseURL +
+      "/studies" +
+      "/" +
+      this.id +
+      "/download/" +
+      code +
+      "?file=" +
+      name
+    );
   }
 
-  copyFiles(){
-    return this.http.get(this.url.baseURL + '/studies' + "/" + this.id + "/sync?include_raw_data=true", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  copyFiles() {
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/sync?include_raw_data=true",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
-  syncFiles(data){
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/sync?include_raw_data=true", data, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  syncFiles(data) {
+    return this.http
+      .post(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/sync?include_raw_data=true",
+        data,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
-
 
   // Study title
   getTitle(id) {
-    let studyId = id ? id : this.id
-    return this.http.get(this.url.baseURL + '/studies' + "/" + studyId + "/title", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    let studyId = id ? id : this.id;
+    return this.http
+      .get(
+        this.url.baseURL + "/studies" + "/" + studyId + "/title",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -267,10 +352,14 @@ export class MetabolightsService extends DataService{
    * @param body The new study title
    * @returns An object containing the new study title as confirmation, via the Observable.
    */
-  saveTitle(body): Observable<{title: string}> {
-    return this.http.put<{title: string}>(this.url.baseURL + '/studies' + "/" + this.id + "/title", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  saveTitle(body): Observable<{ title: string }> {
+    return this.http
+      .put<{ title: string }>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/title",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -278,17 +367,26 @@ export class MetabolightsService extends DataService{
    * @param body The new abstract for the study.
    * @returns An object containing the new description as confirmation, via the Observable.
    */
-  saveAbstract(body): Observable<{description: string}> {
-    return this.http.put<{description: string}>(this.url.baseURL + '/studies' + "/" + this.id + "/description", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  saveAbstract(body): Observable<{ description: string }> {
+    return this.http
+      .put<{ description: string }>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/description",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   getAbstract(id) {
-    let studyId = id ? id : this.id
-    return this.http.get(this.url.baseURL + '/studies' + "/" + studyId + "/description", httpOptions).pipe(
-      map(res => res['description']),
-      catchError(this.handleError)
+    let studyId = id ? id : this.id;
+    return this.http
+      .get(
+        this.url.baseURL + "/studies" + "/" + studyId + "/description",
+        httpOptions
+      )
+      .pipe(
+        map((res) => res["description"]),
+        catchError(this.handleError)
       );
   }
 
@@ -296,10 +394,13 @@ export class MetabolightsService extends DataService{
    * Get the list of contacts associated with a study.
    * @returns The list of contacts for a given study.
    */
-  getPeople(): Observable<IPeopleWrapper>{
-    return this.http.get<IPeopleWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/contacts", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getPeople(): Observable<IPeopleWrapper> {
+    return this.http
+      .get<IPeopleWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -308,52 +409,67 @@ export class MetabolightsService extends DataService{
    * @returns Newly updated contact or contact list.
    */
   savePerson(body): Observable<IPeopleWrapper> {
-    return this.http.post<IPeopleWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/contacts", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post<IPeopleWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updatePerson(email, name, body) {
-    let query = ""
-    if(email && email!= '' && email != null){
-      query = "email=" + email
-    }else if(name && name != '' && name != null){
-      query = "full_name=" + name
+    let query = "";
+    if (email && email != "" && email != null) {
+      query = "email=" + email;
+    } else if (name && name != "" && name != null) {
+      query = "full_name=" + name;
     }
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/contacts?" + query, body, httpOptions).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts?" + query,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   makePersonSubmitter(email, study) {
-    let body = null
-    if(email && email!= '' && email != null){
-      body  = {
-        "submitters": [
+    let body = null;
+    if (email && email != "" && email != null) {
+      body = {
+        submitters: [
           {
-            "email": email
-          }
-        ]
-      }
+            email: email,
+          },
+        ],
+      };
     }
 
-    if(body){
-      return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/submitters", body, httpOptions).pipe(
-        catchError(this.handleError)
-      );
+    if (body) {
+      return this.http
+        .post(
+          this.url.baseURL + "/studies" + "/" + this.id + "/submitters",
+          body,
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
     }
   }
 
   deletePerson(email, name) {
-    let query = ""
-    if(email && email!= '' && email != null){
-      query = "email=" + email
-    }else if(name && name != '' && name != null){
-      query = "full_name=" + name
+    let query = "";
+    if (email && email != "" && email != null) {
+      query = "email=" + email;
+    } else if (name && name != "" && name != null) {
+      query = "full_name=" + name;
     }
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/contacts?" + query, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts?" + query,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -361,10 +477,8 @@ export class MetabolightsService extends DataService{
    * @param url The url of the EBI's OLS service, plus the query terms
    * @returns The query results via the observable.
    */
-  getOntologyTerms(url): Observable<any>{
-    return this.http.get(url, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getOntologyTerms(url): Observable<any> {
+    return this.http.get(url, httpOptions).pipe(catchError(this.handleError));
   }
 
   /**
@@ -373,10 +487,18 @@ export class MetabolightsService extends DataService{
    * @param branch The starting branch of ontology to search from
    * @returns A list of Ontology objects in a wrapper via the Observable.
    */
-  getExactMatchOntologyTerm(term, branch): Observable<IOntologyWrapper>{
-    return this.http.get<IOntologyWrapper>(this.url.baseURL + '/studies'.replace("studies", "ebi-internal") + "/ontology?term=" + term + "&branch=" + branch, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getExactMatchOntologyTerm(term, branch): Observable<IOntologyWrapper> {
+    return this.http
+      .get<IOntologyWrapper>(
+        this.url.baseURL +
+          "/studies".replace("studies", "ebi-internal") +
+          "/ontology?term=" +
+          term +
+          "&branch=" +
+          branch,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -385,10 +507,8 @@ export class MetabolightsService extends DataService{
    * @param url
    * @returns The term description result via the Observable.
    */
-  getOntologyTermDescription(url): Observable<any>{
-    return this.http.get(url, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getOntologyTermDescription(url): Observable<any> {
+    return this.http.get(url, httpOptions).pipe(catchError(this.handleError));
   }
 
   /**
@@ -397,11 +517,13 @@ export class MetabolightsService extends DataService{
    * @param value The ontology to search details of
    * @returns The ontology details via the Observable.
    */
-  getOntologyDetails(value): Observable<any>{
-    let url = this.url.ontologyDetails + value.termSource.name + '/terms/' + encodeURI(encodeURIComponent(value.termAccession))
-    return this.http.get(url, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getOntologyDetails(value): Observable<any> {
+    let url =
+      this.url.ontologyDetails +
+      value.termSource.name +
+      "/terms/" +
+      encodeURI(encodeURIComponent(value.termAccession));
+    return this.http.get(url, httpOptions).pipe(catchError(this.handleError));
   }
 
   /**
@@ -409,27 +531,51 @@ export class MetabolightsService extends DataService{
    * @returns A Publication wrapper object via the Observable
    */
   getPublications(): Observable<IPublicationWrapper> {
-    return this.http.get<IPublicationWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/publications", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<IPublicationWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/publications",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   savePublication(body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/publications", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/publications",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updatePublication(title, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/publications?title=" + title, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/publications?title=" +
+          title,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deletePublication(title) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/publications?title=" + title, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/publications?title=" +
+          title,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -438,28 +584,53 @@ export class MetabolightsService extends DataService{
    * @returns an observable of a list of protocol objects.
    */
   getProtocols(id): Observable<IProtocolWrapper> {
-    let studyId = id ? id : this.id
-    return this.http.get<IProtocolWrapper>(this.url.baseURL + '/studies' + "/" + studyId + "/protocols", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    let studyId = id ? id : this.id;
+    return this.http
+      .get<IProtocolWrapper>(
+        this.url.baseURL + "/studies" + "/" + studyId + "/protocols",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   saveProtocol(body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/protocols", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/protocols",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updateProtocol(title, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/protocols?name=" + title, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/protocols?name=" +
+          title,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deleteProtocol(title) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/protocols?name=" + title + "&force=false", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/protocols?name=" +
+          title +
+          "&force=false",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -467,9 +638,12 @@ export class MetabolightsService extends DataService{
    * @returns An object or list of objects representing study design descriptors, via the Observable.
    */
   getDesignDescriptors(): Observable<IStudyDesignDescriptorWrapper> {
-    return this.http.get<IStudyDesignDescriptorWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/descriptors", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<IStudyDesignDescriptorWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/descriptors",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -478,9 +652,13 @@ export class MetabolightsService extends DataService{
    * @returns An object representing a study design descriptor, via the Observable.
    */
   saveDesignDescriptor(body): Observable<IStudyDesignDescriptorWrapper> {
-    return this.http.post<IStudyDesignDescriptorWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/descriptors", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post<IStudyDesignDescriptorWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/descriptors",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -489,10 +667,22 @@ export class MetabolightsService extends DataService{
    * @param body - The updated design descriptor.
    * @returns An object representing a study design descriptor, via the Observable.
    */
-  updateDesignDescriptor(annotationValue, body): Observable<IStudyDesignDescriptorWrapper> {
-    return this.http.put<IStudyDesignDescriptorWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/descriptors?term=" + annotationValue, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  updateDesignDescriptor(
+    annotationValue,
+    body
+  ): Observable<IStudyDesignDescriptorWrapper> {
+    return this.http
+      .put<IStudyDesignDescriptorWrapper>(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/descriptors?term=" +
+          annotationValue,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -500,10 +690,20 @@ export class MetabolightsService extends DataService{
    * @param annotationValue The annotation value, which identifies the design descriptor to delete
    * @returns An object representing the now deleted study design descriptor, via the Observable.
    */
-  deleteDesignDescriptor(annotationValue): Observable<IStudyDesignDescriptorWrapper> {
-    return this.http.delete<IStudyDesignDescriptorWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/descriptors?term=" + annotationValue, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  deleteDesignDescriptor(
+    annotationValue
+  ): Observable<IStudyDesignDescriptorWrapper> {
+    return this.http
+      .delete<IStudyDesignDescriptorWrapper>(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/descriptors?term=" +
+          annotationValue,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -511,132 +711,284 @@ export class MetabolightsService extends DataService{
    * @returns Either a single factor object, or a list of them.
    */
   getFactors(): Observable<IFactorsWrapper> {
-    return this.http.get<IFactorsWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/factors", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<IFactorsWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/factors",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   saveFactor(body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/factors", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/factors",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updateFactor(factorName, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/factors?name=" + factorName, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/factors?name=" +
+          factorName,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deleteFactor(factorName) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/factors?name=" + factorName, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/factors?name=" +
+          factorName,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Study process sequences / Samples
-  getProcessSequences(){
-    return this.http.get(this.url.baseURL + '/studies' + "/" + this.id + "/processSequence?list_only=false", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  getProcessSequences() {
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/processSequence?list_only=false",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   getSamplesTable(samples_file_name) {
-    return this.http.get(this.url.baseURL + '/studies' + "/" + this.id + "/samples/" + samples_file_name, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/samples/" +
+          samples_file_name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   saveSample(body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/samples", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/samples",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
-  addSamples(file, body){
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/samples/" + file, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  addSamples(file, body) {
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/samples/" + file,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
-  deleteSamples(file, rows){
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/rows/" + file + "?row_num=" + rows, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  deleteSamples(file, rows) {
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/rows/" +
+          file +
+          "?row_num=" +
+          rows,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Study assays
   getAssayTable(assay_file_name) {
-    return this.http.get(this.url.baseURL + '/studies' + "/" + this.id + "/assay/" + assay_file_name, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/assay/" +
+          assay_file_name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   addAssay(body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/assays", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/assays",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deleteAssay(name) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/assays/" + name, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL + "/studies" + "/" + this.id + "/assays/" + name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   addAssayRow(assay_file_name, body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/assay/" + assay_file_name, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/assay/" +
+          assay_file_name,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updateAssayRow(assay_file_name, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/assay/" + assay_file_name, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/assay/" +
+          assay_file_name,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deleteAssayRow(assay_file_name, rowIds) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/assay/" + assay_file_name + "?row_num=" + rowIds, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/assay/" +
+          assay_file_name +
+          "?row_num=" +
+          rowIds,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Study MAF
   getMAF(annotation_file_name) {
-    return this.http.get(this.url.baseURL + '/studies' + "/" + this.id + "/maf/" + annotation_file_name, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/maf/" +
+          annotation_file_name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   getValidatedMAF(annotation_file_name, assay_file_name, technology) {
-    return this.http.get(this.url.baseURL + '/studies' + "/" + this.id + "/maf/validated/" + annotation_file_name + "?assay_file_name=" + assay_file_name + "&technology=" + technology, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/maf/validated/" +
+          annotation_file_name +
+          "?assay_file_name=" +
+          assay_file_name +
+          "&technology=" +
+          technology,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updateMAFEntry(annotation_file_name, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/maf/" + annotation_file_name, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/maf/" +
+          annotation_file_name,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   addMAFEntry(annotation_file_name, body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/maf/" + annotation_file_name, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/maf/" +
+          annotation_file_name,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deleteMAFEntries(annotation_file_name, rowIds) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/maf/" + annotation_file_name + "?row_num=" + rowIds, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/maf/" +
+          annotation_file_name +
+          "?row_num=" +
+          rowIds,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
-  validateMAF(assay_file){
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/maf/validate", {"data": [{ "assay_file_name": assay_file }]},httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  validateMAF(assay_file) {
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/maf/validate",
+        { data: [{ assay_file_name: assay_file }] },
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -648,9 +1000,17 @@ export class MetabolightsService extends DataService{
    * @returns The search results via the Observable.
    */
   search(term, type): Observable<any> {
-    return this.http.get<any>(this.url.baseURL + '/studies'.replace("/studies", "") + "/search/" + type + "?search_value=" + term , httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<any>(
+        this.url.baseURL +
+          "/studies".replace("/studies", "") +
+          "/search/" +
+          type +
+          "?search_value=" +
+          term,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
@@ -659,49 +1019,81 @@ export class MetabolightsService extends DataService{
    * @returns An observable of a TableWrapper object, that contains both the table rows and headers.
    */
   getTable(file_name): Observable<ITableWrapper> {
-    return this.http.get<ITableWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/" + file_name, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .get<ITableWrapper>(
+        this.url.baseURL + "/studies" + "/" + this.id + "/" + file_name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   addColumns(filename, body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/columns/" + filename, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/columns/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   addRows(filename, body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/rows/" + filename, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/rows/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updateRows(filename, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/rows/" + filename, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + this.id + "/rows/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   deleteRows(filename, rowIds) {
-    return this.http.delete(this.url.baseURL + '/studies' + "/" + this.id + "/rows/" + filename + "?row_num=" + rowIds, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/rows/" +
+          filename +
+          "?row_num=" +
+          rowIds,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   updateCells(filename, body) {
-    return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/cells/" + filename, body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + this.id + "/cells/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /**
    * Create a new, empty study.
    * @returns A StudyWrapper object containing the new study accession number as confirmation, via the Observable.
    */
-  createStudy(): Observable<{new_study: string}> {
-    return this.http.get<{new_study: string}>(this.url.baseURL + '/studies' + "/create", httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  createStudy(): Observable<{ new_study: string }> {
+    return this.http
+      .get<{ new_study: string }>(
+        this.url.baseURL + "/studies" + "/create",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   /* Validate an individual study via the webservice. Returns a list of section validation reports.*/
@@ -712,34 +1104,56 @@ export class MetabolightsService extends DataService{
    * @returns A summary of the validation run, via the Observable.
    */
   validateStudy(section, level): Observable<IValidationSummaryWrapper> {
-    if(section == '' || !section){
-      section = 'all'
+    if (section == "" || !section) {
+      section = "all";
     }
-    if(level == '' || !level){
-      level = 'all'
+    if (level == "" || !level) {
+      level = "all";
     }
-    return this.http.get<IValidationSummaryWrapper>(this.url.baseURL + '/studies' + "/" + this.id + "/validate-study?section=" + section + "&level=" + level , httpOptions).pipe(
-      catchError(this.handleError)
-    );
+    return this.http
+      .get<IValidationSummaryWrapper>(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          this.id +
+          "/validate-study?section=" +
+          section +
+          "&level=" +
+          level,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   decompressFiles(body) {
-    return this.http.post(this.url.baseURL + '/studies' + "/" + this.id + "/files/unzip", body, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + this.id + "/files/unzip",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Status
-  changeStatus(status){
-     return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/status", { 'status' : status}, httpOptions).pipe(
-      catchError(this.handleError)
-      );
+  changeStatus(status) {
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + this.id + "/status",
+        { status: status },
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   // Release date
-  changeReleasedate(releaseDate){
-     return this.http.put(this.url.baseURL + '/studies' + "/" + this.id + "/release-date", { 'release_date' : releaseDate}, httpOptions).pipe(
-      catchError(this.handleError)
-    );
+  changeReleasedate(releaseDate) {
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + this.id + "/release-date",
+        { release_date: releaseDate },
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 }

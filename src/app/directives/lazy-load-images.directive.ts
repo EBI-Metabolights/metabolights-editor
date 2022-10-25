@@ -1,10 +1,16 @@
-import { AfterViewInit, Directive, ElementRef, HostBinding, Input } from '@angular/core';
+import {
+  AfterViewInit,
+  Directive,
+  ElementRef,
+  HostBinding,
+  Input,
+} from "@angular/core";
 
 @Directive({
-  selector: 'img[appLazyLoad]'
+  selector: "img[appLazyLoad]",
 })
 export class LazyLoadImagesDirective implements AfterViewInit {
-  @HostBinding('attr.src') srcAttr = null;
+  @HostBinding("attr.src") srcAttr = null;
   @Input() src: string;
 
   constructor(private el: ElementRef) {}
@@ -14,11 +20,11 @@ export class LazyLoadImagesDirective implements AfterViewInit {
   }
 
   private canLazyLoad() {
-    return window && 'IntersectionObserver' in window;
+    return window && "IntersectionObserver" in window;
   }
 
   private lazyLoadImage() {
-    const obs = new IntersectionObserver(entries => {
+    const obs = new IntersectionObserver((entries) => {
       entries.forEach(({ isIntersecting }) => {
         if (isIntersecting) {
           this.loadImage();
