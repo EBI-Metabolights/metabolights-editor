@@ -7,4 +7,11 @@ dist/
 Dockerfile
 Dockerfile.development
 
+# ignore root level json files
 *.json
+
+# ignore angular typescript files
+src/test.ts
+
+# ignore assets
+assets/
