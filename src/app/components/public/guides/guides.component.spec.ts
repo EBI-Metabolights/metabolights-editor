@@ -24,6 +24,8 @@ import {
   RouterTestingModule,
   setupTestingRouter,
 } from '@angular/router/testing';
+import { MockConfigurationService } from 'src/app/configuration.mock.service';
+import { ConfigurationService } from 'src/app/configuration.service';
 import { EditorService } from 'src/app/services/editor.service';
 import { MockEditorService } from 'src/app/services/editor.service.mock';
 
@@ -32,6 +34,7 @@ import { GuidesComponent } from './guides.component';
 describe('GuidesComponent', () => {
   let component: GuidesComponent;
   let fixture: ComponentFixture<GuidesComponent>;
+  let configService: ConfigurationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -64,8 +67,15 @@ describe('GuidesComponent', () => {
         },
         { provide: EditorService, useClass: MockEditorService },
         { provide: Location, useClass: SpyLocation },
+        {
+          provide: ConfigurationService,
+          useClass: MockConfigurationService,
+        }
       ],
-    }).compileComponents();
+    });
+    configService = TestBed.inject(ConfigurationService);
+    configService.loadConfiguration();
+    TestBed.compileComponents();
   }));
 
   beforeEach(() => {

@@ -36,7 +36,6 @@ describe('HelpComponent', () => {
   });
 
   it('should create', () => {
-    console.log(component.configService);
     expect(component).toBeTruthy();
   });
 });

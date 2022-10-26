@@ -40,7 +40,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Input('tableData') tableData: any;
   @Input('validationsId') validationsId: any;
 
-  @ViewChildren(OntologyComponent)
+  @ViewChildren(OntologyComponent) ontologyComponents: QueryList<OntologyComponent>;
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.files) studyFiles: any;
 
@@ -111,7 +111,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   hit = false;
 
-  private ontologyComponents: QueryList<OntologyComponent>;
 
   constructor(
     private clipboardService: ClipboardService,

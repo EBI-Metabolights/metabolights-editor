@@ -22,7 +22,7 @@ export class NavBarComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.domain = this.configService.config.metabolightsWSURL.domain
+    this.domain = this.configService.config.metabolightsWSURL.domain;
   }
 
   logOut() {

@@ -25,11 +25,14 @@ import { StudyComponent } from './study.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { EditorService } from 'src/app/services/editor.service';
 import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { ConfigurationService } from 'src/app/configuration.service';
+import { MockConfigurationService } from 'src/app/configuration.mock.service';
 
 describe('StudyComponent', () => {
   let component: StudyComponent;
   let fixture: ComponentFixture<StudyComponent>;
   let editorService: EditorService;
+  let configService: ConfigurationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -55,8 +58,15 @@ describe('StudyComponent', () => {
         },
         { provide: Location, useClass: SpyLocation },
         { provide: EditorService, useClass: MockEditorService },
+        {
+          provide: ConfigurationService,
+          useClass: MockConfigurationService,
+        }
       ],
-    }).compileComponents();
+    });
+    configService = TestBed.inject(ConfigurationService);
+    configService.loadConfiguration();
+    TestBed.compileComponents();
   }));
 
   beforeEach(() => {

@@ -25,6 +25,6 @@ describe('ConfigurationService', () => {
 
   it('should make a http call to retrieve the config file, and that file should correspond to the environment context', () => {
     service.loadConfiguration();
-    const httpRequest = httpMock.expectOne('/assets/configs/test.config.json');
+    const httpRequest = httpMock.expectOne('/metabolights/editor/assets/configs/test.config.json');
   });
 });

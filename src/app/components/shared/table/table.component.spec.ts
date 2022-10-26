@@ -25,6 +25,7 @@ import { MatSelectModule } from '@angular/material/select';
 
 import { MatIconModule } from '@angular/material/icon';
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable @typescript-eslint/dot-notation */
 describe('TableComponent', () => {
   let component: TableComponent;
   let fixture: ComponentFixture<TableComponent>;
@@ -99,7 +100,7 @@ describe('TableComponent', () => {
 
     beforeEach(() => {
       component.tableData = sampleData;
-      component.data = component.tableData.data;
+      component.data = component.tableData['data'];
       component.initialise();
       // the absence of this was why it was not rendering, not sure how it wasnt being set previously
       component.displayedTableColumns = component.data.displayedColumns;
@@ -151,7 +152,7 @@ describe('TableComponent', () => {
         sampleData.data.rows[0]['Factor Value[Dose]']
       );
       expect(tableRows[1].cells[8].innerText).toContain(
-        sampleData.data.rows[0].Unit
+        sampleData.data.rows[0]['Unit']
       );
     });
   });
@@ -167,7 +168,7 @@ describe('TableComponent', () => {
 
     beforeEach(() => {
       component.tableData = sampleData;
-      component.data = component.tableData.data;
+      component.data = component.tableData['data'];
       component.initialise();
       fixture.detectChanges();
       component.displayedTableColumns = component.data.displayedColumns;

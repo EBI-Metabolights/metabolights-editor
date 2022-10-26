@@ -24,6 +24,8 @@ import {
   RouterTestingModule,
   setupTestingRouter,
 } from '@angular/router/testing';
+import { MockConfigurationService } from 'src/app/configuration.mock.service';
+import { ConfigurationService } from 'src/app/configuration.service';
 import { EditorService } from 'src/app/services/editor.service';
 import { MockEditorService } from 'src/app/services/editor.service.mock';
 
@@ -32,6 +34,7 @@ import { LoginComponent } from './login.component';
 describe('LoginComponent', () => {
   let component: LoginComponent;
   let fixture: ComponentFixture<LoginComponent>;
+  let configService: ConfigurationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -64,14 +67,19 @@ describe('LoginComponent', () => {
         },
         { provide: Location, useClass: SpyLocation },
         { provide: EditorService, useClass: MockEditorService },
+        { provide: ConfigurationService, useClass: MockConfigurationService}
       ],
-    }).compileComponents();
+    });
+    configService = TestBed.inject(ConfigurationService);
+    configService.loadConfiguration();
+    TestBed.compileComponents();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+
   });
 
   it('should create', () => {

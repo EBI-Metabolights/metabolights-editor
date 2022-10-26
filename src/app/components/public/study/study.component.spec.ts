@@ -27,12 +27,15 @@ import { SpyLocation } from '@angular/common/testing';
 import { HttpClientModule } from '@angular/common/http';
 import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
 import { MockLabsWorkspaceService } from 'src/app/services/labs-workspace.service.mock';
+import { MockConfigurationService } from 'src/app/configuration.mock.service';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 describe('StudyComponent', () => {
   let component: PublicStudyComponent;
   let fixture: ComponentFixture<PublicStudyComponent>;
   let editorService: EditorService;
   let labsWorkspaceService: LabsWorkspaceService;
+  let configService: ConfigurationService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -59,9 +62,16 @@ describe('StudyComponent', () => {
         { provide: Location, useClass: SpyLocation },
         { provide: EditorService, useClass: MockEditorService },
         { provide: LabsWorkspaceService, useClass: MockLabsWorkspaceService },
+        {
+          provide: ConfigurationService,
+          useClass: MockConfigurationService,
+        },
         HttpClientModule,
       ],
-    }).compileComponents();
+    });
+    configService = TestBed.inject(ConfigurationService);
+    configService.loadConfiguration();
+    TestBed.compileComponents();
   }));
 
   beforeEach(() => {
