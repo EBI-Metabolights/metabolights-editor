@@ -1,28 +1,38 @@
-import { Injectable } from "@angular/core";
-import { MetabolightsService } from "./../services/metabolights/metabolights.service";
-import { AuthService } from "./../services/metabolights/auth.service";
-import { DOIService } from "./../services/publications/doi.service";
-import { EuropePMCService } from "./../services/publications/europePMC.service";
-import { IAppState } from "./../store";
-import { NgRedux, select } from "@angular-redux/store";
-import { Router } from "@angular/router";
+import { Injectable } from '@angular/core';
+import { MetabolightsService } from './../services/metabolights/metabolights.service';
+import { AuthService } from './../services/metabolights/auth.service';
+import { DOIService } from './../services/publications/doi.service';
+import { EuropePMCService } from './../services/publications/europePMC.service';
+import { IAppState } from './../store';
+import { NgRedux, select } from '@angular-redux/store';
+import { Router } from '@angular/router';
 
-import { map } from "rxjs/operators";
+import { map } from 'rxjs/operators';
 
-import { LoginURL, RedirectURL } from "./../services/globals";
-import { httpOptions } from "./../services/headers";
-import Swal from "sweetalert2";
-import { environment } from "src/environments/environment";
-import { ConfigurationService } from "../configuration.service";
+import { LoginURL, RedirectURL } from './../services/globals';
+import { httpOptions } from './../services/headers';
+import Swal from 'sweetalert2';
+import { environment } from 'src/environments/environment';
+import { ConfigurationService } from '../configuration.service';
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable  @typescript-eslint/no-unused-expressions */
 
+// this is sinful as eval is a huge nono, but it would take too long to fix right now.
+// TODO: remove any references to eval.
+/* eslint-disable no-eval */
+
+// disabling this as properties mirror that of actual file columns.
+/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable @typescript-eslint/dot-notation */
 export function disambiguateUserObj(user) {
-  if (typeof user === "string")
-    console.error("received string when JSON object expected.");
+  if (typeof user === 'string') {
+console.error('received string when JSON object expected.');
+}
   return user.owner ? user.owner.apiToken : user.apiToken;
 }
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class EditorService {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -30,18 +40,18 @@ export class EditorService {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.study.studyAssays) studyAssays;
 
-  redirectUrl: string = "";
+  redirectUrl = '';
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];
   samples_columns_order: any = {
-    "Sample Name": 1,
-    "Characteristics[Organism]": 2,
-    "Characteristics[Organism part]": 3,
-    "Characteristics[Variant]": 4,
-    "Characteristics[Sample type]": 5,
-    "Protocol REF": 6,
-    "Source Name": 7,
+    'Sample Name': 1,
+    'Characteristics[Organism]': 2,
+    'Characteristics[Organism part]': 3,
+    'Characteristics[Variant]': 4,
+    'Characteristics[Sample type]': 5,
+    'Protocol REF': 6,
+    'Source Name': 7,
   };
 
   constructor(
@@ -68,14 +78,14 @@ export class EditorService {
   }
 
   logout(redirect) {
-    localStorage.removeItem("user");
-    localStorage.removeItem("time");
-    localStorage.removeItem("state");
+    localStorage.removeItem('user');
+    localStorage.removeItem('time');
+    localStorage.removeItem('state');
     this.ngRedux.dispatch({
-      type: "RESET",
+      type: 'RESET',
     });
     if (this.configService.config.clearJavaSession && redirect) {
-      window.location.href = this.configService.config.JavaLogoutURL;
+      window.location.href = this.configService.config.javaLogoutURL;
     } else {
       this.router.navigate([this.configService.config.loginURL]);
     }
@@ -109,8 +119,8 @@ export class EditorService {
     interface User {
       updatedAt: number;
       workspaceLocation: string;
-      settings: object;
-      projects: object;
+      settings: Record<string, unknown>;
+      projects: Record<string, unknown>;
       owner: { apiToken: string };
       message: string;
       err: string;
@@ -120,29 +130,29 @@ export class EditorService {
       const userstr = data.content;
       const user: User = JSON.parse(userstr);
       // console.log('user json ' + user);
-      localStorage.setItem("user", JSON.stringify(user.owner));
+      localStorage.setItem('user', JSON.stringify(user.owner));
       httpOptions.headers = httpOptions.headers.set(
-        "user_token",
+        'user_token',
         user.owner.apiToken
       );
       this.ngRedux.dispatch({
-        type: "INITIALISE",
+        type: 'INITIALISE',
       });
       this.ngRedux.dispatch({
-        type: "SET_USER",
+        type: 'SET_USER',
         body: {
           user: user.owner,
         },
       });
       this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
+        type: 'SET_USER_STUDIES',
         body: {
           studies: null,
         },
       });
       localStorage.setItem(
-        "time",
-        this.ngRedux.getState().status["isInitialised"].time
+        'time',
+        this.ngRedux.getState().status['isInitialised']['time']
       );
 
       this.loadValidations();
@@ -150,27 +160,27 @@ export class EditorService {
     } else {
       const user = JSON.parse(data);
       httpOptions.headers = httpOptions.headers.set(
-        "user_token",
+        'user_token',
         disambiguateUserObj(user)
       );
       this.ngRedux.dispatch({
-        type: "INITIALISE",
+        type: 'INITIALISE',
       });
       this.ngRedux.dispatch({
-        type: "SET_USER",
+        type: 'SET_USER',
         body: {
-          user: user,
+          user,
         },
       });
       this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
+        type: 'SET_USER_STUDIES',
         body: {
           studies: null,
         },
       });
       localStorage.setItem(
-        "time",
-        this.ngRedux.getState().status["isInitialised"].time
+        'time',
+        this.ngRedux.getState().status['isInitialised']['time']
       );
       this.loadValidations();
       return true;
@@ -181,15 +191,15 @@ export class EditorService {
     this.dataService.getValidations().subscribe(
       (validations) => {
         this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
+          type: 'SET_LOADING_INFO',
           body: {
-            info: "Loading study validations",
+            info: 'Loading study validations',
           },
         });
         this.ngRedux.dispatch({
-          type: "LOAD_VALIDATION_RULES",
+          type: 'LOAD_VALIDATION_RULES',
           body: {
-            validations: validations,
+            validations,
           },
         });
       },
@@ -209,6 +219,7 @@ export class EditorService {
 
   /**
    * Add a new comment via the DataService
+   *
    * @param data - generic json object containing the new comment.
    * @returns An observable object from the Data Service indicating the success of the operation.
    */
@@ -220,29 +231,29 @@ export class EditorService {
     this.dataService.getLanguageMappings().subscribe(
       (mappings) => {
         this.ngRedux.dispatch({
-          type: "SET_GUIDES_MAPPINGS",
+          type: 'SET_GUIDES_MAPPINGS',
           body: {
-            mappings: mappings,
+            mappings,
           },
         });
-        var selected_language = localStorage.getItem("selected_language");
-        mappings["languages"].forEach((language) => {
+        const selected_language = localStorage.getItem('selected_language');
+        mappings['languages'].forEach((language) => {
           if (
-            (selected_language && language["code"] == selected_language) ||
-            (!selected_language && language["default"])
+            (selected_language && language.code === selected_language) ||
+            (!selected_language && language.default)
           ) {
             this.ngRedux.dispatch({
-              type: "SET_SELECTED_LANGUAGE",
+              type: 'SET_SELECTED_LANGUAGE',
               body: {
-                language: language["code"],
+                language: language.code,
               },
             });
 
-            this.dataService.getGuides(language["code"]).subscribe((guides) => {
+            this.dataService.getGuides(language.code).subscribe((guides) => {
               this.ngRedux.dispatch({
-                type: "SET_GUIDES",
+                type: 'SET_GUIDES',
                 body: {
-                  guides: guides["data"],
+                  guides: guides['data'],
                 },
               });
             });
@@ -257,17 +268,17 @@ export class EditorService {
 
   loadLanguage(language) {
     this.dataService.getGuides(language).subscribe((guides) => {
-      localStorage.setItem("selected_language", language);
+      localStorage.setItem('selected_language', language);
       this.ngRedux.dispatch({
-        type: "SET_SELECTED_LANGUAGE",
+        type: 'SET_SELECTED_LANGUAGE',
         body: {
-          language: language,
+          language,
         },
       });
       this.ngRedux.dispatch({
-        type: "SET_GUIDES",
+        type: 'SET_GUIDES',
         body: {
-          guides: guides["data"],
+          guides: guides['data'],
         },
       });
     });
@@ -276,7 +287,7 @@ export class EditorService {
   getAllStudies() {
     this.dataService.getAllStudies().subscribe((response) => {
       this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
+        type: 'SET_USER_STUDIES',
         body: {
           studies: response.data,
         },
@@ -286,7 +297,7 @@ export class EditorService {
 
   loadStudyId(id) {
     return this.ngRedux.dispatch({
-      type: "SET_STUDY_IDENTIFIER",
+      type: 'SET_STUDY_IDENTIFIER',
       body: {
         study: id,
       },
@@ -298,24 +309,24 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-    if (status != null) {
+    if (status !== null) {
       if (status) {
-        this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
+        this.ngRedux.dispatch({ type: 'ENABLE_LOADING' });
       } else {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+        this.ngRedux.dispatch({ type: 'DISABLE_LOADING' });
       }
     } else {
-      this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+      this.ngRedux.dispatch({ type: 'TOGGLE_LOADING' });
     }
   }
 
   initialiseStudy(route) {
-    if (route == null) {
+    if (route === null) {
       return this.loadStudyId(null);
     } else {
       route.params.subscribe((params) => {
-        let studyID = params["id"];
-        if (this.currentStudyIdentifier != studyID) {
+        const studyID = params.id;
+        if (this.currentStudyIdentifier !== studyID) {
           this.loadStudy(studyID, false);
         }
       });
@@ -323,7 +334,7 @@ export class EditorService {
   }
 
   toggleProtocolsExpand(value) {
-    this.ngRedux.dispatch({ type: "SET_PROTOCOL_EXPAND", body: value });
+    this.ngRedux.dispatch({ type: 'SET_PROTOCOL_EXPAND', body: value });
   }
 
   loadStudy(studyID, readonly) {
@@ -332,92 +343,92 @@ export class EditorService {
     this.dataService.getStudy(studyID).subscribe(
       (study) => {
         this.ngRedux.dispatch({
-          type: "SET_STUDY_ERROR",
+          type: 'SET_STUDY_ERROR',
           body: {
             investigationFailed: false,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
+          type: 'SET_LOADING_INFO',
           body: {
-            info: "Loading investigation details",
+            info: 'Loading investigation details',
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_CONFIGURATION",
+          type: 'SET_CONFIGURATION',
           body: {
             configuration: study.isaInvestigation.comments,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_TITLE",
+          type: 'SET_STUDY_TITLE',
           body: {
             title: study.isaInvestigation.studies[0].title,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_ABSTRACT",
+          type: 'SET_STUDY_ABSTRACT',
           body: {
             description: study.isaInvestigation.studies[0].description,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_SUBMISSION_DATE",
+          type: 'SET_STUDY_SUBMISSION_DATE',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_RELEASE_DATE",
+          type: 'SET_STUDY_RELEASE_DATE',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_STATUS",
+          type: 'SET_STUDY_STATUS',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_REVIEWER_LINK",
+          type: 'SET_STUDY_REVIEWER_LINK',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_PUBLICATIONS",
+          type: 'SET_STUDY_PUBLICATIONS',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_ASSAYS",
+          type: 'SET_STUDY_ASSAYS',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_PEOPLE",
+          type: 'SET_STUDY_PEOPLE',
           body: {
-            study: study,
+            study,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_DESIGN_DESCRIPTORS",
+          type: 'SET_STUDY_DESIGN_DESCRIPTORS',
           body: {
             studyDesignDescriptors:
               study.isaInvestigation.studies[0].studyDesignDescriptors,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_FACTORS",
+          type: 'SET_STUDY_FACTORS',
           body: {
             factors: study.isaInvestigation.studies[0].factors,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_PROTOCOLS",
+          type: 'SET_STUDY_PROTOCOLS',
           body: {
             protocols: study.isaInvestigation.studies[0].protocols,
           },
@@ -426,14 +437,14 @@ export class EditorService {
         if (!readonly) {
           this.validateStudy();
           this.ngRedux.dispatch({
-            type: "SET_STUDY_READONLY",
+            type: 'SET_STUDY_READONLY',
             body: {
               readonly: false,
             },
           });
         } else {
           this.ngRedux.dispatch({
-            type: "SET_STUDY_READONLY",
+            type: 'SET_STUDY_READONLY',
             body: {
               readonly: true,
             },
@@ -444,7 +455,7 @@ export class EditorService {
       (error) => {
         this.toggleLoading(false);
         this.ngRedux.dispatch({
-          type: "SET_STUDY_ERROR",
+          type: 'SET_STUDY_ERROR',
           body: {
             investigationFailed: true,
           },
@@ -462,7 +473,7 @@ export class EditorService {
       (response) => {
         this.toggleLoading(false);
         this.ngRedux.dispatch({
-          type: "SET_STUDY_VALIDATION",
+          type: 'SET_STUDY_VALIDATION',
           body: {
             validation: response.validation,
           },
@@ -481,19 +492,19 @@ export class EditorService {
       (data) => {
         // console.log("Got the files list  !")
         this.ngRedux.dispatch({
-          type: "SET_UPLOAD_LOCATION",
+          type: 'SET_UPLOAD_LOCATION',
           body: {
             uploadLocation: data.uploadPath,
           },
         });
         this.ngRedux.dispatch({
-          type: "SET_OBFUSCATION_CODE",
+          type: 'SET_OBFUSCATION_CODE',
           body: {
             obfuscationCode: data.obfuscationCode,
           },
         });
         data = this.deleteProperties(data);
-        this.ngRedux.dispatch({ type: "SET_STUDY_FILES", body: data });
+        this.ngRedux.dispatch({ type: 'SET_STUDY_FILES', body: data });
         this.loadStudySamples();
         this.loadStudyAssays(data);
       },
@@ -502,19 +513,19 @@ export class EditorService {
           .getStudyFilesList(null, null, null, null)
           .subscribe((data) => {
             this.ngRedux.dispatch({
-              type: "SET_UPLOAD_LOCATION",
+              type: 'SET_UPLOAD_LOCATION',
               body: {
                 uploadLocation: data.uploadPath,
               },
             });
             this.ngRedux.dispatch({
-              type: "SET_OBFUSCATION_CODE",
+              type: 'SET_OBFUSCATION_CODE',
               body: {
                 obfuscationCode: data.obfuscationCode,
               },
             });
             data = this.deleteProperties(data);
-            this.ngRedux.dispatch({ type: "SET_STUDY_FILES", body: data });
+            this.ngRedux.dispatch({ type: 'SET_STUDY_FILES', body: data });
           });
       }
     );
@@ -523,7 +534,7 @@ export class EditorService {
   loadStudyProtocols() {
     this.dataService.getProtocols(null).subscribe((data) => {
       this.ngRedux.dispatch({
-        type: "SET_STUDY_PROTOCOLS",
+        type: 'SET_STUDY_PROTOCOLS',
         body: {
           protocols: data.protocols,
         },
@@ -561,17 +572,17 @@ export class EditorService {
 
   extractAssayDetails(assay) {
     if (assay.name.split(this.currentStudyIdentifier)[1]) {
-      let assayInfo = assay.name
+      const assayInfo = assay.name
         .split(this.currentStudyIdentifier)[1]
-        .split("_");
+        .split('_');
       let assaySubTechnique = null;
       let assayTechnique = null;
       let assayMainTechnique = null;
-      this.validations["assays"]["assaySetup"].main_techniques.forEach((mt) => {
+      this.validations.assays.assaySetup.main_techniques.forEach((mt) => {
         mt.techniques.forEach((t) => {
           if (t.sub_techniques && t.sub_techniques.length > 0) {
             t.sub_techniques.forEach((st) => {
-              if (st.template == assayInfo[1]) {
+              if (st.template === assayInfo[1]) {
                 assaySubTechnique = st;
                 assayTechnique = t;
                 assayMainTechnique = mt;
@@ -581,29 +592,29 @@ export class EditorService {
         });
       });
       return {
-        assaySubTechnique: assaySubTechnique,
-        assayTechnique: assayTechnique,
-        assayMainTechnique: assayMainTechnique,
+        assaySubTechnique,
+        assayTechnique,
+        assayMainTechnique,
       };
     }
     return {
-      assaySubTechnique: "",
-      assayTechnique: "",
-      assayMainTechnique: "",
+      assaySubTechnique: '',
+      assayTechnique: '',
+      assayMainTechnique: '',
     };
   }
 
   loadStudySamples() {
-    if (this.files == null) {
+    if (this.files === null) {
       this.loadStudyFiles(false);
     } else {
       let samplesExist = false;
       this.files.study.forEach((file) => {
-        if (file.file.indexOf("s_") == 0 && file.status == "active") {
+        if (file.file.indexOf('s_') === 0 && file.status === 'active') {
           this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
+            type: 'SET_LOADING_INFO',
             body: {
-              info: "Loading Samples data",
+              info: 'Loading Samples data',
             },
           });
           samplesExist = true;
@@ -612,11 +623,11 @@ export class EditorService {
       });
       if (!samplesExist) {
         Swal.fire({
-          title: "Error",
-          text: "Sample sheet missing. Please upload sample sheet.",
+          title: 'Error',
+          text: 'Sample sheet missing. Please upload sample sheet.',
           showCancelButton: false,
-          confirmButtonColor: "#DD6B55",
-          confirmButtonText: "OK",
+          confirmButtonColor: '#DD6B55',
+          confirmButtonText: 'OK',
         });
       }
     }
@@ -624,248 +635,231 @@ export class EditorService {
 
   loadStudyAssays(files) {
     this.ngRedux.dispatch({
-      type: "SET_LOADING_INFO",
+      type: 'SET_LOADING_INFO',
       body: {
-        info: "Loading assays information",
+        info: 'Loading assays information',
       },
     });
     files.study.forEach((file) => {
-      if (file.file.indexOf("a_") == 0 && file.status == "active") {
+      if (file.file.indexOf('a_') === 0 && file.status === 'active') {
         this.updateAssay(file.file);
       }
     });
   }
 
   updateTableState(filename, tableType, metaInfo) {
-    if (tableType == "samples") {
+    if (tableType === 'samples') {
       this.updateSamples(filename);
-    } else if (tableType == "assays") {
+    } else if (tableType === 'assays') {
       this.updateAssay(filename);
-    } else if (tableType == "maf") {
+    } else if (tableType === 'maf') {
       this.updateMAF(filename);
     }
   }
 
   updateAssay(file) {
     this.dataService.getTable(file).subscribe((data) => {
-      let assay = {};
-      assay["name"] = file;
-      assay["meta"] = this.extractAssayDetails(assay);
-      let columns = [];
+      const assay = {};
+      assay['name'] = file;
+      assay['meta'] = this.extractAssayDetails(assay);
+      const columns = [];
       Object.keys(data.header).forEach((key) => {
-        let fn = "element['" + key + "']";
+        const fn = 'element[\'' + key + '\']';
         columns.push({
           columnDef: key,
-          sticky: "false",
+          sticky: 'false',
           header: key,
           cell: (element) => eval(fn),
         });
       });
-      let displayedColumns = columns.map((a) => {
-        return a.columnDef;
-      });
-      displayedColumns.unshift("Select");
-      displayedColumns = displayedColumns.filter((key) => {
-        return (
-          key.indexOf("Term Accession Number") < 0 &&
-          key.indexOf("Term Source REF") < 0
-        );
-      });
-      data["columns"] = columns;
-      data["displayedColumns"] = displayedColumns;
-      data["file"] = file;
-      data.data.rows ? (data["rows"] = data.data.rows) : (data["rows"] = []);
-      delete data["data"];
-      assay["data"] = data;
-      let protocols = [];
-      protocols.push("Sample collection");
-      if (data["rows"].length > 0) {
+      let displayedColumns = columns.map((a) => a.columnDef);
+      displayedColumns.unshift('Select');
+      displayedColumns = displayedColumns.filter((key) => (
+          key.indexOf('Term Accession Number') < 0 &&
+          key.indexOf('Term Source REF') < 0
+        ));
+      data['columns'] = columns;
+      data['displayedColumns'] = displayedColumns;
+      data[file] = file;
+      data.data.rows ? (data['rows'] = data.data.rows) : (data['rows'] = []);
+      delete data.data;
+      assay['data'] = data;
+      const protocols = [];
+      protocols.push('Sample collection');
+      if (data['rows'].length > 0) {
         columns.forEach((c) => {
-          if (c.header.indexOf("Protocol REF") > -1) {
-            protocols.push(data["rows"][0][c.header]);
+          if (c.header.indexOf('Protocol REF') > -1) {
+            protocols.push(data['rows'][0][c.header]);
           }
         });
       }
-      assay["protocols"] = protocols;
+      assay['protocols'] = protocols;
 
-      let mafFiles = [];
-      data["rows"].forEach((row) => {
+      const mafFiles = [];
+      data['rows'].forEach((row) => {
         // assert that this given value in the row is a string, as we _know_ it can only be a string.
-        let assertedRow = row["Metabolite Assignment File"] as string;
-        let mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g, "");
-        if (mafFile != "" && mafFiles.indexOf(mafFile) < 0) {
+        const assertedRow = row['Metabolite Assignment File'] as string;
+        const mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g, '');
+        if (mafFile !== '' && mafFiles.indexOf(mafFile) < 0) {
           mafFiles.push(mafFile);
         }
       });
       mafFiles.forEach((f) => {
         this.updateMAF(f);
       });
-      assay["mafs"] = mafFiles;
-      this.ngRedux.dispatch({ type: "SET_STUDY_ASSAY", body: assay });
+      assay['mafs'] = mafFiles;
+      this.ngRedux.dispatch({ type: 'SET_STUDY_ASSAY', body: assay });
     });
   }
 
   updateMAF(f) {
     this.dataService.getTable(f).subscribe((mdata) => {
-      let mcolumns = [];
-      let maf = {};
+      const mcolumns = [];
+      const maf = {};
 
       mcolumns.push({
-        columnDef: "Structure",
-        sticky: "true",
-        header: "Structure",
+        columnDef: 'Structure',
+        sticky: 'true',
+        header: 'Structure',
         structure: true,
-        cell: (element) => eval("element['database_identifier']"),
+        cell: (element) => eval('element[\'database_identifier\']'),
       });
 
       Object.keys(mdata.header).forEach((key) => {
-        let fn = "element['" + key + "']";
+        const fn = 'element[\'' + key + '\']';
         mcolumns.push({
           columnDef: key, //.toLowerCase().split(" ").join("_")
-          sticky: "false",
+          sticky: 'false',
           header: key,
           cell: (element) => eval(fn),
         });
       });
 
-      let mdisplayedColumns = mcolumns.map((a) => {
-        return a.columnDef;
-      });
-      mdisplayedColumns.unshift("Select");
-      mdisplayedColumns.sort(function (a, b) {
+      let mdisplayedColumns = mcolumns.map((a) => a.columnDef);
+      mdisplayedColumns.unshift('Select');
+      mdisplayedColumns.sort((a, b) => {
         // assert that the values are numbers, which they have to be as all header values in maf sheet objects are numbers.
-        let assertA = mdata.header[a] as number;
-        let assertB = mdata.header[b] as number;
+        const assertA = mdata.header[a] as number;
+        const assertB = mdata.header[b] as number;
         return assertA - assertB;
       });
-      mdisplayedColumns = mdisplayedColumns.filter((key) => {
-        return (
-          key.indexOf("Term Accession Number") < 0 &&
-          key.indexOf("Term Source REF") < 0
-        );
-      });
+      mdisplayedColumns = mdisplayedColumns.filter((key) => (
+          key.indexOf('Term Accession Number') < 0 &&
+          key.indexOf('Term Source REF') < 0
+        ));
 
-      mdata["columns"] = mcolumns;
-      mdata["displayedColumns"] = mdisplayedColumns;
-      mdata["rows"] = mdata.data.rows;
-      mdata["file"] = f;
-      delete mdata["data"];
+      mdata['columns'] = mcolumns;
+      mdata['displayedColumns'] = mdisplayedColumns;
+      mdata['rows'] = mdata.data.rows;
+      mdata['file'] = f;
+      delete mdata.data;
 
-      maf["data"] = mdata;
-      this.ngRedux.dispatch({ type: "SET_STUDY_MAF", body: maf });
+      maf['data'] = mdata;
+      this.ngRedux.dispatch({ type: 'SET_STUDY_MAF', body: maf });
     });
   }
 
   search(term, type) {
     return this.dataService.search(term, type).pipe(
-      map((data) => {
-        return data;
-      })
+      map((data) => data)
     );
   }
 
   validateMAF(f) {
     return this.dataService.validateMAF(f).pipe(
-      map((data) => {
-        return data;
-      })
+      map((data) => data)
     );
   }
 
   updateSamples(file) {
-    let samples = {};
-    samples["name"] = file;
+    const samples = {};
+    samples['name'] = file;
     this.dataService.getTable(file).subscribe(
       (data) => {
-        let columns = [];
+        const columns = [];
         Object.keys(data.header).forEach((key) => {
-          let fn = "element['" + key + "']";
+          const fn = 'element[\'' + key + '\']';
           columns.push({
             columnDef: key,
-            sticky: key == "Protocol REF" ? "true" : "false",
+            sticky: key === 'Protocol REF' ? 'true' : 'false',
             header: key,
             cell: (element) => eval(fn),
           });
         });
-        let displayedColumns = columns.map((a) => {
-          return a.columnDef;
-        });
-        displayedColumns.unshift("Select");
-        displayedColumns.sort(function (a, b) {
+        let displayedColumns = columns.map((a) => a.columnDef);
+        displayedColumns.unshift('Select');
+        displayedColumns.sort(function(a, b) {
           // assert that the values are numbers, which they have to be as all header values in sample sheet objects are numbers.
-          let assertA = data.header[a] as number;
-          let assertB = data.header[b] as number;
+          const assertA = data.header[a] as number;
+          const assertB = data.header[b] as number;
           return assertA - assertB;
         });
-        var index = displayedColumns.indexOf("Source Name");
+        let index = displayedColumns.indexOf('Source Name');
         if (index > -1) {
           displayedColumns.splice(index, 1);
         }
 
-        var index = displayedColumns.indexOf("Characteristics[Sample type]");
+          index = displayedColumns.indexOf('Characteristics[Sample type]');
         if (index > -1) {
           displayedColumns.splice(index, 1);
         }
 
-        displayedColumns.sort((a, b) => {
-          return (
+        displayedColumns.sort((a, b) => (
+          /* eslint-disable radix */
             parseInt(this.samples_columns_order[a]) -
             parseInt(this.samples_columns_order[b])
-          );
-        });
+          ));
 
-        if (displayedColumns[1] != "Protocol REF") {
-          displayedColumns.splice(displayedColumns.indexOf("Protocol REF"), 1);
-          displayedColumns.splice(1, 0, "Protocol REF");
+        if (displayedColumns[1] !== 'Protocol REF') {
+          displayedColumns.splice(displayedColumns.indexOf('Protocol REF'), 1);
+          displayedColumns.splice(1, 0, 'Protocol REF');
         }
 
-        if (displayedColumns[2] != "Sample Name") {
-          displayedColumns.splice(displayedColumns.indexOf("Sample Name"), 1);
-          displayedColumns.splice(2, 0, "Sample Name");
+        if (displayedColumns[2] !== 'Sample Name') {
+          displayedColumns.splice(displayedColumns.indexOf('Sample Name'), 1);
+          displayedColumns.splice(2, 0, 'Sample Name');
         }
-        displayedColumns = displayedColumns.filter((key) => {
-          return (
-            key.indexOf("Term Accession Number") < 0 &&
-            key.indexOf("Term Source REF") < 0
-          );
-        });
-        data["columns"] = columns;
-        data["displayedColumns"] = displayedColumns;
-        data["file"] = file;
-        data.data.rows ? (data["rows"] = data.data.rows) : (data["rows"] = []);
-        delete data["data"];
-        samples["data"] = data;
-        this.ngRedux.dispatch({ type: "SET_STUDY_SAMPLES", body: samples });
+        displayedColumns = displayedColumns.filter((key) => (
+            key.indexOf('Term Accession Number') < 0 &&
+            key.indexOf('Term Source REF') < 0
+          ));
+        data['columns'] = columns;
+        data['displayedColumns'] = displayedColumns;
+        data['file'] = file;
+        data.data.rows ? (data['rows'] = data.data.rows) : (data['rows'] = []);
+        delete data.data;
+        samples['data'] = data;
+        this.ngRedux.dispatch({ type: 'SET_STUDY_SAMPLES', body: samples });
 
-        let organisms = {};
-        data["rows"].forEach((row) => {
-          let organismName = row["Characteristics[Organism]"] as string;
-          organismName = organismName.replace(/^[ ]+|[ ]+$/g, "");
+        const organisms = {};
+        data['rows'].forEach((row) => {
+          let organismName = row['Characteristics[Organism]'] as string;
+          organismName = organismName.replace(/^[ ]+|[ ]+$/g, '');
 
-          let organismPart = row["Characteristics[Organism part]"];
-          let organismVariant = row["Characteristics[Variant]"];
-          if (organismName != "" && organismName.replace(" ", "") != "") {
-            if (organisms[organismName] == null) {
+          const organismPart = row['Characteristics[Organism part]'];
+          const organismVariant = row['Characteristics[Variant]'];
+          if (organismName !== '' && organismName.replace(' ', '') !== '') {
+            if (organisms[organismName] === null) {
               organisms[organismName] = {
                 parts: [],
                 variants: [],
               };
             } else {
-              if (organisms[organismName]["parts"].indexOf(organismPart) < 0) {
-                organisms[organismName]["parts"].push(organismPart);
+              if (organisms[organismName].parts.indexOf(organismPart) < 0) {
+                organisms[organismName].parts.push(organismPart);
               }
               if (
-                organisms[organismName]["variants"].indexOf(organismVariant) < 0
+                organisms[organismName].variants.indexOf(organismVariant) < 0
               ) {
-                organisms[organismName]["variants"].push(organismVariant);
+                organisms[organismName].variants.push(organismVariant);
               }
             }
           }
         });
         this.ngRedux.dispatch({
-          type: "SET_STUDY_ORGANISMS",
+          type: 'SET_STUDY_ORGANISMS',
           body: {
-            organisms: organisms,
+            organisms,
           },
         });
       },
@@ -875,17 +869,13 @@ export class EditorService {
 
   copyStudyFiles() {
     return this.dataService.copyFiles().pipe(
-      map(() => {
-        return this.loadStudyFiles(true);
-      })
+      map(() => this.loadStudyFiles(true))
     );
   }
 
   syncStudyFiles(data) {
     return this.dataService.syncFiles(data).pipe(
-      map(() => {
-        return this.loadStudyFiles(true);
-      })
+      map(() => this.loadStudyFiles(true))
     );
   }
 
@@ -899,7 +889,7 @@ export class EditorService {
   saveTitle(body) {
     return this.dataService.saveTitle(body).pipe(
       map((data) => {
-        this.ngRedux.dispatch({ type: "SET_STUDY_TITLE", body: data });
+        this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: data });
         return data;
       })
     );
@@ -908,7 +898,7 @@ export class EditorService {
   saveAbstract(body) {
     return this.dataService.saveAbstract(body).pipe(
       map((data) => {
-        this.ngRedux.dispatch({ type: "SET_STUDY_ABSTRACT", body: data });
+        this.ngRedux.dispatch({ type: 'SET_STUDY_ABSTRACT', body: data });
         return data;
       })
     );
@@ -918,7 +908,7 @@ export class EditorService {
     return this.dataService.savePerson(body).pipe(
       map((data) => {
         this.ngRedux.dispatch({
-          type: "UPDATE_STUDY_PEOPLE",
+          type: 'UPDATE_STUDY_PEOPLE',
           body: {
             people: data.contacts,
           },
@@ -932,7 +922,7 @@ export class EditorService {
     return this.dataService.getPeople().pipe(
       map((data) => {
         this.ngRedux.dispatch({
-          type: "UPDATE_STUDY_PEOPLE",
+          type: 'UPDATE_STUDY_PEOPLE',
           body: {
             people: data.contacts,
           },
@@ -986,16 +976,14 @@ export class EditorService {
   // Assays
   addAssay(body) {
     return this.dataService.addAssay(body).pipe(
-      map((data) => {
-        return data;
-      })
+      map((data) => data)
     );
   }
 
   deleteAssay(name) {
     return this.dataService.deleteAssay(name).pipe(
       map((data) => {
-        this.ngRedux.dispatch({ type: "DELETE_STUDY_ASSAY", body: name });
+        this.ngRedux.dispatch({ type: 'DELETE_STUDY_ASSAY', body: name });
         return data;
       })
     );
@@ -1005,7 +993,7 @@ export class EditorService {
   getProtocols(id) {
     return this.dataService.getProtocols(id).pipe(
       map((data) => {
-        this.ngRedux.dispatch({ type: "SET_STUDY_PROTOCOLS", body: data });
+        this.ngRedux.dispatch({ type: 'SET_STUDY_PROTOCOLS', body: data });
         return data;
       })
     );
@@ -1033,7 +1021,7 @@ export class EditorService {
     return this.dataService.getFactors().pipe(
       map((data) => {
         this.ngRedux.dispatch({
-          type: "UPDATE_STUDY_FACTORS",
+          type: 'UPDATE_STUDY_FACTORS',
           body: {
             factors: data.factors,
           },
@@ -1106,7 +1094,7 @@ export class EditorService {
     return this.dataService.getPublications().pipe(
       map((data) => {
         this.ngRedux.dispatch({
-          type: "UPDATE_STUDY_PUBLICATIONS",
+          type: 'UPDATE_STUDY_PUBLICATIONS',
           body: {
             publications: data.publications,
           },

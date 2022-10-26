@@ -1,19 +1,19 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { EditorService } from "../../../services/editor.service";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "./../../../store";
-import { Router } from "@angular/router";
-import { MetaboLightsWSURL } from "./../../../services/globals";
+import { Component, OnInit, Input } from '@angular/core';
+import { EditorService } from '../../../services/editor.service';
+import { NgRedux, select } from '@angular-redux/store';
+import { IAppState } from './../../../store';
+import { Router } from '@angular/router';
+import { MetaboLightsWSURL } from './../../../services/globals';
 
 @Component({
-  selector: "nav-bar",
-  templateUrl: "./nav-bar.component.html",
-  styleUrls: ["./nav-bar.component.css"],
+  selector: 'nav-bar',
+  templateUrl: './nav-bar.component.html',
+  styleUrls: ['./nav-bar.component.css'],
 })
 export class NavBarComponent implements OnInit {
-  @Input("mode") mode: any;
+  @Input('mode') mode: any;
   @select((state) => state.study.identifier) studyIdentifier: string;
-  domain: string = "";
+  domain = '';
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -21,7 +21,7 @@ export class NavBarComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.domain = MetaboLightsWSURL["domain"];
+    this.domain = MetaboLightsWSURL.domain;
   }
 
   logOut() {
@@ -33,6 +33,6 @@ export class NavBarComponent implements OnInit {
   }
 
   redirectToConsole() {
-    this.router.navigate(["/console"]);
+    this.router.navigate(['/console']);
   }
 }

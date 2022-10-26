@@ -1,11 +1,11 @@
-import { CommonModule } from "@angular/common";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { BrowserModule } from "@angular/platform-browser";
+import { CommonModule } from '@angular/common';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
 
-import { UploadComponent } from "./upload.component";
+import { UploadComponent } from './upload.component';
 
-describe("UploadComponent", () => {
+describe('UploadComponent', () => {
   let component: UploadComponent;
   let fixture: ComponentFixture<UploadComponent>;
 
@@ -22,7 +22,7 @@ describe("UploadComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

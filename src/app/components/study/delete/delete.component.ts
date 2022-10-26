@@ -1,24 +1,24 @@
-import { Component, OnInit } from "@angular/core";
-import { select } from "@angular-redux/store";
-import { ActivatedRoute, Router } from "@angular/router";
-import { EditorService } from "../../../services/editor.service";
-import { map } from "rxjs/operators";
-import { environment } from "src/environments/environment";
+import { Component, OnInit } from '@angular/core';
+import { select } from '@angular-redux/store';
+import { ActivatedRoute, Router } from '@angular/router';
+import { EditorService } from '../../../services/editor.service';
+import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-delete",
-  templateUrl: "./delete.component.html",
-  styleUrls: ["./delete.component.css"],
+  selector: 'mtbls-delete',
+  templateUrl: './delete.component.html',
+  styleUrls: ['./delete.component.css'],
 })
 export class DeleteComponent implements OnInit {
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier;
 
-  isModalOpen: boolean = false;
-  isFormBusy: boolean = false;
+  isModalOpen = false;
+  isFormBusy = false;
   status: string = null;
-  curator: boolean = false;
+  curator = false;
   requestedStudy: string = null;
   reload = false;
 
@@ -64,7 +64,7 @@ export class DeleteComponent implements OnInit {
     this.editorService.deleteStudy(this.requestedStudy).subscribe(
       (res) => {
         this.isModalOpen = false;
-        this.router.navigate(["/console"], { queryParams: { reload: "true" } });
+        this.router.navigate(['/console'], { queryParams: { reload: 'true' } });
       },
       (err) => {
         this.isFormBusy = false;

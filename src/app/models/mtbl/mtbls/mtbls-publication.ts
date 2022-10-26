@@ -1,25 +1,25 @@
-import { MTBLSComment } from "./common/mtbls-comment";
-import { Ontology } from "./common/mtbls-ontology";
-import { JsonObject, JsonProperty } from "json2typescript";
+import { MTBLSComment } from './common/mtbls-comment';
+import { Ontology } from './common/mtbls-ontology';
+import { JsonObject, JsonProperty } from 'json2typescript';
 
 @JsonObject
 export class MTBLSPublication {
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[];
 
-  @JsonProperty("title", String)
-  title: string = "";
+  @JsonProperty('title', String)
+  title = '';
 
-  @JsonProperty("authorList", String)
-  authorList: string = "";
+  @JsonProperty('authorList', String)
+  authorList = '';
 
-  @JsonProperty("doi", String)
-  doi: string = "";
+  @JsonProperty('doi', String)
+  doi = '';
 
-  @JsonProperty("pubMedID", String)
-  pubMedID: string = "";
+  @JsonProperty('pubMedID', String)
+  pubMedID = '';
 
-  @JsonProperty("status", Ontology)
+  @JsonProperty('status', Ontology)
   status: Ontology = null;
 
   toJSON() {

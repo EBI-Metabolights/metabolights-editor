@@ -1,15 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
 
 export type CommentBoxStatus =
-  | "Leave a comment"
-  | "Comment saved"
-  | "Update a comment";
+  | 'Leave a comment'
+  | 'Comment saved'
+  | 'Update a comment';
 
 @Component({
-  selector: "app-validation-detail-comment",
-  templateUrl: "./validation-detail-comment.component.html",
-  styleUrls: ["./validation-detail-comment.component.css"],
+  selector: 'app-validation-detail-comment',
+  templateUrl: './validation-detail-comment.component.html',
+  styleUrls: ['./validation-detail-comment.component.css'],
 })
 export class ValidationDetailCommentComponent implements OnInit {
   @Input() curator: boolean;
@@ -18,11 +18,11 @@ export class ValidationDetailCommentComponent implements OnInit {
   @Output() commentSaved: EventEmitter<{ comment: string }> =
     new EventEmitter();
 
-  disableCuratorCommentBox: boolean = false;
-  commentBoxStatus: CommentBoxStatus = "Leave a comment";
+  disableCuratorCommentBox = false;
+  commentBoxStatus: CommentBoxStatus = 'Leave a comment';
 
   monoForm = new FormGroup({
-    commentControl: new FormControl(""),
+    commentControl: new FormControl(''),
   });
 
   constructor() {}
@@ -38,15 +38,15 @@ export class ValidationDetailCommentComponent implements OnInit {
   }
 
   saveComment() {
-    this.commentSaved.emit({ comment: this.monoForm.value["commentControl"] });
+    this.commentSaved.emit({ comment: this.monoForm.value.commentControl });
     this.disableCuratorCommentBox = true;
-    this.monoForm.controls["commentControl"].disable();
-    this.commentBoxStatus = "Comment saved";
+    this.monoForm.controls.commentControl.disable();
+    this.commentBoxStatus = 'Comment saved';
   }
 
   onEditCommentClick() {
     this.disableCuratorCommentBox = false;
-    this.monoForm.controls["commentControl"].enable();
-    this.commentBoxStatus = "Update a comment";
+    this.monoForm.controls.commentControl.enable();
+    this.commentBoxStatus = 'Update a comment';
   }
 }

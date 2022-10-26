@@ -1,10 +1,10 @@
-import { tassign } from "tassign";
-import { MTBLSStudy } from "../../models/mtbl/mtbls/mtbls-study";
-import { MTBLSProtocol } from "../../models/mtbl/mtbls/mtbls-protocol";
-import { MTBLSFactor } from "../../models/mtbl/mtbls/mtbls-factor";
-import { Ontology } from "../../models/mtbl/mtbls/common/mtbls-ontology";
-import { MTBLSProcessSequence } from "../../models/mtbl/mtbls/mtbls-process-sequence";
-import { JsonConvert } from "json2typescript";
+import { tassign } from 'tassign';
+import { MTBLSStudy } from '../../models/mtbl/mtbls/mtbls-study';
+import { MTBLSProtocol } from '../../models/mtbl/mtbls/mtbls-protocol';
+import { MTBLSFactor } from '../../models/mtbl/mtbls/mtbls-factor';
+import { Ontology } from '../../models/mtbl/mtbls/common/mtbls-ontology';
+import { MTBLSProcessSequence } from '../../models/mtbl/mtbls/mtbls-process-sequence';
+import { JsonConvert } from 'json2typescript';
 import {
   SET_STUDY_IDENTIFIER,
   SET_STUDY_TITLE,
@@ -43,9 +43,16 @@ import {
   SET_STUDY_ERROR,
   SET_STUDY_READONLY,
   SET_PROTOCOL_EXPAND,
-} from "./actions";
+} from './actions';
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 export const STUDY_INITIAL_STATE: MTBLSStudy = new MTBLSStudy();
+
+function checkLocal() {
+    return localStorage.getItem('state') === null
+      ? STUDY_INITIAL_STATE
+      : JSON.parse(localStorage.getItem('state')).study;
+  }
 
 function setStudyIdentifier(state, action) {
   if (action.body.study) {
@@ -142,8 +149,8 @@ function setStudyPeople(state, action) {
 }
 
 function setStudyDesignDescriptors(state, action) {
-  let designDescriptors = [];
-  let jsonConvert: JsonConvert = new JsonConvert();
+  const designDescriptors = [];
+  const jsonConvert: JsonConvert = new JsonConvert();
   action.body.studyDesignDescriptors.forEach((descriptor) => {
     designDescriptors.push(jsonConvert.deserialize(descriptor, Ontology));
   });
@@ -159,8 +166,8 @@ function loadValidationRules(state, action) {
 }
 
 function setStudyFactors(state, action) {
-  let studyFactors = [];
-  let jsonConvert: JsonConvert = new JsonConvert();
+  const studyFactors = [];
+  const jsonConvert: JsonConvert = new JsonConvert();
   action.body.factors.forEach((protocol) => {
     studyFactors.push(jsonConvert.deserialize(protocol, MTBLSFactor));
   });
@@ -168,8 +175,8 @@ function setStudyFactors(state, action) {
 }
 
 function setStudyProtocols(state, action) {
-  let studyProtocols = [];
-  let jsonConvert: JsonConvert = new JsonConvert();
+  const studyProtocols = [];
+  const jsonConvert: JsonConvert = new JsonConvert();
   action.body.protocols.forEach((protocol) => {
     studyProtocols.push(jsonConvert.deserialize(protocol, MTBLSProtocol));
   });
@@ -181,8 +188,8 @@ function setStudySamples(state, action) {
 }
 
 function setStudyProcessSequence(state, action) {
-  let studyProcessSequences = [];
-  let jsonConvert: JsonConvert = new JsonConvert();
+  const studyProcessSequences = [];
+  const jsonConvert: JsonConvert = new JsonConvert();
   action.body.processSequence.forEach((process) => {
     studyProcessSequences.push(
       jsonConvert.deserialize(process, MTBLSProcessSequence)
@@ -192,13 +199,13 @@ function setStudyProcessSequence(state, action) {
 }
 
 function addStudyAssay(state, action) {
-  let jsonConvert: JsonConvert = new JsonConvert();
+  const jsonConvert: JsonConvert = new JsonConvert();
   return tassign(state, { assays: state.assays.concat(action.body.assay) });
 }
 
 function addStudyAssayTable(state, action) {
-  let studyProtocols = [];
-  let tempAssayTables = Object.assign({}, state.assayTables);
+  const studyProtocols = [];
+  const tempAssayTables = Object.assign({}, state.assayTables);
   tempAssayTables[action.body.assay] = action.body.assayTable;
   state.protocols.forEach((protocol) => {
     Object.keys(action.body.assayTable.protocolsMetaData).forEach((key) => {
@@ -207,15 +214,15 @@ function addStudyAssayTable(state, action) {
           protocol.name
         ) > -1
       ) {
-        let protocolValidation = state.validations.protocols.default.filter(
-          (p) => p.title == protocol.name
+        const protocolValidation = state.validations.protocols.default.filter(
+          (p) => p.title === protocol.name
         )[0];
         protocol.meta[action.body.assay] =
-          action.body.assayTable.protocolsMetaData[key]["columns"];
+          action.body.assayTable.protocolsMetaData[key].columns;
         protocol.meta[action.body.assay].forEach((column) => {
           if (protocolValidation.columns[column.name]) {
-            column["is-hidden"] = JSON.parse(
-              protocolValidation.columns[column.name]["is-hidden"]
+            column['is-hidden'] = JSON.parse(
+              protocolValidation.columns[column.name]['is-hidden']
             );
           }
         });
@@ -230,15 +237,15 @@ function addStudyAssayTable(state, action) {
 }
 
 function setStudyAssay(state, action) {
-  let tempAssays = Object.assign({}, state.assays);
-  let currentAssay = action.body;
+  const tempAssays = Object.assign({}, state.assays);
+  const currentAssay = action.body;
   tempAssays[currentAssay.name] = action.body;
   return tassign(state, { assays: tempAssays });
 }
 
 function deleteStudyAssay(state, action) {
-  let tempAssays = Object.assign({}, state.assays);
-  let tempMAFS = Object.assign({}, state.mafs);
+  const tempAssays = Object.assign({}, state.assays);
+  const tempMAFS = Object.assign({}, state.mafs);
   tempAssays[action.body].mafs.forEach((maf) => {
     delete tempMAFS[maf];
   });
@@ -247,19 +254,19 @@ function deleteStudyAssay(state, action) {
 }
 
 function setStudyMAF(state, action) {
-  let tempMAFS = Object.assign({}, state.mafs);
+  const tempMAFS = Object.assign({}, state.mafs);
   tempMAFS[action.body.data.file] = action.body;
   return tassign(state, { mafs: tempMAFS });
 }
 
 function addMAF(state, action) {
-  let tempList = [];
+  const tempList = [];
   if (state.metaboliteAnnotationFiles.length > 0) {
     let present = false;
     state.metaboliteAnnotationFiles.forEach((maf) => {
       if (
-        maf.file == action.body.maf.file &&
-        maf.assay == action.body.maf.assay
+        maf.file === action.body.maf.file &&
+        maf.assay === action.body.maf.assay
       ) {
         present = true;
         tempList.push(action.body.maf);
@@ -281,13 +288,13 @@ function updateMAF(state, action) {
   if (state.metaboliteAnnotationFiles) {
     let i = 0;
     state.metaboliteAnnotationFiles.forEach((f) => {
-      if (f == action.body.maf.file && f.assay == action.body.maf.assay) {
+      if (f === action.body.maf.file && f.assay === action.body.maf.assay) {
         index = i;
       }
       i = i + 1;
     });
   }
-  if (index != null) {
+  if (index !== null) {
     state.metaboliteAnnotationFiles[index] = action.body.maf;
   }
   return tassign(state, {
@@ -431,8 +438,3 @@ export function studyReducer(
   return state;
 }
 
-function checkLocal() {
-  return localStorage.getItem("state") === null
-    ? STUDY_INITIAL_STATE
-    : JSON.parse(localStorage.getItem("state")).study;
-}

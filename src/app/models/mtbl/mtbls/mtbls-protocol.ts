@@ -1,13 +1,13 @@
-import { MTBLSComment } from "./common/mtbls-comment";
-import { Ontology } from "./common/mtbls-ontology";
-import { JsonObject, JsonProperty } from "json2typescript";
+import { MTBLSComment } from './common/mtbls-comment';
+import { Ontology } from './common/mtbls-ontology';
+import { JsonObject, JsonProperty } from 'json2typescript';
 
 @JsonObject
 export class ProtocolParameter {
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[] = [];
 
-  @JsonProperty("parameterName", Ontology)
+  @JsonProperty('parameterName', Ontology)
   parameterName: Ontology = null;
 
   toJSON() {
@@ -20,31 +20,31 @@ export class ProtocolParameter {
 
 @JsonObject
 export class MTBLSProtocol {
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[] = [];
 
-  @JsonProperty("name", String)
-  name: string = "";
+  @JsonProperty('name', String)
+  name = '';
 
-  @JsonProperty("description", String)
-  description: string = "";
+  @JsonProperty('description', String)
+  description = '';
 
-  @JsonProperty("uri", String)
-  uri: string = "";
+  @JsonProperty('uri', String)
+  uri = '';
 
-  @JsonProperty("version", String)
-  version: string = "";
+  @JsonProperty('version', String)
+  version = '';
 
-  @JsonProperty("protocolType", Ontology)
+  @JsonProperty('protocolType', Ontology)
   protocolType: Ontology = null;
 
-  @JsonProperty("parameters", [ProtocolParameter])
+  @JsonProperty('parameters', [ProtocolParameter])
   parameters: ProtocolParameter[] = [];
 
-  @JsonProperty("meta", Object, true)
+  @JsonProperty('meta', Object, true)
   meta: any = {};
 
-  @JsonProperty("components", [Ontology])
+  @JsonProperty('components', [Ontology])
   components: Ontology[] = [];
 
   toJSON() {

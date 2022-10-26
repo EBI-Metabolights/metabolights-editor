@@ -1,15 +1,15 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { select } from "@angular-redux/store";
-import { environment } from "src/environments/environment";
-import { Router } from "@angular/router";
+import { Component, OnInit, Input } from '@angular/core';
+import { select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
+import { Router } from '@angular/router';
 
 @Component({
-  selector: "mtbls-mafs",
-  templateUrl: "./mafs.component.html",
-  styleUrls: ["./mafs.component.css"],
+  selector: 'mtbls-mafs',
+  templateUrl: './mafs.component.html',
+  styleUrls: ['./mafs.component.css'],
 })
 export class MafsComponent implements OnInit {
-  @Input("assayName") assayName: any;
+  @Input('assayName') assayName: any;
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.assays) studyAssays;
   @select((state) => state.study.studyAssays) assayFiles;
@@ -43,12 +43,12 @@ export class MafsComponent implements OnInit {
       this.studyAssayFiles = assayfiles;
     });
 
-    // tslint:disable-next-line:indent
+    // eslint-disable-next-line @typescript-eslint/indent
     this.studyAssays.subscribe((value) => {
       this.assays = value;
       const tempMAFs = [];
       Object.values(this.assays).forEach((assay) => {
-        assay["mafs"].forEach((maf) => {
+        assay['mafs'].forEach((maf) => { // eslint-disable-line @typescript-eslint/dot-notation
           tempMAFs.push(maf);
         });
       });
@@ -58,7 +58,7 @@ export class MafsComponent implements OnInit {
       this.mafs.forEach((maf) => {
         let exists = false;
         tempMAFs.forEach((mafName) => {
-          if (maf.name == mafName) {
+          if (maf.name === mafName) {
             exists = true;
           }
         });
@@ -68,8 +68,8 @@ export class MafsComponent implements OnInit {
         i = i + 1;
       });
       if (deletedMAFS.length > 0) {
-        deletedMAFS.forEach((i) => {
-          this.mafs.splice(i, 1);
+        deletedMAFS.forEach((indice) => {
+          this.mafs.splice(indice, 1);
         });
       }
     });
@@ -78,11 +78,11 @@ export class MafsComponent implements OnInit {
       this.studyAssayFiles.forEach((assayFileName) => {
         if (this.assays) {
           const assayName = assayFileName.filename.trim();
-          if (this.assays[assayName]["mafs"].length > 0) {
-            this.assays[assayName]["mafs"].forEach((mafFile) => {
+          if (this.assays[assayName].mafs.length > 0) {
+            this.assays[assayName].mafs.forEach((mafFile) => {
               if (
                 this.mafNames.indexOf(mafFile) === -1 &&
-                mafFile.indexOf("m_") === 0
+                mafFile.indexOf('m_') === 0
               ) {
                 this.mafNames.push(mafFile);
               }
@@ -99,8 +99,8 @@ export class MafsComponent implements OnInit {
         });
       }
       if (value && this.mafNames.length === 0) {
-        if (this.router.url.indexOf("metabolites") > -1) {
-          this.router.navigate(["/study", this.requestedStudy]);
+        if (this.router.url.indexOf('metabolites') > -1) {
+          this.router.navigate(['/study', this.requestedStudy]);
         }
       }
     });

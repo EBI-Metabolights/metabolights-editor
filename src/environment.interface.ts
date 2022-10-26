@@ -6,23 +6,23 @@ export interface Environment {
   endpoint: string; // Root endpoint of metabolights.
   loginURL: string; // Url to route users who are not logged in the event they try and access auth guarded pages.logoutURL
   clearJavaSession: boolean; // Flag to decid whether to clear Java Spring session
-  JavaLogoutURL: string; // Url to route browser to logout from Java spring session
+  javaLogoutURL: string; // Url to route browser to logout from Java spring session
   redirectURL: string; // Holds the url of the page that the user tried to access, in the event of successful authentication.
-  MetabolightsWSURL: MWSURL; // Object containing urls for guides, ontologies and etc. This object is passed to the metabolights.service
-  DOIWSURL: DOIWSURL; // Object containing url for DOI service.
-  EuropePMCURL: EuropePMCURL; // Object containing url for europePMC service.
-  AuthenticationURL: AuthenticationURL; // Object containing the different authentication and authorization endpoints.
-  VideoURL: VideoURL; // Object containing links to all help videos.
+  metabolightWSURL: MWSURL; // Object containing urls for guides, ontologies and etc. This object is passed to the metabolights.service
+  doiWSURL: DoiWSURL; // Object containing url for DOI service.
+  europePMCURL: EuropePMCURL; // Object containing url for europePMC service.
+  authenticationURL: AuthenticationURL; // Object containing the different authentication and authorization endpoints.
+  videoURL: VideoURL; // Object containing links to all help videos.
 }
 
 export interface VideoURL {
   all: string;
   aspera: string;
-  create_account: string;
-  create_study: string;
+  createAccount: string;
+  createStudy: string;
   maf: string;
   factors: string;
-  create_assay: string;
+  createAssay: string;
   protocols: string;
   samples: string;
   descriptors: string;
@@ -36,12 +36,13 @@ interface MWSURL {
   ontologyDetails: string; // the url for ebi's OLS service, usually https://www.ebi.ac.uk/ols/api/ontologies/
 }
 
-interface DOIWSURL {
+interface DoiWSURL {
   article: string; // the address for the DOI API, usually https://api.crossref.org/works/
 }
 
 interface EuropePMCURL {
-  article: string; // the address for the europePMC API, usually https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=<term>&format=json&resultType=core
+  article: string; // the address for the europePMC API, usually
+  //https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=<term>&format=json&resultType=core
 }
 
 interface AuthenticationURL {

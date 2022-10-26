@@ -1,7 +1,7 @@
-import { select } from "@angular-redux/store";
-import { HttpClient, HttpHandler } from "@angular/common/http";
-import { of } from "rxjs";
-import { httpOptions } from "../headers";
+import { select } from '@angular-redux/store';
+import { HttpClient, HttpHandler } from '@angular/common/http';
+import { of } from 'rxjs';
+import { httpOptions } from '../headers';
 
 export class MockMetabolightsService {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -9,9 +9,9 @@ export class MockMetabolightsService {
   http: HttpClient;
 
   getStudyFilesFetch(bool: true) {
-    let obj = {
+    const obj = {
       study: [],
-      latest: "latest",
+      latest: 'latest',
     };
 
     return of({
@@ -20,12 +20,12 @@ export class MockMetabolightsService {
   }
 
   getDownloadLink(name, code) {
-    return of("download.link");
+    return of('download.link');
   }
 
   getTitle(id) {
     return this.http.get(
-      "https://www.ebi.ac.uk/metabolights/ws/studies/title",
+      'https://www.ebi.ac.uk/metabolights/ws/studies/title',
       httpOptions
     );
   }

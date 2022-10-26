@@ -1,22 +1,22 @@
-import { Component, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../store";
-import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
-import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { MTBLSPublication } from "./../../../models/mtbl/mtbls/mtbls-publication";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import * as toastr from "toastr";
-import { Router } from "@angular/router";
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgRedux, select } from '@angular-redux/store';
+import { IAppState } from '../../../store';
+import { MTBLSPerson } from './../../../models/mtbl/mtbls/mtbls-person';
+import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { MTBLSPublication } from './../../../models/mtbl/mtbls/mtbls-publication';
+import { JsonConvert, OperationMode, ValueCheckingMode } from 'json2typescript';
+import * as toastr from 'toastr';
+import { Router } from '@angular/router';
 
-import { EditorService } from "./../../../services/editor.service";
-import { environment } from "src/environments/environment";
+import { EditorService } from './../../../services/editor.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "raw-upload",
-  templateUrl: "./upload.component.html",
-  styleUrls: ["./upload.component.css"],
+  selector: 'raw-upload',
+  templateUrl: './upload.component.html',
+  styleUrls: ['./upload.component.css'],
 })
 export class RawUploadComponent implements OnInit {
   @select((state) => state.status.user) studyUser;
@@ -25,7 +25,7 @@ export class RawUploadComponent implements OnInit {
   user: any = null;
   requestedStudy: string = null;
   files: any = {};
-  isLoading: boolean = false;
+  isLoading = false;
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
@@ -58,8 +58,6 @@ export class RawUploadComponent implements OnInit {
     return file.directory;
   }
 
-  ngAfterViewInit() {}
-
   refreshFiles() {
     this.editorService.loadStudyFiles(true);
   }
@@ -68,7 +66,7 @@ export class RawUploadComponent implements OnInit {
     this.isLoading = true;
     this.editorService.syncStudyFiles({ files: [] }).subscribe((resp) => {
       this.isLoading = false;
-      this.router.navigate(["/guide/meta", this.requestedStudy]);
+      this.router.navigate(['/guide/meta', this.requestedStudy]);
     });
   }
 }

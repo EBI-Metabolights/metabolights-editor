@@ -1,11 +1,11 @@
-import { NgRedux } from "@angular-redux/store";
+import { NgRedux } from '@angular-redux/store';
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
-} from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+} from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   Router,
   UrlSerializer,
@@ -14,19 +14,19 @@ import {
   ROUTER_CONFIGURATION,
   UrlHandlingStrategy,
   RouteReuseStrategy,
-} from "@angular/router";
+} from '@angular/router';
 import {
   RouterTestingModule,
   setupTestingRouter,
-} from "@angular/router/testing";
-import { SpyLocation } from "@angular/common/testing";
+} from '@angular/router/testing';
+import { SpyLocation } from '@angular/common/testing';
 
-import { StudyComponent } from "./study.component";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { EditorService } from "src/app/services/editor.service";
-import { MockEditorService } from "src/app/services/editor.service.mock";
+import { StudyComponent } from './study.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { EditorService } from 'src/app/services/editor.service';
+import { MockEditorService } from 'src/app/services/editor.service.mock';
 
-describe("StudyComponent", () => {
+describe('StudyComponent', () => {
   let component: StudyComponent;
   let fixture: ComponentFixture<StudyComponent>;
   let editorService: EditorService;
@@ -63,11 +63,11 @@ describe("StudyComponent", () => {
     editorService = TestBed.inject(EditorService);
     fixture = TestBed.createComponent(StudyComponent);
     component = fixture.componentInstance;
-    spyOn(component, "setUpSubscriptions").and.stub();
+    spyOn(component, 'setUpSubscriptions').and.stub();
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

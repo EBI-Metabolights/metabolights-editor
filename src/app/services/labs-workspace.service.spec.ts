@@ -1,15 +1,15 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient } from '@angular/common/http';
 import {
   HttpClientTestingModule,
   HttpTestingController,
-} from "@angular/common/http/testing";
-import { TestBed, async } from "@angular/core/testing";
-import { MockConfigurationService } from "../configuration.mock.service";
-import { ConfigurationService } from "../configuration.service";
+} from '@angular/common/http/testing';
+import { TestBed, async } from '@angular/core/testing';
+import { MockConfigurationService } from '../configuration.mock.service';
+import { ConfigurationService } from '../configuration.service';
 
-import { LabsWorkspaceService } from "./labs-workspace.service";
+import { LabsWorkspaceService } from './labs-workspace.service';
 
-describe("LabsWorkspaceService", () => {
+describe('LabsWorkspaceService', () => {
   let httpClientSpy: { get: jasmine.Spy };
   let service: LabsWorkspaceService;
   let configService: ConfigurationService;
@@ -29,11 +29,11 @@ describe("LabsWorkspaceService", () => {
     });
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
-    httpClientSpy = jasmine.createSpyObj("HttpClient", ["post"]);
+    httpClientSpy = jasmine.createSpyObj('HttpClient', ['post']);
     service = new LabsWorkspaceService(httpClientSpy as any, configService);
   });
 
-  it("should be created", () => {
+  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 });

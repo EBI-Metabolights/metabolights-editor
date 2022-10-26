@@ -1,22 +1,24 @@
-import { Component, Input, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { EditorService } from "../../../../services/editor.service";
-import { TableComponent } from "./../../../shared/table/table.component";
-import { select } from "@angular-redux/store";
-import { map } from "rxjs/operators";
-import { environment } from "src/environments/environment";
+import { AfterContentInit, Component, Input, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EditorService } from '../../../../services/editor.service';
+import { TableComponent } from './../../../shared/table/table.component';
+import { select } from '@angular-redux/store';
+import { map } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-maf",
-  templateUrl: "./maf.component.html",
-  styleUrls: ["./maf.component.css"],
+  selector: 'mtbls-maf',
+  templateUrl: './maf.component.html',
+  styleUrls: ['./maf.component.css'],
 })
-export class MafComponent {
-  @Input("value") value: any;
+export class MafComponent implements AfterContentInit {
+  @Input('value') value: any;
 
   @select((state) => state.study.mafs) studyMAFs;
   @select((state) => state.study.readonly) readonly;
-  isReadOnly: boolean = false;
+  @ViewChild(TableComponent) mafTable: TableComponent;
+
+  isReadOnly = false;
 
   currentID = null;
 
@@ -24,7 +26,7 @@ export class MafComponent {
   currentRow = 0;
   isAutoPopulateModalOpen = false;
   isRowEditModalOpen = false;
-  isFormBusy: boolean = false;
+  isFormBusy = false;
   selectedRow = {};
   form: FormGroup;
   currentIndex = 0;
@@ -32,16 +34,15 @@ export class MafComponent {
   rowsToUpdate = [];
   inProgress = true;
 
-  isAutoPopulating: boolean = false;
+  isAutoPopulating = false;
 
   fileTypes: any = [
     {
-      filter_name: "MetaboLights maf sheet type",
-      extensions: ["tsv"],
+      filter_name: 'MetaboLights maf sheet type', //eslint-disable-line @typescript-eslint/naming-convention
+      extensions: ['tsv'],
     },
   ];
 
-  @ViewChild(TableComponent) mafTable: TableComponent;
 
   constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
@@ -58,7 +59,7 @@ export class MafComponent {
       }
     });
     this.readonly.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.isReadOnly = value;
       }
     });
@@ -68,11 +69,11 @@ export class MafComponent {
     this.isRowEditModalOpen = true;
     this.selectedRow = row;
     this.form = this.fb.group({
-      name: [row["metabolite_identification"]],
-      smiles: [row["smiles"]],
-      inchi: [row["inchi"]],
-      databaseId: [row["database_identifier"]],
-      formula: [row["chemical_formula"]],
+      name: [row.metabolite_identification],
+      smiles: [row.smiles],
+      inchi: [row.inchi],
+      databaseId: [row.database_identifier],
+      formula: [row.chemical_formula],
     });
   }
 
@@ -81,10 +82,10 @@ export class MafComponent {
   }
 
   getChebiId() {
-    let dbId = this.form.get("databaseId").value;
-    if (dbId && dbId != "") {
-      if (dbId.toLowerCase().indexOf("chebi") > -1) {
-        this.currentID = dbId.split(":")[1];
+    const dbId = this.form.get('databaseId').value;
+    if (dbId && dbId !== '') {
+      if (dbId.toLowerCase().indexOf('chebi') > -1) {
+        this.currentID = dbId.split(':')[1];
       }
     } else {
       this.currentID = null;
@@ -106,14 +107,14 @@ export class MafComponent {
   }
 
   loadAutoPopulateField(i) {
-    let row = this.mafTable.data.rows[i];
+    const row = this.mafTable.data.rows[i];
     this.selectedRow = row;
     this.form = this.fb.group({
-      name: [row["metabolite_identification"]],
-      smiles: [row["smiles"]],
-      inchi: [row["inchi"]],
-      databaseId: [row["database_identifier"]],
-      formula: [row["chemical_formula"]],
+      name: [row.metabolite_identification],
+      smiles: [row.smiles],
+      inchi: [row.inchi],
+      databaseId: [row.database_identifier],
+      formula: [row.chemical_formula],
     });
     this.getChebiId();
   }
@@ -123,28 +124,28 @@ export class MafComponent {
       this.openAutoPopulateModal();
       this.loadAutoPopulateField(this.currentRow);
     } else {
-      let promises = [];
+      const promises = [];
       this.isAutoPopulating = true;
       this.mafData.data.rows.forEach((row) => {
-        let dbIdentifier = row["database_identifier"];
-        let smiles = row["smiles"];
-        let inchi = row["inchi"];
-        let name = row["metabolite_identification"];
+        const dbIdentifier = row.database_identifier;
+        const smiles = row.smiles;
+        const inchi = row.inchi;
+        const name = row.metabolite_identification;
 
-        if (name && name != "") {
-          const promise = this.getCompound(name, "name");
+        if (name && name !== '') {
+          const promise = this.getCompound(name, 'name');
           promises.push(promise);
         } else {
-          if (dbIdentifier && dbIdentifier != "") {
-            const promise = this.getCompound(dbIdentifier, "databaseid");
+          if (dbIdentifier && dbIdentifier !== '') {
+            const promise = this.getCompound(dbIdentifier, 'databaseid');
             promises.push(promise);
           } else {
-            if (smiles && smiles != "") {
-              const promise = this.getCompound(smiles, "smiles");
+            if (smiles && smiles !== '') {
+              const promise = this.getCompound(smiles, 'smiles');
               promises.push(promise);
             } else {
-              if (inchi && inchi != "") {
-                const promise = this.getCompound(inchi, "inchi");
+              if (inchi && inchi !== '') {
+                const promise = this.getCompound(inchi, 'inchi');
                 promises.push(promise);
               }
             }
@@ -157,27 +158,27 @@ export class MafComponent {
           if (d) {
             this.mafData.data.rows.forEach((row) => {
               if (
-                row["database_identifier"] == d.content[0]["databaseId"] ||
-                row["smiles"] == d.content[0]["smiles"] ||
-                row["inchi"] == d.content[0]["inchi"] ||
-                row["metabolite_identification"] == d.content[0]["name"]
+                row.database_identifier === d.content[0].databaseId ||
+                row.smiles === d.content[0].smiles ||
+                row.inchi === d.content[0].inchi ||
+                row.metabolite_identification === d.content[0].name
               ) {
-                let details = d.content[0];
+                const details = d.content[0];
                 if (details) {
-                  if (this.isEmpty(row["database_identifier"])) {
-                    row["database_identifier"] = details["databaseId"];
+                  if (this.isEmpty(row.database_identifier)) {
+                    row.database_identifier = details.databaseId;
                   }
-                  if (this.isEmpty(row["chemical_formula"])) {
-                    row["chemical_formula"] = details["formula"];
+                  if (this.isEmpty(row.chemical_formula)) {
+                    row.chemical_formula = details.formula;
                   }
-                  if (this.isEmpty(row["inchi"])) {
-                    row["inchi"] = details["inchi"];
+                  if (this.isEmpty(row.inchi)) {
+                    row.inchi = details.inchi;
                   }
-                  if (this.isEmpty(row["metabolite_identification"])) {
-                    row["metabolite_identification"] = details["name"];
+                  if (this.isEmpty(row.metabolite_identification)) {
+                    row.metabolite_identification = details.name;
                   }
-                  if (this.isEmpty(row["smiles"])) {
-                    row["smiles"] = details["smiles"];
+                  if (this.isEmpty(row.smiles)) {
+                    row.smiles = details.smiles;
                   }
                 }
                 this.rowsToUpdate.push(row);
@@ -188,25 +189,12 @@ export class MafComponent {
         this.mafTable.updateRows(this.rowsToUpdate);
       });
 
-      // contents.forEach(data => {
-      // 	if(data){
-      // 		let details = data.content[0]
-      // 		let row = {}
-      // 		if(details){
-      // 			row['database_identifier'] = details['databaseId']
-      // 			row['chemical_formula'] = details['formula']
-      // 			row['inchi'] = details['inchi']
-      // 			row['metabolite_identification'] = details['name']
-      // 			row['smiles'] = details['smiles']
-      // 		}
-      // 		this.mafTable.updateRows([row]);
-      // 	}
-      // })
+
     }
   }
 
   isEmpty(val) {
-    return !val && val == "" ? true : false;
+    return !val && val === '' ? true : false;
   }
 
   async getCompound(id, type) {
@@ -222,17 +210,17 @@ export class MafComponent {
   }
 
   search(type) {
-    let term = this.form.get(type).value;
+    const term = this.form.get(type).value;
     this.isFormBusy = true;
     this.editorService.search(term, type.toLowerCase()).subscribe(
       (res) => {
-        let resultObj = res.content[0];
+        const resultObj = res.content[0];
         this.isFormBusy = false;
-        let fields = ["name", "smiles", "inchi", "formula", "databaseId"];
+        const fields = ['name', 'smiles', 'inchi', 'formula', 'databaseId'];
         fields.forEach((field) => {
-          if (field != term) {
-            if (field == "name") {
-              if (this.form.get(field).value == "") {
+          if (field !== term) {
+            if (field === 'name') {
+              if (this.form.get(field).value === '') {
                 this.form
                   .get(field)
                   .setValue(resultObj[field], { emitEvent: false });
@@ -254,12 +242,16 @@ export class MafComponent {
     );
   }
 
+  /* there are lots of instances like this where the original author is tricking typescript
+  * into working like javascript. A purist would correct all of it, but I am only
+  * one man */
+  /* eslint-disable @typescript-eslint/dot-notation */
   saveCell() {
-    this.selectedRow["metabolite_identification"] = this.form.get("name").value;
-    this.selectedRow["inchi"] = this.form.get("inchi").value;
-    this.selectedRow["database_identifier"] = this.form.get("databaseId").value;
-    this.selectedRow["smiles"] = this.form.get("smiles").value;
-    this.selectedRow["chemical_formula"] = this.form.get("formula").value;
+    this.selectedRow['metabolite_identification'] = this.form.get('name').value;
+    this.selectedRow['inchi'] = this.form.get('inchi').value;
+    this.selectedRow['database_identifier'] = this.form.get('databaseId').value;
+    this.selectedRow['smiles'] = this.form.get('smiles').value;
+    this.selectedRow['chemical_formula'] = this.form.get('formula').value;
     this.mafTable.updateRows([this.selectedRow]);
   }
 

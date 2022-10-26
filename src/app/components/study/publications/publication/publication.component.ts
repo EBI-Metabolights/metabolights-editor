@@ -1,6 +1,6 @@
-import { EditorService } from "../../../../services/editor.service";
-import { DOIService } from "../../../../services/publications/doi.service";
-import { EuropePMCService } from "../../../../services/publications/europePMC.service";
+import { EditorService } from '../../../../services/editor.service';
+import { DOIService } from '../../../../services/publications/doi.service';
+import { EuropePMCService } from '../../../../services/publications/europePMC.service';
 import {
   Component,
   OnInit,
@@ -9,52 +9,52 @@ import {
   OnChanges,
   SimpleChanges,
   ViewChild,
-} from "@angular/core";
-import { MTBLSComment } from "./../../../../models/mtbl/mtbls/common/mtbls-comment";
-import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { MTBLSPublication } from "./../../../../models/mtbl/mtbls/mtbls-publication";
-import { trigger, style, animate, transition } from "@angular/animations";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ValidateRules } from "./publication.validator";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../../store";
-import { OntologyComponent } from "../../../shared/ontology/ontology.component";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import * as toastr from "toastr";
-import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
-import { environment } from "src/environments/environment";
+} from '@angular/core';
+import { MTBLSComment } from './../../../../models/mtbl/mtbls/common/mtbls-comment';
+import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { MTBLSPublication } from './../../../../models/mtbl/mtbls/mtbls-publication';
+import { trigger, style, animate, transition } from '@angular/animations';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ValidateRules } from './publication.validator';
+import { NgRedux, select } from '@angular-redux/store';
+import { IAppState } from '../../../../store';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
+import { JsonConvert, OperationMode, ValueCheckingMode } from 'json2typescript';
+import * as toastr from 'toastr';
+import { MTBLSPerson } from './../../../../models/mtbl/mtbls/mtbls-person';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-publication",
-  templateUrl: "./publication.component.html",
-  styleUrls: ["./publication.component.css"],
+  selector: 'mtbls-publication',
+  templateUrl: './publication.component.html',
+  styleUrls: ['./publication.component.css'],
 })
 export class PublicationComponent implements OnInit {
-  @Input("value") publication: any;
+  @Input('value') publication: any;
   @select((state) => state.study.validations) studyValidations: any;
 
   @ViewChild(OntologyComponent) statusComponent: OntologyComponent;
 
   @select((state) => state.study.readonly) readonly;
-  isReadOnly: boolean = false;
+  isReadOnly = false;
 
   form: FormGroup;
-  isFormBusy: boolean = false;
-  addNewPublication: boolean = false;
+  isFormBusy = false;
+  addNewPublication = false;
 
   validations: any;
-  validationsId = "publications.publication";
+  validationsId = 'publications.publication';
 
-  isModalOpen: boolean = false;
-  isTimeLineModalOpen: boolean = false;
-  isDeleteModalOpen: boolean = false;
-  isUpdateTitleModalOpen: boolean = false;
-  isUpdateAbstractModalOpen: boolean = false;
-  isImportAuthorsModalOpen: boolean = false;
+  isModalOpen = false;
+  isTimeLineModalOpen = false;
+  isDeleteModalOpen = false;
+  isUpdateTitleModalOpen = false;
+  isUpdateAbstractModalOpen = false;
+  isImportAuthorsModalOpen = false;
 
   manuscriptAuthors: any = null;
 
-  publicationAbstract: string = "";
+  publicationAbstract = '';
 
   constructor(
     private fb: FormBuilder,
@@ -73,7 +73,7 @@ export class PublicationComponent implements OnInit {
       this.validations = value;
     });
     this.readonly.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.isReadOnly = value;
       }
     });
@@ -94,7 +94,7 @@ export class PublicationComponent implements OnInit {
 
   saveAuthors() {
     if (!this.isReadOnly) {
-      let authorsA = [];
+      const authorsA = [];
       this.manuscriptAuthors.forEach((author) => {
         if (author.checked) {
           authorsA.push(this.compileAuthor(author));
@@ -103,9 +103,9 @@ export class PublicationComponent implements OnInit {
 
       this.editorService.savePerson({ contacts: authorsA }).subscribe(
         (res) => {
-          toastr.success("Authors imported.", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
+          toastr.success('Authors imported.', 'Success', {
+            timeOut: '2500',
+            positionClass: 'toast-top-center',
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
@@ -115,9 +115,9 @@ export class PublicationComponent implements OnInit {
           });
         },
         (err) => {
-          toastr.error("Failed to import authors.", "Error", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
+          toastr.error('Failed to import authors.', 'Error', {
+            timeOut: '2500',
+            positionClass: 'toast-top-center',
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
@@ -128,19 +128,23 @@ export class PublicationComponent implements OnInit {
   }
 
   compileAuthor(author) {
-    let jsonConvert: JsonConvert = new JsonConvert();
-    let mtblPerson = new MTBLSPerson();
+    const jsonConvert: JsonConvert = new JsonConvert();
+    const mtblPerson = new MTBLSPerson();
     mtblPerson.lastName = author.lastName;
     mtblPerson.firstName = author.firstName;
-    mtblPerson.midInitials = "";
-    mtblPerson.email = "";
-    mtblPerson.phone = "";
-    mtblPerson.fax = "";
-    mtblPerson.address = "";
-    mtblPerson.affiliation = author.affiliation ? author.affiliation : "";
-    let role = jsonConvert.deserializeObject(
+    mtblPerson.midInitials = '';
+    mtblPerson.email = '';
+    mtblPerson.phone = '';
+    mtblPerson.fax = '';
+    mtblPerson.address = '';
+    mtblPerson.affiliation = author.affiliation ? author.affiliation : '';
+    const role = jsonConvert.deserializeObject(
       JSON.parse(
-        '{"annotationValue":"Author","comments":[],"termAccession":"http://purl.obolibrary.org/obo/NCIT_C42781","termSource":{"comments":[],"description":"NCI Thesaurus OBO Edition","file":"http://purl.obolibrary.org/obo/ncit.owl","ontology_name":"NCIT","provenance_name":"NCIT","version":"18.10e"}}'
+        '{"annotationValue":"Author","comments":[],"termAccession":' +
+        '"http://purl.obolibrary.org/obo/NCIT_C42781","termSource":{' +
+        '"comments":[],"description":"NCI Thesaurus OBO Edition","file":' +
+        '"http://purl.obolibrary.org/obo/ncit.owl","ontology_name":"NCIT",' +
+        '"provenance_name":"NCIT","version":"18.10e"}}'
       ),
       Ontology
     );
@@ -149,21 +153,21 @@ export class PublicationComponent implements OnInit {
   }
 
   getAuthorsFromDOI() {
-    this.publicationAbstract = "";
-    let doi = this.getFieldValue("doi").replace("http://dx.doi.org/", "");
-    this.setFieldValue("doi", doi);
-    let doiURL = "http://dx.doi.org/" + doi;
-    if (doi != "") {
+    this.publicationAbstract = '';
+    const doi = this.getFieldValue('doi').replace('http://dx.doi.org/', '');
+    this.setFieldValue('doi', doi);
+    const doiURL = 'http://dx.doi.org/' + doi;
+    if (doi !== '') {
       this.europePMCService
-        .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
+        .getArticleInfo('DOI:' + doi.replace('http://dx.doi.org/', ''))
         .subscribe((article) => {
-          this.manuscriptAuthors = article["authorDetails"];
+          this.manuscriptAuthors = article.authorDetails;
         });
     }
   }
 
   ngOnInit() {
-    if (this.publication == null) {
+    if (this.publication === null) {
       this.addNewPublication = true;
     }
   }
@@ -186,7 +190,7 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.initialiseForm();
       this.isModalOpen = true;
-      this.publicationAbstract = "";
+      this.publicationAbstract = '';
       this.getAbstract();
     }
   }
@@ -224,12 +228,12 @@ export class PublicationComponent implements OnInit {
   updateStudyTitle() {
     if (!this.isReadOnly) {
       this.editorService
-        .saveTitle({ title: this.getFieldValue("title") })
+        .saveTitle({ title: this.getFieldValue('title') })
         .subscribe((res) => {
-          this.ngRedux.dispatch({ type: "SET_STUDY_TITLE", body: res });
-          toastr.success("Title updated.", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
+          this.ngRedux.dispatch({ type: 'SET_STUDY_TITLE', body: res });
+          toastr.success('Title updated.', 'Success', {
+            timeOut: '2500',
+            positionClass: 'toast-top-center',
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
@@ -240,13 +244,13 @@ export class PublicationComponent implements OnInit {
   }
 
   getAbstract() {
-    let doi = this.getFieldValue("doi").replace("http://dx.doi.org/", "");
-    if (doi != "") {
+    const doi = this.getFieldValue('doi').replace('http://dx.doi.org/', '');
+    if (doi !== '') {
       this.europePMCService
-        .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
+        .getArticleInfo('DOI:' + doi.replace('http://dx.doi.org/', ''))
         .subscribe(
           (article) => {
-            if (article.doi == doi) {
+            if (article.doi === doi) {
               this.publicationAbstract = article.abstract;
             }
           },
@@ -255,10 +259,10 @@ export class PublicationComponent implements OnInit {
           }
         );
     } else {
-      let pubMedID = this.getFieldValue("pubMedID");
-      if (pubMedID != "") {
+      const pubMedID = this.getFieldValue('pubMedID');
+      if (pubMedID !== '') {
         this.europePMCService
-          .getArticleInfo("(SRC:MED AND EXT_ID:" + pubMedID + ")")
+          .getArticleInfo('(SRC:MED AND EXT_ID:' + pubMedID + ')')
           .subscribe(
             (article) => {
               this.publicationAbstract = article.abstract;
@@ -272,21 +276,21 @@ export class PublicationComponent implements OnInit {
   }
 
   getArticleFromDOI() {
-    this.publicationAbstract = "";
-    let doi = this.getFieldValue("doi").replace("http://dx.doi.org/", "");
-    this.setFieldValue("doi", doi);
-    let doiURL = "http://dx.doi.org/" + doi;
-    if (doi != "") {
+    this.publicationAbstract = '';
+    const doi = this.getFieldValue('doi').replace('http://dx.doi.org/', '');
+    this.setFieldValue('doi', doi);
+    const doiURL = 'http://dx.doi.org/' + doi;
+    if (doi !== '') {
       this.doiService.getArticleInfo(doiURL).subscribe((article) => {
-        this.setFieldValue("title", article.title.trim());
-        this.setFieldValue("authorList", article.authorList.trim());
-        this.statusComponent.setValue("Published");
+        this.setFieldValue('title', article.title.trim());
+        this.setFieldValue('authorList', article.authorList.trim());
+        this.statusComponent.setValue('Published');
       });
       this.europePMCService
-        .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
+        .getArticleInfo('DOI:' + doi.replace('http://dx.doi.org/', ''))
         .subscribe((article) => {
-          if (article.doi == doi) {
-            this.setFieldValue("pubMedID", article.pubMedID.trim());
+          if (article.doi === doi) {
+            this.setFieldValue('pubMedID', article.pubMedID.trim());
             this.publicationAbstract = article.abstract;
           }
         });
@@ -294,15 +298,15 @@ export class PublicationComponent implements OnInit {
   }
 
   getArticleFromPubMedID() {
-    this.publicationAbstract = "";
-    let pubMedID = this.getFieldValue("pubMedID");
-    if (pubMedID != "") {
+    this.publicationAbstract = '';
+    const pubMedID = this.getFieldValue('pubMedID');
+    if (pubMedID !== '') {
       this.europePMCService
-        .getArticleInfo("(SRC:MED AND EXT_ID:" + pubMedID + ")")
+        .getArticleInfo('(SRC:MED AND EXT_ID:' + pubMedID + ')')
         .subscribe((article) => {
-          this.setFieldValue("title", article.title.trim());
-          this.setFieldValue("authorList", article.authorList.trim());
-          this.setFieldValue("doi", article.doi.trim());
+          this.setFieldValue('title', article.title.trim());
+          this.setFieldValue('authorList', article.authorList.trim());
+          this.setFieldValue('doi', article.doi.trim());
           this.publicationAbstract = article.abstract;
         });
     }
@@ -312,27 +316,27 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.isFormBusy = false;
 
-      if (this.publication == null) {
-        let mtblsPublication = new MTBLSPublication();
+      if (this.publication === null) {
+        const mtblsPublication = new MTBLSPublication();
         this.publication = mtblsPublication;
       }
 
       this.form = this.fb.group({
         pubMedID: [
           this.publication.pubMedID,
-          ValidateRules("pubMedID", this.fieldValidation("pubMedID")),
+          ValidateRules('pubMedID', this.fieldValidation('pubMedID')),
         ],
         doi: [
           this.publication.doi,
-          ValidateRules("doi", this.fieldValidation("doi")),
+          ValidateRules('doi', this.fieldValidation('doi')),
         ],
         authorList: [
           this.publication.authorList,
-          ValidateRules("authorList", this.fieldValidation("authorList")),
+          ValidateRules('authorList', this.fieldValidation('authorList')),
         ],
         title: [
           this.publication.title,
-          ValidateRules("title", this.fieldValidation("title")),
+          ValidateRules('title', this.fieldValidation('title')),
         ],
       });
     }
@@ -344,10 +348,10 @@ export class PublicationComponent implements OnInit {
         .saveAbstract({ description: this.publicationAbstract })
         .subscribe(
           (res) => {
-            this.ngRedux.dispatch({ type: "SET_STUDY_ABSTRACT", body: res });
-            toastr.success("Study abstract updated.", "Success", {
-              timeOut: "2500",
-              positionClass: "toast-top-center",
+            this.ngRedux.dispatch({ type: 'SET_STUDY_ABSTRACT', body: res });
+            toastr.success('Study abstract updated.', 'Success', {
+              timeOut: '2500',
+              positionClass: 'toast-top-center',
               preventDuplicates: true,
               extendedTimeOut: 0,
               tapToDismiss: false,
@@ -363,10 +367,10 @@ export class PublicationComponent implements OnInit {
 
   save() {
     if (!this.isReadOnly) {
-      if (this.statusComponent.values[0] == undefined) {
-        toastr.warning("Publication status cannot be empty", "Warning", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
+      if (this.statusComponent.values[0] === undefined) {
+        toastr.warning('Publication status cannot be empty', 'Warning', {
+          timeOut: '2500',
+          positionClass: 'toast-top-center',
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -378,7 +382,7 @@ export class PublicationComponent implements OnInit {
             .updatePublication(this.publication.title, this.compileBody())
             .subscribe(
               (res) => {
-                this.updatePublications(res, "Publication updated.");
+                this.updatePublications(res, 'Publication updated.');
               },
               (err) => {
                 this.isFormBusy = false;
@@ -387,7 +391,7 @@ export class PublicationComponent implements OnInit {
         } else {
           this.editorService.savePublication(this.compileBody()).subscribe(
             (res) => {
-              this.updatePublications(res, "Publication saved.");
+              this.updatePublications(res, 'Publication saved.');
               this.isModalOpen = false;
             },
             (err) => {
@@ -403,7 +407,7 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.editorService.deletePublication(this.publication.title).subscribe(
         (res) => {
-          this.updatePublications(res, "Publication deleted.");
+          this.updatePublications(res, 'Publication deleted.');
           this.isDeleteModalOpen = false;
           this.isModalOpen = false;
         },
@@ -416,14 +420,14 @@ export class PublicationComponent implements OnInit {
 
   updatePublications(data, message) {
     if (!this.isReadOnly) {
-      this.editorService.getPublications().subscribe((data) => {
+      this.editorService.getPublications().subscribe((res) => {
         this.form.markAsPristine();
         this.initialiseForm();
         this.isModalOpen = false;
 
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
+        toastr.success(message, 'Success', {
+          timeOut: '2500',
+          positionClass: 'toast-top-center',
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -433,13 +437,13 @@ export class PublicationComponent implements OnInit {
   }
 
   compileBody() {
-    let mtblPublication = new MTBLSPublication();
-    mtblPublication.title = this.getFieldValue("title");
-    mtblPublication.authorList = this.getFieldValue("authorList");
-    mtblPublication.doi = this.getFieldValue("doi");
-    mtblPublication.pubMedID = this.getFieldValue("pubMedID");
+    const mtblPublication = new MTBLSPublication();
+    mtblPublication.title = this.getFieldValue('title');
+    mtblPublication.authorList = this.getFieldValue('authorList');
+    mtblPublication.doi = this.getFieldValue('doi');
+    mtblPublication.pubMedID = this.getFieldValue('pubMedID');
     mtblPublication.comments = [];
-    let jsonConvert: JsonConvert = new JsonConvert();
+    const jsonConvert: JsonConvert = new JsonConvert();
     mtblPublication.status = jsonConvert.deserializeObject(
       this.statusComponent.values[0],
       Ontology
@@ -452,10 +456,12 @@ export class PublicationComponent implements OnInit {
   }
 
   get validation() {
-    if (this.validationsId.includes(".")) {
-      var arr = this.validationsId.split(".");
+    if (this.validationsId.includes('.')) {
+      const arr = this.validationsId.split('.');
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()]));
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])){
+;
+}
       return tempValidations;
     }
     return this.validations[this.validationsId];

@@ -6,32 +6,32 @@
   "endpoint": "test",
   "loginURL": "login",
   "redirectURL": "console",
-  "MetabolightsWSURL": {
+  "metabolightWSURL": {
     "domain": "https://www.ebi.ac.uk/metabolights/",
     "baseURL": "https://www.ebi.ac.uk/metabolights/ws",
     "guides": "https://raw.githubusercontent.com/EBI-Metabolights/guides/test/",
     "ontologyDetails": "https://www.ebi.ac.uk/ols/api/ontologies/"
   },
-  "DOIWSURL": {
+  "doiWSURL": {
     "article": "https://api.crossref.org/works/"
   },
-  "EuropePMCURL": {
+  "europePMCURL": {
     "article": "https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=<term>&format=json&resultType=core"
   },
-  "AuthenticationURL": {
+  "authenticationURL": {
     "login": "/webservice/labs/authenticate",
     "token": "/webservice/labs/authenticateToken",
     "initialise": "/webservice/labs-workspace/initialise",
     "studiesList": "/webservice/study/myStudies"
   },
-  "VideoURL": {
+  "videoURL": {
     "all": "",
     "aspera": "",
-    "create_account": "",
-    "create_study": "",
+    "createAccount": "",
+    "createStudy": "",
     "maf": "",
     "factors": "",
-    "create_assay": "",
+    "createAssay": "",
     "protocols": "",
     "samples": "",
     "descriptors": "",

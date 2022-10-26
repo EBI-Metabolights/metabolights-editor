@@ -5,19 +5,19 @@ import {
   Inject,
   OnChanges,
   SimpleChanges,
-} from "@angular/core";
-import { IAppState } from "../../../store";
-import { NgRedux, select } from "@angular-redux/store";
-import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ValidateStudyTitle } from "./title.validator";
-import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
+} from '@angular/core';
+import { IAppState } from '../../../store';
+import { NgRedux, select } from '@angular-redux/store';
+import { EditorService } from '../../../services/editor.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ValidateStudyTitle } from './title.validator';
+import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-title",
-  templateUrl: "./title.component.html",
-  styleUrls: ["./title.component.css"],
+  selector: 'mtbls-title',
+  templateUrl: './title.component.html',
+  styleUrls: ['./title.component.css'],
 })
 export class TitleComponent implements OnInit {
   @select((state) => state.study.title) studyTitle;
@@ -25,16 +25,16 @@ export class TitleComponent implements OnInit {
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.readonly) readonly;
 
-  isReadOnly: boolean = false;
+  isReadOnly = false;
   requestedStudy: string = null;
-  title: string = "";
+  title = '';
   validations: any;
   form: FormGroup;
-  isFormBusy: boolean = false;
+  isFormBusy = false;
 
-  validationsId = "title";
+  validationsId = 'title';
 
-  isModalOpen: boolean = false;
+  isModalOpen = false;
 
   constructor(
     private fb: FormBuilder,
@@ -48,14 +48,14 @@ export class TitleComponent implements OnInit {
 
   setUpSubscriptions() {
     this.studyTitle.subscribe((value) => {
-      if (value == "") {
-        this.title = "Please add your study title here";
+      if (value === '') {
+        this.title = 'Please add your study title here';
       } else {
         this.title = value;
-        if (document.title.indexOf("|") > -1) {
-          document.title = document.title.split(" | ")[0] + " | " + this.title;
+        if (document.title.indexOf('|') > -1) {
+          document.title = document.title.split(' | ')[0] + ' | ' + this.title;
         } else {
-          document.title = " | " + this.title;
+          document.title = ' | ' + this.title;
         }
       }
     });
@@ -65,11 +65,11 @@ export class TitleComponent implements OnInit {
     this.studyIdentifier.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
-        if (document.title.indexOf("|") > -1) {
+        if (document.title.indexOf('|') > -1) {
           document.title =
-            this.requestedStudy + " | " + document.title.split(" | ")[1];
+            this.requestedStudy + ' | ' + document.title.split(' | ')[1];
         } else {
-          document.title = this.requestedStudy + " | ";
+          document.title = this.requestedStudy + ' | ';
         }
       }
     });
@@ -104,15 +104,15 @@ export class TitleComponent implements OnInit {
     if (!this.isReadOnly) {
       this.isFormBusy = true;
       this.editorService
-        .saveTitle(this.compileBody(this.form.get("title").value))
+        .saveTitle(this.compileBody(this.form.get('title').value))
         .subscribe(
           (res) => {
-            this.form.get("title").setValue(res.title);
+            this.form.get('title').setValue(res.title);
             this.form.markAsPristine();
             this.isFormBusy = false;
-            toastr.success("Title updated.", "Success", {
-              timeOut: "2500",
-              positionClass: "toast-top-center",
+            toastr.success('Title updated.', 'Success', {
+              timeOut: '2500',
+              positionClass: 'toast-top-center',
               preventDuplicates: true,
               extendedTimeOut: 0,
               tapToDismiss: false,
@@ -127,7 +127,7 @@ export class TitleComponent implements OnInit {
 
   compileBody(title) {
     return {
-      title: title,
+      title,
     };
   }
 

@@ -1,12 +1,12 @@
-import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { RouterTestingModule } from "@angular/router/testing";
-import { EditorService } from "src/app/services/editor.service";
-import { MockEditorService } from "src/app/services/editor.service.mock";
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { EditorService } from 'src/app/services/editor.service';
+import { MockEditorService } from 'src/app/services/editor.service.mock';
 
-import { StatusComponent } from "./status.component";
+import { StatusComponent } from './status.component';
 
-describe("StatusComponent", () => {
+describe('StatusComponent', () => {
   let component: StatusComponent;
   let fixture: ComponentFixture<StatusComponent>;
   let editorService: EditorService;
@@ -25,13 +25,13 @@ describe("StatusComponent", () => {
     fixture = TestBed.createComponent(StatusComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.status = "status";
-    component.toStatus = "Submitted";
+    component.status = 'status';
+    component.toStatus = 'Submitted';
     component.curator = true;
-    component.requestedStudy = "MTBLSTEST";
+    component.requestedStudy = 'MTBLSTEST';
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

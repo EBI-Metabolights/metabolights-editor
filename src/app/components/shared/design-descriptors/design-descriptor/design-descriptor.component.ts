@@ -5,59 +5,61 @@ import {
   Inject,
   ViewChild,
   SimpleChanges,
-} from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { EditorService } from "../../../../services/editor.service";
-import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../../store";
-import * as toastr from "toastr";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import { OntologyComponent } from "../../ontology/ontology.component";
-import { DOIService } from "../../../../services/publications/doi.service";
-import { EuropePMCService } from "../../../../services/publications/europePMC.service";
-import { FormControl } from "@angular/forms";
-import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { environment } from "src/environments/environment";
-
+} from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EditorService } from '../../../../services/editor.service';
+import { Ontology } from '../../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { NgRedux, select } from '@angular-redux/store';
+import { IAppState } from '../../../../store';
+import * as toastr from 'toastr';
+import { JsonConvert, OperationMode, ValueCheckingMode } from 'json2typescript';
+import { OntologyComponent } from '../../ontology/ontology.component';
+import { DOIService } from '../../../../services/publications/doi.service';
+import { EuropePMCService } from '../../../../services/publications/europePMC.service';
+import { FormControl } from '@angular/forms';
+import { OntologySourceReference } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology-reference';
+import { environment } from 'src/environments/environment';
 @Component({
-  selector: "mtbls-design-descriptor",
-  templateUrl: "./design-descriptor.component.html",
-  styleUrls: ["./design-descriptor.component.css"],
+  selector: 'mtbls-design-descriptor',
+  templateUrl: './design-descriptor.component.html',
+  styleUrls: ['./design-descriptor.component.css'],
 })
 export class DesignDescriptorComponent implements OnInit {
-  @Input("value") descriptor: Ontology;
-  @Input("readOnly") readOnly: boolean;
-
   @select((state) => state.study.validations) studyValidations;
   @select((state) => state.study.publications) studyPublications;
 
   @select((state) => state.study.readonly) studyReadonly;
-  isStudyReadOnly: boolean = false;
+  @select((state) => state.study.studyDesignDescriptors) studyDescriptors;
 
-  validations: any = {};
+
+  @Input('value') descriptor: Ontology;
+  @Input('readOnly') readOnly: boolean;
 
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
-  @select((state) => state.study.studyDesignDescriptors) studyDescriptors;
+  isStudyReadOnly = false;
 
-  validationsId = "studyDesignDescriptors";
-  selectedPublication = new FormControl("", [Validators.required]);
+  validations: any = {};
 
-  isModalOpen: boolean = false;
-  isImportModalOpen: boolean = false;
-  isDeleteModalOpen: boolean = false;
+
+
+  validationsId = 'studyDesignDescriptors';
+  selectedPublication = new FormControl('', [Validators.required]);
+
+  isModalOpen = false;
+  isImportModalOpen = false;
+  isDeleteModalOpen = false;
   publications: any = null;
   descriptors: any = null;
 
   form: FormGroup;
-  isFormBusy: boolean = false;
-  addNewDescriptor: boolean = false;
+  isFormBusy = false;
+  addNewDescriptor = false;
   keywords: any = [];
   selectedkeywords: any = [];
-  status: string = "";
+  status = '';
 
-  loading: boolean = false;
+  loading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -89,14 +91,14 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   getKeyWords() {
-    let doi = this.selectedPublication.value;
+    const doi = this.selectedPublication.value;
     this.europePMCService
-      .getArticleKeyWords("DOI:" + doi.replace("http://dx.doi.org/", ""))
+      .getArticleKeyWords('DOI:' + doi.replace('http://dx.doi.org/', ''))
       .subscribe(
         (keywords) => {
-          let sd = this.descriptors.map((d) => d.annotationValue);
+          const sd = this.descriptors.map((d) => d.annotationValue);
           keywords.forEach((keyword) => {
-            if (sd.indexOf(keyword) == -1) {
+            if (sd.indexOf(keyword) === -1) {
               this.keywords.push(keyword);
             }
           });
@@ -115,7 +117,7 @@ export class DesignDescriptorComponent implements OnInit {
   updateAndClose() {
     this.editorService.getDesignDescriptors().subscribe((res) => {
       this.ngRedux.dispatch({
-        type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
+        type: 'UPDATE_STUDY_DESIGN_DESCRIPTORS',
         body: {
           studyDesignDescriptors: res.studyDesignDescriptors,
         },
@@ -125,69 +127,69 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   toogleSelection(keyword) {
-    let index = this.selectedkeywords.indexOf(keyword);
+    const index = this.selectedkeywords.indexOf(keyword);
     if (index > -1) {
       this.selectedkeywords.splice(index, 1);
       this.delete(keyword);
     } else {
       this.loading = true;
-      this.status = "";
-      this.status = "Mapping keyword to an ontology term";
+      this.status = '';
+      this.status = 'Mapping keyword to an ontology term';
       this.editorService
-        .getExactMatchOntologyTerm(keyword, "design%20descriptor")
+        .getExactMatchOntologyTerm(keyword, 'design%20descriptor')
         .subscribe((terms) => {
           if (terms.OntologyTerm.length > 0) {
-            let jsonConvert: JsonConvert = new JsonConvert();
-            let descriptor = {
+            const jsonConvert: JsonConvert = new JsonConvert();
+            const descriptor = {
               studyDesignDescriptor: jsonConvert.deserialize(
                 terms.OntologyTerm[0],
                 Ontology
               ),
             };
-            this.status = "Adding keyword to the study design descriptors list";
+            this.status = 'Adding keyword to the study design descriptors list';
             this.editorService.saveDesignDescriptor(descriptor).subscribe(
               (res) => {
-                this.status = "";
+                this.status = '';
                 this.selectedkeywords.push(keyword);
                 this.loading = false;
               },
               (err) => {
                 this.loading = false;
-                this.status = "";
+                this.status = '';
                 this.isFormBusy = false;
               }
             );
           } else {
             this.status =
-              "Exact ontology match not found. Create new MetaboLights Onotology term";
-            let newOntology = new Ontology();
+              'Exact ontology match not found. Create new MetaboLights Onotology term';
+            const newOntology = new Ontology();
             newOntology.annotationValue = keyword;
             newOntology.termAccession =
-              "http://www.ebi.ac.uk/metabolights/ontology/placeholder";
+              'http://www.ebi.ac.uk/metabolights/ontology/placeholder';
             newOntology.termSource = new OntologySourceReference();
-            newOntology.termSource.description = "User defined terms";
-            newOntology.termSource.file = "https://www.ebi.ac.uk/metabolights/";
-            newOntology.termSource.name = "MTBLS";
-            newOntology.termSource.provenance_name = "metabolights";
-            newOntology.termSource.version = "1.0";
-            let jsonConvert: JsonConvert = new JsonConvert();
-            let descriptor = {
+            newOntology.termSource.description = 'User defined terms';
+            newOntology.termSource.file = 'https://www.ebi.ac.uk/metabolights/';
+            newOntology.termSource.name = 'MTBLS';
+            newOntology.termSource.provenance_name = 'metabolights';
+            newOntology.termSource.version = '1.0';
+            const jsonConvert: JsonConvert = new JsonConvert();
+            const descriptor = {
               studyDesignDescriptor: jsonConvert.deserialize(
                 newOntology,
                 Ontology
               ),
             };
-            this.status = "Adding keyword to the study design descriptors list";
+            this.status = 'Adding keyword to the study design descriptors list';
             this.editorService.saveDesignDescriptor(descriptor).subscribe(
               (res) => {
                 this.selectedkeywords.push(keyword);
                 this.loading = false;
-                this.status = "";
+                this.status = '';
               },
               (err) => {
                 this.loading = false;
                 this.isFormBusy = false;
-                this.status = "";
+                this.status = '';
               }
             );
           }
@@ -196,7 +198,7 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.descriptor == null) {
+    if (this.descriptor === null) {
       this.addNewDescriptor = true;
     }
   }
@@ -222,7 +224,7 @@ export class DesignDescriptorComponent implements OnInit {
           this.descriptorComponent.reset();
         }
       }
-      let jsonConvert: JsonConvert = new JsonConvert();
+      const jsonConvert: JsonConvert = new JsonConvert();
       if (this.descriptorComponent) {
         this.descriptorComponent.values[0] = jsonConvert.deserializeObject(
           this.descriptor,
@@ -267,7 +269,7 @@ export class DesignDescriptorComponent implements OnInit {
             )
             .subscribe(
               (res) => {
-                this.updateDesignDescriptors(res, "Design descriptor updated.");
+                this.updateDesignDescriptors(res, 'Design descriptor updated.');
               },
               (err) => {
                 this.isFormBusy = false;
@@ -276,7 +278,7 @@ export class DesignDescriptorComponent implements OnInit {
         } else {
           this.editorService.saveDesignDescriptor(this.compileBody()).subscribe(
             (res) => {
-              this.updateDesignDescriptors(res, "Design descriptor saved.");
+              this.updateDesignDescriptors(res, 'Design descriptor saved.');
               this.descriptorComponent.values = [];
               this.isModalOpen = false;
             },
@@ -292,7 +294,7 @@ export class DesignDescriptorComponent implements OnInit {
   updateDesignDescriptors(data, message) {
     this.editorService.getDesignDescriptors().subscribe((res) => {
       this.ngRedux.dispatch({
-        type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
+        type: 'UPDATE_STUDY_DESIGN_DESCRIPTORS',
         body: {
           studyDesignDescriptors: res.studyDesignDescriptors,
         },
@@ -305,9 +307,9 @@ export class DesignDescriptorComponent implements OnInit {
 
     this.descriptorComponent.reset();
 
-    toastr.success(message, "Success", {
-      timeOut: "2500",
-      positionClass: "toast-top-center",
+    toastr.success(message, 'Success', {
+      timeOut: '2500',
+      positionClass: 'toast-top-center',
       preventDuplicates: true,
       extendedTimeOut: 0,
       tapToDismiss: false,
@@ -321,7 +323,7 @@ export class DesignDescriptorComponent implements OnInit {
       }
       this.editorService.deleteDesignDescriptor(value).subscribe(
         (res) => {
-          this.updateDesignDescriptors(res, "Design descriptor deleted.");
+          this.updateDesignDescriptors(res, 'Design descriptor deleted.');
           this.isDeleteModalOpen = false;
           this.isModalOpen = false;
         },
@@ -333,7 +335,7 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   compileBody() {
-    let jsonConvert: JsonConvert = new JsonConvert();
+    const jsonConvert: JsonConvert = new JsonConvert();
     return {
       studyDesignDescriptor: jsonConvert.deserialize(
         this.descriptorComponent.values[0],
@@ -355,10 +357,12 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   get validation() {
-    if (this.validationsId.includes(".")) {
-      var arr = this.validationsId.split(".");
+    if (this.validationsId.includes('.')) {
+      const arr = this.validationsId.split('.');
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()]));
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])){
+;
+}
       return tempValidations;
     }
     return this.validations[this.validationsId];

@@ -1,15 +1,15 @@
-import { CommonModule } from "@angular/common";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
-import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { BrowserModule } from "@angular/platform-browser";
-import { RouterTestingModule } from "@angular/router/testing";
-import { EditorService } from "src/app/services/editor.service";
-import { MockEditorService } from "src/app/services/editor.service.mock";
+import { CommonModule } from '@angular/common';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterTestingModule } from '@angular/router/testing';
+import { EditorService } from 'src/app/services/editor.service';
+import { MockEditorService } from 'src/app/services/editor.service.mock';
 
-import { SamplesComponent } from "./samples.component";
+import { SamplesComponent } from './samples.component';
 
-describe("SamplesComponent", () => {
+describe('SamplesComponent', () => {
   let component: SamplesComponent;
   let fixture: ComponentFixture<SamplesComponent>;
   let editorService: EditorService;
@@ -37,7 +37,7 @@ describe("SamplesComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

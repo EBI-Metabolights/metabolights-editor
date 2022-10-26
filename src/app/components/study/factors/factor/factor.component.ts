@@ -7,26 +7,26 @@ import {
   ViewChild,
   SimpleChanges,
   EventEmitter,
-} from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { EditorService } from "../../../../services/editor.service";
-import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { IAppState } from "../../../../store";
-import * as toastr from "toastr";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import { OntologyComponent } from "../../../shared/ontology/ontology.component";
-import { MTBLSFactor } from "./../../../../models/mtbl/mtbls/mtbls-factor";
-import { environment } from "src/environments/environment";
+} from '@angular/core';
+import { NgRedux, select } from '@angular-redux/store';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EditorService } from '../../../../services/editor.service';
+import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { IAppState } from '../../../../store';
+import * as toastr from 'toastr';
+import { JsonConvert, OperationMode, ValueCheckingMode } from 'json2typescript';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
+import { MTBLSFactor } from './../../../../models/mtbl/mtbls/mtbls-factor';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-factor",
-  templateUrl: "./factor.component.html",
-  styleUrls: ["./factor.component.css"],
+  selector: 'mtbls-factor',
+  templateUrl: './factor.component.html',
+  styleUrls: ['./factor.component.css'],
 })
 export class FactorComponent implements OnInit {
-  @Input("value") factor: MTBLSFactor;
-  @Input("isDropdown") isDropdown: boolean = false;
+  @Input('value') factor: MTBLSFactor;
+  @Input('isDropdown') isDropdown = false;
   @select((state) => state.study.validations) studyValidations: any;
 
   @ViewChild(OntologyComponent) factorTypeComponent: OntologyComponent;
@@ -34,17 +34,17 @@ export class FactorComponent implements OnInit {
   @Output() addFactorToSampleSheet = new EventEmitter<any>();
 
   @select((state) => state.study.readonly) studyReadonly;
-  isStudyReadOnly: boolean = false;
+  isStudyReadOnly = false;
 
-  validationsId = "factors.factor";
+  validationsId = 'factors.factor';
 
-  isModalOpen: boolean = false;
-  isTimeLineModalOpen: boolean = false;
-  isDeleteModalOpen: boolean = false;
+  isModalOpen = false;
+  isTimeLineModalOpen = false;
+  isDeleteModalOpen = false;
 
   form: FormGroup;
-  isFormBusy: boolean = false;
-  addNewFactor: boolean = false;
+  isFormBusy = false;
+  addNewFactor = false;
 
   validations: any = null;
 
@@ -63,7 +63,7 @@ export class FactorComponent implements OnInit {
       this.validations = value;
     });
     this.studyReadonly.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.isStudyReadOnly = value;
       }
     });
@@ -128,14 +128,14 @@ export class FactorComponent implements OnInit {
 
   save() {
     if (!this.isStudyReadOnly) {
-      if (this.getFieldValue("factorName") != "") {
+      if (this.getFieldValue('factorName') !== '') {
         this.isFormBusy = true;
         if (!this.addNewFactor) {
           this.editorService
             .updateFactor(this.factor.factorName, this.compileBody())
             .subscribe(
               (res) => {
-                this.updateFactors(res, "Factor updated.");
+                this.updateFactors(res, 'Factor updated.');
                 this.addFactorToSampleSheet.next(this.factor);
               },
               (err) => {
@@ -143,10 +143,10 @@ export class FactorComponent implements OnInit {
               }
             );
         } else {
-          let tempFactor = this.compileBody();
+          const tempFactor = this.compileBody();
           this.editorService.saveFactor(tempFactor).subscribe(
             (res) => {
-              this.updateFactors(res, "Factor saved.");
+              this.updateFactors(res, 'Factor saved.');
               this.isModalOpen = false;
               this.addFactorToSampleSheet.next(tempFactor.factor);
             },
@@ -163,7 +163,7 @@ export class FactorComponent implements OnInit {
     if (!this.isStudyReadOnly) {
       this.editorService.deleteFactor(this.factor.factorName).subscribe(
         (res) => {
-          this.updateFactors(res, "Factor deleted.");
+          this.updateFactors(res, 'Factor deleted.');
           this.isDeleteModalOpen = false;
           this.isModalOpen = false;
         },
@@ -177,9 +177,9 @@ export class FactorComponent implements OnInit {
   updateFactors(data, message) {
     if (!this.isStudyReadOnly) {
       this.editorService.getFactors().subscribe((res) => {
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
+        toastr.success(message, 'Success', {
+          timeOut: '2500',
+          positionClass: 'toast-top-center',
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -192,10 +192,10 @@ export class FactorComponent implements OnInit {
   }
 
   compileBody() {
-    let mtblsFactor = new MTBLSFactor();
-    mtblsFactor.factorName = this.getFieldValue("factorName");
+    const mtblsFactor = new MTBLSFactor();
+    mtblsFactor.factorName = this.getFieldValue('factorName');
     mtblsFactor.comments = [];
-    let jsonConvert: JsonConvert = new JsonConvert();
+    const jsonConvert: JsonConvert = new JsonConvert();
     mtblsFactor.factorType = jsonConvert.deserializeObject(
       this.factorTypeComponent.values[0],
       Ontology
@@ -204,10 +204,12 @@ export class FactorComponent implements OnInit {
   }
 
   get validation() {
-    if (this.validationsId.includes(".")) {
-      var arr = this.validationsId.split(".");
+    if (this.validationsId.includes('.')) {
+      const arr = this.validationsId.split('.');
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()]));
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])){
+;
+}
       return tempValidations;
     }
     return this.validations[this.validationsId];

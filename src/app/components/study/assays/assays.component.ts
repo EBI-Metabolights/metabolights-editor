@@ -1,21 +1,21 @@
-import { Component, Output, EventEmitter } from "@angular/core";
-import { select } from "@angular-redux/store";
-import { environment } from "src/environments/environment";
+import { Component, Output, EventEmitter } from '@angular/core';
+import { select } from '@angular-redux/store';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-assays",
-  templateUrl: "./assays.component.html",
-  styleUrls: ["./assays.component.css"],
+  selector: 'mtbls-assays',
+  templateUrl: './assays.component.html',
+  styleUrls: ['./assays.component.css'],
 })
 export class AssaysComponent {
   @select((state) => state.study.assays) studyAssays;
   @select((state) => state.study.studyAssays) assayFiles;
   @select((state) => state.study.readonly) readonly;
-  isReadOnly: boolean = false;
+  isReadOnly = false;
 
   assays: any = [];
   studyAssayFiles: any = [];
-  currentSubIndex: number = 0;
+  currentSubIndex = 0;
   assaysNames: any = [];
 
   constructor() {
@@ -28,14 +28,14 @@ export class AssaysComponent {
     this.assayFiles.subscribe((assayfiles) => {
       this.studyAssayFiles = assayfiles;
       if (this.studyAssayFiles) {
-        // tslint:disable-next-line:prefer-for-of
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.studyAssayFiles.length; i++) {
           this.assays.push({});
         }
       }
     });
 
-    // tslint:disable-next-line:indent
+    // eslint-disable-next-line @typescript-eslint/indent
     this.studyAssays.subscribe((value) => {
       if (this.studyAssayFiles) {
         // @ts-ignore
@@ -49,11 +49,11 @@ export class AssaysComponent {
           i++;
         });
       }
-      // tslint:disable-next-line:indent
+      // eslint-disable-next-line @typescript-eslint/indent
     });
 
     this.readonly.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.isReadOnly = value;
       }
     });
@@ -63,7 +63,7 @@ export class AssaysComponent {
     let i = 0;
     let assayIndex = -1;
     this.assays.forEach((assay) => {
-      if (assay.name == name) {
+      if (assay.name === name) {
         assayIndex = i;
       }
       i = i + 1;

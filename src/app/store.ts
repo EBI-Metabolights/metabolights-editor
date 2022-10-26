@@ -1,12 +1,12 @@
-import { combineReducers } from "redux";
-import { routerReducer } from "@angular-redux/router";
-import { MTBLSStudy } from "./models/mtbl/mtbls/mtbls-study";
-import { STUDY_INITIAL_STATE, studyReducer } from "./components/study/store";
-import { SHARED_INITIAL_STATE, sharedReducer } from "./components/store";
+import { combineReducers } from 'redux';
+import { routerReducer } from '@angular-redux/router';
+import { MTBLSStudy } from './models/mtbl/mtbls/mtbls-study';
+import { STUDY_INITIAL_STATE, studyReducer } from './components/study/store';
+import { SHARED_INITIAL_STATE, sharedReducer } from './components/store';
 
 export interface IAppState {
   study: MTBLSStudy;
-  status: Object;
+  status: Record<string, any>;
 }
 
 export const INITIAL_STATE: IAppState = {

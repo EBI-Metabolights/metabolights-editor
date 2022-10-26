@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  context: "production",
+  context: 'production',
   isTesting: false,
-  contextPath: "/metabolights/editor",
+  contextPath: '/metabolights/editor',
 };

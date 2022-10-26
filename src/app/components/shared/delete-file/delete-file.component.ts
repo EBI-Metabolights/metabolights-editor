@@ -1,25 +1,25 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { NgRedux, select } from "@angular-redux/store";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { EditorService } from "../../../services/editor.service";
-import { environment } from "src/environments/environment";
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
+import { NgRedux, select } from '@angular-redux/store';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EditorService } from '../../../services/editor.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-file-delete",
-  templateUrl: "./delete-file.component.html",
-  styleUrls: ["./delete-file.component.css"],
+  selector: 'mtbls-file-delete',
+  templateUrl: './delete-file.component.html',
+  styleUrls: ['./delete-file.component.css'],
 })
 export class DeleteFileComponent implements OnInit {
-  @Input("value") file: string;
-  @Input("type") type: string;
+  @Input('value') file: string;
+  @Input('type') type: string;
   @select((state) => state.study.obfuscationCode) obfuscationCode;
   @Output() fileDeleted = new EventEmitter<any>();
 
-  code = "";
-  isDeleteModalOpen: boolean = false;
-  fileLocation: string = "";
-  forceMetaDataDelete: boolean = false;
+  code = '';
+  isDeleteModalOpen = false;
+  fileLocation = '';
+  forceMetaDataDelete = false;
 
   constructor(
     private fb: FormBuilder,
@@ -41,7 +41,7 @@ export class DeleteFileComponent implements OnInit {
 
   confirmDelete() {
     this.forceMetaDataDelete = false;
-    this.fileLocation = "study";
+    this.fileLocation = 'study';
     this.isDeleteModalOpen = true;
   }
 
@@ -64,10 +64,10 @@ export class DeleteFileComponent implements OnInit {
   }
 
   compileBody(filesList) {
-    let files = [];
+    const files = [];
     filesList.forEach((f) => {
       files.push({ name: f });
     });
-    return { files: files };
+    return { files };
   }
 }

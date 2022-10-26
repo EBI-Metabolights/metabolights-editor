@@ -1,20 +1,20 @@
-import { Component, ViewChild, ViewChildren, QueryList } from "@angular/core";
-import { select } from "@angular-redux/store";
-import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup } from "@angular/forms";
-import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
-import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
-import { MTBLSFactorValue } from "./../../../models/mtbl/mtbls/mtbls-factor-value";
-import { OntologyComponent } from "../../shared/ontology/ontology.component";
-import { TableComponent } from "./../../shared/table/table.component";
-import { MTBLSCharacteristic } from "./../../../models/mtbl/mtbls/mtbls-characteristic";
-import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { environment } from "src/environments/environment";
+import { Component, ViewChild, ViewChildren, QueryList } from '@angular/core';
+import { select } from '@angular-redux/store';
+import { EditorService } from '../../../services/editor.service';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MTBLSFactor } from './../../../models/mtbl/mtbls/mtbls-factor';
+import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
+import { MTBLSFactorValue } from './../../../models/mtbl/mtbls/mtbls-factor-value';
+import { OntologyComponent } from '../../shared/ontology/ontology.component';
+import { TableComponent } from './../../shared/table/table.component';
+import { MTBLSCharacteristic } from './../../../models/mtbl/mtbls/mtbls-characteristic';
+import { Ontology } from './../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-samples",
-  templateUrl: "./samples.component.html",
-  styleUrls: ["./samples.component.css"],
+  selector: 'mtbls-samples',
+  templateUrl: './samples.component.html',
+  styleUrls: ['./samples.component.css'],
 })
 export class SamplesComponent {
   @select((state) => state.study.samples) studySamples;
@@ -23,19 +23,19 @@ export class SamplesComponent {
   @select((state) => state.study.files) studyFiles: any;
 
   @select((state) => state.study.readonly) readonly;
-  isReadOnly: boolean = false;
 
   @ViewChildren(OntologyComponent)
-  private ontologyComponents: QueryList<OntologyComponent>;
   @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
 
+  isReadOnly = false;
+
   selectedFactor: MTBLSFactor = null;
-  isFactorDropdownActive: boolean = false;
+  isFactorDropdownActive = false;
 
   fileTypes: any = [
     {
-      filter_name: "MetaboLights sample sheet type",
-      extensions: ["txt"],
+      filter_name: 'MetaboLights sample sheet type', // eslint-disable-line @typescript-eslint/naming-convention
+      extensions: ['txt'],
     },
   ];
 
@@ -43,11 +43,11 @@ export class SamplesComponent {
   factors: any = null;
   validations: any = null;
 
-  addColumnModalOpen: boolean = false;
-  isAddSamplesModalOpen: boolean = false;
+  addColumnModalOpen = false;
+  isAddSamplesModalOpen = false;
   addColumnType = null;
 
-  emptySamplesExist: boolean = false;
+  emptySamplesExist = false;
   duplicateSamples: any = [];
 
   duplicateNames: any = [];
@@ -55,7 +55,9 @@ export class SamplesComponent {
 
   form: FormGroup;
 
-  validationsId = "samples";
+  validationsId = 'samples';
+
+  private ontologyComponents: QueryList<OntologyComponent>;
 
   constructor(private editorService: EditorService, private fb: FormBuilder) {
     if (!environment.isTesting) {
@@ -73,22 +75,22 @@ export class SamplesComponent {
     this.studyFiles.subscribe((f) => {
       if (f) {
         f.study.forEach((file) => {
-          if (file.type == "raw") {
-            let name = file.file.split(".")[0];
+          if (file.type === 'raw') {
+            const name = file.file.split('.')[0];
             this.rawFileNames.push(name);
           }
         });
       }
     });
     this.studySamples.subscribe((value) => {
-      if (value == null) {
+      if (value === null) {
         this.editorService.loadStudySamples();
       } else {
         this.samples = value;
       }
     });
     this.readonly.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.isReadOnly = value;
       }
     });
@@ -99,18 +101,18 @@ export class SamplesComponent {
   }
 
   parseSamples() {
-    let uniqueSamples = [];
+    const uniqueSamples = [];
     this.duplicateSamples = [];
     this.emptySamplesExist = false;
     if (this.sampleTable.data) {
       this.sampleTable.data.rows.forEach((row) => {
-        let sampleName = row["Sample Name"];
+        const sampleName = row['Sample Name'];
         if (uniqueSamples.indexOf(sampleName) > -1) {
           this.duplicateSamples.push(sampleName);
         } else {
           uniqueSamples.push(sampleName);
         }
-        if (sampleName == "") {
+        if (sampleName === '') {
           this.emptySamplesExist = true;
         }
       });
@@ -118,20 +120,20 @@ export class SamplesComponent {
   }
 
   get unSelectedFactors() {
-    let uniqueSelectedFactors = [];
+    const uniqueSelectedFactors = [];
     if (this.factors) {
-      let usf: any = [];
+      const usf: any = [];
       if (!this.sampleTable) {
         return usf;
       }
       if (this.sampleTable.data && this.sampleTable.data.header) {
         this.keys(this.sampleTable.data.header).forEach((header) => {
-          if (header.indexOf("Factor Value") > -1) {
-            let factorName = header
-              .replace("Factor Value", "")
-              .replace("[", "")
-              .replace("]", "")
-              .replace(/^[ ]+|[ ]+$/g, "");
+          if (header.indexOf('Factor Value') > -1) {
+            const factorName = header
+              .replace('Factor Value', '')
+              .replace('[', '')
+              .replace(']', '')
+              .replace(/^[ ]+|[ ]+$/g, '');
             if (uniqueSelectedFactors.indexOf(factorName) < 0) {
               uniqueSelectedFactors.push(factorName);
             }
@@ -148,20 +150,20 @@ export class SamplesComponent {
   }
 
   addSamples() {
-    let samples = this.form
-      .get("samples")
-      .value.replace(/,/g, "\n")
-      .split("\n");
-    let sRows = [];
+    const samples = this.form
+      .get('samples')
+      .value.replace(/,/g, '\n')
+      .split('\n');
+    const sRows = [];
     samples.forEach((s) => {
-      let existingSamples = this.sampleTable.data.rows.map(
-        (r) => r["Sample Name"]
+      const existingSamples = this.sampleTable.data.rows.map(
+        (r) => r['Sample Name']
       );
       if (existingSamples.indexOf(s) < 0) {
-        let emptyRow = this.sampleTable.getEmptyRow();
-        emptyRow["Source Name"] = s + "";
-        emptyRow["Sample Name"] = s;
-        emptyRow["Protocol REF"] = "Sample collection";
+        const emptyRow = this.sampleTable.getEmptyRow();
+        emptyRow['Source Name'] = s + '';
+        emptyRow['Sample Name'] = s;
+        emptyRow['Protocol REF'] = 'Sample collection';
         sRows.push(emptyRow);
       }
     });
@@ -172,28 +174,28 @@ export class SamplesComponent {
 
   importFileNamesFromRawData() {
     this.duplicateNames = [];
-    let sampleNames = this.sampleTable.data.rows.map((r) => r["Sample Name"]);
+    const sampleNames = this.sampleTable.data.rows.map((r) => r['Sample Name']);
     this.rawFileNames.forEach((rName) => {
       if (sampleNames.indexOf(rName) > -1) {
         this.duplicateNames.push(rName);
       }
     });
-    this.form.get("samples").setValue(this.rawFileNames.join("\n"));
+    this.form.get('samples').setValue(this.rawFileNames.join('\n'));
   }
 
   addColumn(type) {
-    if (type == "factor") {
-      let mtblsFactorValue = new MTBLSFactorValue();
+    if (type === 'factor') {
+      const mtblsFactorValue = new MTBLSFactorValue();
       mtblsFactorValue.category = this.selectedFactor;
-      let columns = [];
-      let newFactorIndex = this.keys(this.sampleTable.data.header).length;
-      let factorValueColumn = new MTBLSColumn(
-        "Factor Value[" + mtblsFactorValue.category.factorName + "]",
-        "",
+      const columns = [];
+      const newFactorIndex = this.keys(this.sampleTable.data.header).length;
+      const factorValueColumn = new MTBLSColumn(
+        'Factor Value[' + mtblsFactorValue.category.factorName + ']',
+        '',
         newFactorIndex
       );
-      let factorUnitValue =
-        this.getOntologyComponentValue("factorUnit").values[0];
+      const factorUnitValue =
+        this.getOntologyComponentValue('factorUnit').values[0];
 
       let factorUnitColumn;
       let factorSourceColumn;
@@ -201,35 +203,35 @@ export class SamplesComponent {
 
       if (
         factorUnitValue &&
-        factorUnitValue != null &&
-        factorUnitValue.annotationValue != ""
+        factorUnitValue !== null &&
+        factorUnitValue.annotationValue !== ''
       ) {
-        factorUnitColumn = new MTBLSColumn("Unit", "", newFactorIndex + 1);
+        factorUnitColumn = new MTBLSColumn('Unit', '', newFactorIndex + 1);
         factorUnitColumn.value = factorUnitValue.annotationValue;
         factorSourceColumn = new MTBLSColumn(
-          "Term Source REF",
-          "",
+          'Term Source REF',
+          '',
           newFactorIndex + 2
         );
         factorAccessionColumn = new MTBLSColumn(
-          "Term Accession Number",
-          "",
+          'Term Accession Number',
+          '',
           newFactorIndex + 3
         );
       } else {
         factorSourceColumn = new MTBLSColumn(
-          "Term Source REF",
-          "",
+          'Term Source REF',
+          '',
           newFactorIndex + 1
         );
         factorAccessionColumn = new MTBLSColumn(
-          "Term Accession Number",
-          "",
+          'Term Accession Number',
+          '',
           newFactorIndex + 2
         );
       }
       columns.push(factorValueColumn.toJSON());
-      if (factorUnitColumn != null) {
+      if (factorUnitColumn !== null) {
         columns.push(factorUnitColumn.toJSON());
       }
       columns.push(factorSourceColumn.toJSON());
@@ -239,35 +241,35 @@ export class SamplesComponent {
 
       this.toggleDropdown();
     } else {
-      let mtblsCharacteristic = new MTBLSCharacteristic();
+      const mtblsCharacteristic = new MTBLSCharacteristic();
       mtblsCharacteristic.category = this.getOntologyComponentValue(
-        "characteristicCategory"
+        'characteristicCategory'
       ).values[0];
       mtblsCharacteristic.value = new Ontology();
 
       let characteristicsCount = 0;
       this.keys(this.sampleTable.data.header).forEach((key) => {
-        if (key.indexOf("Characteristics") > -1) {
+        if (key.indexOf('Characteristics') > -1) {
           characteristicsCount = characteristicsCount + 1;
         }
       });
 
-      let protocolRefIndex = this.sampleTable.data.header["Protocol REF"];
+      const protocolRefIndex = this.sampleTable.data.header['Protocol REF'];
 
-      let columns = [];
-      let characteristicsColumn = new MTBLSColumn(
-        "Characteristics[" + mtblsCharacteristic.category.annotationValue + "]",
-        "",
+      const columns = [];
+      const characteristicsColumn = new MTBLSColumn(
+        'Characteristics[' + mtblsCharacteristic.category.annotationValue + ']',
+        '',
         protocolRefIndex
       );
-      let characteristicsSourceColumn = new MTBLSColumn(
-        "Term Source REF",
-        "",
+      const characteristicsSourceColumn = new MTBLSColumn(
+        'Term Source REF',
+        '',
         protocolRefIndex + 1
       );
-      let characteristicsAccessionColumn = new MTBLSColumn(
-        "Term Accession Number",
-        "",
+      const characteristicsAccessionColumn = new MTBLSColumn(
+        'Term Accession Number',
+        '',
         protocolRefIndex + 2
       );
       columns.push(characteristicsColumn.toJSON());
@@ -279,11 +281,11 @@ export class SamplesComponent {
   }
 
   openAddColumnModal(type, selection) {
-    if (type == "factor") {
+    if (type === 'factor') {
       this.selectedFactor = selection;
     }
 
-    if (type == "characteristic") {
+    if (type === 'characteristic') {
       this.selectedFactor = null;
     }
 
@@ -291,7 +293,7 @@ export class SamplesComponent {
     this.addColumnType = type;
 
     this.form = this.fb.group({
-      title: [""],
+      title: [''],
       samples: [],
     });
   }
@@ -320,16 +322,16 @@ export class SamplesComponent {
   }
 
   getOntologyComponentValue(id) {
-    return this.ontologyComponents.filter((component) => {
-      return component.id === id;
-    })[0];
+    return this.ontologyComponents.filter((component) => component.id === id)[0];
   }
 
   get validation() {
-    if (this.validationsId.includes(".")) {
-      var arr = this.validationsId.split(".");
+    if (this.validationsId.includes('.')) {
+      const arr = this.validationsId.split('.');
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()]));
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])){
+;
+}
       return tempValidations;
     }
     return this.validations[this.validationsId];

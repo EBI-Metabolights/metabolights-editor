@@ -1,57 +1,57 @@
-import { Component, OnInit, Input, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { EditorService } from "../../../../services/editor.service";
+import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { EditorService } from '../../../../services/editor.service';
 import {
   MTBLSProtocol,
   ProtocolParameter,
-} from "./../../../../models/mtbl/mtbls/mtbls-protocol";
-import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
+} from './../../../../models/mtbl/mtbls/mtbls-protocol';
+import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology';
 
-import { IAppState } from "../../../../store";
-import { NgRedux, select } from "@angular-redux/store";
-import { ValidateRules } from "./protocol.validator";
-import { OntologyComponent } from "../../../shared/ontology/ontology.component";
-import * as toastr from "toastr";
-import { JsonConvert } from "json2typescript";
-import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
-import { environment } from "src/environments/environment";
+import { IAppState } from '../../../../store';
+import { NgRedux, select } from '@angular-redux/store';
+import { ValidateRules } from './protocol.validator';
+import { OntologyComponent } from '../../../shared/ontology/ontology.component';
+import * as toastr from 'toastr';
+import { JsonConvert } from 'json2typescript';
+import { IProtocol } from 'src/app/models/mtbl/mtbls/interfaces/protocol.interface';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-protocol",
-  templateUrl: "./protocol.component.html",
-  styleUrls: ["./protocol.component.css"],
+  selector: 'mtbls-protocol',
+  templateUrl: './protocol.component.html',
+  styleUrls: ['./protocol.component.css'],
 })
 export class ProtocolComponent implements OnInit {
-  @Input("value") protocol: any;
-  @Input("required") required: boolean = false;
-  @Input("validations") validations: any;
+  @Input('value') protocol: any;
+  @Input('required') required = false;
+  @Input('validations') validations: any;
 
   @select((state) => state.study.readonly) studyReadonly;
-  isStudyReadOnly: boolean = false;
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
 
   @select((state) => state.study.isProtocolsExpanded) isProtocolsExpanded;
 
-  isModalOpen: boolean = false;
-  isBulkEditModalOpen: boolean = false;
-  isDeleteModalOpen: boolean = false;
-  isParameterModalOpen: boolean = false;
-  isFormBusy: boolean = false;
-  isSymbolDropdownActive: boolean = false;
+  isStudyReadOnly = false;
+  isModalOpen = false;
+  isBulkEditModalOpen = false;
+  isDeleteModalOpen = false;
+  isParameterModalOpen = false;
+  isFormBusy = false;
+  isSymbolDropdownActive = false;
 
   editor: any;
 
   selectedProtocol: any = null;
 
-  addNewProtocol: boolean = false;
-  caretPos: number = 0;
+  addNewProtocol = false;
+  caretPos = 0;
 
-  expand: boolean = true;
+  expand = true;
 
   form: FormGroup;
 
-  validationsId = "protocols.protocol";
+  validationsId = 'protocols.protocol';
 
   constructor(
     private fb: FormBuilder,
@@ -69,7 +69,7 @@ export class ProtocolComponent implements OnInit {
     });
 
     this.studyReadonly.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.isStudyReadOnly = value;
       }
     });
@@ -80,10 +80,10 @@ export class ProtocolComponent implements OnInit {
   }
 
   saveColumnValue(col, assay) {
-    let columns = [];
-    let column = {
-      name: "",
-      value: "",
+    const columns = [];
+    const column = {
+      name: '',
+      value: '',
       index: null,
     };
     if (col.isOntology) {
@@ -91,13 +91,13 @@ export class ProtocolComponent implements OnInit {
       column.index = col.index;
       column.name = col.name;
       columns.push(column);
-      let ontSrc = {
+      const ontSrc = {
         name: col.ontologyDetails.ref,
         value: col.values[0][0].termSource.name,
         index: col.index + 1,
       };
       columns.push(ontSrc);
-      let ontAcc = {
+      const ontAcc = {
         name: col.ontologyDetails.accession,
         value: col.values[0][0].termAccession,
         index: col.index + 2,
@@ -110,12 +110,12 @@ export class ProtocolComponent implements OnInit {
       columns.push(column);
     }
     this.editorService
-      .addColumns(assay, { data: columns }, "assays", null)
+      .addColumns(assay, { data: columns }, 'assays', null)
       .subscribe(
         (res) => {
-          toastr.success("Assay specifications updated.", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
+          toastr.success('Assay specifications updated.', 'Success', {
+            timeOut: '2500',
+            positionClass: 'toast-top-center',
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
@@ -128,11 +128,11 @@ export class ProtocolComponent implements OnInit {
   }
 
   formatTitle(term) {
-    let s = term
-      .replace(/_/g, " ")
-      .replace(/\.[^/.]+$/, "")
-      .replace(/\[/g, " - ")
-      .replace(/\]/g, "");
+    const s = term
+      .replace(/_/g, ' ')
+      .replace(/\.[^/.]+$/, '')
+      .replace(/\[/g, ' - ')
+      .replace(/\]/g, '');
     return s[0].toUpperCase() + s.slice(1);
   }
 
@@ -140,7 +140,7 @@ export class ProtocolComponent implements OnInit {
     let isEmpty = true;
     this.getAssaysWithProtocol().forEach((assay) => {
       this.protocol.meta[assay].forEach((col) => {
-        if (!col["is-hidden"]) {
+        if (!col['is-hidden']) {
           isEmpty = false;
         }
       });
@@ -151,7 +151,7 @@ export class ProtocolComponent implements OnInit {
   hasAssaySectionsEmpty(assay) {
     let isEmpty = true;
     this.protocol.meta[assay].forEach((col) => {
-      if (!col["is-hidden"]) {
+      if (!col['is-hidden']) {
         isEmpty = false;
       }
     });
@@ -161,9 +161,9 @@ export class ProtocolComponent implements OnInit {
   setEditor(editor: any) {
     this.editor = editor;
     this.editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-      let ops = [];
+      const ops = [];
       delta.ops.forEach((op) => {
-        if (op.insert && typeof op.insert === "string") {
+        if (op.insert && typeof op.insert === 'string') {
           ops.push({
             insert: op.insert,
           });
@@ -184,8 +184,8 @@ export class ProtocolComponent implements OnInit {
 
   addSymbol(content) {
     this.editor.focus();
-    var caretPosition = this.editor.getSelection(true);
-    this.editor.insertText(caretPosition, content, "user");
+    const caretPosition = this.editor.getSelection(true);
+    this.editor.insertText(caretPosition, content, 'user');
     this.toggleSymbolDropdown();
   }
 
@@ -194,15 +194,15 @@ export class ProtocolComponent implements OnInit {
   }
 
   copyToClipboard(item) {
-    document.addEventListener("copy", (e: ClipboardEvent) => {
-      e.clipboardData.setData("text/plain", item);
+    document.addEventListener('copy', (e: ClipboardEvent) => {
+      e.clipboardData.setData('text/plain', item);
       e.preventDefault();
-      document.removeEventListener("copy", null);
+      document.removeEventListener('copy', null);
     });
-    document.execCommand("copy");
-    toastr.success("", "Copied symbol " + item + " to clipboard", {
-      timeOut: "0",
-      positionClass: "toast-top-center",
+    document.execCommand('copy');
+    toastr.success('', 'Copied symbol ' + item + ' to clipboard', {
+      timeOut: '0',
+      positionClass: 'toast-top-center',
       preventDuplicates: true,
       extendedTimeOut: 0,
     });
@@ -219,9 +219,9 @@ export class ProtocolComponent implements OnInit {
   }
 
   strip(html) {
-    var tmp = document.createElement("DIV");
+    const tmp = document.createElement('DIV');
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
+    return tmp.textContent || tmp.innerText || '';
   }
 
   confirmDelete() {
@@ -236,7 +236,7 @@ export class ProtocolComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
-    this.form.removeControl("description");
+    this.form.removeControl('description');
   }
 
   openParameterModal() {
@@ -249,41 +249,40 @@ export class ProtocolComponent implements OnInit {
   }
 
   deleteParameter(parameter) {
-    let filteredParameters = this.form
-      .get("parameters")
-      .value.filter(function (obj) {
-        return (
+    const filteredParameters = this.form
+      .get('parameters')
+      .value.filter((obj) =>
+        (
           obj.parameterName.annotationValue !==
           parameter.parameterName.annotationValue
-        );
-      });
+        ));
     if (filteredParameters) {
-      this.form.get("parameters").setValue(filteredParameters);
+      this.form.get('parameters').setValue(filteredParameters);
       this.form.markAsDirty();
     }
   }
 
   addParameter() {
-    let parameter = new ProtocolParameter();
+    const parameter = new ProtocolParameter();
     parameter.parameterName = this.parameterName.values[0];
     if (
-      this.form.get("parameters").value.length == 1 &&
-      this.form.get("parameters").value[0].parameterName.annotationValue == ""
+      this.form.get('parameters').value.length === 1 &&
+      this.form.get('parameters').value[0].parameterName.annotationValue === ''
     ) {
-      this.form.get("parameters").setValue([parameter]);
+      this.form.get('parameters').setValue([parameter]);
     } else if (
-      this.form.get("parameters").value.length == 1 &&
-      this.form.get("parameters").value[0].parameterName.annotationValue != ""
+      this.form.get('parameters').value.length === 1 &&
+      this.form.get('parameters').value[0].parameterName.annotationValue !== ''
     ) {
       this.form
-        .get("parameters")
-        .setValue(this.form.get("parameters").value.concat(parameter));
-    } else if (this.form.get("parameters").value.length > 1) {
+        .get('parameters')
+        .setValue(this.form.get('parameters').value.concat(parameter));
+    } else if (this.form.get('parameters').value.length > 1) {
       this.form
-        .get("parameters")
-        .setValue(this.form.get("parameters").value.concat(parameter));
+        .get('parameters')
+        .setValue(this.form.get('parameters').value.concat(parameter));
     } else {
-      this.form.get("parameters").setValue([parameter]);
+      this.form.get('parameters').setValue([parameter]);
     }
     this.isParameterModalOpen = false;
     this.form.markAsDirty();
@@ -291,15 +290,15 @@ export class ProtocolComponent implements OnInit {
 
   save() {
     if (!this.isStudyReadOnly) {
-      if (this.getFieldValue("description")) {
+      if (this.getFieldValue('description')) {
         this.isFormBusy = true;
         if (!this.addNewProtocol) {
           this.editorService
             .updateProtocol(this.protocol.name, this.compileBody())
             .subscribe(
               (res) => {
-                this.updateProtocols(res, "Protocol updated.");
-                this.form.removeControl("description");
+                this.updateProtocols(res, 'Protocol updated.');
+                this.form.removeControl('description');
                 // this.isModalOpen = false;
               },
               (err) => {
@@ -309,8 +308,8 @@ export class ProtocolComponent implements OnInit {
         } else {
           this.editorService.saveProtocol(this.compileBody()).subscribe(
             (res) => {
-              this.updateProtocols(res, "Protocol saved.");
-              this.form.removeControl("description");
+              this.updateProtocols(res, 'Protocol saved.');
+              this.form.removeControl('description');
               this.isModalOpen = false;
             },
             (err) => {
@@ -319,7 +318,7 @@ export class ProtocolComponent implements OnInit {
           );
         }
       } else {
-        alert("Protocol description cannot be empty");
+        alert('Protocol description cannot be empty');
       }
     }
   }
@@ -330,8 +329,8 @@ export class ProtocolComponent implements OnInit {
         this.editorService.deleteProtocol(this.protocol.name).subscribe(
           (res) => {
             this.addNewProtocol = true;
-            this.updateProtocols(res, "Protocol deleted.");
-            this.form.removeControl("description");
+            this.updateProtocols(res, 'Protocol deleted.');
+            this.form.removeControl('description');
             this.isDeleteModalOpen = false;
             this.isModalOpen = false;
           },
@@ -340,9 +339,9 @@ export class ProtocolComponent implements OnInit {
           }
         );
       } else {
-        toastr.error("Cannot delete a default protocol", "Error", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
+        toastr.error('Cannot delete a default protocol', 'Error', {
+          timeOut: '2500',
+          positionClass: 'toast-top-center',
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -355,19 +354,19 @@ export class ProtocolComponent implements OnInit {
     this.isFormBusy = false;
     this.form = null;
     if (this.protocol == null) {
-      let mtblsProtocol = new MTBLSProtocol();
+      const mtblsProtocol = new MTBLSProtocol();
       mtblsProtocol.parameters = [];
       this.protocol = mtblsProtocol;
     }
     this.form = this.fb.group({
       name: [
         { value: this.protocol.name, disabled: this.required },
-        ValidateRules("name", this.fieldValidation("name")),
+        ValidateRules('name', this.fieldValidation('name')),
       ],
       parameters: [this.protocol.parameters],
       description: [
         this.protocol.description,
-        ValidateRules("description", this.fieldValidation("description")),
+        ValidateRules('description', this.fieldValidation('description')),
       ],
     });
   }
@@ -376,9 +375,9 @@ export class ProtocolComponent implements OnInit {
     if (!this.isStudyReadOnly) {
       this.initialiseForm();
       if (this.protocol.parameters.length > 0) {
-        this.form.get("parameters").setValue(this.protocol.parameters);
+        this.form.get('parameters').setValue(this.protocol.parameters);
       } else {
-        this.form.get("parameters").setValue([]);
+        this.form.get('parameters').setValue([]);
       }
       this.selectedProtocol = protocol;
       this.isModalOpen = true;
@@ -392,21 +391,19 @@ export class ProtocolComponent implements OnInit {
         this.form.markAsPristine();
         this.initialiseForm();
         if (!this.addNewProtocol) {
-          let jsonConvert: JsonConvert = new JsonConvert();
+          const jsonConvert: JsonConvert = new JsonConvert();
           // assert that the protocols is a list
-          let assertedProtocols = res.protocols as IProtocol[];
+          const assertedProtocols = res.protocols as IProtocol[];
           this.protocol = jsonConvert.deserialize(
-            assertedProtocols.filter((p) => {
-              return p.name == this.protocol.name;
-            })[0],
+            assertedProtocols.filter((p) => p.name === this.protocol.name)[0],
             MTBLSProtocol
           );
           this.openModal(this.protocol);
         }
 
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
+        toastr.success(message, 'Success', {
+          timeOut: '2500',
+          positionClass: 'toast-top-center',
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -416,23 +413,25 @@ export class ProtocolComponent implements OnInit {
   }
 
   compileBody() {
-    let mtblProtocol = new MTBLSProtocol();
-    mtblProtocol.name = this.getFieldValue("name");
-    mtblProtocol.description = this.getFieldValue("description")
-      .replace(/#/g, " ")
-      .replace(/"/g, "'");
+    const mtblProtocol = new MTBLSProtocol();
+    mtblProtocol.name = this.getFieldValue('name');
+    mtblProtocol.description = this.getFieldValue('description')
+      .replace(/#/g, ' ')
+      .replace(/"/g, '\'');
     mtblProtocol.protocolType = new Ontology();
-    mtblProtocol.protocolType.annotationValue = this.getFieldValue("name");
-    mtblProtocol.parameters = this.getFieldValue("parameters");
+    mtblProtocol.protocolType.annotationValue = this.getFieldValue('name');
+    mtblProtocol.parameters = this.getFieldValue('parameters');
     return { protocol: mtblProtocol.toJSON() };
   }
 
   get validation() {
     if (this.validations) {
-      if (this.validationsId.includes(".")) {
-        var arr = this.validationsId.split(".");
+      if (this.validationsId.includes('.')) {
+        const arr = this.validationsId.split('.');
         let tempValidations = JSON.parse(JSON.stringify(this.validations));
-        while (arr.length && (tempValidations = tempValidations[arr.shift()]));
+        while (arr.length && (tempValidations = tempValidations[arr.shift()])){
+;
+}
         return tempValidations;
       }
       return this.validations[this.validationsId];

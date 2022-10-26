@@ -1,37 +1,37 @@
-import { MTBLSComment } from "./common/mtbls-comment";
-import { Ontology } from "./common/mtbls-ontology";
-import { MTBLSProtocol } from "./mtbls-protocol";
-import { MTBLSSource } from "./mtbls-source";
-import { MTBLSSample } from "./mtbls-sample";
-import { JsonObject, JsonProperty } from "json2typescript";
+import { MTBLSComment } from './common/mtbls-comment';
+import { Ontology } from './common/mtbls-ontology';
+import { MTBLSProtocol } from './mtbls-protocol';
+import { MTBLSSource } from './mtbls-source';
+import { MTBLSSample } from './mtbls-sample';
+import { JsonObject, JsonProperty } from 'json2typescript';
 
 @JsonObject
 export class MTBLSAssayProcessSequence {
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[] = [];
 
-  @JsonProperty("executesProtocol", MTBLSProtocol)
+  @JsonProperty('executesProtocol', MTBLSProtocol)
   executesProtocol: MTBLSProtocol = null;
 
-  @JsonProperty("name", String)
-  name: string = "";
+  @JsonProperty('name', String)
+  name = '';
 
-  @JsonProperty("inputs", [MTBLSSource])
+  @JsonProperty('inputs', [MTBLSSource])
   inputs: MTBLSSource[] = [];
 
-  @JsonProperty("outputs", [MTBLSSample])
+  @JsonProperty('outputs', [MTBLSSample])
   outputs: MTBLSSample[] = [];
 
-  @JsonProperty("parameterValues")
+  @JsonProperty('parameterValues')
   parameterValues: any[] = [];
 
-  @JsonProperty("performer")
+  @JsonProperty('performer')
   performer: any = null;
 
-  @JsonProperty("previousProcess", MTBLSAssayProcessSequence)
+  @JsonProperty('previousProcess', MTBLSAssayProcessSequence)
   previousProcess: MTBLSAssayProcessSequence = null;
 
-  @JsonProperty("nextProcess", MTBLSAssayProcessSequence)
+  @JsonProperty('nextProcess', MTBLSAssayProcessSequence)
   nextProcess: MTBLSAssayProcessSequence = null;
 
   toJSON() {

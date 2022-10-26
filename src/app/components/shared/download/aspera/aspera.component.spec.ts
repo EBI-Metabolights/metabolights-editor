@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AsperaDownloadComponent } from "./aspera.component";
+import { AsperaDownloadComponent } from './aspera.component';
 
-describe("AsperaComponent", () => {
+describe('AsperaComponent', () => {
   let component: AsperaDownloadComponent;
   let fixture: ComponentFixture<AsperaDownloadComponent>;
 
@@ -18,7 +18,7 @@ describe("AsperaComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

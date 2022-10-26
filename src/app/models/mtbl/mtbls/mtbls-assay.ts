@@ -1,29 +1,29 @@
-import { MTBLSComment } from "./common/mtbls-comment";
-import { Ontology } from "./common/mtbls-ontology";
-import { JsonObject, JsonProperty } from "json2typescript";
-import { MTBLSSource } from "./mtbls-source";
-import { MTBLSFactorValue } from "./mtbls-factor-value";
-import { MTBLSCharacteristic } from "./mtbls-characteristic";
-import { MTBLSProcessSequence } from "./mtbls-process-sequence";
+import { MTBLSComment } from './common/mtbls-comment';
+import { Ontology } from './common/mtbls-ontology';
+import { JsonObject, JsonProperty } from 'json2typescript';
+import { MTBLSSource } from './mtbls-source';
+import { MTBLSFactorValue } from './mtbls-factor-value';
+import { MTBLSCharacteristic } from './mtbls-characteristic';
+import { MTBLSProcessSequence } from './mtbls-process-sequence';
 
 @JsonObject
 export class MTBLSAssay {
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[] = [];
 
-  @JsonProperty("filename", String)
-  filename: string = "";
+  @JsonProperty('filename', String)
+  filename = '';
 
-  @JsonProperty("measurementType", Ontology)
+  @JsonProperty('measurementType', Ontology)
   measurementType: Ontology = null;
 
-  @JsonProperty("technologyPlatform", String)
-  technologyPlatform: string = "";
+  @JsonProperty('technologyPlatform', String)
+  technologyPlatform = '';
 
-  @JsonProperty("technologyType", Ontology)
+  @JsonProperty('technologyType', Ontology)
   technologyType: Ontology = null;
 
-  @JsonProperty("processSequence")
+  @JsonProperty('processSequence')
   processSequence: any[];
 
   toJSON() {

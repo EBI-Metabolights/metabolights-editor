@@ -2,7 +2,7 @@
 // environment.ts
 export const environment = {
   production: true,
-  context: "development",
+  context: 'development',
   isTesting: false,
-  contextPath: "/metabolights/editor",
+  contextPath: '/metabolights/editor',
 };

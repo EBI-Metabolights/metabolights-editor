@@ -4,23 +4,23 @@ import {
   ElementRef,
   HostBinding,
   Input,
-} from "@angular/core";
+} from '@angular/core';
 
 @Directive({
-  selector: "img[appLazyLoad]",
+  selector: 'img[appLazyLoad]',
 })
 export class LazyLoadImagesDirective implements AfterViewInit {
-  @HostBinding("attr.src") srcAttr = null;
+  @HostBinding('attr.src') srcAttr = null;
   @Input() src: string;
 
   constructor(private el: ElementRef) {}
 
   ngAfterViewInit() {
-    this.canLazyLoad() ? this.lazyLoadImage() : this.loadImage();
+    this.canLazyLoad() ? this.lazyLoadImage() : this.loadImage(); // eslint-disable-line @typescript-eslint/no-unused-expressions
   }
 
   private canLazyLoad() {
-    return window && "IntersectionObserver" in window;
+    return window && 'IntersectionObserver' in window;
   }
 
   private lazyLoadImage() {

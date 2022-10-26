@@ -9,17 +9,17 @@ import {
   ElementRef,
   EventEmitter,
   ViewChild,
-} from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ValidateRules } from "./ontology.validator";
-import { COMMA, ENTER } from "@angular/cdk/keycodes";
-import { FormControl } from "@angular/forms";
+} from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ValidateRules } from './ontology.validator';
+import { COMMA, ENTER } from '@angular/cdk/keycodes';
+import { FormControl } from '@angular/forms';
 import {
   MatAutocompleteSelectedEvent,
   MatAutocompleteTrigger,
-} from "@angular/material/autocomplete";
-import { MatChipInputEvent } from "@angular/material/chips";
-import { Observable, fromEvent } from "rxjs";
+} from '@angular/material/autocomplete';
+import { MatChipInputEvent } from '@angular/material/chips';
+import { Observable, fromEvent } from 'rxjs';
 import {
   map,
   filter,
@@ -28,38 +28,42 @@ import {
   startWith,
   switchAll,
   tap,
-} from "rxjs/operators";
-import { EditorService } from "../../../services/editor.service";
-import { MetaboLightsWSURL } from "../../../services/globals";
+} from 'rxjs/operators';
+import { EditorService } from '../../../services/editor.service';
+import { MetaboLightsWSURL } from '../../../services/globals';
 
-import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-
+import { Ontology } from '../../../models/mtbl/mtbls/common/mtbls-ontology';
+import { OntologySourceReference } from '../../../models/mtbl/mtbls/common/mtbls-ontology-reference';
+import { JsonConvert, OperationMode, ValueCheckingMode } from 'json2typescript';
+import { ConfigurationService } from 'src/app/configuration.service';
+/* eslint-disable no-underscore-dangle */
 @Component({
-  selector: "mtbls-ontology",
-  templateUrl: "./ontology.component.html",
-  styleUrls: ["./ontology.component.css"],
+  selector: 'mtbls-ontology',
+  templateUrl: './ontology.component.html',
+  styleUrls: ['./ontology.component.css'],
 })
-export class OntologyComponent implements OnInit {
-  @Input("validations") validations: any;
-  @Input("values") values: Ontology[] = [];
-  @Input("inline") isInline: boolean;
-  @Input("id") id: string;
+export class OntologyComponent implements OnInit, OnChanges {
+  @Input('validations') validations: any;
+  @Input('values') values: Ontology[] = [];
+  @Input('inline') isInline: boolean;
+  @Input('id') id: string;
 
   @Output() changed = new EventEmitter<any>();
 
-  domain: string = "";
-  loading: boolean = false;
-  termsLoading: boolean = false;
-  isforcedOntology: boolean = false;
-  searchedMore: boolean = false;
-  url: string = "";
+  @ViewChild('input', { read: MatAutocompleteTrigger })
+  valueInput: MatAutocompleteTrigger;
+
+  domain = '';
+  loading = false;
+  termsLoading = false;
+  isforcedOntology = false;
+  searchedMore = false;
+  url = '';
   endPoints: any[] = [];
   addOnBlur = false;
-  inputValue: string = "";
+  inputValue = '';
   form: FormGroup;
-  isFormBusy: boolean = false;
+  isFormBusy = false;
   visible = true;
   selectable = true;
   removable = true;
@@ -69,100 +73,30 @@ export class OntologyComponent implements OnInit {
   allvalues: Array<Ontology> = [];
   ontologyDetails: any = {};
 
-  @ViewChild("input", { read: MatAutocompleteTrigger })
-  valueInput: MatAutocompleteTrigger;
 
-  constructor(private editorService: EditorService) {}
-
-  setValues(values) {
-    this.values = values;
-  }
-
-  optionSelected(selected: MatAutocompleteSelectedEvent) {
-    if (selected.option.value != null || selected.option.value != undefined) {
-      this.setValue(selected.option.value);
-      var inputElement = <HTMLInputElement>document.getElementById("test");
-      inputElement.value = "";
-      this.triggerChanges();
-    } else {
-      this.retrieveMore();
-      setTimeout(() => {
-        this.valueInput.openPanel();
-      });
-    }
-  }
-
-  showMore(e, accession) {
-    this.editorService
-      .getOntologyTermDescription(
-        "https://www.ebi.ac.uk/ols/api/ontologies/" +
-          accession.termSource.name +
-          "/terms/" +
-          encodeURI(encodeURIComponent(accession.termAccession))
-      )
-      .subscribe(
-        (response) => {
-          accession.info = response;
-        },
-        (error) => {
-          accession.info = "-";
-        }
-      );
-  }
-
-  getObjectKeys(ann) {
-    return Object.keys(ann);
-  }
-
-  fetchOntologyDetails() {
-    this.allvalues.forEach((value) => {
-      if (value.termSource.name != "MTBLS") {
-        if (!this.ontologyDetails[value.termSource.name]) {
-          this.editorService.getOntologyDetails(value).subscribe((details) => {
-            this.ontologyDetails[value.termSource.name] = details;
-            if (details.config) {
-              value.termSource.version = details.config.version;
-              value.termSource.description = details.config.title;
-              value.termSource.file = details.config.id;
-            }
-          });
-        } else {
-          if (this.ontologyDetails[value.termSource.name].config) {
-            value.termSource.version =
-              this.ontologyDetails[value.termSource.name].config.version;
-            value.termSource.description =
-              this.ontologyDetails[value.termSource.name].config.title;
-            value.termSource.file =
-              this.ontologyDetails[value.termSource.name].config.id;
-          }
-        }
-      }
-    });
-  }
+  constructor(private editorService: EditorService, private configService: ConfigurationService) {}
 
   ngOnInit() {
-    this.domain = MetaboLightsWSURL["domain"];
-    if (this.values == null || this.values[0] == null) {
+    this.domain = this.configService.config.metabolightWSURL.domain;
+    if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
 
-    if (this.validations["data-type"] == "ontology") {
-      if (this.validations["recommended-ontologies"]) {
+    if (this.validations['data-type'] === 'ontology') {
+      if (this.validations['recommended-ontologies']) {
         this.isforcedOntology =
-          this.validations["recommended-ontologies"]["is-forced-ontology"];
+          this.validations['recommended-ontologies']['is-forced-ontology'];
         this.url =
-          this.validations["recommended-ontologies"]["ontology"]["url"];
+          this.validations['recommended-ontologies'].ontology.url;
         this.addOnBlur =
-          this.validations["recommended-ontologies"]["ontology"][
-            "allowFreeText"
-          ];
-        this.endPoints = this.validations["recommended-ontologies"]["ontology"];
-        if (this.url != "") {
+          this.validations['recommended-ontologies'].ontology.allowFreeText;
+        this.endPoints = this.validations['recommended-ontologies'].ontology;
+        if (this.url !== '') {
           this.editorService
             .getOntologyTerms(this.domain + this.url)
             .subscribe((terms) => {
               this.allvalues = [];
-              let jsonConvert: JsonConvert = new JsonConvert();
+              const jsonConvert: JsonConvert = new JsonConvert();
               if (terms.OntologyTerm) {
                 terms.OntologyTerm.forEach((term) => {
                   this.allvalues.push(
@@ -186,19 +120,17 @@ export class OntologyComponent implements OnInit {
       .pipe(distinctUntilChanged(), debounceTime(300))
       .subscribe(
         (value) => {
-          if (value && value != "") {
+          if (value && value !== '') {
             this.inputValue = value;
             this.allvalues = [];
-            this.values = this.values.filter(function (el) {
-              return el != null;
-            });
+            this.values = this.values.filter((el) => el !== null);
 
             if (this.values.length < 1) {
-              let term = "";
+              let term = '';
               let ontologyFilter = null;
-              if (value.indexOf(":") > -1) {
-                term = value.split(":")[1];
-                ontologyFilter = value.split(":")[0];
+              if (value.indexOf(':') > -1) {
+                term = value.split(':')[1];
+                ontologyFilter = value.split(':')[0];
               } else {
                 term = value;
               }
@@ -210,15 +142,15 @@ export class OntologyComponent implements OnInit {
                 .subscribe((terms) => {
                   this.allvalues = [];
                   this.loading = false;
-                  let jsonConvert: JsonConvert = new JsonConvert();
+                  const jsonConvert: JsonConvert = new JsonConvert();
                   if (terms.OntologyTerm) {
-                    terms.OntologyTerm.forEach((term) => {
-                      let tempOntTerm = jsonConvert.deserializeObject(
-                        term,
+                    terms.OntologyTerm.forEach((t) => {
+                      const tempOntTerm = jsonConvert.deserializeObject(
+                        t,
                         Ontology
                       );
                       if (ontologyFilter) {
-                        if (tempOntTerm.termSource.name == ontologyFilter) {
+                        if (tempOntTerm.termSource.name === ontologyFilter) {
                           this.allvalues.push(tempOntTerm);
                         }
                       } else {
@@ -229,8 +161,8 @@ export class OntologyComponent implements OnInit {
                   this.fetchOntologyDetails();
                   this.filteredvalues = this.valueCtrl.valueChanges.pipe(
                     startWith(null),
-                    map((value: Ontology | null) =>
-                      value ? this._filter(value) : this.allvalues.slice()
+                    map((val: Ontology | null) =>
+                      val ? this._filter(val) : this.allvalues.slice()
                     )
                   );
                 });
@@ -241,24 +173,96 @@ export class OntologyComponent implements OnInit {
       );
   }
 
+
+  ngOnChanges(changes: SimpleChanges) {
+    this.values = this.values.filter((val) => val !== null);
+  }
+
+  setValues(values) {
+    this.values = values;
+  }
+
+  optionSelected(selected: MatAutocompleteSelectedEvent) {
+    if (selected.option.value !== null || selected.option.value !== undefined) {
+      this.setValue(selected.option.value);
+      const inputElement = document.getElementById('test') as HTMLInputElement;
+      inputElement.value = '';
+      this.triggerChanges();
+    } else {
+      this.retrieveMore();
+      setTimeout(() => {
+        this.valueInput.openPanel();
+      });
+    }
+  }
+
+  showMore(e, accession) {
+    this.editorService
+      .getOntologyTermDescription(
+        'https://www.ebi.ac.uk/ols/api/ontologies/' +
+          accession.termSource.name +
+          '/terms/' +
+          encodeURI(encodeURIComponent(accession.termAccession))
+      )
+      .subscribe(
+        (response) => {
+          accession.info = response;
+        },
+        (error) => {
+          accession.info = '-';
+        }
+      );
+  }
+
+  getObjectKeys(ann) {
+    return Object.keys(ann);
+  }
+
+  fetchOntologyDetails() {
+    this.allvalues.forEach((value) => {
+      if (value.termSource.name !== 'MTBLS') {
+        if (!this.ontologyDetails[value.termSource.name]) {
+          this.editorService.getOntologyDetails(value).subscribe((details) => {
+            this.ontologyDetails[value.termSource.name] = details;
+            if (details.config) {
+              value.termSource.version = details.config.version;
+              value.termSource.description = details.config.title;
+              value.termSource.file = details.config.id;
+            }
+          });
+        } else {
+          if (this.ontologyDetails[value.termSource.name].config) {
+            value.termSource.version =
+              this.ontologyDetails[value.termSource.name].config.version;
+            value.termSource.description =
+              this.ontologyDetails[value.termSource.name].config.title;
+            value.termSource.file =
+              this.ontologyDetails[value.termSource.name].config.id;
+          }
+        }
+      }
+    });
+  }
+
+
   retrieveMore() {
     this.termsLoading = true;
     this.allvalues = [];
-    let term = this.inputValue;
+    const term = this.inputValue;
     this.loading = true;
     this.editorService
       .getOntologyTerms(
         this.domain +
           this.url +
           term +
-          "&queryFields=MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
+          '&queryFields=MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}'
       )
       .subscribe((terms) => {
         this.allvalues = [];
         this.loading = false;
-        let jsonConvert: JsonConvert = new JsonConvert();
-        terms.OntologyTerm.forEach((term) => {
-          this.allvalues.push(jsonConvert.deserializeObject(term, Ontology));
+        const jsonConvert: JsonConvert = new JsonConvert();
+        terms.OntologyTerm.forEach((ontTerm) => {
+          this.allvalues.push(jsonConvert.deserializeObject(ontTerm, Ontology));
         });
         this.fetchOntologyDetails();
         this.termsLoading = false;
@@ -275,7 +279,7 @@ export class OntologyComponent implements OnInit {
   indexOfObject(array, key, value): any {
     if (this.values && this.values.length > 0) {
       return array
-        .filter((el) => el != null)
+        .filter((el) => el !== null)
         .map((e) => e[key])
         .indexOf(value);
     }
@@ -285,7 +289,7 @@ export class OntologyComponent implements OnInit {
   remove(value: Ontology): void {
     const index = this.indexOfObject(
       this.values,
-      "annotationValue",
+      'annotationValue',
       value.annotationValue
     );
     if (index >= 0) {
@@ -298,22 +302,22 @@ export class OntologyComponent implements OnInit {
     if (this.addOnBlur) {
       const input = event.input;
       const value = event.value;
-      if (event.value.replace(" ", "") != "") {
-        if (this.indexOfObject(this.values, "annotationValue", value) == -1) {
-          let newOntology = new Ontology();
+      if (event.value.replace(' ', '') !== '') {
+        if (this.indexOfObject(this.values, 'annotationValue', value) === -1) {
+          const newOntology = new Ontology();
           newOntology.annotationValue = value.trim();
           newOntology.termAccession =
-            "http://www.ebi.ac.uk/metabolights/ontology/placeholder";
+            'http://www.ebi.ac.uk/metabolights/ontology/placeholder';
           newOntology.termSource = new OntologySourceReference();
-          newOntology.termSource.description = "User defined terms";
-          newOntology.termSource.file = "https://www.ebi.ac.uk/metabolights/";
-          newOntology.termSource.name = "MTBLS";
-          newOntology.termSource.provenance_name = "metabolights";
-          newOntology.termSource.version = "1.0";
+          newOntology.termSource.description = 'User defined terms';
+          newOntology.termSource.file = 'https://www.ebi.ac.uk/metabolights/';
+          newOntology.termSource.name = 'MTBLS';
+          newOntology.termSource.provenance_name = 'metabolights';
+          newOntology.termSource.version = '1.0';
           this.setValue(newOntology);
         }
-        var inputElement = <HTMLInputElement>document.getElementById("test");
-        inputElement.value = "";
+        const inputElement = document.getElementById('test') as HTMLInputElement;
+        inputElement.value = '';
         this.valueCtrl.setValue(null);
         this.triggerChanges();
       }
@@ -324,9 +328,9 @@ export class OntologyComponent implements OnInit {
     if (
       this.indexOfObject(
         this.values,
-        "annotationValue",
+        'annotationValue',
         event.option.value.annotationValue
-      ) == -1
+      ) === -1
     ) {
       this.setValue(event.option.value);
     }
@@ -337,8 +341,8 @@ export class OntologyComponent implements OnInit {
   setValue(value) {
     let termExists = false;
     this.allvalues.forEach((val) => {
-      if (typeof value == "string" || value instanceof String) {
-        if (value && val.annotationValue.toLowerCase() == value.toLowerCase()) {
+      if (typeof value === 'string' || value instanceof String) {
+        if (value && val.annotationValue.toLowerCase() === value.toLowerCase()) {
           termExists = true;
           this.values = [val];
         }
@@ -346,7 +350,7 @@ export class OntologyComponent implements OnInit {
         if (
           val.annotationValue &&
           value.annotationValue &&
-          val.annotationValue.toLowerCase() ==
+          val.annotationValue.toLowerCase() ===
             value.annotationValue.toLowerCase()
         ) {
           termExists = true;
@@ -360,7 +364,7 @@ export class OntologyComponent implements OnInit {
   }
 
   reset() {
-    this.inputValue = "";
+    this.inputValue = '';
     this.allvalues = [];
     this.valueCtrl.setValue(null);
     this.values = [];
@@ -375,13 +379,11 @@ export class OntologyComponent implements OnInit {
     if (value.annotationValue) {
       const filterValue = value.annotationValue.toLowerCase();
       return this.allvalues.filter(
-        (value) =>
-          value.annotationValue.toLowerCase().indexOf(filterValue) === 0
+        (val) =>
+          val.annotationValue.toLowerCase().indexOf(filterValue) === 0
       );
     }
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    this.values = this.values.filter((val) => val != null);
-  }
+
 }

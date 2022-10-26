@@ -1,5 +1,5 @@
-import { IsaInvestigation } from "./isa-investigation.interface";
-
+import { IsaInvestigation } from './isa-investigation.interface';
+/* eslint-disable @typescript-eslint/naming-convention */
 /*Interface to represent a study summary*/
 export interface IStudySummary {
   isaInvestigation: IsaInvestigation;

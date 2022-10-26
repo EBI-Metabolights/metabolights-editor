@@ -136,53 +136,53 @@
                 <li
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(0, 'descriptors')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 0 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 0 }"
                 >
                   <a>Descriptors</a>
                 </li>
                 <li
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(1, 'protocols')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 1 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 1 }"
                 >
                   <a>Protocols</a>
                 </li>
                 <li
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(2, 'samples')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 2 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 2 }"
                 >
                   <a>Samples</a>
                 </li>
                 <li
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(3, 'assays')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 3 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 3 }"
                 >
                   <a>Assays</a>
                 </li>
                 <li
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(4, 'metabolites')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 4 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 4 }"
                 >
                   <a>Metabolites</a>
                 </li>
                 <li
                   (click)="selectCurrentTab(5, 'files')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 5 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 5 }"
                 >
                   <a>Files</a>
                 </li>
                 <li
                   *ngIf="!studyError && (isOwner || isCurator)"
                   (click)="selectCurrentTab(6, 'metabolites')"
-                  [ngClass]="{ 'is-active': (currentIndex | async) == 6 }"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 6 }"
                 >
                   <a>Validations</a>
                 </li>
 
-                <!-- <li *ngIf="!studyError" (click)="selectCurrentTab(6, 'pathways')" [ngClass]="{'is-active': (currentIndex | async) == 6 }"><a>Pathways</a></li> -->
+                <!-- <li *ngIf="!studyError" (click)="selectCurrentTab(6, 'pathways')" [ngClass]="{'is-active': (currentIndex | async) === 6 }"><a>Pathways</a></li> -->
               </ul>
             </div>
           </div>
@@ -192,7 +192,7 @@
                 <span *ngIf="!studyError">
                   <div
                     class="tab-content fadeIn animated"
-                    *ngIf="(currentIndex | async) == 0"
+                    *ngIf="(currentIndex | async) === 0"
                   >
                     <mtbls-design-descriptors></mtbls-design-descriptors>
                     <br />
@@ -200,46 +200,46 @@
                   </div>
                   <div
                     class="tab-content fadeIn animated"
-                    *ngIf="(currentIndex | async) == 1"
+                    *ngIf="(currentIndex | async) === 1"
                   >
                     <mtbls-protocols></mtbls-protocols>
                   </div>
                 </span>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentIndex | async) == 2"
+                  *ngIf="(currentIndex | async) === 2"
                 >
                   <mtbls-samples></mtbls-samples>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentIndex | async) == 3"
+                  *ngIf="(currentIndex | async) === 3"
                 >
                   <mtbls-assays></mtbls-assays>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentIndex | async) == 4"
+                  *ngIf="(currentIndex | async) === 4"
                 >
                   <mtbls-mafs></mtbls-mafs>
                 </div>
                 <span *ngIf="files != null">
                   <div
                     class="tab-content fadeIn animated"
-                    *ngIf="(currentIndex | async) == 5"
+                    *ngIf="(currentIndex | async) === 5"
                   >
                     <mtbls-files></mtbls-files>
                   </div>
                 </span>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentIndex | async) == 6 && (isOwner || isCurator)"
+                  *ngIf="(currentIndex | async) === 6 && (isOwner || isCurator)"
                 >
                   <study-validations></study-validations>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentIndex | async) == 7"
+                  *ngIf="(currentIndex | async) === 7"
                 >
                   <mtbls-pathways></mtbls-pathways>
                 </div>

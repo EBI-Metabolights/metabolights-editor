@@ -1,19 +1,19 @@
-import { MTBLSComment } from "./common/mtbls-comment";
-import { Ontology } from "./common/mtbls-ontology";
-import { JsonObject, JsonProperty } from "json2typescript";
+import { MTBLSComment } from './common/mtbls-comment';
+import { Ontology } from './common/mtbls-ontology';
+import { JsonObject, JsonProperty } from 'json2typescript';
 
 @JsonObject
 export class MTBLSCharacteristic {
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[] = [];
 
-  @JsonProperty("unit")
+  @JsonProperty('unit')
   unit: any = null;
 
-  @JsonProperty("category", Ontology)
+  @JsonProperty('category', Ontology)
   category: Ontology = null;
 
-  @JsonProperty("value")
+  @JsonProperty('value')
   value: any = null;
 
   toJSON() {
@@ -21,7 +21,7 @@ export class MTBLSCharacteristic {
       comments: this.comments.map((a) => a.toJSON()),
       unit: this.unit,
       category: this.category ? this.category.toJSON() : null,
-      value: this.value ? this.value : "",
+      value: this.value ? this.value : '',
     };
   }
 }

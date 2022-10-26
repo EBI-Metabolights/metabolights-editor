@@ -1,15 +1,15 @@
-import { JsonObject, JsonProperty } from "json2typescript";
+import { JsonObject, JsonProperty } from 'json2typescript';
 
 @JsonObject
 export class MTBLSComment {
-  @JsonProperty("name", String)
-  name: string = "";
+  @JsonProperty('name', String)
+  name = '';
 
-  @JsonProperty("value")
-  value: any = "";
+  @JsonProperty('value')
+  value: any = '';
 
   toJSON() {
-    if (this.name != "" || this.name != null) {
+    if (this.name !== '' || this.name !== null) {
       return {
         name: this.name,
         value: JSON.stringify(this.value),

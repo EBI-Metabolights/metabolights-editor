@@ -1,5 +1,5 @@
-import { IComment } from "./comment.interface";
-import { IOntologySourceReference } from "./ontology-source-reference.interface";
+import { IComment } from './comment.interface';
+import { IOntologySourceReference } from './ontology-source-reference.interface';
 
 export interface IOntology {
   comments: IComment[];

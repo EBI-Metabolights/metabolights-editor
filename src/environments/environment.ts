@@ -4,9 +4,9 @@
 
 export const environment = {
   production: false,
-  context: "development",
+  context: 'development',
   isTesting: false,
-  contextPath: "/metabolights/editor",
+  contextPath: '/metabolights/editor',
 };
 
 /*

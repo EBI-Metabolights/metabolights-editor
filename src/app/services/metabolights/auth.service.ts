@@ -1,13 +1,13 @@
-import { Injectable } from "@angular/core";
-import { httpOptions } from "./../headers";
-import { Router } from "@angular/router";
-import { catchError, map } from "rxjs/operators";
-import { throwError } from "rxjs";
-import { HttpClient } from "@angular/common/http";
-import { ConfigurationService } from "src/app/configuration.service";
+import { Injectable } from '@angular/core';
+import { httpOptions } from './../headers';
+import { Router } from '@angular/router';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthService {
   constructor(
@@ -20,11 +20,11 @@ export class AuthService {
     return this.http
       .post(
         this.configService.config.endpoint +
-          this.configService.config.AuthenticationURL.login,
+          this.configService.config.authenticationURL.login,
         body,
         {
           headers: httpOptions.headers,
-          observe: "response",
+          observe: 'response',
         }
       )
       .pipe(
@@ -40,9 +40,9 @@ export class AuthService {
     return this.http
       .post(
         this.configService.config.endpoint +
-          this.configService.config.AuthenticationURL.token,
+          this.configService.config.authenticationURL.token,
         body,
-        { observe: "response" as "body" }
+        { observe: 'response' as 'body' }
       )
       .pipe(
         map((res) => res),
@@ -54,8 +54,8 @@ export class AuthService {
   getValidatedJWTUser(response): any {
     return this.http.post(
       this.configService.config.endpoint +
-        this.configService.config.AuthenticationURL.initialise,
-      { jwt: response.headers.get("jwt"), user: response.headers.get("user") },
+        this.configService.config.authenticationURL.initialise,
+      { jwt: response.headers.get('jwt'), user: response.headers.get('user') },
       httpOptions
     );
   }

@@ -1,12 +1,12 @@
-import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { SpyLocation } from "@angular/common/testing";
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { SpyLocation } from '@angular/common/testing';
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
-} from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+} from '@angular/core';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import {
   Router,
   UrlSerializer,
@@ -15,15 +15,15 @@ import {
   ROUTER_CONFIGURATION,
   UrlHandlingStrategy,
   RouteReuseStrategy,
-} from "@angular/router";
+} from '@angular/router';
 import {
   RouterTestingModule,
   setupTestingRouter,
-} from "@angular/router/testing";
+} from '@angular/router/testing';
 
-import { ProgressComponent } from "./progress.component";
+import { ProgressComponent } from './progress.component';
 
-describe("ProgressComponent", () => {
+describe('ProgressComponent', () => {
   let component: ProgressComponent;
   let fixture: ComponentFixture<ProgressComponent>;
 
@@ -59,7 +59,7 @@ describe("ProgressComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

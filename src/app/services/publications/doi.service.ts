@@ -1,20 +1,20 @@
-import { catchError, map, tap } from "rxjs/operators";
-import { DOIWSURL } from "./../globals";
-import { DataService } from "./../data.service";
-import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
-import { ICrossRefDOI } from "src/app/models/mtbl/mtbls/interfaces/crossref-doi.interface";
-import { environment } from "src/environments/environment";
-import { ConfigurationService } from "src/app/configuration.service";
+import { catchError, map, tap } from 'rxjs/operators';
+import { doiWSURL } from './../globals';
+import { DataService } from './../data.service';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { ICrossRefDOI } from 'src/app/models/mtbl/mtbls/interfaces/crossref-doi.interface';
+import { environment } from 'src/environments/environment';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class DOIService extends DataService {
   constructor(http: HttpClient, private configService: ConfigurationService) {
-    super("", http);
-    this.url = this.configService.config.DOIWSURL;
+    super('', http);
+    this.url = this.configService.config.doiWSURL;
   }
 
   getArticleInfo(doi): Observable<ICrossRefDOI> {
@@ -34,8 +34,8 @@ export class DOIService extends DataService {
     return {
       title: data.message.title[0],
       authorList: data.message.author
-        .map((author) => author.family + " " + author.given)
-        .join(", "),
+        .map((author) => author.family + ' ' + author.given)
+        .join(', '),
     };
   }
 }

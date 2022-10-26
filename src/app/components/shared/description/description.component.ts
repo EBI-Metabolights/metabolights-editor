@@ -5,19 +5,19 @@ import {
   Inject,
   OnChanges,
   SimpleChanges,
-} from "@angular/core";
-import { IAppState } from "../../../store";
-import { NgRedux, select } from "@angular-redux/store";
-import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ValidateStudyDescription } from "./description.validator";
-import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
+} from '@angular/core';
+import { IAppState } from '../../../store';
+import { NgRedux, select } from '@angular-redux/store';
+import { EditorService } from '../../../services/editor.service';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { validateStudyDescription } from './description.validator';
+import * as toastr from 'toastr';
+import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: "mtbls-description",
-  templateUrl: "./description.component.html",
-  styleUrls: ["./description.component.css"],
+  selector: 'mtbls-description',
+  templateUrl: './description.component.html',
+  styleUrls: ['./description.component.css'],
 })
 export class DescriptionComponent implements OnChanges, OnInit {
   @select((state) => state.study.abstract) studyDescription;
@@ -27,19 +27,19 @@ export class DescriptionComponent implements OnChanges, OnInit {
   studyDesignDescriptors: any[];
   @select((state) => state.study.readonly) readonly;
 
-  isReadOnly: boolean = false;
+  isReadOnly = false;
 
   form: FormGroup;
-  isFormBusy: boolean = false;
-  description: string = "";
+  isFormBusy = false;
+  description = '';
   validations: any;
-  isSymbolDropdownActive: boolean = false;
+  isSymbolDropdownActive = false;
   editor: any;
 
-  validationsId = "description";
+  validationsId = 'description';
 
-  isModalOpen: boolean = false;
-  hasChanges: boolean = false;
+  isModalOpen = false;
+  hasChanges = false;
 
   constructor(
     private fb: FormBuilder,
@@ -56,8 +56,8 @@ export class DescriptionComponent implements OnChanges, OnInit {
       this.validations = value;
     });
     this.studyDescription.subscribe((value) => {
-      if (value == "") {
-        this.description = "Please add your study title here";
+      if (value === '') {
+        this.description = 'Please add your study title here';
       } else {
         this.description = value;
       }
@@ -75,17 +75,17 @@ export class DescriptionComponent implements OnChanges, OnInit {
 
   addSymbol(content) {
     this.editor.focus();
-    var caretPosition = this.editor.getSelection(true);
-    this.editor.insertText(caretPosition, content, "user");
+    const caretPosition = this.editor.getSelection(true);
+    this.editor.insertText(caretPosition, content, 'user');
     this.toggleSymbolDropdown();
   }
 
   setEditor(editor: any) {
     this.editor = editor;
     this.editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-      let ops = [];
+      const ops = [];
       delta.ops.forEach((op) => {
-        if (op.insert && typeof op.insert === "string") {
+        if (op.insert && typeof op.insert === 'string') {
           ops.push({
             insert: op.insert,
           });
@@ -112,7 +112,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
       this.form = this.fb.group({
         description: [
           this.description,
-          ValidateStudyDescription(this.validation),
+          validateStudyDescription(this.validation),
         ],
       });
     }
@@ -136,9 +136,9 @@ export class DescriptionComponent implements OnChanges, OnInit {
   }
 
   strip(html) {
-    var tmp = document.createElement("DIV");
+    const tmp = document.createElement('DIV');
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || "";
+    return tmp.textContent || tmp.innerText || '';
   }
 
   save() {
@@ -148,19 +148,19 @@ export class DescriptionComponent implements OnChanges, OnInit {
         .saveAbstract(
           this.compileBody(
             this.form
-              .get("description")
-              .value.replace(new RegExp("\n", "g"), "<br />")
+              .get('description')
+              .value.replace(new RegExp('\n', 'g'), '<br />')
           )
         )
         .subscribe(
           (res) => {
-            this.form.get("description").setValue(res.description);
+            this.form.get('description').setValue(res.description);
             this.form.markAsPristine();
             this.isFormBusy = false;
 
-            toastr.success("Abstract updated.", "Success", {
-              timeOut: "2500",
-              positionClass: "toast-top-center",
+            toastr.success('Abstract updated.', 'Success', {
+              timeOut: '2500',
+              positionClass: 'toast-top-center',
               preventDuplicates: true,
               extendedTimeOut: 0,
               tapToDismiss: false,
@@ -175,7 +175,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
 
   compileBody(description) {
     return {
-      description: description,
+      description,
     };
   }
 
@@ -184,7 +184,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.value != undefined) {
+    if (changes.value !== undefined) {
       this.description = changes.value.currentValue;
     }
   }

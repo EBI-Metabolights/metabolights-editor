@@ -1,8 +1,8 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MafsComponent } from "./mafs.component";
+import { MafsComponent } from './mafs.component';
 
-describe("MafsComponent", () => {
+describe('MafsComponent', () => {
   let component: MafsComponent;
   let fixture: ComponentFixture<MafsComponent>;
 
@@ -18,7 +18,7 @@ describe("MafsComponent", () => {
     fixture.detectChanges();
   });
 
-  it("should create", () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });

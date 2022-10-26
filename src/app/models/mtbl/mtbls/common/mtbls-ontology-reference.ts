@@ -1,24 +1,24 @@
-import { MTBLSComment } from "./mtbls-comment";
-import { JsonObject, JsonProperty } from "json2typescript";
+import { MTBLSComment } from './mtbls-comment';
+import { JsonObject, JsonProperty } from 'json2typescript';
 
 @JsonObject
 export class OntologySourceReference {
-  @JsonProperty("description", String, true)
-  description: string = "";
+  @JsonProperty('description', String, true)
+  description = '';
 
-  @JsonProperty("file", String)
-  file: string = "";
+  @JsonProperty('file', String)
+  file = '';
 
-  @JsonProperty("name", String, true)
-  name: string = "";
+  @JsonProperty('name', String, true)
+  name = '';
 
-  @JsonProperty("provenanceName", String, true)
-  provenance_name: string = "";
+  @JsonProperty('provenanceName', String, true)
+  provenance_name = ''; // eslint-disable-line @typescript-eslint/naming-convention
 
-  @JsonProperty("version", String)
-  version: string = "";
+  @JsonProperty('version', String)
+  version = '';
 
-  @JsonProperty("comments", [MTBLSComment])
+  @JsonProperty('comments', [MTBLSComment])
   comments: MTBLSComment[] = [];
 
   toJSON() {

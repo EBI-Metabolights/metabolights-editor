@@ -1,30 +1,30 @@
-import { isDevMode } from "@angular/core";
+import { isDevMode } from '@angular/core';
+/* eslint-disable */
+let origin = window.location.origin;
+let branch = 'development';
 
-var origin = window.location.origin;
-var branch = "development";
-
-if (origin.indexOf("localhost") > -1) {
-  origin = "https://wwwdev.ebi.ac.uk";
+if (origin.indexOf('localhost') > -1) {
+  origin = 'https://wwwdev.ebi.ac.uk';
 }
 
-var host = window.location.host;
-var subdomain = host.split(".")[0];
+const host = window.location.host;
+const subdomain = host.split('.')[0];
 
-if (subdomain == "www") {
-  branch = "master";
+if (subdomain == 'www') {
+  branch = 'master';
 }
 
-if (origin.indexOf("8080") > -1) {
-  origin = origin.replace("8080", "5000");
+if (origin.indexOf('8080') > -1) {
+  origin = origin.replace('8080', '5000');
 }
 
-var endpoint = origin + "/metabolights";
+const endpoint = origin + '/metabolights';
 
-var metaboLightsWSDomain = endpoint;
-var metaboLightsDomain = endpoint;
+const metaboLightsWSDomain = endpoint;
+const metaboLightsDomain = endpoint;
 
-export const LoginURL = "login";
-export const RedirectURL = "console";
+export const LoginURL = 'login';
+export const RedirectURL = 'console';
 
 export const MetaboLightsWSURL = {};
 MetaboLightsWSURL["domain"] = metaboLightsDomain + "/";

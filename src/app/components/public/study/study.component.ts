@@ -1,18 +1,19 @@
-import { Component, OnInit } from "@angular/core";
-import { EditorService } from "../../../services/editor.service";
-import { Router } from "@angular/router";
-import { IAppState } from "../../../store";
-import { NgRedux, select } from "@angular-redux/store";
-import { ActivatedRoute } from "@angular/router";
-import { MetaboLightsWSURL } from "./../../../services/globals";
-import { HttpClient } from "@angular/common/http";
-import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
-import { environment } from "src/environments/environment";
+import { Component, OnInit } from '@angular/core';
+import { EditorService } from '../../../services/editor.service';
+import { Router } from '@angular/router';
+import { IAppState } from '../../../store';
+import { NgRedux, select } from '@angular-redux/store';
+import { ActivatedRoute } from '@angular/router';
+import { MetaboLightsWSURL } from './../../../services/globals';
+import { HttpClient } from '@angular/common/http';
+import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
+import { environment } from 'src/environments/environment';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 @Component({
-  selector: "study",
-  templateUrl: "./study.component.html",
-  styleUrls: ["./study.component.css"],
+  selector: 'study',
+  templateUrl: './study.component.html',
+  styleUrls: ['./study.component.css'],
 })
 export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -26,17 +27,17 @@ export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.reviewerLink) studyReviewerLink;
 
   loading: any = true;
-  requestedTab: number = 0;
-  status: string = "submitted";
-  tab: string = "descriptors";
+  requestedTab = 0;
+  status = 'submitted';
+  tab = 'descriptors';
   requestedStudy: string = null;
-  studyError: boolean = false;
+  studyError = false;
   validation: any = {};
   files: any = null;
   currentUser: any = null;
   isOwner: any = false;
   isCurator: any = false;
-  domain: string = "";
+  domain = '';
   reviewerLink: string = null;
 
   constructor(
@@ -44,29 +45,31 @@ export class PublicStudyComponent implements OnInit {
     private editorService: EditorService,
     private router: Router,
     private route: ActivatedRoute,
-    private labsWorkspaceService: LabsWorkspaceService
+    private labsWorkspaceService: LabsWorkspaceService,
+    private configService: ConfigurationService
   ) {
     let isInitialised;
     if (!environment.isTesting) {
-      isInitialised = this.ngRedux.getState().status["isInitialised"];
+      isInitialised = this.ngRedux.getState().status['isInitialised']; // eslint-disable-line @typescript-eslint/dot-notation
+
     }
-    let ObfuscationCode = localStorage.getItem("obfuscationcode");
-    let owner = localStorage.getItem("isOwner");
-    if (owner && owner != null && owner != "") {
+    let obfuscationCode = localStorage.getItem('obfuscationCode');
+    const owner = localStorage.getItem('isOwner');
+    if (owner && owner !== null && owner !== '') {
       this.isOwner = JSON.parse(owner.toLowerCase());
     }
 
-    let curator = localStorage.getItem("isCurator");
-    if (curator && curator != null && curator != "") {
+    const curator = localStorage.getItem('isCurator');
+    if (curator && curator !== null && curator !== '') {
       this.isCurator = JSON.parse(curator.toLowerCase());
     }
 
-    if (ObfuscationCode) {
-      ObfuscationCode = ObfuscationCode.replace("reviewer", "");
-      let studyID = localStorage.getItem("mtblsid");
+    if (obfuscationCode) {
+      obfuscationCode = obfuscationCode.replace('reviewer', '');
+      const studyID = localStorage.getItem('mtblsid');
       if (!isInitialised) {
         this.editorService.initialise(
-          '{"apiToken":"ocode:' + ObfuscationCode + '"}',
+          '{"apiToken":"ocode:' + obfuscationCode + '"}',
           false
         );
         if (!environment.isTesting) {
@@ -75,24 +78,24 @@ export class PublicStudyComponent implements OnInit {
       }
     } else {
       if (!isInitialised) {
-        let mtblsUser = localStorage.getItem("mtblsuser");
-        let mtblsJWT = localStorage.getItem("mtblsjwt");
-        if (mtblsJWT && mtblsJWT != "" && mtblsUser && mtblsUser != "") {
+        const mtblsUser = localStorage.getItem('mtblsuser');
+        const mtblsJWT = localStorage.getItem('mtblsjwt');
+        if (mtblsJWT && mtblsJWT !== '' && mtblsUser && mtblsUser !== '') {
           this.labsWorkspaceService
             .initialise({ jwt: mtblsJWT, user: mtblsUser })
             .subscribe((res) => {
               localStorage.setItem(
-                "user",
+                'user',
                 JSON.stringify(JSON.parse(res.content).owner)
               );
-              let localUser = localStorage.getItem("user");
+              const localUser = localStorage.getItem('user');
               this.editorService.initialise(localUser, false);
               if (!environment.isTesting) {
                 this.loadStudy(null);
               }
             });
         } else {
-          localStorage.removeItem("user");
+          localStorage.removeItem('user');
           if (!environment.isTesting) {
             this.loadStudy(null);
           }
@@ -102,7 +105,7 @@ export class PublicStudyComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.domain = MetaboLightsWSURL["domain"];
+    this.domain = this.configService.config.metabolightWSURL.domain;
   }
 
   loadStudy(studyId) {
@@ -111,11 +114,11 @@ export class PublicStudyComponent implements OnInit {
       this.editorService.loadStudyInReview(studyId);
     } else {
       this.editorService.loadPublicStudy({
-        id: this.route.snapshot.paramMap.get("study"),
+        id: this.route.snapshot.paramMap.get('study'),
       });
     }
     this.studyIdentifier.subscribe((value) => {
-      if (value != null) {
+      if (value !== null) {
         this.requestedStudy = value;
       }
     });
@@ -145,27 +148,27 @@ export class PublicStudyComponent implements OnInit {
     });
 
     this.route.params.subscribe((params) => {
-      if (params["tab"] == "files") {
+      if (params.tab === 'files') {
         this.requestedTab = 5;
-        this.tab = "files";
-      } else if (params["tab"] == "metabolites") {
+        this.tab = 'files';
+      } else if (params.tab === 'metabolites') {
         this.requestedTab = 4;
-        this.tab = "metabolites";
-      } else if (params["tab"] == "assays") {
+        this.tab = 'metabolites';
+      } else if (params.tab === 'assays') {
         this.requestedTab = 3;
-        this.tab = "assays";
-      } else if (params["tab"] == "samples") {
+        this.tab = 'assays';
+      } else if (params.tab === 'samples') {
         this.requestedTab = 2;
-        this.tab = "samples";
-      } else if (params["tab"] == "protocols") {
+        this.tab = 'samples';
+      } else if (params.tab === 'protocols') {
         this.requestedTab = 1;
-        this.tab = "protocols";
-      } else if (params["tab"] == "validations") {
+        this.tab = 'protocols';
+      } else if (params.tab === 'validations') {
         this.requestedTab = 6;
-        this.tab = "validations";
+        this.tab = 'validations';
       } else {
         this.requestedTab = 0;
-        this.tab = "descriptors";
+        this.tab = 'descriptors';
       }
     });
     this.selectCurrentTab(this.requestedTab, this.tab);
@@ -173,33 +176,33 @@ export class PublicStudyComponent implements OnInit {
 
   selectCurrentTab(index, tab) {
     this.ngRedux.dispatch({
-      type: "SET_TAB_INDEX",
+      type: 'SET_TAB_INDEX',
       body: {
         currentTabIndex: index,
       },
     });
-    let urlSplit = window.location.pathname
-      .replace(/\/$/, "")
-      .split("/")
+    const urlSplit = window.location.pathname
+      .replace(/\/$/, '')
+      .split('/')
       .filter((n) => n);
     if (urlSplit.length >= 2) {
-      if (urlSplit[urlSplit.length - 1].indexOf("MTBLS") < 0) {
+      if (urlSplit[urlSplit.length - 1].indexOf('MTBLS') < 0) {
         urlSplit.pop();
       }
     }
     window.history.pushState(
-      "",
-      "",
-      window.location.origin + "/" + urlSplit.join("/") + "/" + tab
+      '',
+      '',
+      window.location.origin + '/' + urlSplit.join('/') + '/' + tab
     );
-    if (index == 6) {
+    if (index === 6) {
       this.editorService.validateStudy();
-      document.getElementById("tab-content-wrapper").scrollIntoView();
+      document.getElementById('tab-content-wrapper').scrollIntoView();
     }
   }
 
   isJSON(data) {
-    var ret = true;
+    let ret = true;
     try {
       JSON.parse(data);
     } catch (e) {
