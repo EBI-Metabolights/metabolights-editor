@@ -1,5 +1,4 @@
 import { catchError, map } from 'rxjs/operators';
-import { europePMCURL } from './../globals';
 import { DataService } from './../data.service';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';

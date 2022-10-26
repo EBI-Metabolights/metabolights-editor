@@ -1,5 +1,4 @@
 import { catchError, map, tap } from 'rxjs/operators';
-import { doiWSURL } from './../globals';
 import { DataService } from './../data.service';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';

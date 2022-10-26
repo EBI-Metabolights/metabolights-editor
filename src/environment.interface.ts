@@ -8,7 +8,7 @@ export interface Environment {
   clearJavaSession: boolean; // Flag to decid whether to clear Java Spring session
   javaLogoutURL: string; // Url to route browser to logout from Java spring session
   redirectURL: string; // Holds the url of the page that the user tried to access, in the event of successful authentication.
-  metabolightWSURL: MWSURL; // Object containing urls for guides, ontologies and etc. This object is passed to the metabolights.service
+  metabolightsWSURL: MWSURL; // Object containing urls for guides, ontologies and etc. This object is passed to the metabolights.service
   doiWSURL: DoiWSURL; // Object containing url for DOI service.
   europePMCURL: EuropePMCURL; // Object containing url for europePMC service.
   authenticationURL: AuthenticationURL; // Object containing the different authentication and authorization endpoints.

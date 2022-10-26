@@ -49,8 +49,8 @@ export class GuidesComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-    this.domain = this.configService.config.metabolightWSURL.domain;
-    this.repo = this.configService.config.metabolightWSURL.guides;
+    this.domain = this.configService.config.metabolightsWSURL.domain;
+    this.repo = this.configService.config.metabolightsWSURL.guides;
   }
 
   setUpSubscriptions() {

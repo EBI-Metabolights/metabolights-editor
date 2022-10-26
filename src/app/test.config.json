@@ -6,7 +6,7 @@
   "endpoint": "test",
   "loginURL": "login",
   "redirectURL": "console",
-  "metabolightWSURL": {
+  "metabolightsWSURL": {
     "domain": "https://www.ebi.ac.uk/metabolights/",
     "baseURL": "https://www.ebi.ac.uk/metabolights/ws",
     "guides": "https://raw.githubusercontent.com/EBI-Metabolights/guides/test/",

@@ -37,7 +37,7 @@ export class MetabolightsService extends DataService {
     ngRedux?: NgRedux<IAppState>
   ) {
     super('', http);
-    this.url = this.configService.config.metabolightWSURL;
+    this.url = this.configService.config.metabolightsWSURL;
     if (!environment.isTesting) {
       this.studyIdentifier.subscribe((value) => (this.id = value));
     }

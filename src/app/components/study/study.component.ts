@@ -66,7 +66,7 @@ export class StudyComponent implements OnInit, OnDestroy {
         this.requestedStudy = value;
       }
     });
-    this.domain = this.configService.config.metabolightWSURL.domain;
+    this.domain = this.configService.config.metabolightsWSURL.domain;
 
     this.investigationFailed.subscribe((value) => {
       this.studyError = value;

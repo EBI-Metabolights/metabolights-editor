@@ -22,7 +22,7 @@ Please report the issues here - https://github.com/EBI-Metabolights/metabolights
 
 - [Install angular CLI](https://angular.io/cli) to get started
 
-- Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Run `ng serve --serve-path /metabolights/editor` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 Editor by default connects to [MetaboLights DEV](https://wwwdev.ebi.ac.uk/metabolights) webservices (a development server to test new features). You may need to create a DEV account inorder to login and test.
 

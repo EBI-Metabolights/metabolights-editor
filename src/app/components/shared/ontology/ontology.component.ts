@@ -77,7 +77,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   constructor(private editorService: EditorService, private configService: ConfigurationService) {}
 
   ngOnInit() {
-    this.domain = this.configService.config.metabolightWSURL.domain;
+    this.domain = this.configService.config.metabolightsWSURL.domain;
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }

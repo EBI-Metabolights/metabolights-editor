@@ -3,7 +3,7 @@ import { EditorService } from '../../../services/editor.service';
 import { NgRedux, select } from '@angular-redux/store';
 import { IAppState } from './../../../store';
 import { Router } from '@angular/router';
-import { MetaboLightsWSURL } from './../../../services/globals';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 @Component({
   selector: 'nav-bar',
@@ -17,11 +17,12 @@ export class NavBarComponent implements OnInit {
   constructor(
     public router: Router,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private configService: ConfigurationService
   ) {}
 
   ngOnInit() {
-    this.domain = MetaboLightsWSURL.domain;
+    this.domain = this.configService.config.metabolightsWSURL.domain
   }
 
   logOut() {

@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       secret: ['', Validators.required],
     });
-    this.domain = this.configService.config.metabolightWSURL.domain;
+    this.domain = this.configService.config.metabolightsWSURL.domain;
   }
 
   resetForm() {

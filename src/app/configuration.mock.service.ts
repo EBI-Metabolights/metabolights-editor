@@ -15,7 +15,7 @@ export class MockConfigurationService {
       javaLogoutURL:
         'http://localhost:8080/metabolights/j_spring_security_logout',
       redirectURL: 'console',
-      metabolightWSURL: {
+      metabolightsWSURL: {
         domain: 'https://www.ebi.ac.uk/metabolights/',
         baseURL: 'https://www.ebi.ac.uk/metabolights/ws',
         guides:

@@ -105,7 +105,7 @@ export class PublicStudyComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.domain = this.configService.config.metabolightWSURL.domain;
+    this.domain = this.configService.config.metabolightsWSURL.domain;
   }
 
   loadStudy(studyId) {
