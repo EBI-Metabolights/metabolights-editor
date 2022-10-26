@@ -1,26 +1,26 @@
-import { NgRedux } from '@angular-redux/store';
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { Ontology } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { NgRedux } from "@angular-redux/store";
+import { CommonModule } from "@angular/common";
+import { Component, EventEmitter, Input, Output } from "@angular/core";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { ProtocolComponent } from './protocol.component';
+import { ProtocolComponent } from "./protocol.component";
 
-@Component({ selector: 'mtbls-ontology', template: '' })
+@Component({ selector: "mtbls-ontology", template: "" })
 class MockOntologyComponent {
-  @Input('validations') validations: any;
-  @Input('values') values: Ontology[] = [];
-  @Input('inline') isInline: boolean;
-  @Input('id') id: string;
+  @Input("validations") validations: any;
+  @Input("values") values: Ontology[] = [];
+  @Input("inline") isInline: boolean;
+  @Input("id") id: string;
 
   @Output() changed = new EventEmitter<any>();
 }
 
-describe('ProtocolComponent', () => {
+describe("ProtocolComponent", () => {
   let component: ProtocolComponent;
   let fixture: ComponentFixture<ProtocolComponent>;
   let editorService: EditorService;
@@ -46,18 +46,18 @@ describe('ProtocolComponent', () => {
         {
           comments: [],
           parameterName: {
-            annotationValue: 'annotation',
+            annotationValue: "annotation",
           },
         },
       ],
     };
 
-    spyOn(component, 'getAssaysWithProtocol').and.callFake(() => ['a', 'b']);
-    spyOn(component, 'hasAllSectionsEmpty').and.returnValue(true);
+    spyOn(component, "getAssaysWithProtocol").and.callFake(() => ["a", "b"]);
+    spyOn(component, "hasAllSectionsEmpty").and.returnValue(true);
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

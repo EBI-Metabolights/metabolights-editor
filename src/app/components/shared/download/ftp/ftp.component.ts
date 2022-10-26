@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { NgRedux, select } from "@angular-redux/store";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-download-ftp',
-  templateUrl: './ftp.component.html',
-  styleUrls: ['./ftp.component.css'],
+  selector: "mtbls-download-ftp",
+  templateUrl: "./ftp.component.html",
+  styleUrls: ["./ftp.component.css"],
 })
 export class FtpDownloadComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;

@@ -1,5 +1,5 @@
-import { select } from '@angular-redux/store';
-import { RedirectURL } from './globals';
+import { select } from "@angular-redux/store";
+import { RedirectURL } from "./globals";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export class MockEditorService {
@@ -12,17 +12,17 @@ export class MockEditorService {
   validations: any = {};
   files: any = [];
   samples_columns_order: any = {
-    'Sample Name': 1,
-    'Characteristics[Organism]': 2,
-    'Characteristics[Organism part]': 3,
-    'Characteristics[Variant]': 4,
-    'Characteristics[Sample type]': 5,
-    'Protocol REF': 6,
-    'Source Name': 7,
+    "Sample Name": 1,
+    "Characteristics[Organism]": 2,
+    "Characteristics[Organism part]": 3,
+    "Characteristics[Variant]": 4,
+    "Characteristics[Sample type]": 5,
+    "Protocol REF": 6,
+    "Source Name": 7,
   };
 
   refreshValidations() {
-    return { success: 'Validation Schema File updated' };
+    return { success: "Validation Schema File updated" };
   }
 
   loadValidations() {
@@ -34,7 +34,7 @@ export class MockEditorService {
   }
 
   overrideValidations(data) {
-    return { success: 'Validation \'val\' stored in the database' };
+    return { success: "Validation 'val' stored in the database" };
   }
 
   initialiseStudy(route) {
@@ -47,13 +47,13 @@ export class MockEditorService {
 
   getStudyPrivateFolderAccess() {
     return {
-      access: 'Write',
+      access: "Write",
     };
   }
 
   toggleFolderAccess() {
     return {
-      access: 'Write',
+      access: "Write",
     };
   }
 }

@@ -1,31 +1,31 @@
-import { catchError, map } from 'rxjs/operators';
-import { MetaboLightsWSURL } from './../globals';
-import { httpOptions } from './../headers';
-import { DataService } from './../data.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from './../../store';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
-import { IStudySummary } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
-import { IStudyDetailWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-detail.interface';
-import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/validation-summary.interface';
-import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
-import { IProtocolWrapper } from 'src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface';
-import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
-import { IPeopleWrapper } from 'src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface';
-import { IFactorsWrapper } from 'src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface';
-import { IPublicationWrapper } from 'src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface';
-import { IStudyDesignDescriptorWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface';
-import { IOntologyWrapper } from 'src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface';
-import { environment } from 'src/environments/environment';
-import { ConfigurationService } from 'src/app/configuration.service';
+import { catchError, map } from "rxjs/operators";
+import { MetaboLightsWSURL } from "./../globals";
+import { httpOptions } from "./../headers";
+import { DataService } from "./../data.service";
+import { NgRedux, select } from "@angular-redux/store";
+import { IAppState } from "./../../store";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { Router } from "@angular/router";
+import { HttpClient } from "@angular/common/http";
+import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
+import { IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { IProtocolWrapper } from "src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface";
+import { ITableWrapper } from "src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface";
+import { IPeopleWrapper } from "src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface";
+import { IFactorsWrapper } from "src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface";
+import { IPublicationWrapper } from "src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface";
+import { IStudyDesignDescriptorWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface";
+import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
+import { environment } from "src/environments/environment";
+import { ConfigurationService } from "src/app/configuration.service";
 
 // disabling this as parameter names mirror that of actual file columns
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class MetabolightsService extends DataService {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -36,7 +36,7 @@ export class MetabolightsService extends DataService {
     private configService: ConfigurationService,
     ngRedux?: NgRedux<IAppState>
   ) {
-    super('', http);
+    super("", http);
     this.url = this.configService.config.metabolightsWSURL;
     if (!environment.isTesting) {
       this.studyIdentifier.subscribe((value) => (this.id = value));
@@ -49,7 +49,7 @@ export class MetabolightsService extends DataService {
    * @returns Our validations config file via the Observable.
    */
   getValidations(): Observable<any> {
-    return this.http.get('assets/configs/validations.json').pipe(
+    return this.http.get("assets/configs/validations.json").pipe(
       map((res) => res),
       catchError(this.handleError)
     );
@@ -70,9 +70,9 @@ export class MetabolightsService extends DataService {
     return this.http
       .post<{ success: string }>(
         this.url.baseURL +
-          '/ebi-internal/' +
+          "/ebi-internal/" +
           this.id +
-          '/validate-study/update-file',
+          "/validate-study/update-file",
         {},
         httpOptions
       )
@@ -83,9 +83,9 @@ export class MetabolightsService extends DataService {
     return this.http
       .post<{ success: string }>(
         this.url.baseURL +
-          '/ebi-internal/' +
+          "/ebi-internal/" +
           this.id +
-          '/validate-study/override',
+          "/validate-study/override",
         data,
         httpOptions
       )
@@ -101,9 +101,9 @@ export class MetabolightsService extends DataService {
     return this.http
       .post<{ success: string }>(
         this.url.baseURL +
-          '/ebi-internal/' +
+          "/ebi-internal/" +
           this.id +
-          '/validate-study/comment',
+          "/validate-study/comment",
         data,
         httpOptions
       )
@@ -113,7 +113,7 @@ export class MetabolightsService extends DataService {
   // Study validation details
   getLanguageMappings() {
     return this.http
-      .get(this.url.guides + 'mapping.json')
+      .get(this.url.guides + "mapping.json")
       .pipe(catchError(this.handleError));
   }
 
@@ -125,7 +125,7 @@ export class MetabolightsService extends DataService {
   getStudyPrivateFolderAccess(): Observable<{ Access: string }> {
     return this.http
       .get<{ Access: string }>(
-        this.url.baseURL + '/studies/' + this.id + '/access',
+        this.url.baseURL + "/studies/" + this.id + "/access",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -139,7 +139,7 @@ export class MetabolightsService extends DataService {
   toggleFolderAccess(): Observable<{ Access: string }> {
     return this.http
       .put<{ Access: string }>(
-        this.url.baseURL + '/studies/' + this.id + '/access/toggle',
+        this.url.baseURL + "/studies/" + this.id + "/access/toggle",
         {},
         httpOptions
       )
@@ -149,7 +149,7 @@ export class MetabolightsService extends DataService {
   // Study validation details
   getGuides(language) {
     return this.http
-      .get(this.url.guides + 'I10n/' + language + '.json')
+      .get(this.url.guides + "I10n/" + language + ".json")
       .pipe(catchError(this.handleError));
   }
 
@@ -157,7 +157,7 @@ export class MetabolightsService extends DataService {
   getAllStudies(): Observable<IStudyDetailWrapper> {
     return this.http
       .get<IStudyDetailWrapper>(
-        this.url.baseURL + '/studies' + '/user',
+        this.url.baseURL + "/studies" + "/user",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -179,7 +179,7 @@ export class MetabolightsService extends DataService {
   getMetaInfo(): Observable<{ data: any }> {
     return this.http
       .get<{ data: any }>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/meta-info',
+        this.url.baseURL + "/studies" + "/" + this.id + "/meta-info",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -193,7 +193,7 @@ export class MetabolightsService extends DataService {
    */
   getStudy(id): Observable<IStudySummary> {
     return this.http
-      .get<IStudySummary>(this.url.baseURL + '/studies' + '/' + id, httpOptions)
+      .get<IStudySummary>(this.url.baseURL + "/studies" + "/" + id, httpOptions)
       .pipe(catchError(this.handleError));
   }
 
@@ -207,10 +207,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           studyId +
-          '/files?include_raw_data=' +
+          "/files?include_raw_data=" +
           queryRawFiles,
         httpOptions
       )
@@ -228,17 +228,17 @@ export class MetabolightsService extends DataService {
       return this.http
         .get<IStudyFiles>(
           this.url.baseURL +
-            '/studies' +
-            '/' +
+            "/studies" +
+            "/" +
             studyId +
-            '/files-fetch?force=true',
+            "/files-fetch?force=true",
           httpOptions
         )
         .pipe(catchError(this.handleError));
     } else {
       return this.http
         .get<IStudyFiles>(
-          this.url.baseURL + '/studies' + '/' + studyId + '/files-fetch',
+          this.url.baseURL + "/studies" + "/" + studyId + "/files-fetch",
           httpOptions
         )
         .pipe(catchError(this.handleError));
@@ -258,17 +258,17 @@ export class MetabolightsService extends DataService {
     const studyId = id ? id : this.id;
     const includeSubDir = include_sub_dir ? include_sub_dir : null;
     const directory = dir ? dir : null;
-    let query = this.url.baseURL + '/studies' + '/' + studyId + '/files/tree?';
+    let query = this.url.baseURL + "/studies" + "/" + studyId + "/files/tree?";
     if (includeSubDir) {
-      query = query + 'include_sub_dir=' + includeSubDir;
+      query = query + "include_sub_dir=" + includeSubDir;
     } else {
-      query = query + 'include_sub_dir=false';
+      query = query + "include_sub_dir=false";
     }
     if (directory) {
       if (parent) {
-        query = query + '&directory=' + parent + directory.file;
+        query = query + "&directory=" + parent + directory.file;
       } else {
-        query = query + '&directory=' + directory.file;
+        query = query + "&directory=" + directory.file;
       }
     }
     return this.http
@@ -279,16 +279,16 @@ export class MetabolightsService extends DataService {
   deleteStudyFiles(id, body, location, force) {
     const studyId = id ? id : this.id;
     const forcequery = force ? force : false;
-    const locationQuery = location ? location : 'study';
+    const locationQuery = location ? location : "study";
     return this.http
       .post(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           studyId +
-          '/files?location=' +
+          "/files?location=" +
           locationQuery +
-          '&force=' +
+          "&force=" +
           forcequery,
         body,
         httpOptions
@@ -298,23 +298,23 @@ export class MetabolightsService extends DataService {
 
   deleteStudy(id) {
     return this.http
-      .delete(this.url.baseURL + '/studies' + '/' + id + '/delete', httpOptions)
+      .delete(this.url.baseURL + "/studies" + "/" + id + "/delete", httpOptions)
       .pipe(catchError(this.handleError));
   }
 
   downloadURL(name, code) {
-    return this.url.baseURL + this.id + '/' + name + '?token=' + code;
+    return this.url.baseURL + this.id + "/" + name + "?token=" + code;
   }
 
   downloadLink(name, code) {
     return (
       this.url.baseURL +
-      '/studies' +
-      '/' +
+      "/studies" +
+      "/" +
       this.id +
-      '/download/' +
+      "/download/" +
       code +
-      '?file=' +
+      "?file=" +
       name
     );
   }
@@ -323,10 +323,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/sync?include_raw_data=true',
+          "/sync?include_raw_data=true",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -336,10 +336,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .post(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/sync?include_raw_data=true',
+          "/sync?include_raw_data=true",
         data,
         httpOptions
       )
@@ -351,7 +351,7 @@ export class MetabolightsService extends DataService {
     const studyId = id ? id : this.id;
     return this.http
       .get(
-        this.url.baseURL + '/studies' + '/' + studyId + '/title',
+        this.url.baseURL + "/studies" + "/" + studyId + "/title",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -366,7 +366,7 @@ export class MetabolightsService extends DataService {
   saveTitle(body): Observable<{ title: string }> {
     return this.http
       .put<{ title: string }>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/title',
+        this.url.baseURL + "/studies" + "/" + this.id + "/title",
         body,
         httpOptions
       )
@@ -382,7 +382,7 @@ export class MetabolightsService extends DataService {
   saveAbstract(body): Observable<{ description: string }> {
     return this.http
       .put<{ description: string }>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/description',
+        this.url.baseURL + "/studies" + "/" + this.id + "/description",
         body,
         httpOptions
       )
@@ -393,11 +393,11 @@ export class MetabolightsService extends DataService {
     const studyId = id ? id : this.id;
     return this.http
       .get(
-        this.url.baseURL + '/studies' + '/' + studyId + '/description',
+        this.url.baseURL + "/studies" + "/" + studyId + "/description",
         httpOptions
       )
       .pipe(
-        map((res) => res['description']), // eslint-disable-line @typescript-eslint/dot-notation
+        map((res) => res["description"]), // eslint-disable-line @typescript-eslint/dot-notation
         catchError(this.handleError)
       );
   }
@@ -410,7 +410,7 @@ export class MetabolightsService extends DataService {
   getPeople(): Observable<IPeopleWrapper> {
     return this.http
       .get<IPeopleWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/contacts',
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -425,7 +425,7 @@ export class MetabolightsService extends DataService {
   savePerson(body): Observable<IPeopleWrapper> {
     return this.http
       .post<IPeopleWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/contacts',
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts",
         body,
         httpOptions
       )
@@ -433,15 +433,15 @@ export class MetabolightsService extends DataService {
   }
 
   updatePerson(email, name, body) {
-    let query = '';
-    if (email && email !== '' && email !== null) {
-      query = 'email=' + email;
-    } else if (name && name !== '' && name !== null) {
-      query = 'full_name=' + name;
+    let query = "";
+    if (email && email !== "" && email !== null) {
+      query = "email=" + email;
+    } else if (name && name !== "" && name !== null) {
+      query = "full_name=" + name;
     }
     return this.http
       .put(
-        this.url.baseURL + '/studies' + '/' + this.id + '/contacts?' + query,
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts?" + query,
         body,
         httpOptions
       )
@@ -450,7 +450,7 @@ export class MetabolightsService extends DataService {
 
   makePersonSubmitter(email, study) {
     let body = null;
-    if (email && email !== '' && email !== null) {
+    if (email && email !== "" && email !== null) {
       body = {
         submitters: [
           {
@@ -463,7 +463,7 @@ export class MetabolightsService extends DataService {
     if (body) {
       return this.http
         .post(
-          this.url.baseURL + '/studies' + '/' + this.id + '/submitters',
+          this.url.baseURL + "/studies" + "/" + this.id + "/submitters",
           body,
           httpOptions
         )
@@ -472,15 +472,15 @@ export class MetabolightsService extends DataService {
   }
 
   deletePerson(email, name) {
-    let query = '';
-    if (email && email !== '' && email !== null) {
-      query = 'email=' + email;
-    } else if (name && name !== '' && name !== null) {
-      query = 'full_name=' + name;
+    let query = "";
+    if (email && email !== "" && email !== null) {
+      query = "email=" + email;
+    } else if (name && name !== "" && name !== null) {
+      query = "full_name=" + name;
     }
     return this.http
       .delete(
-        this.url.baseURL + '/studies' + '/' + this.id + '/contacts?' + query,
+        this.url.baseURL + "/studies" + "/" + this.id + "/contacts?" + query,
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -507,10 +507,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get<IOntologyWrapper>(
         this.url.baseURL +
-          '/studies'.replace('studies', 'ebi-internal') +
-          '/ontology?term=' +
+          "/studies".replace("studies", "ebi-internal") +
+          "/ontology?term=" +
           term +
-          '&branch=' +
+          "&branch=" +
           branch,
         httpOptions
       )
@@ -539,7 +539,7 @@ export class MetabolightsService extends DataService {
     const url =
       this.url.ontologyDetails +
       value.termSource.name +
-      '/terms/' +
+      "/terms/" +
       encodeURI(encodeURIComponent(value.termAccession));
     return this.http.get(url, httpOptions).pipe(catchError(this.handleError));
   }
@@ -552,7 +552,7 @@ export class MetabolightsService extends DataService {
   getPublications(): Observable<IPublicationWrapper> {
     return this.http
       .get<IPublicationWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/publications',
+        this.url.baseURL + "/studies" + "/" + this.id + "/publications",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -561,7 +561,7 @@ export class MetabolightsService extends DataService {
   savePublication(body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/publications',
+        this.url.baseURL + "/studies" + "/" + this.id + "/publications",
         body,
         httpOptions
       )
@@ -572,10 +572,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .put(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/publications?title=' +
+          "/publications?title=" +
           title,
         body,
         httpOptions
@@ -587,10 +587,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/publications?title=' +
+          "/publications?title=" +
           title,
         httpOptions
       )
@@ -607,7 +607,7 @@ export class MetabolightsService extends DataService {
     const studyId = id ? id : this.id;
     return this.http
       .get<IProtocolWrapper>(
-        this.url.baseURL + '/studies' + '/' + studyId + '/protocols',
+        this.url.baseURL + "/studies" + "/" + studyId + "/protocols",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -616,7 +616,7 @@ export class MetabolightsService extends DataService {
   saveProtocol(body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/protocols',
+        this.url.baseURL + "/studies" + "/" + this.id + "/protocols",
         body,
         httpOptions
       )
@@ -627,10 +627,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .put(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/protocols?name=' +
+          "/protocols?name=" +
           title,
         body,
         httpOptions
@@ -642,12 +642,12 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/protocols?name=' +
+          "/protocols?name=" +
           title +
-          '&force=false',
+          "&force=false",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -661,7 +661,7 @@ export class MetabolightsService extends DataService {
   getDesignDescriptors(): Observable<IStudyDesignDescriptorWrapper> {
     return this.http
       .get<IStudyDesignDescriptorWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/descriptors',
+        this.url.baseURL + "/studies" + "/" + this.id + "/descriptors",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -676,7 +676,7 @@ export class MetabolightsService extends DataService {
   saveDesignDescriptor(body): Observable<IStudyDesignDescriptorWrapper> {
     return this.http
       .post<IStudyDesignDescriptorWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/descriptors',
+        this.url.baseURL + "/studies" + "/" + this.id + "/descriptors",
         body,
         httpOptions
       )
@@ -697,10 +697,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .put<IStudyDesignDescriptorWrapper>(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/descriptors?term=' +
+          "/descriptors?term=" +
           annotationValue,
         body,
         httpOptions
@@ -720,10 +720,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete<IStudyDesignDescriptorWrapper>(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/descriptors?term=' +
+          "/descriptors?term=" +
           annotationValue,
         httpOptions
       )
@@ -738,7 +738,7 @@ export class MetabolightsService extends DataService {
   getFactors(): Observable<IFactorsWrapper> {
     return this.http
       .get<IFactorsWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/factors',
+        this.url.baseURL + "/studies" + "/" + this.id + "/factors",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -747,7 +747,7 @@ export class MetabolightsService extends DataService {
   saveFactor(body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/factors',
+        this.url.baseURL + "/studies" + "/" + this.id + "/factors",
         body,
         httpOptions
       )
@@ -758,10 +758,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .put(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/factors?name=' +
+          "/factors?name=" +
           factorName,
         body,
         httpOptions
@@ -773,10 +773,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/factors?name=' +
+          "/factors?name=" +
           factorName,
         httpOptions
       )
@@ -788,10 +788,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/processSequence?list_only=false',
+          "/processSequence?list_only=false",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -801,10 +801,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/samples/' +
+          "/samples/" +
           samples_file_name,
         httpOptions
       )
@@ -814,7 +814,7 @@ export class MetabolightsService extends DataService {
   saveSample(body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/samples',
+        this.url.baseURL + "/studies" + "/" + this.id + "/samples",
         body,
         httpOptions
       )
@@ -824,7 +824,7 @@ export class MetabolightsService extends DataService {
   addSamples(file, body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/samples/' + file,
+        this.url.baseURL + "/studies" + "/" + this.id + "/samples/" + file,
         body,
         httpOptions
       )
@@ -835,12 +835,12 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/rows/' +
+          "/rows/" +
           file +
-          '?row_num=' +
+          "?row_num=" +
           rows,
         httpOptions
       )
@@ -852,10 +852,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/assay/' +
+          "/assay/" +
           assay_file_name,
         httpOptions
       )
@@ -865,7 +865,7 @@ export class MetabolightsService extends DataService {
   addAssay(body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/assays',
+        this.url.baseURL + "/studies" + "/" + this.id + "/assays",
         body,
         httpOptions
       )
@@ -875,7 +875,7 @@ export class MetabolightsService extends DataService {
   deleteAssay(name) {
     return this.http
       .delete(
-        this.url.baseURL + '/studies' + '/' + this.id + '/assays/' + name,
+        this.url.baseURL + "/studies" + "/" + this.id + "/assays/" + name,
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -885,10 +885,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .post(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/assay/' +
+          "/assay/" +
           assay_file_name,
         body,
         httpOptions
@@ -900,10 +900,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .put(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/assay/' +
+          "/assay/" +
           assay_file_name,
         body,
         httpOptions
@@ -915,12 +915,12 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/assay/' +
+          "/assay/" +
           assay_file_name +
-          '?row_num=' +
+          "?row_num=" +
           rowIds,
         httpOptions
       )
@@ -932,10 +932,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/maf/' +
+          "/maf/" +
           annotation_file_name,
         httpOptions
       )
@@ -946,14 +946,14 @@ export class MetabolightsService extends DataService {
     return this.http
       .get(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/maf/validated/' +
+          "/maf/validated/" +
           annotation_file_name +
-          '?assay_file_name=' +
+          "?assay_file_name=" +
           assay_file_name +
-          '&technology=' +
+          "&technology=" +
           technology,
         httpOptions
       )
@@ -964,10 +964,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .put(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/maf/' +
+          "/maf/" +
           annotation_file_name,
         body,
         httpOptions
@@ -979,10 +979,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .post(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/maf/' +
+          "/maf/" +
           annotation_file_name,
         body,
         httpOptions
@@ -994,12 +994,12 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/maf/' +
+          "/maf/" +
           annotation_file_name +
-          '?row_num=' +
+          "?row_num=" +
           rowIds,
         httpOptions
       )
@@ -1009,7 +1009,7 @@ export class MetabolightsService extends DataService {
   validateMAF(assay_file) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/maf/validate',
+        this.url.baseURL + "/studies" + "/" + this.id + "/maf/validate",
         { data: [{ assay_file_name: assay_file }] },
         httpOptions
       )
@@ -1030,10 +1030,10 @@ export class MetabolightsService extends DataService {
     return this.http
       .get<any>(
         this.url.baseURL +
-          '/studies'.replace('/studies', '') +
-          '/search/' +
+          "/studies".replace("/studies", "") +
+          "/search/" +
           type +
-          '?search_value=' +
+          "?search_value=" +
           term,
         httpOptions
       )
@@ -1049,7 +1049,7 @@ export class MetabolightsService extends DataService {
   getTable(file_name): Observable<ITableWrapper> {
     return this.http
       .get<ITableWrapper>(
-        this.url.baseURL + '/studies' + '/' + this.id + '/' + file_name,
+        this.url.baseURL + "/studies" + "/" + this.id + "/" + file_name,
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -1058,7 +1058,7 @@ export class MetabolightsService extends DataService {
   addColumns(filename, body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/columns/' + filename,
+        this.url.baseURL + "/studies" + "/" + this.id + "/columns/" + filename,
         body,
         httpOptions
       )
@@ -1068,7 +1068,7 @@ export class MetabolightsService extends DataService {
   addRows(filename, body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/rows/' + filename,
+        this.url.baseURL + "/studies" + "/" + this.id + "/rows/" + filename,
         body,
         httpOptions
       )
@@ -1078,7 +1078,7 @@ export class MetabolightsService extends DataService {
   updateRows(filename, body) {
     return this.http
       .put(
-        this.url.baseURL + '/studies' + '/' + this.id + '/rows/' + filename,
+        this.url.baseURL + "/studies" + "/" + this.id + "/rows/" + filename,
         body,
         httpOptions
       )
@@ -1089,12 +1089,12 @@ export class MetabolightsService extends DataService {
     return this.http
       .delete(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/rows/' +
+          "/rows/" +
           filename +
-          '?row_num=' +
+          "?row_num=" +
           rowIds,
         httpOptions
       )
@@ -1104,7 +1104,7 @@ export class MetabolightsService extends DataService {
   updateCells(filename, body) {
     return this.http
       .put(
-        this.url.baseURL + '/studies' + '/' + this.id + '/cells/' + filename,
+        this.url.baseURL + "/studies" + "/" + this.id + "/cells/" + filename,
         body,
         httpOptions
       )
@@ -1119,7 +1119,7 @@ export class MetabolightsService extends DataService {
   createStudy(): Observable<{ new_study: string }> {
     return this.http
       .get<{ new_study: string }>(
-        this.url.baseURL + '/studies' + '/create',
+        this.url.baseURL + "/studies" + "/create",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -1134,21 +1134,21 @@ export class MetabolightsService extends DataService {
    * @returns A summary of the validation run, via the Observable.
    */
   validateStudy(section, level): Observable<IValidationSummaryWrapper> {
-    if (section === '' || !section) {
-      section = 'all';
+    if (section === "" || !section) {
+      section = "all";
     }
-    if (level === '' || !level) {
-      level = 'all';
+    if (level === "" || !level) {
+      level = "all";
     }
     return this.http
       .get<IValidationSummaryWrapper>(
         this.url.baseURL +
-          '/studies' +
-          '/' +
+          "/studies" +
+          "/" +
           this.id +
-          '/validate-study?section=' +
+          "/validate-study?section=" +
           section +
-          '&level=' +
+          "&level=" +
           level,
         httpOptions
       )
@@ -1158,7 +1158,7 @@ export class MetabolightsService extends DataService {
   decompressFiles(body) {
     return this.http
       .post(
-        this.url.baseURL + '/studies' + '/' + this.id + '/files/unzip',
+        this.url.baseURL + "/studies" + "/" + this.id + "/files/unzip",
         body,
         httpOptions
       )
@@ -1169,7 +1169,7 @@ export class MetabolightsService extends DataService {
   changeStatus(status) {
     return this.http
       .put(
-        this.url.baseURL + '/studies' + '/' + this.id + '/status',
+        this.url.baseURL + "/studies" + "/" + this.id + "/status",
         { status },
         httpOptions
       )
@@ -1180,7 +1180,7 @@ export class MetabolightsService extends DataService {
   changeReleasedate(releaseDate) {
     return this.http
       .put(
-        this.url.baseURL + '/studies' + '/' + this.id + '/release-date',
+        this.url.baseURL + "/studies" + "/" + this.id + "/release-date",
         { release_date: releaseDate },
         httpOptions
       )

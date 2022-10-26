@@ -1,18 +1,18 @@
-import { AfterContentInit, Component, Input, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EditorService } from '../../../../services/editor.service';
-import { TableComponent } from './../../../shared/table/table.component';
-import { select } from '@angular-redux/store';
-import { map } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
+import { AfterContentInit, Component, Input, ViewChild } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { EditorService } from "../../../../services/editor.service";
+import { TableComponent } from "./../../../shared/table/table.component";
+import { select } from "@angular-redux/store";
+import { map } from "rxjs/operators";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-maf',
-  templateUrl: './maf.component.html',
-  styleUrls: ['./maf.component.css'],
+  selector: "mtbls-maf",
+  templateUrl: "./maf.component.html",
+  styleUrls: ["./maf.component.css"],
 })
 export class MafComponent implements AfterContentInit {
-  @Input('value') value: any;
+  @Input("value") value: any;
 
   @select((state) => state.study.mafs) studyMAFs;
   @select((state) => state.study.readonly) readonly;
@@ -38,11 +38,10 @@ export class MafComponent implements AfterContentInit {
 
   fileTypes: any = [
     {
-      filter_name: 'MetaboLights maf sheet type', //eslint-disable-line @typescript-eslint/naming-convention
-      extensions: ['tsv'],
+      filter_name: "MetaboLights maf sheet type", //eslint-disable-line @typescript-eslint/naming-convention
+      extensions: ["tsv"],
     },
   ];
-
 
   constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
@@ -82,10 +81,10 @@ export class MafComponent implements AfterContentInit {
   }
 
   getChebiId() {
-    const dbId = this.form.get('databaseId').value;
-    if (dbId && dbId !== '') {
-      if (dbId.toLowerCase().indexOf('chebi') > -1) {
-        this.currentID = dbId.split(':')[1];
+    const dbId = this.form.get("databaseId").value;
+    if (dbId && dbId !== "") {
+      if (dbId.toLowerCase().indexOf("chebi") > -1) {
+        this.currentID = dbId.split(":")[1];
       }
     } else {
       this.currentID = null;
@@ -132,20 +131,20 @@ export class MafComponent implements AfterContentInit {
         const inchi = row.inchi;
         const name = row.metabolite_identification;
 
-        if (name && name !== '') {
-          const promise = this.getCompound(name, 'name');
+        if (name && name !== "") {
+          const promise = this.getCompound(name, "name");
           promises.push(promise);
         } else {
-          if (dbIdentifier && dbIdentifier !== '') {
-            const promise = this.getCompound(dbIdentifier, 'databaseid');
+          if (dbIdentifier && dbIdentifier !== "") {
+            const promise = this.getCompound(dbIdentifier, "databaseid");
             promises.push(promise);
           } else {
-            if (smiles && smiles !== '') {
-              const promise = this.getCompound(smiles, 'smiles');
+            if (smiles && smiles !== "") {
+              const promise = this.getCompound(smiles, "smiles");
               promises.push(promise);
             } else {
-              if (inchi && inchi !== '') {
-                const promise = this.getCompound(inchi, 'inchi');
+              if (inchi && inchi !== "") {
+                const promise = this.getCompound(inchi, "inchi");
                 promises.push(promise);
               }
             }
@@ -188,13 +187,11 @@ export class MafComponent implements AfterContentInit {
         });
         this.mafTable.updateRows(this.rowsToUpdate);
       });
-
-
     }
   }
 
   isEmpty(val) {
-    return !val && val === '' ? true : false;
+    return !val && val === "" ? true : false;
   }
 
   async getCompound(id, type) {
@@ -216,11 +213,11 @@ export class MafComponent implements AfterContentInit {
       (res) => {
         const resultObj = res.content[0];
         this.isFormBusy = false;
-        const fields = ['name', 'smiles', 'inchi', 'formula', 'databaseId'];
+        const fields = ["name", "smiles", "inchi", "formula", "databaseId"];
         fields.forEach((field) => {
           if (field !== term) {
-            if (field === 'name') {
-              if (this.form.get(field).value === '') {
+            if (field === "name") {
+              if (this.form.get(field).value === "") {
                 this.form
                   .get(field)
                   .setValue(resultObj[field], { emitEvent: false });
@@ -243,15 +240,15 @@ export class MafComponent implements AfterContentInit {
   }
 
   /* there are lots of instances like this where the original author is tricking typescript
-  * into working like javascript. A purist would correct all of it, but I am only
-  * one man */
+   * into working like javascript. A purist would correct all of it, but I am only
+   * one man */
   /* eslint-disable @typescript-eslint/dot-notation */
   saveCell() {
-    this.selectedRow['metabolite_identification'] = this.form.get('name').value;
-    this.selectedRow['inchi'] = this.form.get('inchi').value;
-    this.selectedRow['database_identifier'] = this.form.get('databaseId').value;
-    this.selectedRow['smiles'] = this.form.get('smiles').value;
-    this.selectedRow['chemical_formula'] = this.form.get('formula').value;
+    this.selectedRow["metabolite_identification"] = this.form.get("name").value;
+    this.selectedRow["inchi"] = this.form.get("inchi").value;
+    this.selectedRow["database_identifier"] = this.form.get("databaseId").value;
+    this.selectedRow["smiles"] = this.form.get("smiles").value;
+    this.selectedRow["chemical_formula"] = this.form.get("formula").value;
     this.mafTable.updateRows([this.selectedRow]);
   }
 

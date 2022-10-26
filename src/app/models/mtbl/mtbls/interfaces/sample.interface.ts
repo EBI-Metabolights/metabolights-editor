@@ -1,6 +1,6 @@
-import { ICharacteristic } from './characteristic.interface';
-import { IComment } from './comment.interface';
-import { ISource } from './source.interface';
+import { ICharacteristic } from "./characteristic.interface";
+import { IComment } from "./comment.interface";
+import { ISource } from "./source.interface";
 
 export interface ISample {
   comments: IComment[];

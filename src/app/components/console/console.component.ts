@@ -1,15 +1,15 @@
-import { Router, ActivatedRoute } from '@angular/router';
-import { IAppState } from './../../store';
-import { NgRedux, select } from '@angular-redux/store';
-import { AfterContentInit, Component, OnInit } from '@angular/core';
-import { EditorService } from '../../services/editor.service';
-import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { Router, ActivatedRoute } from "@angular/router";
+import { IAppState } from "./../../store";
+import { NgRedux, select } from "@angular-redux/store";
+import { AfterContentInit, Component, OnInit } from "@angular/core";
+import { EditorService } from "../../services/editor.service";
+import { HttpClient } from "@angular/common/http";
+import { environment } from "src/environments/environment";
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
-  selector: 'mtbls-console',
-  templateUrl: './console.component.html',
-  styleUrls: ['./console.component.css'],
+  selector: "mtbls-console",
+  templateUrl: "./console.component.html",
+  styleUrls: ["./console.component.css"],
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.isCurator) isCurator;
@@ -47,12 +47,12 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   createNewStudy() {
     this.submittedStudies = this.studies.filter(
-      (study) => study['status'] === 'Submitted'
+      (study) => study["status"] === "Submitted"
     );
     if (this.submittedStudies.length > 0) {
       this.isConfirmationModalOpen = true;
     } else {
-      this.router.navigate(['/guide/create']);
+      this.router.navigate(["/guide/create"]);
     }
   }
 
@@ -64,16 +64,17 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.userStudies.subscribe((value) => {
       if (value === null) {
         this.ngRedux.dispatch({
-          type: 'SET_LOADING_INFO',
+          type: "SET_LOADING_INFO",
           body: {
-            info: 'Loading user studies',
+            info: "Loading user studies",
           },
         });
         this.editorService.getAllStudies();
       } else {
         this.editorService.toggleLoading(false);
         this.studies = value;
-        this.studies.sort((a, b) => +new Date(b['releaseDate']) - +new Date(a['releaseDate'])
+        this.studies.sort(
+          (a, b) => +new Date(b["releaseDate"]) - +new Date(a["releaseDate"])
         );
         this.filteredStudies = this.studies;
         this.loadingStudies = false;
@@ -95,7 +96,9 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   filterStudies(value) {
     this.filterValue = value;
     if (value != null) {
-      this.filteredStudies = this.studies.filter((s) => s['status'].toLowerCase() === value.toLowerCase());
+      this.filteredStudies = this.studies.filter(
+        (s) => s["status"].toLowerCase() === value.toLowerCase()
+      );
     } else {
       this.filteredStudies = this.studies;
     }
@@ -103,9 +106,9 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   applyFilter(value) {
-    if (value !== '') {
+    if (value !== "") {
       this.filteredStudies = this.studies.filter((s) => {
-        if (value !== '') {
+        if (value !== "") {
           return (
             this.getString(s).toLowerCase().indexOf(value.toLowerCase()) !== -1
           );
@@ -117,6 +120,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   getString(s) {
-    return s.accession + ' ' + s.title + ' ' + s.description;
+    return s.accession + " " + s.title + " " + s.description;
   }
 }

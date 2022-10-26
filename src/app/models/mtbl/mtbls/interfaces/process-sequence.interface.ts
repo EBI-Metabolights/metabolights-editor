@@ -1,7 +1,7 @@
-import { IComment } from './comment.interface';
-import { IProtocol } from './protocol.interface';
-import { ISample } from './sample.interface';
-import { ISource } from './source.interface';
+import { IComment } from "./comment.interface";
+import { IProtocol } from "./protocol.interface";
+import { ISample } from "./sample.interface";
+import { ISource } from "./source.interface";
 
 export interface IProcessSequence {
   comments: IComment[];

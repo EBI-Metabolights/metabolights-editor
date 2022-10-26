@@ -1,18 +1,18 @@
 export class MockEuropePMCService {
   getArticleInfo() {
     return {
-      title: '',
-      authorList: '',
-      authorDetails: '',
-      pubMedID: '',
-      doi: '',
-      abstract: '',
+      title: "",
+      authorList: "",
+      authorDetails: "",
+      pubMedID: "",
+      doi: "",
+      abstract: "",
     };
   }
 
   getArticleKeywords() {
     return {
-      keywords: ['keywords'],
+      keywords: ["keywords"],
     };
   }
 }

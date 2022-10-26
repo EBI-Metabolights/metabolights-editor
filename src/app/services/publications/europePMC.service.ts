@@ -1,14 +1,14 @@
-import { catchError, map } from 'rxjs/operators';
-import { DataService } from './../data.service';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { IEuropePMCResponseWrapper } from 'src/app/models/mtbl/mtbls/interfaces/europe-pmc-response-wrapper.interface';
-import { environment } from 'src/environments/environment';
-import { ConfigurationService } from 'src/app/configuration.service';
+import { catchError, map } from "rxjs/operators";
+import { DataService } from "./../data.service";
+import { Injectable } from "@angular/core";
+import { Observable } from "rxjs";
+import { HttpClient } from "@angular/common/http";
+import { IEuropePMCResponseWrapper } from "src/app/models/mtbl/mtbls/interfaces/europe-pmc-response-wrapper.interface";
+import { environment } from "src/environments/environment";
+import { ConfigurationService } from "src/app/configuration.service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 /**
  * Service that queries the EuropePMC API for journal article information
@@ -21,7 +21,7 @@ export class EuropePMCService extends DataService {
    */
   constructor(http: HttpClient, private configService: ConfigurationService) {
     // cannot reference 'this.' within a super() call, so need to assign the url after
-    super('', http);
+    super("", http);
     this.url = this.configService.config.europePMCURL;
   }
 
@@ -35,7 +35,7 @@ export class EuropePMCService extends DataService {
    */
   getArticleInfo(doi): Observable<any> {
     return this.http
-      .get<IEuropePMCResponseWrapper>(this.url.article.replace('<term>', doi))
+      .get<IEuropePMCResponseWrapper>(this.url.article.replace("<term>", doi))
       .pipe(
         map((res) => this.extractArticleDetails(res, doi)),
         catchError(this.handleError)
@@ -52,7 +52,7 @@ export class EuropePMCService extends DataService {
    */
   getArticleKeyWords(doi): Observable<string[]> {
     return this.http
-      .get<IEuropePMCResponseWrapper>(this.url.article.replace('<term>', doi))
+      .get<IEuropePMCResponseWrapper>(this.url.article.replace("<term>", doi))
       .pipe(
         map((res) => res.resultList.result[0].keywordList.keyword),
         catchError(this.handleError)
@@ -79,12 +79,12 @@ export class EuropePMCService extends DataService {
       };
     } else {
       return {
-        title: '',
-        authorList: '',
-        authorDetails: '',
-        pubMedID: '',
-        doi: '',
-        abstract: '',
+        title: "",
+        authorList: "",
+        authorDetails: "",
+        pubMedID: "",
+        doi: "",
+        abstract: "",
       };
     }
   }

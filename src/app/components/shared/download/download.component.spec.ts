@@ -1,14 +1,14 @@
-import { CommonModule } from '@angular/common';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { of } from 'rxjs';
-import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
-import { MockMetabolightsService } from 'src/app/services/metabolights/metabolights.service.mock';
+import { CommonModule } from "@angular/common";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { of } from "rxjs";
+import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
+import { MockMetabolightsService } from "src/app/services/metabolights/metabolights.service.mock";
 
-import { DownloadComponent } from './download.component';
+import { DownloadComponent } from "./download.component";
 
-describe('DownloadComponent', () => {
+describe("DownloadComponent", () => {
   let component: DownloadComponent;
   let metabolightsService: MetabolightsService;
   let fixture: ComponentFixture<DownloadComponent>;
@@ -27,11 +27,11 @@ describe('DownloadComponent', () => {
     fixture = TestBed.createComponent(DownloadComponent);
     component = fixture.componentInstance;
     metabolightsService = TestBed.inject(MetabolightsService);
-    spyOn(component, 'getDownloadLink').and.returnValue(of('download.link'));
+    spyOn(component, "getDownloadLink").and.returnValue(of("download.link"));
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

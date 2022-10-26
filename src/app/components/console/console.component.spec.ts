@@ -1,13 +1,13 @@
-import { NgRedux } from '@angular-redux/store';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SpyLocation } from '@angular/common/testing';
+import { NgRedux } from "@angular-redux/store";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
-} from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+} from "@angular/core";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import {
   ChildrenOutletContexts,
   Router,
@@ -16,17 +16,17 @@ import {
   ROUTES,
   UrlHandlingStrategy,
   UrlSerializer,
-} from '@angular/router';
+} from "@angular/router";
 import {
   RouterTestingModule,
   setupTestingRouter,
-} from '@angular/router/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+} from "@angular/router/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { ConsoleComponent } from './console.component';
+import { ConsoleComponent } from "./console.component";
 
-describe('ConsoleComponent', () => {
+describe("ConsoleComponent", () => {
   let component: ConsoleComponent;
   let fixture: ComponentFixture<ConsoleComponent>;
 
@@ -64,7 +64,7 @@ describe('ConsoleComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

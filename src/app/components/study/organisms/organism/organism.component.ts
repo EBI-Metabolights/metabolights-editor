@@ -1,12 +1,12 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input } from "@angular/core";
 
 @Component({
-  selector: 'mtbls-organism',
-  templateUrl: './organism.component.html',
-  styleUrls: ['./organism.component.css'],
+  selector: "mtbls-organism",
+  templateUrl: "./organism.component.html",
+  styleUrls: ["./organism.component.css"],
 })
 export class OrganismComponent implements OnInit {
-  @Input('value') organism: any;
+  @Input("value") organism: any;
   isModalOpen = false;
 
   constructor() {}

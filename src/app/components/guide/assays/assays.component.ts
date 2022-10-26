@@ -1,19 +1,19 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder } from '@angular/forms';
-import { EditorService } from '../../../services/editor.service';
-import { select } from '@angular-redux/store';
-import { MTBLSColumn } from './../../../models/mtbl/mtbls/common/mtbls-column';
-import * as toastr from 'toastr';
-import Swal from 'sweetalert2';
-import { tassign } from 'tassign';
-import { SamplesComponent } from './../../study/samples/samples.component';
-import { environment } from 'src/environments/environment';
+import { Component, ViewChild, OnInit } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FormBuilder } from "@angular/forms";
+import { EditorService } from "../../../services/editor.service";
+import { select } from "@angular-redux/store";
+import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
+import * as toastr from "toastr";
+import Swal from "sweetalert2";
+import { tassign } from "tassign";
+import { SamplesComponent } from "./../../study/samples/samples.component";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'guide-assays',
-  templateUrl: './assays.component.html',
-  styleUrls: ['./assays.component.css'],
+  selector: "guide-assays",
+  templateUrl: "./assays.component.html",
+  styleUrls: ["./assays.component.css"],
 })
 export class GuidedAssaysComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -30,8 +30,8 @@ export class GuidedAssaysComponent implements OnInit {
   selectedMAFDataArray: any[] = [];
   selectedAssay: any = null;
   selectedAssayData: any = null;
-  samplesNames: any = '';
-  controlsNames: any = '';
+  samplesNames: any = "";
+  controlsNames: any = "";
 
   isEditAssayModalOpen = false;
   subStep = 1;
@@ -86,21 +86,21 @@ export class GuidedAssaysComponent implements OnInit {
 
   deleteSelectedAssay(name) {
     Swal.fire({
-      title: 'Are you sure?',
-      text: 'Once deleted, you will not be able to recover this assay!',
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this assay!",
       showCancelButton: true,
-      confirmButtonColor: '#DD6B55',
-      confirmButtonText: 'Confirm',
-      cancelButtonText: 'Back',
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
         this.editorService.deleteAssay(name).subscribe((resp) => {
           this.extractAssayInfo(true);
           Swal.fire({
-            title: 'Assay deleted!',
-            text: '',
-            type: 'success',
-            confirmButtonText: 'OK',
+            title: "Assay deleted!",
+            text: "",
+            type: "success",
+            confirmButtonText: "OK",
           }).then(() => {});
         });
       }
@@ -110,12 +110,12 @@ export class GuidedAssaysComponent implements OnInit {
   saveSamples() {
     const exisitingSamples = [];
     if (this.controlsNames && this.samplesNames) {
-      const finalControls = this.controlsNames.replace(/,/g, '\n').split('\n');
-      const finalSamples = this.samplesNames.replace(/,/g, '\n').split('\n');
+      const finalControls = this.controlsNames.replace(/,/g, "\n").split("\n");
+      const finalSamples = this.samplesNames.replace(/,/g, "\n").split("\n");
       if (finalSamples.length <= 0) {
-        toastr.error('Please add sample names', 'Error', {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+        toastr.error("Please add sample names", "Error", {
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -127,9 +127,9 @@ export class GuidedAssaysComponent implements OnInit {
         finalControls.forEach((s) => {
           if (exisitingSamples.indexOf(s) < 0) {
             const emptyRow = this.getEmptyRow(this.samples.data);
-            emptyRow['Source Name'] = s;
-            emptyRow['Sample Name'] = s;
-            emptyRow['Protocol REF'] = 'Sample collection';
+            emptyRow["Source Name"] = s;
+            emptyRow["Sample Name"] = s;
+            emptyRow["Protocol REF"] = "Sample collection";
             sRows.push(emptyRow);
           } else {
             duplicates.push(s);
@@ -138,9 +138,9 @@ export class GuidedAssaysComponent implements OnInit {
         finalSamples.forEach((s) => {
           if (exisitingSamples.indexOf(s) < 0) {
             const emptyRow = this.getEmptyRow(this.samples.data);
-            emptyRow['Source Name'] = s;
-            emptyRow['Sample Name'] = s;
-            emptyRow['Protocol REF'] = 'Sample collection';
+            emptyRow["Source Name"] = s;
+            emptyRow["Sample Name"] = s;
+            emptyRow["Protocol REF"] = "Sample collection";
             sRows.push(emptyRow);
           } else {
             duplicates.push(s);
@@ -148,33 +148,33 @@ export class GuidedAssaysComponent implements OnInit {
         });
         if (duplicates.length > 0 && sRows.length > 0) {
           Swal.fire({
-            title: 'Duplicate samples found',
-            text: duplicates.join(', ') + ' already exist',
-            type: 'warning',
+            title: "Duplicate samples found",
+            text: duplicates.join(", ") + " already exist",
+            type: "warning",
             showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ignore duplicates, proceed!',
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ignore duplicates, proceed!",
           }).then((result) => {
             if (result.value) {
               this.editorService
                 .addRows(
                   this.samples.name,
                   { data: { rows: sRows, index: 0 } },
-                  'samples',
+                  "samples",
                   null
                 )
                 .subscribe(
                   (res) => {
-                    toastr.success('Samples added successfully', 'Success', {
-                      timeOut: '2500',
-                      positionClass: 'toast-top-center',
+                    toastr.success("Samples added successfully", "Success", {
+                      timeOut: "2500",
+                      positionClass: "toast-top-center",
                       preventDuplicates: true,
                       extendedTimeOut: 0,
                       tapToDismiss: false,
                     });
-                    this.controlsNames = '';
-                    this.samplesNames = '';
+                    this.controlsNames = "";
+                    this.samplesNames = "";
                     this.changeSubStep(4);
                   },
                   (err) => {
@@ -190,20 +190,20 @@ export class GuidedAssaysComponent implements OnInit {
             .addRows(
               this.samples.name,
               { data: { rows: sRows, index: 0 } },
-              'samples',
+              "samples",
               null
             )
             .subscribe(
               (res) => {
-                toastr.success('Samples added successfully', 'Success', {
-                  timeOut: '2500',
-                  positionClass: 'toast-top-center',
+                toastr.success("Samples added successfully", "Success", {
+                  timeOut: "2500",
+                  positionClass: "toast-top-center",
                   preventDuplicates: true,
                   extendedTimeOut: 0,
                   tapToDismiss: false,
                 });
-                this.controlsNames = '';
-                this.samplesNames = '';
+                this.controlsNames = "";
+                this.samplesNames = "";
                 this.changeSubStep(4);
               },
               (err) => {
@@ -214,11 +214,11 @@ export class GuidedAssaysComponent implements OnInit {
       }
     } else {
       toastr.error(
-        'Please add experimental controls and sample names',
-        'Error',
+        "Please add experimental controls and sample names",
+        "Error",
         {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -230,7 +230,7 @@ export class GuidedAssaysComponent implements OnInit {
   getEmptyRow(data) {
     const obj = tassign({}, data.rows[0]);
     Object.keys(obj).forEach((prop) => {
-      obj[prop] = '';
+      obj[prop] = "";
     });
     return obj;
   }
@@ -244,18 +244,18 @@ export class GuidedAssaysComponent implements OnInit {
 
   checkSampleTypeColumnExists() {
     const sampleTypeColumn = this.samples.data.columns.filter(
-      (col) => col.columnDef === 'Characteristics[Sample type]'
+      (col) => col.columnDef === "Characteristics[Sample type]"
     );
     if (sampleTypeColumn.length > 0) {
-      console.log('Sample type column exist. Extraction sample types.');
+      console.log("Sample type column exist. Extraction sample types.");
     } else {
       Swal.fire({
         title:
-          'Sample type column doesnt exist. Would you like to capture sample types data?',
+          "Sample type column doesnt exist. Would you like to capture sample types data?",
         showCancelButton: true,
-        confirmButtonColor: '#DD6B55',
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Yes",
+        cancelButtonText: "No",
       }).then((selection) => {
         if (selection.value) {
           this.addSampleTypeColumn();
@@ -267,27 +267,27 @@ export class GuidedAssaysComponent implements OnInit {
   addSampleTypeColumn() {
     let characteristicsCount = 0;
     this.keys(this.samples.data.header).forEach((key) => {
-      if (key.indexOf('Characteristics') > -1) {
+      if (key.indexOf("Characteristics") > -1) {
         characteristicsCount = characteristicsCount + 1;
       }
     });
 
-    const protocolRefIndex = this.samples.data.header['Protocol REF'];
+    const protocolRefIndex = this.samples.data.header["Protocol REF"];
 
     const columns = [];
     const characteristicsColumn = new MTBLSColumn(
-      'Characteristics[Sample type]',
-      '',
+      "Characteristics[Sample type]",
+      "",
       protocolRefIndex
     );
     const characteristicsSourceColumn = new MTBLSColumn(
-      'Term Source REF',
-      '',
+      "Term Source REF",
+      "",
       protocolRefIndex + 1
     );
     const characteristicsAccessionColumn = new MTBLSColumn(
-      'Term Accession Number',
-      '',
+      "Term Accession Number",
+      "",
       protocolRefIndex + 2
     );
     columns.push(characteristicsColumn.toJSON());
@@ -298,7 +298,7 @@ export class GuidedAssaysComponent implements OnInit {
 
   addColumns(columns) {
     this.editorService
-      .addColumns(this.samples.name, { data: columns }, 'samples', null)
+      .addColumns(this.samples.name, { data: columns }, "samples", null)
       .subscribe(
         (res) => true,
         (err) => {
@@ -326,15 +326,15 @@ export class GuidedAssaysComponent implements OnInit {
 
   openFullStudyView() {
     Swal.fire({
-      title: 'Switch to full study view? Are you sure?',
-      text: 'Please add assay details by using the add/edit details button!',
+      title: "Switch to full study view? Are you sure?",
+      text: "Please add assay details by using the add/edit details button!",
       showCancelButton: true,
-      confirmButtonColor: '#DD6B55',
-      confirmButtonText: 'Confirm',
-      cancelButtonText: 'Back',
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Confirm",
+      cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
-        this.router.navigate(['/study', this.requestedStudy]);
+        this.router.navigate(["/study", this.requestedStudy]);
       }
     });
   }

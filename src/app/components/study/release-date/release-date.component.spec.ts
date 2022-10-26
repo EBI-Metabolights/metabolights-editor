@@ -1,11 +1,11 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { ReleaseDateComponent } from './release-date.component';
+import { ReleaseDateComponent } from "./release-date.component";
 
-describe('ReleaseDateComponent', () => {
+describe("ReleaseDateComponent", () => {
   let component: ReleaseDateComponent;
   let fixture: ComponentFixture<ReleaseDateComponent>;
   let editorService: EditorService;
@@ -25,7 +25,7 @@ describe('ReleaseDateComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

@@ -25,5 +25,4 @@ export interface ITableHeader {
   [key: string]: HeaderKey;
   index: number;
   mandatory: boolean;
-
 }

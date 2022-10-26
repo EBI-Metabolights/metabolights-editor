@@ -1,14 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { MetabolightsService } from '../../../../services/metabolights/metabolights.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as toastr from 'toastr';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
+import { NgRedux, select } from "@angular-redux/store";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import * as toastr from "toastr";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-ftp',
-  templateUrl: './ftp.component.html',
-  styleUrls: ['./ftp.component.css'],
+  selector: "mtbls-ftp",
+  templateUrl: "./ftp.component.html",
+  styleUrls: ["./ftp.component.css"],
 })
 export class FTPUploadComponent implements OnInit {
   @select((state) => state.study.uploadLocation) uploadLocation;
@@ -16,10 +16,10 @@ export class FTPUploadComponent implements OnInit {
 
   isFTPUploadModalOpen = false;
 
-  validationsId = 'upload';
+  validationsId = "upload";
   displayHelpModal = false;
 
-  uploadPath = '';
+  uploadPath = "";
 
   constructor(
     private fb: FormBuilder,

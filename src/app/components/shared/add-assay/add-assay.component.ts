@@ -10,18 +10,18 @@ import {
   OnChanges,
   SimpleChanges,
   ChangeDetectorRef,
-} from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EditorService } from '../../../services/editor.service';
-import { NgRedux, select } from '@angular-redux/store';
-import Swal from 'sweetalert2';
-import { environment } from 'src/environments/environment';
+} from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { EditorService } from "../../../services/editor.service";
+import { NgRedux, select } from "@angular-redux/store";
+import Swal from "sweetalert2";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'add-assay',
-  templateUrl: './add-assay.component.html',
-  styleUrls: ['./add-assay.component.css'],
+  selector: "add-assay",
+  templateUrl: "./add-assay.component.html",
+  styleUrls: ["./add-assay.component.css"],
 })
 export class AddAssayComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -103,7 +103,7 @@ export class AddAssayComponent implements OnInit {
 
   extractAssayDetails(assay) {
     if (assay.name.split(this.requestedStudy)[1]) {
-      const assayInfo = assay.name.split(this.requestedStudy)[1].split('_');
+      const assayInfo = assay.name.split(this.requestedStudy)[1].split("_");
       let assaySubTechnique = null;
       let assayTechnique = null;
       let assayMainTechnique = null;
@@ -127,9 +127,9 @@ export class AddAssayComponent implements OnInit {
       };
     }
     return {
-      assaySubTechnique: '',
-      assayTechnique: '',
-      assayMainTechnique: '',
+      assaySubTechnique: "",
+      assayTechnique: "",
+      assayMainTechnique: "",
     };
   }
 
@@ -161,9 +161,9 @@ export class AddAssayComponent implements OnInit {
       window.location.reload();
 
       Swal.fire({
-        title: 'Assay added!',
-        text: '',
-        type: 'success',
+        title: "Assay added!",
+        text: "",
+        type: "success",
       });
     });
   }

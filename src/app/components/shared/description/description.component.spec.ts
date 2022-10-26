@@ -1,15 +1,15 @@
-import { NgRedux } from '@angular-redux/store';
-import { CommonModule } from '@angular/common';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { Browser } from 'selenium-webdriver';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { NgRedux } from "@angular-redux/store";
+import { CommonModule } from "@angular/common";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { Browser } from "selenium-webdriver";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { DescriptionComponent } from './description.component';
+import { DescriptionComponent } from "./description.component";
 
-describe('DescriptionComponent', () => {
+describe("DescriptionComponent", () => {
   let component: DescriptionComponent;
   let fixture: ComponentFixture<DescriptionComponent>;
 
@@ -30,7 +30,7 @@ describe('DescriptionComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

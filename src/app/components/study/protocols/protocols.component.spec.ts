@@ -1,10 +1,10 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { ProtocolsComponent } from './protocols.component';
+import { ProtocolsComponent } from "./protocols.component";
 
-describe('ProtocolsComponent', () => {
+describe("ProtocolsComponent", () => {
   let component: ProtocolsComponent;
   let fixture: ComponentFixture<ProtocolsComponent>;
 
@@ -22,7 +22,7 @@ describe('ProtocolsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

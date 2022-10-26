@@ -32,4 +32,3 @@ jobs:
         run: |
           npx ng lint metabolights-editor
           npm run check-formatting
-

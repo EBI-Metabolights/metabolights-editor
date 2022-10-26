@@ -5,18 +5,18 @@ import {
   Inject,
   OnChanges,
   SimpleChanges,
-} from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import Swal from 'sweetalert2';
-import { ActivatedRoute } from '@angular/router';
-import { EditorService } from '../../../services/editor.service';
-import * as toastr from 'toastr';
-import { environment } from 'src/environments/environment';
+} from "@angular/core";
+import { NgRedux, select } from "@angular-redux/store";
+import Swal from "sweetalert2";
+import { ActivatedRoute } from "@angular/router";
+import { EditorService } from "../../../services/editor.service";
+import * as toastr from "toastr";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-status',
-  templateUrl: './status.component.html',
-  styleUrls: ['./status.component.css'],
+  selector: "mtbls-status",
+  templateUrl: "./status.component.html",
+  styleUrls: ["./status.component.css"],
 })
 export class StatusComponent implements OnInit {
   @select((state) => state.study.status) studyStatus;
@@ -30,7 +30,7 @@ export class StatusComponent implements OnInit {
   isFormBusy = false;
   status: string = null;
   curator = false;
-  toStatus = 'Submitted';
+  toStatus = "Submitted";
   requestedStudy: string = null;
 
   constructor(
@@ -72,19 +72,19 @@ export class StatusComponent implements OnInit {
         toStatus = this.toStatus;
       }
       Swal.fire({
-        title: 'Are you sure?',
+        title: "Are you sure?",
         showCancelButton: true,
-        confirmButtonColor: '#DD6B55',
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Back',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "Confirm",
+        cancelButtonText: "Back",
       }).then((willChange) => {
         if (willChange.value) {
           this.editorService.changeStatus(toStatus).subscribe(
             (data) => {
               this.closeModal();
-              toastr.success('Study status updated.', 'Success', {
-                timeOut: '2500',
-                positionClass: 'toast-top-center',
+              toastr.success("Study status updated.", "Success", {
+                timeOut: "2500",
+                positionClass: "toast-top-center",
                 preventDuplicates: true,
                 extendedTimeOut: 0,
                 tapToDismiss: false,

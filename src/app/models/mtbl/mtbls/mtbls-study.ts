@@ -1,13 +1,13 @@
-import { MTBLSComment } from './common/mtbls-comment';
-import { MTBLSPublication } from './mtbls-publication';
-import { MTBLSPerson } from './mtbls-person';
-import { MTBLSSample } from './mtbls-sample';
-import { MTBLSAssay } from './mtbls-assay';
-import { MTBLSProtocol } from './mtbls-protocol';
-import { MTBLSFactor } from './mtbls-factor';
-import { MTBLSProcessSequence } from './mtbls-process-sequence';
-import { Ontology } from './common/mtbls-ontology';
-import { JsonObject, JsonProperty } from 'json2typescript';
+import { MTBLSComment } from "./common/mtbls-comment";
+import { MTBLSPublication } from "./mtbls-publication";
+import { MTBLSPerson } from "./mtbls-person";
+import { MTBLSSample } from "./mtbls-sample";
+import { MTBLSAssay } from "./mtbls-assay";
+import { MTBLSProtocol } from "./mtbls-protocol";
+import { MTBLSFactor } from "./mtbls-factor";
+import { MTBLSProcessSequence } from "./mtbls-process-sequence";
+import { Ontology } from "./common/mtbls-ontology";
+import { JsonObject, JsonProperty } from "json2typescript";
 
 @JsonObject
 export class MTBLSStudy {

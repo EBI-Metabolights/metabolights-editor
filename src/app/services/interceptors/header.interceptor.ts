@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   HttpRequest,
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
-} from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { disambiguateUserObj } from '../editor.service';
+} from "@angular/common/http";
+import { Observable } from "rxjs";
+import { disambiguateUserObj } from "../editor.service";
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
@@ -16,9 +16,9 @@ export class HeaderInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-    if (request.headers.has('user_token')) {
-      if (request.headers.get('user_token') === 'dummy') {
-        if (localStorage.getItem('user') !== null) {
+    if (request.headers.has("user_token")) {
+      if (request.headers.get("user_token") === "dummy") {
+        if (localStorage.getItem("user") !== null) {
           request = request.clone({
             setHeaders: {
               user_token: disambiguateUserObj(this.getUserObj()),
@@ -31,6 +31,6 @@ export class HeaderInterceptor implements HttpInterceptor {
   }
 
   getUserObj() {
-    return JSON.parse(localStorage.getItem('user'));
+    return JSON.parse(localStorage.getItem("user"));
   }
 }

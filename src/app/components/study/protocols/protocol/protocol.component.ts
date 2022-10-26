@@ -1,30 +1,30 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EditorService } from '../../../../services/editor.service';
+import { Component, OnInit, Input, ViewChild } from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { EditorService } from "../../../../services/editor.service";
 import {
   MTBLSProtocol,
   ProtocolParameter,
-} from './../../../../models/mtbl/mtbls/mtbls-protocol';
-import { Ontology } from './../../../../models/mtbl/mtbls/common/mtbls-ontology';
+} from "./../../../../models/mtbl/mtbls/mtbls-protocol";
+import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 
-import { IAppState } from '../../../../store';
-import { NgRedux, select } from '@angular-redux/store';
-import { ValidateRules } from './protocol.validator';
-import { OntologyComponent } from '../../../shared/ontology/ontology.component';
-import * as toastr from 'toastr';
-import { JsonConvert } from 'json2typescript';
-import { IProtocol } from 'src/app/models/mtbl/mtbls/interfaces/protocol.interface';
-import { environment } from 'src/environments/environment';
+import { IAppState } from "../../../../store";
+import { NgRedux, select } from "@angular-redux/store";
+import { ValidateRules } from "./protocol.validator";
+import { OntologyComponent } from "../../../shared/ontology/ontology.component";
+import * as toastr from "toastr";
+import { JsonConvert } from "json2typescript";
+import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-protocol',
-  templateUrl: './protocol.component.html',
-  styleUrls: ['./protocol.component.css'],
+  selector: "mtbls-protocol",
+  templateUrl: "./protocol.component.html",
+  styleUrls: ["./protocol.component.css"],
 })
 export class ProtocolComponent implements OnInit {
-  @Input('value') protocol: any;
-  @Input('required') required = false;
-  @Input('validations') validations: any;
+  @Input("value") protocol: any;
+  @Input("required") required = false;
+  @Input("validations") validations: any;
 
   @select((state) => state.study.readonly) studyReadonly;
 
@@ -51,7 +51,7 @@ export class ProtocolComponent implements OnInit {
 
   form: FormGroup;
 
-  validationsId = 'protocols.protocol';
+  validationsId = "protocols.protocol";
 
   constructor(
     private fb: FormBuilder,
@@ -82,8 +82,8 @@ export class ProtocolComponent implements OnInit {
   saveColumnValue(col, assay) {
     const columns = [];
     const column = {
-      name: '',
-      value: '',
+      name: "",
+      value: "",
       index: null,
     };
     if (col.isOntology) {
@@ -110,12 +110,12 @@ export class ProtocolComponent implements OnInit {
       columns.push(column);
     }
     this.editorService
-      .addColumns(assay, { data: columns }, 'assays', null)
+      .addColumns(assay, { data: columns }, "assays", null)
       .subscribe(
         (res) => {
-          toastr.success('Assay specifications updated.', 'Success', {
-            timeOut: '2500',
-            positionClass: 'toast-top-center',
+          toastr.success("Assay specifications updated.", "Success", {
+            timeOut: "2500",
+            positionClass: "toast-top-center",
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
@@ -129,10 +129,10 @@ export class ProtocolComponent implements OnInit {
 
   formatTitle(term) {
     const s = term
-      .replace(/_/g, ' ')
-      .replace(/\.[^/.]+$/, '')
-      .replace(/\[/g, ' - ')
-      .replace(/\]/g, '');
+      .replace(/_/g, " ")
+      .replace(/\.[^/.]+$/, "")
+      .replace(/\[/g, " - ")
+      .replace(/\]/g, "");
     return s[0].toUpperCase() + s.slice(1);
   }
 
@@ -140,7 +140,7 @@ export class ProtocolComponent implements OnInit {
     let isEmpty = true;
     this.getAssaysWithProtocol().forEach((assay) => {
       this.protocol.meta[assay].forEach((col) => {
-        if (!col['is-hidden']) {
+        if (!col["is-hidden"]) {
           isEmpty = false;
         }
       });
@@ -151,7 +151,7 @@ export class ProtocolComponent implements OnInit {
   hasAssaySectionsEmpty(assay) {
     let isEmpty = true;
     this.protocol.meta[assay].forEach((col) => {
-      if (!col['is-hidden']) {
+      if (!col["is-hidden"]) {
         isEmpty = false;
       }
     });
@@ -163,7 +163,7 @@ export class ProtocolComponent implements OnInit {
     this.editor.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
       const ops = [];
       delta.ops.forEach((op) => {
-        if (op.insert && typeof op.insert === 'string') {
+        if (op.insert && typeof op.insert === "string") {
           ops.push({
             insert: op.insert,
           });
@@ -185,7 +185,7 @@ export class ProtocolComponent implements OnInit {
   addSymbol(content) {
     this.editor.focus();
     const caretPosition = this.editor.getSelection(true);
-    this.editor.insertText(caretPosition, content, 'user');
+    this.editor.insertText(caretPosition, content, "user");
     this.toggleSymbolDropdown();
   }
 
@@ -194,15 +194,15 @@ export class ProtocolComponent implements OnInit {
   }
 
   copyToClipboard(item) {
-    document.addEventListener('copy', (e: ClipboardEvent) => {
-      e.clipboardData.setData('text/plain', item);
+    document.addEventListener("copy", (e: ClipboardEvent) => {
+      e.clipboardData.setData("text/plain", item);
       e.preventDefault();
-      document.removeEventListener('copy', null);
+      document.removeEventListener("copy", null);
     });
-    document.execCommand('copy');
-    toastr.success('', 'Copied symbol ' + item + ' to clipboard', {
-      timeOut: '0',
-      positionClass: 'toast-top-center',
+    document.execCommand("copy");
+    toastr.success("", "Copied symbol " + item + " to clipboard", {
+      timeOut: "0",
+      positionClass: "toast-top-center",
       preventDuplicates: true,
       extendedTimeOut: 0,
     });
@@ -219,9 +219,9 @@ export class ProtocolComponent implements OnInit {
   }
 
   strip(html) {
-    const tmp = document.createElement('DIV');
+    const tmp = document.createElement("DIV");
     tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
+    return tmp.textContent || tmp.innerText || "";
   }
 
   confirmDelete() {
@@ -236,7 +236,7 @@ export class ProtocolComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
-    this.form.removeControl('description');
+    this.form.removeControl("description");
   }
 
   openParameterModal() {
@@ -250,14 +250,14 @@ export class ProtocolComponent implements OnInit {
 
   deleteParameter(parameter) {
     const filteredParameters = this.form
-      .get('parameters')
-      .value.filter((obj) =>
-        (
+      .get("parameters")
+      .value.filter(
+        (obj) =>
           obj.parameterName.annotationValue !==
           parameter.parameterName.annotationValue
-        ));
+      );
     if (filteredParameters) {
-      this.form.get('parameters').setValue(filteredParameters);
+      this.form.get("parameters").setValue(filteredParameters);
       this.form.markAsDirty();
     }
   }
@@ -266,23 +266,23 @@ export class ProtocolComponent implements OnInit {
     const parameter = new ProtocolParameter();
     parameter.parameterName = this.parameterName.values[0];
     if (
-      this.form.get('parameters').value.length === 1 &&
-      this.form.get('parameters').value[0].parameterName.annotationValue === ''
+      this.form.get("parameters").value.length === 1 &&
+      this.form.get("parameters").value[0].parameterName.annotationValue === ""
     ) {
-      this.form.get('parameters').setValue([parameter]);
+      this.form.get("parameters").setValue([parameter]);
     } else if (
-      this.form.get('parameters').value.length === 1 &&
-      this.form.get('parameters').value[0].parameterName.annotationValue !== ''
+      this.form.get("parameters").value.length === 1 &&
+      this.form.get("parameters").value[0].parameterName.annotationValue !== ""
     ) {
       this.form
-        .get('parameters')
-        .setValue(this.form.get('parameters').value.concat(parameter));
-    } else if (this.form.get('parameters').value.length > 1) {
+        .get("parameters")
+        .setValue(this.form.get("parameters").value.concat(parameter));
+    } else if (this.form.get("parameters").value.length > 1) {
       this.form
-        .get('parameters')
-        .setValue(this.form.get('parameters').value.concat(parameter));
+        .get("parameters")
+        .setValue(this.form.get("parameters").value.concat(parameter));
     } else {
-      this.form.get('parameters').setValue([parameter]);
+      this.form.get("parameters").setValue([parameter]);
     }
     this.isParameterModalOpen = false;
     this.form.markAsDirty();
@@ -290,15 +290,15 @@ export class ProtocolComponent implements OnInit {
 
   save() {
     if (!this.isStudyReadOnly) {
-      if (this.getFieldValue('description')) {
+      if (this.getFieldValue("description")) {
         this.isFormBusy = true;
         if (!this.addNewProtocol) {
           this.editorService
             .updateProtocol(this.protocol.name, this.compileBody())
             .subscribe(
               (res) => {
-                this.updateProtocols(res, 'Protocol updated.');
-                this.form.removeControl('description');
+                this.updateProtocols(res, "Protocol updated.");
+                this.form.removeControl("description");
                 // this.isModalOpen = false;
               },
               (err) => {
@@ -308,8 +308,8 @@ export class ProtocolComponent implements OnInit {
         } else {
           this.editorService.saveProtocol(this.compileBody()).subscribe(
             (res) => {
-              this.updateProtocols(res, 'Protocol saved.');
-              this.form.removeControl('description');
+              this.updateProtocols(res, "Protocol saved.");
+              this.form.removeControl("description");
               this.isModalOpen = false;
             },
             (err) => {
@@ -318,7 +318,7 @@ export class ProtocolComponent implements OnInit {
           );
         }
       } else {
-        alert('Protocol description cannot be empty');
+        alert("Protocol description cannot be empty");
       }
     }
   }
@@ -329,8 +329,8 @@ export class ProtocolComponent implements OnInit {
         this.editorService.deleteProtocol(this.protocol.name).subscribe(
           (res) => {
             this.addNewProtocol = true;
-            this.updateProtocols(res, 'Protocol deleted.');
-            this.form.removeControl('description');
+            this.updateProtocols(res, "Protocol deleted.");
+            this.form.removeControl("description");
             this.isDeleteModalOpen = false;
             this.isModalOpen = false;
           },
@@ -339,9 +339,9 @@ export class ProtocolComponent implements OnInit {
           }
         );
       } else {
-        toastr.error('Cannot delete a default protocol', 'Error', {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+        toastr.error("Cannot delete a default protocol", "Error", {
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -361,12 +361,12 @@ export class ProtocolComponent implements OnInit {
     this.form = this.fb.group({
       name: [
         { value: this.protocol.name, disabled: this.required },
-        ValidateRules('name', this.fieldValidation('name')),
+        ValidateRules("name", this.fieldValidation("name")),
       ],
       parameters: [this.protocol.parameters],
       description: [
         this.protocol.description,
-        ValidateRules('description', this.fieldValidation('description')),
+        ValidateRules("description", this.fieldValidation("description")),
       ],
     });
   }
@@ -375,9 +375,9 @@ export class ProtocolComponent implements OnInit {
     if (!this.isStudyReadOnly) {
       this.initialiseForm();
       if (this.protocol.parameters.length > 0) {
-        this.form.get('parameters').setValue(this.protocol.parameters);
+        this.form.get("parameters").setValue(this.protocol.parameters);
       } else {
-        this.form.get('parameters').setValue([]);
+        this.form.get("parameters").setValue([]);
       }
       this.selectedProtocol = protocol;
       this.isModalOpen = true;
@@ -401,9 +401,9 @@ export class ProtocolComponent implements OnInit {
           this.openModal(this.protocol);
         }
 
-        toastr.success(message, 'Success', {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+        toastr.success(message, "Success", {
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -414,24 +414,25 @@ export class ProtocolComponent implements OnInit {
 
   compileBody() {
     const mtblProtocol = new MTBLSProtocol();
-    mtblProtocol.name = this.getFieldValue('name');
-    mtblProtocol.description = this.getFieldValue('description')
-      .replace(/#/g, ' ')
-      .replace(/"/g, '\'');
+    mtblProtocol.name = this.getFieldValue("name");
+    mtblProtocol.description = this.getFieldValue("description")
+      .replace(/#/g, " ")
+      .replace(/"/g, "'");
     mtblProtocol.protocolType = new Ontology();
-    mtblProtocol.protocolType.annotationValue = this.getFieldValue('name');
-    mtblProtocol.parameters = this.getFieldValue('parameters');
+    mtblProtocol.protocolType.annotationValue = this.getFieldValue("name");
+    mtblProtocol.parameters = this.getFieldValue("parameters");
     return { protocol: mtblProtocol.toJSON() };
   }
 
   get validation() {
     if (this.validations) {
-      if (this.validationsId.includes('.')) {
-        const arr = this.validationsId.split('.');
+      if (this.validationsId.includes(".")) {
+        const arr = this.validationsId.split(".");
         let tempValidations = JSON.parse(JSON.stringify(this.validations));
-        while (arr.length && (tempValidations = tempValidations[arr.shift()])){
-;
-}
+        while (
+          arr.length &&
+          (tempValidations = tempValidations[arr.shift()])
+        ) {}
         return tempValidations;
       }
       return this.validations[this.validationsId];

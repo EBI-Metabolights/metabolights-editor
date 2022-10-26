@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from "@angular/core";
 import {
   CanActivate,
   Router,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   CanActivateChild,
-} from '@angular/router';
-import { EditorService } from './services/editor.service';
-import { NgRedux } from '@angular-redux/store';
-import { IAppState } from './store';
-import { IsInitialised } from './components/store';
-import { SessionStatus } from './models/mtbl/mtbls/enums/session-status.enum';
-import { ConfigurationService } from './configuration.service';
-import { HttpResponse } from '@angular/common/http';
+} from "@angular/router";
+import { EditorService } from "./services/editor.service";
+import { NgRedux } from "@angular-redux/store";
+import { IAppState } from "./store";
+import { IsInitialised } from "./components/store";
+import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
+import { ConfigurationService } from "./configuration.service";
+import { HttpResponse } from "@angular/common/http";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
   constructor(
@@ -47,7 +47,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
    * @returns boolean indicating whether the user is logged in.
    */
   checkLogin(url: string): boolean {
-    const isInit = this.ngRedux.getState().status['isInitialised']; // eslint-disable-line @typescript-eslint/dot-notation
+    const isInit = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
 
     switch (this.evaluateSession(isInit)) {
       case SessionStatus.Active:
@@ -58,9 +58,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return false;
 
       case SessionStatus.NotInit:
-        const isUserJSON = this.isJSON(localStorage.getItem('user'));
+        const isUserJSON = this.isJSON(localStorage.getItem("user"));
         if (isUserJSON) {
-          const user = JSON.parse(localStorage.getItem('user'));
+          const user = JSON.parse(localStorage.getItem("user"));
           this.editorService
             .authenticateAPIToken({ token: user.apiToken, user })
             .subscribe((res: HttpResponse<any>) => {
@@ -78,13 +78,13 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
       case SessionStatus.NoRecord:
         this.editorService.redirectUrl = url;
-        this.router.navigate(['/login']);
+        this.router.navigate(["/login"]);
         return false;
 
       default:
-        console.log('hit default case in checkLogin');
+        console.log("hit default case in checkLogin");
         this.editorService.redirectUrl = url;
-        this.router.navigate(['/login']);
+        this.router.navigate(["/login"]);
         return false;
     }
   }
@@ -100,8 +100,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     // which will either be arriving at the app for the first time, or refreshing the page.
     if (
       isInitialisedObj.ready === false &&
-      typeof isInitialisedObj.time === 'string' &&
-      localStorage.getItem('user') === null
+      typeof isInitialisedObj.time === "string" &&
+      localStorage.getItem("user") === null
     ) {
       return SessionStatus.NoRecord;
     }
@@ -109,9 +109,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     const now = new Date();
     let then = null;
 
-    const isUserJSON = this.isJSON(localStorage.getItem('user'));
-    if (localStorage.getItem('time') !== null && isUserJSON) {
-      then = new Date(localStorage.getItem('time'));
+    const isUserJSON = this.isJSON(localStorage.getItem("user"));
+    if (localStorage.getItem("time") !== null && isUserJSON) {
+      then = new Date(localStorage.getItem("time"));
     } else {
       return SessionStatus.NotInit;
     }

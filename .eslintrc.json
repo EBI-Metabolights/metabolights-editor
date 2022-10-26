@@ -16,11 +16,13 @@
         "createDefaultProgram": true
       },
       "extends": [
+        "prettier",
         "plugin:@angular-eslint/ng-cli-compat",
         "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
         "plugin:@angular-eslint/template/process-inline-templates"
       ],
       "rules": {
+        "@typescript-eslint/quotes": "off",
         "@angular-eslint/component-selector": "off",
         "@angular-eslint/no-input-rename": "off",
         "@typescript-eslint/consistent-type-definitions": "error",

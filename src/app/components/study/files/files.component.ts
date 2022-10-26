@@ -1,22 +1,21 @@
-import { Component, OnInit, Input } from '@angular/core';
-import * as toastr from 'toastr';
-import { EditorService } from '../../../services/editor.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { MetabolightsService } from '../../../services/metabolights/metabolights.service';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit, Input } from "@angular/core";
+import * as toastr from "toastr";
+import { EditorService } from "../../../services/editor.service";
+import { NgRedux, select } from "@angular-redux/store";
+import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-files',
-  templateUrl: './files.component.html',
-  styleUrls: ['./files.component.css'],
+  selector: "mtbls-files",
+  templateUrl: "./files.component.html",
+  styleUrls: ["./files.component.css"],
 })
 export class FilesComponent implements OnInit {
-
   @select((state) => state.study.readonly) readonly;
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
-  @Input('validations') validations: any;
+  @Input("validations") validations: any;
 
   rawFiles: any[] = [];
   metaFiles: any[] = [];
@@ -25,7 +24,7 @@ export class FilesComponent implements OnInit {
   uploadFiles: any[] = [];
   filesLoading = false;
   rawFilesLoading = false;
-  validationsId = 'upload';
+  validationsId = "upload";
 
   filteredMetaFiles: any[] = [];
   filteredRawFiles: any[] = [];
@@ -53,9 +52,7 @@ export class FilesComponent implements OnInit {
 
   refreshingData = false;
 
-
   isReadOnly = false;
-
 
   constructor(
     private editorService: EditorService,
@@ -106,31 +103,31 @@ export class FilesComponent implements OnInit {
 
   selectedDownloadFiles() {
     if (this.selectedMetaFiles.length > 0) {
-      let files = '';
+      let files = "";
       this.selectedMetaFiles.forEach((f) => {
-        if (files === '') {
+        if (files === "") {
           files = f.file;
         } else {
-          files = files + ',' + f.file;
+          files = files + "," + f.file;
         }
       });
       return files;
     } else {
-      return 'metadata';
+      return "metadata";
     }
   }
 
   deleteSelected() {
     if (this.selectedCategory !== null) {
-      if (this.selectedCategory === 'meta') {
+      if (this.selectedCategory === "meta") {
         this.executeDelete(this.selectedMetaFiles);
-      } else if (this.selectedCategory === 'audit') {
+      } else if (this.selectedCategory === "audit") {
         this.executeDelete(this.selectedAuditFiles);
-      } else if (this.selectedCategory === 'derived') {
+      } else if (this.selectedCategory === "derived") {
         this.executeDelete(this.selectedDerivedFiles);
-      } else if (this.selectedCategory === 'upload') {
+      } else if (this.selectedCategory === "upload") {
         this.executeDelete(this.selectedUploadFiles);
-      } else if (this.selectedCategory === 'raw') {
+      } else if (this.selectedCategory === "raw") {
         this.executeDelete(this.selectedRawFiles);
       }
     }
@@ -160,9 +157,9 @@ export class FilesComponent implements OnInit {
       )
       .subscribe((data) => {
         this.closeDeleteConfirmation();
-        toastr.success('File(s) deleted successfully', 'Success', {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+        toastr.success("File(s) deleted successfully", "Success", {
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,
@@ -182,84 +179,88 @@ export class FilesComponent implements OnInit {
   selectFiles(event, category, file, includeAll) {
     if (includeAll) {
       if (event.currentTarget.checked) {
-        if (category === 'raw') {
+        if (category === "raw") {
           this.selectedRawFiles = this.filteredRawFiles.slice();
-        } else if (category === 'audit') {
+        } else if (category === "audit") {
           this.selectedAuditFiles = this.filteredAuditFiles.slice();
-        } else if (category === 'derived') {
+        } else if (category === "derived") {
           this.selectedDerivedFiles = this.filteredDerivedFiles.slice();
-        } else if (category === 'upload') {
+        } else if (category === "upload") {
           this.selectedUploadFiles = this.filteredUploadFiles.slice();
-        } else if (category === 'meta') {
+        } else if (category === "meta") {
           this.selectedMetaFiles = this.filteredMetaFiles.slice();
         }
       } else {
-        if (category === 'raw') {
+        if (category === "raw") {
           this.selectedRawFiles = [];
-        } else if (category === 'audit') {
+        } else if (category === "audit") {
           this.selectedAuditFiles = [];
-        } else if (category === 'derived') {
+        } else if (category === "derived") {
           this.selectedDerivedFiles = [];
-        } else if (category === 'upload') {
+        } else if (category === "upload") {
           this.selectedUploadFiles = [];
-        } else if (category === 'meta') {
+        } else if (category === "meta") {
           this.selectedMetaFiles = [];
         }
       }
     } else {
       if (event.currentTarget.checked) {
-        if (category === 'raw') {
+        if (category === "raw") {
           this.selectedRawFiles = this.selectedRawFiles.concat(
             this.filteredRawFiles.filter((f) => f.file === file.file)
           );
-        } else if (category === 'audit') {
+        } else if (category === "audit") {
           this.selectedAuditFiles = this.selectedAuditFiles.concat(
             this.filteredAuditFiles.filter((f) => f.file === file.file)
           );
-        } else if (category === 'derived') {
+        } else if (category === "derived") {
           this.selectedDerivedFiles = this.selectedDerivedFiles.concat(
             this.filteredDerivedFiles.filter((f) => f.file === file.file)
           );
-        } else if (category === 'upload') {
+        } else if (category === "upload") {
           this.selectedUploadFiles = this.selectedUploadFiles.concat(
             this.filteredUploadFiles.filter((f) => f.file === file.file)
           );
-        } else if (category === 'meta') {
+        } else if (category === "meta") {
           this.selectedMetaFiles = this.selectedMetaFiles.concat(
             this.filteredMetaFiles.filter((f) => f.file === file.file)
           );
         }
       } else {
-        if (category === 'raw') {
+        if (category === "raw") {
           const selectedFileNames = this.selectedRawFiles.map((r) => r.file);
           const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
           if (indexOfSelectedFileName > -1) {
             this.selectedRawFiles.splice(indexOfSelectedFileName, 1);
           }
-        } else if (category === 'audit') {
+        } else if (category === "audit") {
           const selectedFileNames = this.selectedAuditFiles.map((r) => r.file);
           const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
           if (indexOfSelectedFileName > -1) {
             this.selectedAuditFiles.splice(indexOfSelectedFileName, 1);
           }
-        } else if (category === 'derived') {
-          const selectedFileNames = this.selectedDerivedFiles.map((r) => r.file);
+        } else if (category === "derived") {
+          const selectedFileNames = this.selectedDerivedFiles.map(
+            (r) => r.file
+          );
           const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
           if (indexOfSelectedFileName > -1) {
             this.selectedDerivedFiles.splice(indexOfSelectedFileName, 1);
           }
-        } else if (category === 'upload') {
+        } else if (category === "upload") {
           const selectedFileNames =
             this.selectedUploadFiles.length > 0
               ? this.selectedUploadFiles.map((r) => r.file)
               : [];
           if (selectedFileNames) {
-            const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
+            const indexOfSelectedFileName = selectedFileNames.indexOf(
+              file.file
+            );
             if (indexOfSelectedFileName > -1) {
               this.selectedUploadFiles.splice(indexOfSelectedFileName, 1);
             }
           }
-        } else if (category === 'meta') {
+        } else if (category === "meta") {
           const selectedFileNames = this.selectedMetaFiles.map((r) => r.file);
           const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
           if (indexOfSelectedFileName > -1) {
@@ -273,21 +274,21 @@ export class FilesComponent implements OnInit {
   decompresssFiles(files) {
     const body = { files: [] };
     files.forEach((file) => {
-      if (file.type === 'compressed') {
+      if (file.type === "compressed") {
         body.files.push({ name: file.file });
       }
     });
 
-    const fileNames = body.files.map((file) => file.name).join(', ');
+    const fileNames = body.files.map((file) => file.name).join(", ");
 
     if (body.files.length > 0) {
       this.editorService.decompressFiles(body).subscribe((response) => {
         toastr.success(
-          'Job submitted - Started decompressing files (' + fileNames + ')',
-          'Success',
+          "Job submitted - Started decompressing files (" + fileNames + ")",
+          "Success",
           {
-            timeOut: '2500',
-            positionClass: 'toast-top-center',
+            timeOut: "2500",
+            positionClass: "toast-top-center",
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: true,
@@ -301,7 +302,7 @@ export class FilesComponent implements OnInit {
   containsZipFiles(files) {
     let contains = false;
     files.forEach((file) => {
-      if (file.type === 'compressed') {
+      if (file.type === "compressed") {
         contains = true;
       }
     });
@@ -310,31 +311,31 @@ export class FilesComponent implements OnInit {
 
   isChecked(filename, category) {
     let isFileChecked = false;
-    if (category === 'raw') {
+    if (category === "raw") {
       this.selectedRawFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'audit') {
+    } else if (category === "audit") {
       this.selectedAuditFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'derived') {
+    } else if (category === "derived") {
       this.selectedDerivedFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'upload') {
+    } else if (category === "upload") {
       this.selectedUploadFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'meta') {
+    } else if (category === "meta") {
       this.selectedMetaFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
@@ -407,22 +408,22 @@ export class FilesComponent implements OnInit {
 
     data.study?.forEach((file) => {
       if (
-        file.type === 'raw' ||
-        file.type === 'unknown' ||
-        file.type === 'compressed' ||
-        file.type === 'derived'
+        file.type === "raw" ||
+        file.type === "unknown" ||
+        file.type === "compressed" ||
+        file.type === "derived"
       ) {
         this.rawFiles.push(file);
         this.filteredRawFiles.push(file);
-      } else if (file.type.indexOf('metadata') > -1) {
+      } else if (file.type.indexOf("metadata") > -1) {
         this.metaFiles.push(file);
         this.filteredMetaFiles.push(file);
-      } else if (file.type === 'audit') {
+      } else if (file.type === "audit") {
         this.auditFiles.push(file);
         this.filteredAuditFiles.push(file);
       } else if (
-        file.type === 'internal_mapping' ||
-        file.type === 'spreadsheet'
+        file.type === "internal_mapping" ||
+        file.type === "spreadsheet"
       ) {
         this.derivedFiles.push(file);
         this.filteredDerivedFiles.push(file);
@@ -436,26 +437,28 @@ export class FilesComponent implements OnInit {
 
   applyFilter(event, target) {
     const term = event.target.value;
-    if (target === 'meta') {
+    if (target === "meta") {
       this.filteredMetaFiles = this.aFilter(term, this.metaFiles);
-    } else if (target === 'audit') {
+    } else if (target === "audit") {
       this.filteredAuditFiles = this.aFilter(term, this.auditFiles);
-    } else if (target === 'raw') {
+    } else if (target === "raw") {
       this.filteredRawFiles = this.aFilter(term, this.rawFiles);
-    } else if (target === 'derived') {
+    } else if (target === "derived") {
       this.filteredDerivedFiles = this.aFilter(term, this.derivedFiles);
-    } else if (target === 'upload') {
+    } else if (target === "upload") {
       this.filteredUploadFiles = this.aFilter(term, this.uploadFiles);
     }
   }
 
   aFilter(term, source) {
     let target = [];
-    if (term === '') {
+    if (term === "") {
       target = source;
       return target;
     } else {
-      target = source.filter((t) => t.file.toLowerCase().indexOf(term.toLowerCase()) > -1);
+      target = source.filter(
+        (t) => t.file.toLowerCase().indexOf(term.toLowerCase()) > -1
+      );
       return target;
     }
   }
@@ -466,9 +469,9 @@ export class FilesComponent implements OnInit {
         files: [],
       })
       .subscribe((data) => {
-        toastr.success('Files synced successfully', 'Success', {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+        toastr.success("Files synced successfully", "Success", {
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: false,

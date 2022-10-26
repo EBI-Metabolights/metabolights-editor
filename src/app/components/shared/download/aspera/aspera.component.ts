@@ -1,12 +1,12 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { NgRedux, select } from "@angular-redux/store";
+import { environment } from "src/environments/environment";
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
-  selector: 'mtbls-download-aspera',
-  templateUrl: './aspera.component.html',
-  styleUrls: ['./aspera.component.css'],
+  selector: "mtbls-download-aspera",
+  templateUrl: "./aspera.component.html",
+  styleUrls: ["./aspera.component.css"],
 })
 export class AsperaDownloadComponent implements OnInit {
   @select((state) => state.study.uploadLocation) uploadLocation;
@@ -18,17 +18,17 @@ export class AsperaDownloadComponent implements OnInit {
   displayHelpModal = false;
   studyId: string = null;
   isAsperaDownloadModalOpen = false;
-  selectedTab = 'plugin';
+  selectedTab = "plugin";
   file = null;
   allowMultipleSelection = false;
-  type = 'file';
+  type = "file";
   requestedStudy = null;
   fileTypes = null;
   currentTransferId = null;
-  validationsId = 'download';
-  MIN_CONNECT_VERSION = '3.6.0.0';
-  CONNECT_AUTOINSTALL_LOCATION = '//d3gcli72yxqn2z.cloudfront.net/connect/v4';
-  downloadPath = '';
+  validationsId = "download";
+  MIN_CONNECT_VERSION = "3.6.0.0";
+  CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
+  downloadPath = "";
   validation: any = null;
   asperaWeb: any = null;
 
@@ -76,7 +76,7 @@ export class AsperaDownloadComponent implements OnInit {
       sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
     });
     this.asperaWeb.initSession();
-     this.downloadFile();
+    this.downloadFile();
   }
 
   downloadFile() {
@@ -84,17 +84,17 @@ export class AsperaDownloadComponent implements OnInit {
       {
         paths: [
           {
-            source: '/studies/public/' + this.requestedStudy,
+            source: "/studies/public/" + this.requestedStudy,
           },
         ],
-        remote_host: 'fasp.ebi.ac.uk',
-        remote_user: 'fasp-ml',
-        remote_password: 'Xz68YfDe',
-        direction: 'receive',
+        remote_host: "fasp.ebi.ac.uk",
+        remote_user: "fasp-ml",
+        remote_password: "Xz68YfDe",
+        direction: "receive",
         target_rate_kbps: 5e4,
         allow_dialogs: !0,
         ssh_port: 33001,
-        resume: 'sparse_checksum',
+        resume: "sparse_checksum",
       },
       {}
     );

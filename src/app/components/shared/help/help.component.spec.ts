@@ -1,12 +1,12 @@
-import { ConfigurableFocusTrap } from '@angular/cdk/a11y';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockConfigurationService } from 'src/app/configuration.mock.service';
-import { ConfigurationService } from 'src/app/configuration.service';
+import { ConfigurableFocusTrap } from "@angular/cdk/a11y";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { MockConfigurationService } from "src/app/configuration.mock.service";
+import { ConfigurationService } from "src/app/configuration.service";
 
-import { HelpComponent } from './help.component';
+import { HelpComponent } from "./help.component";
 
-describe('HelpComponent', () => {
+describe("HelpComponent", () => {
   let component: HelpComponent;
   let fixture: ComponentFixture<HelpComponent>;
   let configService: ConfigurationService;
@@ -31,11 +31,11 @@ describe('HelpComponent', () => {
     fixture = TestBed.createComponent(HelpComponent);
     component = fixture.componentInstance;
 
-    component.target = 'all';
+    component.target = "all";
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

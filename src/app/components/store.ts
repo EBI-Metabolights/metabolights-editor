@@ -1,5 +1,5 @@
-import { strictEqual } from 'assert';
-import { tassign } from 'tassign';
+import { strictEqual } from "assert";
+import { tassign } from "tassign";
 import {
   TOGGLE_LOADING,
   ENABLE_LOADING,
@@ -17,7 +17,7 @@ import {
   SET_GUIDES,
   SET_USER,
   RESET,
-} from './actions';
+} from "./actions";
 
 export interface IsInitialised {
   ready: boolean;
@@ -27,20 +27,20 @@ export interface IsInitialised {
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export const SHARED_INITIAL_STATE: Record<string, unknown> = {
   loading: true,
-  info: '',
-  configuration: '',
+  info: "",
+  configuration: "",
   isCurator: false,
   user: null,
   error: false,
-  message: '',
-  currentTabIndex: '0',
+  message: "",
+  currentTabIndex: "0",
   isInitialised: {
     ready: false,
-    time: '',
+    time: "",
   },
   userStudies: null,
   mappings: null,
-  selectedLanguage: 'en',
+  selectedLanguage: "en",
   guides: null,
 };
 
@@ -89,7 +89,7 @@ function reset(state, action) {
   return tassign(state, {
     isInitialised: {
       ready: false,
-      time: '',
+      time: "",
     },
   });
 }
@@ -113,17 +113,17 @@ function setGuides(state, action) {
 function setLoadingConfiguration(state, action) {
   const configurationValue = {};
   action.body.configuration.forEach((config) => {
-    if (config.name === 'Created With Configuration') {
-      configurationValue['created_with'] = config.value;
-    } else if (config.name === 'Last Opened With Configuration') {
-      configurationValue['opened_with'] = config.value;
+    if (config.name === "Created With Configuration") {
+      configurationValue["created_with"] = config.value;
+    } else if (config.name === "Last Opened With Configuration") {
+      configurationValue["opened_with"] = config.value;
     }
   });
   return tassign(state, { configuration: configurationValue });
 }
 
 function setCurrentUser(state, action) {
-  const isCurator = action.body.user.role === 'ROLE_SUPER_USER' ? true : false;
+  const isCurator = action.body.user.role === "ROLE_SUPER_USER" ? true : false;
   return tassign(state, { user: action.body.user, isCurator });
 }
 

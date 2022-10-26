@@ -1,4 +1,4 @@
-import { IOntology } from './ontology.interface';
+import { IOntology } from "./ontology.interface";
 
 // same with a lot of these interfaces, there would be a cascade of problems
 // if we adhered to camelcase.

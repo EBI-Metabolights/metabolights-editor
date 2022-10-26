@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { ConfigurationService } from '../configuration.service';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { ConfigurationService } from "../configuration.service";
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: "root",
 })
 export class LabsWorkspaceService {
   url: string = null;

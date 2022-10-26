@@ -1,15 +1,15 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { select } from '@angular-redux/store';
-import { environment } from 'src/environments/environment';
-import { Router } from '@angular/router';
+import { Component, OnInit, Input } from "@angular/core";
+import { select } from "@angular-redux/store";
+import { environment } from "src/environments/environment";
+import { Router } from "@angular/router";
 
 @Component({
-  selector: 'mtbls-mafs',
-  templateUrl: './mafs.component.html',
-  styleUrls: ['./mafs.component.css'],
+  selector: "mtbls-mafs",
+  templateUrl: "./mafs.component.html",
+  styleUrls: ["./mafs.component.css"],
 })
 export class MafsComponent implements OnInit {
-  @Input('assayName') assayName: any;
+  @Input("assayName") assayName: any;
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.assays) studyAssays;
   @select((state) => state.study.studyAssays) assayFiles;
@@ -48,7 +48,8 @@ export class MafsComponent implements OnInit {
       this.assays = value;
       const tempMAFs = [];
       Object.values(this.assays).forEach((assay) => {
-        assay['mafs'].forEach((maf) => { // eslint-disable-line @typescript-eslint/dot-notation
+        assay.mafs.forEach((maf) => {
+          // eslint-disable-line @typescript-eslint/dot-notation
           tempMAFs.push(maf);
         });
       });
@@ -82,7 +83,7 @@ export class MafsComponent implements OnInit {
             this.assays[assayName].mafs.forEach((mafFile) => {
               if (
                 this.mafNames.indexOf(mafFile) === -1 &&
-                mafFile.indexOf('m_') === 0
+                mafFile.indexOf("m_") === 0
               ) {
                 this.mafNames.push(mafFile);
               }
@@ -99,8 +100,8 @@ export class MafsComponent implements OnInit {
         });
       }
       if (value && this.mafNames.length === 0) {
-        if (this.router.url.indexOf('metabolites') > -1) {
-          this.router.navigate(['/study', this.requestedStudy]);
+        if (this.router.url.indexOf("metabolites") > -1) {
+          this.router.navigate(["/study", this.requestedStudy]);
         }
       }
     });

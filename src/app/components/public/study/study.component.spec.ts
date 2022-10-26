@@ -1,11 +1,11 @@
-import { NgRedux } from '@angular-redux/store';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { NgRedux } from "@angular-redux/store";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
-} from '@angular/core';
+} from "@angular/core";
 import {
   Router,
   UrlSerializer,
@@ -14,23 +14,23 @@ import {
   ROUTER_CONFIGURATION,
   UrlHandlingStrategy,
   RouteReuseStrategy,
-} from '@angular/router';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+} from "@angular/router";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import {
   RouterTestingModule,
   setupTestingRouter,
-} from '@angular/router/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
-import { PublicStudyComponent } from './study.component';
-import { SpyLocation } from '@angular/common/testing';
-import { HttpClientModule } from '@angular/common/http';
-import { LabsWorkspaceService } from 'src/app/services/labs-workspace.service';
-import { MockLabsWorkspaceService } from 'src/app/services/labs-workspace.service.mock';
-import { MockConfigurationService } from 'src/app/configuration.mock.service';
-import { ConfigurationService } from 'src/app/configuration.service';
+} from "@angular/router/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
+import { PublicStudyComponent } from "./study.component";
+import { SpyLocation } from "@angular/common/testing";
+import { HttpClientModule } from "@angular/common/http";
+import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
+import { MockLabsWorkspaceService } from "src/app/services/labs-workspace.service.mock";
+import { MockConfigurationService } from "src/app/configuration.mock.service";
+import { ConfigurationService } from "src/app/configuration.service";
 
-describe('StudyComponent', () => {
+describe("StudyComponent", () => {
   let component: PublicStudyComponent;
   let fixture: ComponentFixture<PublicStudyComponent>;
   let editorService: EditorService;
@@ -83,7 +83,7 @@ describe('StudyComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

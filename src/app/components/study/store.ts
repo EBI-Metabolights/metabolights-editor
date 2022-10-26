@@ -1,10 +1,10 @@
-import { tassign } from 'tassign';
-import { MTBLSStudy } from '../../models/mtbl/mtbls/mtbls-study';
-import { MTBLSProtocol } from '../../models/mtbl/mtbls/mtbls-protocol';
-import { MTBLSFactor } from '../../models/mtbl/mtbls/mtbls-factor';
-import { Ontology } from '../../models/mtbl/mtbls/common/mtbls-ontology';
-import { MTBLSProcessSequence } from '../../models/mtbl/mtbls/mtbls-process-sequence';
-import { JsonConvert } from 'json2typescript';
+import { tassign } from "tassign";
+import { MTBLSStudy } from "../../models/mtbl/mtbls/mtbls-study";
+import { MTBLSProtocol } from "../../models/mtbl/mtbls/mtbls-protocol";
+import { MTBLSFactor } from "../../models/mtbl/mtbls/mtbls-factor";
+import { Ontology } from "../../models/mtbl/mtbls/common/mtbls-ontology";
+import { MTBLSProcessSequence } from "../../models/mtbl/mtbls/mtbls-process-sequence";
+import { JsonConvert } from "json2typescript";
 import {
   SET_STUDY_IDENTIFIER,
   SET_STUDY_TITLE,
@@ -43,16 +43,16 @@ import {
   SET_STUDY_ERROR,
   SET_STUDY_READONLY,
   SET_PROTOCOL_EXPAND,
-} from './actions';
+} from "./actions";
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 
 export const STUDY_INITIAL_STATE: MTBLSStudy = new MTBLSStudy();
 
 function checkLocal() {
-    return localStorage.getItem('state') === null
-      ? STUDY_INITIAL_STATE
-      : JSON.parse(localStorage.getItem('state')).study;
-  }
+  return localStorage.getItem("state") === null
+    ? STUDY_INITIAL_STATE
+    : JSON.parse(localStorage.getItem("state")).study;
+}
 
 function setStudyIdentifier(state, action) {
   if (action.body.study) {
@@ -221,8 +221,8 @@ function addStudyAssayTable(state, action) {
           action.body.assayTable.protocolsMetaData[key].columns;
         protocol.meta[action.body.assay].forEach((column) => {
           if (protocolValidation.columns[column.name]) {
-            column['is-hidden'] = JSON.parse(
-              protocolValidation.columns[column.name]['is-hidden']
+            column["is-hidden"] = JSON.parse(
+              protocolValidation.columns[column.name]["is-hidden"]
             );
           }
         });
@@ -437,4 +437,3 @@ export function studyReducer(
 
   return state;
 }
-

@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { NgRedux, select } from "@angular-redux/store";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-factors',
-  templateUrl: './factors.component.html',
-  styleUrls: ['./factors.component.css'],
+  selector: "mtbls-factors",
+  templateUrl: "./factors.component.html",
+  styleUrls: ["./factors.component.css"],
 })
 export class FactorsComponent implements OnInit {
   @select((state) => state.study.factors) studyFactors;

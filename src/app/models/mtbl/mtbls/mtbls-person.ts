@@ -1,37 +1,37 @@
-import { MTBLSComment } from './common/mtbls-comment';
-import { Ontology } from './common/mtbls-ontology';
-import { JsonObject, JsonProperty } from 'json2typescript';
+import { MTBLSComment } from "./common/mtbls-comment";
+import { Ontology } from "./common/mtbls-ontology";
+import { JsonObject, JsonProperty } from "json2typescript";
 
 @JsonObject
 export class MTBLSPerson {
-  @JsonProperty('comments', [MTBLSComment])
+  @JsonProperty("comments", [MTBLSComment])
   comments: MTBLSComment[] = [];
 
-  @JsonProperty('firstName', String)
-  firstName = '';
+  @JsonProperty("firstName", String)
+  firstName = "";
 
-  @JsonProperty('lastName', String)
-  lastName = '';
+  @JsonProperty("lastName", String)
+  lastName = "";
 
-  @JsonProperty('email', String)
-  email = '';
+  @JsonProperty("email", String)
+  email = "";
 
-  @JsonProperty('affiliation', String)
-  affiliation = '';
+  @JsonProperty("affiliation", String)
+  affiliation = "";
 
-  @JsonProperty('address', String)
-  address = '';
+  @JsonProperty("address", String)
+  address = "";
 
-  @JsonProperty('fax', String)
-  fax = '';
+  @JsonProperty("fax", String)
+  fax = "";
 
-  @JsonProperty('midInitials', String)
-  midInitials = '';
+  @JsonProperty("midInitials", String)
+  midInitials = "";
 
-  @JsonProperty('phone', String)
-  phone = '';
+  @JsonProperty("phone", String)
+  phone = "";
 
-  @JsonProperty('roles', Ontology)
+  @JsonProperty("roles", Ontology)
   roles: Ontology[] = [];
 
   toJSON() {

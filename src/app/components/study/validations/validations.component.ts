@@ -1,24 +1,23 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { EditorService } from '../../../services/editor.service';
-import * as toastr from 'toastr';
+import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { NgRedux, select } from "@angular-redux/store";
+import { EditorService } from "../../../services/editor.service";
+import * as toastr from "toastr";
 
 @Component({
-  selector: 'study-validations',
-  templateUrl: './validations.component.html',
-  styleUrls: ['./validations.component.css'],
+  selector: "study-validations",
+  templateUrl: "./validations.component.html",
+  styleUrls: ["./validations.component.css"],
 })
 export class ValidationsComponent implements OnInit, AfterViewInit {
-
   @select((state) => state.study.validation) validation: any;
   @select((state) => state.status.isCurator) isCurator;
 
   studyValidation: any = null;
   noValidationsfound: any = null;
-  displayOption = 'error';
+  displayOption = "error";
   defaultToastrOptions: any = {
-    timeOut: '2500',
-    positionClass: 'toast-top-center',
+    timeOut: "2500",
+    positionClass: "toast-top-center",
     preventDuplicates: true,
     extendedTimeOut: 0,
     tapToDismiss: false,
@@ -27,7 +26,6 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   /**Extraordinary bad practice to have a testing flag, but attempts to mock out the select have failed.
    * The state library itself is also long unmaintained. */
   isTesting = false;
-
 
   curator = false;
 
@@ -54,13 +52,13 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     this.editorService.refreshValidations().subscribe(
       (res) => {
         this.editorService.loadValidations();
-        toastr.success(res.success, 'Success', this.defaultToastrOptions);
+        toastr.success(res.success, "Success", this.defaultToastrOptions);
       },
       (err) => {
         toastr.success(
-          'Validation refresh job is submitted. If your study is large, validations will take some time to refresh.' +
-            'If your study validations are not refreshing please contact us.',
-          'Success',
+          "Validation refresh job is submitted. If your study is large, validations will take some time to refresh." +
+            "If your study validations are not refreshing please contact us.",
+          "Success",
           this.defaultToastrOptions
         );
       }
@@ -80,15 +78,15 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
       (res) => {
         toastr.success(
           res.success,
-          'Successfully overriden the validation',
+          "Successfully overriden the validation",
           this.defaultToastrOptions
         );
         this.refreshValidations();
       },
       (err) => {
         toastr.error(
-          'Validation override failed',
-          'Error',
+          "Validation override failed",
+          "Error",
           this.defaultToastrOptions
         );
       }
@@ -114,7 +112,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     this.editorService.addComment(data).subscribe((res) => {
       toastr.success(
         res.success,
-        'Successfully posted the comment',
+        "Successfully posted the comment",
         this.defaultToastrOptions
       );
       this.refreshValidations();

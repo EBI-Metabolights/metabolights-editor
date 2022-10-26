@@ -1,17 +1,17 @@
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { MockConfigurationService } from 'src/app/configuration.mock.service';
-import { ConfigurationService } from 'src/app/configuration.service';
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { MockConfigurationService } from "src/app/configuration.mock.service";
+import { ConfigurationService } from "src/app/configuration.service";
 import {
   failedValidation,
   successfulValidation,
-} from 'src/app/models/mtbl/mtbls/mocks/mock-validation';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+} from "src/app/models/mtbl/mtbls/mocks/mock-validation";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { OntologyComponent } from './ontology.component';
+import { OntologyComponent } from "./ontology.component";
 
-describe('OntologyComponent', () => {
+describe("OntologyComponent", () => {
   let component: OntologyComponent;
   let fixture: ComponentFixture<OntologyComponent>;
   let editorService: EditorService;
@@ -26,7 +26,8 @@ describe('OntologyComponent', () => {
         {
           provide: ConfigurationService,
           useClass: MockConfigurationService,
-        },],
+        },
+      ],
     });
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
@@ -41,7 +42,7 @@ describe('OntologyComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

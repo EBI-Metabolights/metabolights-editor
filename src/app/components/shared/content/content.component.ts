@@ -6,27 +6,27 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
-} from '@angular/core';
+} from "@angular/core";
 @Component({
-  selector: 'mtbls-content',
-  templateUrl: './content.component.html',
-  styleUrls: ['./content.component.css'],
+  selector: "mtbls-content",
+  templateUrl: "./content.component.html",
+  styleUrls: ["./content.component.css"],
 })
 export class ContentComponent implements OnInit, OnChanges {
-  @Input('value') content: any;
-  @Input('count') count: any;
-  @Input('message') message: string;
+  @Input("value") content: any;
+  @Input("count") count: any;
+  @Input("message") message: string;
 
   @Output() editContent = new EventEmitter<string>();
 
-  displayContent = '';
+  displayContent = "";
   displayMoreOption = false;
 
   constructor() {}
 
   ngOnInit() {
-    if (this.message === '' || this.message === null) {
-      this.message = 'This section is empty.';
+    if (this.message === "" || this.message === null) {
+      this.message = "This section is empty.";
     }
 
     if (this.count > 0) {
@@ -49,7 +49,7 @@ export class ContentComponent implements OnInit, OnChanges {
   }
 
   emitEditContentEvent() {
-    this.editContent.next('');
+    this.editContent.next("");
   }
 
   ngOnChanges(changes: SimpleChanges) {

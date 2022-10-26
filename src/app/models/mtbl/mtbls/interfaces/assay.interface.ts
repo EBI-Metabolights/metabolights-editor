@@ -1,7 +1,7 @@
-import { IComment } from './comment.interface';
-import { IOntology } from './ontology.interface';
-import { ISample } from './sample.interface';
-import { ISource } from './source.interface';
+import { IComment } from "./comment.interface";
+import { IOntology } from "./ontology.interface";
+import { ISample } from "./sample.interface";
+import { ISource } from "./source.interface";
 
 export interface IAssay {
   comments: IComment[];

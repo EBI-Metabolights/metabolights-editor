@@ -1,16 +1,16 @@
-import { NgRedux } from '@angular-redux/store';
-import { CommonModule } from '@angular/common';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SpyLocation } from '@angular/common/testing';
+import { NgRedux } from "@angular-redux/store";
+import { CommonModule } from "@angular/common";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
-} from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+} from "@angular/core";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
 import {
   Router,
   UrlSerializer,
@@ -19,19 +19,19 @@ import {
   ROUTER_CONFIGURATION,
   UrlHandlingStrategy,
   RouteReuseStrategy,
-} from '@angular/router';
+} from "@angular/router";
 import {
   RouterTestingModule,
   setupTestingRouter,
-} from '@angular/router/testing';
-import { MockConfigurationService } from 'src/app/configuration.mock.service';
-import { ConfigurationService } from 'src/app/configuration.service';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+} from "@angular/router/testing";
+import { MockConfigurationService } from "src/app/configuration.mock.service";
+import { ConfigurationService } from "src/app/configuration.service";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { GuidesComponent } from './guides.component';
+import { GuidesComponent } from "./guides.component";
 
-describe('GuidesComponent', () => {
+describe("GuidesComponent", () => {
   let component: GuidesComponent;
   let fixture: ComponentFixture<GuidesComponent>;
   let configService: ConfigurationService;
@@ -70,7 +70,7 @@ describe('GuidesComponent', () => {
         {
           provide: ConfigurationService,
           useClass: MockConfigurationService,
-        }
+        },
       ],
     });
     configService = TestBed.inject(ConfigurationService);
@@ -84,7 +84,7 @@ describe('GuidesComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

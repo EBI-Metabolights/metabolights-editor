@@ -1,28 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { EditorService } from '../../../services/editor.service';
-import * as toastr from 'toastr';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from '../../../store';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { Router } from "@angular/router";
+import { EditorService } from "../../../services/editor.service";
+import * as toastr from "toastr";
+import { NgRedux, select } from "@angular-redux/store";
+import { IAppState } from "../../../store";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'app-create',
-  templateUrl: './create.component.html',
-  styleUrls: ['./create.component.css'],
+  selector: "app-create",
+  templateUrl: "./create.component.html",
+  styleUrls: ["./create.component.css"],
 })
 export class CreateComponent implements OnInit {
   selectedCreateOption = 2;
   currentSubStep = 0;
-  newStudy = 'MTBLS1';
+  newStudy = "MTBLS1";
   options: any[] = [
     {
-      text: 'Yes, I would like to upload files now',
+      text: "Yes, I would like to upload files now",
       value: 1,
       disabled: false,
     },
     {
-      text: 'I will upload files later',
+      text: "I will upload files later",
       value: 2,
       disabled: false,
     },
@@ -39,7 +39,7 @@ export class CreateComponent implements OnInit {
 
   ngOnInit() {
     if (!environment.isTesting) {
-      this.ngRedux.dispatch({ type: 'DISABLE_LOADING' });
+      this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
     }
   }
 
@@ -56,9 +56,9 @@ export class CreateComponent implements OnInit {
         this.isLoading = false;
       },
       (err) => {
-        toastr.error('Study creation error.', 'Error', {
-          timeOut: '2500',
-          positionClass: 'toast-top-center',
+        toastr.error("Study creation error.", "Error", {
+          timeOut: "2500",
+          positionClass: "toast-top-center",
           preventDuplicates: true,
           extendedTimeOut: 0,
           tapToDismiss: true,
@@ -73,9 +73,9 @@ export class CreateComponent implements OnInit {
     setTimeout(() => {
       this.isLoading = false;
       if (this.selectedCreateOption === 1) {
-        this.router.navigate(['/guide/upload', this.newStudy]);
+        this.router.navigate(["/guide/upload", this.newStudy]);
       } else {
-        this.router.navigate(['/guide/meta', this.newStudy]);
+        this.router.navigate(["/guide/meta", this.newStudy]);
       }
     }, 3000);
   }

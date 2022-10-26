@@ -1,11 +1,11 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { select } from '@angular-redux/store';
-import { environment } from 'src/environments/environment';
+import { Component, Output, EventEmitter } from "@angular/core";
+import { select } from "@angular-redux/store";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-assays',
-  templateUrl: './assays.component.html',
-  styleUrls: ['./assays.component.css'],
+  selector: "mtbls-assays",
+  templateUrl: "./assays.component.html",
+  styleUrls: ["./assays.component.css"],
 })
 export class AssaysComponent {
   @select((state) => state.study.assays) studyAssays;

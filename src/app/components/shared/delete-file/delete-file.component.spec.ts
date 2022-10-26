@@ -1,15 +1,15 @@
-import { CommonModule } from '@angular/common';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
-import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
-import { MockMetabolightsService } from 'src/app/services/metabolights/metabolights.service.mock';
+import { CommonModule } from "@angular/common";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
+import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
+import { MockMetabolightsService } from "src/app/services/metabolights/metabolights.service.mock";
 
-import { DeleteFileComponent } from './delete-file.component';
+import { DeleteFileComponent } from "./delete-file.component";
 
-describe('DeleteComponent', () => {
+describe("DeleteComponent", () => {
   let component: DeleteFileComponent;
   let fixture: ComponentFixture<DeleteFileComponent>;
 
@@ -30,7 +30,7 @@ describe('DeleteComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

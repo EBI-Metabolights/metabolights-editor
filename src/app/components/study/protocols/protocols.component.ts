@@ -4,22 +4,22 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
-} from '@angular/core';
-import { NgRedux, select } from '@angular-redux/store';
-import { EditorService } from '../../../services/editor.service';
-import { environment } from 'src/environments/environment';
+} from "@angular/core";
+import { NgRedux, select } from "@angular-redux/store";
+import { EditorService } from "../../../services/editor.service";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'mtbls-protocols',
-  templateUrl: './protocols.component.html',
-  styleUrls: ['./protocols.component.css'],
+  selector: "mtbls-protocols",
+  templateUrl: "./protocols.component.html",
+  styleUrls: ["./protocols.component.css"],
 })
 export class ProtocolsComponent implements OnInit, OnChanges {
   @select((state) => state.study.protocols) studyProtocols;
   @select((state) => state.study.validations) studyValidations;
   @select((state) => state.study.isProtocolsExpanded) isProtocolsExpanded;
 
-  @Input('assay') assay: any;
+  @Input("assay") assay: any;
 
   @select((state) => state.study.readonly) studyReadonly;
   isStudyReadOnly = false;
@@ -31,7 +31,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   customProtocols: string[] = [];
   defaultProtocols: string[] = [];
 
-  validationsId = 'protocols';
+  validationsId = "protocols";
   expand = true;
 
   constructor(private editorService: EditorService) {
@@ -54,7 +54,9 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     this.studyValidations.subscribe((value) => {
       if (value) {
         this.validations = value;
-        this.validation.default.sort((a, b) => a['sort-order'] - b['sort-order']);
+        this.validation.default.sort(
+          (a, b) => a["sort-order"] - b["sort-order"]
+        );
         this.defaultProtocols = this.validation.default.map(
           (protocol) => protocol.title
         );

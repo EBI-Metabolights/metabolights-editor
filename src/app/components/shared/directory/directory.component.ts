@@ -1,21 +1,20 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { EditorService } from '../../../services/editor.service';
-import { NgRedux, select } from '@angular-redux/store';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { EditorService } from "../../../services/editor.service";
+import { NgRedux, select } from "@angular-redux/store";
+import { environment } from "src/environments/environment";
 @Component({
-  selector: 'mtbls-directory',
-  templateUrl: './directory.component.html',
-  styleUrls: ['./directory.component.css'],
+  selector: "mtbls-directory",
+  templateUrl: "./directory.component.html",
+  styleUrls: ["./directory.component.css"],
 })
 export class DirectoryComponent implements OnInit {
-  @Input('file') file: any;
-  @Input('parent') parent: any;
-  @Input('level') level: any;
+  @Input("file") file: any;
+  @Input("parent") parent: any;
+  @Input("level") level: any;
 
   @Output() fileDeleted = new EventEmitter<any>();
 
   @select((state) => state.study.readonly) readonly;
-
 
   selectedMetaFiles: any[] = [];
   selectedRawFiles: any[] = [];
@@ -26,7 +25,6 @@ export class DirectoryComponent implements OnInit {
   isReadOnly = false;
 
   constructor(private editorService: EditorService) {}
-
 
   ngOnInit() {
     if (!environment.isTesting) {
@@ -66,31 +64,31 @@ export class DirectoryComponent implements OnInit {
 
   isChecked(filename, category) {
     let isFileChecked = false;
-    if (category === 'raw') {
+    if (category === "raw") {
       this.selectedRawFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'audit') {
+    } else if (category === "audit") {
       this.selectedAuditFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'derived') {
+    } else if (category === "derived") {
       this.selectedDerivedFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'upload') {
+    } else if (category === "upload") {
       this.selectedUploadFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
       });
-    } else if (category === 'meta') {
+    } else if (category === "meta") {
       this.selectedMetaFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;

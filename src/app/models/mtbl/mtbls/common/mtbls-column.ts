@@ -1,14 +1,14 @@
-import { JsonObject, JsonProperty } from 'json2typescript';
+import { JsonObject, JsonProperty } from "json2typescript";
 
 @JsonObject
 export class MTBLSColumn {
-  @JsonProperty('name', String)
-  name = '';
+  @JsonProperty("name", String)
+  name = "";
 
-  @JsonProperty('value')
-  value: any = '';
+  @JsonProperty("value")
+  value: any = "";
 
-  @JsonProperty('index', Number)
+  @JsonProperty("index", Number)
   index: number = null;
 
   constructor(name, value, index) {

@@ -1,13 +1,13 @@
-import { NgRedux } from '@angular-redux/store';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SpyLocation } from '@angular/common/testing';
+import { NgRedux } from "@angular-redux/store";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
-} from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+} from "@angular/core";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import {
   Router,
   UrlSerializer,
@@ -16,17 +16,17 @@ import {
   ROUTER_CONFIGURATION,
   UrlHandlingStrategy,
   RouteReuseStrategy,
-} from '@angular/router';
+} from "@angular/router";
 import {
   RouterTestingModule,
   setupTestingRouter,
-} from '@angular/router/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+} from "@angular/router/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { CreateComponent } from './create.component';
+import { CreateComponent } from "./create.component";
 
-describe('CreateComponent', () => {
+describe("CreateComponent", () => {
   let component: CreateComponent;
   let fixture: ComponentFixture<CreateComponent>;
   let editorService: EditorService;
@@ -66,7 +66,7 @@ describe('CreateComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

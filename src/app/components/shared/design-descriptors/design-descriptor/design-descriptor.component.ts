@@ -5,24 +5,24 @@ import {
   Inject,
   ViewChild,
   SimpleChanges,
-} from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { EditorService } from '../../../../services/editor.service';
-import { Ontology } from '../../../../models/mtbl/mtbls/common/mtbls-ontology';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from '../../../../store';
-import * as toastr from 'toastr';
-import { JsonConvert, OperationMode, ValueCheckingMode } from 'json2typescript';
-import { OntologyComponent } from '../../ontology/ontology.component';
-import { DOIService } from '../../../../services/publications/doi.service';
-import { EuropePMCService } from '../../../../services/publications/europePMC.service';
-import { FormControl } from '@angular/forms';
-import { OntologySourceReference } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology-reference';
-import { environment } from 'src/environments/environment';
+} from "@angular/core";
+import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { EditorService } from "../../../../services/editor.service";
+import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
+import { NgRedux, select } from "@angular-redux/store";
+import { IAppState } from "../../../../store";
+import * as toastr from "toastr";
+import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { OntologyComponent } from "../../ontology/ontology.component";
+import { DOIService } from "../../../../services/publications/doi.service";
+import { EuropePMCService } from "../../../../services/publications/europePMC.service";
+import { FormControl } from "@angular/forms";
+import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
+import { environment } from "src/environments/environment";
 @Component({
-  selector: 'mtbls-design-descriptor',
-  templateUrl: './design-descriptor.component.html',
-  styleUrls: ['./design-descriptor.component.css'],
+  selector: "mtbls-design-descriptor",
+  templateUrl: "./design-descriptor.component.html",
+  styleUrls: ["./design-descriptor.component.css"],
 })
 export class DesignDescriptorComponent implements OnInit {
   @select((state) => state.study.validations) studyValidations;
@@ -31,9 +31,8 @@ export class DesignDescriptorComponent implements OnInit {
   @select((state) => state.study.readonly) studyReadonly;
   @select((state) => state.study.studyDesignDescriptors) studyDescriptors;
 
-
-  @Input('value') descriptor: Ontology;
-  @Input('readOnly') readOnly: boolean;
+  @Input("value") descriptor: Ontology;
+  @Input("readOnly") readOnly: boolean;
 
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
@@ -41,10 +40,8 @@ export class DesignDescriptorComponent implements OnInit {
 
   validations: any = {};
 
-
-
-  validationsId = 'studyDesignDescriptors';
-  selectedPublication = new FormControl('', [Validators.required]);
+  validationsId = "studyDesignDescriptors";
+  selectedPublication = new FormControl("", [Validators.required]);
 
   isModalOpen = false;
   isImportModalOpen = false;
@@ -57,7 +54,7 @@ export class DesignDescriptorComponent implements OnInit {
   addNewDescriptor = false;
   keywords: any = [];
   selectedkeywords: any = [];
-  status = '';
+  status = "";
 
   loading = false;
 
@@ -93,7 +90,7 @@ export class DesignDescriptorComponent implements OnInit {
   getKeyWords() {
     const doi = this.selectedPublication.value;
     this.europePMCService
-      .getArticleKeyWords('DOI:' + doi.replace('http://dx.doi.org/', ''))
+      .getArticleKeyWords("DOI:" + doi.replace("http://dx.doi.org/", ""))
       .subscribe(
         (keywords) => {
           const sd = this.descriptors.map((d) => d.annotationValue);
@@ -117,7 +114,7 @@ export class DesignDescriptorComponent implements OnInit {
   updateAndClose() {
     this.editorService.getDesignDescriptors().subscribe((res) => {
       this.ngRedux.dispatch({
-        type: 'UPDATE_STUDY_DESIGN_DESCRIPTORS',
+        type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
         body: {
           studyDesignDescriptors: res.studyDesignDescriptors,
         },
@@ -133,10 +130,10 @@ export class DesignDescriptorComponent implements OnInit {
       this.delete(keyword);
     } else {
       this.loading = true;
-      this.status = '';
-      this.status = 'Mapping keyword to an ontology term';
+      this.status = "";
+      this.status = "Mapping keyword to an ontology term";
       this.editorService
-        .getExactMatchOntologyTerm(keyword, 'design%20descriptor')
+        .getExactMatchOntologyTerm(keyword, "design%20descriptor")
         .subscribe((terms) => {
           if (terms.OntologyTerm.length > 0) {
             const jsonConvert: JsonConvert = new JsonConvert();
@@ -146,32 +143,32 @@ export class DesignDescriptorComponent implements OnInit {
                 Ontology
               ),
             };
-            this.status = 'Adding keyword to the study design descriptors list';
+            this.status = "Adding keyword to the study design descriptors list";
             this.editorService.saveDesignDescriptor(descriptor).subscribe(
               (res) => {
-                this.status = '';
+                this.status = "";
                 this.selectedkeywords.push(keyword);
                 this.loading = false;
               },
               (err) => {
                 this.loading = false;
-                this.status = '';
+                this.status = "";
                 this.isFormBusy = false;
               }
             );
           } else {
             this.status =
-              'Exact ontology match not found. Create new MetaboLights Onotology term';
+              "Exact ontology match not found. Create new MetaboLights Onotology term";
             const newOntology = new Ontology();
             newOntology.annotationValue = keyword;
             newOntology.termAccession =
-              'http://www.ebi.ac.uk/metabolights/ontology/placeholder';
+              "http://www.ebi.ac.uk/metabolights/ontology/placeholder";
             newOntology.termSource = new OntologySourceReference();
-            newOntology.termSource.description = 'User defined terms';
-            newOntology.termSource.file = 'https://www.ebi.ac.uk/metabolights/';
-            newOntology.termSource.name = 'MTBLS';
-            newOntology.termSource.provenance_name = 'metabolights';
-            newOntology.termSource.version = '1.0';
+            newOntology.termSource.description = "User defined terms";
+            newOntology.termSource.file = "https://www.ebi.ac.uk/metabolights/";
+            newOntology.termSource.name = "MTBLS";
+            newOntology.termSource.provenance_name = "metabolights";
+            newOntology.termSource.version = "1.0";
             const jsonConvert: JsonConvert = new JsonConvert();
             const descriptor = {
               studyDesignDescriptor: jsonConvert.deserialize(
@@ -179,17 +176,17 @@ export class DesignDescriptorComponent implements OnInit {
                 Ontology
               ),
             };
-            this.status = 'Adding keyword to the study design descriptors list';
+            this.status = "Adding keyword to the study design descriptors list";
             this.editorService.saveDesignDescriptor(descriptor).subscribe(
               (res) => {
                 this.selectedkeywords.push(keyword);
                 this.loading = false;
-                this.status = '';
+                this.status = "";
               },
               (err) => {
                 this.loading = false;
                 this.isFormBusy = false;
-                this.status = '';
+                this.status = "";
               }
             );
           }
@@ -269,7 +266,7 @@ export class DesignDescriptorComponent implements OnInit {
             )
             .subscribe(
               (res) => {
-                this.updateDesignDescriptors(res, 'Design descriptor updated.');
+                this.updateDesignDescriptors(res, "Design descriptor updated.");
               },
               (err) => {
                 this.isFormBusy = false;
@@ -278,7 +275,7 @@ export class DesignDescriptorComponent implements OnInit {
         } else {
           this.editorService.saveDesignDescriptor(this.compileBody()).subscribe(
             (res) => {
-              this.updateDesignDescriptors(res, 'Design descriptor saved.');
+              this.updateDesignDescriptors(res, "Design descriptor saved.");
               this.descriptorComponent.values = [];
               this.isModalOpen = false;
             },
@@ -294,7 +291,7 @@ export class DesignDescriptorComponent implements OnInit {
   updateDesignDescriptors(data, message) {
     this.editorService.getDesignDescriptors().subscribe((res) => {
       this.ngRedux.dispatch({
-        type: 'UPDATE_STUDY_DESIGN_DESCRIPTORS',
+        type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
         body: {
           studyDesignDescriptors: res.studyDesignDescriptors,
         },
@@ -307,9 +304,9 @@ export class DesignDescriptorComponent implements OnInit {
 
     this.descriptorComponent.reset();
 
-    toastr.success(message, 'Success', {
-      timeOut: '2500',
-      positionClass: 'toast-top-center',
+    toastr.success(message, "Success", {
+      timeOut: "2500",
+      positionClass: "toast-top-center",
       preventDuplicates: true,
       extendedTimeOut: 0,
       tapToDismiss: false,
@@ -323,7 +320,7 @@ export class DesignDescriptorComponent implements OnInit {
       }
       this.editorService.deleteDesignDescriptor(value).subscribe(
         (res) => {
-          this.updateDesignDescriptors(res, 'Design descriptor deleted.');
+          this.updateDesignDescriptors(res, "Design descriptor deleted.");
           this.isDeleteModalOpen = false;
           this.isModalOpen = false;
         },
@@ -357,12 +354,10 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   get validation() {
-    if (this.validationsId.includes('.')) {
-      const arr = this.validationsId.split('.');
+    if (this.validationsId.includes(".")) {
+      const arr = this.validationsId.split(".");
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])){
-;
-}
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
     return this.validations[this.validationsId];

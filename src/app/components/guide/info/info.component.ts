@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { NgRedux, select } from '@angular-redux/store';
-import { IAppState } from '../../../store';
-import { EditorService } from './../../../services/editor.service';
-import { Router } from '@angular/router';
-import { environment } from 'src/environments/environment';
+import { Component, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { NgRedux, select } from "@angular-redux/store";
+import { IAppState } from "../../../store";
+import { EditorService } from "./../../../services/editor.service";
+import { Router } from "@angular/router";
+import { environment } from "src/environments/environment";
 
 @Component({
-  selector: 'app-info',
-  templateUrl: './info.component.html',
-  styleUrls: ['./info.component.css'],
+  selector: "app-info",
+  templateUrl: "./info.component.html",
+  styleUrls: ["./info.component.css"],
 })
 export class InfoComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -42,6 +42,6 @@ export class InfoComponent implements OnInit {
   ngOnInit() {}
 
   proceedToNextStep() {
-    this.router.navigate(['/guide/upload', this.requestedStudy]);
+    this.router.navigate(["/guide/upload", this.requestedStudy]);
   }
 }
