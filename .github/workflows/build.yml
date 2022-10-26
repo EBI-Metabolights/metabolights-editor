@@ -27,7 +27,7 @@ jobs:
           npm run build --prod
       - name: run unit tests
         run: |
-          npm test-headless
+          npm run test-headless
       - name: Check formatting and linting
         run: |
           npx ng lint metabolights-editor
