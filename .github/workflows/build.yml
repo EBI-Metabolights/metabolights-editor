@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [14.x]
 
     steps:
       - uses: actions/checkout@v1
@@ -27,6 +27,8 @@ jobs:
           npm run build --prod
       - name: run unit tests
         run: |
-          ng test
+          npm test
       - name: check formatting and linting
-        run: ng lint
+        run: |
+          ng lint
+          
