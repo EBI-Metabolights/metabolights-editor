@@ -119,8 +119,8 @@ export class EditorService {
     interface User {
       updatedAt: number;
       workspaceLocation: string;
-      settings: Record<string, unknown>;
-      projects: Record<string, unknown>;
+      settings: Record<string, any>;
+      projects: Record<string, any>;
       owner: { apiToken: string };
       message: string;
       err: string;
