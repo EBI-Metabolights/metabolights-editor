@@ -25,7 +25,7 @@ export interface IsInitialised {
 }
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-export const SHARED_INITIAL_STATE: Record<string, unknown> = {
+export const SHARED_INITIAL_STATE: Record<string, any> = {
   loading: true,
   info: "",
   configuration: "",
@@ -128,9 +128,9 @@ function setCurrentUser(state, action) {
 }
 
 export function sharedReducer(
-  state: Record<string, unknown> = SHARED_INITIAL_STATE,
+  state: Record<string, any> = SHARED_INITIAL_STATE,
   action
-): Record<string, unknown> {
+): Record<string, any> {
   switch (action.type) {
     case TOGGLE_LOADING:
       return toggleLoading(state);
