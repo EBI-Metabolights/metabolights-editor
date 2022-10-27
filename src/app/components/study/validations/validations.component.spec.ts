@@ -12,10 +12,11 @@ import { ValidationsComponent } from "./validations.component";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 /* eslint-disable @typescript-eslint/naming-convention */
-
+/* eslint-disable @angular-eslint/directive-selector */
+/* eslint-disable @angular-eslint/directive-class-suffix */
 @Directive({
   // linter says this should be used as an attribute on a tag but its a mock
-  selector: "app-validation-detail", // eslint-disable-line @angular-eslint/directive-selector
+  selector: "app-validation-detail",
 })
 export class MockValidationDetailComponent {
   // eslint-disable-line @angular-eslint/directive-class-suffix

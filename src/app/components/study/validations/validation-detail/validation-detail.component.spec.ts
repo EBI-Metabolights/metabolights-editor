@@ -16,7 +16,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { failedValidation } from "src/app/models/mtbl/mtbls/mocks/mock-validation";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
-import { ValidationDetailCommentComponent } from "./validation-detail-comment/validation-detail-comment.component";
+import { ValidationDetailCommentComponent } from "./comment/validation-detail-comment.component";
 
 import { ValidationDetailComponent } from "./validation-detail.component";
 

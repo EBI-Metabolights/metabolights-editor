@@ -16,6 +16,7 @@ declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable space-before-function-paren */
 @Component({
   selector: "mtbls-aspera",
   templateUrl: "./aspera.component.html",

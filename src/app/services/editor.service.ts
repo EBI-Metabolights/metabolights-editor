@@ -786,6 +786,7 @@ export class EditorService {
         });
         let displayedColumns = columns.map((a) => a.columnDef);
         displayedColumns.unshift("Select");
+        /* eslint-disable space-before-function-paren */
         displayedColumns.sort(function (a, b) {
           // assert that the values are numbers, which they have to be as all header values in sample sheet objects are numbers.
           const assertA = data.header[a] as number;

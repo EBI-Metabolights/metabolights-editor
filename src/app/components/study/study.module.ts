@@ -33,7 +33,7 @@ import { SharedModule } from "../shared/shared.module";
 import { HttpClientModule } from "@angular/common/http";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
-import { ValidationDetailCommentComponent } from "./validations/validation-detail/validation-detail-comment/validation-detail-comment.component";
+import { ValidationDetailCommentComponent } from "./validations/validation-detail/comment/validation-detail-comment.component";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatChipsModule } from "@angular/material/chips";
