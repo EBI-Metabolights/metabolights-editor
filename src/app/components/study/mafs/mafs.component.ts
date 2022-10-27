@@ -48,7 +48,8 @@ export class MafsComponent implements OnInit {
       this.assays = value;
       const tempMAFs = [];
       Object.values(this.assays).forEach((assay) => {
-        assay.mafs.forEach((maf) => {
+        const assertAssay = assay as any;
+        assertAssay.mafs.forEach((maf) => {
           // eslint-disable-line @typescript-eslint/dot-notation
           tempMAFs.push(maf);
         });
