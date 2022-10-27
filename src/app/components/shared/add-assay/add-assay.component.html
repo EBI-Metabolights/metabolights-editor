@@ -1,79 +1,157 @@
 <span>
-	<a (click)="openAddAssayModal()" class="button button-primary">Add technique</a>
+  <a (click)="openAddAssayModal()" class="button button-primary"
+    >Add technique</a
+  >
 </span>
 <span>
-	<div *ngIf="assaySetup" class="modal" [ngClass]="{'is-active': isAddAssayModalOpen}">
-		<div class="modal-background"></div>
-		<div class="modal-card vw80">
-		      <div *ngIf="isFormBusy" class="load-bar">
-		        <div class="bar"></div>
-		        <div class="bar"></div>
-		        <div class="bar"></div>
-		    </div>
-		    <section class="modal-card-body">
-		    	<div class="field is-horizontal">
-		    		<div class="field-body">
-		    			<div class="field">
-		    				<div class="bg-white">
-		    					<span style="flex: 0 0 100%;">
-		    						<h3 class="mb5">Select technique</h3>
-		    						<span>
-		    							<mat-button-toggle-group [(ngModel)]="selectedAssayTechnologyOption" (ngModelChange)="assayTechnologyChange()" class="mat-button-toggle-group-vertical" #group="matButtonToggleGroup">
-		    								<mat-button-toggle [disabled]="technology.disabled" class="mb5" *ngFor="let technology of assaySetup.main_techniques"  [value]="technology">
-		    									{{ technology.name }}
-		    								</mat-button-toggle>
-		    							</mat-button-toggle-group>
-		    						</span>
-		    						<br>
-		    						<span *ngIf="selectedAssayTechnologyOption != null && selectedAssayTechnologyOption.techniques && selectedAssayTechnologyOption.techniques.length > 0">
-		    							<br>
-		    							<h3 class="mb5">Select assay</h3>
-		    							<mat-button-toggle-group [(ngModel)]="selectedAssayTypeOption" (ngModelChange)="assayTypeChange()" class="mat-button-toggle-group-vertical" #group="matButtonToggleGroup">
-		    								<mat-button-toggle [disabled]="technique.disabled" class="mb5" *ngFor="let technique of selectedAssayTechnologyOption.techniques"  [value]="technique">
-		    									{{ technique.name }}
-		    								</mat-button-toggle>
-		    							</mat-button-toggle-group>
-		    							<br>
-		    						</span>
-		    						<span *ngIf="selectedAssayTypeOption != null && selectedAssayTypeOption.sub_techniques
-		    						&& selectedAssayTypeOption.sub_techniques.length > 0">
-		    						<br>
-		    						<h3 class="mb5">Define assay</h3>
-		    						<mat-button-toggle-group [(ngModel)]="selectedAssayVariantOption" (ngModelChange)="assayTypeVariantChange()" class="mat-button-toggle-group-vertical" #group="matButtonToggleGroup">
-		    							<mat-button-toggle [disabled]="sub_technique.disabled" class="mb5" *ngFor="let sub_technique of selectedAssayTypeOption.sub_techniques"  [value]="sub_technique">
-		    								{{ sub_technique.name }}
-		    							</mat-button-toggle>
-		    						</mat-button-toggle-group>
-		    					</span>
-		    					<span *ngIf="selectedAssayVariantOption && selectedAssayVariantOption.columns && selectedAssayVariantOption.columns.length > 0">
-		    						<br>
-		    						<!-- <h3>Column details</h3> -->
-		    						<span class="mb5" *ngFor="let column of selectedAssayVariantOption.columns; index as i">
-		    							<br>
-		    							<small>Select {{ column.name }}</small>
-		    							<span class="mb5">
-		    								<mat-button-toggle-group [(ngModel)]="selectedAssayVariantColumnOption[i]" (ngModelChange)="assayTypeVariantColumnChange()" class="mat-button-toggle-group-vertical" #group="matButtonToggleGroup">
-		    									<mat-button-toggle [disabled]="columnValue.disabled" class="mb5" *ngFor="let columnValue of column.values"  [value]="columnValue">
-		    										{{ columnValue.name }}
-		    									</mat-button-toggle>
-		    								</mat-button-toggle-group>
-		    							</span>
-		    						</span>
-		    					</span>
-		    				</span>
-		    			</div>
-		    		</div>
-		    	</div>
-		    </div>
-		</section>
-		<footer class="modal-card-foot buttons is-right">
-			<span *ngIf="selectedAssayTechnologyOption != null && selectedAssayTypeOption != null">
-				<button (click)='addAssay()' class="button is-primary">
-					+ Add assay type
-				</button>
-			</span>
-			<button class="button" (click)='closeAddAssayModal()'>Cancel</button>
-		</footer>
-	</div>
-</div>
+  <div
+    *ngIf="assaySetup"
+    class="modal"
+    [ngClass]="{ 'is-active': isAddAssayModalOpen }"
+  >
+    <div class="modal-background"></div>
+    <div class="modal-card vw80">
+      <div *ngIf="isFormBusy" class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <section class="modal-card-body">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <div class="bg-white">
+                <span style="flex: 0 0 100%">
+                  <h3 class="mb5">Select technique</h3>
+                  <span>
+                    <mat-button-toggle-group
+                      [(ngModel)]="selectedAssayTechnologyOption"
+                      (ngModelChange)="assayTechnologyChange()"
+                      class="mat-button-toggle-group-vertical"
+                      #group="matButtonToggleGroup"
+                    >
+                      <mat-button-toggle
+                        [disabled]="technology.disabled"
+                        class="mb5"
+                        *ngFor="let technology of assaySetup.main_techniques"
+                        [value]="technology"
+                      >
+                        {{ technology.name }}
+                      </mat-button-toggle>
+                    </mat-button-toggle-group>
+                  </span>
+                  <br />
+                  <span
+                    *ngIf="
+                      selectedAssayTechnologyOption != null &&
+                      selectedAssayTechnologyOption.techniques &&
+                      selectedAssayTechnologyOption.techniques.length > 0
+                    "
+                  >
+                    <br />
+                    <h3 class="mb5">Select assay</h3>
+                    <mat-button-toggle-group
+                      [(ngModel)]="selectedAssayTypeOption"
+                      (ngModelChange)="assayTypeChange()"
+                      class="mat-button-toggle-group-vertical"
+                      #group="matButtonToggleGroup"
+                    >
+                      <mat-button-toggle
+                        [disabled]="technique.disabled"
+                        class="mb5"
+                        *ngFor="
+                          let technique of selectedAssayTechnologyOption.techniques
+                        "
+                        [value]="technique"
+                      >
+                        {{ technique.name }}
+                      </mat-button-toggle>
+                    </mat-button-toggle-group>
+                    <br />
+                  </span>
+                  <span
+                    *ngIf="
+                      selectedAssayTypeOption != null &&
+                      selectedAssayTypeOption.sub_techniques &&
+                      selectedAssayTypeOption.sub_techniques.length > 0
+                    "
+                  >
+                    <br />
+                    <h3 class="mb5">Define assay</h3>
+                    <mat-button-toggle-group
+                      [(ngModel)]="selectedAssayVariantOption"
+                      (ngModelChange)="assayTypeVariantChange()"
+                      class="mat-button-toggle-group-vertical"
+                      #group="matButtonToggleGroup"
+                    >
+                      <mat-button-toggle
+                        [disabled]="sub_technique.disabled"
+                        class="mb5"
+                        *ngFor="
+                          let sub_technique of selectedAssayTypeOption.sub_techniques
+                        "
+                        [value]="sub_technique"
+                      >
+                        {{ sub_technique.name }}
+                      </mat-button-toggle>
+                    </mat-button-toggle-group>
+                  </span>
+                  <span
+                    *ngIf="
+                      selectedAssayVariantOption &&
+                      selectedAssayVariantOption.columns &&
+                      selectedAssayVariantOption.columns.length > 0
+                    "
+                  >
+                    <br />
+                    <!-- <h3>Column details</h3> -->
+                    <span
+                      class="mb5"
+                      *ngFor="
+                        let column of selectedAssayVariantOption.columns;
+                        index as i
+                      "
+                    >
+                      <br />
+                      <small>Select {{ column.name }}</small>
+                      <span class="mb5">
+                        <mat-button-toggle-group
+                          [(ngModel)]="selectedAssayVariantColumnOption[i]"
+                          (ngModelChange)="assayTypeVariantColumnChange()"
+                          class="mat-button-toggle-group-vertical"
+                          #group="matButtonToggleGroup"
+                        >
+                          <mat-button-toggle
+                            [disabled]="columnValue.disabled"
+                            class="mb5"
+                            *ngFor="let columnValue of column.values"
+                            [value]="columnValue"
+                          >
+                            {{ columnValue.name }}
+                          </mat-button-toggle>
+                        </mat-button-toggle-group>
+                      </span>
+                    </span>
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <span
+          *ngIf="
+            selectedAssayTechnologyOption != null &&
+            selectedAssayTypeOption != null
+          "
+        >
+          <button (click)="addAssay()" class="button is-primary">
+            + Add assay type
+          </button>
+        </span>
+        <button class="button" (click)="closeAddAssayModal()">Cancel</button>
+      </footer>
+    </div>
+  </div>
 </span>

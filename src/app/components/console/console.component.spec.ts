@@ -1,38 +1,61 @@
-import { NgRedux } from '@angular-redux/store';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { SpyLocation } from '@angular/common/testing';
-import { NgModuleFactoryLoader, Compiler, Injector, Optional } from '@angular/core';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChildrenOutletContexts, Router, RouteReuseStrategy, ROUTER_CONFIGURATION, ROUTES, UrlHandlingStrategy, UrlSerializer } from '@angular/router';
-import { RouterTestingModule, setupTestingRouter } from '@angular/router/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { NgRedux } from "@angular-redux/store";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { SpyLocation } from "@angular/common/testing";
+import {
+  NgModuleFactoryLoader,
+  Compiler,
+  Injector,
+  Optional,
+} from "@angular/core";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import {
+  ChildrenOutletContexts,
+  Router,
+  RouteReuseStrategy,
+  ROUTER_CONFIGURATION,
+  ROUTES,
+  UrlHandlingStrategy,
+  UrlSerializer,
+} from "@angular/router";
+import {
+  RouterTestingModule,
+  setupTestingRouter,
+} from "@angular/router/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { ConsoleComponent } from './console.component';
+import { ConsoleComponent } from "./console.component";
 
-describe('ConsoleComponent', () => {
+describe("ConsoleComponent", () => {
   let component: ConsoleComponent;
   let fixture: ComponentFixture<ConsoleComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ConsoleComponent ],
+      declarations: [ConsoleComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
         NgRedux,
         {
-        provide: Router,
-        useFactory: setupTestingRouter,
-        deps: [
-          UrlSerializer, ChildrenOutletContexts, Location, NgModuleFactoryLoader, Compiler, Injector,
-          ROUTES, ROUTER_CONFIGURATION, [UrlHandlingStrategy, new Optional()],
-          [RouteReuseStrategy, new Optional()]
-        ]
-      },
-      {provide: EditorService, useClass: MockEditorService},
-      { provide: Location, useClass: SpyLocation },]
-    })
-    .compileComponents();
+          provide: Router,
+          useFactory: setupTestingRouter,
+          deps: [
+            UrlSerializer,
+            ChildrenOutletContexts,
+            Location,
+            NgModuleFactoryLoader,
+            Compiler,
+            Injector,
+            ROUTES,
+            ROUTER_CONFIGURATION,
+            [UrlHandlingStrategy, new Optional()],
+            [RouteReuseStrategy, new Optional()],
+          ],
+        },
+        { provide: EditorService, useClass: MockEditorService },
+        { provide: Location, useClass: SpyLocation },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -41,7 +64,7 @@ describe('ConsoleComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

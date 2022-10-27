@@ -1,28 +1,28 @@
 .panel-block.success {
-    border-left-color: #23D160;
-    border-left-width: 7px;
-    color: #363636;
+  border-left-color: #23d160;
+  border-left-width: 7px;
+  color: #363636;
 }
 
 .panel-block.info {
-    border-left-color: #3273dc;
-    border-left-width: 7px;
-    color: #363636;
+  border-left-color: #3273dc;
+  border-left-width: 7px;
+  color: #363636;
 }
 
 .panel-block.warning {
-    border-left-color: #FFDD56;
-    border-left-width: 7px;
-    color: #363636;
+  border-left-color: #ffdd56;
+  border-left-width: 7px;
+  color: #363636;
 }
 
 .panel-block.error {
-    border-left-color: #FF3760;
-    border-left-width: 7px;
-    color: #363636;
+  border-left-color: #ff3760;
+  border-left-width: 7px;
+  color: #363636;
 }
 
 .comment {
-    border: #363636 !important;
-    border-width: 0.5px !important;
+  border: #363636 !important;
+  border-width: 0.5px !important;
 }

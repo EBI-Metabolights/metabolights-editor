@@ -1,14 +1,16 @@
-<div class="px-20" [ngClass]="{'hover-highlight': !isReadOnly}">
-    <div class="mtbls-section bb">
-		<h6>
-			<span *ngFor="let person of (people | async); let i = index">
-				<span *ngIf="i!=0">,&nbsp;</span>
-				<mtbls-person [value]="person"></mtbls-person>
-			</span>
-			<mtbls-person *ngIf="!isReadOnly" [value]="null"></mtbls-person>
-		</h6>
-		<span *ngIf="(people | async) && (people | async).length == 0">
-			<small class="has-text-grey-light"><i>No study persons/authors found</i></small>
-		</span>
-	</div>
+<div class="px-20" [ngClass]="{ 'hover-highlight': !isReadOnly }">
+  <div class="mtbls-section bb">
+    <h6>
+      <span *ngFor="let person of people | async; let i = index">
+        <span *ngIf="i != 0">,&nbsp;</span>
+        <mtbls-person [value]="person"></mtbls-person>
+      </span>
+      <mtbls-person *ngIf="!isReadOnly" [value]="null"></mtbls-person>
+    </h6>
+    <span *ngIf="(people | async) && (people | async).length == 0">
+      <small class="has-text-grey-light"
+        ><i>No study persons/authors found</i></small
+      >
+    </span>
+  </div>
 </div>

@@ -1,212 +1,335 @@
-<span *ngIf='publication == null || addNewPublication; else showPublicationDetails'>
-	<a class="button is-light is-pulled-right is-small hover-button" (click)='openModal()'>+ Add Publication</a>
+<span
+  *ngIf="publication == null || addNewPublication; else showPublicationDetails"
+>
+  <a
+    class="button is-light is-pulled-right is-small hover-button"
+    (click)="openModal()"
+    >+ Add Publication</a
+  >
 </span>
 <ng-template #showPublicationDetails>
-	<div *ngIf="publication">
-		<article class="tile is-child box">
-			<div class="content">
-				<h4 class="publication-title">
-					<b>
-						{{ publication.title | slice : 0 : 90 }}<span *ngIf="publication.title.length > 90">...</span>
-					</b>
-				</h4>
-				<h6 class="publication-authors" style="margin-bottom: 0">
-					<small>
-						<mat-icon>people</mat-icon> {{ publication.authorList | slice : 0 : 60 }}<span *ngIf="publication.authorList.length > 60">...</span>
-					</small>
-				</h6>
-				<a *ngIf="!isReadOnly" class="button is-small custom-button" (click)='openModal()'>
-					<mat-icon>edit</mat-icon> Edit
-				</a>&nbsp;
-				<a class="button is-small custom-button" [href]="'//dx.doi.org/' + publication.doi" target="_blank">
-					<mat-icon>insert_link</mat-icon>
-				</a>
-			</div>
-		</article>
-	</div>
+  <div *ngIf="publication">
+    <article class="tile is-child box">
+      <div class="content">
+        <h4 class="publication-title">
+          <b>
+            {{ publication.title | slice: 0:90
+            }}<span *ngIf="publication.title.length > 90">...</span>
+          </b>
+        </h4>
+        <h6 class="publication-authors" style="margin-bottom: 0">
+          <small>
+            <mat-icon>people</mat-icon> {{ publication.authorList | slice: 0:60
+            }}<span *ngIf="publication.authorList.length > 60">...</span>
+          </small>
+        </h6>
+        <a
+          *ngIf="!isReadOnly"
+          class="button is-small custom-button"
+          (click)="openModal()"
+        >
+          <mat-icon>edit</mat-icon> Edit </a
+        >&nbsp;
+        <a
+          class="button is-small custom-button"
+          [href]="'//dx.doi.org/' + publication.doi"
+          target="_blank"
+        >
+          <mat-icon>insert_link</mat-icon>
+        </a>
+      </div>
+    </article>
+  </div>
 </ng-template>
-<div class="modal" [ngClass]="{'is-active': isDeleteModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-card">
-		<section class="modal-card-body">
-			<p>Are you sure you want to delete?</p>
-		</section>
-		<footer class="modal-card-foot">
-			<div class="columns is-gapless full-width">
-				<div class="column is-half">
-					<button (click)='closeDelete()' class="button is-info">Cancel</button>
-				</div>
-				<div class="column is-half has-text-right">
-					<button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
-				</div>
-			</div>
-		</footer>
-	</div>
+<div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>Are you sure you want to delete?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)="closeDelete()" class="button is-info">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)="delete()" class="button is-danger">
+            OK! Delete Permanently
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isImportAuthorsModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-card vw80">
-		<section class="modal-card-body">
-			<p>Please select the authors you would like to import</p>
-			<br>
-			<div *ngIf="manuscriptAuthors">
-				<span *ngFor="let author of manuscriptAuthors">
-					<mat-checkbox class="example-margin" [(ngModel)]="author.checked"> <b>{{ author.fullName }}</b> <span *ngIf="author.authorId != null && author.authorId.type == 'ORCID'"> <small> (ORCID: {{ author.authorId.value }})</small> </span> <br> <small *ngIf="author.affiliation">{{ author.affiliation }}</small> </mat-checkbox>
-					<br><br>
-				</span>
-			</div>
-		</section>
-		<footer class="modal-card-foot">
-			<div class="columns is-gapless full-width">
-				<div class="column is-half">
-
-				</div>
-				<div class="column is-half has-text-right">
-					<button (click)='closeImportAuthor()' class="button is-default">Done</button><button (click)="saveAuthors()" class="button is-info">Import Selected</button>
-				</div>
-			</div>
-		</footer>
-	</div>
+<div class="modal" [ngClass]="{ 'is-active': isImportAuthorsModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card vw80">
+    <section class="modal-card-body">
+      <p>Please select the authors you would like to import</p>
+      <br />
+      <div *ngIf="manuscriptAuthors">
+        <span *ngFor="let author of manuscriptAuthors">
+          <mat-checkbox class="example-margin" [(ngModel)]="author.checked">
+            <b>{{ author.fullName }}</b>
+            <span
+              *ngIf="author.authorId != null && author.authorId.type == 'ORCID'"
+            >
+              <small> (ORCID: {{ author.authorId.value }})</small>
+            </span>
+            <br />
+            <small *ngIf="author.affiliation">{{ author.affiliation }}</small>
+          </mat-checkbox>
+          <br /><br />
+        </span>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half"></div>
+        <div class="column is-half has-text-right">
+          <button (click)="closeImportAuthor()" class="button is-default">
+            Done</button
+          ><button (click)="saveAuthors()" class="button is-info">
+            Import Selected
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isUpdateTitleModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-card">
-		<section class="modal-card-body">
-			<p>Your MetaboLights study title will be updated to match your publication title</p>
-		</section>
-		<footer class="modal-card-foot">
-			<div class="columns is-gapless full-width">
-				<div class="column is-half">
-					<button (click)='closeUpdateTitleModal()' class="button">Cancel</button>
-				</div>
-				<div class="column is-half has-text-right">
-					<button (click)='updateStudyTitle()' class="button is-success">OK</button>
-				</div>
-			</div>
-		</footer>
-	</div>
+<div class="modal" [ngClass]="{ 'is-active': isUpdateTitleModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>
+        Your MetaboLights study title will be updated to match your publication
+        title
+      </p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)="closeUpdateTitleModal()" class="button">
+            Cancel
+          </button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)="updateStudyTitle()" class="button is-success">
+            OK
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isUpdateAbstractModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-card">
-		<section class="modal-card-body">
-			<p>Your MetaboLights study abstract will be updated to match your publication abstract</p>
-		</section>
-		<footer class="modal-card-foot">
-			<div class="columns is-gapless full-width">
-				<div class="column is-half">
-					<button (click)='closeUpdateTitleModal()' class="button">Cancel</button>
-				</div>
-				<div class="column is-half has-text-right">
-					<button (click)='updateStudyAbstract()' class="button is-success">OK</button>
-				</div>
-			</div>
-		</footer>
-	</div>
+<div class="modal" [ngClass]="{ 'is-active': isUpdateAbstractModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>
+        Your MetaboLights study abstract will be updated to match your
+        publication abstract
+      </p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)="closeUpdateTitleModal()" class="button">
+            Cancel
+          </button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)="updateStudyAbstract()" class="button is-success">
+            OK
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isModalOpen}">
-	<form *ngIf="form" [formGroup]="form">
-		<div class="modal-background"></div>
-		<div class="modal-card vw80">
-			<div *ngIf="isFormBusy" class="load-bar">
-				<div class="bar"></div>
-				<div class="bar"></div>
-				<div class="bar"></div>
-			</div>
-			<section class="modal-card-body">
-				<mat-form-field class="full-width">
-					<textarea class="no-scroll"
-					formControlName="title"
-					matInput
-					[tabIndex]="1"
-					cdkAutosizeMinRows="3"
-					cdkAutosizeMaxRows="3"
-					cdkTextareaAutosize>
-				</textarea>
-				<mat-hint>{{ fieldValidation('title').description }}</mat-hint>
-				<mat-error
-				*ngIf="form.get('title').errors &&
-				form.get('title').dirty &&
-				form.get('title').errors.title">
-				{{ form.get('title').errors.title.error }}
-			</mat-error>
-		</mat-form-field>
-		<mat-form-field class="full-width">
-			<textarea class="no-scroll"
-			formControlName="authorList"
-			matInput
-			[tabIndex]="2"
-			cdkAutosizeMinRows="1"
-			cdkAutosizeMaxRows="4"
-			cdkTextareaAutosize>
-		</textarea>
-		<mat-hint>{{ fieldValidation('authorList').description }}</mat-hint>
-		<mat-error
-		*ngIf="form.get('authorList').errors &&
-		form.get('authorList').dirty &&
-		form.get('authorList').errors.authorList">
-		{{ form.get('authorList').authorList.title.error }}
-	</mat-error>
-</mat-form-field>
-<mat-form-field class="full-width">
-	<input class="no-scroll"
-	formControlName="doi"
-	[tabIndex]="3"
-	(blur)="getArticleFromDOI()"
-	matInput>
-	<mat-hint>{{ fieldValidation('doi').description }}</mat-hint>
-	<mat-error
-	*ngIf="form.get('doi').errors &&
-	form.get('doi').dirty &&
-	form.get('doi').errors.doi">
-	{{ form.get('doi').errors.doi.error }}
-</mat-error>
-</mat-form-field>
-<mat-form-field class="full-width">
-	<input class="no-scroll"
-	[tabIndex]="4"
-	formControlName="pubMedID"
-	(blur)="getArticleFromPubMedID()"
-	matInput>
-	<mat-hint>{{ fieldValidation('pubMedID').description }}</mat-hint>
-	<mat-error
-	*ngIf="form.get('pubMedID').errors &&
-	form.get('pubMedID').dirty &&
-	form.get('pubMedID').errors.pubMedID">
-	{{ form.get('pubMedID').errors.pubMedID.error }}
-</mat-error>
-</mat-form-field>
-<mtbls-ontology class="mt-20" #publicationStatus [validations]="fieldValidation('status')" (changed)="onChanges($event)" [values]='[publication.status]' [inline]="true"></mtbls-ontology>
-<div class="control" *ngIf="publicationAbstract != ''">
-	<br>
-	<label><small><b>Publication abstract</b></small></label><br>
-	<p>
-	<small>{{ publicationAbstract }}</small>
-	</p>
-</div>
-</section>
-<footer class="modal-card-foot">
-	<div class="columns is-gapless full-width">
-		<div class="column is-two-third">
-			<button *ngIf="!addNewPublication" [tabIndex]="-1" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete</mat-icon></button>
-			<button *ngIf="!addNewPublication && form.get('title').value != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='confirmTitleUpdate()'><small>Update title</small></button>
-			<button *ngIf="!addNewPublication && publicationAbstract != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='confirmAbstractUpdate()'><small>Update abstract</small></button>
-			<button *ngIf="!addNewPublication && form.get('doi').value != ''" [tabIndex]="-1" class="button is-light is-pulled-left" (click)='openImportAuthorsModal()'><small>Import Authors</small></button>
-		</div>
-		<div class="column is-one-third has-text-right">
-			<button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
-				<mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
-				Save
-			</button>
-			<button *ngIf="form.pristine" (click)='closeModal()' [tabIndex]="6" class="button is-info">OK</button>
-			<button class="button" [disabled]="isFormBusy" [tabIndex]="7" (click)='closeModal()'>Cancel</button>
-		</div>
-	</div>
-</footer>
-</div>
-</form>
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+  <form *ngIf="form" [formGroup]="form">
+    <div class="modal-background"></div>
+    <div class="modal-card vw80">
+      <div *ngIf="isFormBusy" class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <section class="modal-card-body">
+        <mat-form-field class="full-width">
+          <textarea
+            class="no-scroll"
+            formControlName="title"
+            matInput
+            [tabIndex]="1"
+            cdkAutosizeMinRows="3"
+            cdkAutosizeMaxRows="3"
+            cdkTextareaAutosize
+          >
+          </textarea>
+          <mat-hint>{{ fieldValidation("title").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('title').errors &&
+              form.get('title').dirty &&
+              form.get('title').errors.title
+            "
+          >
+            {{ form.get("title").errors.title.error }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <textarea
+            class="no-scroll"
+            formControlName="authorList"
+            matInput
+            [tabIndex]="2"
+            cdkAutosizeMinRows="1"
+            cdkAutosizeMaxRows="4"
+            cdkTextareaAutosize
+          >
+          </textarea>
+          <mat-hint>{{ fieldValidation("authorList").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('authorList').errors &&
+              form.get('authorList').dirty &&
+              form.get('authorList').errors.authorList
+            "
+          >
+            {{ form.get("authorList").authorList.title.error }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input
+            class="no-scroll"
+            formControlName="doi"
+            [tabIndex]="3"
+            (blur)="getArticleFromDOI()"
+            matInput
+          />
+          <mat-hint>{{ fieldValidation("doi").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('doi').errors &&
+              form.get('doi').dirty &&
+              form.get('doi').errors.doi
+            "
+          >
+            {{ form.get("doi").errors.doi.error }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input
+            class="no-scroll"
+            [tabIndex]="4"
+            formControlName="pubMedID"
+            (blur)="getArticleFromPubMedID()"
+            matInput
+          />
+          <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('pubMedID').errors &&
+              form.get('pubMedID').dirty &&
+              form.get('pubMedID').errors.pubMedID
+            "
+          >
+            {{ form.get("pubMedID").errors.pubMedID.error }}
+          </mat-error>
+        </mat-form-field>
+        <mtbls-ontology
+          class="mt-20"
+          #publicationStatus
+          [validations]="fieldValidation('status')"
+          (changed)="onChanges($event)"
+          [values]="[publication.status]"
+          [inline]="true"
+        ></mtbls-ontology>
+        <div class="control" *ngIf="publicationAbstract != ''">
+          <br />
+          <label
+            ><small><b>Publication abstract</b></small></label
+          ><br />
+          <p>
+            <small>{{ publicationAbstract }}</small>
+          </p>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-two-third">
+            <button
+              *ngIf="!addNewPublication"
+              [tabIndex]="-1"
+              class="button is-danger is-pulled-left"
+              (click)="confirmDelete()"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button
+              *ngIf="!addNewPublication && form.get('title').value != ''"
+              [tabIndex]="-1"
+              class="button is-light is-pulled-left"
+              (click)="confirmTitleUpdate()"
+            >
+              <small>Update title</small>
+            </button>
+            <button
+              *ngIf="!addNewPublication && publicationAbstract != ''"
+              [tabIndex]="-1"
+              class="button is-light is-pulled-left"
+              (click)="confirmAbstractUpdate()"
+            >
+              <small>Update abstract</small>
+            </button>
+            <button
+              *ngIf="!addNewPublication && form.get('doi').value != ''"
+              [tabIndex]="-1"
+              class="button is-light is-pulled-left"
+              (click)="openImportAuthorsModal()"
+            >
+              <small>Import Authors</small>
+            </button>
+          </div>
+          <div class="column is-one-third has-text-right">
+            <button
+              *ngIf="!form.pristine"
+              [disabled]="!form.valid || isFormBusy"
+              (click)="save()"
+              class="button is-info"
+            >
+              <mat-spinner
+                [diameter]="20"
+                [strokeWidth]="3"
+                *ngIf="isFormBusy"
+              ></mat-spinner>
+              Save
+            </button>
+            <button
+              *ngIf="form.pristine"
+              (click)="closeModal()"
+              [tabIndex]="6"
+              class="button is-info"
+            >
+              OK
+            </button>
+            <button
+              class="button"
+              [disabled]="isFormBusy"
+              [tabIndex]="7"
+              (click)="closeModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </form>
 </div>

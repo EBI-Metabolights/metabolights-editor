@@ -1,37 +1,48 @@
 <span>
-	<span *ngIf="assays && assays.length > 0; else noAssays">
-	<div *ngIf="!isReadOnly">
-		<add-assay></add-assay>
-	</div>
-	<br>
-	<div class="card">
-        <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
-          	<div class="column is-full tabs npt" style="margin-bottom: 0; padding-bottom: 0">
-           		<ul>
-           			<span *ngFor="let assay of assays; let i = index">
-            			<li (click)="selectCurrentSubTab(i)" [ngClass]="{'is-active': currentSubIndex == i }"><a>Assay Sheet {{i + 1}}</a></li>
-        			</span>
-          		</ul>
-        	</div>
-      	</div>
-	  	<span *ngFor="let assay of assays; let i = index">
-	  		<span *ngIf="currentSubIndex == i">
-	  			<assay-details (assayDelete)="assayDeleted($event)" [assayName]="assay.name"></assay-details>
-	  		</span>
-	  	</span>
-	</div>
-	<span >
-		<div>&nbsp;</div>
-	</span>
-</span>
-<ng-template #noAssays>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
-	<div class="has-text-centered">
-		<p>No Assays Found</p>
-		<add-assay></add-assay>
-	</div>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
-</ng-template>
+  <span *ngIf="assays && assays.length > 0; else noAssays">
+    <div *ngIf="!isReadOnly">
+      <add-assay></add-assay>
+    </div>
+    <br />
+    <div class="card">
+      <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
+        <div
+          class="column is-full tabs npt"
+          style="margin-bottom: 0; padding-bottom: 0"
+        >
+          <ul>
+            <span *ngFor="let assay of assays; let i = index">
+              <li
+                (click)="selectCurrentSubTab(i)"
+                [ngClass]="{ 'is-active': currentSubIndex == i }"
+              >
+                <a>Assay Sheet {{ i + 1 }}</a>
+              </li>
+            </span>
+          </ul>
+        </div>
+      </div>
+      <span *ngFor="let assay of assays; let i = index">
+        <span *ngIf="currentSubIndex == i">
+          <assay-details
+            (assayDelete)="assayDeleted($event)"
+            [assayName]="assay.name"
+          ></assay-details>
+        </span>
+      </span>
+    </div>
+    <span>
+      <div>&nbsp;</div>
+    </span>
+  </span>
+  <ng-template #noAssays>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+    <div class="has-text-centered">
+      <p>No Assays Found</p>
+      <add-assay></add-assay>
+    </div>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+  </ng-template>
 </span>

@@ -1,59 +1,104 @@
-<button (click)="openDownloadModal()" class="button is-default is-pulled-left">Aspera Download</button>&nbsp;
+<button (click)="openDownloadModal()" class="button is-default is-pulled-left">
+  Aspera Download</button
+>&nbsp;
 <small class="had-text-dark">
-    <a (click)="toggleHelp()">
-        <mat-icon class="mat-icon notranslate material-icons mat-icon-no-color" role="img" aria-hidden="true">help</mat-icon>
-        Help
-    </a>
+  <a (click)="toggleHelp()">
+    <mat-icon
+      class="mat-icon notranslate material-icons mat-icon-no-color"
+      role="img"
+      aria-hidden="true"
+      >help</mat-icon
+    >
+    Help
+  </a>
 </small>
-<div class="modal" [ngClass]="{'is-active': displayHelpModal}">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-        <section class="modal-card-body">
-        <p><b >Aspera Download</b><br ><br > Aspera is a fast way of transferring files. Aspera lets you control the transfer rate to better suit your internet connection. You can also stop the transfer, and later resume where you left off. <br ><br > Note that Aspera is a plugin that you have to install in your browser. Please make sure you have privileges to install the Aspera plugin, contact your local IT support if you can not install this plugin.</p>
-        </section>
-        <footer class="modal-card-foot">
-        <div class="columns is-gapless full-width">
-            <div (click)="toggleHelp()" class="column is-full has-text-right"><button  class="button is-default">Close</button></div>
+<div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>
+        <b>Aspera Download</b><br /><br />
+        Aspera is a fast way of transferring files. Aspera lets you control the
+        transfer rate to better suit your internet connection. You can also stop
+        the transfer, and later resume where you left off. <br /><br />
+        Note that Aspera is a plugin that you have to install in your browser.
+        Please make sure you have privileges to install the Aspera plugin,
+        contact your local IT support if you can not install this plugin.
+      </p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div (click)="toggleHelp()" class="column is-full has-text-right">
+          <button class="button is-default">Close</button>
         </div>
-        </footer>
-    </div>
+      </div>
+    </footer>
+  </div>
 </div>
-<div  class="modal"  [ngClass]="{'is-active': isAsperaDownloadModalOpen}">
-    <div  class="modal-background"></div>
-    <div  class="modal-card">
-        <section  class="modal-card-body">
-        <div  class="tabs is-toggle is-fullwidth">
-            <ul >
-                <li  class="is-active"><a >Aspera Connect transfer plug-in</a></li>
-            </ul>
+<div class="modal" [ngClass]="{ 'is-active': isAsperaDownloadModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <div class="tabs is-toggle is-fullwidth">
+        <ul>
+          <li class="is-active"><a>Aspera Connect transfer plug-in</a></li>
+        </ul>
+      </div>
+      <span class="ng-star-inserted">
+        <div class="content-wrapper has-text-centered vc">
+          <div>
+            <br /><img
+              src="/metabolights/editor/assets/img/aspera.jpeg"
+              style="height: 100px"
+            /><br /><br />
+            <span class="ng-star-inserted">
+              <button (click)="download()" class="button is-success">
+                Download file <span class="ng-star-inserted">s</span>
+              </button>
+            </span>
+            &nbsp; <br /><br /><br /><small class="has-text-grey"
+              ><b
+                ><a
+                  href="https://downloads.asperasoft.com/connect2/"
+                  target="_blank"
+                  >Install plugin</a
+                ></b
+              > | <b
+                ><a
+                  href="https://www.asperasoft.com/company/support/transfer-clients/"
+                  target="_blank"
+                  >Platform support</a
+                ></b
+              ></small
+            >
+          </div>
         </div>
-        <span  class="ng-star-inserted">
-            <div  class="content-wrapper has-text-centered vc">
-                <div >
-                    <br ><img  src="/metabolights/editor/assets/img/aspera.jpeg" style="height: 100px"><br ><br >
-                    <span  class="ng-star-inserted">
-                    <button (click)="download()" class="button is-success">
-                        Download file <span class="ng-star-inserted">s</span>
-                    </button>
-                    </span>
-                    &nbsp; <br ><br ><br ><small class="has-text-grey"><b ><a  href="https://downloads.asperasoft.com/connect2/" target="_blank">Install plugin</a></b> | <b ><a  href="https://www.asperasoft.com/company/support/transfer-clients/" target="_blank">Platform support</a></b></small>
-                </div>
-            </div>
-        </span>
-        <div  class="panel-block notification is-primary" style="margin-top: 20px;">
-            <small  class="is-tiny">
-                <i >
-                    <mat-icon  class="mat-icon notranslate material-icons mat-icon-no-color" role="img" aria-hidden="true">info</mat-icon>
-                    You may close this modal and proceed to the next steps while the files are being uploaded
-                </i>
-            </small>
+      </span>
+      <div class="panel-block notification is-primary" style="margin-top: 20px">
+        <small class="is-tiny">
+          <i>
+            <mat-icon
+              class="mat-icon notranslate material-icons mat-icon-no-color"
+              role="img"
+              aria-hidden="true"
+              >info</mat-icon
+            >
+            You may close this modal and proceed to the next steps while the
+            files are being uploaded
+          </i>
+        </small>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-two-third">&nbsp;</div>
+        <div
+          (click)="closeDownloadModal()"
+          class="column is-one-third has-text-right"
+        >
+          <button class="button is-default">Close</button>
         </div>
-        </section>
-        <footer  class="modal-card-foot">
-        <div  class="columns is-gapless full-width">
-            <div  class="column is-two-third"> &nbsp; </div>
-            <div (click)="closeDownloadModal()" class="column is-one-third has-text-right"><button  class="button is-default">Close</button></div>
-        </div>
-        </footer>
-    </div>
+      </div>
+    </footer>
+  </div>
 </div>

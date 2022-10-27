@@ -4,5 +4,5 @@
  * mirror this response. If this is objectionable to anyone, I will do my penance, and write the full fat interface.
  */
 export interface ICrossRefDOI {
-    [key: string]: any;
+  [key: string]: any;
 }
