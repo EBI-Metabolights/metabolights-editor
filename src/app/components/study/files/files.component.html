@@ -87,14 +87,14 @@
             <div class="ftp-box">
               <div class="container">
                 <a class="button is-light ftp-button" (click)="checkFTPFolder()">
-                <mat-icon>safety_check</mat-icon> 
+                <mat-icon>account_balance</mat-icon> 
 
                   Check FTP Folder </a>
                 <div class="status-container" matTooltip="Info about the action">
-                  <div class="dummy">STATUS: <i>{{check.status}}</i></div>
+                  <div class="dummy">STATUS: <i>{{calculation.status}}</i></div>
                   <div class="dummy">DESCRIPTION: {{
-                    check.description === '' ? 'N/A' : check.description}}</div>
-                  <div class="dummy">LAST UPDATE: {{check.last_update_time}}</div>
+                    calculation.description === '' ? 'N/A' : calculation.description}}</div>
+                  <div class="dummy">LAST UPDATE: {{calculation.last_update_time}}</div>
   
                 </div>
               </div> 
@@ -102,10 +102,10 @@
             </div>
             <div class="ftp-box">
               <div class="container">
-                  <a class="button is-light " (click)="sync()">
+                  <button class="button is-light " (click)="sync()" [disabled]="calculation.status !== 'SYNC_NEEDED' || false">
                     <mat-icon>sync</mat-icon>
 
-                    Sync Contents </a>
+                    Sync Contents </button>
                   <div class="status-container">
                   <div class="dummy">STATUS: {{ongoingStatus.status}}</div>
                   <div class="dummy">DESCRIPTION: {{

@@ -16,6 +16,12 @@ import { httpOptions } from './headers';
 @Injectable({
   providedIn: 'root'
 })
+/**
+ * Service for ftp directory operations:
+ *  - checking whether there are any new files in the FTP upload directory
+ *  - synchronise the ftp directory with the study directory
+ *  - check on the status of sync operations
+ */
 export class FtpManagementService {
   @select((state) => state.study.identifier) studyIdentifier;
   id: string;

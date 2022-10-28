@@ -59,7 +59,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit {
   isReadOnly = false;
 
   // ftp ops response variables
-  check: FTPResponse = {
+  calculation: FTPResponse = {
     status: 'Loading',
     description: '...',
     last_update_time: '...'
@@ -70,7 +70,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit {
     last_update_time: 'never'
   };
 
-  intervalSub = interval(1000);
+  intervalSub = interval(2000);
 
   constructor(
     private editorService: EditorService,
@@ -86,7 +86,9 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     let sub = this.ftpService.syncCalculation()
     .subscribe(ftpRes => {
-      this.check = ftpRes
+      this.calculation = ftpRes
+      console.log(`does the res equal SYNC_NEEDED?
+      ${this.calculation.status === 'SYNC_NEEDED'}`)
       sub.unsubscribe();
     })
   }
@@ -522,7 +524,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit {
       status: ${ftpRes.status}
       description: ${ftpRes.description}
       update_time: ${ftpRes.last_update_time}`)
-      this.check = ftpRes;
+      this.calculation = ftpRes;
     })
   }
 
