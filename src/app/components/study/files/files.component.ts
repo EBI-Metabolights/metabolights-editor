@@ -1,16 +1,20 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy, AfterViewInit } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { NgRedux, select } from "@angular-redux/store";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import { environment } from "src/environments/environment";
+import { FtpManagementService } from "src/app/services/ftp-management.service";
+import { FTPResponse } from "src/app/models/mtbl/mtbls/interfaces/generics/ftp-response.interface";
+import { subscribeOn } from "rxjs-compat/operator/subscribeOn";
+import { interval, Observable } from "rxjs";
 
 @Component({
   selector: "mtbls-files",
   templateUrl: "./files.component.html",
   styleUrls: ["./files.component.css"],
 })
-export class FilesComponent implements OnInit {
+export class FilesComponent implements OnInit, OnDestroy, AfterViewInit {
   @select((state) => state.study.readonly) readonly;
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.status.isCurator) isCurator;
@@ -54,9 +58,24 @@ export class FilesComponent implements OnInit {
 
   isReadOnly = false;
 
+  // ftp ops response variables
+  check: FTPResponse = {
+    status: 'Loading',
+    description: '...',
+    last_update_time: '...'
+  };
+  ongoingStatus: FTPResponse = {
+    status: 'N/A',
+    description: '',
+    last_update_time: 'never'
+  };
+
+  intervalSub = interval(1000);
+
   constructor(
     private editorService: EditorService,
-    private dataService: MetabolightsService
+    private dataService: MetabolightsService,
+    private ftpService: FtpManagementService
   ) {}
 
   ngOnInit() {
@@ -65,6 +84,19 @@ export class FilesComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    let sub = this.ftpService.syncCalculation()
+    .subscribe(ftpRes => {
+      this.check = ftpRes
+      sub.unsubscribe();
+    })
+  }
+
+  ngAfterViewInit(): void {
+    
+  }
+
+  ngOnDestroy(): void {
+      // kill all subs somehow
   }
 
   setUpSubscriptions() {
@@ -481,6 +513,38 @@ export class FilesComponent implements OnInit {
 
   isFolder(file) {
     return file.directory;
+  }
+
+  checkFTPFolder(): void {
+    console.log('checking')
+    this.ftpService.syncCalculation(true).subscribe(ftpRes => {
+      console.log(`hit callback with 
+      status: ${ftpRes.status}
+      description: ${ftpRes.description}
+      update_time: ${ftpRes.last_update_time}`)
+      this.check = ftpRes;
+    })
+  }
+
+  sync(): void {
+    console.log('init sync')
+    this.ftpService.synchronise().subscribe(res => {
+      console.log(`res is 
+      ${res}`)
+      // check the status every second or so
+      this.intervalSub.subscribe(x => {
+        if(this.ongoingStatus.status !== "COMPLETED_SUCCESS"){
+          this.checkSyncStatus();
+        }
+
+      })
+    })
+  }
+
+  checkSyncStatus(): void {
+    this.ftpService.getSyncStatus().subscribe(ftpRes => {
+      this.ongoingStatus = ftpRes
+    })
   }
 
   get validation() {

@@ -49,6 +49,83 @@
     <mtbls-download-aspera></mtbls-download-aspera>
   </span>
   <div>&nbsp;</div>
+<!--Ftp operations information banner start-->
+<div *ngIf="!isReadOnly" class="notification is-warning">
+  <small
+    ><mat-icon>info</mat-icon> Owing to recent technological infrastructure changes at the EBI,
+    we now have to manage the transfer of FTP files differently. If you cannot see your recently uploaded files
+    please contact us at 
+    <a
+      [href]="
+        'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - ' +
+        requestedStudy
+      "
+      >metabolights-help@ebi.ac.uk</a
+    >
+    for help.</small
+  >
+</div>
+<!--Ftp operations information banner start-->
+<!-- FTP operations start-->
+  <nav class="panel">
+    <span #spacer></span>
+    <p
+      class="panel-heading"
+      style="z-index: 1000; padding: 7px 10px"
+      stickyThing
+      [spacer]="spacer"
+      [attr.marginTop]="!isReadOnly ? '35' : '0'"
+      isReadOnly
+    >
+      <label>
+       &nbsp;&nbsp;<small>UPLOAD FOLDER OPERATIONS</small>
+      </label>
+     
+    </p>
+    <div class="panel-block">
+        <div class="container">
+            <div class="ftp-box">
+              <div class="container">
+                <a class="button is-light ftp-button" (click)="checkFTPFolder()">
+                <mat-icon>safety_check</mat-icon> 
+
+                  Check FTP Folder </a>
+                <div class="status-container" matTooltip="Info about the action">
+                  <div class="dummy">STATUS: <i>{{check.status}}</i></div>
+                  <div class="dummy">DESCRIPTION: {{
+                    check.description === '' ? 'N/A' : check.description}}</div>
+                  <div class="dummy">LAST UPDATE: {{check.last_update_time}}</div>
+  
+                </div>
+              </div> 
+              
+            </div>
+            <div class="ftp-box">
+              <div class="container">
+                  <a class="button is-light " (click)="sync()">
+                    <mat-icon>sync</mat-icon>
+
+                    Sync Contents </a>
+                  <div class="status-container">
+                  <div class="dummy">STATUS: {{ongoingStatus.status}}</div>
+                  <div class="dummy">DESCRIPTION: {{
+                    ongoingStatus.description === '' ? 'N/A' : ongoingStatus.description}}
+                  </div>
+                  <div class="dummy">LAST UPDATE: {{ongoingStatus.last_update_time}}</div>
+  
+                </div>
+              </div>
+
+            </div>
+          
+        </div>
+
+
+    </div>
+  </nav>
+  <!-- Ftp operations end-->
+  
+  <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer></span>
     <p
@@ -159,6 +236,9 @@
       <a class="panel-block"> No metadata files </a>
     </ng-template>
   </nav>
+  <!--ISA Metadata panel end -->
+
+  <!-- i_Investigation.txt warning start-->
   <div *ngIf="!isReadOnly" class="notification is-warning">
     <small
       ><mat-icon>info</mat-icon> If uploaded ISA Investigation file
@@ -174,6 +254,9 @@
       for help.</small
     >
   </div>
+  <!-- i_Investigation.txt warning end-->
+
+  <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
     <span #spacer1></span>
     <span *ngIf="rawFilesLoading; else rawFilesLoaded">
@@ -242,6 +325,9 @@
       </ng-template>
     </ng-template>
   </nav>
+  <!-- RAW / DERIVED files panel end-->
+
+  <!-- Audit files panel start-->
   <nav *ngIf="auditFiles.length > 0" class="panel">
     <span #spacer2></span>
     <p
@@ -265,6 +351,9 @@
       </span>
     </span>
   </nav>
+  <!-- Audit files panel end -->
+
+  <!-- Inferred Data panel start-->
   <nav *ngIf="derivedFiles.length > 0" class="panel">
     <p
       class="panel-heading"
@@ -362,6 +451,9 @@
       </span>
     </span>
   </nav>
+  <!-- Inferred data penel end-->
+
+  <!-- FTP panel start-->
   <nav *ngIf="uploadFiles?.length > 0 && !isReadOnly" class="panel">
     <div *ngIf="!isReadOnly" class="notification is-info">
       <small
@@ -471,6 +563,7 @@
       </span>
     </span>
   </nav>
+<!--FTP panel end-->  
 </ng-template>
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
