@@ -21,22 +21,8 @@ export class HeaderInterceptor implements HttpInterceptor {
         if (localStorage.getItem("user") !== null) {
           request = request.clone({
             setHeaders: {
-              /**
-               * 
-               * 
-               * 
-               * 
-               * 
-               * REMOVE THIS
-               * 
-               * 
-               * 
-               * 
-               * 
-               * 
-               */
-              /*user_token: disambiguateUserObj(this.getUserObj()),*/
-              user_token: '6996ca30-672c-4cda-9a0e-d113d640776f'
+              user_token: disambiguateUserObj(this.getUserObj()),
+             
             },
           });
         }
