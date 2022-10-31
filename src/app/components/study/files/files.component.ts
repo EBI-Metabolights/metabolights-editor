@@ -568,7 +568,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   }
 
   checkFTPFolder(fource) {
-    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED"]
+    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
     this.ftpService.syncCalculation(fource)
     .subscribe(res => {
       this.isCalculating = true;
