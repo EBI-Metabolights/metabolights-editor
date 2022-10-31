@@ -80,7 +80,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     last_update_time: 'N/A'
   };
 
-  syncButtonEnabled = true;
+  syncButtonEnabled = false;
   syncButtonToolTipMessage = 'can only sync when new files found'
   isSyncing = false;
 
@@ -127,7 +127,9 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
           return true;
         }
     } else if (this.calculation.status === 'NO_SYNC_NEEDED') {
-      return false;
+      return true;
+    } else {
+      return false
     }
   }
 

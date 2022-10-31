@@ -118,8 +118,9 @@
                 <button 
                   class="button is-info " 
                   [ngClass]="isSyncing ? 'is-loading' : '' "
-                  (click)="sync()" 
-                  [disabled]="calculation.status !== 'SYNC_NEEDED' ">
+                  (click)="sync()" >
+                  <!--[disabled]="syncButtonEnabled" -->
+                  <!--[disabled]="calculation.status !== 'SYNC_NEEDED' "> -->
                     <mat-icon>sync</mat-icon>
                     Sync Contents  
                   </button>
