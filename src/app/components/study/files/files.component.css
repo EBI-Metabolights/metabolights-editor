@@ -51,7 +51,7 @@ img {
   display: flex;
   flex-direction: column;
   max-width: 50%;
-  padding-left: 0%;
+  padding-left: 0;
   padding-top: 0;
   height: 100%;
   /*border: green dashed 2px;*/
@@ -59,6 +59,7 @@ img {
 
 .interior-container.left {
   border-right: 1px solid #dbdbdb;
+  padding-left: 1%;
 }
 
 .interior-container.right {

@@ -80,6 +80,11 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     description: '',
     last_update_time: 'N/A'
   };
+  loadingResponse: FTPResponse = {
+    status: 'LOADING',
+    description: 'loading...',
+    last_update_time: 'n/a'
+  }
 
   syncButtonEnabled = false;
   syncButtonToolTipMessage = 'can only sync when new files found'
@@ -600,16 +605,19 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
 
 
   sync(): void {
-    console.log('init sync')
     this.isSyncing = true;
+    let temp = this.ongoingStatus.last_update_time
+    this.ongoingStatus = this.loadingResponse;
+    this.ongoingStatus.last_update_time = temp;
     this.ftpService.synchronise().subscribe(res => {
-      console.log(`res is 
-      ${res}`)
       // check the status every second or so
       this.intervalSub.subscribe(x => {
+        console.log('hit sync intervall callback')
         if(this.ongoingStatus.status !== "COMPLETED_SUCCESS"){
           this.checkSyncStatus();
         } else {
+          // if the op was previously successful this will always be hit
+          console.log('hit else block')
           this.isSyncing = false;
           // setting this here instead of making an unncessary call
           this.calculation.status = 'NO_SYNC_NEEDED';
@@ -621,7 +629,9 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   }
 
   checkSyncStatus(): void {
+    console.log('hit check sync status')
     this.ftpService.getSyncStatus().subscribe(ftpRes => {
+      console.log(ftpRes.status)
       this.ongoingStatus = ftpRes
       this.evalSyncButtonEnabled();
     })
