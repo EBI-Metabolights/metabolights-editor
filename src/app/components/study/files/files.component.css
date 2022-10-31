@@ -82,6 +82,10 @@ img {
   border-top: 1px solid #dbdbdb;
 }
 
+.response.bottom {
+  border-bottom: 0 !important;
+}
+
 .ftp-button {
   vertical-align: middle !important;
 }

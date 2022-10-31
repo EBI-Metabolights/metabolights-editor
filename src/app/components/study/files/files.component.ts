@@ -9,6 +9,7 @@ import { FTPResponse } from "src/app/models/mtbl/mtbls/interfaces/generics/ftp-r
 import { subscribeOn } from "rxjs-compat/operator/subscribeOn";
 import { interval, Observable, of } from "rxjs";
 import { delay, mergeMap, tap } from "rxjs/operators";
+import { E } from "@angular/cdk/keycodes";
 
 
 const CalculationStatus = {
@@ -82,9 +83,12 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
 
   syncButtonEnabled = false;
   syncButtonToolTipMessage = 'can only sync when new files found'
+
   isSyncing = false;
+  isCalculating = false;
 
   intervalSub = interval(2000);
+  calcInterval = interval(20000)
 
   constructor(
     private editorService: EditorService,
@@ -104,6 +108,12 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
       console.log(`does the res equal SYNC_NEEDED?
       ${this.calculation.status === 'SYNC_NEEDED'}`)
       sub.unsubscribe();
+    })
+
+    let syncStatusSub = this.ftpService.getSyncStatus()
+    .subscribe(statusRes => {
+      this.ongoingStatus = statusRes
+      syncStatusSub.unsubscribe();
     })
   }
 
@@ -558,20 +568,28 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   }
 
   checkFTPFolder() {
+    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED"]
     this.ftpService.syncCalculation(true)
-    .pipe(
-      /**
-       * So this currently just retries it once, after a 30 second delay.
-       */
-      mergeMap((res: FTPResponse) => {
-        if (res.status === 'CALCULATING' || res.status === 'PENDING'){
-          return this.ftpService.syncCalculation(true).pipe(delay(30000))
-        } else {
-          return of(res)
-        }
-      }),
-      tap(res => console.log(res))
-    ).subscribe(res => this.calculation = res)
+    .subscribe(res => {
+      this.isCalculating = true;
+      if (accept.includes(res.status)) {
+        this.calculation = res;
+        this.isCalculating = false;
+      } else {
+        let sub = this.calcInterval.subscribe(x => { 
+          this.ftpService.syncCalculation(false).subscribe(ftpRes => {
+            if(accept.includes(ftpRes.status)) {
+              this.calculation = ftpRes
+              this.isCalculating = false;
+              sub.unsubscribe();
+            }
+          })
+        })
+      }
+
+      
+      
+    })
   }
 
 

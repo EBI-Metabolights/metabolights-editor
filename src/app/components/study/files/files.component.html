@@ -91,7 +91,10 @@
                 As a result the calculation process may take a few minutes
               </div> 
               <div class="interior-container right">
-                <a class="button is-info ftp-button" (click)="checkFTPFolder()">
+                <a 
+                class="button is-info ftp-button" 
+                [ngClass]="isCalculating ? 'is-loading' : '' "
+                (click)="checkFTPFolder()">
                   <mat-icon>account_balance</mat-icon> 
   
                     Check FTP Folder </a>
@@ -99,7 +102,7 @@
                     <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b> <i>{{calculation.status | calculationTransform}}</i></div>
                     <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
                       calculation.description === '' ? 'N/A' : calculation.description}}</div>
-                      <div class="response"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{calculation.last_update_time}}</div>
+                      <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{calculation.last_update_time}}</div>
     
                   </div>
               </div>
@@ -130,7 +133,7 @@
                   <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
                     ongoingStatus.description === '' ? 'N/A' : ongoingStatus.description}}
                   </div>
-                  <div class="response"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{ongoingStatus.last_update_time}}</div>
+                  <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{ongoingStatus.last_update_time}}</div>
   
                 </div>
               </div>
