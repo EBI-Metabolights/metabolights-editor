@@ -108,17 +108,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
       this.setUpSubscriptions();
     }
 
-    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED"]
-    let sub = this.calcInterval.subscribe(x => {
-      this.ftpService.syncCalculation(false).subscribe(ftpRes => {
-        if(accept.includes(ftpRes.status)) {
-          console.log('does the res not CALCULATING, then stop');
-          this.calculation = ftpRes
-          this.isCalculating = false;
-          sub.unsubscribe();
-        }
-      });
-    });
+    this.checkFTPFolder(false);
 
     let syncStatusSub = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
@@ -577,9 +567,9 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     return file.directory;
   }
 
-  checkFTPFolder() {
+  checkFTPFolder(fource) {
     const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED"]
-    this.ftpService.syncCalculation(true)
+    this.ftpService.syncCalculation(fource)
     .subscribe(res => {
       this.isCalculating = true;
       if (accept.includes(res.status)) {
@@ -630,7 +620,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
           this.evalSyncButtonEnabled();
           syncsub.unsubscribe();
           this.editorService.loadStudyFiles(true);
-          this.checkFTPFolder();
+          this.checkFTPFolder(true);
         }
       })
     })

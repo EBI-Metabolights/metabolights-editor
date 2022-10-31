@@ -54,7 +54,7 @@
   <small
     ><mat-icon>info</mat-icon> Owing to recent technological infrastructure changes at the EBI,
     we now have to manage the transfer of FTP files differently. If you cannot see your recently uploaded files
-    please contact us at 
+    please contact us at
     <a
       [href]="
         'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - ' +
@@ -80,7 +80,7 @@
       <label>
        &nbsp;&nbsp;<small>UPLOAD FOLDER OPERATIONS</small>
       </label>
-     
+
     </p>
     <div class="panel-block">
         <div class="container">
@@ -90,24 +90,24 @@
                 <span>What is this</span>
                 Check /verify that you have anything in your study folder that needds to be synced over. FTP directories are closely guarded at the EBI.
                 As a result the calculation process may take a few minutes
-              </div> 
+              </div>
               <div class="interior-container right">
-                <a 
-                class="button is-info ftp-button" 
+                <a
+                class="button is-info ftp-button"
                 [ngClass]="isCalculating ? 'is-loading' : '' "
-                (click)="checkFTPFolder()">
-                  <mat-icon>account_balance</mat-icon> 
-  
+                (click)="checkFTPFolder(true)">
+                  <mat-icon>account_balance</mat-icon>
+
                     Check FTP Folder </a>
                   <div class="status-container" matTooltip="Info about the action">
                     <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b> <i>{{calculation.status | calculationTransform}}</i></div>
                     <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
                       calculation.description === '' ? 'N/A' : calculation.description}}</div>
                       <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{calculation.last_update_time}}</div>
-    
+
                   </div>
               </div>
-              
+
             </div>
             <!--Check ftp folder end-->
 
@@ -115,19 +115,19 @@
             <div class="ftp-box container">
               <div class="interior-container left">
                 <span> What is this </span>
-                Initiate synchronisation to align your study folder with your FTP upload folder. 
+                Initiate synchronisation to align your study folder with your FTP upload folder.
                 Please note that new FTP uploads are not automatcally transferred. For more information click here.
               </div>
               <div class="interior-container right">
 
-                <button 
-                  class="button is-info " 
+                <button
+                  class="button is-info "
                   [ngClass]="isSyncing ? 'is-loading' : '' "
                   (click)="sync()" >
                   <!--[disabled]="syncButtonEnabled" -->
                   <!--[disabled]="calculation.status !== 'SYNC_NEEDED' "> -->
                     <mat-icon>sync</mat-icon>
-                    Sync Contents  
+                    Sync Contents
                   </button>
 
                   <div class="status-container">
@@ -136,7 +136,7 @@
                     ongoingStatus.description === '' ? 'N/A' : ongoingStatus.description}}
                   </div>
                   <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{ongoingStatus.last_update_time}}</div>
-  
+
                 </div>
               </div>
             </div>
@@ -145,7 +145,7 @@
     </div>
   </nav>
   <!-- Ftp operations end-->
-  
+
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer></span>
@@ -584,7 +584,7 @@
       </span>
     </span>
   </nav>
-<!--FTP panel end-->  
+<!--FTP panel end-->
 </ng-template>
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
