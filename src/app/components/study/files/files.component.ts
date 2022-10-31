@@ -629,7 +629,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
           this.calculation.status = 'NO_SYNC_NEEDED';
           this.evalSyncButtonEnabled();
           syncsub.unsubscribe();
-          this.loadFilesPassively();
+          this.editorService.loadStudyFiles(true);
           this.checkFTPFolder();
         }
       })
