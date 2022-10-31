@@ -49,6 +49,99 @@
     <mtbls-download-aspera></mtbls-download-aspera>
   </span>
   <div>&nbsp;</div>
+<!--Ftp operations information banner start-->
+<div *ngIf="!isReadOnly" class="notification is-warning">
+  <small
+    ><mat-icon>info</mat-icon> Owing to recent technological infrastructure changes at the EBI,
+    we now have to manage the transfer of FTP files differently. If you cannot see your recently uploaded files
+    please contact us at 
+    <a
+      [href]="
+        'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - ' +
+        requestedStudy
+      "
+      >metabolights-help@ebi.ac.uk</a
+    >
+    for help.</small
+  >
+</div>
+<!--Ftp operations information banner start-->
+<!-- FTP operations start-->
+  <nav class="panel">
+    <span #spacer></span>
+    <p
+      class="panel-heading"
+      style="z-index: 1000; padding: 7px 10px"
+      stickyThing
+      [spacer]="spacer"
+      [attr.marginTop]="!isReadOnly ? '35' : '0'"
+      isReadOnly
+    >
+      <label>
+       &nbsp;&nbsp;<small>UPLOAD FOLDER OPERATIONS</small>
+      </label>
+     
+    </p>
+    <div class="panel-block">
+        <div class="container">
+          <!--Check ftp folder start-->
+            <div class="ftp-box container ">
+              <div class="interior-container ">
+                Check /verify that you have anything in your study folder that needds to be synced over. FTP directories are closely guarded at the EBI.
+                As a result the calculation process may take a few minutes
+              </div> 
+              <div class="interior-container right">
+                <a class="button is-info ftp-button" (click)="checkFTPFolder()">
+                  <mat-icon>account_balance</mat-icon> 
+  
+                    Check FTP Folder </a>
+                  <div class="status-container" matTooltip="Info about the action">
+                    <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b> <i>{{calculation.status | calculationTransform}}</i></div>
+                    <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
+                      calculation.description === '' ? 'N/A' : calculation.description}}</div>
+                      <div class="response"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{calculation.last_update_time}}</div>
+    
+                  </div>
+              </div>
+              
+            </div>
+            <!--Check ftp folder end-->
+
+            <!--Sync folder start-->
+            <div class="ftp-box container">
+              <div class="interior-container ">
+                Initiate synchronisation to align your study folder with your FTP upload folder. 
+                Please note that new FTP uploads are not automatcally transferred. For more information click here.
+              </div>
+              <div class="interior-container right">
+
+                <button 
+                  class="button is-info " 
+                  [ngClass]="isSyncing ? 'is-loading' : '' "
+                  (click)="sync()" >
+                  <!--[disabled]="syncButtonEnabled" -->
+                  <!--[disabled]="calculation.status !== 'SYNC_NEEDED' "> -->
+                    <mat-icon>sync</mat-icon>
+                    Sync Contents  
+                  </button>
+
+                  <div class="status-container">
+                  <div class="response"><mat-icon>info</mat-icon><b>SYNC OPERATION STATUS: </b><i>{{ongoingStatus.status | syncOpTransform}}</i> </div>
+                  <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
+                    ongoingStatus.description === '' ? 'N/A' : ongoingStatus.description}}
+                  </div>
+                  <div class="response"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{ongoingStatus.last_update_time}}</div>
+  
+                </div>
+              </div>
+            </div>
+            <!--Sync folder end-->
+        </div>
+    </div>
+  </nav>
+  <!-- Ftp operations end-->
+  
+  <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer></span>
     <p
@@ -159,6 +252,9 @@
       <a class="panel-block"> No metadata files </a>
     </ng-template>
   </nav>
+  <!--ISA Metadata panel end -->
+
+  <!-- i_Investigation.txt warning start-->
   <div *ngIf="!isReadOnly" class="notification is-warning">
     <small
       ><mat-icon>info</mat-icon> If uploaded ISA Investigation file
@@ -174,6 +270,9 @@
       for help.</small
     >
   </div>
+  <!-- i_Investigation.txt warning end-->
+
+  <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
     <span #spacer1></span>
     <span *ngIf="rawFilesLoading; else rawFilesLoaded">
@@ -242,6 +341,9 @@
       </ng-template>
     </ng-template>
   </nav>
+  <!-- RAW / DERIVED files panel end-->
+
+  <!-- Audit files panel start-->
   <nav *ngIf="auditFiles.length > 0" class="panel">
     <span #spacer2></span>
     <p
@@ -265,6 +367,9 @@
       </span>
     </span>
   </nav>
+  <!-- Audit files panel end -->
+
+  <!-- Inferred Data panel start-->
   <nav *ngIf="derivedFiles.length > 0" class="panel">
     <p
       class="panel-heading"
@@ -362,6 +467,9 @@
       </span>
     </span>
   </nav>
+  <!-- Inferred data penel end-->
+
+  <!-- FTP panel start-->
   <nav *ngIf="uploadFiles?.length > 0 && !isReadOnly" class="panel">
     <div *ngIf="!isReadOnly" class="notification is-info">
       <small
@@ -471,6 +579,7 @@
       </span>
     </span>
   </nav>
+<!--FTP panel end-->  
 </ng-template>
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>

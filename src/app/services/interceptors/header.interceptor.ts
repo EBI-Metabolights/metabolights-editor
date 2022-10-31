@@ -22,6 +22,7 @@ export class HeaderInterceptor implements HttpInterceptor {
           request = request.clone({
             setHeaders: {
               user_token: disambiguateUserObj(this.getUserObj()),
+             
             },
           });
         }

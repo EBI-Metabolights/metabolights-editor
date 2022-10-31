@@ -1,16 +1,30 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy, AfterViewInit, OnChanges, SimpleChange } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { NgRedux, select } from "@angular-redux/store";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import { environment } from "src/environments/environment";
+import { FtpManagementService } from "src/app/services/ftp-management.service";
+import { FTPResponse } from "src/app/models/mtbl/mtbls/interfaces/generics/ftp-response.interface";
+import { subscribeOn } from "rxjs-compat/operator/subscribeOn";
+import { interval, Observable, of } from "rxjs";
+import { delay, mergeMap, tap } from "rxjs/operators";
+
+
+const CalculationStatus = {
+  NO_TASK: 'Nothing to do',
+  UNKNOWN: 'Status unknown, potential error',
+  SYNC_NEEDED: 'New files to be synchronised',
+  SYNC_NOT_NEEDED: 'No new files to synchronise',
+  CALCULATING: 'Scanning...'
+}
 
 @Component({
   selector: "mtbls-files",
   templateUrl: "./files.component.html",
   styleUrls: ["./files.component.css"],
 })
-export class FilesComponent implements OnInit {
+export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
   @select((state) => state.study.readonly) readonly;
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.status.isCurator) isCurator;
@@ -54,9 +68,28 @@ export class FilesComponent implements OnInit {
 
   isReadOnly = false;
 
+  // ftp ops response variables
+  calculation: FTPResponse = {
+    status: 'Loading',
+    description: '...',
+    last_update_time: '...'
+  };
+  ongoingStatus: FTPResponse = {
+    status: 'UNKNOWN',
+    description: '',
+    last_update_time: 'N/A'
+  };
+
+  syncButtonEnabled = false;
+  syncButtonToolTipMessage = 'can only sync when new files found'
+  isSyncing = false;
+
+  intervalSub = interval(2000);
+
   constructor(
     private editorService: EditorService,
-    private dataService: MetabolightsService
+    private dataService: MetabolightsService,
+    private ftpService: FtpManagementService
   ) {}
 
   ngOnInit() {
@@ -65,6 +98,47 @@ export class FilesComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    let sub = this.ftpService.syncCalculation()
+    .subscribe(ftpRes => {
+      this.calculation = ftpRes
+      console.log(`does the res equal SYNC_NEEDED?
+      ${this.calculation.status === 'SYNC_NEEDED'}`)
+      sub.unsubscribe();
+    })
+  }
+
+  ngOnChanges(changes) {
+    this.syncButtonToolTipMessage = this.evalSyncButtonTooltip();
+    this.syncButtonEnabled = this.evalSyncButtonEnabled();
+  }
+
+  evalSyncButtonTooltip() {
+    return this.calculation.status === 'SYNC_NEEDED' ? 'Click to sync' : 'Can only sync when new files found'
+  }
+
+  evalSyncButtonEnabled(): boolean {
+    if (this.calculation.status === 'SYNC_NEEDED') {
+      if (
+        this.ongoingStatus.status === 'PENDING' ||
+        this.ongoingStatus.status === 'RUNNING'
+        ) {
+          return false;
+        } else {
+          return true;
+        }
+    } else if (this.calculation.status === 'NO_SYNC_NEEDED') {
+      return true;
+    } else {
+      return false
+    }
+  }
+
+  ngAfterViewInit(): void {
+    
+  }
+
+  ngOnDestroy(): void {
+      // kill all subs somehow
   }
 
   setUpSubscriptions() {
@@ -481,6 +555,58 @@ export class FilesComponent implements OnInit {
 
   isFolder(file) {
     return file.directory;
+  }
+
+  checkFTPFolder() {
+    this.ftpService.syncCalculation(true)
+    .pipe(
+      /**
+       * So this currently just retries it once, after a 30 second delay.
+       */
+      mergeMap((res: FTPResponse) => {
+        if (res.status === 'CALCULATING' || res.status === 'PENDING'){
+          return this.ftpService.syncCalculation(true).pipe(delay(30000))
+        } else {
+          return of(res)
+        }
+      }),
+      tap(res => console.log(res))
+    ).subscribe(res => this.calculation = res)
+  }
+
+
+  onSyncButtonClick(): void {
+    this.syncButtonEnabled = false;
+    this.sync();
+  }
+
+
+  sync(): void {
+    console.log('init sync')
+    this.isSyncing = true;
+    this.ftpService.synchronise().subscribe(res => {
+      console.log(`res is 
+      ${res}`)
+      // check the status every second or so
+      this.intervalSub.subscribe(x => {
+        if(this.ongoingStatus.status !== "COMPLETED_SUCCESS"){
+          this.checkSyncStatus();
+        } else {
+          this.isSyncing = false;
+          // setting this here instead of making an unncessary call
+          this.calculation.status = 'NO_SYNC_NEEDED';
+          this.evalSyncButtonEnabled();
+
+        }
+      })
+    })
+  }
+
+  checkSyncStatus(): void {
+    this.ftpService.getSyncStatus().subscribe(ftpRes => {
+      this.ongoingStatus = ftpRes
+      this.evalSyncButtonEnabled();
+    })
   }
 
   get validation() {
