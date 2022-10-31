@@ -49,6 +49,9 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { TooltipDirective } from './files/tooltip.directive';
+import { CalculationTransformPipe } from "./files/calculation-transform.pipe";
+import { SyncOpTransformPipe } from "./files/sync-op-transform.pipe";
 
 @NgModule({
   declarations: [
@@ -72,6 +75,9 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
     ValidationsComponent,
     ValidationDetailComponent,
     ValidationDetailCommentComponent,
+    TooltipDirective,
+    CalculationTransformPipe,
+    SyncOpTransformPipe
   ],
   imports: [
     CommonModule,
@@ -100,6 +106,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
     MatButtonToggleModule,
     QuillModule,
     MatCheckboxModule,
+  
+    
   ],
   exports: [
     AssaysComponent,
@@ -122,6 +130,8 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
     ValidationsComponent,
     ValidationDetailComponent,
     ValidationDetailCommentComponent,
+    CalculationTransformPipe,
+    SyncOpTransformPipe
   ],
   providers: [
     AuthGuard,

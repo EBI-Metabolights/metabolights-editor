@@ -11,8 +11,6 @@ import { AppError } from './error/app-error';
 import { httpOptions } from './headers';
 
 
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -65,7 +63,6 @@ export class FtpManagementService {
     * @returns FTP response object giving insight into the current 'calculation'
     */
    public syncCalculation(force = false): Observable<FTPResponse> {
-     console.log(httpOptions)
      return this.http.post<FTPResponse>(`${this.url}/sync-calculation?force=${force.toString()}`, {}, httpOptions)
    }
 }

@@ -84,43 +84,58 @@
     </p>
     <div class="panel-block">
         <div class="container">
-            <div class="ftp-box">
-              <div class="container">
-                <a class="button is-light ftp-button" (click)="checkFTPFolder()">
-                <mat-icon>account_balance</mat-icon> 
-
-                  Check FTP Folder </a>
-                <div class="status-container" matTooltip="Info about the action">
-                  <div class="dummy">STATUS: <i>{{calculation.status}}</i></div>
-                  <div class="dummy">DESCRIPTION: {{
-                    calculation.description === '' ? 'N/A' : calculation.description}}</div>
-                  <div class="dummy">LAST UPDATE: {{calculation.last_update_time}}</div>
-  
-                </div>
+          <!--Check ftp folder start-->
+            <div class="ftp-box container ">
+              <div class="interior-container ">
+                Check /verify that you have anything in your study folder that needds to be synced over. FTP directories are closely guarded at the EBI.
+                As a result the calculation process may take a few minutes
               </div> 
+              <div class="interior-container right">
+                <a class="button is-info ftp-button" (click)="checkFTPFolder()">
+                  <mat-icon>account_balance</mat-icon> 
+  
+                    Check FTP Folder </a>
+                  <div class="status-container" matTooltip="Info about the action">
+                    <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b> <i>{{calculation.status | calculationTransform}}</i></div>
+                    <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
+                      calculation.description === '' ? 'N/A' : calculation.description}}</div>
+                      <div class="response"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{calculation.last_update_time}}</div>
+    
+                  </div>
+              </div>
               
             </div>
-            <div class="ftp-box">
-              <div class="container">
-                  <button class="button is-light " (click)="sync()" [disabled]="calculation.status !== 'SYNC_NEEDED' || false">
-                    <mat-icon>sync</mat-icon>
+            <!--Check ftp folder end-->
 
-                    Sync Contents </button>
+            <!--Sync folder start-->
+            <div class="ftp-box container">
+              <div class="interior-container ">
+                Initiate synchronisation to align your study folder with your FTP upload folder. 
+                Please note that new FTP uploads are not automatcally transferred. For more information click here.
+              </div>
+              <div class="interior-container right">
+
+                <button 
+                  class="button is-info " 
+                  [ngClass]="isSyncing ? 'is-loading' : '' "
+                  (click)="sync()" 
+                  [disabled]="calculation.status !== 'SYNC_NEEDED' ">
+                    <mat-icon>sync</mat-icon>
+                    Sync Contents  
+                  </button>
+
                   <div class="status-container">
-                  <div class="dummy">STATUS: {{ongoingStatus.status}}</div>
-                  <div class="dummy">DESCRIPTION: {{
+                  <div class="response"><mat-icon>info</mat-icon><b>SYNC OPERATION STATUS: </b><i>{{ongoingStatus.status | syncOpTransform}}</i> </div>
+                  <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
                     ongoingStatus.description === '' ? 'N/A' : ongoingStatus.description}}
                   </div>
-                  <div class="dummy">LAST UPDATE: {{ongoingStatus.last_update_time}}</div>
+                  <div class="response"><mat-icon>history</mat-icon><b>LAST UPDATE:</b> {{ongoingStatus.last_update_time}}</div>
   
                 </div>
               </div>
-
             </div>
-          
+            <!--Sync folder end-->
         </div>
-
-
     </div>
   </nav>
   <!-- Ftp operations end-->
