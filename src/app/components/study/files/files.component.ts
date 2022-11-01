@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy, AfterViewInit, OnChanges, SimpleChange } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy, AfterViewInit, OnChanges, SimpleChange, ViewChild, ElementRef } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { NgRedux, select } from "@angular-redux/store";
@@ -31,6 +31,12 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
   @Input("validations") validations: any;
+
+  @ViewChild('trackHeight') elementView: ElementRef;
+  containerHeight: any = 279;
+
+  @ViewChild('trackHeight') statusContainerView: ElementRef;
+  statusContainerHeight: any = 267;
 
   rawFiles: any[] = [];
   metaFiles: any[] = [];
@@ -107,8 +113,13 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-
-    this.checkFTPFolder(false);
+    let sub = this.ftpService.syncCalculation()
+    .subscribe(ftpRes => {
+      this.calculation = ftpRes
+      this.containerHeight = this.elementView.nativeElement.offsetHeight
+      this.statusContainerHeight = this.statusContainerView.nativeElement.offsetHeight;
+      sub.unsubscribe();
+    })
 
     let syncStatusSub = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
@@ -120,6 +131,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   ngOnChanges(changes) {
     this.syncButtonToolTipMessage = this.evalSyncButtonTooltip();
     this.syncButtonEnabled = this.evalSyncButtonEnabled();
+    this.containerHeight = this.elementView.nativeElement.offsetHeight;
   }
 
   evalSyncButtonTooltip() {
@@ -575,29 +587,24 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
       if (accept.includes(res.status)) {
         this.calculation = res;
         this.isCalculating = false;
+        this.containerHeight = this.elementView.nativeElement.offsetHeight;
+        this.statusContainerHeight = this.statusContainerView.nativeElement.offsetHeight;
       } else {
         let sub = this.calcInterval.subscribe(x => {
           this.ftpService.syncCalculation(false).subscribe(ftpRes => {
             if(accept.includes(ftpRes.status)) {
               this.calculation = ftpRes
               this.isCalculating = false;
+              this.containerHeight = this.elementView.nativeElement.offsetHeight
+              this.statusContainerHeight = this.statusContainerView.nativeElement.offsetHeight;
+
               sub.unsubscribe();
             }
           })
         })
       }
-
-
-
     })
   }
-
-
-  onSyncButtonClick(): void {
-    this.syncButtonEnabled = false;
-    this.sync();
-  }
-
 
   sync(): void {
     this.isSyncing = true;
