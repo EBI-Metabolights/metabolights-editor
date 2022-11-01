@@ -571,6 +571,9 @@ export class EditorService {
   }
 
   extractAssayDetails(assay) {
+    if (this.validations === undefined) {
+      this.loadValidations();
+    }
     if (assay.name.split(this.currentStudyIdentifier)[1]) {
       const assayInfo = assay.name
         .split(this.currentStudyIdentifier)[1]
@@ -578,7 +581,7 @@ export class EditorService {
       let assaySubTechnique = null;
       let assayTechnique = null;
       let assayMainTechnique = null;
-      this.validations.assays.assaySetup.main_techniques.forEach((mt) => {
+      this.validations["assays"]["assaySetup"].main_techniques.forEach((mt) => {
         mt.techniques.forEach((t) => {
           if (t.sub_techniques && t.sub_techniques.length > 0) {
             t.sub_techniques.forEach((st) => {
