@@ -13,6 +13,7 @@ import { IsInitialised } from "./components/store";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 import { HttpResponse } from "@angular/common/http";
+import {browserRefresh} from './app.component';
 
 @Injectable({
   providedIn: "root",
@@ -51,6 +52,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 
     switch (this.evaluateSession(isInit)) {
       case SessionStatus.Active:
+        if (browserRefresh) {
+          return this.editorService.initialise(localStorage.getItem('user'), false);
+        }
         return true;
 
       case SessionStatus.Expired:

@@ -107,11 +107,8 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-    let sub = this.ftpService.syncCalculation()
-    .subscribe(ftpRes => {
-      this.calculation = ftpRes
-      sub.unsubscribe();
-    })
+
+    this.checkFTPFolder(false);
 
     let syncStatusSub = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
@@ -147,7 +144,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   }
 
   ngAfterViewInit(): void {
-    
+
   }
 
   ngOnDestroy(): void {
@@ -570,16 +567,16 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     return file.directory;
   }
 
-  checkFTPFolder() {
-    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED"]
-    this.ftpService.syncCalculation(true)
+  checkFTPFolder(fource) {
+    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
+    this.ftpService.syncCalculation(fource)
     .subscribe(res => {
       this.isCalculating = true;
       if (accept.includes(res.status)) {
         this.calculation = res;
         this.isCalculating = false;
       } else {
-        let sub = this.calcInterval.subscribe(x => { 
+        let sub = this.calcInterval.subscribe(x => {
           this.ftpService.syncCalculation(false).subscribe(ftpRes => {
             if(accept.includes(ftpRes.status)) {
               this.calculation = ftpRes
@@ -590,8 +587,8 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
         })
       }
 
-      
-      
+
+
     })
   }
 
@@ -609,9 +606,10 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     this.ongoingStatus.last_update_time = temp;
     this.ftpService.synchronise().subscribe(res => {
       // check the status every second or so
-      this.intervalSub.subscribe(x => {
+      let syncsub = this.intervalSub.subscribe(x => {
         console.log('hit sync intervall callback')
         if(this.ongoingStatus.status !== "COMPLETED_SUCCESS"){
+          console.log('hit if  block')
           this.checkSyncStatus();
         } else {
           // if the op was previously successful this will always be hit
@@ -620,7 +618,9 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
           // setting this here instead of making an unncessary call
           this.calculation.status = 'NO_SYNC_NEEDED';
           this.evalSyncButtonEnabled();
-
+          syncsub.unsubscribe();
+          this.editorService.loadStudyFiles(true);
+          this.checkFTPFolder(true);
         }
       })
     })

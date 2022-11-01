@@ -684,7 +684,7 @@ export class EditorService {
       );
       data["columns"] = columns;
       data["displayedColumns"] = displayedColumns;
-      data[file] = file;
+      data["file"] = file;
       data.data.rows ? (data["rows"] = data.data.rows) : (data["rows"] = []);
       delete data.data;
       assay["data"] = data;
@@ -849,13 +849,15 @@ export class EditorService {
                 variants: [],
               };
             } else {
-              if (organisms[organismName].parts.indexOf(organismPart) < 0) {
-                organisms[organismName].parts.push(organismPart);
-              }
-              if (
-                organisms[organismName].variants.indexOf(organismVariant) < 0
-              ) {
-                organisms[organismName].variants.push(organismVariant);
+              if (organisms[organismName]) {
+                if (organisms[organismName].parts.indexOf(organismPart) < 0) {
+                  organisms[organismName].parts.push(organismPart);
+                }
+                if (
+                  organisms[organismName].variants.indexOf(organismVariant) < 0
+                ) {
+                  organisms[organismName].variants.push(organismVariant);
+                }
               }
             }
           }
