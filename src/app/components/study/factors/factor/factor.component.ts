@@ -27,6 +27,8 @@ import { environment } from "src/environments/environment";
 export class FactorComponent implements OnInit {
   @Input("value") factor: MTBLSFactor;
   @Input("isDropdown") isDropdown = false;
+
+  // this refers to the validations.json file, NOT the results of the validation pipeline for the study.
   @select((state) => state.study.validations) studyValidations: any;
 
   @ViewChild(OntologyComponent) factorTypeComponent: OntologyComponent;
@@ -46,7 +48,7 @@ export class FactorComponent implements OnInit {
   isFormBusy = false;
   addNewFactor = false;
 
-  validations: any = null;
+  validationRules: any = null;
 
   constructor(
     private fb: FormBuilder,
@@ -60,7 +62,7 @@ export class FactorComponent implements OnInit {
 
   setUpSubscriptions() {
     this.studyValidations.subscribe((value) => {
-      this.validations = value;
+      this.validationRules = value;
     });
     this.studyReadonly.subscribe((value) => {
       if (value !== null) {
@@ -70,6 +72,7 @@ export class FactorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.editorService.loadValidations();
     if (this.factor == null) {
       this.addNewFactor = true;
       if (this.factorTypeComponent) {
@@ -206,11 +209,11 @@ export class FactorComponent implements OnInit {
   get validation() {
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
-      let tempValidations = JSON.parse(JSON.stringify(this.validations));
+      let tempValidations = JSON.parse(JSON.stringify(this.validationRules));
       while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
-    return this.validations[this.validationsId];
+    return this.validationRules[this.validationsId];
   }
 
   fieldValidation(fieldId) {

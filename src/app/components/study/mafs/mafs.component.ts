@@ -45,11 +45,13 @@ export class MafsComponent implements OnInit {
 
     // eslint-disable-next-line @typescript-eslint/indent
     this.studyAssays.subscribe((value) => {
+      console.log(`value returned from state select:
+      ${value}`)
       this.assays = value;
       const tempMAFs = [];
       Object.values(this.assays).forEach((assay) => {
-        const assertAssay = assay as any;
-        assertAssay.mafs.forEach((maf) => {
+        //const assertAssay = assay as any;
+        assay["mafs"].forEach((maf) => {
           // eslint-disable-line @typescript-eslint/dot-notation
           tempMAFs.push(maf);
         });
@@ -80,8 +82,9 @@ export class MafsComponent implements OnInit {
       this.studyAssayFiles.forEach((assayFileName) => {
         if (this.assays) {
           const assayName = assayFileName.filename.trim();
-          if (this.assays[assayName].mafs.length > 0) {
-            this.assays[assayName].mafs.forEach((mafFile) => {
+
+          if (this.assays[assayName]["mafs"].length > 0) {
+            this.assays[assayName]["mafs"].forEach((mafFile) => {
               if (
                 this.mafNames.indexOf(mafFile) === -1 &&
                 mafFile.indexOf("m_") === 0

@@ -110,8 +110,6 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     let sub = this.ftpService.syncCalculation()
     .subscribe(ftpRes => {
       this.calculation = ftpRes
-      console.log(`does the res equal SYNC_NEEDED?
-      ${this.calculation.status === 'SYNC_NEEDED'}`)
       sub.unsubscribe();
     })
 
