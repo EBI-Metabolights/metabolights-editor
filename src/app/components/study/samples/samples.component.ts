@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList, OnChanges } from "@angular/core";
 import { select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import { FormBuilder, FormGroup } from "@angular/forms";
@@ -16,7 +16,7 @@ import { environment } from "src/environments/environment";
   templateUrl: "./samples.component.html",
   styleUrls: ["./samples.component.css"],
 })
-export class SamplesComponent {
+export class SamplesComponent  {
   @select((state) => state.study.samples) studySamples;
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.factors) studyFactors;
@@ -25,6 +25,8 @@ export class SamplesComponent {
   @select((state) => state.study.readonly) readonly;
 
   @ViewChildren(OntologyComponent)
+  private ontologyComponents: QueryList<OntologyComponent>;
+
   @ViewChild(TableComponent, { static: true })
   sampleTable: TableComponent;
 
@@ -58,12 +60,15 @@ export class SamplesComponent {
 
   validationsId = "samples";
 
-  private ontologyComponents: QueryList<OntologyComponent>;
 
   constructor(private editorService: EditorService, private fb: FormBuilder) {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+  }
+
+  onChanges($event) {
+
   }
 
   setUpSubscriptions() {
@@ -189,6 +194,7 @@ export class SamplesComponent {
       const mtblsFactorValue = new MTBLSFactorValue();
       mtblsFactorValue.category = this.selectedFactor;
       const columns = [];
+      console.log(this.sampleTable);
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
         "Factor Value[" + mtblsFactorValue.category.factorName + "]",
