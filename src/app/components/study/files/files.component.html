@@ -87,10 +87,12 @@
           <!--Check ftp folder start-->
             <div class="ftp-box container ">
               <div class="interior-container left">
-                <span>What is this</span>
-                Check /verify that you have anything in your study folder that needds to be synced over. FTP directories are closely guarded at the EBI.
-                As a result the calculation process may take a few minutes
-              </div>
+                <span class="title-button"><mat-icon>help</mat-icon>What is this</span>
+                <p class="interior-container-text">
+                  Check if you have anything in your study folder that needs to be synchronised. FTP directories are closely guarded at the EBI.
+                  As a result the calculation process may take a few minutes.
+                </p>
+              </div> 
               <div class="interior-container right">
                 <a
                 class="button is-info ftp-button"
@@ -99,7 +101,7 @@
                   <mat-icon>account_balance</mat-icon>
 
                     Check FTP Folder </a>
-                  <div class="status-container" matTooltip="Info about the action">
+                  <div class="status-container">
                     <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b> <i>{{calculation.status | calculationTransform}}</i></div>
                     <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b> {{
                       calculation.description === '' ? 'N/A' : calculation.description}}</div>
@@ -114,9 +116,11 @@
             <!--Sync folder start-->
             <div class="ftp-box container">
               <div class="interior-container left">
-                <span> What is this </span>
-                Initiate synchronisation to align your study folder with your FTP upload folder.
-                Please note that new FTP uploads are not automatcally transferred. For more information click here.
+                <span class="title-button"><mat-icon>help</mat-icon>What is this</span>
+                <p class="interior-container-text">
+                  Initiate synchronisation to align your study folder with your FTP upload folder. 
+                  Please note that new FTP uploads are not automatcally transferred. For more information click here.
+                </p>
               </div>
               <div class="interior-container right">
 

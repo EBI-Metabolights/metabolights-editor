@@ -59,11 +59,29 @@ img {
 
 .interior-container.left {
   border-right: 1px solid #dbdbdb;
-  padding-left: 1%;
+  padding-left: 0%;
 }
 
 .interior-container.right {
   border-left: 1px solid #dbdbdb;
+}
+
+
+.title-button {
+  width: 100%;
+  text-align: left;
+  color: black !important;
+  font-size: 1.2em;
+  padding-bottom: 1%;
+  padding-top: 1.4%;
+  min-height: 36px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.interior-container-text {
+  padding-left: 5%;
+  font-size: 0.9em;
+  padding-top: 2%;
 }
 
 .status-container {
@@ -77,6 +95,7 @@ img {
   border-bottom: 1px solid #dbdbdb;
   color: #000000;
   padding: 3px;
+  overflow-wrap: break-word;
 }
 
 .response.top {
