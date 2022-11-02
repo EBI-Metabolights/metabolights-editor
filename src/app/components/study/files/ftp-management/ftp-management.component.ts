@@ -12,6 +12,7 @@ export class FtpManagementComponent implements OnInit, OnChanges {
   @Input('ongoingStatus') ongoingStatus: FTPResponse;
   @Input('isSyncing') isSyncing: boolean = false;
   @Input('isCalculating') isCalculating: boolean = false;
+  @Input('requestedStudy') requestedStudy: string;
 
   @Output() checkClicked = new EventEmitter<any>();
   @Output() syncClicked = new EventEmitter<any>();
