@@ -110,12 +110,31 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+
     let sub = this.ftpService.syncCalculation()
-    .subscribe(ftpRes => {
-      this.calculation = ftpRes
-      this.containerHeight = this.elementView.nativeElement.offsetHeight
-      sub.unsubscribe();
-    })
+      .subscribe(ftpRes => {
+        if (ftpRes.status !== 'CALCULATING') {
+          this.calculation = ftpRes;
+          this.isCalculating = false;
+          this.calculation = ftpRes
+          this.containerHeight = this.elementView.nativeElement.offsetHeight
+          sub.unsubscribe();
+        } else {
+          this.isCalculating = true;
+          const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
+          sub = this.calcInterval.subscribe(x => {
+            this.ftpService.syncCalculation(false).subscribe(ftpRes => {
+              if(accept.includes(ftpRes.status)) {
+                this.calculation = ftpRes;
+                this.isCalculating = false;
+                this.calculation = ftpRes
+                this.containerHeight = this.elementView.nativeElement.offsetHeight
+                sub.unsubscribe();
+              }
+            });
+          });
+        }
+      });
 
     let syncStatusSub = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
@@ -567,14 +586,14 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   }
 
   /**
-   * Checks the FTP folder to see if there are any new uploads. This initiates a 'calculation' process 
+   * Checks the FTP folder to see if there are any new uploads. This initiates a 'calculation' process
    * within the FTP infrastructure, and can take anywhere from a few seconds to a few minutes.
    * It calls the ftp service method syncCalculation once with the force flag set to true, to instruct the
    *  API to initiate a new calculation process. Any subsequent calls are made with the force flag set to false
    * so that it does not initiate a new process while one is underway.
    * It will keep making the call to the API to check the status of the calculation operation until it receives
    *  a status in the response that matches the 'accept' array below.
-   * @param force 
+   * @param force
    */
   checkFTPFolder(force): void {
     const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
