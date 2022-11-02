@@ -1,0 +1,89 @@
+<!--Ftp operations information banner start-->
+<div *ngIf="!isReadOnly" class="notification is-warning">
+    <small
+      ><mat-icon>info</mat-icon> Owing to recent technological infrastructure changes at the EBI,
+      we now have to manage the transfer of FTP files differently. Using the below left hand box you can check whether you have any
+      files in your FTP upload directory that are not present in your study directory (the study directory is the directory that is eventually made public).
+      If you do have new files in your FTP directory, you can sync them over using the box on the right. Please note that the operations undertaken by both
+      boxes are asynchronous, and may take some minutes to complete.
+  
+      
+      If you cannot see your recently uploaded files
+      please contact us at 
+      <a
+        [href]="
+          'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - ' +
+          requestedStudy
+        "
+        >metabolights-help@ebi.ac.uk</a
+      >
+      for help.</small
+    >
+  </div>
+  
+  
+  <div class="container parent">
+    <!--Check FTP Folder-->
+    <article class="message article-box" #trackHeight>
+      <!--message header start-->
+      <div class="message-header">
+        <p>Check FTP Upload Folder</p>
+        <span><mat-icon matTooltip="Check if you have anything in your study folder that needs to be synchronised. FTP directories are closely guarded at the EBI.
+          As a result the calculation process may take 2-3 minutes.">help</mat-icon></span>
+      </div>
+      <!--message header end-->
+      <div class="message-body padding">
+        <div class=" container ">
+
+          <div class="interior-container right" #trackStatusHeight>
+            <a 
+            class="button is-info ftp-button" 
+          class="button is-info ftp-button" 
+            class="button is-info ftp-button" 
+            [ngClass]="isCalculating ? 'is-loading' : '' "
+            (click)="onCheckClick()">
+              <mat-icon>account_balance</mat-icon> 
+  
+              Click to Check FTP Folder </a>
+              <div class="status-container">
+                <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b><br> <i>{{calculation.status | calculationTransform}}</i></div>
+                <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b><br> 
+                {{ calculation.description === '' ? 'N/A' : calculation.description }}</div>  
+                <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b><br> {{calculation.last_update_time}}</div>
+              </div>
+          </div>
+        </div>
+        </div>
+  
+    </article>
+    
+      <!--Check ftp folder end-->
+  
+      <!--Sync folder start-->
+      <article  class="message article-box" [ngStyle]="{'max-height.px' : containerHeight, 'min-height.px' : containerHeight}">
+        <div class="message-header">
+          <p>Synchronise Folders</p>
+          <span><mat-icon matTooltip="Initiate synchronisation to align your study folder with your FTP upload folder. 
+            Please note that new FTP uploads are not automatically transferred.">help</mat-icon></span>
+        </div>
+        <div class="message-body padding">
+          <div class="container">
+
+            <div class="interior-container right">
+              <button 
+                class="button is-info " 
+                [ngClass]="isSyncing ? 'is-loading' : '' "
+                (click)="onSyncClick()" >
+                  <mat-icon>sync</mat-icon>
+                  Click to Sync Contents    
+                </button>
+                <div class="status-container">
+                  <div class="response"><mat-icon>info</mat-icon><b>SYNC STATUS: </b><br><i>{{ongoingStatus.status | syncOpTransform}}</i> </div>
+                  <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b><br> {{ongoingStatus.last_update_time}}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </article>
+      <!--Sync folder end-->
+  </div>
