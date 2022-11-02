@@ -50,9 +50,10 @@ import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { TooltipDirective } from './files/tooltip.directive';
-import { CalculationTransformPipe } from "./files/calculation-transform.pipe";
-import { SyncOpTransformPipe } from "./files/sync-op-transform.pipe";
+import { CalculationTransformPipe } from "./files/ftp-management/calculation-transform.pipe";
+import { SyncOpTransformPipe } from "./files/ftp-management/sync-op-transform.pipe";
 import { FtpManagementComponent } from './files/ftp-management/ftp-management.component';
+import { TimezoneTransformPipe } from "./files/ftp-management/timezone.pipe";
 
 @NgModule({
   declarations: [
@@ -79,6 +80,7 @@ import { FtpManagementComponent } from './files/ftp-management/ftp-management.co
     TooltipDirective,
     CalculationTransformPipe,
     SyncOpTransformPipe,
+    TimezoneTransformPipe,
     FtpManagementComponent
   ],
   imports: [
@@ -134,6 +136,7 @@ import { FtpManagementComponent } from './files/ftp-management/ftp-management.co
     ValidationDetailCommentComponent,
     CalculationTransformPipe,
     SyncOpTransformPipe,
+    TimezoneTransformPipe,
     FtpManagementComponent
   ],
   providers: [

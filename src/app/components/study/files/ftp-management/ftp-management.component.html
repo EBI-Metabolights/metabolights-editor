@@ -49,7 +49,7 @@
                 <div class="response top"><mat-icon>info</mat-icon><b>FTP FOLDER STATUS: </b><br> <i>{{calculation.status | calculationTransform}}</i></div>
                 <div class="response"><mat-icon>description</mat-icon><b>DESCRIPTION:</b><br> 
                 {{ calculation.description === '' ? 'N/A' : calculation.description }}</div>  
-                <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b><br> {{calculation.last_update_time}}</div>
+                <div class="response bottom"><mat-icon>history</mat-icon><b>LAST UPDATE:</b><br> {{calculation.last_update_time | timezoneTransform }}</div>
               </div>
           </div>
         </div>

@@ -25,6 +25,7 @@ export class FtpManagementComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnInit(): void {
+  
   }
 
   ngOnChanges(changes: SimpleChanges): void {
