@@ -62,7 +62,7 @@ export class MafsComponent implements OnInit {
       this.mafs.forEach((maf) => {
         let exists = false;
         tempMAFs.forEach((mafName) => {
-          if (maf.name === mafName) {
+          if (maf && maf.name === mafName) {
             exists = true;
           }
         });
