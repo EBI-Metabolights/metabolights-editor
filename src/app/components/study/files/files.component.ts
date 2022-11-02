@@ -32,7 +32,6 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   @select((state) => state.study.identifier) studyIdentifier: any;
   @Input("validations") validations: any;
 
-  @ViewChild('trackHeight') elementView: ElementRef;
   containerHeight: any = 279;
 
   rawFiles: any[] = [];
@@ -110,31 +109,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-
-    let sub = this.ftpService.syncCalculation()
-      .subscribe(ftpRes => {
-        if (ftpRes.status !== 'CALCULATING') {
-          this.calculation = ftpRes;
-          this.isCalculating = false;
-          this.calculation = ftpRes
-          this.containerHeight = this.elementView.nativeElement.offsetHeight
-          sub.unsubscribe();
-        } else {
-          this.isCalculating = true;
-          const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
-          sub = this.calcInterval.subscribe(x => {
-            this.ftpService.syncCalculation(false).subscribe(ftpRes => {
-              if(accept.includes(ftpRes.status)) {
-                this.calculation = ftpRes;
-                this.isCalculating = false;
-                this.calculation = ftpRes
-                this.containerHeight = this.elementView.nativeElement.offsetHeight
-                sub.unsubscribe();
-              }
-            });
-          });
-        }
-      });
+    this.checkFTPFolder(false, true)
 
     let syncStatusSub = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
@@ -144,7 +119,6 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   }
 
   ngOnChanges(changes) {
-    this.containerHeight = this.elementView.nativeElement.offsetHeight;
   }
 
 
@@ -574,7 +548,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
    * @param $event - angular event object.
    */
   handleCheckClick($event): void {
-    this.checkFTPFolder(true);
+    this.checkFTPFolder(true, false);
   }
 
   /**
@@ -595,23 +569,22 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
    *  a status in the response that matches the 'accept' array below.
    * @param force
    */
-  checkFTPFolder(force): void {
+  checkFTPFolder(force: boolean, init: boolean): void {
     const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
-    this.ftpService.syncCalculation(force)
+    let sub = this.ftpService.syncCalculation(force)
     .subscribe(res => {
       this.isCalculating = true;
       if (accept.includes(res.status)) {
         this.calculation = res;
         this.isCalculating = false;
-        this.containerHeight = this.elementView.nativeElement.offsetHeight;
       } else {
-        let sub = this.calcInterval.subscribe(x => {
+        let calcsub = this.calcInterval.subscribe(x => {
           this.ftpService.syncCalculation(false).subscribe(ftpRes => {
             if(accept.includes(ftpRes.status)) {
               this.calculation = ftpRes
               this.isCalculating = false;
-              this.containerHeight = this.elementView.nativeElement.offsetHeight
-              sub.unsubscribe();
+              calcsub.unsubscribe();
+              if(init) { sub.unsubscribe();  }
             }
           })
         })
@@ -645,7 +618,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
           this.calculation.status = 'NO_SYNC_NEEDED';
           syncsub.unsubscribe();
           this.editorService.loadStudyFiles(true);
-          this.checkFTPFolder(true);
+          this.checkFTPFolder(true, false);
         }
       })
     })

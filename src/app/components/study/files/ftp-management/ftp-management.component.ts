@@ -27,6 +27,7 @@ export class FtpManagementComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if(this.elementView !== undefined)
       this.containerHeight = this.elementView.nativeElement.offsetHeight;
   }
 
