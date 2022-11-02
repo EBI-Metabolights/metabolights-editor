@@ -25,18 +25,14 @@ const CalculationStatus = {
   templateUrl: "./files.component.html",
   styleUrls: ["./files.component.css"],
 })
-export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChanges {
+export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   @select((state) => state.study.readonly) readonly;
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
   @Input("validations") validations: any;
 
-  @ViewChild('trackHeight') elementView: ElementRef;
   containerHeight: any = 279;
-
-  @ViewChild('trackHeight') statusContainerView: ElementRef;
-  statusContainerHeight: any = 267;
 
   rawFiles: any[] = [];
   metaFiles: any[] = [];
@@ -113,13 +109,7 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-    let sub = this.ftpService.syncCalculation()
-    .subscribe(ftpRes => {
-      this.calculation = ftpRes
-      this.containerHeight = this.elementView.nativeElement.offsetHeight
-      this.statusContainerHeight = this.statusContainerView.nativeElement.offsetHeight;
-      sub.unsubscribe();
-    })
+    this.checkFTPFolder(false, true)
 
     let syncStatusSub = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
@@ -129,35 +119,9 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
   }
 
   ngOnChanges(changes) {
-    this.syncButtonToolTipMessage = this.evalSyncButtonTooltip();
-    this.syncButtonEnabled = this.evalSyncButtonEnabled();
-    this.containerHeight = this.elementView.nativeElement.offsetHeight;
   }
 
-  evalSyncButtonTooltip() {
-    return this.calculation.status === 'SYNC_NEEDED' ? 'Click to sync' : 'Can only sync when new files found'
-  }
 
-  evalSyncButtonEnabled(): boolean {
-    if (this.calculation.status === 'SYNC_NEEDED') {
-      if (
-        this.ongoingStatus.status === 'PENDING' ||
-        this.ongoingStatus.status === 'RUNNING'
-        ) {
-          return false;
-        } else {
-          return true;
-        }
-    } else if (this.calculation.status === 'NO_SYNC_NEEDED') {
-      return true;
-    } else {
-      return false
-    }
-  }
-
-  ngAfterViewInit(): void {
-
-  }
 
   ngOnDestroy(): void {
       // kill all subs somehow
@@ -579,26 +543,48 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     return file.directory;
   }
 
-  checkFTPFolder(fource) {
+  /**
+   * Handler for ftp-management component check button event emitter.
+   * @param $event - angular event object.
+   */
+  handleCheckClick($event): void {
+    this.checkFTPFolder(true, false);
+  }
+
+  /**
+   * Handler for ftp-management component sync button event emitter.
+   * @param $event - angular event object.
+   */
+  handleSyncClick($event): void {
+    this.sync();
+  }
+
+  /**
+   * Checks the FTP folder to see if there are any new uploads. This initiates a 'calculation' process
+   * within the FTP infrastructure, and can take anywhere from a few seconds to a few minutes.
+   * It calls the ftp service method syncCalculation once with the force flag set to true, to instruct the
+   *  API to initiate a new calculation process. Any subsequent calls are made with the force flag set to false
+   * so that it does not initiate a new process while one is underway.
+   * It will keep making the call to the API to check the status of the calculation operation until it receives
+   *  a status in the response that matches the 'accept' array below.
+   * @param force
+   */
+  checkFTPFolder(force: boolean, init: boolean): void {
     const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
-    this.ftpService.syncCalculation(fource)
+    let sub = this.ftpService.syncCalculation(force)
     .subscribe(res => {
       this.isCalculating = true;
       if (accept.includes(res.status)) {
         this.calculation = res;
         this.isCalculating = false;
-        this.containerHeight = this.elementView.nativeElement.offsetHeight;
-        this.statusContainerHeight = this.statusContainerView.nativeElement.offsetHeight;
       } else {
-        let sub = this.calcInterval.subscribe(x => {
+        let calcsub = this.calcInterval.subscribe(x => {
           this.ftpService.syncCalculation(false).subscribe(ftpRes => {
             if(accept.includes(ftpRes.status)) {
               this.calculation = ftpRes
               this.isCalculating = false;
-              this.containerHeight = this.elementView.nativeElement.offsetHeight
-              this.statusContainerHeight = this.statusContainerView.nativeElement.offsetHeight;
-
-              sub.unsubscribe();
+              calcsub.unsubscribe();
+              if(init) { sub.unsubscribe();  }
             }
           })
         })
@@ -606,7 +592,16 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     })
   }
 
+  /**
+   * Synchronise an FTP folder with a study folder.
+   * This initiates the synchronisation process within the FTP infrastructure.
+   * Owing to recent changes this operation is now asynchronous, and is queued
+   * with specific EBI FTP helpers. It initiates the sync by calling the ftp service method
+   * synchronise, and then repeatedly checks the status of the operation until it receives a
+   * status from the 'accept' list below.
+   */
   sync(): void {
+    const accept = ["COMPLETED_SUCCESS", "SYNC_FAILURE", "START_FAILURE"]
     this.isSyncing = true;
     let temp = this.ongoingStatus.last_update_time
     this.ongoingStatus = this.loadingResponse;
@@ -614,27 +609,28 @@ export class FilesComponent implements OnInit, OnDestroy, AfterViewInit, OnChang
     this.ftpService.synchronise().subscribe(res => {
       // check the status every second or so
       let syncsub = this.intervalSub.subscribe(x => {
-        if(this.ongoingStatus.status !== "COMPLETED_SUCCESS"){
+        if(!accept.includes(this.ongoingStatus.status)){
           this.checkSyncStatus();
         } else {
           // if the op was previously successful this will always be hit
           this.isSyncing = false;
           // setting this here instead of making an unncessary call
           this.calculation.status = 'NO_SYNC_NEEDED';
-          this.evalSyncButtonEnabled();
           syncsub.unsubscribe();
           this.editorService.loadStudyFiles(true);
-          this.checkFTPFolder(true);
+          this.checkFTPFolder(true, false);
         }
       })
     })
   }
 
+  /**
+   * Checks the current status of a sync operation by calling the ftp service method getSyncStatus.
+   */
   checkSyncStatus(): void {
     this.ftpService.getSyncStatus().subscribe(ftpRes => {
       console.log(ftpRes.status)
       this.ongoingStatus = ftpRes
-      this.evalSyncButtonEnabled();
     })
   }
 

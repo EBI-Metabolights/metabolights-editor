@@ -52,6 +52,7 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { TooltipDirective } from './files/tooltip.directive';
 import { CalculationTransformPipe } from "./files/calculation-transform.pipe";
 import { SyncOpTransformPipe } from "./files/sync-op-transform.pipe";
+import { FtpManagementComponent } from './files/ftp-management/ftp-management.component';
 
 @NgModule({
   declarations: [
@@ -77,7 +78,8 @@ import { SyncOpTransformPipe } from "./files/sync-op-transform.pipe";
     ValidationDetailCommentComponent,
     TooltipDirective,
     CalculationTransformPipe,
-    SyncOpTransformPipe
+    SyncOpTransformPipe,
+    FtpManagementComponent
   ],
   imports: [
     CommonModule,
@@ -131,7 +133,8 @@ import { SyncOpTransformPipe } from "./files/sync-op-transform.pipe";
     ValidationDetailComponent,
     ValidationDetailCommentComponent,
     CalculationTransformPipe,
-    SyncOpTransformPipe
+    SyncOpTransformPipe,
+    FtpManagementComponent
   ],
   providers: [
     AuthGuard,
