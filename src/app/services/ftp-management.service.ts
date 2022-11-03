@@ -65,4 +65,8 @@ export class FtpManagementService {
    public syncCalculation(force = false): Observable<FTPResponse> {
      return this.http.post<FTPResponse>(`${this.url}/sync-calculation?force=${force.toString()}`, {}, httpOptions)
    }
+
+   public set service_url(newrl: string) {
+    this.url = newrl;
+   }
 }
