@@ -52,6 +52,7 @@
 
 <!--ftp management component start-->
 <app-ftp-management 
+  *ngIf="!isReadOnly"
   [calculation]="calculation" 
   [ongoingStatus]="ongoingStatus" 
   [isSyncing]="isSyncing" 
