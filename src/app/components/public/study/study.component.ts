@@ -66,7 +66,7 @@ export class PublicStudyComponent implements OnInit {
     if (obfuscationCode) {
       obfuscationCode = obfuscationCode.replace("reviewer", "");
       const studyID = localStorage.getItem("mtblsid");
-      if (!isInitialised) {
+      if (!isInitialised.ready) {
         this.editorService.initialise(
           '{"apiToken":"ocode:' + obfuscationCode + '"}',
           false
@@ -76,7 +76,7 @@ export class PublicStudyComponent implements OnInit {
         }
       }
     } else {
-      if (!isInitialised) {
+      if (!isInitialised.ready) {
         const mtblsUser = localStorage.getItem("mtblsuser");
         const mtblsJWT = localStorage.getItem("mtblsjwt");
         if (mtblsJWT && mtblsJWT !== "" && mtblsUser && mtblsUser !== "") {
@@ -99,6 +99,8 @@ export class PublicStudyComponent implements OnInit {
             this.loadStudy(null);
           }
         }
+      } else {
+        console.log('Looks like study already got initialised!!');
       }
     }
   }
