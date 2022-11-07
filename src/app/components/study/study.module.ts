@@ -49,7 +49,6 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { TooltipDirective } from './files/tooltip.directive';
 import { CalculationTransformPipe } from "./files/ftp-management/calculation-transform.pipe";
 import { SyncOpTransformPipe } from "./files/ftp-management/sync-op-transform.pipe";
 import { FtpManagementComponent } from './files/ftp-management/ftp-management.component';
@@ -77,7 +76,6 @@ import { TimezoneTransformPipe } from "./files/ftp-management/timezone.pipe";
     ValidationsComponent,
     ValidationDetailComponent,
     ValidationDetailCommentComponent,
-    TooltipDirective,
     CalculationTransformPipe,
     SyncOpTransformPipe,
     TimezoneTransformPipe,

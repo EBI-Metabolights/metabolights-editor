@@ -21,7 +21,6 @@ export class FtpManagementComponent implements OnInit, OnChanges {
   containerHeight: any = 279;
 
 
-
   constructor() { }
 
   ngOnInit(): void {
