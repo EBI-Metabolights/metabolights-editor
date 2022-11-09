@@ -45,6 +45,10 @@ export class MockEditorService {
     return null;
   }
 
+  loadStudyFiles() {
+    return null;
+  }
+
   getStudyPrivateFolderAccess() {
     return {
       access: "Write",

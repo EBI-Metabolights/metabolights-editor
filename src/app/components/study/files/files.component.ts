@@ -1,24 +1,15 @@
-import { Component, OnInit, Input, OnDestroy, AfterViewInit, OnChanges, SimpleChange, ViewChild, ElementRef } from "@angular/core";
+import { Component, OnInit, Input, OnDestroy, OnChanges } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
-import { NgRedux, select } from "@angular-redux/store";
+import { select } from "@angular-redux/store";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import { environment } from "src/environments/environment";
 import { FtpManagementService } from "src/app/services/ftp-management.service";
 import { FTPResponse } from "src/app/models/mtbl/mtbls/interfaces/generics/ftp-response.interface";
-import { subscribeOn } from "rxjs-compat/operator/subscribeOn";
-import { interval, Observable, of } from "rxjs";
-import { delay, mergeMap, tap } from "rxjs/operators";
-import { E } from "@angular/cdk/keycodes";
+import { interval, Subscription } from "rxjs";
 
 
-const CalculationStatus = {
-  NO_TASK: 'Nothing to do',
-  UNKNOWN: 'Status unknown, potential error',
-  SYNC_NEEDED: 'New files to be synchronised',
-  SYNC_NOT_NEEDED: 'No new files to synchronise',
-  CALCULATING: 'Scanning...'
-}
+
 
 @Component({
   selector: "mtbls-files",
@@ -94,8 +85,15 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   isSyncing = false;
   isCalculating = false;
 
-  intervalSub = interval(2000);
-  calcInterval = interval(20000)
+  // interval observables used for polling API for ftp updates
+  syncInterval = interval(2000);
+  calcInterval = interval(20000);
+
+  // subscription objects as component variables to make unsubscribing easier
+  syncStatusSubscription: Subscription = null;
+  calcIntervalSubscription: Subscription = null;
+  syncIntervalSubscription: Subscription = null;
+
 
   constructor(
     private editorService: EditorService,
@@ -111,10 +109,11 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     }
     this.checkFTPFolder(false, true)
 
-    let syncStatusSub = this.ftpService.getSyncStatus()
+    this.syncStatusSubscription = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
       this.ongoingStatus = statusRes
-      syncStatusSub.unsubscribe();
+      console.log('hit');
+      this.syncStatusSubscription.unsubscribe();
     })
   }
 
@@ -124,7 +123,15 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
 
 
   ngOnDestroy(): void {
-      // kill all subs somehow
+    if(this.syncStatusSubscription !== null) {
+      this.syncStatusSubscription.unsubscribe();
+    }
+    if(this.calcIntervalSubscription !== null) {
+      this.calcIntervalSubscription.unsubscribe();
+    }
+    if(this.syncIntervalSubscription !== null) {
+      this.syncIntervalSubscription.unsubscribe();
+    }
   }
 
   setUpSubscriptions() {
@@ -578,12 +585,12 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
         this.calculation = res;
         this.isCalculating = false;
       } else {
-        let calcsub = this.calcInterval.subscribe(x => {
+        this.calcIntervalSubscription = this.calcInterval.subscribe(x => {
           this.ftpService.syncCalculation(false).subscribe(ftpRes => {
             if(accept.includes(ftpRes.status)) {
               this.calculation = ftpRes
               this.isCalculating = false;
-              calcsub.unsubscribe();
+              this.calcIntervalSubscription.unsubscribe();
               if(init) { sub.unsubscribe();  }
             }
           })
@@ -608,15 +615,16 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     this.ongoingStatus.last_update_time = temp;
     this.ftpService.synchronise().subscribe(res => {
       // check the status every second or so
-      let syncsub = this.intervalSub.subscribe(x => {
+      this.syncIntervalSubscription = this.syncInterval.subscribe(x => {
         if(!accept.includes(this.ongoingStatus.status)){
+          console.log('hit the thing')
           this.checkSyncStatus();
         } else {
           // if the op was previously successful this will always be hit
           this.isSyncing = false;
           // setting this here instead of making an unncessary call
           this.calculation.status = 'NO_SYNC_NEEDED';
-          syncsub.unsubscribe();
+          this.syncIntervalSubscription.unsubscribe();
           this.editorService.loadStudyFiles(true);
           this.checkFTPFolder(true, false);
         }
@@ -628,7 +636,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
    * Checks the current status of a sync operation by calling the ftp service method getSyncStatus.
    */
   checkSyncStatus(): void {
-    this.ftpService.getSyncStatus().subscribe(ftpRes => {
+    this.syncStatusSubscription = this.ftpService.getSyncStatus().subscribe(ftpRes => {
       console.log(ftpRes.status)
       this.ongoingStatus = ftpRes
     })

@@ -1,5 +1,6 @@
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { of } from "rxjs";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 import { FtpManagementService } from "src/app/services/ftp-management.service";
@@ -41,7 +42,32 @@ describe("FilesComponent", () => {
     fixture.detectChanges();
   });
 
+  
+
   it("should create", () => {
     expect(component).toBeTruthy();
+  });
+
+  describe('synchronise tests', () => {
+
+    afterEach(() => {
+      component.ngOnDestroy();
+    })
+
+    // I am mystified as to why this very simple test doesn't work.
+    xit('should make at least one call to check the status of the sync operation', async(() => {
+      spyOn(component, 'checkSyncStatus');
+      spyOn(ftpService, 'getSyncStatus').and.returnValue(of({
+        status: 'COMPLETED_SUCCESS',
+        description: '',
+        last_update_time: 'October 31st 1970'
+    }));
+      component.sync();
+      fixture.detectChanges();
+      expect(ftpService.getSyncStatus).toHaveBeenCalledTimes(2);
+      component.syncIntervalSubscription.unsubscribe();
+    }));
+
+
   });
 });

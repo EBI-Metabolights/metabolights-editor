@@ -1,13 +1,11 @@
 import { select } from '@angular-redux/store';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { ConfigurationService } from '../configuration.service';
 import { FTPResponse } from '../models/mtbl/mtbls/interfaces/generics/ftp-response.interface';
 import { GenericHttpResponse } from '../models/mtbl/mtbls/interfaces/generics/generic-http-response.interface';
-import { AppError } from './error/app-error';
 import { httpOptions } from './headers';
 
 
