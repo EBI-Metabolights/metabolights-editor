@@ -577,7 +577,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
    * @param force
    */
   checkFTPFolder(force: boolean, init: boolean): void {
-    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN"]
+    const accept = ["NO_TASK", "SYNC_NEEDED", "SYNC_NOT_NEEDED", "UNKNOWN", "CALCULATION_FAILURE"]
     let sub = this.ftpService.syncCalculation(force)
     .subscribe(res => {
       this.isCalculating = true;
