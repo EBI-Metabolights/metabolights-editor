@@ -1,14 +1,11 @@
 <!--Ftp operations information banner start-->
 <div class="notification is-warning">
     <small
-      ><mat-icon>info</mat-icon> Owing to recent technological infrastructure changes at the EBI,
-      we now have to manage the transfer of FTP files differently. Using the below left hand box you can check whether you have any
-      files in your FTP upload directory that are not present in your study directory (the study directory is the directory that is eventually made public).
-      If you do have new files in your FTP directory, you can sync them over using the box on the right. Please note that the operations undertaken by both
-      boxes are asynchronous, and may take some minutes to complete.
-
-
-      If you cannot see your recently uploaded files
+      ><mat-icon>info</mat-icon> Owing to recent technological infrastructure changes at the EBI, we now have to manage the transfer of FTP files differently (Aspera & FTP).
+      Using the box on the left below you can check whether you have any files in your FTP upload directory that are not present in your study directory (the directory that is eventually made public).
+      If you do have new files in your FTP upload directory, you can sync them to the study directory using the box on the right. When synchronised the sync status will change to "Sync operation completed successfully".
+      Please note that the operations undertaken by both boxes are asynchronous, and may take some minutes to complete. Please click the button "Refresh" to see changes in the online editor.
+       <br>If you cannot see your recently uploaded files
       please contact us at
       <a
         [href]="
@@ -36,8 +33,8 @@
         <div class=" container ">
 
           <div class="interior-container right" #trackStatusHeight>
-            <a 
-            class="button is-info ftp-button" 
+            <a
+            class="button is-info ftp-button"
             [ngClass]="isCalculating ? 'is-loading' : '' "
             (click)="onCheckClick()">
               <mat-icon>account_balance</mat-icon>
