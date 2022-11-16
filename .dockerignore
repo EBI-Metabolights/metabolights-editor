@@ -1,6 +1,5 @@
 nginx.conf
 
-dist
 .github
 node_modules
 npm-debug.log
