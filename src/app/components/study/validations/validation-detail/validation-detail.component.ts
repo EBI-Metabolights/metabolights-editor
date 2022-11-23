@@ -2,9 +2,10 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
-  ViewChild,
+  SimpleChanges,
 } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../../services/editor.service";
@@ -30,7 +31,7 @@ export interface ValidationDetail {
   templateUrl: "./validation-detail.component.html",
   styleUrls: ["./validation-detail.component.css"],
 })
-export class ValidationDetailComponent implements OnInit {
+export class ValidationDetailComponent implements OnInit, OnChanges {
   @Input() isCurator: boolean;
   @Input() validationDetail: ValidationDetail;
   @Output() commentSaved: EventEmitter<{ comment: string }> =
@@ -49,6 +50,10 @@ export class ValidationDetailComponent implements OnInit {
     extendedTimeOut: 0,
     tapToDismiss: false,
   };
+  // whether comment box is visible.
+  visible = false;
+  // whether the comment button is visible
+  showCommentButton = false;
 
   constructor(private editorService: EditorService) {}
 
@@ -58,6 +63,28 @@ export class ValidationDetailComponent implements OnInit {
       ? (this.hasDescription = true)
       : (this.hasDescription = false);
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+      this.showCommentButton = this.evalCommentButton();
+  }
+
+  handleBoxClick() {
+    this.visible = !this.visible;
+  }
+
+
+  evalCommentButton() {
+    if(this.isCurator) {
+      return true;
+    } else {
+      if (this.validationDetail.comment) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+  }
+
 
   isNotNaN(desc): boolean {
     if (typeof desc === null) {

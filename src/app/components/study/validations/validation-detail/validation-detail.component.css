@@ -1,3 +1,6 @@
+
+
+
 .panel-block.success {
   border-left-color: #23d160;
   border-left-width: 7px;
@@ -44,7 +47,6 @@
 
 .override {
   float: right;
-  transform: translateX(150%);
 }
 
 .val-header {
@@ -54,4 +56,89 @@
 
 .divide-longer {
   transform: scaleX(1.5);
+}
+
+.container {
+  display: flex;
+  background-color: whitesmoke;
+  border-radius: 3px;
+  width: 100%;
+}
+
+.container.error {
+  border-left: 7px solid #ff3760;
+}
+
+.container.warning {
+  border-left: 7px solid #ffdd56;
+}
+
+.container.success {
+  border-left: 7px solid #23d160;
+}
+
+.container.info {
+  border-left: 7px solid #3273dc;
+}
+
+.message {
+  min-width: 80%;
+  max-width: 100%;
+  padding-left: 2%;
+  padding-top: 2%;
+  padding-right: 2%;
+  padding-bottom: 2%;
+  margin-bottom: 0 !important;
+}
+
+.comment-box {
+  --comment-box-height: 0px;
+  height: var(--comment-box-height);
+  transition: height 0.4s;
+}
+
+.comment-box.visible {
+  --border-var: 1px solid grey;
+  height: 125px;
+  transition: height 0.4s;
+  border-left: var(--border-var);
+  border-right: var(--border-var);
+  border-bottom: var(--border-var);
+}
+
+.button-block {
+  background-color: whitesmoke;
+  min-width: 10%;
+  align-items: center;
+  justify-content: space-evenly;
+  display: flex;
+  flex-direction: column;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  text-align: center;
+  padding: 1%;
+}
+
+
+
+.toggle-comment {
+  border-radius: 3px !important;
+  border-color: #3273dc;
+  background-color: whitesmoke;
+  color: #3273dc;
+  width: 90
+}
+
+
+.override-text {
+  border-radius: 3px !important;
+  background-color: whitesmoke;
+
+  border-color: #ff3760;;
+  color: #ff3760;;
+
+}
+
+.icon-translate {
+  transform: translateY(3px);
 }
