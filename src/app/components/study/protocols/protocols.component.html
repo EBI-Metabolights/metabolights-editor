@@ -1,33 +1,50 @@
 <span>
-	<div>
-		<div class="mtbls-section">
-			<h6 class="mb10">
-				<span style="font-size: 0.8em;"><mtbls-help *ngIf="!isStudyReadOnly" target="protocols"></mtbls-help></span>&nbsp;
-					<a (click)="toggleExpand()" style="margin-right: 10px; margin-left: 10px"  class="button is-default is-pulled-right is-small">
-						<span *ngIf="!expand; else expandSections">
-							<i class="material-icons">
-								calendar_view_day
-							</i> Expand all
-						</span>
-						<ng-template #expandSections>
-							<i class="material-icons">
-								list
-							</i> Collapse all
-						</ng-template>
-					</a>
-				<mtbls-protocol *ngIf="!isStudyReadOnly" [value]="null" [validations]="validations"></mtbls-protocol>&nbsp;
-			</h6>
-		</div>
-	</div>
+  <div>
+    <div class="mtbls-section">
+      <h6 class="mb10">
+        <span style="font-size: 0.8em"
+          ><mtbls-help
+            *ngIf="!isStudyReadOnly"
+            target="protocols"
+          ></mtbls-help></span
+        >&nbsp;
+        <a
+          (click)="toggleExpand()"
+          style="margin-right: 10px; margin-left: 10px"
+          class="button is-default is-pulled-right is-small"
+        >
+          <span *ngIf="!expand; else expandSections">
+            <i class="material-icons"> calendar_view_day </i> Expand all
+          </span>
+          <ng-template #expandSections>
+            <i class="material-icons"> list </i> Collapse all
+          </ng-template>
+        </a>
+        <mtbls-protocol
+          *ngIf="!isStudyReadOnly"
+          [value]="null"
+          [validations]="validations"
+        ></mtbls-protocol
+        >&nbsp;
+      </h6>
+    </div>
+  </div>
 
-	<div *ngFor="let protocol of defaultProtocols">
-		<span *ngIf="getProtocol(protocol) != null">
-			<mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"></mtbls-protocol>
-		</span>
-	</div>
-	<div *ngFor="let protocol of customProtocols">
-		<span *ngIf="getProtocol(protocol) != null">
-			<mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>
-		</span>
-	</div>
+  <div *ngFor="let protocol of defaultProtocols">
+    <span *ngIf="getProtocol(protocol) != null">
+      <mtbls-protocol
+        [value]="getProtocol(protocol)"
+        [required]="true"
+        [validations]="validations"
+      ></mtbls-protocol>
+    </span>
+  </div>
+  <div *ngFor="let protocol of customProtocols">
+    <span *ngIf="getProtocol(protocol) != null">
+      <mtbls-protocol
+        [value]="getProtocol(protocol)"
+        [validations]="validations"
+      ></mtbls-protocol>
+    </span>
+  </div>
 </span>

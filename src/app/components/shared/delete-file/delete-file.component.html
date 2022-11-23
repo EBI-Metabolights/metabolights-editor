@@ -1,30 +1,35 @@
 <span *ngIf="type == 'icon'; else ButtonDownload">
-    <a target="_blank" (click)="confirmDelete()">
-      <mat-icon>delete</mat-icon>
-    </a>
-  </span>
-  <ng-template #ButtonDownload>
-    <a target="_blank" (click)="confirmDelete()" class="button is-small is-light">
-      <mat-icon>trash</mat-icon> Delete
-    </a>
-  </ng-template>
-  
-<div class="modal has-text-left" [ngClass]="{'is-active': isDeleteModalOpen}">
+  <a target="_blank" (click)="confirmDelete()">
+    <mat-icon>delete</mat-icon>
+  </a>
+</span>
+<ng-template #ButtonDownload>
+  <a target="_blank" (click)="confirmDelete()" class="button is-small is-light">
+    <mat-icon>trash</mat-icon> Delete
+  </a>
+</ng-template>
+
+<div class="modal has-text-left" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
       <p>Are you sure you want to delete?</p>
       <label>
-        <input type="checkbox" [checked]="forceMetaDataDelete"> <small>&nbsp;Force delete meta data</small>
+        <input type="checkbox" [checked]="forceMetaDataDelete" />
+        <small>&nbsp;Force delete meta data</small>
       </label>
     </section>
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
         <div class="column is-half">
-          <button (click)='closeDeleteConfirmation()' class="button is-info">Cancel</button>
+          <button (click)="closeDeleteConfirmation()" class="button is-info">
+            Cancel
+          </button>
         </div>
         <div class="column is-half has-text-right">
-          <button (click)='deleteSelected()' class="button is-danger">OK! Delete Permanently</button>
+          <button (click)="deleteSelected()" class="button is-danger">
+            OK! Delete Permanently
+          </button>
         </div>
       </div>
     </footer>

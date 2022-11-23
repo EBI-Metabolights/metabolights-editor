@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  context: 'production',
+  context: "production",
   isTesting: false,
-  videoBaseURL: 'https://www.ebi.ac.uk/metabolights/contents/assets/videos/',
+  contextPath: "/metabolights/editor",
 };

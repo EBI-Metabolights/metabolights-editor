@@ -1,29 +1,35 @@
 <span class="clickable" (click)="openModal()">
-	Video tutorial <i class="material-icons"> help_outline </i>
+  Video tutorial <i class="material-icons"> help_outline </i>
 </span>
-<div class="modal" [ngClass]="{'is-active': isModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-card">
-		<section class="modal-card-body">
-			<!-- <img style="width: 80%" src="assets/help/title.gif"> -->
-			<div class="has-text-centered">
-				<video width="100%" controls>
-					<source [src]="videoLink" type="video/mp4">
-						Your browser does not support HTML5 video.
-					</video>
-				</div>
-			</section>
-			<footer class="modal-card-foot buttons is-right">
-				<div class="columns is-gapless full-width">
-					<div class="column is-two-third">
-						<a href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!" class="button is-default">
-							<mat-icon style="font-size: 0.93em;" class="mat-icon material-icons">feedback</mat-icon> Contact us
-						</a>
-					</div>
-					<div class="column is-one-third has-text-right">
-						<button (click)='closeModal()' class="button is-info">OK</button>
-					</div>
-				</div>
-			</footer>
-		</div>
-	</div>
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <!-- <img style="width: 80%" src="assets/help/title.gif"> -->
+      <div class="has-text-centered">
+        <video width="100%" controls>
+          <source [src]="videoLink" type="video/mp4" />
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <div class="columns is-gapless full-width">
+        <div class="column is-two-third">
+          <a
+            href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!"
+            class="button is-default"
+          >
+            <mat-icon style="font-size: 0.93em" class="mat-icon material-icons"
+              >feedback</mat-icon
+            >
+            Contact us
+          </a>
+        </div>
+        <div class="column is-one-third has-text-right">
+          <button (click)="closeModal()" class="button is-info">OK</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

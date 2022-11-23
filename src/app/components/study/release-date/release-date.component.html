@@ -1,29 +1,36 @@
 <div class="control">
-	<div class="tags has-addons">
-		<span class="tag is-dark">Release Date</span>
-		<span (click)='openModal()' class="tag is-success clickable">
-		{{ releaseDate }}
-		</span>
-	</div>
+  <div class="tags has-addons">
+    <span class="tag is-dark">Release Date</span>
+    <span (click)="openModal()" class="tag is-success clickable">
+      {{ releaseDate }}
+    </span>
+  </div>
 </div>
-<div *ngIf="releaseDate" class="modal" [ngClass]="{'is-active': isModalOpen}">
-	<div class="modal-background"></div>
-	<div class="modal-card">
-		<section class="modal-card-body">
-			<mat-form-field>
-			  <input matInput (dateChange)="updateReleaseDate('change', $event)" [matDatepicker]="picker" [(value)]="releaseDate" placeholder="Choose your study release date">
-			  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-			  <mat-datepicker #picker></mat-datepicker>
-			</mat-form-field>
-		</section>
-		<footer class="modal-card-foot buttons is-right">
-			<div class="columns is-gapless full-width">
-		      <div class="column is-two-third">
-		      </div>
-		      <div class="column is-one-third has-text-right">
-		        <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>OK</button>
-		      </div>
-		    </div>
-		</footer>
-	</div>
+<div *ngIf="releaseDate" class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <mat-form-field>
+        <input
+          matInput
+          (dateChange)="updateReleaseDate('change', $event)"
+          [matDatepicker]="picker"
+          [(value)]="releaseDate"
+          placeholder="Choose your study release date"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <div class="columns is-gapless full-width">
+        <div class="column is-two-third"></div>
+        <div class="column is-one-third has-text-right">
+          <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
+            OK
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>

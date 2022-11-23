@@ -6,8 +6,10 @@
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
+    "test-headless": "ng test --watch=false --browsers=ChromeHeadless",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "check-formatting": "prettier --check ."
   },
   "private": true,
   "dependencies": {
@@ -48,13 +50,25 @@
     "zone.js": "~0.10.3"
   },
   "devDependencies": {
+    "@angular-eslint/builder": "1.2.0",
+    "@angular-eslint/eslint-plugin": "1.2.0",
+    "@angular-eslint/eslint-plugin-template": "1.2.0",
+    "@angular-eslint/schematics": "1.2.0",
+    "@angular-eslint/template-parser": "1.2.0",
     "@angular/cli": "~10.0.5 ",
     "@angular/compiler-cli": "~10.0.7",
     "@angular/language-service": "~10.0.7",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.16.0",
+    "@typescript-eslint/eslint-plugin": "4.3.0",
+    "@typescript-eslint/parser": "4.3.0",
     "codelyzer": "~4.5.0",
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsdoc": "30.7.6",
+    "eslint-plugin-prefer-arrow": "1.2.2",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "^5.1.1",
@@ -62,9 +76,10 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "prettier": "2.7.1",
     "protractor": "^7.0.0",
     "ts-node": "~7.0.0",
-    "tslint": "~5.11.0",
+    "tslint": "^5.18.0",
     "typescript": "~3.9.7"
   }
 }

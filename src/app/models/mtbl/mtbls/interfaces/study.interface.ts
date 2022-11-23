@@ -10,24 +10,22 @@ import { ISource } from "./source.interface";
 import { IStudyDesignDescriptor } from "./study-design-descriptor.interface";
 
 export interface IStudy {
-    assays: IAssay[];
-    characteristicCategories: any[];
-    comments: IComment[];
-    description: string;
-    factors: IFactor[];
-    filename: string;
-    identifier: string;
-    people: IPerson[];
-    processSequence: IProcessSequence[];
-    protocols: IProtocol[];
-    publicReleaseDate: string;
-    publications: IPublication[];
-    samples: ISample[];
-    sources: ISource[];
-    studyDesignDescriptors: IStudyDesignDescriptor[];
-    subissionDate: string;
-    title: string;
-    units: any[];
-
-
+  assays: IAssay[];
+  characteristicCategories: any[];
+  comments: IComment[];
+  description: string;
+  factors: IFactor[];
+  filename: string;
+  identifier: string;
+  people: IPerson[];
+  processSequence: IProcessSequence[];
+  protocols: IProtocol[];
+  publicReleaseDate: string;
+  publications: IPublication[];
+  samples: ISample[];
+  sources: ISource[];
+  studyDesignDescriptors: IStudyDesignDescriptor[];
+  subissionDate: string;
+  title: string;
+  units: any[];
 }

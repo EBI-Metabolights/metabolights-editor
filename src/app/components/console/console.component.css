@@ -1,31 +1,31 @@
-.is-rounded{
-	border-radius: 4px !important;
+.is-rounded {
+  border-radius: 4px !important;
 }
 
 .message-header {
-    align-items: center;
-    background-color: #EEF6FC;
-    border-radius: 0;
-    color: #174287;
-    display: flex;
-    font-weight: 700;
-    justify-content: space-between;
-    line-height: 1.25;
-    padding: 0.75em 1em;
-    position: relative;
+  align-items: center;
+  background-color: #eef6fc;
+  border-radius: 0;
+  color: #174287;
+  display: flex;
+  font-weight: 700;
+  justify-content: space-between;
+  line-height: 1.25;
+  padding: 0.75em 1em;
+  position: relative;
 }
 
 .message-body {
-    border-color: #dbdbdb;
-    border-radius: 0px;
-    border-style: solid;
-    border-width: 0;
-    color: #4a4a4a;
-    padding: 1.25em 1.5em;
+  border-color: #dbdbdb;
+  border-radius: 0px;
+  border-style: solid;
+  border-width: 0;
+  color: #4a4a4a;
+  padding: 1.25em 1.5em;
 }
 
 .message {
-    background-color: #ffffffb5;
-	border-radius: 0px;
-	border: 1px solid #cce9ff;
+  background-color: #ffffffb5;
+  border-radius: 0px;
+  border: 1px solid #cce9ff;
 }

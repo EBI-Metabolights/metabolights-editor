@@ -1,29 +1,40 @@
 <span *ngIf="mafs && mafs.length > 0; else noLinkedMAFFiles">
-	<br>
-	<div class="card">
-        <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
-          	<div class="column is-full tabs npt" style="margin-bottom: 0; padding-bottom: 0">
-           		<ul>
-           			<span *ngFor="let maf of mafs; let i = index">
-            			<li (click)="selectCurrentSubTab(i)" [ngClass]="{'is-active': currentSubIndex == i }"><a>MAF Sheet {{i + 1}}</a></li>
-        			</span>
-          		</ul>
-        	</div>
-      	</div>
-	  	<span *ngFor="let maf of mafs; let i = index">
-	  		<span *ngIf="currentSubIndex == i">
-	  			<mtbls-maf [value]="maf"></mtbls-maf>
-	  		</span>
-	  	</span>
-	</div>
-	<span >
-		<div>&nbsp;</div>
-	</span>
+  <br />
+  <div class="card">
+    <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
+      <div
+        class="column is-full tabs npt"
+        style="margin-bottom: 0; padding-bottom: 0"
+      >
+        <ul>
+          <span *ngFor="let maf of mafs; let i = index">
+            <li
+              (click)="selectCurrentSubTab(i)"
+              [ngClass]="{ 'is-active': currentSubIndex == i }"
+            >
+              <a>MAF Sheet {{ i + 1 }}</a>
+            </li>
+          </span>
+        </ul>
+      </div>
+    </div>
+    <span *ngFor="let maf of mafs; let i = index">
+      <span *ngIf="currentSubIndex == i">
+        <mtbls-maf [value]="maf"></mtbls-maf>
+      </span>
+    </span>
+  </div>
+  <span>
+    <div>&nbsp;</div>
+  </span>
 </span>
 <ng-template #noLinkedMAFFiles>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
-	<p class="has-text-centered">To add metabolite identification information please first ensure you have added details to the assay table.</p>
-	<div>&nbsp;</div>
-	<div>&nbsp;</div>
+  <div>&nbsp;</div>
+  <div>&nbsp;</div>
+  <p class="has-text-centered">
+    To add metabolite identification information please first ensure you have
+    added details to the assay table.
+  </p>
+  <div>&nbsp;</div>
+  <div>&nbsp;</div>
 </ng-template>

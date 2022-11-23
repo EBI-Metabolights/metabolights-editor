@@ -1,12 +1,29 @@
 <div *ngIf="!isReadOnly" class="notification is-primary">
-	Please complete the table below to include organism & organism part. You may also add further details relating to the sample characteristics <a class="button border is-small is-light">
-		<span><mat-icon>add</mat-icon>characteristic</span>
-	</a> or metadata such as gender or drug treatment <button class="button border is-light is-small"><span><mat-icon>add</mat-icon>Factor</span></button> <br><span style="font-size: 0.8em;"><mtbls-help target="samples"></mtbls-help></span>
+  Please complete the table below to include organism & organism part. You may
+  also add further details relating to the sample characteristics
+  <a class="button border is-small is-light">
+    <span><mat-icon>add</mat-icon>characteristic</span>
+  </a>
+  or metadata such as gender or drug treatment
+  <button class="button border is-light is-small">
+    <span><mat-icon>add</mat-icon>Factor</span>
+  </button>
+  <br /><span style="font-size: 0.8em"
+    ><mtbls-help target="samples"></mtbls-help
+  ></span>
 </div>
-<div *ngIf="duplicateSamples.length > 0 && !isReadOnly" class="notification is-warning">
-  <small><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br>
+<div
+  *ngIf="duplicateSamples.length > 0 && !isReadOnly"
+  class="notification is-warning"
+>
+  <small
+    ><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br />
     <span *ngFor="let sample of duplicateSamples">
-      <span (click)="sampleTable.filterDuplicate(sample)" class="pointer tag is-white">{{ sample }}</span>&nbsp;
+      <span
+        (click)="sampleTable.filterDuplicate(sample)"
+        class="pointer tag is-white"
+        >{{ sample }}</span
+      >&nbsp;
     </span>
   </small>
 </div>
@@ -16,36 +33,59 @@
   </div>
 -->
 <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
-	<div class="dropdown" [ngClass]="{'is-active': isFactorDropdownActive}">
-		<div class="dropdown-trigger">
-			<button (click)="toggleDropdown()" class="button is-light is-small add-factor-button"><span><mat-icon>add</mat-icon>Factor</span></button>
-		</div>
-		<div class="dropdown-menu has-text-left" role="menu">
-			<div class="dropdown-content">
-					<span *ngFor="let factor of unSelectedFactors">
-						<a (click)="openAddColumnModal('factor', factor)" class="dropdown-item">
-							{{ factor.factorName }}
-						</a>
-					</span>
-					<hr class="dropdown-divider">
-				  <mtbls-factor (addFactorToSampleSheet)="openAddColumnModal('factor', $event)" [isDropdown]="true" [value]="null"></mtbls-factor>
-			</div>
-		</div>
-	</div>
-	&nbsp;
-	<a (click)="openAddColumnModal('characteristic', null)" class="button is-small is-light">
-		<span><mat-icon>add</mat-icon>Characteristic</span>
-	</a>
-	&nbsp;
-	<a (click)="openAddSamplesModal()" class="button is-small is-light">
-		<mat-icon>add</mat-icon> Samples
-	</a>
+  <div class="dropdown" [ngClass]="{ 'is-active': isFactorDropdownActive }">
+    <div class="dropdown-trigger">
+      <button
+        (click)="toggleDropdown()"
+        class="button is-light is-small add-factor-button"
+      >
+        <span><mat-icon>add</mat-icon>Factor</span>
+      </button>
+    </div>
+    <div class="dropdown-menu has-text-left" role="menu">
+      <div class="dropdown-content">
+        <span *ngFor="let factor of unSelectedFactors">
+          <a
+            (click)="openAddColumnModal('factor', factor)"
+            class="dropdown-item"
+          >
+            {{ factor.factorName }}
+          </a>
+        </span>
+        <hr class="dropdown-divider" />
+        <mtbls-factor
+          (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
+          [isDropdown]="true"
+          [value]="null"
+        ></mtbls-factor>
+      </div>
+    </div>
+  </div>
+  &nbsp;
+  <a
+    (click)="openAddColumnModal('characteristic', null)"
+    class="button is-small is-light"
+  >
+    <span><mat-icon>add</mat-icon>Characteristic</span>
+  </a>
+  &nbsp;
+  <a (click)="openAddSamplesModal()" class="button is-small is-light">
+    <mat-icon>add</mat-icon> Samples
+  </a>
 </span>
-<mtbls-table [fileTypes]="fileTypes" (updated)="refresh()" [tableData]="samples" validationsId="samples"></mtbls-table>
+<mtbls-table
+  [fileTypes]="fileTypes"
+  (updated)="refresh()"
+  [tableData]="samples"
+  validationsId="samples"
+></mtbls-table>
 
-<div class="modal" [ngClass]="{'is-active': addColumnModalOpen}">
+<div class="modal" [ngClass]="{ 'is-active': addColumnModalOpen }">
   <div class="modal-background"></div>
-  <div *ngIf="addColumnType && addColumnType == 'characteristic'" class="modal-card">
+  <div
+    *ngIf="addColumnType && addColumnType == 'characteristic'"
+    class="modal-card"
+  >
     <div *ngIf="isFormBusy" class="load-bar">
       <div class="bar"></div>
       <div class="bar"></div>
@@ -54,16 +94,28 @@
     <form *ngIf="form" [formGroup]="form">
       <section class="modal-card-body">
         <div>
-          <mtbls-ontology [id]="'characteristicCategory'" [validations]="fieldValidation('category')" (changed)="onChanges($event)" [values]='[]' [inline]="true"></mtbls-ontology>
+          <mtbls-ontology
+            [id]="'characteristicCategory'"
+            [validations]="fieldValidation('category')"
+            (changed)="onChanges($event)"
+            [values]="[]"
+            [inline]="true"
+          ></mtbls-ontology>
         </div>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
-          <div class="column is-one-third">
-          </div>
+          <div class="column is-one-third"></div>
           <div class="column is-two-third has-text-right">
-            <button (click)='closeAddColumnModal()' class="button">Cancel</button>
-            <button (click)="addColumn('characteristic')" class="button is-info">Add characteristic Column</button>
+            <button (click)="closeAddColumnModal()" class="button">
+              Cancel
+            </button>
+            <button
+              (click)="addColumn('characteristic')"
+              class="button is-info"
+            >
+              Add characteristic Column
+            </button>
           </div>
         </div>
       </footer>
@@ -77,16 +129,30 @@
     </div>
     <form *ngIf="form" [formGroup]="form">
       <section class="modal-card-body">
-        <h6 class="modal-card-title">Add factor column to Sample sheet - <span class="highlight">{{ selectedFactor.factorName }}</span></h6>
-        <mtbls-ontology [id]="'factorUnit'" class="mt-20" #factorUnit [validations]="fieldValidation('unit')" (changed)="onChanges($event)" [values]='[]' [inline]="true"></mtbls-ontology>
+        <h6 class="modal-card-title">
+          Add factor column to Sample sheet -
+          <span class="highlight">{{ selectedFactor.factorName }}</span>
+        </h6>
+        <mtbls-ontology
+          [id]="'factorUnit'"
+          class="mt-20"
+          #factorUnit
+          [validations]="fieldValidation('unit')"
+          (changed)="onChanges($event)"
+          [values]="[]"
+          [inline]="true"
+        ></mtbls-ontology>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
-          <div class="column is-half">
-          </div>
+          <div class="column is-half"></div>
           <div class="column is-half has-text-right">
-            <button (click)='closeAddColumnModal()' class="button">Cancel</button>
-            <button (click)="addColumn('factor')" class="button is-info">Add Factor Column</button>
+            <button (click)="closeAddColumnModal()" class="button">
+              Cancel
+            </button>
+            <button (click)="addColumn('factor')" class="button is-info">
+              Add Factor Column
+            </button>
           </div>
         </div>
       </footer>
@@ -94,7 +160,7 @@
   </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isAddSamplesModalOpen}">
+<div class="modal" [ngClass]="{ 'is-active': isAddSamplesModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -109,42 +175,62 @@
             <div class="field">
               <div class="control">
                 <mat-form-field class="full-width">
-                  <mat-label>{{ validation['samples'].label }}</mat-label>
-                  <textarea class="no-scroll"
-                  formControlName="samples"
-                  matInput
-                  [placeholder]="validation['samples'].placeholder"
-                  cdkAutosizeMinRows="20"
-                  cdkAutosizeMaxRows="10"
-                  cdkTextareaAutosize>
-                </textarea>
-                <mat-hint>{{ validation.samples.description }}</mat-hint>
-                <mat-error
-                *ngIf="form.get('samples').errors &&
-                form.get('samples').dirty &&
-                form.get('samples').errors.samples">
-                {{ form.get('samples').errors.samples.error }}
-              </mat-error>
-            </mat-form-field>
-          </div>
-          <div *ngIf="duplicateNames && duplicateNames.length > 0">
-            <small class="tiny"><mat-icon>info</mat-icon> Duplicates alert: Sample names already exist in the Sample Sheet. Please proceed to add the new sample names.</small>
+                  <mat-label>{{ validation["samples"].label }}</mat-label>
+                  <textarea
+                    class="no-scroll"
+                    formControlName="samples"
+                    matInput
+                    [placeholder]="validation['samples'].placeholder"
+                    cdkAutosizeMinRows="20"
+                    cdkAutosizeMaxRows="10"
+                    cdkTextareaAutosize
+                  >
+                  </textarea>
+                  <mat-hint>{{ validation.samples.description }}</mat-hint>
+                  <mat-error
+                    *ngIf="
+                      form.get('samples').errors &&
+                      form.get('samples').dirty &&
+                      form.get('samples').errors.samples
+                    "
+                  >
+                    {{ form.get("samples").errors.samples.error }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+              <div *ngIf="duplicateNames && duplicateNames.length > 0">
+                <small class="tiny"
+                  ><mat-icon>info</mat-icon> Duplicates alert: Sample names
+                  already exist in the Sample Sheet. Please proceed to add the
+                  new sample names.</small
+                >
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-two-third">
+            <button
+              class="button is-primary is-small"
+              (click)="importFileNamesFromRawData()"
+            >
+              Import RAW Data Filenames
+            </button>
+          </div>
+          <div class="column is-one-third has-text-right">
+            <button
+              class="button is-info"
+              [disabled]="isFormBusy"
+              (click)="closeAddSamplesModal()"
+            >
+              Cancel
+            </button>
+            <button (click)="addSamples()" class="button is-info">Add</button>
+          </div>
+        </div>
+      </footer>
     </div>
-  </section>
-  <footer class="modal-card-foot">
-    <div class="columns is-gapless full-width">
-      <div class="column is-two-third">
-        <button class="button is-primary is-small" (click)='importFileNamesFromRawData()'>Import RAW Data Filenames</button>
-      </div>
-      <div class="column is-one-third has-text-right">
-        <button class="button is-info" [disabled]="isFormBusy" (click)='closeAddSamplesModal()'>Cancel</button>
-        <button (click)="addSamples()" class="button is-info">Add</button>
-      </div>
-    </div>
-  </footer>
-</div>
-</form>
+  </form>
 </div>

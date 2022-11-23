@@ -1,36 +1,34 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { ConfigurationService } from 'src/app/configuration.service';
-import { VideoURL } from 'src/environment.interface';
+import { Component, OnInit, Input } from "@angular/core";
+import { ConfigurationService } from "src/app/configuration.service";
+import { VideoURL } from "src/environment.interface";
 
 @Component({
-  selector: 'mtbls-help',
-  templateUrl: './help.component.html',
-  styleUrls: ['./help.component.css']
+  selector: "mtbls-help",
+  templateUrl: "./help.component.html",
+  styleUrls: ["./help.component.css"],
 })
 export class HelpComponent implements OnInit {
+  @Input("target") target: string;
 
-  @Input('target') target: string;
+  isModalOpen = false;
+  videoLink = "201904_ML_ALL.mp4";
 
-  isModalOpen: boolean = false;
-  videoLink: string = '201904_ML_ALL.mp4';
-  videoBaseURL: string;
-
-  constructor(private configService: ConfigurationService) { }
+  constructor(private configService: ConfigurationService) {}
 
   ngOnInit() {
-    this.videoLink = this.getVideoLink()
+    this.videoLink = this.getVideoLink();
   }
 
   getVideoLink(): string {
-    let accessor = this.target as keyof VideoURL
-    return this.configService.config.VideoURL[accessor]
+    const accessor = this.target as keyof VideoURL;
+    return this.configService.config.videoURL[accessor];
   }
 
-  openModal(){
-  	this.isModalOpen = true;
+  openModal() {
+    this.isModalOpen = true;
   }
 
-  closeModal(){
-  	this.isModalOpen = false;
+  closeModal() {
+    this.isModalOpen = false;
   }
 }

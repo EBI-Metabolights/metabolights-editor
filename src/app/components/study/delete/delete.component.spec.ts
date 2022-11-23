@@ -1,22 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ActivatedRouteSnapshot } from "@angular/router";
+import { RouterTestingModule } from "@angular/router/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { DeleteComponent } from './delete.component';
+import { DeleteComponent } from "./delete.component";
 
-describe('DeleteComponent', () => {
+describe("DeleteComponent", () => {
   let component: DeleteComponent;
   let fixture: ComponentFixture<DeleteComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DeleteComponent ],
+      declarations: [DeleteComponent],
       imports: [RouterTestingModule],
-      providers: [{ provide: EditorService, useClass: MockEditorService }]
-    })
-    .compileComponents();
+      providers: [{ provide: EditorService, useClass: MockEditorService }],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -25,7 +24,7 @@ describe('DeleteComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

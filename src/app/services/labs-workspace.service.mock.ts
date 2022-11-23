@@ -1,5 +1,5 @@
 export class MockLabsWorkspaceService {
-    initialise() {
-        return null;
-    }
+  initialise() {
+    return null;
+  }
 }

@@ -1,23 +1,22 @@
-import { CommonModule } from '@angular/common';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { CommonModule } from "@angular/common";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { MafComponent } from './maf.component';
+import { MafComponent } from "./maf.component";
 
-describe('MafComponent', () => {
+describe("MafComponent", () => {
   let component: MafComponent;
   let fixture: ComponentFixture<MafComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MafComponent ],
+      declarations: [MafComponent],
       imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule],
-      providers: [{provide: EditorService, useClass: MockEditorService}]
-    })
-    .compileComponents();
+      providers: [{ provide: EditorService, useClass: MockEditorService }],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -26,7 +25,7 @@ describe('MafComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

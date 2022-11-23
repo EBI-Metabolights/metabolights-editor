@@ -1,44 +1,46 @@
-import { AbstractControl, ValidatorFn } from '@angular/forms';
+import { AbstractControl, ValidatorFn } from "@angular/forms";
 
-export function ValidateRules(field:string, validation: any): ValidatorFn {
-    return (control: AbstractControl): { [key: string]: any } | null => {
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+/* eslint-disable @typescript-eslint/naming-convention */
+function strip(html) {
+  const tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || "";
+}
 
-    	let value = control.value;
-    	let invalid = false;
-    	let errorMessage = "";
+export function ValidateRules(field: string, validation: any): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    const value = control.value;
+    let invalid = false;
+    let errorMessage = "";
 
-    	validation.rules.forEach( rule => {
-            if(value!= null){
-    		    switch(rule.condition) { 
-                    case "min": { 
-                        if (strip(value.toString()).length < rule.value && JSON.parse(validation['is-required'])){
-                            invalid = true
-                            errorMessage = errorMessage + rule.error
-                        }
-                        break;
-                    };
-                    case "pattern": { 
-                        let re = new RegExp(rule.value, "i");
-                        if(!re.test(value)){
-                            invalid = true
-                            errorMessage = errorMessage + rule.error
-                        }
-                        break;
-                    };
-                } 
+    validation.rules.forEach((rule) => {
+      if (value !== null) {
+        switch (rule.condition) {
+          case "min": {
+            if (
+              strip(value.toString()).length < rule.value &&
+              JSON.parse(validation["is-required"])
+            ) {
+              invalid = true;
+              errorMessage = errorMessage + rule.error;
             }
-
-        })
-        if (invalid) {
-            return { [field]: { 'error': errorMessage} };
+            break;
+          }
+          case "pattern": {
+            const re = new RegExp(rule.value, "i");
+            if (!re.test(value)) {
+              invalid = true;
+              errorMessage = errorMessage + rule.error;
+            }
+            break;
+          }
         }
-        return null;
-    };
-
-    function strip(html)
-    {
-       var tmp = document.createElement("DIV");
-       tmp.innerHTML = html;
-       return tmp.textContent || tmp.innerText || "";
+      }
+    });
+    if (invalid) {
+      return { [field]: { error: errorMessage } };
     }
+    return null;
+  };
 }

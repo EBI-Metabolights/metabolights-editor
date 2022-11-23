@@ -1,14 +1,18 @@
-<div [ngClass]="{'hover-highlight': !isReadOnly}" class="px-20 mtbls-section">
+<div [ngClass]="{ 'hover-highlight': !isReadOnly }" class="px-20 mtbls-section">
   <div *ngIf="description != undefined">
     <span *ngIf="description != ''; else emptyDescription">
-      <p [innerHTML]="description" class="clickable" (click)='openModal()'></p>
+      <p [innerHTML]="description" class="clickable" (click)="openModal()"></p>
     </span>
     <ng-template #emptyDescription>
-      <p [innerHTML]="'Please add your study summary here'" class="clickable" (click)='openModal()'></p>
+      <p
+        [innerHTML]="'Please add your study summary here'"
+        class="clickable"
+        (click)="openModal()"
+      ></p>
     </ng-template>
   </div>
 </div>
-<div class="modal" [ngClass]="{'is-active': isModalOpen && !isReadOnly}">
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen && !isReadOnly }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card vw80">
@@ -23,115 +27,195 @@
             <div class="field">
               <div class="control">
                 <mat-label>Study summary</mat-label>
-                
-                  <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px" formControlName="description" [placeholder]="validation.placeholder">
-                      <div quill-editor-toolbar>
-                        <span class="ql-formats">
-                          <button class="ql-bold"></button>
-                          <button class="ql-italic"></button>
-                          <button class="ql-underline"></button>
-                          <button class="ql-strike"></button>
-                        </span>
-                        <span class="ql-formats">
-                          <button class="ql-list" value="ordered"></button>
-                          <button class="ql-list" value="bullet"></button>
-                          <select class="ql-align">
-                            <option selected></option>
-                            <option value="center"></option>
-                            <option value="right"></option>
-                            <option value="justify"></option>
-                          </select>
-                        </span>
-                        <span class="ql-formats">
-                          <button class="ql-link"></button>
-                        </span>
-                        <span class="ql-formats">
-                          <button (click)="clearFormatting('description')"><i class="material-icons">
-                            format_clear
-                            </i></button>
-                        </span>
-                        <span class="ql-formats">
-                            <div  class="dropdown is-right" [ngClass]="{'is-active': isSymbolDropdownActive}">
-                                <div class="dropdown-trigger">
-                                  <button (click)="toggleSymbolDropdown()" class="button is-light is-small"><span>
-                                      <i class="material-icons">
-                                          gesture
-                                      </i>
-                                  </span></button>
-                                </div>
-                            <div class="dropdown-menu has-text-left" role="menu">
-                                <div class="dropdown-content">
-                                      <a (click)="addSymbol('°')" class="dropdown-item dd-element">
-                                        °
-                                      </a>
-                                      <a (click)="addSymbol('α')" class="dropdown-item dd-element">
-                                        α
-                                      </a>
-                                      <a (click)="addSymbol('β')" class="dropdown-item dd-element">
-                                        β
-                                      </a>
-                                      <a (click)="addSymbol('γ')" class="dropdown-item dd-element">
-                                        γ
-                                      </a>
-                                      <a (click)="addSymbol('←')" class="dropdown-item dd-element">
-                                        ←
-                                      </a>
-                                      <a (click)="addSymbol('→')" class="dropdown-item dd-element">
-                                        →
-                                      </a>
-                                      <a (click)="addSymbol('↔')" class="dropdown-item dd-element">
-                                        ↔
-                                      </a>
-                                       <a (click)="addSymbol('↑')" class="dropdown-item dd-element">
-                                        ↑
-                                      </a>
-                                       <a (click)="addSymbol('↓')" class="dropdown-item dd-element">
-                                        ↓
-                                      </a>
-                                      <a (click)="addSymbol('≥')" class="dropdown-item dd-element">
-                                       ≥
-                                     </a>
-                                       <a (click)="addSymbol('≤')" class="dropdown-item dd-element">
-                                       ≤
-                                     </a>
-                                      <a (click)="addSymbol('≠')" class="dropdown-item dd-element">
-                                     ≠
-                                   </a>
-                                      <a (click)="addSymbol('±')" class="dropdown-item dd-element">
-                                     ±
-                                   </a>
-                                    <a (click)="addSymbol('µ')" class="dropdown-item dd-element">
-                                      µ
-                                    </a>
-                                    <a (click)="addSymbol('Å')" class="dropdown-item dd-element">
-                                      Å
-                                    </a>
-                                </div>
-                              </div>
-                            </div>
-                        </span>
+
+                <quill-editor
+                  (onEditorCreated)="setEditor($event)"
+                  style="height: 250px"
+                  formControlName="description"
+                  [placeholder]="validation.placeholder"
+                >
+                  <div quill-editor-toolbar>
+                    <span class="ql-formats">
+                      <button class="ql-bold"></button>
+                      <button class="ql-italic"></button>
+                      <button class="ql-underline"></button>
+                      <button class="ql-strike"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button class="ql-list" value="ordered"></button>
+                      <button class="ql-list" value="bullet"></button>
+                      <select class="ql-align">
+                        <option selected></option>
+                        <option value="center"></option>
+                        <option value="right"></option>
+                        <option value="justify"></option>
+                      </select>
+                    </span>
+                    <span class="ql-formats">
+                      <button class="ql-link"></button>
+                    </span>
+                    <span class="ql-formats">
+                      <button (click)="clearFormatting('description')">
+                        <i class="material-icons"> format_clear </i>
+                      </button>
+                    </span>
+                    <span class="ql-formats">
+                      <div
+                        class="dropdown is-right"
+                        [ngClass]="{ 'is-active': isSymbolDropdownActive }"
+                      >
+                        <div class="dropdown-trigger">
+                          <button
+                            (click)="toggleSymbolDropdown()"
+                            class="button is-light is-small"
+                          >
+                            <span>
+                              <i class="material-icons"> gesture </i>
+                            </span>
+                          </button>
+                        </div>
+                        <div class="dropdown-menu has-text-left" role="menu">
+                          <div class="dropdown-content">
+                            <a
+                              (click)="addSymbol('°')"
+                              class="dropdown-item dd-element"
+                            >
+                              °
+                            </a>
+                            <a
+                              (click)="addSymbol('α')"
+                              class="dropdown-item dd-element"
+                            >
+                              α
+                            </a>
+                            <a
+                              (click)="addSymbol('β')"
+                              class="dropdown-item dd-element"
+                            >
+                              β
+                            </a>
+                            <a
+                              (click)="addSymbol('γ')"
+                              class="dropdown-item dd-element"
+                            >
+                              γ
+                            </a>
+                            <a
+                              (click)="addSymbol('←')"
+                              class="dropdown-item dd-element"
+                            >
+                              ←
+                            </a>
+                            <a
+                              (click)="addSymbol('→')"
+                              class="dropdown-item dd-element"
+                            >
+                              →
+                            </a>
+                            <a
+                              (click)="addSymbol('↔')"
+                              class="dropdown-item dd-element"
+                            >
+                              ↔
+                            </a>
+                            <a
+                              (click)="addSymbol('↑')"
+                              class="dropdown-item dd-element"
+                            >
+                              ↑
+                            </a>
+                            <a
+                              (click)="addSymbol('↓')"
+                              class="dropdown-item dd-element"
+                            >
+                              ↓
+                            </a>
+                            <a
+                              (click)="addSymbol('≥')"
+                              class="dropdown-item dd-element"
+                            >
+                              ≥
+                            </a>
+                            <a
+                              (click)="addSymbol('≤')"
+                              class="dropdown-item dd-element"
+                            >
+                              ≤
+                            </a>
+                            <a
+                              (click)="addSymbol('≠')"
+                              class="dropdown-item dd-element"
+                            >
+                              ≠
+                            </a>
+                            <a
+                              (click)="addSymbol('±')"
+                              class="dropdown-item dd-element"
+                            >
+                              ±
+                            </a>
+                            <a
+                              (click)="addSymbol('µ')"
+                              class="dropdown-item dd-element"
+                            >
+                              µ
+                            </a>
+                            <a
+                              (click)="addSymbol('Å')"
+                              class="dropdown-item dd-element"
+                            >
+                              Å
+                            </a>
+                          </div>
+                        </div>
                       </div>
-                    </quill-editor>
-              <mat-hint><small>{{ validation.description }}</small></mat-hint><br>
-              <mat-error
-              *ngIf="form.get('description').errors &&
-              form.get('description').dirty &&
-              form.get('description').errors.description">
-              <small>{{ form.get('description').errors.description.error }}</small>
-            </mat-error>
+                    </span>
+                  </div>
+                </quill-editor>
+                <mat-hint
+                  ><small>{{ validation.description }}</small></mat-hint
+                ><br />
+                <mat-error
+                  *ngIf="
+                    form.get('description').errors &&
+                    form.get('description').dirty &&
+                    form.get('description').errors.description
+                  "
+                >
+                  <small>{{
+                    form.get("description").errors.description.error
+                  }}</small>
+                </mat-error>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <button
+          *ngIf="form.get('description').dirty"
+          [disabled]="!form.valid || isFormBusy"
+          (click)="save()"
+          class="button is-info"
+        >
+          <mat-spinner
+            [diameter]="20"
+            [strokeWidth]="3"
+            *ngIf="isFormBusy"
+          ></mat-spinner>
+          Save
+        </button>
+        <button
+          *ngIf="!form.get('description').dirty"
+          (click)="closeModal()"
+          class="button is-info"
+        >
+          OK
+        </button>
+        <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
+          Cancel
+        </button>
+      </footer>
     </div>
-  </section>
-  <footer class="modal-card-foot buttons is-right">
-    <button *ngIf="form.get('description').dirty" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
-      <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
-      Save
-    </button>
-    <button *ngIf="!form.get('description').dirty" (click)='closeModal()' class="button is-info">OK</button>
-    <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>Cancel</button>
-  </footer>
-</div>
-</form>
+  </form>
 </div>

@@ -1,8 +1,8 @@
-.pointer{
-	cursor: pointer;
+.pointer {
+  cursor: pointer;
 }
 
 .tag.is-info {
-    margin-right: 5px !important;
-    margin-top: 5px !important;
+  margin-right: 5px !important;
+  margin-top: 5px !important;
 }

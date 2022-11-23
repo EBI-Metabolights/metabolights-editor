@@ -1,11 +1,18 @@
-<span *ngIf='person == null || addNewPerson; else showPersonDetails'>
-  <a class="button is-light is-pulled-right is-small" [ngClass]="{'hover-button': !isReadOnly}" (click)='openModal()'>+ Add person</a>
+<span *ngIf="person == null || addNewPerson; else showPersonDetails">
+  <a
+    class="button is-light is-pulled-right is-small"
+    [ngClass]="{ 'hover-button': !isReadOnly }"
+    (click)="openModal()"
+    >+ Add person</a
+  >
 </span>
 <ng-template #showPersonDetails>
-  <span class="clickable" (click)='openModal()'>{{person.firstName}} {{person.midInitials}} {{person.lastName}}</span>
+  <span class="clickable" (click)="openModal()"
+    >{{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span
+  >
 </ng-template>
 
-<div class="modal" [ngClass]="{'is-active': isDeleteModalOpen}">
+<div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
@@ -14,37 +21,54 @@
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
         <div class="column is-half">
-          <button (click)='closeDelete()' class="button is-info">Cancel</button>
+          <button (click)="closeDelete()" class="button is-info">Cancel</button>
         </div>
         <div class="column is-half has-text-right">
-          <button (click)='delete()' class="button is-danger">OK! Delete Permanently</button>
+          <button (click)="delete()" class="button is-danger">
+            OK! Delete Permanently
+          </button>
         </div>
       </div>
     </footer>
   </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isApproveSubmitterModalOpen}">
+<div class="modal" [ngClass]="{ 'is-active': isApproveSubmitterModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
-      <p>Are you sure you want to add this user as submitter of this study?</p><br/>
-      <p><small><mat-icon>info</mat-icon>User should already have a MetaboLights account to grant the submitter role. Please create, confirm and then assign the role.</small></p>
+      <p>Are you sure you want to add this user as submitter of this study?</p>
+      <br />
+      <p>
+        <small
+          ><mat-icon>info</mat-icon>User should already have a MetaboLights
+          account to grant the submitter role. Please create, confirm and then
+          assign the role.</small
+        >
+      </p>
     </section>
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
         <div class="column is-half">
-          <button (click)='closeSubmitterAproval()' class="button is-info">Cancel</button>
+          <button (click)="closeSubmitterAproval()" class="button is-info">
+            Cancel
+          </button>
         </div>
         <div class="column is-half has-text-right">
-          <button (click)='grantSubmitter()' class="button is-danger">Proceed</button>
+          <button (click)="grantSubmitter()" class="button is-danger">
+            Proceed
+          </button>
         </div>
       </div>
     </footer>
   </div>
 </div>
 
-<div class="modal" *ngIf="person" [ngClass]="{'is-active': isTimeLineModalOpen}">
+<div
+  class="modal"
+  *ngIf="person"
+  [ngClass]="{ 'is-active': isTimeLineModalOpen }"
+>
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
@@ -59,7 +83,10 @@
                 <div class="timeline-marker"></div>
                 <div class="timeline-content">
                   <p>
-                    {{ update.owner }}&emsp;<span class="tag is-small is-light">{{ update.ts }}</span>
+                    {{ update.owner }}&emsp;<span
+                      class="tag is-small is-light"
+                      >{{ update.ts }}</span
+                    >
                   </p>
                 </div>
               </div>
@@ -73,17 +100,16 @@
     </section>
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
-        <div class="column is-half">
-        </div>
+        <div class="column is-half"></div>
         <div class="column is-half has-text-right">
-          <button (click)='closeHistory()' class="button is-info">OK</button>
+          <button (click)="closeHistory()" class="button is-info">OK</button>
         </div>
       </div>
     </footer>
   </div>
 </div>
 
-<div class="modal" [ngClass]="{'is-active': isModalOpen}">
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -93,168 +119,255 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-      	<table class="full-width" cellspacing="0">
-      		<tr>
-      			<td>
-      				<mat-form-field class="full-width">
-                <input class="no-scroll" 
-                formControlName="lastName"
-                [readonly]="isReadOnly"
-                matInput>
-                <mat-hint>{{ fieldValidation('lastName').description }}</mat-hint>
+        <table class="full-width" cellspacing="0">
+          <tr>
+            <td>
+              <mat-form-field class="full-width">
+                <input
+                  class="no-scroll"
+                  formControlName="lastName"
+                  [readonly]="isReadOnly"
+                  matInput
+                />
+                <mat-hint>{{
+                  fieldValidation("lastName").description
+                }}</mat-hint>
                 <mat-error
-                *ngIf="form.get('lastName').errors &&
-                form.get('lastName').dirty &&
-                form.get('lastName').errors.lastName">
-                {{ form.get('lastName').errors.lastName.error }}
-              </mat-error>
-            </mat-form-field>
-          </td>
-          <td>
-            <mat-form-field class="full-width">
-              <input class="no-scroll" 
-              formControlName="midInitials"
-              [readonly]="isReadOnly"
-              matInput>
-              <mat-hint>{{ fieldValidation('midInitials').description }}</mat-hint>
-              <mat-error
-              *ngIf="form.get('midInitials').errors &&
-              form.get('midInitials').dirty &&
-              form.get('midInitials').errors.midInitials">
-              {{ form.get('midInitials').errors.midInitials.error }}
-            </mat-error>
-          </mat-form-field>
-        </td>
-        <td>
-          <mat-form-field class="full-width">
-            <input class="no-scroll" 
-            formControlName="firstName"
+                  *ngIf="
+                    form.get('lastName').errors &&
+                    form.get('lastName').dirty &&
+                    form.get('lastName').errors.lastName
+                  "
+                >
+                  {{ form.get("lastName").errors.lastName.error }}
+                </mat-error>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field class="full-width">
+                <input
+                  class="no-scroll"
+                  formControlName="midInitials"
+                  [readonly]="isReadOnly"
+                  matInput
+                />
+                <mat-hint>{{
+                  fieldValidation("midInitials").description
+                }}</mat-hint>
+                <mat-error
+                  *ngIf="
+                    form.get('midInitials').errors &&
+                    form.get('midInitials').dirty &&
+                    form.get('midInitials').errors.midInitials
+                  "
+                >
+                  {{ form.get("midInitials").errors.midInitials.error }}
+                </mat-error>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field class="full-width">
+                <input
+                  class="no-scroll"
+                  formControlName="firstName"
+                  [readonly]="isReadOnly"
+                  matInput
+                />
+                <mat-hint>{{
+                  fieldValidation("firstName").description
+                }}</mat-hint>
+                <mat-error
+                  *ngIf="
+                    form.get('firstName').errors &&
+                    form.get('firstName').dirty &&
+                    form.get('firstName').errors.firstName
+                  "
+                >
+                  {{ form.get("firstName").errors.firstName.error }}
+                </mat-error>
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+        <mat-form-field class="full-width">
+          <input
+            class="no-scroll"
+            formControlName="email"
             [readonly]="isReadOnly"
-            matInput>
-            <mat-hint>{{ fieldValidation('firstName').description }}</mat-hint>
-            <mat-error
-            *ngIf="form.get('firstName').errors &&
-            form.get('firstName').dirty &&
-            form.get('firstName').errors.firstName">
-            {{ form.get('firstName').errors.firstName.error }}
+            matInput
+          />
+          <mat-hint>{{ fieldValidation("email").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('email').errors &&
+              form.get('email').dirty &&
+              form.get('email').errors.email
+            "
+          >
+            {{ form.get("email").errors.email.error }}
           </mat-error>
         </mat-form-field>
-      </td>
-    </tr>
-  </table>
-  <mat-form-field class="full-width">
-    <input class="no-scroll" 
-    formControlName="email"
-    [readonly]="isReadOnly"
-    matInput>
-    <mat-hint>{{ fieldValidation('email').description }}</mat-hint>
-    <mat-error
-    *ngIf="form.get('email').errors &&
-    form.get('email').dirty &&
-    form.get('email').errors.email">
-    {{ form.get('email').errors.email.error }}
-  </mat-error>
-</mat-form-field>
 
-<table class="full-width" cellspacing="0">
-  <tr>
-   <td>
-    <mat-form-field class="full-width">
-      <input class="no-scroll" 
-      formControlName="phone"
-      [readonly]="isReadOnly"
-      matInput>
-      <mat-hint>{{ fieldValidation('phone').description }}</mat-hint>
-      <mat-error
-      *ngIf="form.get('phone').errors &&
-      form.get('phone').dirty &&
-      form.get('phone').errors.phone">
-      {{ form.get('phone').errors.phone.error }}
-    </mat-error>
-  </mat-form-field>
-</td>
-<td>
-  <mat-form-field class="full-width">
-    <input class="no-scroll" 
-    formControlName="fax"
-    [readonly]="isReadOnly"
-    matInput>
-    <mat-hint>{{ fieldValidation('fax').description }}</mat-hint>
-    <mat-error
-    *ngIf="form.get('fax').errors &&
-    form.get('fax').dirty &&
-    form.get('fax').errors.fax">
-    {{ form.get('fax').errors.fax.error }}
-  </mat-error>
-</mat-form-field>
-</td>
-</tr>
-</table>
-<mat-form-field class="full-width">
- <textarea class="no-scroll" 
- formControlName="address"
- [readonly]="isReadOnly"
- matInput
- cdkAutosizeMinRows="1"
- cdkAutosizeMaxRows="4"
- cdkTextareaAutosize>
-</textarea>
-<mat-hint>{{ fieldValidation('address').description }}</mat-hint>
-<mat-error
-*ngIf="form.get('address').errors &&
-form.get('address').dirty &&
-form.get('address').errors.address">
-{{ form.get('address').errors.address.error }}
-</mat-error>
-</mat-form-field>
-<mat-form-field class="full-width">
- <input class="no-scroll" 
- formControlName="affiliation"
- [readonly]="isReadOnly"
- matInput>
- <mat-hint>{{ fieldValidation('affiliation').description }}</mat-hint>
- <mat-error
- *ngIf="form.get('affiliation').errors &&
- form.get('affiliation').dirty &&
- form.get('affiliation').errors.affiliation">
- {{ form.get('affiliation').errors.affiliation.error }}
-</mat-error>
-</mat-form-field>
-<span *ngIf="!isReadOnly">
-    <mtbls-ontology class="mt-20" #personRoles [validations]="fieldValidation('roles')" (changed)="onChanges($event)" [values]='person.roles' [inline]="true"></mtbls-ontology>
-</span>
-<mat-error
-*ngIf="form.get('roles').errors &&
-form.get('roles').dirty &&
-form.get('roles').errors.roles">
-<small>{{ form.get('roles').errors.roles.error }}</small>
-</mat-error>
-</section>
-<footer *ngIf="!isReadOnly" class="modal-card-foot">
-  <div class="columns is-gapless full-width">
-    <div class="column is-half">
-      <button *ngIf="!addNewPerson" class="button is-danger is-pulled-left" (click)="confirmDelete()"><mat-icon>delete</mat-icon></button>
-      <button *ngIf="!addNewPerson && person.email" class="button is-secondary is-pulled-left" (click)="approveGrantSubmitterRole()"><mat-icon>person</mat-icon> Make Submitter</button>
+        <table class="full-width" cellspacing="0">
+          <tr>
+            <td>
+              <mat-form-field class="full-width">
+                <input
+                  class="no-scroll"
+                  formControlName="phone"
+                  [readonly]="isReadOnly"
+                  matInput
+                />
+                <mat-hint>{{ fieldValidation("phone").description }}</mat-hint>
+                <mat-error
+                  *ngIf="
+                    form.get('phone').errors &&
+                    form.get('phone').dirty &&
+                    form.get('phone').errors.phone
+                  "
+                >
+                  {{ form.get("phone").errors.phone.error }}
+                </mat-error>
+              </mat-form-field>
+            </td>
+            <td>
+              <mat-form-field class="full-width">
+                <input
+                  class="no-scroll"
+                  formControlName="fax"
+                  [readonly]="isReadOnly"
+                  matInput
+                />
+                <mat-hint>{{ fieldValidation("fax").description }}</mat-hint>
+                <mat-error
+                  *ngIf="
+                    form.get('fax').errors &&
+                    form.get('fax').dirty &&
+                    form.get('fax').errors.fax
+                  "
+                >
+                  {{ form.get("fax").errors.fax.error }}
+                </mat-error>
+              </mat-form-field>
+            </td>
+          </tr>
+        </table>
+        <mat-form-field class="full-width">
+          <textarea
+            class="no-scroll"
+            formControlName="address"
+            [readonly]="isReadOnly"
+            matInput
+            cdkAutosizeMinRows="1"
+            cdkAutosizeMaxRows="4"
+            cdkTextareaAutosize
+          ></textarea>
+          <mat-hint>{{ fieldValidation("address").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('address').errors &&
+              form.get('address').dirty &&
+              form.get('address').errors.address
+            "
+          >
+            {{ form.get("address").errors.address.error }}
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="full-width">
+          <input
+            class="no-scroll"
+            formControlName="affiliation"
+            [readonly]="isReadOnly"
+            matInput
+          />
+          <mat-hint>{{ fieldValidation("affiliation").description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('affiliation').errors &&
+              form.get('affiliation').dirty &&
+              form.get('affiliation').errors.affiliation
+            "
+          >
+            {{ form.get("affiliation").errors.affiliation.error }}
+          </mat-error>
+        </mat-form-field>
+        <span *ngIf="!isReadOnly">
+          <mtbls-ontology
+            class="mt-20"
+            #personRoles
+            [validations]="fieldValidation('roles')"
+            (changed)="onChanges($event)"
+            [values]="person.roles"
+            [inline]="true"
+          ></mtbls-ontology>
+        </span>
+        <mat-error
+          *ngIf="
+            form.get('roles').errors &&
+            form.get('roles').dirty &&
+            form.get('roles').errors.roles
+          "
+        >
+          <small>{{ form.get("roles").errors.roles.error }}</small>
+        </mat-error>
+      </section>
+      <footer *ngIf="!isReadOnly" class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button
+              *ngIf="!addNewPerson"
+              class="button is-danger is-pulled-left"
+              (click)="confirmDelete()"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+            <button
+              *ngIf="!addNewPerson && person.email"
+              class="button is-secondary is-pulled-left"
+              (click)="approveGrantSubmitterRole()"
+            >
+              <mat-icon>person</mat-icon> Make Submitter
+            </button>
+          </div>
+          <div class="column is-half has-text-right">
+            <button
+              *ngIf="!form.pristine"
+              [disabled]="!form.valid || isFormBusy"
+              (click)="save()"
+              class="button is-info"
+            >
+              <mat-spinner
+                [diameter]="20"
+                [strokeWidth]="3"
+                *ngIf="isFormBusy"
+              ></mat-spinner>
+              Save
+            </button>
+            <button
+              *ngIf="form.pristine"
+              (click)="closeModal()"
+              class="button is-info"
+            >
+              OK
+            </button>
+            <button
+              class="button"
+              [disabled]="isFormBusy"
+              (click)="closeModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </footer>
+      <footer *ngIf="isReadOnly" class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half"></div>
+          <div class="column is-half has-text-right">
+            <button (click)="closeModal()" class="button is-info">OK</button>
+          </div>
+        </div>
+      </footer>
     </div>
-    <div class="column is-half has-text-right">
-      <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
-        <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
-        Save
-      </button>
-      <button *ngIf="form.pristine" (click)='closeModal()' class="button is-info">OK</button>
-      <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>Cancel</button>
-    </div>
-  </div>
-</footer>
-<footer *ngIf="isReadOnly" class="modal-card-foot">
-    <div class="columns is-gapless full-width">
-      <div class="column is-half">
-      </div>
-      <div class="column is-half has-text-right">
-        <button (click)='closeModal()' class="button is-info">OK</button>
-      </div>
-    </div>
-  </footer>
-</div>
-</form>
+  </form>
 </div>

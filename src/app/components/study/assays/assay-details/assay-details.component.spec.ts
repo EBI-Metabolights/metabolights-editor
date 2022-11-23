@@ -1,20 +1,19 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { EditorService } from 'src/app/services/editor.service';
-import { MockEditorService } from 'src/app/services/editor.service.mock';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { EditorService } from "src/app/services/editor.service";
+import { MockEditorService } from "src/app/services/editor.service.mock";
 
-import { AssayDetailsComponent } from './assay-details.component';
+import { AssayDetailsComponent } from "./assay-details.component";
 
-describe('AssayDetailsComponent', () => {
+describe("AssayDetailsComponent", () => {
   let component: AssayDetailsComponent;
   let fixture: ComponentFixture<AssayDetailsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AssayDetailsComponent ],
+      declarations: [AssayDetailsComponent],
       imports: [],
-      providers: [{ provide: EditorService, useClass: MockEditorService }]
-    })
-    .compileComponents();
+      providers: [{ provide: EditorService, useClass: MockEditorService }],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -23,7 +22,7 @@ describe('AssayDetailsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
