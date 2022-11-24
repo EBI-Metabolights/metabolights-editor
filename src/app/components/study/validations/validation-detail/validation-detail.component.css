@@ -98,8 +98,9 @@
 }
 
 .comment-box.visible {
-  --border-var: 1px solid grey;
-  height: 125px;
+  --border-var: 1px solid rgb(214, 214, 214);
+  min-height: 200px;
+  overflow: hidden;
   transition: height 0.4s;
   border-left: var(--border-var);
   border-right: var(--border-var);
