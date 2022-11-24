@@ -1,13 +1,13 @@
-.no-files-placeholder{
-	min-height: 120px;
-	border: 1px dashed #f1f1f4;
-	border-radius: 4px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+.no-files-placeholder {
+  min-height: 120px;
+  border: 1px dashed #f1f1f4;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .notification.is-primary {
-    background-color: #b4d1d626;
-    color: #000;
+  background-color: #b4d1d626;
+  color: #000;
 }

@@ -1,33 +1,36 @@
-import { MTBLSComment } from './mtbls-comment';
-import { OntologySourceReference } from './mtbls-ontology-reference';
+import { MTBLSComment } from "./mtbls-comment";
+import { OntologySourceReference } from "./mtbls-ontology-reference";
 import { JsonObject, JsonProperty } from "json2typescript";
 
+// turning this off here as json2typescript is old and
+// I don't want to break it
+/* eslint-disable @typescript-eslint/ban-types */
 @JsonObject
-export class Ontology{
-    @JsonProperty("comments", [MTBLSComment])
-	comments: MTBLSComment[] = []
-    
-    @JsonProperty("termAccession", String)
-    termAccession: string = ''
+export class Ontology {
+  @JsonProperty("comments", [MTBLSComment])
+  comments: MTBLSComment[] = [];
 
-    @JsonProperty("annotationValue", String)
-    annotationValue: string = '';
+  @JsonProperty("termAccession", String)
+  termAccession = "";
 
-    @JsonProperty("annotationDefinition", String, true)
-    annotationDefinition: string = '';
+  @JsonProperty("annotationValue", String)
+  annotationValue = "";
 
-    @JsonProperty("termSource", OntologySourceReference)
-    termSource: OntologySourceReference = undefined;
+  @JsonProperty("annotationDefinition", String, true)
+  annotationDefinition = "";
 
-    @JsonProperty("name", String, true)
-    name: String = '';
+  @JsonProperty("termSource", OntologySourceReference)
+  termSource: OntologySourceReference = undefined;
 
-	toJSON() {
-    	return {
-            "comments": this.comments.map(a => a.toJSON()),
-            "termAccession": this.termAccession,
-            "annotationValue": this.annotationValue,
-            "termSource": this.termSource ? this.termSource.toJSON() : null
-        }
-    }
+  @JsonProperty("name", String, true)
+  name: String = "";
+
+  toJSON() {
+    return {
+      comments: this.comments.map((a) => a.toJSON()),
+      termAccession: this.termAccession,
+      annotationValue: this.annotationValue,
+      termSource: this.termSource ? this.termSource.toJSON() : null,
+    };
+  }
 }

@@ -1,20 +1,36 @@
 <p>
-	<span (click)="emitEditContentEvent()" *ngIf="displayContent.length > 0; else emptyMessage" [innerHTML]='displayContent' class="fadeIn animated"></span>
-	<ng-template #emptyMessage>
-		<p (click)="emitEditContentEvent()" class="has-text-centered">
-	    	<i>
-	    		<small>
-	    			<span [innerHTML]='message' class="has-text-grey-light fadeIn animated"></span>
-	    		</small>
-	    	</i>
-    	</p>
-    </ng-template>
-	<span *ngIf="displayMoreOption; else hideContent">
-		&nbsp;<a (click)="toggleContent()"><i><small><mat-icon>arrow_drop_down</mat-icon>more</small></i></a>
-	</span>
-	<ng-template #hideContent>
-		<span *ngIf="displayContent.length > count">
-			&nbsp;<a (click)="toggleContent()"><i><small><mat-icon>arrow_drop_up</mat-icon>hide</small></i></a>
-		</span>
-	</ng-template>
+  <span
+    (click)="emitEditContentEvent()"
+    *ngIf="displayContent.length > 0; else emptyMessage"
+    [innerHTML]="displayContent"
+    class="fadeIn animated"
+  ></span>
+  <ng-template #emptyMessage>
+    <p (click)="emitEditContentEvent()" class="has-text-centered">
+      <i>
+        <small>
+          <span
+            [innerHTML]="message"
+            class="has-text-grey-light fadeIn animated"
+          ></span>
+        </small>
+      </i>
+    </p>
+  </ng-template>
+  <span *ngIf="displayMoreOption; else hideContent">
+    &nbsp;<a (click)="toggleContent()"
+      ><i
+        ><small><mat-icon>arrow_drop_down</mat-icon>more</small></i
+      ></a
+    >
+  </span>
+  <ng-template #hideContent>
+    <span *ngIf="displayContent.length > count">
+      &nbsp;<a (click)="toggleContent()"
+        ><i
+          ><small><mat-icon>arrow_drop_up</mat-icon>hide</small></i
+        ></a
+      >
+    </span>
+  </ng-template>
 </p>

@@ -1,88 +1,164 @@
 <mtbls-header></mtbls-header>
 <div class="container page-wrapper">
-    <div *ngIf="languageMappings" class="tabs is-right">
-        <ul>
-            <li *ngFor="let language of languageMappings['languages'];" [ngClass]="{'is-active' : language['code'] == languageSelected}"><a (click)="setSelectedLanguage(language['code'])">{{ language['name'] }}</a></li>
-        </ul>
+  <div *ngIf="languageMappings" class="tabs is-right">
+    <ul>
+      <li
+        *ngFor="let language of languageMappings['languages']"
+        [ngClass]="{ 'is-active': language['code'] == languageSelected }"
+      >
+        <a (click)="setSelectedLanguage(language['code'])">{{
+          language["name"]
+        }}</a>
+      </li>
+    </ul>
+  </div>
+  <span *ngIf="guidesSelected">
+    <div class="tabs is-boxed" style="margin-bottom: 0rem">
+      <ul>
+        <li
+          [ngClass]="{ 'is-active': tab == selectedTab }"
+          *ngFor="let tab of tabs"
+        >
+          <a style="text-transform: capitalize" (click)="setSelectedTab(tab)">
+            <span>{{ tab.replace("_", " ") }}</span>
+          </a>
+        </li>
+      </ul>
     </div>
-    <span *ngIf="guidesSelected">
-        <div class="tabs is-boxed" style="margin-bottom: 0rem;">
-            <ul>
-                <li [ngClass]="{'is-active' : tab == selectedTab}" *ngFor="let tab of tabs">
-                    <a style="text-transform: capitalize;" (click)="setSelectedTab(tab)">
-                        <span>{{ tab.replace("_", " ") }}</span>
-                    </a>
+    <div
+      style="
+        background-color: white;
+        border-top: 0px solid transparent;
+        border: 1px solid #dbdbdb;
+        border-radius: 0 0 4px 4px;
+        padding: 10px 20px;
+      "
+    >
+      <div class="columns" style="padding-top: 10px">
+        <div class="column is-narrow" style="width: 240px">
+          <aside class="menu">
+            <p class="menu-label">Sections</p>
+            <ul class="menu-list">
+              <ng-container
+                *ngFor="let key of getKeys(guidesSelected[selectedTab])"
+              >
+                <li *ngIf="guidesSelected[selectedTab][key].visible">
+                  <a
+                    [ngClass]="{ 'is-active': key == selectedSection }"
+                    (click)="selectSection(key)"
+                    style="text-transform: capitalize"
+                    >{{ guidesSelected[selectedTab][key].title }}</a
+                  >
                 </li>
+              </ng-container>
             </ul>
+          </aside>
         </div>
-        <div style="background-color: white; border-top: 0px solid transparent; border: 1px solid #dbdbdb; border-radius: 0 0 4px 4px; padding: 10px 20px;">
-            <div class="columns" style="padding-top: 10px;">
-                <div class="column is-narrow" style="width: 240px">
-                    <aside class="menu">
-                        <p class="menu-label">
-                            Sections
-                        </p>
-                        <ul class="menu-list">
-                            <ng-container *ngFor="let key of getKeys(guidesSelected[selectedTab])">
-                                <li *ngIf="guidesSelected[selectedTab][key].visible"><a [ngClass]="{'is-active' : key == selectedSection}" (click)="selectSection(key)" style="text-transform: capitalize;">{{ guidesSelected[selectedTab][key].title }}</a></li>
-                            </ng-container>
-                        </ul>
-                    </aside>
+        <div class="column">
+          <ng-container
+            *ngFor="let key of getKeys(guidesSelected[selectedTab])"
+          >
+            <div
+              style="margin-bottom: 10px"
+              *ngIf="guidesSelected[selectedTab][key].visible"
+            >
+              <div *ngIf="selectedSection == key" style="margin-bottom: 10px">
+                <h2>
+                  <b>{{ guidesSelected[selectedTab][key].title }}</b>
+                </h2>
+                <p>
+                  {{ guidesSelected[selectedTab][key]["description"] }}
+                </p>
+                <div
+                  style="margin-bottom: 10px; margin-top: 10px"
+                  *ngFor="
+                    let section of guidesSelected[selectedTab][key]['sections']
+                  "
+                >
+                  <span *ngIf="section.visible">
+                    <b>{{ section.title }}</b>
+                    <div
+                      style="word-wrap: break-word"
+                      [innerHTML]="section.content"
+                    ></div>
+                    <div
+                      style="
+                        display: flex;
+                        flex-flow: wrap;
+                        justify-content: center;
+                      "
+                    >
+                      <div
+                        style="padding: 10px"
+                        *ngFor="let img of section.img"
+                        class="column is-three-quarters"
+                      >
+                        <img
+                          (click)="open(img.url)"
+                          style="border: 1px solid #dbdbdb"
+                          src="{{ getURL(img.url) }}"
+                        />
+                        <span>
+                          <small
+                            ><i>{{ img.description }}</i></small
+                          >
+                        </span>
+                      </div>
+                    </div>
+                    <div *ngIf="section.img.length == 0">&nbsp;</div>
+                    <div
+                      *ngIf="section.video && section.video.length > 0"
+                      style="
+                        display: flex;
+                        flex-flow: wrap;
+                        justify-content: center;
+                      "
+                    >
+                      <div
+                        style="padding: 10px"
+                        *ngFor="let video of section.video"
+                        class="column is-three-quarters"
+                      >
+                        <span *ngIf="video.url != ''">
+                          <small
+                            ><i>{{ video.title }}</i></small
+                          >
+                          <video width="100%" height="auto" controls>
+                            <source [src]="video.url" type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                          <span *ngIf="video.description != ''">
+                            <small
+                              ><i>{{ video.description }}</i></small
+                            >
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+                  </span>
                 </div>
-                <div class="column">
-                    <ng-container *ngFor="let key of getKeys(guidesSelected[selectedTab])">
-                        <div style="margin-bottom: 10px" *ngIf="guidesSelected[selectedTab][key].visible">
-                            <div *ngIf="selectedSection == key" style="margin-bottom: 10px">
-                                <h2><b>{{ guidesSelected[selectedTab][key].title }}</b></h2>
-                                <p>
-                                    {{ guidesSelected[selectedTab][key]["description"] }}
-                                </p>
-                                <div style="margin-bottom: 10px; margin-top: 10px" *ngFor="let section of guidesSelected[selectedTab][key]['sections']">
-                                    <span *ngIf="section.visible">
-                                        <b>{{ section.title }}</b>
-                                        <div style="word-wrap: break-word;" [innerHTML]="section.content"></div>
-                                        <div style="display: flex; flex-flow: wrap;  justify-content: center">
-                                            <div style="padding: 10px;" *ngFor="let img of section.img" class="column is-three-quarters">
-                                                <img (click)="open(img.url)" style="border: 1px solid #dbdbdb" src='{{ getURL(img.url) }}'>
-                                                <span>
-                                                <small><i>{{ img.description }}</i></small>
-                                                </span>
-                                            </div>
-                                        </div> 
-                                        <div *ngIf="section.img.length == 0">
-                                            &nbsp;
-                                        </div>
-                                        <div *ngIf="section.video && section.video.length > 0" style="display: flex; flex-flow: wrap; justify-content: center">
-                                            <div style="padding: 10px;" *ngFor="let video of section.video" class="column is-three-quarters">
-                                                <span *ngIf="video.url != ''">
-                                                    <small><i>{{ video.title }}</i></small>
-                                                    <video width="100%" height="auto" controls>
-                                                        <source [src]="video.url" type="video/mp4">
-                                                    Your browser does not support the video tag.
-                                                    </video>
-                                                    <span *ngIf="video.description != ''">
-                                                        <small><i>{{ video.description }}</i></small>
-                                                    </span>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </span> 
-                                </div>
-                            </div>
-                        </div>
-                    </ng-container>
-                </div>
+              </div>
             </div>
+          </ng-container>
         </div>
-    </span>
-</div>
-<div class="modal" [ngClass]="{'is-active': isImageModalOpen}">
-    <div class="modal-background" style="background-color: rgba(10, 10, 10, 0.65) !important;"></div>
-    <div class="modal-card">
-        <section class="modal-card-body">
-            <img src='{{ getURL(selectedImgURL) }}'>
-        </section>
+      </div>
     </div>
-    <button (click)="closeImageModal()" class="modal-close is-large" aria-label="close"></button>
+  </span>
+</div>
+<div class="modal" [ngClass]="{ 'is-active': isImageModalOpen }">
+  <div
+    class="modal-background"
+    style="background-color: rgba(10, 10, 10, 0.65) !important"
+  ></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <img src="{{ getURL(selectedImgURL) }}" />
+    </section>
+  </div>
+  <button
+    (click)="closeImageModal()"
+    class="modal-close is-large"
+    aria-label="close"
+  ></button>
 </div>
 <mtbls-footer></mtbls-footer>

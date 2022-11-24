@@ -1,16 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { OrganismsComponent } from './organisms.component';
+import { OrganismsComponent } from "./organisms.component";
 
-describe('OrganismsComponent', () => {
+describe("OrganismsComponent", () => {
   let component: OrganismsComponent;
   let fixture: ComponentFixture<OrganismsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OrganismsComponent ]
-    })
-    .compileComponents();
+      declarations: [OrganismsComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -19,20 +18,14 @@ describe('OrganismsComponent', () => {
     fixture.detectChanges();
     component.organisms = [
       {
-        name: 'organism',
-        variants: [
-          'var1',
-          'another variant'
-        ],
-        parts: [
-          'leaves',
-          'feet'
-        ]
-      }
-    ]
+        name: "organism",
+        variants: ["var1", "another variant"],
+        parts: ["leaves", "feet"],
+      },
+    ];
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

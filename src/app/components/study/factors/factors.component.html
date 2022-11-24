@@ -1,9 +1,7 @@
 <div class="card">
-  <header class="card-heading" [ngClass]="{'hover-highlight': !isReadOnly}">
+  <header class="card-heading" [ngClass]="{ 'hover-highlight': !isReadOnly }">
     <span>
-      <p class="is-pulled-left">
-        Factors
-      </p>
+      <p class="is-pulled-left">Factors</p>
       <span *ngIf="!isReadOnly">
         <mtbls-factor [value]="null"></mtbls-factor>
       </span>
@@ -11,7 +9,7 @@
   </header>
   <div class="card-content">
     <div class="content">
-      <div *ngIf="factors && factors.length > 0;else emptyMessage">
+      <div *ngIf="factors && factors.length > 0; else emptyMessage">
         <div id="meta">
           <div *ngFor="let factor of factors">
             <mtbls-factor [value]="factor"></mtbls-factor>
@@ -19,7 +17,9 @@
         </div>
       </div>
       <ng-template #emptyMessage>
-        <p class="has-text-grey-light has-text-centered"><small>No Study factors defined yet.</small></p>
+        <p class="has-text-grey-light has-text-centered">
+          <small>No Study factors defined yet.</small>
+        </p>
       </ng-template>
     </div>
   </div>

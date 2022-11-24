@@ -1,11 +1,12 @@
-<div [ngClass]="{'hover-highlight': !isReadOnly}" class="px-20 mtbls-section">
+<div [ngClass]="{ 'hover-highlight': !isReadOnly }" class="px-20 mtbls-section">
   <h2 class="title is-3">
     <b>
-      <span>{{ requestedStudy }}: </span><span [innerHTML]='title' class="clickable" (click)='openModal()'></span>
+      <span>{{ requestedStudy }}: </span
+      ><span [innerHTML]="title" class="clickable" (click)="openModal()"></span>
     </b>
   </h2>
 </div>
-<div class="modal" [ngClass]="{'is-active': isModalOpen}">
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card vw80">
@@ -21,42 +22,68 @@
               <div class="control">
                 <mat-form-field class="full-width">
                   <mat-label>Study title</mat-label>
-                  <textarea class="no-scroll" 
-                  formControlName="title"
-                  matInput
-                  [placeholder]="validation.placeholder" 
-                  cdkAutosizeMinRows="20"
-                  cdkAutosizeMaxRows="30"
-                  cdkTextareaAutosize>
-                </textarea>
-                <mat-hint>{{ validation.description }}</mat-hint>
-                <mat-error
-                *ngIf="form.get('title').errors &&
-                form.get('title').dirty &&
-                form.get('title').errors.title">
-                {{ form.get('title').errors.title.error }}
-              </mat-error>
-            </mat-form-field>
+                  <textarea
+                    class="no-scroll"
+                    formControlName="title"
+                    matInput
+                    [placeholder]="validation.placeholder"
+                    cdkAutosizeMinRows="20"
+                    cdkAutosizeMaxRows="30"
+                    cdkTextareaAutosize
+                  >
+                  </textarea>
+                  <mat-hint>{{ validation.description }}</mat-hint>
+                  <mat-error
+                    *ngIf="
+                      form.get('title').errors &&
+                      form.get('title').dirty &&
+                      form.get('title').errors.title
+                    "
+                  >
+                    {{ form.get("title").errors.title.error }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <div class="columns is-gapless full-width">
+          <div class="column is-two-third">
+            <mtbls-help target=""></mtbls-help>
+          </div>
+          <div class="column is-one-third has-text-right">
+            <button
+              *ngIf="form.get('title').dirty"
+              [disabled]="!form.valid || isFormBusy"
+              (click)="save()"
+              class="button is-info"
+            >
+              <mat-spinner
+                [diameter]="20"
+                [strokeWidth]="3"
+                *ngIf="isFormBusy"
+              ></mat-spinner>
+              Save
+            </button>
+            <button
+              *ngIf="!form.get('title').dirty"
+              (click)="closeModal()"
+              class="button is-info"
+            >
+              OK
+            </button>
+            <button
+              class="button"
+              [disabled]="isFormBusy"
+              (click)="closeModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </footer>
     </div>
-  </section>
-  <footer class="modal-card-foot buttons is-right">
-    <div class="columns is-gapless full-width">
-      <div class="column is-two-third">
-        <mtbls-help target=""></mtbls-help>
-      </div>
-      <div class="column is-one-third has-text-right">
-        <button *ngIf="form.get('title').dirty" [disabled]="!form.valid || isFormBusy" (click)='save()' class="button is-info">
-          <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
-          Save
-        </button>
-        <button *ngIf="!form.get('title').dirty" (click)='closeModal()' class="button is-info">OK</button>
-        <button class="button" [disabled]="isFormBusy" (click)='closeModal()'>Cancel</button>
-      </div>
-    </div>
-  </footer>
-</div>
-</form>
+  </form>
 </div>

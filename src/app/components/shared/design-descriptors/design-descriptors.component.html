@@ -1,37 +1,54 @@
 <span *ngIf="inline; else showCard">
-  <div *ngIf="(descriptors | async)?.length > 0;else emptyMessage">
-      <div id="meta" class="field is-grouped is-grouped-multiline">
-        <div *ngFor="let descriptor of (descriptors | async)">
-          <mtbls-design-descriptor [readOnly]="readOnly" [value]="descriptor"></mtbls-design-descriptor>
-        </div>
+  <div *ngIf="(descriptors | async)?.length > 0; else emptyMessage">
+    <div id="meta" class="field is-grouped is-grouped-multiline">
+      <div *ngFor="let descriptor of descriptors | async">
+        <mtbls-design-descriptor
+          [readOnly]="readOnly"
+          [value]="descriptor"
+        ></mtbls-design-descriptor>
       </div>
     </div>
+  </div>
 </span>
 <ng-template #showCard>
   <div class="card">
-    <header class="card-heading" [ngClass]="{'hover-highlight': isReadOnly}">
+    <header class="card-heading" [ngClass]="{ 'hover-highlight': isReadOnly }">
       <span>
         <p class="is-pulled-left">
           <small>KEYWORDS</small>
         </p>
-        <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"></mtbls-design-descriptor>
+        <mtbls-design-descriptor
+          *ngIf="!isReadOnly"
+          [readOnly]="readOnly"
+          [value]="null"
+        ></mtbls-design-descriptor>
       </span>
     </header>
     <div class="card-content">
       <div class="content">
-        <div *ngIf="(descriptors | async)?.length > 0;else emptyMessage">
+        <div *ngIf="(descriptors | async)?.length > 0; else emptyMessage">
           <div id="meta" class="field is-grouped is-grouped-multiline">
-            <div *ngFor="let descriptor of (descriptors | async)">
-              <mtbls-design-descriptor [readOnly]="readOnly" [value]="descriptor"></mtbls-design-descriptor>
+            <div *ngFor="let descriptor of descriptors | async">
+              <mtbls-design-descriptor
+                [readOnly]="readOnly"
+                [value]="descriptor"
+              ></mtbls-design-descriptor>
             </div>
           </div>
         </div>
         <ng-template #emptyMessage>
           <span *ngIf="!isReadOnly; else emptyReadOnlyMessage">
-            <p class="has-text-grey-light has-text-centered"><small>Add terms that define your study eg. technique, disease, targeted / untargeted metabolities </small><br></p>
+            <p class="has-text-grey-light has-text-centered">
+              <small
+                >Add terms that define your study eg. technique, disease,
+                targeted / untargeted metabolities </small
+              ><br />
+            </p>
           </span>
           <ng-template #emptyReadOnlyMessage>
-              <p class="has-text-grey-light has-text-centered"><small>No design descriptors defined.</small><br></p>
+            <p class="has-text-grey-light has-text-centered">
+              <small>No design descriptors defined.</small><br />
+            </p>
           </ng-template>
         </ng-template>
       </div>

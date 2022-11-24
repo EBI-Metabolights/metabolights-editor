@@ -1,42 +1,40 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { FormBuilder} from '@angular/forms';
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { FormBuilder } from "@angular/forms";
 
 @Component({
-	selector: 'mtbls-upload',
-	templateUrl: './upload.component.html',
-	styleUrls: ['./upload.component.css']
+  selector: "mtbls-upload",
+  templateUrl: "./upload.component.html",
+  styleUrls: ["./upload.component.css"],
 })
 export class UploadComponent implements OnInit {
+  @Input("mode") mode = "button";
+  @Input("size") size = "is-small";
 
-	@Input('mode') mode: string = 'button';
-	@Input('size') size: string = 'is-small';
+  @Input("file") file: string = null;
+  @Input("multiple") allowMultipleSelection = true;
+  @Input("type") type = "file";
+  @Input("fileTypes") fileTypes: any = {
+    filter_name: "All types", // eslint-disable-line @typescript-eslint/naming-convention
+    extensions: ["*"],
+  };
 
-	@Input('file') file: string = null;
-	@Input('multiple') allowMultipleSelection: boolean = true;
-	@Input('type') type: string = 'file';
-	@Input('fileTypes') fileTypes: any = {
-        filter_name : "All types",
-        extensions : ["*"]
-    };
+  @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
+  isUploadModalOpen = false;
 
-	@Output() complete = new EventEmitter<any>();
-	isUploadModalOpen: boolean = false;
+  constructor(private fb: FormBuilder) {}
 
-	constructor(private fb: FormBuilder) { }
+  ngOnInit() {}
 
-	ngOnInit() {
-	}
+  uploadComplete() {
+    this.complete.emit();
+    this.closeUploadModal();
+  }
 
-	uploadComplete(){
-		this.complete.emit();
-		this.closeUploadModal()
-	}
+  openUploadModal() {
+    this.isUploadModalOpen = true;
+  }
 
-	openUploadModal(){
-		this.isUploadModalOpen = true;
-	}
-
-	closeUploadModal(){
-		this.isUploadModalOpen = false;	
-	}
+  closeUploadModal() {
+    this.isUploadModalOpen = false;
+  }
 }

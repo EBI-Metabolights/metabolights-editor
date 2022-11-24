@@ -1,341 +1,341 @@
 {
-    "header": {
-        "Sample Name": 0,
-        "Protocol REF": 1,
-        "Parameter Value[Post Extraction]": 2,
-        "Parameter Value[Derivatization]": 3,
-        "Extract Name": 4,
-        "Protocol REF.1": 5,
-        "Parameter Value[Chromatography Instrument]": 6,
-        "Term Source REF": 7,
-        "Term Accession Number": 8,
-        "Parameter Value[Autosampler model]": 9,
-        "Parameter Value[Column model]": 10,
-        "Parameter Value[Column type]": 11,
-        "Parameter Value[Guard column]": 12,
-        "Labeled Extract Name": 13,
-        "Label": 14,
-        "Term Source REF.1": 15,
-        "Term Accession Number.1": 16,
-        "Protocol REF.2": 17,
-        "Parameter Value[Scan polarity]": 18,
-        "Parameter Value[Scan m/z range]": 19,
-        "Parameter Value[Instrument]": 20,
-        "Term Source REF.2": 21,
-        "Term Accession Number.2": 22,
-        "Parameter Value[Ion source]": 23,
-        "Term Source REF.3": 24,
-        "Term Accession Number.3": 25,
-        "Parameter Value[Mass analyzer]": 26,
-        "Term Source REF.4": 27,
-        "Term Accession Number.4": 28,
-        "MS Assay Name": 29,
-        "Raw Spectral Data File": 30,
-        "Protocol REF.3": 31,
-        "Normalization Name": 32,
-        "Derived Spectral Data File": 33,
-        "Protocol REF.4": 34,
-        "Data Transformation Name": 35,
-        "Metabolite Assignment File": 36
+  "header": {
+    "Sample Name": 0,
+    "Protocol REF": 1,
+    "Parameter Value[Post Extraction]": 2,
+    "Parameter Value[Derivatization]": 3,
+    "Extract Name": 4,
+    "Protocol REF.1": 5,
+    "Parameter Value[Chromatography Instrument]": 6,
+    "Term Source REF": 7,
+    "Term Accession Number": 8,
+    "Parameter Value[Autosampler model]": 9,
+    "Parameter Value[Column model]": 10,
+    "Parameter Value[Column type]": 11,
+    "Parameter Value[Guard column]": 12,
+    "Labeled Extract Name": 13,
+    "Label": 14,
+    "Term Source REF.1": 15,
+    "Term Accession Number.1": 16,
+    "Protocol REF.2": 17,
+    "Parameter Value[Scan polarity]": 18,
+    "Parameter Value[Scan m/z range]": 19,
+    "Parameter Value[Instrument]": 20,
+    "Term Source REF.2": 21,
+    "Term Accession Number.2": 22,
+    "Parameter Value[Ion source]": 23,
+    "Term Source REF.3": 24,
+    "Term Accession Number.3": 25,
+    "Parameter Value[Mass analyzer]": 26,
+    "Term Source REF.4": 27,
+    "Term Accession Number.4": 28,
+    "MS Assay Name": 29,
+    "Raw Spectral Data File": 30,
+    "Protocol REF.3": 31,
+    "Normalization Name": 32,
+    "Derived Spectral Data File": 33,
+    "Protocol REF.4": 34,
+    "Data Transformation Name": 35,
+    "Metabolite Assignment File": 36
+  },
+  "columns": [
+    {
+      "columnDef": "Sample Name",
+      "sticky": "false",
+      "header": "Sample Name"
     },
-    "columns": [
-        {
-            "columnDef": "Sample Name",
-            "sticky": "false",
-            "header": "Sample Name"
-        },
-        {
-            "columnDef": "Protocol REF",
-            "sticky": "false",
-            "header": "Protocol REF"
-        },
-        {
-            "columnDef": "Parameter Value[Post Extraction]",
-            "sticky": "false",
-            "header": "Parameter Value[Post Extraction]"
-        },
-        {
-            "columnDef": "Parameter Value[Derivatization]",
-            "sticky": "false",
-            "header": "Parameter Value[Derivatization]"
-        },
-        {
-            "columnDef": "Extract Name",
-            "sticky": "false",
-            "header": "Extract Name"
-        },
-        {
-            "columnDef": "Protocol REF.1",
-            "sticky": "false",
-            "header": "Protocol REF.1"
-        },
-        {
-            "columnDef": "Parameter Value[Chromatography Instrument]",
-            "sticky": "false",
-            "header": "Parameter Value[Chromatography Instrument]"
-        },
-        {
-            "columnDef": "Term Source REF",
-            "sticky": "false",
-            "header": "Term Source REF"
-        },
-        {
-            "columnDef": "Term Accession Number",
-            "sticky": "false",
-            "header": "Term Accession Number"
-        },
-        {
-            "columnDef": "Parameter Value[Autosampler model]",
-            "sticky": "false",
-            "header": "Parameter Value[Autosampler model]"
-        },
-        {
-            "columnDef": "Parameter Value[Column model]",
-            "sticky": "false",
-            "header": "Parameter Value[Column model]"
-        },
-        {
-            "columnDef": "Parameter Value[Column type]",
-            "sticky": "false",
-            "header": "Parameter Value[Column type]"
-        },
-        {
-            "columnDef": "Parameter Value[Guard column]",
-            "sticky": "false",
-            "header": "Parameter Value[Guard column]"
-        },
-        {
-            "columnDef": "Labeled Extract Name",
-            "sticky": "false",
-            "header": "Labeled Extract Name"
-        },
-        {
-            "columnDef": "Label",
-            "sticky": "false",
-            "header": "Label"
-        },
-        {
-            "columnDef": "Term Source REF.1",
-            "sticky": "false",
-            "header": "Term Source REF.1"
-        },
-        {
-            "columnDef": "Term Accession Number.1",
-            "sticky": "false",
-            "header": "Term Accession Number.1"
-        },
-        {
-            "columnDef": "Protocol REF.2",
-            "sticky": "false",
-            "header": "Protocol REF.2"
-        },
-        {
-            "columnDef": "Parameter Value[Scan polarity]",
-            "sticky": "false",
-            "header": "Parameter Value[Scan polarity]"
-        },
-        {
-            "columnDef": "Parameter Value[Scan m/z range]",
-            "sticky": "false",
-            "header": "Parameter Value[Scan m/z range]"
-        },
-        {
-            "columnDef": "Parameter Value[Instrument]",
-            "sticky": "false",
-            "header": "Parameter Value[Instrument]"
-        },
-        {
-            "columnDef": "Term Source REF.2",
-            "sticky": "false",
-            "header": "Term Source REF.2"
-        },
-        {
-            "columnDef": "Term Accession Number.2",
-            "sticky": "false",
-            "header": "Term Accession Number.2"
-        },
-        {
-            "columnDef": "Parameter Value[Ion source]",
-            "sticky": "false",
-            "header": "Parameter Value[Ion source]"
-        },
-        {
-            "columnDef": "Term Source REF.3",
-            "sticky": "false",
-            "header": "Term Source REF.3"
-        },
-        {
-            "columnDef": "Term Accession Number.3",
-            "sticky": "false",
-            "header": "Term Accession Number.3"
-        },
-        {
-            "columnDef": "Parameter Value[Mass analyzer]",
-            "sticky": "false",
-            "header": "Parameter Value[Mass analyzer]"
-        },
-        {
-            "columnDef": "Term Source REF.4",
-            "sticky": "false",
-            "header": "Term Source REF.4"
-        },
-        {
-            "columnDef": "Term Accession Number.4",
-            "sticky": "false",
-            "header": "Term Accession Number.4"
-        },
-        {
-            "columnDef": "MS Assay Name",
-            "sticky": "false",
-            "header": "MS Assay Name"
-        },
-        {
-            "columnDef": "Raw Spectral Data File",
-            "sticky": "false",
-            "header": "Raw Spectral Data File"
-        },
-        {
-            "columnDef": "Protocol REF.3",
-            "sticky": "false",
-            "header": "Protocol REF.3"
-        },
-        {
-            "columnDef": "Normalization Name",
-            "sticky": "false",
-            "header": "Normalization Name"
-        },
-        {
-            "columnDef": "Derived Spectral Data File",
-            "sticky": "false",
-            "header": "Derived Spectral Data File"
-        },
-        {
-            "columnDef": "Protocol REF.4",
-            "sticky": "false",
-            "header": "Protocol REF.4"
-        },
-        {
-            "columnDef": "Data Transformation Name",
-            "sticky": "false",
-            "header": "Data Transformation Name"
-        },
-        {
-            "columnDef": "Metabolite Assignment File",
-            "sticky": "false",
-            "header": "Metabolite Assignment File"
-        }
-    ],
-    "displayedColumns": [
-        "Select",
-        "Sample Name",
-        "Protocol REF",
-        "Parameter Value[Post Extraction]",
-        "Parameter Value[Derivatization]",
-        "Extract Name",
-        "Protocol REF.1",
-        "Parameter Value[Chromatography Instrument]",
-        "Parameter Value[Autosampler model]",
-        "Parameter Value[Column model]",
-        "Parameter Value[Column type]",
-        "Parameter Value[Guard column]",
-        "Labeled Extract Name",
-        "Label",
-        "Protocol REF.2",
-        "Parameter Value[Scan polarity]",
-        "Parameter Value[Scan m/z range]",
-        "Parameter Value[Instrument]",
-        "Parameter Value[Ion source]",
-        "Parameter Value[Mass analyzer]",
-        "MS Assay Name",
-        "Raw Spectral Data File",
-        "Protocol REF.3",
-        "Normalization Name",
-        "Derived Spectral Data File",
-        "Protocol REF.4",
-        "Data Transformation Name",
-        "Metabolite Assignment File"
-    ],
-    "file": "a_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling.txt",
-    "rows": [
-        {
-            "index": 0,
-            "Sample Name": "u0.027_pool1_PS",
-            "Protocol REF": "Sample Collection",
-            "Parameter Value[Post Extraction]": "",
-            "Parameter Value[Derivatization]": "",
-            "Extract Name": "",
-            "Protocol REF.1": "Chromatography",
-            "Parameter Value[Chromatography Instrument]": "LC Instrument",
-            "Term Source REF": "MTBLS",
-            "Term Accession Number": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000315",
-            "Parameter Value[Autosampler model]": "",
-            "Parameter Value[Column model]": "",
-            "Parameter Value[Column type]": "hilic",
-            "Parameter Value[Guard column]": "",
-            "Labeled Extract Name": "",
-            "Label": "",
-            "Term Source REF.1": "",
-            "Term Accession Number.1": "",
-            "Protocol REF.2": "Mass spectrometry",
-            "Parameter Value[Scan polarity]": "reverse phase",
-            "Parameter Value[Scan m/z range]": "",
-            "Parameter Value[Instrument]": "",
-            "Term Source REF.2": "",
-            "Term Accession Number.2": "",
-            "Parameter Value[Ion source]": "",
-            "Term Source REF.3": "",
-            "Term Accession Number.3": "",
-            "Parameter Value[Mass analyzer]": "",
-            "Term Source REF.4": "",
-            "Term Accession Number.4": "",
-            "MS Assay Name": "",
-            "Raw Spectral Data File": "",
-            "Protocol REF.3": "",
-            "Normalization Name": "",
-            "Derived Spectral Data File": "",
-            "Protocol REF.4": "",
-            "Data Transformation Name": "",
-            "Metabolite Assignment File": "m_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling_v2_maf.tsv"
-        },
-        {
-            "index": 1,
-            "Sample Name": "u0.027_pool1_PS",
-            "Protocol REF": "Extraction",
-            "Parameter Value[Post Extraction]": "",
-            "Parameter Value[Derivatization]": "",
-            "Extract Name": "",
-            "Protocol REF.1": "Chromatography",
-            "Parameter Value[Chromatography Instrument]": "LC Instrument",
-            "Term Source REF": "",
-            "Term Accession Number": "",
-            "Parameter Value[Autosampler model]": "",
-            "Parameter Value[Column model]": "",
-            "Parameter Value[Column type]": "hilic",
-            "Parameter Value[Guard column]": "",
-            "Labeled Extract Name": "",
-            "Label": "",
-            "Term Source REF.1": "",
-            "Term Accession Number.1": "",
-            "Protocol REF.2": "Mass spectrometry",
-            "Parameter Value[Scan polarity]": "alternating",
-            "Parameter Value[Scan m/z range]": "",
-            "Parameter Value[Instrument]": "",
-            "Term Source REF.2": "",
-            "Term Accession Number.2": "",
-            "Parameter Value[Ion source]": "",
-            "Term Source REF.3": "",
-            "Term Accession Number.3": "",
-            "Parameter Value[Mass analyzer]": "",
-            "Term Source REF.4": "",
-            "Term Accession Number.4": "",
-            "MS Assay Name": "",
-            "Raw Spectral Data File": "",
-            "Protocol REF.3": "Data transformation",
-            "Normalization Name": "",
-            "Derived Spectral Data File": "",
-            "Protocol REF.4": "Metabolite identification",
-            "Data Transformation Name": "",
-            "Metabolite Assignment File": "m_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling_v2_maf.tsv"
-        }
-    ]
+    {
+      "columnDef": "Protocol REF",
+      "sticky": "false",
+      "header": "Protocol REF"
+    },
+    {
+      "columnDef": "Parameter Value[Post Extraction]",
+      "sticky": "false",
+      "header": "Parameter Value[Post Extraction]"
+    },
+    {
+      "columnDef": "Parameter Value[Derivatization]",
+      "sticky": "false",
+      "header": "Parameter Value[Derivatization]"
+    },
+    {
+      "columnDef": "Extract Name",
+      "sticky": "false",
+      "header": "Extract Name"
+    },
+    {
+      "columnDef": "Protocol REF.1",
+      "sticky": "false",
+      "header": "Protocol REF.1"
+    },
+    {
+      "columnDef": "Parameter Value[Chromatography Instrument]",
+      "sticky": "false",
+      "header": "Parameter Value[Chromatography Instrument]"
+    },
+    {
+      "columnDef": "Term Source REF",
+      "sticky": "false",
+      "header": "Term Source REF"
+    },
+    {
+      "columnDef": "Term Accession Number",
+      "sticky": "false",
+      "header": "Term Accession Number"
+    },
+    {
+      "columnDef": "Parameter Value[Autosampler model]",
+      "sticky": "false",
+      "header": "Parameter Value[Autosampler model]"
+    },
+    {
+      "columnDef": "Parameter Value[Column model]",
+      "sticky": "false",
+      "header": "Parameter Value[Column model]"
+    },
+    {
+      "columnDef": "Parameter Value[Column type]",
+      "sticky": "false",
+      "header": "Parameter Value[Column type]"
+    },
+    {
+      "columnDef": "Parameter Value[Guard column]",
+      "sticky": "false",
+      "header": "Parameter Value[Guard column]"
+    },
+    {
+      "columnDef": "Labeled Extract Name",
+      "sticky": "false",
+      "header": "Labeled Extract Name"
+    },
+    {
+      "columnDef": "Label",
+      "sticky": "false",
+      "header": "Label"
+    },
+    {
+      "columnDef": "Term Source REF.1",
+      "sticky": "false",
+      "header": "Term Source REF.1"
+    },
+    {
+      "columnDef": "Term Accession Number.1",
+      "sticky": "false",
+      "header": "Term Accession Number.1"
+    },
+    {
+      "columnDef": "Protocol REF.2",
+      "sticky": "false",
+      "header": "Protocol REF.2"
+    },
+    {
+      "columnDef": "Parameter Value[Scan polarity]",
+      "sticky": "false",
+      "header": "Parameter Value[Scan polarity]"
+    },
+    {
+      "columnDef": "Parameter Value[Scan m/z range]",
+      "sticky": "false",
+      "header": "Parameter Value[Scan m/z range]"
+    },
+    {
+      "columnDef": "Parameter Value[Instrument]",
+      "sticky": "false",
+      "header": "Parameter Value[Instrument]"
+    },
+    {
+      "columnDef": "Term Source REF.2",
+      "sticky": "false",
+      "header": "Term Source REF.2"
+    },
+    {
+      "columnDef": "Term Accession Number.2",
+      "sticky": "false",
+      "header": "Term Accession Number.2"
+    },
+    {
+      "columnDef": "Parameter Value[Ion source]",
+      "sticky": "false",
+      "header": "Parameter Value[Ion source]"
+    },
+    {
+      "columnDef": "Term Source REF.3",
+      "sticky": "false",
+      "header": "Term Source REF.3"
+    },
+    {
+      "columnDef": "Term Accession Number.3",
+      "sticky": "false",
+      "header": "Term Accession Number.3"
+    },
+    {
+      "columnDef": "Parameter Value[Mass analyzer]",
+      "sticky": "false",
+      "header": "Parameter Value[Mass analyzer]"
+    },
+    {
+      "columnDef": "Term Source REF.4",
+      "sticky": "false",
+      "header": "Term Source REF.4"
+    },
+    {
+      "columnDef": "Term Accession Number.4",
+      "sticky": "false",
+      "header": "Term Accession Number.4"
+    },
+    {
+      "columnDef": "MS Assay Name",
+      "sticky": "false",
+      "header": "MS Assay Name"
+    },
+    {
+      "columnDef": "Raw Spectral Data File",
+      "sticky": "false",
+      "header": "Raw Spectral Data File"
+    },
+    {
+      "columnDef": "Protocol REF.3",
+      "sticky": "false",
+      "header": "Protocol REF.3"
+    },
+    {
+      "columnDef": "Normalization Name",
+      "sticky": "false",
+      "header": "Normalization Name"
+    },
+    {
+      "columnDef": "Derived Spectral Data File",
+      "sticky": "false",
+      "header": "Derived Spectral Data File"
+    },
+    {
+      "columnDef": "Protocol REF.4",
+      "sticky": "false",
+      "header": "Protocol REF.4"
+    },
+    {
+      "columnDef": "Data Transformation Name",
+      "sticky": "false",
+      "header": "Data Transformation Name"
+    },
+    {
+      "columnDef": "Metabolite Assignment File",
+      "sticky": "false",
+      "header": "Metabolite Assignment File"
+    }
+  ],
+  "displayedColumns": [
+    "Select",
+    "Sample Name",
+    "Protocol REF",
+    "Parameter Value[Post Extraction]",
+    "Parameter Value[Derivatization]",
+    "Extract Name",
+    "Protocol REF.1",
+    "Parameter Value[Chromatography Instrument]",
+    "Parameter Value[Autosampler model]",
+    "Parameter Value[Column model]",
+    "Parameter Value[Column type]",
+    "Parameter Value[Guard column]",
+    "Labeled Extract Name",
+    "Label",
+    "Protocol REF.2",
+    "Parameter Value[Scan polarity]",
+    "Parameter Value[Scan m/z range]",
+    "Parameter Value[Instrument]",
+    "Parameter Value[Ion source]",
+    "Parameter Value[Mass analyzer]",
+    "MS Assay Name",
+    "Raw Spectral Data File",
+    "Protocol REF.3",
+    "Normalization Name",
+    "Derived Spectral Data File",
+    "Protocol REF.4",
+    "Data Transformation Name",
+    "Metabolite Assignment File"
+  ],
+  "file": "a_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling.txt",
+  "rows": [
+    {
+      "index": 0,
+      "Sample Name": "u0.027_pool1_PS",
+      "Protocol REF": "Sample Collection",
+      "Parameter Value[Post Extraction]": "",
+      "Parameter Value[Derivatization]": "",
+      "Extract Name": "",
+      "Protocol REF.1": "Chromatography",
+      "Parameter Value[Chromatography Instrument]": "LC Instrument",
+      "Term Source REF": "MTBLS",
+      "Term Accession Number": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000315",
+      "Parameter Value[Autosampler model]": "",
+      "Parameter Value[Column model]": "",
+      "Parameter Value[Column type]": "hilic",
+      "Parameter Value[Guard column]": "",
+      "Labeled Extract Name": "",
+      "Label": "",
+      "Term Source REF.1": "",
+      "Term Accession Number.1": "",
+      "Protocol REF.2": "Mass spectrometry",
+      "Parameter Value[Scan polarity]": "reverse phase",
+      "Parameter Value[Scan m/z range]": "",
+      "Parameter Value[Instrument]": "",
+      "Term Source REF.2": "",
+      "Term Accession Number.2": "",
+      "Parameter Value[Ion source]": "",
+      "Term Source REF.3": "",
+      "Term Accession Number.3": "",
+      "Parameter Value[Mass analyzer]": "",
+      "Term Source REF.4": "",
+      "Term Accession Number.4": "",
+      "MS Assay Name": "",
+      "Raw Spectral Data File": "",
+      "Protocol REF.3": "",
+      "Normalization Name": "",
+      "Derived Spectral Data File": "",
+      "Protocol REF.4": "",
+      "Data Transformation Name": "",
+      "Metabolite Assignment File": "m_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling_v2_maf.tsv"
+    },
+    {
+      "index": 1,
+      "Sample Name": "u0.027_pool1_PS",
+      "Protocol REF": "Extraction",
+      "Parameter Value[Post Extraction]": "",
+      "Parameter Value[Derivatization]": "",
+      "Extract Name": "",
+      "Protocol REF.1": "Chromatography",
+      "Parameter Value[Chromatography Instrument]": "LC Instrument",
+      "Term Source REF": "",
+      "Term Accession Number": "",
+      "Parameter Value[Autosampler model]": "",
+      "Parameter Value[Column model]": "",
+      "Parameter Value[Column type]": "hilic",
+      "Parameter Value[Guard column]": "",
+      "Labeled Extract Name": "",
+      "Label": "",
+      "Term Source REF.1": "",
+      "Term Accession Number.1": "",
+      "Protocol REF.2": "Mass spectrometry",
+      "Parameter Value[Scan polarity]": "alternating",
+      "Parameter Value[Scan m/z range]": "",
+      "Parameter Value[Instrument]": "",
+      "Term Source REF.2": "",
+      "Term Accession Number.2": "",
+      "Parameter Value[Ion source]": "",
+      "Term Source REF.3": "",
+      "Term Accession Number.3": "",
+      "Parameter Value[Mass analyzer]": "",
+      "Term Source REF.4": "",
+      "Term Accession Number.4": "",
+      "MS Assay Name": "",
+      "Raw Spectral Data File": "",
+      "Protocol REF.3": "Data transformation",
+      "Normalization Name": "",
+      "Derived Spectral Data File": "",
+      "Protocol REF.4": "Metabolite identification",
+      "Data Transformation Name": "",
+      "Metabolite Assignment File": "m_MTBLS1413_LC-MS_alternating_hilic_metabolite_profiling_v2_maf.tsv"
+    }
+  ]
 }

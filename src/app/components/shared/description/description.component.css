@@ -1,10 +1,9 @@
-
 :host /deep/ .ql-container {
-	min-height: 250px;
+  min-height: 250px;
 }
 
-.dd-element{
-	display: inline-block; 
-	padding-right: 1em; 
-	width: 1.4em
+.dd-element {
+  display: inline-block;
+  padding-right: 1em;
+  width: 1.4em;
 }

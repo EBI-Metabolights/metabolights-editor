@@ -1,25 +1,33 @@
-import { NgRedux } from '@angular-redux/store';
-import { CommonModule } from '@angular/common';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { MetabolightsService } from 'src/app/services/metabolights/metabolights.service';
-import { MockMetabolightsService } from 'src/app/services/metabolights/metabolights.service.mock';
+import { NgRedux } from "@angular-redux/store";
+import { CommonModule } from "@angular/common";
+import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrowserModule } from "@angular/platform-browser";
+import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
+import { MockMetabolightsService } from "src/app/services/metabolights/metabolights.service.mock";
 
-import { PeopleComponent } from './people.component';
+import { PeopleComponent } from "./people.component";
 
-describe('PeopleComponent', () => {
+describe("PeopleComponent", () => {
   let component: PeopleComponent;
   let fixture: ComponentFixture<PeopleComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ PeopleComponent ],
-      imports: [HttpClientTestingModule, BrowserModule, CommonModule, FormsModule, ReactiveFormsModule],
-      providers: [NgRedux, {provide: MetabolightsService, useClass: MockMetabolightsService}]
-    })
-    .compileComponents();
+      declarations: [PeopleComponent],
+      imports: [
+        HttpClientTestingModule,
+        BrowserModule,
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+      ],
+      providers: [
+        NgRedux,
+        { provide: MetabolightsService, useClass: MockMetabolightsService },
+      ],
+    }).compileComponents();
   }));
 
   beforeEach(() => {
@@ -28,7 +36,7 @@ describe('PeopleComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });
