@@ -14,6 +14,8 @@ import { httpOptions } from "./../services/headers";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
+import { Store } from "@ngrx/store";
+import { retrievedUser } from "../state/user.actions";
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 
@@ -59,7 +61,8 @@ export class EditorService {
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {
     this.redirectUrl = this.configService.config.redirectURL;
     this.studyIdentifier.subscribe((value) => {
@@ -121,12 +124,13 @@ export class EditorService {
       workspaceLocation: string;
       settings: Record<string, any>;
       projects: Record<string, any>;
-      owner: { apiToken: string };
+      owner: any;
       message: string;
       err: string;
     }
 
     if (signInRequest) {
+      console.log(data);
       const userstr = data.content;
       const user: User = JSON.parse(userstr);
       // console.log('user json ' + user);
@@ -144,6 +148,7 @@ export class EditorService {
           user: user.owner,
         },
       });
+      this.store.dispatch(retrievedUser({user: user.owner}))
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
@@ -172,6 +177,7 @@ export class EditorService {
           user,
         },
       });
+      this.store.dispatch(retrievedUser({user: user}));
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {

@@ -29,6 +29,7 @@ import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { StoreModule } from "@ngrx/store";
 
 import { NgxWigModule } from "ngx-wig";
 import { MatTableModule } from "@angular/material/table";
@@ -54,6 +55,7 @@ import { AuthService } from "./services/metabolights/auth.service";
 import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
+import { userReducer } from "./state/user.reducer";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -108,6 +110,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         },
       },
     }),
+    StoreModule.forRoot({user: userReducer})
   ],
   exports: [],
   providers: [
