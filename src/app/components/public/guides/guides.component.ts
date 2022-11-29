@@ -8,6 +8,9 @@ import { MetaboLightsWSURL } from "./../../../services/globals";
 import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { Store } from "@ngrx/store";
+import { setLoadingDisabled } from "src/app/state/meta-settings.actions";
+import { selectLanguage } from "src/app/state/meta-settings.selector";
 
 @Component({
   selector: "app-guides",
@@ -15,9 +18,14 @@ import { ConfigurationService } from "src/app/configuration.service";
   styleUrls: ["./guides.component.css"],
 })
 export class GuidesComponent implements OnInit {
+
+  //old state
   @select((state) => state.status.mappings) mappings;
   @select((state) => state.status.guides) guides;
   @select((state) => state.status.selectedLanguage) selectedLanguage;
+
+  // new state
+  selectedLanguage$ = this.store.select(selectLanguage)
 
   domain = "";
   repo = "";
@@ -40,7 +48,8 @@ export class GuidesComponent implements OnInit {
     public router: Router,
     private editorService: EditorService,
     private route: ActivatedRoute,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {}
 
   ngOnInit(): void {
@@ -54,6 +63,7 @@ export class GuidesComponent implements OnInit {
   setUpSubscriptions() {
     this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
 
+    this.store.dispatch(setLoadingDisabled())
     this.mappings.subscribe((value) => {
       if (value != null) {
         this.languageMappings = value;
@@ -78,6 +88,9 @@ export class GuidesComponent implements OnInit {
         this.languageSelected = value;
       }
     });
+    this.selectedLanguage$.subscribe(lang => {
+      this.languageSelected = lang;
+    })
   }
 
   open(image: string): void {

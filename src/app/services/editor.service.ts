@@ -16,6 +16,19 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
 import { Store } from "@ngrx/store";
 import { retrievedUser } from "../state/user.actions";
+import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo } from "../state/meta-settings.actions";
+import { S } from "@angular/cdk/keycodes";
+import { selectIsInitialised } from "../state/meta-settings.selector";
+
+interface User {
+  updatedAt: number;
+  workspaceLocation: string;
+  settings: Record<string, any>;
+  projects: Record<string, any>;
+  owner: any;
+  message: string;
+  err: string;
+}
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 
@@ -42,10 +55,14 @@ export class EditorService {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.study.studyAssays) studyAssays;
 
+  // not totally confident that this will work where i need it to (localStorage.setItem('time'))
+  isInitialised$ = this.store.select(selectIsInitialised)
+
   redirectUrl = "";
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];
+  isInitialised = null;
   samples_columns_order: any = {
     "Sample Name": 1,
     "Characteristics[Organism]": 2,
@@ -74,6 +91,10 @@ export class EditorService {
     this.studyFiles.subscribe((value) => {
       this.files = value;
     });
+
+    this.isInitialised$.subscribe(isInit => {
+      this.isInitialised = isInit;
+    })
   }
 
   login(body) {
@@ -87,6 +108,8 @@ export class EditorService {
     this.ngRedux.dispatch({
       type: "RESET",
     });
+
+    this.store.dispatch(resetInit())
     if (this.configService.config.clearJavaSession && redirect) {
       window.location.href = this.configService.config.javaLogoutURL;
     } else {
@@ -119,15 +142,7 @@ export class EditorService {
   }
 
   initialise(data, signInRequest) {
-    interface User {
-      updatedAt: number;
-      workspaceLocation: string;
-      settings: Record<string, any>;
-      projects: Record<string, any>;
-      owner: any;
-      message: string;
-      err: string;
-    }
+
 
     if (signInRequest) {
       console.log(data);
@@ -157,7 +172,7 @@ export class EditorService {
       });
       localStorage.setItem(
         "time",
-        this.ngRedux.getState().status["isInitialised"]["time"]
+        this.isInitialised.time
       );
 
       this.loadValidations();
@@ -186,7 +201,7 @@ export class EditorService {
       });
       localStorage.setItem(
         "time",
-        this.ngRedux.getState().status["isInitialised"]["time"]
+        this.isInitialised.time
       );
       this.loadValidations();
       return true;
@@ -202,6 +217,9 @@ export class EditorService {
             info: "Loading study validations",
           },
         });
+
+        this.store.dispatch(setLoadingInfo({newInfo: "Loading study validations"}));
+
         this.ngRedux.dispatch({
           type: "LOAD_VALIDATION_RULES",
           body: {
@@ -318,11 +336,17 @@ export class EditorService {
     if (status !== null) {
       if (status) {
         this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
+
+        this.store.dispatch(setLoadingEnabled())
       } else {
         this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+        
+        this.store.dispatch(setLoadingDisabled());
       }
     } else {
       this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+
+      this.store.dispatch(setLoadingDisabled());
     }
   }
 
@@ -360,6 +384,9 @@ export class EditorService {
             info: "Loading investigation details",
           },
         });
+
+        this.store.dispatch(setLoadingInfo({newInfo: "Loading invstigation details"}));
+
         this.ngRedux.dispatch({
           type: "SET_CONFIGURATION",
           body: {
@@ -626,6 +653,8 @@ export class EditorService {
               info: "Loading Samples data",
             },
           });
+
+          this.store.dispatch(setLoadingInfo({newInfo: "Loading Samples data"}));
           samplesExist = true;
           this.updateSamples(file.file);
         }
@@ -649,6 +678,8 @@ export class EditorService {
         info: "Loading assays information",
       },
     });
+
+    this.store.dispatch(setLoadingInfo({newInfo: "Loading assays information"}))
     files.study.forEach((file) => {
       if (file.file.indexOf("a_") === 0 && file.status === "active") {
         this.updateAssay(file.file);

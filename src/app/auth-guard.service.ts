@@ -14,6 +14,10 @@ import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 import { HttpResponse } from "@angular/common/http";
 import {browserRefresh} from './app.component';
+import { select, Store } from "@ngrx/store";
+import { selectIsInitialised } from "./state/meta-settings.selector";
+import { of } from "rxjs";
+import { takeUntil } from "rxjs/operators";
 
 @Injectable({
   providedIn: "root",
@@ -23,8 +27,12 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     private editorService: EditorService,
     private configService: ConfigurationService,
     private router: Router,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) {}
+
+  isInitialised$ = this.store.select(selectIsInitialised)
+  destroy$ = of('null')
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -48,8 +56,13 @@ export class AuthGuard implements CanActivate, CanActivateChild {
    * @returns boolean indicating whether the user is logged in.
    */
   checkLogin(url: string): boolean {
-    const isInit = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
-
+    //let isInit = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
+    let isInit = null;
+    let isInitSub = this.store.pipe(
+      select(selectIsInitialised), takeUntil(this.destroy$)).subscribe(
+      (isInitResp) => isInit = isInitResp
+    );
+    console.log(isInit);
     switch (this.evaluateSession(isInit)) {
       case SessionStatus.Active:
         if (browserRefresh) {
@@ -91,6 +104,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         this.router.navigate(["/login"]);
         return false;
     }
+    this.destroy$.subscribe(res => {
+      // this activates the takeUntil at the start of the method
+    })
   }
 
   /**

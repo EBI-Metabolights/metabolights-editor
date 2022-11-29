@@ -7,6 +7,8 @@ import { NgRedux, select } from "@angular-redux/store";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { Store } from "@ngrx/store";
+import { setLoadingDisabled } from "src/app/state/meta-settings.actions";
 
 @Component({
   selector: "app-login",
@@ -24,12 +26,15 @@ export class LoginComponent implements OnInit {
     private ngRedux: NgRedux<IAppState>,
     public router: Router,
     private editorService: EditorService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {}
 
   ngOnInit() {
     if (!environment.isTesting) {
       this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+
+      this.store.dispatch(setLoadingDisabled())
     }
     this.form = this.fb.group({
       email: ["", [Validators.required, Validators.email]],

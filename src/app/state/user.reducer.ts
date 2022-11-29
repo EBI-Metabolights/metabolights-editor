@@ -24,6 +24,17 @@ export const initialState: Readonly<MtblsUser> = {
     apiToken: null
 }
 
+/**
+ * previous selectors referenced in:
+ * /components/guide/meta/meta.component [x] removed? []
+ * /components/guide/upload/upload.component [x] removed? []
+ * /components/public/header/header.component [x] removed? []
+ * /components/public/study/study.component [x] removed? []
+ * 
+ * 
+ * previous dispatches referenced in:
+ * /app/services.editor.service (2) [x] removed? []
+ */
 export const userReducer = createReducer(
     initialState,
     on(retrievedUser, (state, { user}) => user)

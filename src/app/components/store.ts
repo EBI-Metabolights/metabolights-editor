@@ -26,11 +26,11 @@ export interface IsInitialised {
 /* eslint-disable @typescript-eslint/dot-notation */
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export const SHARED_INITIAL_STATE: Record<string, any> = {
-  loading: true,
+  loading: true, // converted in state/metaSettings.*.ts NGRX
   info: "",
   configuration: "",
   isCurator: false,
-  user: null,
+  user: null, // converted to state/user.*.ts NGRX
   error: false,
   message: "",
   currentTabIndex: "0",
@@ -132,35 +132,35 @@ export function sharedReducer(
   action
 ): Record<string, any> {
   switch (action.type) {
-    case TOGGLE_LOADING:
+    case TOGGLE_LOADING:// converted in state/meta-settings.reducer
       return toggleLoading(state);
-    case ENABLE_LOADING:
+    case ENABLE_LOADING:// converted in state/meta-settings.reducer
       return enableLoading(state);
-    case DISABLE_LOADING:
+    case DISABLE_LOADING:// converted in state/meta-settings.reducer
       return disableLoading(state);
-    case ENABLE_ERROR:
+    case ENABLE_ERROR:// converted in state/meta-settings.reducer
       return enableError(state);
-    case DISABLE_ERROR:
+    case DISABLE_ERROR: // converted in state/meta-settings.reducer
       return disableError(state);
     case SET_MESSAGE:
       return setMessage(state, action);
-    case SET_LOADING_INFO:
+    case SET_LOADING_INFO:// converted in state/meta-settings.reducer
       return setLoadingInfo(state, action);
     case SET_CONFIGURATION:
       return setLoadingConfiguration(state, action);
     case SET_TAB_INDEX:
       return setCurrentTabIndex(state, action);
-    case SET_USER:
+    case SET_USER: // converted in state/user.reducer
       return setCurrentUser(state, action);
-    case INITIALISE:
+    case INITIALISE:// converted in state/meta-settings.reducer
       return setInitialised(state, action);
-    case RESET:
+    case RESET: // converted in state/meta-settings.reducer
       return reset(state, action);
     case SET_USER_STUDIES:
       return setUserStudies(state, action);
     case SET_GUIDES_MAPPINGS:
       return setGuidesMappings(state, action);
-    case SET_SELECTED_LANGUAGE:
+    case SET_SELECTED_LANGUAGE:// converted in state/meta-settings.reducer.ts
       return setSelectedLanguage(state, action);
     case SET_GUIDES:
       return setGuides(state, action);

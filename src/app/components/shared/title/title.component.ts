@@ -13,6 +13,8 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Store } from "@ngrx/store";
+import { selectUser } from "src/app/state/user.selectors";
 
 @Component({
   selector: "mtbls-title",
@@ -24,6 +26,8 @@ export class TitleComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.readonly) readonly;
+
+  user$ = this.store.select(selectUser);
 
   isReadOnly = false;
   requestedStudy: string = null;
@@ -39,7 +43,8 @@ export class TitleComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
@@ -47,6 +52,9 @@ export class TitleComponent implements OnInit {
   }
 
   setUpSubscriptions() {
+    this.user$.subscribe(user => {
+      console.log(`did this work: ${user.apiToken}`)
+    })
     this.studyTitle.subscribe((value) => {
       if (value === "") {
         this.title = "Please add your study title here";

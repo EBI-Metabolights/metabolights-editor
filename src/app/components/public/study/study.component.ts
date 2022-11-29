@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { Router } from "@angular/router";
 import { IAppState } from "../../../store";
@@ -9,13 +9,20 @@ import { HttpClient } from "@angular/common/http";
 import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+// doing this as having both select functions from the state libraries causes an error.
+import * as NGRX from "@ngrx/store"
+import { selectUser } from "src/app/state/user.selectors";
+import { takeUntil } from "rxjs/operators";
+import { of } from "rxjs";
+import { selectIsInitialised } from "src/app/state/meta-settings.selector";
 
 @Component({
   selector: "study",
   templateUrl: "./study.component.html",
   styleUrls: ["./study.component.css"],
 })
-export class PublicStudyComponent implements OnInit {
+export class PublicStudyComponent implements OnInit, OnDestroy {
+  //old state
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.status.user) user;
   @select((state) => state.study.status) studyStatus;
@@ -25,6 +32,9 @@ export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.status.userStudies) userStudies;
   @select((state) => state.study.reviewerLink) studyReviewerLink;
+
+  //new state
+  user$ = this.store.select(selectUser) // seemingly not used
 
   loading: any = true;
   requestedTab = 0;
@@ -40,17 +50,24 @@ export class PublicStudyComponent implements OnInit {
   domain = "";
   reviewerLink: string = null;
 
+  destroy$ = of(null)
+
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private editorService: EditorService,
     private router: Router,
     private route: ActivatedRoute,
     private labsWorkspaceService: LabsWorkspaceService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: NGRX.Store
   ) {
     let isInitialised;
     if (!environment.isTesting) {
-      isInitialised = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
+      //sInitialised = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
+      let isInitialisedSub = this.store.pipe(
+        NGRX.select(selectIsInitialised), takeUntil(this.destroy$)).subscribe(
+        (isInit) => isInitialised = isInit
+      );
     }
     let obfuscationCode = localStorage.getItem("obfuscationCode");
     const owner = localStorage.getItem("isOwner");
@@ -107,6 +124,12 @@ export class PublicStudyComponent implements OnInit {
 
   ngOnInit() {
     this.domain = this.configService.config.metabolightsWSURL.domain;
+  }
+
+  ngOnDestroy(): void {
+      this.destroy$.subscribe(res => {
+
+      })
   }
 
   loadStudy(studyId) {

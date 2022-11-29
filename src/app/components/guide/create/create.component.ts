@@ -5,6 +5,8 @@ import * as toastr from "toastr";
 import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "../../../store";
 import { environment } from "src/environments/environment";
+import { Store } from "@ngrx/store";
+import { setLoadingDisabled } from "src/app/state/meta-settings.actions";
 
 @Component({
   selector: "app-create",
@@ -32,7 +34,8 @@ export class CreateComponent implements OnInit {
   constructor(
     private editorService: EditorService,
     private router: Router,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) {
     this.editorService.initialiseStudy(null);
   }
@@ -40,6 +43,8 @@ export class CreateComponent implements OnInit {
   ngOnInit() {
     if (!environment.isTesting) {
       this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+
+      this.store.dispatch(setLoadingDisabled())
     }
   }
 

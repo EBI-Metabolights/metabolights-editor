@@ -13,6 +13,6 @@ import { MtblsUser } from '../models/mtbl/mtbls/mtbls-user.interface';
 
 
 export const retrievedUser = createAction(
-    '[User/API]',
+    '[User/API] retrieved User',
     props<{ user: Readonly<MtblsUser>}>()
 )
