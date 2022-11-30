@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
 import { Store } from "@ngrx/store";
-import { retrievedUser } from "../state/user.actions";
+import { retrievedUser, retrievedUserStudies } from "../state/user.actions";
 import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo } from "../state/meta-settings.actions";
 import { S } from "@angular/cdk/keycodes";
 import { selectIsInitialised } from "../state/meta-settings.selector";
@@ -94,9 +94,7 @@ export class EditorService {
       this.files = value;
     });
 
-    this.isInitialised$.subscribe(isInit => {
-      this.isInitialised = isInit;
-    })
+    this.isInitialised = this.isInitService.getIsInit()
   }
 
   login(body) {
@@ -111,7 +109,7 @@ export class EditorService {
       type: "RESET",
     });
 
-    this.store.dispatch(resetInit())
+    this.isInitService.reset();
     if (this.configService.config.clearJavaSession && redirect) {
       window.location.href = this.configService.config.javaLogoutURL;
     } else {
@@ -161,6 +159,7 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
+      //-----------
       this.ngRedux.dispatch({
         type: "SET_USER",
         body: {
@@ -168,12 +167,16 @@ export class EditorService {
         },
       });
       this.store.dispatch(retrievedUser({user: user.owner}))
+      //--------------------
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
           studies: null,
         },
       });
+      this.store.dispatch(retrievedUserStudies({newStudies: null}))
+
+
       localStorage.setItem(
         "time",
         this.isInitialised.time
@@ -191,6 +194,7 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
+      //------------------
       this.ngRedux.dispatch({
         type: "SET_USER",
         body: {
@@ -198,12 +202,14 @@ export class EditorService {
         },
       });
       this.store.dispatch(retrievedUser({user: user}));
+      //------------------
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
           studies: null,
         },
       });
+      this.store.dispatch(retrievedUserStudies({newStudies: null}))
       localStorage.setItem(
         "time",
         this.isInitialised.time
@@ -321,6 +327,7 @@ export class EditorService {
           studies: response.data,
         },
       });
+      this.store.dispatch(retrievedUserStudies({newStudies: response.data}))
     });
   }
 

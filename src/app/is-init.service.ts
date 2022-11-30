@@ -1,9 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
-import { throwError } from "rxjs";
-import { catchError, tap } from "rxjs/operators";
 import { IsInitialised } from "./components/store";
-import { selectIsInitialised } from "./state/meta-settings.selector";
 
 
 @Injectable({
@@ -15,7 +11,7 @@ export class IsInitService {
         time: ""
     }
 
-    constructor(private store: Store) {
+    constructor() {
 
     }
 

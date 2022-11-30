@@ -25,17 +25,18 @@ import { IsInitService } from "src/app/is-init.service";
 export class PublicStudyComponent implements OnInit, OnDestroy {
   //old state
   @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.status.user) user;
+  @select((state) => state.status.user) user; // unused
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.investigationFailed) investigationFailed;
   @select((state) => state.study.files) studyFiles;
-  @select((state) => state.status.userStudies) userStudies;
+  @select((state) => state.status.userStudies) userStudies; //unused
   @select((state) => state.study.reviewerLink) studyReviewerLink;
 
   //new state
-  user$ = this.store.select(selectUser) // seemingly not used
+  user$ = this.store.select(selectUser) // seemingly not used above
+  userStudies$ = this.store.select(selectUser) // seemingly not used above 
 
   loading: any = true;
   requestedTab = 0;

@@ -27,8 +27,6 @@ export class TitleComponent implements OnInit {
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.readonly) readonly;
 
-  user$ = this.store.select(selectUser);
-
   isReadOnly = false;
   requestedStudy: string = null;
   title = "";
@@ -52,9 +50,6 @@ export class TitleComponent implements OnInit {
   }
 
   setUpSubscriptions() {
-    this.user$.subscribe(user => {
-      console.log(`did this work: ${user.apiToken}`)
-    })
     this.studyTitle.subscribe((value) => {
       if (value === "") {
         this.title = "Please add your study title here";

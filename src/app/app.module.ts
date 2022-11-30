@@ -55,7 +55,7 @@ import { AuthService } from "./services/metabolights/auth.service";
 import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
-import { userReducer } from "./state/user.reducer";
+import { userReducer, userStudyReducer } from "./state/user.reducer";
 import { metaSettingsReducer } from "./state/meta-settings.reducer";
 import { IsInitService } from "./is-init.service";
 
@@ -112,7 +112,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         },
       },
     }),
-    StoreModule.forRoot({user: userReducer, meta: metaSettingsReducer})
+    StoreModule.forRoot({user: userReducer, meta: metaSettingsReducer, userStudies: userStudyReducer})
   ],
   exports: [],
   providers: [

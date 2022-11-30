@@ -142,13 +142,13 @@ export function sharedReducer(
       return enableError(state);
     case DISABLE_ERROR: // converted in state/meta-settings.reducer
       return disableError(state);
-    case SET_MESSAGE:
+    case SET_MESSAGE: // seemingly unused
       return setMessage(state, action);
     case SET_LOADING_INFO:// converted in state/meta-settings.reducer
       return setLoadingInfo(state, action);
-    case SET_CONFIGURATION:
+    case SET_CONFIGURATION: // TODO ancillary.
       return setLoadingConfiguration(state, action);
-    case SET_TAB_INDEX:
+    case SET_TAB_INDEX: // TODO ancillary
       return setCurrentTabIndex(state, action);
     case SET_USER: // converted in state/user.reducer
       return setCurrentUser(state, action);
@@ -156,13 +156,13 @@ export function sharedReducer(
       return setInitialised(state, action);
     case RESET: // converted in state/meta-settings.reducer
       return reset(state, action);
-    case SET_USER_STUDIES:
+    case SET_USER_STUDIES: // converted in state/user.reducer
       return setUserStudies(state, action);
-    case SET_GUIDES_MAPPINGS:
+    case SET_GUIDES_MAPPINGS:// TODO: ancillary
       return setGuidesMappings(state, action);
     case SET_SELECTED_LANGUAGE:// converted in state/meta-settings.reducer.ts
       return setSelectedLanguage(state, action);
-    case SET_GUIDES:
+    case SET_GUIDES:// TODO: ancillary
       return setGuides(state, action);
   }
 

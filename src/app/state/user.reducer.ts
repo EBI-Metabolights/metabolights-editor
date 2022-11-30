@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store";
 import { MtblsUser } from "../models/mtbl/mtbls/mtbls-user.interface";
-import { retrievedUser } from "./user.actions";
+import * as UserActions from "./user.actions";
 
 
 export const initialState: Readonly<MtblsUser> = {
@@ -24,6 +24,7 @@ export const initialState: Readonly<MtblsUser> = {
     apiToken: null
 }
 
+export const userStudiesInitialState: Readonly<any> = {studies: []}
 /**
  * previous selectors referenced in:
  * /components/guide/meta/meta.component [x] removed? []
@@ -37,5 +38,20 @@ export const initialState: Readonly<MtblsUser> = {
  */
 export const userReducer = createReducer(
     initialState,
-    on(retrievedUser, (state, { user}) => user)
+    on(UserActions.retrievedUser, (state, { user}) => user),
+    on(UserActions.retrievedUserStudies)
 );
+
+/**
+ * previous selectors referenced in:
+ * /components/console.component [x] removed? []
+ * /components/study.component [x] removed? []
+ * 
+ * previous dispatches referenced in:
+ * /services/editor.service (3) [x] removed? []
+ */
+export const userStudyReducer = createReducer(
+    userStudiesInitialState,
+    on(UserActions.retrievedUserStudies, (state, {newStudies}) => ({...state, studies: newStudies}))
+
+)
