@@ -19,6 +19,7 @@ import { retrievedUser } from "../state/user.actions";
 import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo } from "../state/meta-settings.actions";
 import { S } from "@angular/cdk/keycodes";
 import { selectIsInitialised } from "../state/meta-settings.selector";
+import { IsInitService } from "../is-init.service";
 
 interface User {
   updatedAt: number;
@@ -79,7 +80,8 @@ export class EditorService {
     private authService: AuthService,
     private dataService: MetabolightsService,
     private configService: ConfigurationService,
-    private store: Store
+    private store: Store,
+    private isInitService: IsInitService
   ) {
     this.redirectUrl = this.configService.config.redirectURL;
     this.studyIdentifier.subscribe((value) => {
@@ -154,6 +156,8 @@ export class EditorService {
         "user_token",
         user.owner.apiToken
       );
+      this.isInitService.setIsInit();
+
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
@@ -183,6 +187,7 @@ export class EditorService {
         "user_token",
         disambiguateUserObj(user)
       );
+      this.isInitService.setIsInit();
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });

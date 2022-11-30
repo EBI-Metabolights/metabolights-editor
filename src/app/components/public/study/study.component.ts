@@ -15,6 +15,7 @@ import { selectUser } from "src/app/state/user.selectors";
 import { takeUntil } from "rxjs/operators";
 import { of } from "rxjs";
 import { selectIsInitialised } from "src/app/state/meta-settings.selector";
+import { IsInitService } from "src/app/is-init.service";
 
 @Component({
   selector: "study",
@@ -59,16 +60,15 @@ export class PublicStudyComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private labsWorkspaceService: LabsWorkspaceService,
     private configService: ConfigurationService,
-    private store: NGRX.Store
+    private store: NGRX.Store,
+    private isInitService: IsInitService
   ) {
     let isInitialised;
     if (!environment.isTesting) {
       //sInitialised = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
-      let isInitialisedSub = this.store.pipe(
-        NGRX.select(selectIsInitialised), takeUntil(this.destroy$)).subscribe(
-        (isInit) => isInitialised = isInit
-      );
+      
     }
+    isInitialised = this.isInitService.getIsInit();
     let obfuscationCode = localStorage.getItem("obfuscationCode");
     const owner = localStorage.getItem("isOwner");
     if (owner && owner !== null && owner !== "") {

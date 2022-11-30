@@ -13,11 +13,16 @@ import { IsInitialised } from "./components/store";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 import { HttpResponse } from "@angular/common/http";
-import {browserRefresh} from './app.component';
+import { browserRefresh } from './app.component';
 import { select, Store } from "@ngrx/store";
 import { selectIsInitialised } from "./state/meta-settings.selector";
 import { of } from "rxjs";
-import { takeUntil } from "rxjs/operators";
+import { take, takeUntil, tap } from "rxjs/operators";
+import { IsInitService } from "./is-init.service";
+
+async function getIsInitialisedObject() {
+
+}
 
 @Injectable({
   providedIn: "root",
@@ -28,8 +33,9 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     private configService: ConfigurationService,
     private router: Router,
     private ngRedux: NgRedux<IAppState>,
-    private store: Store
-  ) {}
+    private store: Store,
+    private isInitService: IsInitService
+  ) { }
 
   isInitialised$ = this.store.select(selectIsInitialised)
   destroy$ = of('null')
@@ -55,14 +61,13 @@ export class AuthGuard implements CanActivate, CanActivateChild {
    * @param url - url to be used a redirect if the user is found to be not logged in.
    * @returns boolean indicating whether the user is logged in.
    */
-  checkLogin(url: string): boolean {
+   checkLogin(url: string): boolean {
     //let isInit = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
-    let isInit = null;
-    let isInitSub = this.store.pipe(
-      select(selectIsInitialised), takeUntil(this.destroy$)).subscribe(
-      (isInitResp) => isInit = isInitResp
-    );
-    console.log(isInit);
+
+    return this.isLoggedIn(this.isInitService.getIsInit(), url);
+  }
+
+  isLoggedIn(isInit: IsInitialised, url: string): boolean {
     switch (this.evaluateSession(isInit)) {
       case SessionStatus.Active:
         if (browserRefresh) {
@@ -104,9 +109,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         this.router.navigate(["/login"]);
         return false;
     }
-    this.destroy$.subscribe(res => {
-      // this activates the takeUntil at the start of the method
-    })
   }
 
   /**

@@ -57,6 +57,7 @@ import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
 import { userReducer } from "./state/user.reducer";
 import { metaSettingsReducer } from "./state/meta-settings.reducer";
+import { IsInitService } from "./is-init.service";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -111,7 +112,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         },
       },
     }),
-    StoreModule.forRoot({user: userReducer, metaSettings: metaSettingsReducer})
+    StoreModule.forRoot({user: userReducer, meta: metaSettingsReducer})
   ],
   exports: [],
   providers: [
@@ -128,6 +129,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
     DOIService,
     AuthService,
     LabsWorkspaceService,
+    IsInitService,
     { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
   ],
   bootstrap: [AppComponent],
