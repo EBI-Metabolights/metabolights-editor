@@ -16,7 +16,7 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
 import { Store } from "@ngrx/store";
 import { retrievedUser, retrievedUserStudies } from "../state/user.actions";
-import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo } from "../state/meta-settings.actions";
+import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo, toggleLoading } from "../state/meta-settings.actions";
 import { S } from "@angular/cdk/keycodes";
 import { selectIsInitialised } from "../state/meta-settings.selector";
 import { IsInitService } from "../is-init.service";
@@ -157,24 +157,9 @@ export class EditorService {
       );
       this.isInitService.setIsInit();
 
-      this.ngRedux.dispatch({
-        type: "INITIALISE",
-      });
-      //-----------
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user: user.owner,
-        },
-      });
+
       this.store.dispatch(retrievedUser({user: user.owner}))
-      //--------------------
-      this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
-        body: {
-          studies: null,
-        },
-      });
+
       this.store.dispatch(retrievedUserStudies({newStudies: null}))
 
 
@@ -192,24 +177,9 @@ export class EditorService {
         disambiguateUserObj(user)
       );
       this.isInitService.setIsInit();
-      this.ngRedux.dispatch({
-        type: "INITIALISE",
-      });
-      //------------------
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user,
-        },
-      });
+
       this.store.dispatch(retrievedUser({user: user}));
-      //------------------
-      this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
-        body: {
-          studies: null,
-        },
-      });
+
       this.store.dispatch(retrievedUserStudies({newStudies: null}))
       localStorage.setItem(
         "time",
@@ -223,12 +193,6 @@ export class EditorService {
   loadValidations() {
     this.dataService.getValidations().subscribe(
       (validations) => {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading study validations",
-          },
-        });
 
         this.store.dispatch(setLoadingInfo({newInfo: "Loading study validations"}));
 
@@ -266,12 +230,6 @@ export class EditorService {
   loadGuides() {
     this.dataService.getLanguageMappings().subscribe(
       (mappings) => {
-        this.ngRedux.dispatch({
-          type: "SET_GUIDES_MAPPINGS",
-          body: {
-            mappings,
-          },
-        });
         this.store.dispatch(AncillaryActions.retrievedGuidesMappings({newMappings: mappings}))
         const selected_language = localStorage.getItem("selected_language");
         mappings["languages"].forEach((language) => {
@@ -279,20 +237,10 @@ export class EditorService {
             (selected_language && language.code === selected_language) ||
             (!selected_language && language.default)
           ) {
-            this.ngRedux.dispatch({
-              type: "SET_SELECTED_LANGUAGE",
-              body: {
-                language: language.code,
-              },
-            });
+
+            this.store.dispatch(AncillaryActions.setSelectedLanguage({newLang: language.code}))
             //----------------------------
             this.dataService.getGuides(language.code).subscribe((guides) => {
-              this.ngRedux.dispatch({
-                type: "SET_GUIDES",
-                body: {
-                  guides: guides["data"],
-                },
-              });
               this.store.dispatch(AncillaryActions.retrievedGuides({newGuides: guides["data"]}))
             });
           }
@@ -308,31 +256,14 @@ export class EditorService {
   loadLanguage(language) {
     this.dataService.getGuides(language).subscribe((guides) => {
       localStorage.setItem("selected_language", language);
-      this.ngRedux.dispatch({
-        type: "SET_SELECTED_LANGUAGE",
-        body: {
-          language,
-        },
-      });
+      this.store.dispatch(AncillaryActions.setSelectedLanguage({newLang: language}))
 
-      this.ngRedux.dispatch({
-        type: "SET_GUIDES",
-        body: {
-          guides: guides["data"],
-        },
-      });
       this.store.dispatch(AncillaryActions.retrievedGuides({newGuides: guides["data"]}))
     });
   }
 
   getAllStudies() {
     this.dataService.getAllStudies().subscribe((response) => {
-      this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
-        body: {
-          studies: response.data,
-        },
-      });
       this.store.dispatch(retrievedUserStudies({newStudies: response.data}))
     });
   }
@@ -353,18 +284,15 @@ export class EditorService {
   toggleLoading(status) {
     if (status !== null) {
       if (status) {
-        this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
 
         this.store.dispatch(setLoadingEnabled())
       } else {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
         
         this.store.dispatch(setLoadingDisabled());
       }
     } else {
-      this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
 
-      this.store.dispatch(setLoadingDisabled());
+      this.store.dispatch(toggleLoading());
     }
   }
 
@@ -396,21 +324,9 @@ export class EditorService {
             investigationFailed: false,
           },
         });
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading investigation details",
-          },
-        });
 
         this.store.dispatch(setLoadingInfo({newInfo: "Loading investigation details"}));
 
-        this.ngRedux.dispatch({
-          type: "SET_CONFIGURATION",
-          body: {
-            configuration: study.isaInvestigation.comments,
-          },
-        });
         this.store.dispatch(AncillaryActions.retrievedConfiguration({newConfiguration: study.isaInvestigation.comments}))
 
         this.ngRedux.dispatch({
@@ -667,13 +583,6 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
-            body: {
-              info: "Loading Samples data",
-            },
-          });
-
           this.store.dispatch(setLoadingInfo({newInfo: "Loading Samples data"}));
           samplesExist = true;
           this.updateSamples(file.file);
@@ -692,13 +601,6 @@ export class EditorService {
   }
 
   loadStudyAssays(files) {
-    this.ngRedux.dispatch({
-      type: "SET_LOADING_INFO",
-      body: {
-        info: "Loading assays information",
-      },
-    });
-
     this.store.dispatch(setLoadingInfo({newInfo: "Loading assays information"}))
     files.study.forEach((file) => {
       if (file.file.indexOf("a_") === 0 && file.status === "active") {

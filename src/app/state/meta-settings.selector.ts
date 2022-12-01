@@ -26,9 +26,3 @@ export const selectIsInitialised = createSelector(
     }
 )
 
-export const selectLanguage = createSelector(
-    selectMeta,
-    (meta) => {
-        return meta.selectedLanguage
-    }
-)

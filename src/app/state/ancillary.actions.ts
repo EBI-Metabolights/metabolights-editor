@@ -21,3 +21,5 @@ export const retrievedConfiguration = createAction(
     '[Ancillary/API] retrieved configuration',
     props<{newConfiguration: StudyConfiguration[]}>()
 )
+
+export const setSelectedLanguage = createAction('[Language] set', props<{newLang: string}>())

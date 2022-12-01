@@ -27,13 +27,10 @@ import * as AncillaryActions from "src/app/state/ancillary.actions"
 export class PublicStudyComponent implements OnInit, OnDestroy {
   //old state
   @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.status.user) user; // unused
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.study.validation) studyValidation;
-  @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.investigationFailed) investigationFailed;
   @select((state) => state.study.files) studyFiles;
-  @select((state) => state.status.userStudies) userStudies; //unused
   @select((state) => state.study.reviewerLink) studyReviewerLink;
 
   //new state
@@ -203,12 +200,6 @@ export class PublicStudyComponent implements OnInit, OnDestroy {
   }
 
   selectCurrentTab(index, tab) {
-    this.ngRedux.dispatch({
-      type: "SET_TAB_INDEX",
-      body: {
-        currentTabIndex: index,
-      },
-    });
     this.store.dispatch(AncillaryActions.setTabIndex({newIndex: index}));
     
     const urlSplit = window.location.pathname

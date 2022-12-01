@@ -23,7 +23,6 @@ function sortcopy(array) {
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.status.userStudies) userStudies;
 
   userStudies$ = this.store.select(selectUserStudies);
 
@@ -76,13 +75,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   setUpSubscriptions() {
     this.userStudies$.subscribe((value) => {
       if (value.studies === null) {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading user studies",
-          },
-        });
-
         this.store.dispatch(setLoadingInfo({newInfo: "Loading user studies"}));
 
         this.editorService.getAllStudies();

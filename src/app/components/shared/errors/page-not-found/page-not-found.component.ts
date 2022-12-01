@@ -15,8 +15,6 @@ export class PageNotFoundComponent implements OnInit {
 
   ngOnInit() {
     if (!environment.isTesting) {
-      this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-
       this.store.dispatch(setLoadingDisabled());
     }
   }

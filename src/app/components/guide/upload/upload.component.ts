@@ -22,7 +22,6 @@ import { selectUser } from "src/app/state/user.selectors";
 })
 export class RawUploadComponent implements OnInit {
   //old state
-  @select((state) => state.status.user) studyUser;
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.files) studyFiles;
 
@@ -48,10 +47,7 @@ export class RawUploadComponent implements OnInit {
   }
 
   setUpSubscriptions() {
-    this.studyUser.subscribe((value) => {
-      this.user = value;
-      //this.user.checked = true;
-    });
+
     this.studyIdentifier.subscribe((value) => {
       this.requestedStudy = value;
     });

@@ -10,7 +10,6 @@ import { selectUser } from "src/app/state/user.selectors";
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent {
-  @select((state) => state.status.user) user;
   user$ = this.store.select(selectUser)
 
   authUser: any = null;
@@ -23,13 +22,8 @@ export class HeaderComponent {
   }
 
   setUpSubscription() {
-    this.user.subscribe((value) => {
-      if (value != null) {
-        this.authUser = value;
-      }
-    });
     this.user$.subscribe(user => {
-      if (user !== null) this.user = user;
+      if (user !== null) this.authUser = user;
     })
   }
 

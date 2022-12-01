@@ -42,8 +42,6 @@ export class CreateComponent implements OnInit {
 
   ngOnInit() {
     if (!environment.isTesting) {
-      this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-
       this.store.dispatch(setLoadingDisabled())
     }
   }

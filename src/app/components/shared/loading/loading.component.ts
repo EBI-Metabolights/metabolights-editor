@@ -10,11 +10,6 @@ import { selectLoading, selectLoadingInfo } from "src/app/state/meta-settings.se
 })
 export class LoadingComponent implements OnInit {
 
-  //old state
-  @select((state) => state.status.loading) isLoading: boolean;
-  @select((state) => state.status.info) loadingInformation: string;
-
-
   //new state
   loading$ = this.store.select(selectLoading);
   loadingInfo$ = this.store.select(selectLoadingInfo);

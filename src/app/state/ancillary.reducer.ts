@@ -7,6 +7,8 @@ export interface Ancillary {
     guides: Object;
     tabIndex: string;
     configuration: any;
+    selectedLanguage: string;
+
 }
 
 export const initialAncillaryState: Readonly<Ancillary> = {
@@ -14,32 +16,34 @@ export const initialAncillaryState: Readonly<Ancillary> = {
     guides: null,
     tabIndex: "1",
     configuration: null,
+    selectedLanguage: "en"
+
 }
 
 export const ancillaryReducer = createReducer(
     initialAncillaryState,
     /**
      * references to previous selector in:
-     * /components/public/guides.component [x] removed? []
+     * /components/public/guides.component [x] removed? [x]
      * 
      * references to previous dispatches in:
-     * /components/public/guides/ [x] removed? []
+     * /components/public/guides/ [x] removed? [x]
      */
     on(AncillaryActions.retrievedGuidesMappings, (state, {newMappings}) => ({...state, guidesMappings: newMappings})),
     /**
      * references to previous selector in:
-     * /component/public/guides.component [x] removed ? []
+     * /component/public/guides.component [x] removed ? [x]
      * 
      * references to previous dispatches in:
-     * /services/editor.service.ts (2) [x] removed? []
+     * /services/editor.service.ts (2) [x] removed? [x]
      */
     on(AncillaryActions.retrievedGuides, (state, {newGuides}) => ({...state, guides: newGuides})),
     /**
      * references to previous selector in:
-     * /components/public/study.component (incl template) [] removed? []
+     * /components/public/study.component (incl template) [x] removed? [x]
      * 
      * references to previous dispatches referenced in:
-     * /components/public/study/study.component [x] removed? []
+     * /components/public/study/study.component [x] removed? [x]
      */
     on(AncillaryActions.setTabIndex, (state, {newIndex}) => ({...state, index: newIndex})),
     /**
@@ -47,7 +51,16 @@ export const ancillaryReducer = createReducer(
      * nowehere seemingly
      * 
      * references to previous dispatches in:
-     * /services/editor.service [x] removed?[]
+     * /services/editor.service [x] removed?[x]
      */
-    on(AncillaryActions.retrievedConfiguration, (state, {newConfiguration}) => ({...state, configuration: newConfiguration}))
+    on(AncillaryActions.retrievedConfiguration, (state, {newConfiguration}) => ({...state, configuration: newConfiguration})),
+        /**
+     * previous selector referenced in:
+     * /components/public/guide.component [x] removed? [x]
+     * 
+     * previous dispatches referenced in:
+     * /services/editor.service [x] removed? [x]
+     */
+    on(AncillaryActions.setSelectedLanguage, (state, {newLang}) => ({...state, selectedLanguage: newLang})),
+   
 )

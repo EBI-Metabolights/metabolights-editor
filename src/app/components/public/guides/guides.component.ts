@@ -10,7 +10,6 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngrx/store";
 import { setLoadingDisabled } from "src/app/state/meta-settings.actions";
-import { selectLanguage } from "src/app/state/meta-settings.selector";
 import * as AncillarySelectors from "src/app/state/ancillary.selector";
 
 @Component({
@@ -20,13 +19,9 @@ import * as AncillarySelectors from "src/app/state/ancillary.selector";
 })
 export class GuidesComponent implements OnInit {
 
-  //old state
-  @select((state) => state.status.mappings) mappings;
-  @select((state) => state.status.guides) guides;
-  @select((state) => state.status.selectedLanguage) selectedLanguage;
 
   // new state
-  selectedLanguage$ = this.store.select(selectLanguage)
+  selectedLanguage$ = this.store.select(AncillarySelectors.selectLanguage)
   selectedMapping$ = this.store.select(AncillarySelectors.selectGuidesMappings)
   selectedGuides$ = this.store.select(AncillarySelectors.selectGuides)
 
@@ -64,27 +59,13 @@ export class GuidesComponent implements OnInit {
   }
 
   setUpSubscriptions() {
-    this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
 
     this.store.dispatch(setLoadingDisabled())
-    this.mappings.subscribe((value) => {
-      if (value != null) {
-        this.languageMappings = value;
-      }
-    });
 
-    this.guides.subscribe((value) => {
-      if (value != null) {
-        this.guidesSelected = value;
-        this.tabs = Object.keys(this.guidesSelected);
-        this.tab = this.route.snapshot.paramMap.get("tab");
-        if (this.tabs.indexOf(this.tab) > -1) {
-          this.setSelectedTab(this.tab);
-        } else {
-          this.setSelectedTab(this.tabs[0]);
-        }
-      }
-    });
+    this.selectedMapping$.subscribe((value) => {
+      if (value !== null) this.languageMappings = value;
+    })
+
 
     this.selectedGuides$.subscribe(val => {
       if (val !== null) {
@@ -98,16 +79,11 @@ export class GuidesComponent implements OnInit {
         }
       }
     })
-    //-------------------------------
-    this.selectedLanguage.subscribe((value) => {
-      if (value != null) {
-        this.languageSelected = value;
-      }
-    });
+
     this.selectedLanguage$.subscribe(lang => {
       if (lang !== null) this.languageSelected = lang;
     })
-    //------------------------------------
+
   }
 
   open(image: string): void {

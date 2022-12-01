@@ -13,7 +13,6 @@ export const setInitialised = createAction('[IsInit] set init')
 
 export const resetInit = createAction('[IsInit] reset')
 
-export const setSelectedLanguage = createAction('[Language] set', props<{newLang: string}>())
 
 export const setErrorEnabled = createAction('[Error] enabled')
 

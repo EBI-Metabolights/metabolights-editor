@@ -23,3 +23,10 @@ export const selectTabIndex = createSelector(
         return ancillary.tabIndex
     }
 )
+
+export const selectLanguage = createSelector(
+    selectAncillary,
+    (ancillary) => {
+        return ancillary.selectedLanguage
+    }
+)

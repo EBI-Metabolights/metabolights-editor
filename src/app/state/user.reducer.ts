@@ -27,14 +27,14 @@ export const initialState: Readonly<MtblsUser> = {
 export const userStudiesInitialState: Readonly<any> = {studies: []}
 /**
  * previous selectors referenced in:
- * /components/guide/meta/meta.component [x] removed? []
- * /components/guide/upload/upload.component [x] removed? []
- * /components/public/header/header.component [x] removed? []
- * /components/public/study/study.component [x] removed? []
+ * /components/guide/meta/meta.component [x] removed? [x]
+ * /components/guide/upload/upload.component [x] removed? [x]
+ * /components/public/header/header.component [x] removed? [x]
+ * /components/public/study/study.component [x] removed? [x]
  * 
  * 
  * previous dispatches referenced in:
- * /app/services.editor.service (2) [x] removed? []
+ * /app/services.editor.service (2) [x] removed? [x]
  */
 export const userReducer = createReducer(
     initialState,
@@ -44,11 +44,11 @@ export const userReducer = createReducer(
 
 /**
  * previous selectors referenced in:
- * /components/console.component [x] removed? []
- * /components/study.component [x] removed? []
+ * /components/console.component [x] removed? [x]
+ * /components/study.component [x] removed? [x]
  * 
  * previous dispatches referenced in:
- * /services/editor.service (3) [x] removed? []
+ * /services/editor.service (3) [x] removed? [x]
  */
 export const userStudyReducer = createReducer(
     userStudiesInitialState,
