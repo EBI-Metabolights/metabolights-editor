@@ -8,9 +8,6 @@ import { FtpManagementService } from "src/app/services/ftp-management.service";
 import { FTPResponse } from "src/app/models/mtbl/mtbls/interfaces/generics/ftp-response.interface";
 import { interval, Subscription } from "rxjs";
 
-
-
-
 @Component({
   selector: "mtbls-files",
   templateUrl: "./files.component.html",
@@ -112,7 +109,6 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     this.syncStatusSubscription = this.ftpService.getSyncStatus()
     .subscribe(statusRes => {
       this.ongoingStatus = statusRes
-      console.log('hit');
       this.syncStatusSubscription.unsubscribe();
     })
   }
