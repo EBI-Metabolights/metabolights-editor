@@ -58,6 +58,7 @@ import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
 import { userReducer, userStudyReducer } from "./state/user.reducer";
 import { metaSettingsReducer } from "./state/meta-settings.reducer";
 import { IsInitService } from "./is-init.service";
+import { ancillaryReducer } from "./state/ancillary.reducer";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -112,7 +113,11 @@ export function configLoader(injector: Injector): () => Promise<any> {
         },
       },
     }),
-    StoreModule.forRoot({user: userReducer, meta: metaSettingsReducer, userStudies: userStudyReducer})
+    StoreModule.forRoot({
+      user: userReducer, 
+      meta: metaSettingsReducer, 
+      userStudies: userStudyReducer,
+      ancillary: ancillaryReducer})
   ],
   exports: [],
   providers: [

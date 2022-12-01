@@ -20,6 +20,7 @@ import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo } from
 import { S } from "@angular/cdk/keycodes";
 import { selectIsInitialised } from "../state/meta-settings.selector";
 import { IsInitService } from "../is-init.service";
+import * as AncillaryActions from "../state/ancillary.actions";
 
 interface User {
   updatedAt: number;
@@ -271,6 +272,7 @@ export class EditorService {
             mappings,
           },
         });
+        this.store.dispatch(AncillaryActions.retrievedGuidesMappings({newMappings: mappings}))
         const selected_language = localStorage.getItem("selected_language");
         mappings["languages"].forEach((language) => {
           if (
@@ -283,7 +285,7 @@ export class EditorService {
                 language: language.code,
               },
             });
-
+            //----------------------------
             this.dataService.getGuides(language.code).subscribe((guides) => {
               this.ngRedux.dispatch({
                 type: "SET_GUIDES",
@@ -291,8 +293,10 @@ export class EditorService {
                   guides: guides["data"],
                 },
               });
+              this.store.dispatch(AncillaryActions.retrievedGuides({newGuides: guides["data"]}))
             });
           }
+          //---------------------------------
         });
       },
       (err) => {
@@ -310,12 +314,14 @@ export class EditorService {
           language,
         },
       });
+
       this.ngRedux.dispatch({
         type: "SET_GUIDES",
         body: {
           guides: guides["data"],
         },
       });
+      this.store.dispatch(AncillaryActions.retrievedGuides({newGuides: guides["data"]}))
     });
   }
 
@@ -397,7 +403,7 @@ export class EditorService {
           },
         });
 
-        this.store.dispatch(setLoadingInfo({newInfo: "Loading invstigation details"}));
+        this.store.dispatch(setLoadingInfo({newInfo: "Loading investigation details"}));
 
         this.ngRedux.dispatch({
           type: "SET_CONFIGURATION",
@@ -405,6 +411,8 @@ export class EditorService {
             configuration: study.isaInvestigation.comments,
           },
         });
+        this.store.dispatch(AncillaryActions.retrievedConfiguration({newConfiguration: study.isaInvestigation.comments}))
+
         this.ngRedux.dispatch({
           type: "SET_STUDY_TITLE",
           body: {

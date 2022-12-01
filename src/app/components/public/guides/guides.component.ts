@@ -11,6 +11,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngrx/store";
 import { setLoadingDisabled } from "src/app/state/meta-settings.actions";
 import { selectLanguage } from "src/app/state/meta-settings.selector";
+import * as AncillarySelectors from "src/app/state/ancillary.selector";
 
 @Component({
   selector: "app-guides",
@@ -26,6 +27,8 @@ export class GuidesComponent implements OnInit {
 
   // new state
   selectedLanguage$ = this.store.select(selectLanguage)
+  selectedMapping$ = this.store.select(AncillarySelectors.selectGuidesMappings)
+  selectedGuides$ = this.store.select(AncillarySelectors.selectGuides)
 
   domain = "";
   repo = "";
@@ -83,14 +86,28 @@ export class GuidesComponent implements OnInit {
       }
     });
 
+    this.selectedGuides$.subscribe(val => {
+      if (val !== null) {
+        this.guidesSelected = val;
+        this.tabs = Object.keys(this.guidesSelected);
+        this.tab = this.route.snapshot.paramMap.get("tab");
+        if (this.tabs.indexOf(this.tab) > -1) {
+          this.setSelectedTab(this.tab);
+        } else {
+          this.setSelectedTab(this.tabs[0]);
+        }
+      }
+    })
+    //-------------------------------
     this.selectedLanguage.subscribe((value) => {
       if (value != null) {
         this.languageSelected = value;
       }
     });
     this.selectedLanguage$.subscribe(lang => {
-      this.languageSelected = lang;
+      if (lang !== null) this.languageSelected = lang;
     })
+    //------------------------------------
   }
 
   open(image: string): void {

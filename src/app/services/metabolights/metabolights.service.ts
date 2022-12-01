@@ -21,6 +21,7 @@ import { IStudyDesignDescriptorWrapper } from "src/app/models/mtbl/mtbls/interfa
 import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { GuidesMapping } from "src/app/models/mtbl/mtbls/interfaces/guides-mapping.interface";
 
 // disabling this as parameter names mirror that of actual file columns
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -111,9 +112,9 @@ export class MetabolightsService extends DataService {
   }
 
   // Study validation details
-  getLanguageMappings() {
+  getLanguageMappings(): Observable<GuidesMapping[]> {
     return this.http
-      .get(this.url.guides + "mapping.json")
+      .get<GuidesMapping[]>(this.url.guides + "mapping.json")
       .pipe(catchError(this.handleError));
   }
 

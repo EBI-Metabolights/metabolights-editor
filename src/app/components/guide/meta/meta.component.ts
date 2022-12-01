@@ -35,6 +35,7 @@ export class MetaComponent implements OnInit {
 
   requestedStudy: string = null;
   user: any = null;
+  checked = null;
 
   currentTitle: string = null;
   currentDescription: string = null;
@@ -98,7 +99,7 @@ export class MetaComponent implements OnInit {
     });
     this.studyUser.subscribe((value) => {
       this.user = value;
-      this.user.checked = false;
+      this.checked = false;
     });
 
 
@@ -200,7 +201,7 @@ export class MetaComponent implements OnInit {
                             authorsA.push(this.compileAuthor(author));
                           }
                         });
-                        if (this.user.checked) {
+                        if (this.checked) {
                           authorsA.push(this.compileSubmitter(this.user));
                         }
                         this.editorService

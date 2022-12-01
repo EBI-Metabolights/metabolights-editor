@@ -50,7 +50,7 @@ export class RawUploadComponent implements OnInit {
   setUpSubscriptions() {
     this.studyUser.subscribe((value) => {
       this.user = value;
-      this.user.checked = true;
+      //this.user.checked = true;
     });
     this.studyIdentifier.subscribe((value) => {
       this.requestedStudy = value;

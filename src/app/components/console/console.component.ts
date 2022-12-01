@@ -75,7 +75,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   setUpSubscriptions() {
     this.userStudies$.subscribe((value) => {
-      if (value === null) {
+      if (value.studies === null) {
         this.ngRedux.dispatch({
           type: "SET_LOADING_INFO",
           body: {
@@ -88,7 +88,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
         this.editorService.getAllStudies();
       } else {
         this.editorService.toggleLoading(false);
-        this.studies = value as any[];
+        this.studies = value.studies as any[];
         this.studies = sortcopy(this.studies);
         this.filteredStudies = sortcopy(this.studies);
         this.loadingStudies = false;

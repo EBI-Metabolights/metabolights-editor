@@ -16,6 +16,8 @@ import { takeUntil } from "rxjs/operators";
 import { of } from "rxjs";
 import { selectIsInitialised } from "src/app/state/meta-settings.selector";
 import { IsInitService } from "src/app/is-init.service";
+import { selectTabIndex } from "src/app/state/ancillary.selector";
+import * as AncillaryActions from "src/app/state/ancillary.actions"
 
 @Component({
   selector: "study",
@@ -37,6 +39,7 @@ export class PublicStudyComponent implements OnInit, OnDestroy {
   //new state
   user$ = this.store.select(selectUser) // seemingly not used above
   userStudies$ = this.store.select(selectUser) // seemingly not used above 
+  currentIndex$ = this.store.select(selectTabIndex)
 
   loading: any = true;
   requestedTab = 0;
@@ -206,6 +209,8 @@ export class PublicStudyComponent implements OnInit, OnDestroy {
         currentTabIndex: index,
       },
     });
+    this.store.dispatch(AncillaryActions.setTabIndex({newIndex: index}));
+    
     const urlSplit = window.location.pathname
       .replace(/\/$/, "")
       .split("/")
