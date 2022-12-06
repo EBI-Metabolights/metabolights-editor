@@ -183,7 +183,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   optionSelected(selected: MatAutocompleteSelectedEvent) {
-    if (selected.option.value !== null || selected.option.value !== undefined) {
+    if (selected.option.value !== null && selected.option.value !== undefined) {
       this.setValue(selected.option.value);
       const inputElement = document.getElementById("test") as HTMLInputElement;
       inputElement.value = "";

@@ -9,6 +9,9 @@ import { HttpClient } from "@angular/common/http";
 import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import {SessionStatus} from '../../../models/mtbl/mtbls/enums/session-status.enum';
+import {AuthGuard} from '../../../auth-guard.service';
+import {browserRefresh} from '../../../app.component';
 
 @Component({
   selector: "study",
@@ -43,6 +46,7 @@ export class PublicStudyComponent implements OnInit {
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private editorService: EditorService,
+    private authGuardService: AuthGuard,
     private router: Router,
     private route: ActivatedRoute,
     private labsWorkspaceService: LabsWorkspaceService,
@@ -76,31 +80,21 @@ export class PublicStudyComponent implements OnInit {
         }
       }
     } else {
-      if (!isInitialised.ready) {
-        const mtblsUser = localStorage.getItem("mtblsuser");
-        const mtblsJWT = localStorage.getItem("mtblsjwt");
-        if (mtblsJWT && mtblsJWT !== "" && mtblsUser && mtblsUser !== "") {
-          this.labsWorkspaceService
-            .initialise({ jwt: mtblsJWT, user: mtblsUser })
-            .subscribe((res) => {
-              localStorage.setItem(
-                "user",
-                JSON.stringify(JSON.parse(res.content).owner)
-              );
-              const localUser = localStorage.getItem("user");
-              this.editorService.initialise(localUser, false);
-              if (!environment.isTesting) {
-                this.loadStudy(null);
-              }
-            });
-        } else {
-          localStorage.removeItem("user");
+      switch (this.authGuardService.evaluateSession(isInitialised)) {
+        case SessionStatus.Active:
+          if (browserRefresh) {
+            this.editorService.initialise(localStorage.getItem('user'), false);
+          }
           if (!environment.isTesting) {
             this.loadStudy(null);
           }
-        }
-      } else {
-        console.log('Looks like study already got initialised!!');
+          break;
+        default:
+          if (!environment.isTesting) {
+            this.loadStudy(null);
+          }
+          break;
+
       }
     }
   }
