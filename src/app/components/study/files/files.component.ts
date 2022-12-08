@@ -38,6 +38,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   filteredRawFiles: any[] = [];
   filteredAuditFiles: any[] = [];
   filteredDerivedFiles: any[] = [];
+  filteredDerivedDataFiles: any[] = [];
   filteredUploadFiles: any[] = [];
 
   selectedMetaFiles: any[] = [];
@@ -494,6 +495,11 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       ) {
         this.derivedFiles.push(file);
         this.filteredDerivedFiles.push(file);
+      } else if (
+        file.type === "derived_data"
+      ) {
+        this.derivedFiles.push(file);
+        this.filteredDerivedDataFiles.push(file);
       } else {
         this.rawFiles.push(file);
         this.filteredRawFiles.push(file);
