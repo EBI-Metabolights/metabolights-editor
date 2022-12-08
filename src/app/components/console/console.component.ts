@@ -5,6 +5,16 @@ import { AfterContentInit, Component, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
+import { setLoadingInfo } from "src/app/state/meta-settings.actions";
+import { Store } from "@ngrx/store";
+import { selectUserStudies } from "src/app/state/user.selectors";
+
+
+function sortcopy(array) {
+  return array.slice(0).sort(
+    (a, b) => +new Date(b["releaseDate"]) - +new Date(a["releaseDate"])
+  )
+}
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
   selector: "mtbls-console",
@@ -13,9 +23,10 @@ import { environment } from "src/environments/environment";
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.status.userStudies) userStudies;
 
-  studies: string[] = [];
+  userStudies$ = this.store.select(selectUserStudies);
+
+  studies: any[] = [];
   filteredStudies: string[] = [];
   loadingStudies = false;
   filterValue: string = null;
@@ -30,7 +41,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     public router: Router,
     public http: HttpClient,
     private ngRedux: NgRedux<IAppState>,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private store: Store
   ) {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
@@ -61,22 +73,16 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   setUpSubscriptions() {
-    this.userStudies.subscribe((value) => {
-      if (value === null) {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading user studies",
-          },
-        });
+    this.userStudies$.subscribe((value) => {
+      if (value.studies === null) {
+        this.store.dispatch(setLoadingInfo({newInfo: "Loading user studies"}));
+
         this.editorService.getAllStudies();
       } else {
         this.editorService.toggleLoading(false);
-        this.studies = value;
-        this.studies.sort(
-          (a, b) => +new Date(b["releaseDate"]) - +new Date(a["releaseDate"])
-        );
-        this.filteredStudies = this.studies;
+        this.studies = value.studies as any[];
+        this.studies = sortcopy(this.studies);
+        this.filteredStudies = sortcopy(this.studies);
         this.loadingStudies = false;
       }
     });

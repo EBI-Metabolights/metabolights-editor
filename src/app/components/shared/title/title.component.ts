@@ -13,6 +13,8 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Store } from "@ngrx/store";
+import { selectUser } from "src/app/state/user.selectors";
 
 @Component({
   selector: "mtbls-title",
@@ -39,7 +41,8 @@ export class TitleComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) {
     if (!environment.isTesting) {
       this.setUpSubscriptions();

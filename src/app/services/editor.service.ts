@@ -14,6 +14,23 @@ import { httpOptions } from "./../services/headers";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
+import { Store } from "@ngrx/store";
+import { retrievedUser, retrievedUserStudies } from "../state/user.actions";
+import { resetInit, setLoadingDisabled, setLoadingEnabled, setLoadingInfo, toggleLoading } from "../state/meta-settings.actions";
+import { S } from "@angular/cdk/keycodes";
+import { selectIsInitialised } from "../state/meta-settings.selector";
+import { IsInitService } from "../is-init.service";
+import * as AncillaryActions from "../state/ancillary.actions";
+
+interface User {
+  updatedAt: number;
+  workspaceLocation: string;
+  settings: Record<string, any>;
+  projects: Record<string, any>;
+  owner: any;
+  message: string;
+  err: string;
+}
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 
@@ -40,10 +57,14 @@ export class EditorService {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.study.studyAssays) studyAssays;
 
+  // not totally confident that this will work where i need it to (localStorage.setItem('time'))
+  isInitialised$ = this.store.select(selectIsInitialised)
+
   redirectUrl = "";
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];
+  isInitialised = null;
   samples_columns_order: any = {
     "Sample Name": 1,
     "Characteristics[Organism]": 2,
@@ -59,7 +80,9 @@ export class EditorService {
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store,
+    private isInitService: IsInitService
   ) {
     this.redirectUrl = this.configService.config.redirectURL;
     this.studyIdentifier.subscribe((value) => {
@@ -71,6 +94,8 @@ export class EditorService {
     this.studyFiles.subscribe((value) => {
       this.files = value;
     });
+
+    this.isInitialised = this.isInitService.getIsInit()
   }
 
   login(body) {
@@ -84,6 +109,8 @@ export class EditorService {
     this.ngRedux.dispatch({
       type: "RESET",
     });
+
+    this.isInitService.reset();
     if (this.configService.config.clearJavaSession && redirect) {
       window.location.href = this.configService.config.javaLogoutURL;
     } else {
@@ -116,17 +143,10 @@ export class EditorService {
   }
 
   initialise(data, signInRequest) {
-    interface User {
-      updatedAt: number;
-      workspaceLocation: string;
-      settings: Record<string, any>;
-      projects: Record<string, any>;
-      owner: { apiToken: string };
-      message: string;
-      err: string;
-    }
+
 
     if (signInRequest) {
+      console.log(data);
       const userstr = data.content;
       const user: User = JSON.parse(userstr);
       // console.log('user json ' + user);
@@ -135,24 +155,17 @@ export class EditorService {
         "user_token",
         user.owner.apiToken
       );
-      this.ngRedux.dispatch({
-        type: "INITIALISE",
-      });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user: user.owner,
-        },
-      });
-      this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
-        body: {
-          studies: null,
-        },
-      });
+      this.isInitService.setIsInit();
+
+
+      this.store.dispatch(retrievedUser({user: user.owner}))
+
+      this.store.dispatch(retrievedUserStudies({newStudies: null}))
+
+
       localStorage.setItem(
         "time",
-        this.ngRedux.getState().status["isInitialised"]["time"]
+        this.isInitialised.time
       );
 
       this.loadValidations();
@@ -163,24 +176,14 @@ export class EditorService {
         "user_token",
         disambiguateUserObj(user)
       );
-      this.ngRedux.dispatch({
-        type: "INITIALISE",
-      });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user,
-        },
-      });
-      this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
-        body: {
-          studies: null,
-        },
-      });
+      this.isInitService.setIsInit();
+
+      this.store.dispatch(retrievedUser({user: user}));
+
+      this.store.dispatch(retrievedUserStudies({newStudies: null}))
       localStorage.setItem(
         "time",
-        this.ngRedux.getState().status["isInitialised"]["time"]
+        this.isInitialised.time
       );
       this.loadValidations();
       return true;
@@ -190,12 +193,9 @@ export class EditorService {
   loadValidations() {
     this.dataService.getValidations().subscribe(
       (validations) => {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading study validations",
-          },
-        });
+
+        this.store.dispatch(setLoadingInfo({newInfo: "Loading study validations"}));
+
         this.ngRedux.dispatch({
           type: "LOAD_VALIDATION_RULES",
           body: {
@@ -230,34 +230,21 @@ export class EditorService {
   loadGuides() {
     this.dataService.getLanguageMappings().subscribe(
       (mappings) => {
-        this.ngRedux.dispatch({
-          type: "SET_GUIDES_MAPPINGS",
-          body: {
-            mappings,
-          },
-        });
+        this.store.dispatch(AncillaryActions.retrievedGuidesMappings({newMappings: mappings}))
         const selected_language = localStorage.getItem("selected_language");
         mappings["languages"].forEach((language) => {
           if (
             (selected_language && language.code === selected_language) ||
             (!selected_language && language.default)
           ) {
-            this.ngRedux.dispatch({
-              type: "SET_SELECTED_LANGUAGE",
-              body: {
-                language: language.code,
-              },
-            });
 
+            this.store.dispatch(AncillaryActions.setSelectedLanguage({newLang: language.code}))
+            //----------------------------
             this.dataService.getGuides(language.code).subscribe((guides) => {
-              this.ngRedux.dispatch({
-                type: "SET_GUIDES",
-                body: {
-                  guides: guides["data"],
-                },
-              });
+              this.store.dispatch(AncillaryActions.retrievedGuides({newGuides: guides["data"]}))
             });
           }
+          //---------------------------------
         });
       },
       (err) => {
@@ -269,29 +256,15 @@ export class EditorService {
   loadLanguage(language) {
     this.dataService.getGuides(language).subscribe((guides) => {
       localStorage.setItem("selected_language", language);
-      this.ngRedux.dispatch({
-        type: "SET_SELECTED_LANGUAGE",
-        body: {
-          language,
-        },
-      });
-      this.ngRedux.dispatch({
-        type: "SET_GUIDES",
-        body: {
-          guides: guides["data"],
-        },
-      });
+      this.store.dispatch(AncillaryActions.setSelectedLanguage({newLang: language}))
+
+      this.store.dispatch(AncillaryActions.retrievedGuides({newGuides: guides["data"]}))
     });
   }
 
   getAllStudies() {
     this.dataService.getAllStudies().subscribe((response) => {
-      this.ngRedux.dispatch({
-        type: "SET_USER_STUDIES",
-        body: {
-          studies: response.data,
-        },
-      });
+      this.store.dispatch(retrievedUserStudies({newStudies: response.data}))
     });
   }
 
@@ -311,12 +284,15 @@ export class EditorService {
   toggleLoading(status) {
     if (status !== null) {
       if (status) {
-        this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
+
+        this.store.dispatch(setLoadingEnabled())
       } else {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+        
+        this.store.dispatch(setLoadingDisabled());
       }
     } else {
-      this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+
+      this.store.dispatch(toggleLoading());
     }
   }
 
@@ -348,18 +324,11 @@ export class EditorService {
             investigationFailed: false,
           },
         });
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading investigation details",
-          },
-        });
-        this.ngRedux.dispatch({
-          type: "SET_CONFIGURATION",
-          body: {
-            configuration: study.isaInvestigation.comments,
-          },
-        });
+
+        this.store.dispatch(setLoadingInfo({newInfo: "Loading investigation details"}));
+
+        this.store.dispatch(AncillaryActions.retrievedConfiguration({newConfiguration: study.isaInvestigation.comments}))
+
         this.ngRedux.dispatch({
           type: "SET_STUDY_TITLE",
           body: {
@@ -614,12 +583,7 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
-            body: {
-              info: "Loading Samples data",
-            },
-          });
+          this.store.dispatch(setLoadingInfo({newInfo: "Loading Samples data"}));
           samplesExist = true;
           this.updateSamples(file.file);
         }
@@ -637,12 +601,7 @@ export class EditorService {
   }
 
   loadStudyAssays(files) {
-    this.ngRedux.dispatch({
-      type: "SET_LOADING_INFO",
-      body: {
-        info: "Loading assays information",
-      },
-    });
+    this.store.dispatch(setLoadingInfo({newInfo: "Loading assays information"}))
     files.study.forEach((file) => {
       if (file.file.indexOf("a_") === 0 && file.status === "active") {
         this.updateAssay(file.file);

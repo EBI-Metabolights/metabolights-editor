@@ -8,6 +8,9 @@ import { MetaboLightsWSURL } from "./../../../services/globals";
 import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { Store } from "@ngrx/store";
+import { setLoadingDisabled } from "src/app/state/meta-settings.actions";
+import * as AncillarySelectors from "src/app/state/ancillary.selector";
 
 @Component({
   selector: "app-guides",
@@ -15,9 +18,12 @@ import { ConfigurationService } from "src/app/configuration.service";
   styleUrls: ["./guides.component.css"],
 })
 export class GuidesComponent implements OnInit {
-  @select((state) => state.status.mappings) mappings;
-  @select((state) => state.status.guides) guides;
-  @select((state) => state.status.selectedLanguage) selectedLanguage;
+
+
+  // new state
+  selectedLanguage$ = this.store.select(AncillarySelectors.selectLanguage)
+  selectedMapping$ = this.store.select(AncillarySelectors.selectGuidesMappings)
+  selectedGuides$ = this.store.select(AncillarySelectors.selectGuides)
 
   domain = "";
   repo = "";
@@ -40,7 +46,8 @@ export class GuidesComponent implements OnInit {
     public router: Router,
     private editorService: EditorService,
     private route: ActivatedRoute,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {}
 
   ngOnInit(): void {
@@ -52,17 +59,17 @@ export class GuidesComponent implements OnInit {
   }
 
   setUpSubscriptions() {
-    this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
 
-    this.mappings.subscribe((value) => {
-      if (value != null) {
-        this.languageMappings = value;
-      }
-    });
+    this.store.dispatch(setLoadingDisabled())
 
-    this.guides.subscribe((value) => {
-      if (value != null) {
-        this.guidesSelected = value;
+    this.selectedMapping$.subscribe((value) => {
+      if (value !== null) this.languageMappings = value;
+    })
+
+
+    this.selectedGuides$.subscribe(val => {
+      if (val !== null) {
+        this.guidesSelected = val;
         this.tabs = Object.keys(this.guidesSelected);
         this.tab = this.route.snapshot.paramMap.get("tab");
         if (this.tabs.indexOf(this.tab) > -1) {
@@ -71,13 +78,12 @@ export class GuidesComponent implements OnInit {
           this.setSelectedTab(this.tabs[0]);
         }
       }
-    });
+    })
 
-    this.selectedLanguage.subscribe((value) => {
-      if (value != null) {
-        this.languageSelected = value;
-      }
-    });
+    this.selectedLanguage$.subscribe(lang => {
+      if (lang !== null) this.languageSelected = lang;
+    })
+
   }
 
   open(image: string): void {

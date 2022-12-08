@@ -12,6 +12,8 @@ import { EuropePMCService } from "../../../services/publications/europePMC.servi
 import * as toastr from "toastr";
 
 import { environment } from "src/environments/environment";
+import { Store } from "@ngrx/store";
+import { selectUser } from "src/app/state/user.selectors";
 
 @Component({
   selector: "app-meta",
@@ -19,6 +21,7 @@ import { environment } from "src/environments/environment";
   styleUrls: ["./meta.component.css"],
 })
 export class MetaComponent implements OnInit {
+  //old state
   @select((state) => state.status.user) studyUser;
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.title) studyTitle;
@@ -27,8 +30,12 @@ export class MetaComponent implements OnInit {
   @select((state) => state.study.studyDesignDescriptors)
   studyDesignDescriptors: any[];
 
+  //new state
+  user$ = this.store.select(selectUser)
+
   requestedStudy: string = null;
   user: any = null;
+  checked = null;
 
   currentTitle: string = null;
   currentDescription: string = null;
@@ -63,7 +70,8 @@ export class MetaComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private doiService: DOIService,
-    private europePMCService: EuropePMCService
+    private europePMCService: EuropePMCService,
+    private store: Store
   ) {
     this.editorService.initialiseStudy(this.route);
     if (!environment.isTesting) {
@@ -91,8 +99,13 @@ export class MetaComponent implements OnInit {
     });
     this.studyUser.subscribe((value) => {
       this.user = value;
-      this.user.checked = false;
+      this.checked = false;
     });
+
+
+    this.user$.subscribe(user => {
+      this.user = user;
+    })
   }
 
   getCurrentStudyMetaData() {}
@@ -188,7 +201,7 @@ export class MetaComponent implements OnInit {
                             authorsA.push(this.compileAuthor(author));
                           }
                         });
-                        if (this.user.checked) {
+                        if (this.checked) {
                           authorsA.push(this.compileSubmitter(this.user));
                         }
                         this.editorService

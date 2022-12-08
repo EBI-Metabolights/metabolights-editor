@@ -100,10 +100,20 @@ export const failedValidation = {
       section: "basic",
       details: [
         {
-          message: "Successfully read the investigation file",
+          message: "The concurrent.futures module provides two module utility " + 
+          "functions for waiting for tasks via their Future objects. Recall " +
+          "that Future objects are only created when we call submit() to " + 
+          "push tasks into the thread pool.These wait functions are optional " + 
+          "to use, as you can wait for results directly after calling map() " + 
+          "or submit() or wait for all tasks in the thread pool to finish. " + 
+          "You can use both functions with Future objects created by one or " + 
+          "more thread pools, they are not specific to any given thread pool " + 
+          "in your application. This is helpful if you want to perform waiting "  + 
+          "operations across multiple thread pools that are executing different " +
+           "types of tasks.",
           section: "basic",
           val_sequence: "basic_2",
-          status: "success",
+          status: "error",
           metadata_file: "i_Investigation.txt",
           value: "",
           description:
@@ -196,7 +206,7 @@ export const failedValidation = {
             "File 'QC1_NEG.raw' does not exist (a_MTBLS2411_LC-MS_negative_reverse-phase_metabolite_profiling.txt)",
           val_override: "false",
           val_message: "",
-          comment: "Grabaogoli",
+          comment: "Grabaogoli 2",
         },
       ],
       message: "Unsuccessful validation",

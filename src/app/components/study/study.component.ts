@@ -7,6 +7,7 @@ import { MetaboLightsWSURL } from "./../../services/globals";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { Store } from "@ngrx/store";
 
 @Component({
   selector: "mtbls-study",
@@ -14,6 +15,7 @@ import { ConfigurationService } from "src/app/configuration.service";
   styleUrls: ["./study.component.css"],
 })
 export class StudyComponent implements OnInit, OnDestroy {
+  // old state
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
@@ -21,6 +23,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   @select((state) => state.study.obfuscationCode) studyObfuscationCode;
 
   @select((state) => state.study.investigationFailed) investigationFailed;
+
+  // new state
 
   studyError = false;
   requestedTab = 0;
@@ -37,7 +41,8 @@ export class StudyComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute,
     private editorService: EditorService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {
     /**I am conscious that this is extremely bad practice. However, testing with the angular-redux library,
      * which is at this point abandonware, is a labyrinth of poor documentation and non existent patterns.

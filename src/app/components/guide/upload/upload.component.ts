@@ -12,6 +12,8 @@ import { Router } from "@angular/router";
 
 import { EditorService } from "./../../../services/editor.service";
 import { environment } from "src/environments/environment";
+import { Store } from "@ngrx/store";
+import { selectUser } from "src/app/state/user.selectors";
 
 @Component({
   selector: "raw-upload",
@@ -19,9 +21,13 @@ import { environment } from "src/environments/environment";
   styleUrls: ["./upload.component.css"],
 })
 export class RawUploadComponent implements OnInit {
-  @select((state) => state.status.user) studyUser;
+  //old state
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.files) studyFiles;
+
+  //new state
+  user$ = this.store.select(selectUser)
+
   user: any = null;
   requestedStudy: string = null;
   files: any = {};
@@ -31,7 +37,8 @@ export class RawUploadComponent implements OnInit {
     private ngRedux: NgRedux<IAppState>,
     private route: ActivatedRoute,
     private router: Router,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private store: Store
   ) {
     this.editorService.initialiseStudy(this.route);
     if (!environment.isTesting) {
@@ -40,16 +47,17 @@ export class RawUploadComponent implements OnInit {
   }
 
   setUpSubscriptions() {
-    this.studyUser.subscribe((value) => {
-      this.user = value;
-      this.user.checked = true;
-    });
+
     this.studyIdentifier.subscribe((value) => {
       this.requestedStudy = value;
     });
     this.studyFiles.subscribe((value) => {
       this.files = value;
     });
+
+    this.user$.subscribe(user => {
+      this.user = user;
+    })
   }
 
   ngOnInit() {}

@@ -1,4 +1,4 @@
-<div class="modal" [ngClass]="{ 'is-active': (isLoading | async) }">
+<div class="modal" [ngClass]="{ 'is-active': (loading$ | async) }">
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body vc vh50 has-text-centered">
@@ -7,7 +7,7 @@
         <br />
         <small>
           <p class="has-text-info">
-            <mat-icon>comment</mat-icon>{{ loadingInformation | async }}
+            <mat-icon>comment</mat-icon>{{ loadingInfo$ | async }}
           </p>
         </small>
       </span>
