@@ -22,6 +22,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
   @Input("validations") validations: any;
+  @Input("isReadonly") isReadonly: boolean;
 
   containerHeight: any = 279;
 
@@ -60,7 +61,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
 
   refreshingData = false;
 
-  isReadOnly = false;
+  isReadOnly = true;
 
   // ftp ops response variables
   calculation: FTPResponse = {
@@ -107,17 +108,13 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-    this.checkFTPFolder(false, true)
+    if (!this.isReadonly) this.ftpSetup();
+    
 
-    this.syncStatusSubscription = this.ftpService.getSyncStatus()
-    .subscribe(statusRes => {
-      this.ongoingStatus = statusRes
-      console.log('hit');
-      this.syncStatusSubscription.unsubscribe();
-    })
   }
 
   ngOnChanges(changes) {
+    if(!this.isReadOnly) this.ftpSetup();
   }
 
 
@@ -134,12 +131,18 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     }
   }
 
+  ftpSetup() {
+    this.checkFTPFolder(false, true)
+    this.syncStatusSubscription = this.ftpService.getSyncStatus()
+    .subscribe(statusRes => {
+      this.ongoingStatus = statusRes
+      console.log('hit');
+      this.syncStatusSubscription.unsubscribe();
+    })
+  }
+
   setUpSubscriptions() {
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        this.isReadOnly = value;
-      }
-    });
+
     this.studyStatus.subscribe((value) => {
       this.status = value;
     });

@@ -28,6 +28,7 @@ export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.status.userStudies) userStudies;
   @select((state) => state.study.reviewerLink) studyReviewerLink;
+  @select((state) => state.study.readonly) readonly;
 
   loading: any = true;
   requestedTab = 0;
@@ -40,6 +41,7 @@ export class PublicStudyComponent implements OnInit {
   currentUser: any = null;
   isOwner: any = false;
   isCurator: any = false;
+  isReadonly = true;
   domain = "";
   reviewerLink: string = null;
 
@@ -141,6 +143,10 @@ export class PublicStudyComponent implements OnInit {
     this.studyReviewerLink.subscribe((value) => {
       this.reviewerLink = value;
     });
+
+    this.readonly.subscribe((value) => {
+      this.isReadonly = value;
+    })
 
     this.route.params.subscribe((params) => {
       if (params.tab === "files") {

@@ -18,6 +18,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.status) studyStatus;
+  @select((state) => state.study.readonly) readonly;
   @select((state) => state.study.obfuscationCode) studyObfuscationCode;
 
   @select((state) => state.study.investigationFailed) investigationFailed;
@@ -31,6 +32,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   obfuscationCode: string = null;
   domain: string = null;
   messageExpanded = false;
+  isReadonly = true;
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
@@ -80,6 +82,10 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.studyValidation.subscribe((value) => {
       this.validation = value;
     });
+
+    this.readonly.subscribe((value) => {
+      this.isReadonly = value;
+    })
 
     this.route.params.subscribe((params) => {
       this.requestedStudy = params.id;
