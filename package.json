@@ -13,7 +13,7 @@
   },
   "private": true,
   "dependencies": {
-    "@angular-devkit/build-angular": "^0.1100.2",
+    "@angular-devkit/build-angular": "^15.0.4",
     "@angular-redux/router": "^10.0.0",
     "@angular-redux/store": "^10.0.0",
     "@angular/animations": "^10.0.7",
