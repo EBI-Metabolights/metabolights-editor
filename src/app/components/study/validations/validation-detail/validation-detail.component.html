@@ -15,7 +15,7 @@
     <div class="wrapper container">
       <div class="val-message">
         {{ validationDetail.message }}.
-        
+
       </div>
       <div>
         <span
@@ -63,10 +63,10 @@
   </ng-template>
 </mat-expansion-panel>-->
 <!--validation message start-->
-<div 
+<div
 class="container"
 [ngClass]="[validationDetail.status, 'container']"
-[ngStyle]="{'width': curator === true ? '85%' : '100% !important'}"
+[ngStyle]="{'width': isCurator === true ? '85%' : '100% !important'}"
 >
   <div class="message">
     {{validationDetail.message}}
@@ -95,12 +95,12 @@ class="container"
       </button>
     </span>
     </div>
-    <div 
-    class="chevron" 
+    <div
+    class="chevron"
     matTooltip="Click to show or hide comment box."
     *ngIf="evalCommentButton()">
       <button (click)="handleBoxClick()" class="button toggle-comment">
-        <mat-icon class="icon-translate">rate_review</mat-icon> 
+        <mat-icon class="icon-translate">rate_review</mat-icon>
         {{ visible === true ? 'Hide' : 'Show'}}
 
       </button>
