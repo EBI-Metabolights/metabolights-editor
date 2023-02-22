@@ -26,7 +26,7 @@ export class RawUploadComponent implements OnInit {
   requestedStudy: string = null;
   files: any = {};
   isLoading = false;
-
+  context = ""
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private route: ActivatedRoute,
@@ -52,7 +52,9 @@ export class RawUploadComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.context = environment.contextPath
+  }
 
   isFolder(file) {
     return file.directory;

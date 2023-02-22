@@ -36,6 +36,8 @@ import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { ConfigurationService } from "src/app/configuration.service";
+import { environment } from "src/environments/environment";
+
 /* eslint-disable no-underscore-dangle */
 @Component({
   selector: "mtbls-ontology",
@@ -72,13 +74,14 @@ export class OntologyComponent implements OnInit, OnChanges {
   filteredvalues: Observable<Ontology[]>;
   allvalues: Array<Ontology> = [];
   ontologyDetails: any = {};
-
+  context = ""
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService
   ) {}
 
   ngOnInit() {
+    this.context = environment.contextPath
     this.domain = this.configService.config.metabolightsWSURL.domain;
     if (this.values === null || this.values[0] === null) {
       this.values = [];
@@ -183,7 +186,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   optionSelected(selected: MatAutocompleteSelectedEvent) {
-    if (selected.option.value !== null || selected.option.value !== undefined) {
+    if (selected.option.value !== null && selected.option.value !== undefined) {
       this.setValue(selected.option.value);
       const inputElement = document.getElementById("test") as HTMLInputElement;
       inputElement.value = "";

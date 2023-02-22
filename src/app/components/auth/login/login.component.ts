@@ -18,6 +18,7 @@ export class LoginComponent implements OnInit {
   isFormBusy = false;
   invalidCredentials = false;
   domain = "";
+  context = "";
 
   constructor(
     private fb: FormBuilder,
@@ -36,6 +37,7 @@ export class LoginComponent implements OnInit {
       secret: ["", Validators.required],
     });
     this.domain = this.configService.config.metabolightsWSURL.domain;
+    this.context = environment.contextPath
   }
 
   resetForm() {

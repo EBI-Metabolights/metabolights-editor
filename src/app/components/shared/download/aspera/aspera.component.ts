@@ -31,8 +31,9 @@ export class AsperaDownloadComponent implements OnInit {
   downloadPath = "";
   validation: any = null;
   asperaWeb: any = null;
-
+  context = ""
   ngOnInit() {
+    this.context = environment.contextPath
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }

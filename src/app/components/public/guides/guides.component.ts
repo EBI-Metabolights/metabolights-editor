@@ -33,7 +33,7 @@ export class GuidesComponent implements OnInit {
 
   tab: string = null;
   section: string = null;
-
+  context = ""
   constructor(
     private fb: FormBuilder,
     private ngRedux: NgRedux<IAppState>,
@@ -44,6 +44,7 @@ export class GuidesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.context = environment.contextPath
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
@@ -142,6 +143,11 @@ export class GuidesComponent implements OnInit {
   }
 
   getURLBase(url) {
-    return "/metabolights/editor" + url;
+    const domain = window.location.host.split(".")[0];
+    if (domain === "www" || domain === "wwwdev") {
+      return "/metabolights" + url;
+    } else {
+      return this.context + url;
+    }
   }
 }

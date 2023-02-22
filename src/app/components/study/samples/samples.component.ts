@@ -238,7 +238,7 @@ export class SamplesComponent  {
         );
       }
       columns.push(factorValueColumn.toJSON());
-      if (factorUnitColumn !== null) {
+      if (factorUnitColumn !== undefined) {
         columns.push(factorUnitColumn.toJSON());
       }
       columns.push(factorSourceColumn.toJSON());

@@ -56,7 +56,7 @@ export class MetaComponent implements OnInit {
 
   form: FormGroup;
   isLoading = false;
-
+  context = ""
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
@@ -71,7 +71,9 @@ export class MetaComponent implements OnInit {
     }
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.context = environment.contextPath
+  }
 
   setUpSubscriptions() {
     this.studyIdentifier.subscribe((value) => {

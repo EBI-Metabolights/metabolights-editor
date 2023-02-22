@@ -12,7 +12,7 @@ export class HeaderComponent {
 
   authUser: any = null;
   query = "";
-
+  context = ""
   constructor() {
     if (!environment.isTesting) {
       this.setUpSubscription();
@@ -25,6 +25,10 @@ export class HeaderComponent {
         this.authUser = value;
       }
     });
+  }
+
+  ngOnInit() {
+    this.context = environment.contextPath
   }
 
   sendQuery() {

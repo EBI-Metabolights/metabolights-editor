@@ -57,7 +57,7 @@ export class DesignDescriptorComponent implements OnInit {
   status = "";
 
   loading = false;
-
+  context = ""
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
@@ -195,6 +195,7 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.context = environment.contextPath
     if (this.descriptor === null) {
       this.addNewDescriptor = true;
     }

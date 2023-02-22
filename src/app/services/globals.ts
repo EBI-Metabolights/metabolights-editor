@@ -1,4 +1,5 @@
 import { isDevMode } from "@angular/core";
+import { environment } from "src/environments/environment";
 /* eslint-disable */
 let origin = window.location.origin;
 let branch = "development";
@@ -31,7 +32,7 @@ MetaboLightsWSURL["domain"] = metaboLightsDomain + "/";
 MetaboLightsWSURL["baseURL"] = metaboLightsWSDomain + "/ws";
 MetaboLightsWSURL["studiesList"] = MetaboLightsWSURL["baseURL"] + "/studies";
 MetaboLightsWSURL["study"] = MetaboLightsWSURL["baseURL"] + "/studies";
-MetaboLightsWSURL["validations"] = "assets/configs/validations.json";
+MetaboLightsWSURL["validations"] = environment.contextPath + "/assets/configs/validations.json";
 MetaboLightsWSURL["guides"] =
   "https://raw.githubusercontent.com/EBI-Metabolights/guides/" + branch + "/";
 

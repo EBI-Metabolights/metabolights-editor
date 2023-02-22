@@ -23,10 +23,11 @@ export class DirectoryComponent implements OnInit {
   selectedUploadFiles: any[] = [];
 
   isReadOnly = false;
-
+  context = ""
   constructor(private editorService: EditorService) {}
 
   ngOnInit() {
+    this.context = environment.contextPath
     if (!environment.isTesting) {
       this.setUpSubscription();
     }

@@ -37,7 +37,7 @@ export class GuidedAssaysComponent implements OnInit {
   subStep = 1;
   files: any = [];
   samples: any = {};
-
+  context = ""
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
@@ -82,7 +82,9 @@ export class GuidedAssaysComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.context = environment.contextPath
+  }
 
   deleteSelectedAssay(name) {
     Swal.fire({

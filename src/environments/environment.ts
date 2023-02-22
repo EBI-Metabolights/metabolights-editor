@@ -3,10 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
-  context: "development",
+  production: true,
+  context: "kubernetes",
   isTesting: false,
-  contextPath: "/metabolights/editor",
+  contextPath: "/metabolights/editor"
 };
 
 /*

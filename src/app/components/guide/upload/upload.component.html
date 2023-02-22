@@ -13,7 +13,7 @@
         <img
           style="height: 32px"
           class="is-pulled-left"
-          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+          src="{{ this.context }}/assets/img/MetaboLightsLogo.png"
         />
         <span style="margin-left: 10px">{{ requestedStudy }}</span
         >: Upload files
@@ -71,10 +71,10 @@
                   <div class="column is-three-fifths">
                     <span class="panel-icon">
                       <span *ngIf="isFolder(file); else fileIcon">
-                        <img src="/metabolights/editor/assets/img/folder.png" />
+                        <img src="{{ this.context }}/assets/img/folder.png" />
                       </span>
                       <ng-template #fileIcon>
-                        <img src="/metabolights/editor/assets/img/file.png" />
+                        <img src="{{ this.context }}/assets/img/file.png" />
                       </ng-template>
                     </span>
                     <span>
@@ -99,10 +99,10 @@
                   <div class="column is-three-fifths">
                     <span class="panel-icon">
                       <span *ngIf="isFolder(file); else fileIcon">
-                        <img src="/metabolights/editor/assets/img/folder.png" />
+                        <img src="{{ this.context }}/assets/img/folder.png" />
                       </span>
                       <ng-template #fileIcon>
-                        <img src="/metabolights/editor/assets/img/file.png" />
+                        <img src="{{ this.context }}/assets/img/file.png" />
                       </ng-template>
                     </span>
                     <span>

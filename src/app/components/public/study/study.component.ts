@@ -42,7 +42,7 @@ export class PublicStudyComponent implements OnInit {
   isCurator: any = false;
   domain = "";
   reviewerLink: string = null;
-
+  context = ""
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private editorService: EditorService,
@@ -100,6 +100,7 @@ export class PublicStudyComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.context = environment.contextPath
     this.domain = this.configService.config.metabolightsWSURL.domain;
   }
 

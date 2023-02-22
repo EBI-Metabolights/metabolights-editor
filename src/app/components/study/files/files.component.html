@@ -1,7 +1,7 @@
 <span *ngIf="filesLoading; else showContent">
   <div class="vc vh30">
     <span class="has-text-centered">
-      <img src="/metabolights/editor/assets/img/loading.svg" /><br />
+      <img src="{{ this.context }}/assets/img/loading.svg" /><br />
       <small class="has-text-grey">LOADING FILES</small>
     </span>
   </div>
@@ -23,7 +23,7 @@
       <span *ngIf="refreshingData">
         <img
           style="height: 10px; margin-left: 10px"
-          src="/metabolights/editor/assets/img/loading.svg"
+          src="{{ this.context }}/assets/img/loading.svg"
         />
       </span>
     </span>
@@ -51,11 +51,11 @@
   <div>&nbsp;</div>
 
 <!--ftp management component start-->
-<app-ftp-management 
+<app-ftp-management
   *ngIf="!isReadOnly"
-  [calculation]="calculation" 
-  [ongoingStatus]="ongoingStatus" 
-  [isSyncing]="isSyncing" 
+  [calculation]="calculation"
+  [ongoingStatus]="ongoingStatus"
+  [isSyncing]="isSyncing"
   [isCalculating]="isCalculating"
   [requestedStudy]="requestedStudy"
   (checkClicked)="handleCheckClick($event)"
@@ -64,7 +64,7 @@
 <!--ftp management component end-->
 
 
-  
+
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer></span>
@@ -133,20 +133,20 @@
                     <span *ngIf="file.files; else openFolder">
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder.png"
+                        src="{{ this.context }}/assets/img/folder.png"
                       />
                     </span>
                     <ng-template #openFolder>
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder-open.png"
+                        src="{{ this.context }}/assets/img/folder-open.png"
                       />
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/file.png"
+                      src="{{ this.context }}/assets/img/file.png"
                     />
                   </ng-template>
                 </span>
@@ -202,7 +202,7 @@
     <span *ngIf="rawFilesLoading; else rawFilesLoaded">
       <img
         style="height: 10px; margin-left: 10px"
-        src="/metabolights/editor/assets/img/loading.svg"
+        src="{{ this.context }}/assets/img/loading.svg"
       />
     </span>
     <ng-template #rawFilesLoaded>
@@ -336,6 +336,15 @@
         </span>
       </p>
     </div>
+    <span *ngIf="filteredDerivedDataFiles.length > 0">
+      <span *ngFor="let file of filteredDerivedDataFiles">
+       <mtbls-directory
+         [level]="0"
+         [parent]="''"
+         [file]="file"
+       ></mtbls-directory>
+      </span>
+    </span>
     <span *ngIf="filteredDerivedFiles.length > 0">
       <span *ngFor="let file of filteredDerivedFiles">
         <a class="panel-block">
@@ -353,20 +362,20 @@
                     <span *ngIf="file.files; else openFolder">
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder.png"
+                        src="{{ this.context }}/assets/img/folder.png"
                       />
                     </span>
                     <ng-template #openFolder>
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder-open.png"
+                        src="{{ this.context }}/assets/img/folder-open.png"
                       />
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/file.png"
+                      src="{{ this.context }}/assets/img/file.png"
                     />
                   </ng-template>
                 </span>
@@ -478,13 +487,13 @@
                   <span *ngIf="isFolder(file); else fileIcon">
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/folder.png"
+                      src="{{ this.context }}/assets/img/folder.png"
                     />
                   </span>
                   <ng-template #fileIcon>
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/file.png"
+                      src="{{ this.context }}/assets/img/file.png"
                     />
                   </ng-template>
                 </span>

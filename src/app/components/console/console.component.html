@@ -38,7 +38,7 @@
         <img
           style="height: 32px"
           class="is-pulled-left"
-          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+          src="{{ this.context }}/assets/img/MetaboLightsLogo.png"
         />
         <span style="margin-left: 10px"
           >My Studies
@@ -175,7 +175,7 @@
       </ng-template>
     </nav>
     <p *ngIf="loadingStudies" class="has-text-centered">
-      <img src="/metabolights/editor/assets/img/loading.svg" /> <br />
+      <img src="{{ this.context }}/assets/img/loading.svg" /> <br />
       Loading studies
     </p>
   </div>

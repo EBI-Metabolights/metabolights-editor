@@ -28,7 +28,7 @@ export class CreateComponent implements OnInit {
     },
   ];
   isLoading = false;
-
+  context = ""
   constructor(
     private editorService: EditorService,
     private router: Router,
@@ -38,6 +38,7 @@ export class CreateComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.context = environment.contextPath
     if (!environment.isTesting) {
       this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
     }

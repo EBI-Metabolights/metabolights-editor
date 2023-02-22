@@ -14,20 +14,20 @@
           <span *ngIf="!file.files; else openFolder">
             <img
               class="file-img"
-              src="/metabolights/editor/assets/img/folder.png"
+              src="{{ this.context }}/assets/img/folder.png"
             />
           </span>
           <ng-template #openFolder>
             <img
               class="file-img"
-              src="/metabolights/editor/assets/img/folder-open.png"
+              src="{{ this.context }}/assets/img/folder-open.png"
             />
           </ng-template>
         </span>
         <ng-template #fileIcon>
           <img
             class="file-img"
-            src="/metabolights/editor/assets/img/file.png"
+            src="{{ this.context }}/assets/img/file.png"
           />
         </ng-template>
       </span>

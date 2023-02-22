@@ -24,7 +24,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   submittedStudies: any = [];
 
   isConfirmationModalOpen = false;
-
+  context = ""
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -39,7 +39,9 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.context = environment.contextPath
+  }
 
   toggleMessage() {
     this.messageExpanded = !this.messageExpanded;

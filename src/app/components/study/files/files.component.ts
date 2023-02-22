@@ -38,6 +38,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   filteredRawFiles: any[] = [];
   filteredAuditFiles: any[] = [];
   filteredDerivedFiles: any[] = [];
+  filteredDerivedDataFiles: any[] = [];
   filteredUploadFiles: any[] = [];
 
   selectedMetaFiles: any[] = [];
@@ -93,7 +94,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   syncStatusSubscription: Subscription = null;
   calcIntervalSubscription: Subscription = null;
   syncIntervalSubscription: Subscription = null;
-
+  context = ""
 
   constructor(
     private editorService: EditorService,
@@ -102,6 +103,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   ) {}
 
   ngOnInit() {
+    this.context = environment.contextPath
     this.loadFiles();
     this.loadAccess();
     if (!environment.isTesting) {
@@ -494,6 +496,11 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       ) {
         this.derivedFiles.push(file);
         this.filteredDerivedFiles.push(file);
+      } else if (
+        file.type === "derived_data"
+      ) {
+        this.derivedFiles.push(file);
+        this.filteredDerivedDataFiles.push(file);
       } else {
         this.rawFiles.push(file);
         this.filteredRawFiles.push(file);

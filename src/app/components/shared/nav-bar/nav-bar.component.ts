@@ -4,7 +4,7 @@ import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "./../../../store";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
-
+import { environment } from "src/environments/environment";
 @Component({
   selector: "nav-bar",
   templateUrl: "./nav-bar.component.html",
@@ -14,6 +14,7 @@ export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
   @select((state) => state.study.identifier) studyIdentifier: string;
   domain = "";
+  context = ""
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -22,6 +23,7 @@ export class NavBarComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.context = environment.contextPath
     this.domain = this.configService.config.metabolightsWSURL.domain;
   }
 

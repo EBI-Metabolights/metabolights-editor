@@ -18,7 +18,7 @@ export class InfoComponent implements OnInit {
   requestedStudy: string = null;
   uploadFiles: any[] = [];
   isLoading = false;
-
+  context = ""
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private router: Router,
@@ -39,7 +39,9 @@ export class InfoComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.context = environment.contextPath
+  }
 
   proceedToNextStep() {
     this.router.navigate(["/guide/upload", this.requestedStudy]);

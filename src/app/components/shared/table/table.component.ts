@@ -50,7 +50,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Output() rowEdit = new EventEmitter<any>();
 
   @select((state) => state.study.readonly) readonly;
-
+  context = ""
   @Input("fileTypes") fileTypes: any = [
     {
       filter_name: "All types", // eslint-disable-line
@@ -119,6 +119,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ) {}
 
   ngOnInit() {
+    this.context = environment.contextPath
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }

@@ -31,7 +31,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   obfuscationCode: string = null;
   domain: string = null;
   messageExpanded = false;
-
+  context = ""
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private router: Router,
@@ -114,6 +114,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.context = environment.contextPath
     window.addEventListener("scroll", this.scrollFunction, true);
   }
 
