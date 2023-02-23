@@ -183,19 +183,28 @@
     <div class="modal-background"></div>
     <div class="modal-card">
       <section class="modal-card-body">
-        <p>
+        <p *ngIf="submittedStudies.length < 2">
           You have {{ submittedStudies.length }} Studies in progress. Are you
           sure you want to create another study?
+        </p>
+        <p *ngIf="submittedStudies.length > 1 ">
+          You can create at most two studies in Submitted status, however you have {{ submittedStudies.length }} Submitted studies.
+          To add new one, please complete your current studies and update their status.
         </p>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
             <button (click)="closeConfirmation()" class="button is-info">
-              Cancel
+              <p *ngIf="submittedStudies.length < 2 ">
+                Cancel
+              </p>
+              <p *ngIf="submittedStudies.length > 1">
+                Close
+              </p>
             </button>
           </div>
-          <div class="column is-half has-text-right">
+          <div *ngIf="submittedStudies.length < 2 || isCurator" class="column is-half has-text-right">
             <a [routerLink]="['/guide/create']" class="button is-success"
               >Create new</a
             >

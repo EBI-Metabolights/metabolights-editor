@@ -6,8 +6,11 @@ import { NgRedux } from "@angular-redux/store";
 
 export class InternalServerError {
   constructor(error: any = null) {
+    const errorMessage = error.error.message
+      ? error.error.message
+      : error.message ? error.message : "Internal server error."
     toastr.warning(
-      error.message +
+      errorMessage +
         ' <a href="mailto:metabolights-help@ebi.ac.uk">Contact us</a> if the problem persist.',
       "",
       {
