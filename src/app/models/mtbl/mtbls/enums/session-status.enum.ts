@@ -6,5 +6,4 @@ export enum SessionStatus { // eslint-disable-line no-shadow
   Expired = "session expired",
   Active = "session active",
   NoRecord = "no user data in local storage or data store",
-  Curator = "we do not log out curator users"
 }

@@ -14,7 +14,6 @@ import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 import { HttpResponse } from "@angular/common/http";
 import {browserRefresh} from './app.component';
-import { Session } from "protractor";
 
 @Injectable({
   providedIn: "root",
@@ -24,7 +23,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     private editorService: EditorService,
     private configService: ConfigurationService,
     private router: Router,
-    private ngRedux: NgRedux<IAppState>,
+    private ngRedux: NgRedux<IAppState>
   ) {}
 
   canActivate(
@@ -52,9 +51,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     const isInit = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
 
     switch (this.evaluateSession(isInit)) {
-      case SessionStatus.Curator:
-        return true;
-      
       case SessionStatus.Active:
         if (browserRefresh) {
           return this.editorService.initialise(localStorage.getItem('user'), false);
@@ -106,10 +102,6 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   evaluateSession(isInitialisedObj: IsInitialised): SessionStatus {
     // in app.component.ts we are subscribing to all router events, and recording when that event is NavigationStart,
     // which will either be arriving at the app for the first time, or refreshing the page.
-    
-    // don't logout curators
-    if(this.ngRedux.getState().status['isCurator']) return SessionStatus.Curator
-
     if (
       isInitialisedObj.ready === false &&
       typeof isInitialisedObj.time === "string" &&
