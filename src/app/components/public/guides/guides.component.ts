@@ -143,7 +143,7 @@ export class GuidesComponent implements OnInit {
 
   getURLBase(url) {
     const domain = window.location.host.split(".")[0];
-    if (domain === "www" || domain === "wwwdev") {
+    if (domain === "www" || domain === "wwwdev" || domain === "wwwint" || domain === "www-test") {
       return "/metabolights" + url;
     } else {
       return url;
