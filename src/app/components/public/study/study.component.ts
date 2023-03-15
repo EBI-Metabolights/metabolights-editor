@@ -4,7 +4,6 @@ import { Router } from "@angular/router";
 import { IAppState } from "../../../store";
 import { NgRedux, select } from "@angular-redux/store";
 import { ActivatedRoute } from "@angular/router";
-import { MetaboLightsWSURL } from "./../../../services/globals";
 import { HttpClient } from "@angular/common/http";
 import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
 import { environment } from "src/environments/environment";
@@ -12,6 +11,8 @@ import { ConfigurationService } from "src/app/configuration.service";
 import {SessionStatus} from '../../../models/mtbl/mtbls/enums/session-status.enum';
 import {AuthGuard} from '../../../auth-guard.service';
 import {browserRefresh} from '../../../app.component';
+import { StudyPermisssion } from "src/app/services/headers";
+import { PlatformLocation } from "@angular/common";
 
 @Component({
   selector: "study",
@@ -40,9 +41,10 @@ export class PublicStudyComponent implements OnInit {
   currentUser: any = null;
   isOwner: any = false;
   isCurator: any = false;
-  domain = "";
+  endpoint = "";
+  baseHref: any = "";
   reviewerLink: string = null;
-
+  permissions: StudyPermisssion = null;
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private editorService: EditorService,
@@ -50,57 +52,45 @@ export class PublicStudyComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private labsWorkspaceService: LabsWorkspaceService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private platformLocation: PlatformLocation
   ) {
-    let isInitialised;
-    if (!environment.isTesting) {
-      isInitialised = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
-    }
-    let obfuscationCode = localStorage.getItem("obfuscationCode");
-    const owner = localStorage.getItem("isOwner");
-    if (owner && owner !== null && owner !== "") {
-      this.isOwner = JSON.parse(owner.toLowerCase());
-    }
 
-    const curator = localStorage.getItem("isCurator");
-    if (curator && curator !== null && curator !== "") {
-      this.isCurator = JSON.parse(curator.toLowerCase());
-    }
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+    this.permissions = this.ngRedux.getState().status.studyPermission;
 
-    if (obfuscationCode) {
-      obfuscationCode = obfuscationCode.replace("reviewer", "");
-      const studyID = localStorage.getItem("mtblsid");
-      if (!isInitialised.ready) {
-        this.editorService.initialise(
-          '{"apiToken":"ocode:' + obfuscationCode + '"}',
-          false
-        );
-        if (!environment.isTesting) {
-          this.loadStudy(studyID);
-        }
+    const curatorStatus = localStorage.getItem("isCurator");
+    const userName = localStorage.getItem("username");
+    if (curatorStatus !== null && curatorStatus.toLowerCase() === "true"){
+      this.isCurator = true;
+    }
+    let reviewMode = false;
+    const studyId = this.route.snapshot.paramMap.get("study");
+    const obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
+
+    if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === studyId){
+      if (obfuscationCode === this.permissions.obfuscationCode && this.permissions.studyStatus.toUpperCase() === "INREVIEW"){
+        reviewMode = true;
       }
+      if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
+        this.isOwner = true;
+      }
+    }
+
+    if (reviewMode === true) {
+      this.loadStudy(studyId);
     } else {
-      switch (this.authGuardService.evaluateSession(isInitialised)) {
-        case SessionStatus.Active:
-          if (browserRefresh) {
-            this.editorService.initialise(localStorage.getItem('user'), false);
-          }
-          if (!environment.isTesting) {
-            this.loadStudy(null);
-          }
-          break;
-        default:
-          if (!environment.isTesting) {
-            this.loadStudy(null);
-          }
-          break;
-
-      }
+      this.loadStudy(null);
     }
   }
 
   ngOnInit() {
-    this.domain = this.configService.config.metabolightsWSURL.domain;
+    if (this.configService.config.endpoint.endsWith("/")){
+      this.endpoint = this.configService.config.endpoint;
+    } else {
+      this.endpoint = this.configService.config.endpoint + "/";
+    }
+
   }
 
   loadStudy(studyId) {
@@ -125,9 +115,13 @@ export class PublicStudyComponent implements OnInit {
     this.studyFiles.subscribe((value) => {
       this.files = value;
       this.loading = false;
-      if (this.isCurator || this.isOwner) {
-        this.editorService.validateStudy();
-      }
+        if(this.status === undefined || this.status === null || this.status === "Public"){
+          return;
+        }
+
+        if (this.isCurator || this.isOwner) {
+          this.editorService.validateStudy();
+        }
     });
 
     this.investigationFailed.subscribe((value) => {
@@ -176,6 +170,11 @@ export class PublicStudyComponent implements OnInit {
         currentTabIndex: index,
       },
     });
+
+
+    const queryParams = this.route.snapshot.queryParamMap;
+
+
     const urlSplit = window.location.pathname
       .replace(/\/$/, "")
       .split("/")
@@ -185,10 +184,23 @@ export class PublicStudyComponent implements OnInit {
         urlSplit.pop();
       }
     }
+    let location = window.location.origin + "/" + urlSplit.join("/") + "/" + tab;
+    if (queryParams.keys.length > 0) {
+      const params = Array(0);
+      for(const i of queryParams.keys){
+        if (i !== "loginOneTimeToken"){
+          params.push(i+"="+queryParams.get(i));
+        }
+      }
+      if (params.length > 0){
+        location = window.location.origin + "/" + urlSplit.join("/") + "/" + tab + "?" + params.join("&");
+      }
+
+    }
     window.history.pushState(
       "",
       "",
-      window.location.origin + "/" + urlSplit.join("/") + "/" + tab
+      location
     );
     if (index === 6) {
       this.editorService.validateStudy();

@@ -9,11 +9,16 @@ import { Router } from "@angular/router";
 
 import { map } from "rxjs/operators";
 
-import { LoginURL, RedirectURL } from "./../services/globals";
-import { httpOptions } from "./../services/headers";
+import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermisssion } from "./../services/headers";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
+import { stringify } from "@angular/compiler/src/util";
+import jwtDecode from "jwt-decode";
+import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
+import * as toastr from "toastr";
+import { HttpHeaders } from "@angular/common/http";
+
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
 
@@ -39,6 +44,8 @@ export class EditorService {
   @select((state) => state.study.validations) studyValidations;
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.study.studyAssays) studyAssays;
+  @select((state) => state.study) stateStudy;
+  study: MTBLSStudy;
 
   redirectUrl = "";
   currentStudyIdentifier: string = null;
@@ -55,15 +62,18 @@ export class EditorService {
   };
 
   constructor(
-    private ngRedux: NgRedux<IAppState>,
+    public ngRedux: NgRedux<IAppState>,
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
-    private configService: ConfigurationService
+    public configService: ConfigurationService
   ) {
     this.redirectUrl = this.configService.config.redirectURL;
     this.studyIdentifier.subscribe((value) => {
       this.currentStudyIdentifier = value;
+    });
+    this.stateStudy.subscribe((value) => {
+      this.study = value;
     });
     this.studyValidations.subscribe((value) => {
       this.validations = value;
@@ -78,9 +88,9 @@ export class EditorService {
   }
 
   logout(redirect) {
-    localStorage.removeItem("user");
-    localStorage.removeItem("time");
-    localStorage.removeItem("state");
+
+    this.clearSessionData();
+
     this.ngRedux.dispatch({
       type: "RESET",
     });
@@ -98,6 +108,9 @@ export class EditorService {
   getValidatedJWTUser(body) {
     return this.authService.getValidatedJWTUser(body);
   }
+  getAuthenticatedUser(jwt, userName) {
+    return this.authService.getAuthenticatedUser(jwt, userName);
+  }
 
   metaInfo() {
     return this.dataService.getMetaInfo();
@@ -106,22 +119,138 @@ export class EditorService {
   loadStudyInReview(id) {
     this.loadStudyId(id);
     this.loadStudy(id, true);
-    this.loadValidations();
+    // this.loadValidations();
   }
 
   loadPublicStudy(body) {
     this.loadStudyId(body.id);
     this.loadStudy(body.id, true);
-    this.loadValidations();
+    // if(this.study !== null && this.study.status !== null && this.study.status !== "Public"){
+    //   this.loadValidations();
+    // }
+  }
+
+  async getJwtWithOneTimeToken(oneTimeToken: string) {
+    const config = this.configService.config;
+    const url = config.metabolightsWSURL.baseURL + config.authenticationURL.getJwtWithOneTimeToken;
+    const requestHeaders = new HttpHeaders({
+      Accept: "application/json",
+      one_time_token: oneTimeToken
+    });
+    interface RequestBody {
+      jwt: string;
+    }
+    try {
+      const response = await this.authService.http.get<RequestBody>(url,
+        {
+          headers: requestHeaders,
+          observe: "body",
+        }
+      ).toPromise();
+      return response.jwt;
+    } catch (err) {
+      console.log(err);
+      toastr.error(err.message, "Error", {
+        timeOut: "5000",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: true,
+      });
+      return null;
+    }
+  }
+
+  async getStudyPermissionByObfuscationCode(obfuscationCode: string) {
+    return this.getStudyPermission(obfuscationCode, "/auth/permissions/obfuscationcode/");
+  }
+
+  async getStudyPermissionByStudyId(studyId: string) {
+    return this.getStudyPermission(studyId, "/auth/permissions/accession-number/");
+  }
+
+  async getStudyPermission(key: string, path: string) {
+    const url = this.configService.config.metabolightsWSURL.baseURL + path + key;
+    try {
+      const response = await this.authService.http.get<StudyPermisssion>(url,
+        {
+          headers: httpOptions.headers,
+          observe: "body",
+        }
+      ).toPromise();
+      return response;
+    } catch (err) {
+      console.log(err);
+      toastr.error(err.message, "Error", {
+        timeOut: "2500",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: true,
+      });
+      return null;
+    }
+  }
+
+  async updateSession(){
+    const activeJwt = localStorage.getItem("jwt");
+    const localUser = localStorage.getItem("user");
+    const user: MetabolightsUser = JSON.parse(localUser);
+    if(activeJwt !== null){
+      const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
+      const username = decoded.sub;
+      if (user === null || user.email !== username){
+        this.clearSessionData();
+        this.ngRedux.dispatch({
+          type: "RESET",
+        });
+        await this.loginWithJwt(activeJwt, username);
+        return true;
+      } else {
+        // console.log('user json ' + user);
+        const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+        localStorage.setItem("isCurator", isCurator);
+        const apiToken = user.apiToken ?? "";
+        localStorage.setItem("apiToken", apiToken);
+        localStorage.setItem("username", user.email);
+        localStorage.setItem("jwtExpirationTime", decoded.exp.toString());
+        this.initialise(localUser, false);
+      }
+      return false;
+    } else {
+      this.clearSessionData();
+    }
+    return false;
+  }
+
+  clearSessionData(){
+    localStorage.removeItem("jwt");
+    localStorage.removeItem("username");
+    localStorage.removeItem("jwtExpirationTime");
+    localStorage.removeItem("user");
+    localStorage.removeItem("isCurator");
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("apiToken");
+    localStorage.removeItem("loginOneTimeToken");
+  }
+
+  async loginWithJwt(jwtToken: string, userName: string) {
+    const body = { jwt: jwtToken, user: userName };
+    const url = this.configService.config.metabolightsWSURL.baseURL + this.configService.config.authenticationURL.initialise;
+    const response = await this.authService.http.post(url, body, httpOptions).toPromise();
+    const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
+    const expiration = decoded.exp;
+    localStorage.setItem("jwt", jwtToken);
+
+    localStorage.setItem("username", userName);
+    localStorage.setItem("jwtExpirationTime", expiration.toString());
+    return this.initialise(response, true);
   }
 
   initialise(data, signInRequest) {
     interface User {
       updatedAt: number;
-      workspaceLocation: string;
-      settings: Record<string, any>;
-      projects: Record<string, any>;
-      owner: { apiToken: string };
+      owner: { apiToken: string; role: string; email: string; status: string };
       message: string;
       err: string;
     }
@@ -131,6 +260,8 @@ export class EditorService {
       const user: User = JSON.parse(userstr);
       // console.log('user json ' + user);
       localStorage.setItem("user", JSON.stringify(user.owner));
+      const isCurator = user.owner.role === "ROLE_SUPER_USER" ? "true" : "false";
+      localStorage.setItem("isCurator", isCurator);
       httpOptions.headers = httpOptions.headers.set(
         "user_token",
         user.owner.apiToken
@@ -150,10 +281,6 @@ export class EditorService {
           studies: null,
         },
       });
-      localStorage.setItem(
-        "time",
-        this.ngRedux.getState().status["isInitialised"]["time"]
-      );
 
       this.loadValidations();
       return true;
@@ -163,6 +290,8 @@ export class EditorService {
         "user_token",
         disambiguateUserObj(user)
       );
+      const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+      localStorage.setItem("isCurator", isCurator);
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
@@ -178,10 +307,6 @@ export class EditorService {
           studies: null,
         },
       });
-      localStorage.setItem(
-        "time",
-        this.ngRedux.getState().status["isInitialised"]["time"]
-      );
       this.loadValidations();
       return true;
     }

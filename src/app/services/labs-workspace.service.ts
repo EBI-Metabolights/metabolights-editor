@@ -13,7 +13,7 @@ export class LabsWorkspaceService {
     private configService: ConfigurationService
   ) {
     this.url =
-      this.configService.config.endpoint +
+      this.configService.config.metabolightsWSURL.baseURL +
       this.configService.config.authenticationURL.initialise;
   }
 

@@ -30,7 +30,7 @@
         >
           <img
             height="20px"
-            src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+            src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
           />&nbsp;MetaboLights&nbsp;Study Editor
         </a>
       </ng-template>
@@ -42,7 +42,7 @@
       <a
         *ngIf="mode != 'light'"
         target="_blank"
-        [href]="domain + (studyIdentifier | async)"
+        [href]="baseHref + (studyIdentifier | async)"
         class="navbar-item"
       >
         <i class="material-icons"> visibility </i>&nbsp;Preview

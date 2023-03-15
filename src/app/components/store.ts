@@ -17,7 +17,10 @@ import {
   SET_GUIDES,
   SET_USER,
   RESET,
+  SET_STUDY_PERMISSION,
+  RESET_STUDY_PERMISSION
 } from "./actions";
+import { SET_STUDY_ASSAY } from "./study/actions";
 
 export interface IsInitialised {
   ready: boolean;
@@ -42,6 +45,7 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
   mappings: null,
   selectedLanguage: "en",
   guides: null,
+  studyPermission: null,
 };
 
 function toggleLoading(state) {
@@ -110,6 +114,13 @@ function setGuides(state, action) {
   return tassign(state, { guides: action.body.guides });
 }
 
+function setStudyPermission(state, action) {
+  return tassign(state, { studyPermission: action.body.studyPermission });
+}
+function resetStudyPermission(state, action) {
+  return tassign(state, { studyPermission: null });
+}
+
 function setLoadingConfiguration(state, action) {
   const configurationValue = {};
   action.body.configuration.forEach((config) => {
@@ -164,6 +175,10 @@ export function sharedReducer(
       return setSelectedLanguage(state, action);
     case SET_GUIDES:
       return setGuides(state, action);
+    case SET_STUDY_PERMISSION:
+      return setStudyPermission(state, action);
+    case RESET_STUDY_PERMISSION:
+      return resetStudyPermission(state, action);
   }
 
   return state;

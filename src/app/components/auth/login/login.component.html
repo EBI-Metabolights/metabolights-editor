@@ -5,7 +5,7 @@
         <img
           style="height: 32px"
           class="is-pulled-left"
-          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+          src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
         />
         <span style="margin-top: -25px; margin-left: 10px"
           >MetaboLights - Study Editor</span
@@ -62,7 +62,7 @@
                     <a
                       class="button is-white forgot-button is-pulled-right"
                       target="_blank"
-                      [href]="domain + 'forgotPassword'"
+                      [href]="endpoint + 'forgotPassword'"
                       >Forgot Your Password?</a
                     >
                   </div>
@@ -75,7 +75,7 @@
     </nav>
     <p class="has-text-centered">
       <br />
-      <a target="_blank" [href]="domain + 'newAccount'">
+      <a target="_blank" [href]="endpoint + 'newAccount'">
         <mat-icon>person</mat-icon> Create a new account</a
       >
     </p>

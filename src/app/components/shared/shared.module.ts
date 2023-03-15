@@ -49,6 +49,7 @@ import { EuropePMCService } from "src/app/services/publications/europePMC.servic
 import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
 import { EditTableDirective } from "src/app/directives/edit-table.directive";
 import { QuillModule } from "ngx-quill";
+import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -82,6 +83,7 @@ import { QuillModule } from "ngx-quill";
     OntologyComponent,
     OntologyDetailsComponent,
     EditTableDirective,
+    NoStudyPageComponent,
   ],
   imports: [
     CommonModule,

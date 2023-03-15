@@ -1,0 +1,27 @@
+<div class="columns" style="min-height: 100vh; margin: 60px 0">
+  <div class="column is-8 is-offset-2">
+    <div style="margin: 0 0 20px 0">
+      <article class="message is-small has-shadow">
+        <div (click)="toggleMessage()" class="message-header">
+          <p>
+            <span class="material-icons">error</span>&nbsp;{{ messageHeader }}
+          </p>
+          <button
+            *ngIf="!messageExpanded"
+            style="background-color: transparent; border: 0"
+          >
+            <span class="material-icons">keyboard_arrow_down</span>
+          </button>
+          <button
+            *ngIf="messageExpanded"
+            style="background-color: transparent; border: 0"
+          >
+            <span class="material-icons">keyboard_arrow_up</span>
+          </button>
+        </div>
+        <div *ngIf="messageExpanded" class="message-body">
+          {{ messageContent }}
+        </div>
+      </article>
+    </div>
+</div>

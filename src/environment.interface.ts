@@ -50,4 +50,5 @@ interface AuthenticationURL {
   token: string; // endpoint for requests to acquire and validate tokens.
   initialise: string; // endpoint to intialise the editor with the user information, and studies pertaining to that user.
   studiesList: string; // root study endpoint on the webservice, used to both get a list of studies and individual studies.
+  getJwtWithOneTimeToken: string;
 }

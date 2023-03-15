@@ -34,6 +34,7 @@ export class MockConfigurationService {
         token: "/webservice/labs/authenticateToken",
         initialise: "/webservice/labs-workspace/initialise",
         studiesList: "/webservice/study/myStudies",
+        getJwtWithOneTimeToken: ""
       },
       videoURL: {
         all: "",

@@ -135,7 +135,7 @@
                 <a
                   id="mlLogo"
                   class="ml-logo"
-                  href="index"
+                  href="{{ metabolightsWebsiteUrl }}/index"
                   title="Back to MetaboLights homepage"
                 >
                   <img
@@ -170,15 +170,15 @@
                 <small class="hidden-xs">
                   <span class="examples"
                     >Examples:
-                    <a href="/metabolights/search?freeTextQuery=alanine"
+                    <a href="{{ metabolightsWebsiteUrl }}/search?freeTextQuery=alanine"
                       >Alanine</a
                     >,
-                    <a href="/metabolights/search?freeTextQuery=Homo sapiens"
+                    <a href="{{ metabolightsWebsiteUrl }}/search?freeTextQuery=Homo sapiens"
                       >Homo sapiens</a
                     >,
-                    <a href="/metabolights/search?freeTextQuery=urine">Urine</a
+                    <a href="{{ metabolightsWebsiteUrl }}/search?freeTextQuery=urine">Urine</a
                     >,
-                    <a href="/metabolights/search?freeTextQuery=MTBLS1"
+                    <a href="{{ metabolightsWebsiteUrl }}/search?freeTextQuery=MTBLS1"
                       >MTBLS1</a
                     >
                   </span></small
@@ -209,33 +209,33 @@
           >
             <span class="hidden-sm hidden-md">
               <ul class="nav navbar-nav cnav">
-                <li><a href="/metabolights/index">Home</a></li>
-                <li><a href="/metabolights/studies">Browse Studies</a></li>
-                <li><a href="/metabolights/compounds">Browse Compounds</a></li>
-                <li><a href="/metabolights/species">Browse Species</a></li>
-                <li><a href="/metabolights/download">Download</a></li>
-                <li><a href="/metabolights/guides">Help</a></li>
-                <li><a href="/metabolights/contact">Give us feedback</a></li>
-                <li><a href="/metabolights/about">About</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/index">Home</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/studies">Browse Studies</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/compounds">Browse Compounds</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/species">Browse Species</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/download">Download</a></li>
+                <li><a href="{{ baseHref }}guides">Help</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/contact">Give us feedback</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/about">About</a></li>
               </ul>
               <ul class="nav navbar-nav cnav navbar-right">
-                <li><a href="/metabolights/presubmit">Submit Study</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/presubmit">Submit Study</a></li>
                 <li *ngIf="authUser && authUser.firstName">
-                  <a href="/metabolights/useroptions">{{
+                  <a href="{{ metabolightsWebsiteUrl }}/useroptions">{{
                     authUser.firstName
                   }}</a>
                 </li>
                 <li *ngIf="!authUser || !authUser.firstName">
-                  <a href="/metabolights/login">Login</a>
+                  <a href="{{ metabolightsWebsiteUrl }}/login">Login</a>
                 </li>
               </ul>
             </span>
             <span class="hidden-xs hidden-lg">
               <ul class="nav navbar-nav cnav">
-                <li><a href="/metabolights/index">Home</a></li>
-                <li><a href="/metabolights/studies">Browse Studies</a></li>
-                <li><a href="/metabolights/compounds">Browse Compounds</a></li>
-                <li><a href="/metabolights/species">Browse Species</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/index">Home</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/studies">Browse Studies</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/compounds">Browse Compounds</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/species">Browse Species</a></li>
                 <li class="dropdown">
                   <a
                     href="#"
@@ -247,26 +247,26 @@
                     >More <span class="caret"></span
                   ></a>
                   <ul class="dropdown-menu">
-                    <li><a href="/metabolights/download">Download</a></li>
-                    <li><a href="/metabolights/guides">Help</a></li>
+                    <li><a href="{{ metabolightsWebsiteUrl }}/download">Download</a></li>
+                    <li><a href="{{ baseHref }}guides">Help</a></li>
                     <li>
-                      <a href="/metabolights/contact">Give us feedback</a>
+                      <a href="{{ metabolightsWebsiteUrl }}/contact">Give us feedback</a>
                     </li>
-                    <li><a href="/metabolights/about">About</a></li>
+                    <li><a href="{{ metabolightsWebsiteUrl }}/about">About</a></li>
                   </ul>
                 </li>
               </ul>
               <ul class="nav navbar-nav cnav navbar-right">
-                <li><a href="/metabolights/presubmit">Submit Study</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/presubmit">Submit Study</a></li>
                 <span *ngIf="authUser; else noUser">
                   <li>
-                    <a href="/metabolights/useroptions">{{
+                    <a href="{{ metabolightsWebsiteUrl }}/useroptions">{{
                       authUser.firstName
                     }}</a>
                   </li>
                 </span>
                 <ng-template #noUser>
-                  <li><a href="/metabolights/login">Login</a></li>
+                  <li><a href="{{ metabolightsWebsiteUrl }}/login">Login</a></li>
                 </ng-template>
               </ul>
             </span>

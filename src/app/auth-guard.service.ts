@@ -1,10 +1,12 @@
-import { Injectable } from "@angular/core";
+import { Injectable, OnInit } from "@angular/core";
+import * as toastr from "toastr";
 import {
   CanActivate,
   Router,
   ActivatedRouteSnapshot,
   RouterStateSnapshot,
   CanActivateChild,
+  ActivatedRoute,
 } from "@angular/router";
 import { EditorService } from "./services/editor.service";
 import { NgRedux } from "@angular-redux/store";
@@ -14,70 +16,200 @@ import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 import { HttpResponse } from "@angular/common/http";
 import {browserRefresh} from './app.component';
-
+import jwtDecode from "jwt-decode";
+import { httpOptions, MtblsJwtPayload } from "./services/headers";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { catchError, map } from "rxjs/operators";
+import { throwError } from "rxjs";
+import { ErrorMessageService } from "./services/error-message.service";
 @Injectable({
   providedIn: "root",
 })
-export class AuthGuard implements CanActivate, CanActivateChild {
+export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
+
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
     private router: Router,
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private errorMessageService: ErrorMessageService,
     private ngRedux: NgRedux<IAppState>
   ) {}
 
-  canActivate(
+
+  async canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
+  ) {
     const url: string = state.url;
-    return this.checkLogin(url);
+    const continueProcess = await this.checkAuthenticationRequest(state);
+    if (continueProcess === false){
+      return false;
+    }
+    return await this.checkUrlAndLogin(url, state);
   }
 
-  canActivateChild(
+  async checkAuthenticationRequest(state: RouterStateSnapshot) {
+    try{
+      let loginOneTimeToken = null;
+      if(state.root.queryParamMap.has("loginOneTimeToken") === false){
+        return true;
+      }
+
+      loginOneTimeToken = state.root.queryParamMap.get("loginOneTimeToken");
+      this.updateHistory(state);
+      if(loginOneTimeToken === ""){
+        this.editorService.redirectUrl = state.url;
+        this.router.navigate(["/login"]);
+        return false;
+      }
+
+      const localLoginOneTimeToken = localStorage.getItem("loginOneTimeToken");
+
+      if (localLoginOneTimeToken === loginOneTimeToken){
+        return true;
+      }
+      const jwt = await this.editorService.getJwtWithOneTimeToken(loginOneTimeToken);
+      let decoded = null;
+      try{
+         decoded = jwtDecode<MtblsJwtPayload>(jwt);
+      } catch(err){
+      }
+      if (decoded === null){
+        this.editorService.redirectUrl = state.url;
+        this.router.navigate(["/login"]);
+        return false;
+      }
+
+      const localJwt = localStorage.getItem("jwt");
+
+      if (localJwt !== null && jwt === localJwt){
+        return true;
+      }
+
+      const userName = decoded.sub;
+
+      if (localJwt === null){
+        this.editorService.redirectUrl = state.url;
+        await this.editorService.loginWithJwt(jwt, userName);
+        localStorage.setItem("loginOneTimeToken", loginOneTimeToken);
+        toastr.success(userName + "is logged in successfully.", "Metabolights Editor session is activated.", {
+          timeOut: "5000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
+      } else {
+        let localDecoded = null;
+        try{
+          localDecoded= jwtDecode<MtblsJwtPayload>(localJwt);
+        } catch(err){
+        }
+        const currentUser = localDecoded.sub;
+        if(currentUser !== userName) {
+          await this.editorService.loginWithJwt(jwt, userName);
+          toastr.info("User: " + userName , "Session is swithed to other user.", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
+      }
+      return true;
+    } catch(err) {
+      this.editorService.redirectUrl = state.url;
+      const errorCode = "E-0001-001";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    }
+  }
+
+  updateHistory(state: RouterStateSnapshot){
+    const queryParams = state.root.queryParamMap;
+    let location = window.location.origin + "/" + window.location.pathname;
+
+    if (queryParams.keys.length > 0) {
+      const params = Array(0);
+      for(const i of queryParams.keys){
+        if (i !== "loginOneTimeToken"){
+          params.push(i+"="+queryParams.get(i));
+        }
+      }
+      if (params.length > 0){
+        location = window.location.origin + "/" + window.location.pathname + "?" + params.join("&");
+      }
+    }
+    window.history.pushState(
+      "",
+      "",
+      location
+    );
+  }
+
+  async canActivateChild(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ): boolean {
-    return this.canActivate(route, state);
+  ) {
+    return await this.canActivate(route, state);
+  }
+
+  // eslint-disable-next-line @angular-eslint/contextual-lifecycle
+  ngOnInit(): void {
   }
 
   /**
-   * Checks whether a user is logged in.
+   * Checks whether a user is logged in or view file.
    *
    * @param url - url to be used a redirect if the user is found to be not logged in.
    * @returns boolean indicating whether the user is logged in.
    */
-  checkLogin(url: string): boolean {
-    const isInit = this.ngRedux.getState().status["isInitialised"]; // eslint-disable-line @typescript-eslint/dot-notation
+  async checkUrlAndLogin(url: string, state: RouterStateSnapshot) {
+    const localJwt = localStorage.getItem("jwt");
+    if (url.startsWith("/login")){
+      if(localJwt !== null){
+        this.router.navigate(["/console"]);
+        return false;
+      } else {
+        return true;
+      }
+    }
+    let studyIdentifier = null;
+    let obfuscationCode = null;
+    if (url.startsWith("/MTBLS")) {
+      studyIdentifier = url.split("/")[1];
+    } else if (url.startsWith("/study/MTBLS")){
+      studyIdentifier = url.split("/")[2];
+    } else if (url.startsWith("/reviewer")) {
+      obfuscationCode = url.split("/")[1].replace("reviewer", "");
+    }else if (url.startsWith("/study/")) {
+      this.editorService.redirectUrl = url;
+      const errorCode = "E-0001-001";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    }
 
-    switch (this.evaluateSession(isInit)) {
+    if (studyIdentifier !== null){
+      return await this.checkStudyUrl(url, studyIdentifier, state);
+    } else if(obfuscationCode !== null) {
+      return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
+    }
+
+    switch (this.evaluateSession(null)) {
       case SessionStatus.Active:
-        if (browserRefresh) {
-          return this.editorService.initialise(localStorage.getItem('user'), false);
-        }
         return true;
 
       case SessionStatus.Expired:
+        this.editorService.redirectUrl = url;
         this.editorService.logout(false);
         return false;
 
       case SessionStatus.NotInit:
-        const isUserJSON = this.isJSON(localStorage.getItem("user"));
-        if (isUserJSON) {
-          const user = JSON.parse(localStorage.getItem("user"));
-          this.editorService
-            .authenticateAPIToken({ token: user.apiToken, user })
-            .subscribe((res: HttpResponse<any>) => {
-              this.editorService
-                .getValidatedJWTUser(res)
-                .subscribe((jwtres) => {
-                  this.router.navigate([this.editorService.redirectUrl]);
-                  return this.editorService.initialise(jwtres, true);
-                });
-            });
-        } else {
-          this.editorService.logout(false);
-        }
+        this.editorService.redirectUrl = url;
+        await this.editorService.updateSession();
         break;
 
       case SessionStatus.NoRecord:
@@ -92,6 +224,105 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return false;
     }
   }
+  async checkStudyObfuscationCode(url: string, obfuscationCode: string, state: RouterStateSnapshot, studyId: string) {
+    const studyPermission = await this.editorService.getStudyPermissionByObfuscationCode(obfuscationCode);
+    if (studyPermission === null || studyPermission.studyId === ""){
+      this.editorService.redirectUrl = url;
+      const errorCode = "E-0001-002";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    }
+    if (studyId !== null && studyId !== studyPermission.studyId){
+      this.editorService.redirectUrl = url;
+      const errorCode = "E-0001-002";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    }
+    if (url.startsWith("/reviewer")) {
+      if (studyPermission.view){
+        if (url.startsWith("/reviewer")){
+          const params = { reviewCode: obfuscationCode };
+          this.router.navigate(["/" + studyPermission.studyId + "/files"], {queryParams: params});
+          return false;
+        }
+        const permissions = studyPermission;
+        this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: {studyPermission: permissions} });
+        return true;
+      }
+    }
+    if (studyPermission.view){
+      if (url.startsWith("/reviewer")){
+        const params = { reviewCode: obfuscationCode };
+        this.router.navigate(["/" + studyPermission.studyId + "/files"], {queryParams: params});
+        return false;
+      } else if (url.startsWith("/MTBLS")){
+
+      }
+      const permissions = studyPermission;
+      this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: {studyPermission: permissions} });
+      return true;
+    }
+    return false;
+  }
+
+  async checkStudyUrl(url: string, studyId: string, state: RouterStateSnapshot) {
+    const regEx = new RegExp('^(MTBLS[1-9][0-9]{0,10})($|\\?)', 'g');
+    const studyIdResults = studyId.match(regEx);
+    if (studyIdResults === null || studyIdResults.length === 0){
+      this.editorService.redirectUrl = url;
+      const errorCode = "E-0001-003";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    }
+    let studyIdentifier = studyIdResults[0];
+    if(studyIdentifier.endsWith("?")){
+      studyIdentifier = studyIdResults[0].slice(0, -1);
+    }
+    const studyPermission = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
+    if (studyPermission === null || studyPermission.studyId === ""){
+      this.editorService.redirectUrl = url;
+      const errorCode = "E-0001-002";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    }
+
+    const isPublic = studyPermission.studyStatus.toUpperCase() === "PUBLIC";
+    if (url.startsWith("/MTBLS")){
+      const isCurator = localStorage.getItem("isCurator");
+
+      if (isPublic || studyPermission.submitterOfStudy || (isCurator && isCurator.toLowerCase() === "true")) {
+        const permissions = studyPermission;
+        this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: {studyPermission: permissions} });
+        return true;
+      }
+      const reviewCode = state.root.queryParams.reviewCode;
+      if (reviewCode){
+        return await this.checkStudyObfuscationCode(url, reviewCode, state, studyId);
+      }
+
+      this.editorService.redirectUrl = url;
+      const errorCode = "E-0001-004";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+      return false;
+    } else {
+      if (studyPermission.edit){
+        const permissions = studyPermission;
+        this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: {studyPermission: permissions} });
+        return true;
+      } else {
+        if (studyPermission.userName == null || studyPermission.userName.length === 0){
+          this.editorService.redirectUrl = url;
+          this.router.navigate(["/login"]);
+        } else {
+          this.editorService.redirectUrl = url;
+          const errorCode = "E-0001-004";
+          this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode}});
+        }
+        return false;
+      }
+    }
+
+  }
 
   /**
    * check whether a user has an open session, and if they do, whether it is still valid
@@ -102,41 +333,40 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   evaluateSession(isInitialisedObj: IsInitialised): SessionStatus {
     // in app.component.ts we are subscribing to all router events, and recording when that event is NavigationStart,
     // which will either be arriving at the app for the first time, or refreshing the page.
-    if (
-      isInitialisedObj.ready === false &&
-      typeof isInitialisedObj.time === "string" &&
-      localStorage.getItem("user") === null
-    ) {
+    // if (
+    //   isInitialisedObj.ready === false &&
+    //   typeof isInitialisedObj.time === "string" &&
+    //   localStorage.getItem("user") === null
+    // ) {
+    //   return SessionStatus.NoRecord;
+    // }
+
+    if(localStorage.getItem("jwt") === null){
       return SessionStatus.NoRecord;
     }
 
-    const now = new Date();
-    let then = null;
-
-    const isUserJSON = this.isJSON(localStorage.getItem("user"));
-    if (localStorage.getItem("time") !== null && isUserJSON) {
-      then = new Date(localStorage.getItem("time"));
-    } else {
-      return SessionStatus.NotInit;
+    if (localStorage.getItem("user") === null) {
+        return SessionStatus.NotInit;
     }
 
-    if (
-      now.getTime() - then.getTime() >
-      this.configService.config.sessionLength
-    ) {
+    const now = new Date();
+    const jwtExpirationTime = localStorage.getItem("jwtExpirationTime");
+    let then;
+
+    if(jwtExpirationTime == null){
+      const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem("jwt"));
+      const expiration = decoded.exp;
+      localStorage.setItem("jwtExpirationTime", expiration.toString());
+      then = new Date(expiration*1000);
+    } else {
+      then = new Date(Number(jwtExpirationTime)*1000);
+    }
+    const nowTime = now.getTime();
+    const thenTime = then.getTime();
+    if (nowTime > thenTime) {
       return SessionStatus.Expired;
     } else {
       return SessionStatus.Active;
     }
-  }
-
-  isJSON(data) {
-    let ret = true;
-    try {
-      JSON.parse(data);
-    } catch (e) {
-      ret = false;
-    }
-    return ret;
   }
 }

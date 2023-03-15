@@ -22,13 +22,14 @@ import { InfoComponent } from "./components/guide/info/info.component";
 import { MetaComponent } from "./components/guide/meta/meta.component";
 import { GuidedAssaysComponent } from "./components/guide/assays/assays.component";
 import { GuidesComponent } from "./components/public/guides/guides.component";
+import { NoStudyPageComponent } from "./components/shared/errors/no-study-page/no-study-page.component";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
-export function studyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url.length === 0) {
+export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
+  if (url === null || url.length === 0) {
     return null;
   }
-  const reg = /([MTBLS|mtbls]{5})([0-9]+)$/;
+  const reg = /reviewer(.*)$/;
   const param = url[0].toString();
 
   if (param.match(reg)) {
@@ -36,26 +37,35 @@ export function studyMatcher(url: UrlSegment[]): UrlMatchResult {
     if (url[1]) {
       data = { consumed: url, posParams: { study: url[0], tab: url[1] } };
     } else {
-      data = { consumed: url, posParams: { study: url[0] } };
+      data = { consumed: url, posParams: { study: url[0], tab: "descriptors" } };
     }
-    localStorage.removeItem("mtblsid");
-    localStorage.removeItem("obfuscationcode");
     return data;
-  } else if (param.match(/([reviewer]{8})/)) {
+  }
+  return null;
+}
+
+/* eslint-disable prefer-arrow/prefer-arrow-functions */
+export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
+  if (url === null || url.length === 0) {
+    return null;
+  }
+  const reg = /([MTBLS|mtbls])([0-9]+)(.*)$/;
+  const param = url[0].toString();
+
+  if (param.match(reg)) {
     let data = null;
     if (url[1]) {
       data = { consumed: url, posParams: { study: url[0], tab: url[1] } };
     } else {
-      data = { consumed: url, posParams: { study: url[0] } };
+      data = { consumed: url, posParams: { study: url[0], tab: "descriptors" } };
     }
     return data;
-  } else {
-    return null;
   }
+  return null;
 }
 
 const routes: Routes = [
-  { path: "login", component: LoginComponent },
+  { path: "login", canActivate: [AuthGuard], component: LoginComponent },
   { path: "guides", component: GuidesComponent },
   { path: "guides/:tab", component: GuidesComponent },
   { path: "guides/:tab/:section", component: GuidesComponent },
@@ -106,8 +116,10 @@ const routes: Routes = [
     component: StudyComponent,
   },
   { path: "study", redirectTo: "console", pathMatch: "full" },
-
-  { matcher: studyMatcher, component: PublicStudyComponent },
+  { path: "study-not-found", component: NoStudyPageComponent },
+  { path: "page-not-found", component: PageNotFoundComponent },
+  { matcher: publicStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
+  { matcher: reviewerStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
   { path: "**", component: PageNotFoundComponent },
 ];
 

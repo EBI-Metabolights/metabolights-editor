@@ -1,5 +1,4 @@
 import { select } from "@angular-redux/store";
-import { RedirectURL } from "./globals";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export class MockEditorService {
@@ -7,7 +6,6 @@ export class MockEditorService {
   @select((state) => state.study.validations) studyValidations;
   @select((state) => state.study.files) studyFiles;
 
-  redirectUrl: string = RedirectURL;
   currentStudyIdentifier: string = null;
   validations: any = {};
   files: any = [];

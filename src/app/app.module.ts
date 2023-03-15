@@ -5,6 +5,7 @@ import {
   DevToolsExtension,
 } from "@angular-redux/store";
 import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
+import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
 
 import { IAppState, rootReducer, INITIAL_STATE } from "./store";
 
@@ -125,6 +126,11 @@ export function configLoader(injector: Injector): () => Promise<any> {
     AuthService,
     LabsWorkspaceService,
     { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
+    {
+      provide: APP_BASE_HREF,
+      useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
+      deps: [PlatformLocation]
+    }
   ],
   bootstrap: [AppComponent],
 })

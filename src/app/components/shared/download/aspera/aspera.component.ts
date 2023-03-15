@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
+import { PlatformLocation } from "@angular/common";
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
@@ -31,11 +32,16 @@ export class AsperaDownloadComponent implements OnInit {
   downloadPath = "";
   validation: any = null;
   asperaWeb: any = null;
+  baseHref: any;
 
+  constructor(private platformLocation: PlatformLocation) {
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+  }
   ngOnInit() {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+
   }
 
   setUpSubscriptions() {

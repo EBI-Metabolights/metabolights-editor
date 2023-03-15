@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
+import { ConfigurationService } from "src/app/configuration.service";
+import { PlatformLocation } from "@angular/common";
 
 @Component({
   selector: "mtbls-header",
@@ -8,19 +10,26 @@ import { environment } from "src/environments/environment";
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent {
-  @select((state) => state.status.user) user;
+ @select((state) => state.status.user) studyUser;
 
   authUser: any = null;
   query = "";
+  metabolightsWebsiteUrl: string;
+  baseHref: string;
 
-  constructor() {
-    if (!environment.isTesting) {
+  constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
       this.setUpSubscription();
-    }
+      const url = this.configService.config.endpoint;
+      if(url.endsWith("/")){
+        this.metabolightsWebsiteUrl = url.slice(0, url.length - 1);
+      } else {
+        this.metabolightsWebsiteUrl = url;
+      }
+      this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
 
   setUpSubscription() {
-    this.user.subscribe((value) => {
+    this.studyUser.subscribe((value) => {
       if (value != null) {
         this.authUser = value;
       }

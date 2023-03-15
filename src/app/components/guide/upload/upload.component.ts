@@ -12,6 +12,7 @@ import { Router } from "@angular/router";
 
 import { EditorService } from "./../../../services/editor.service";
 import { environment } from "src/environments/environment";
+import { PlatformLocation } from "@angular/common";
 
 @Component({
   selector: "raw-upload",
@@ -26,17 +27,19 @@ export class RawUploadComponent implements OnInit {
   requestedStudy: string = null;
   files: any = {};
   isLoading = false;
-
+  baseHref: string;
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private route: ActivatedRoute,
     private router: Router,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private platformLocation: PlatformLocation
   ) {
     this.editorService.initialiseStudy(this.route);
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
 
   setUpSubscriptions() {

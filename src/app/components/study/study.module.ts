@@ -53,6 +53,7 @@ import { CalculationTransformPipe } from "./files/ftp-management/calculation-tra
 import { SyncOpTransformPipe } from "./files/ftp-management/sync-op-transform.pipe";
 import { FtpManagementComponent } from './files/ftp-management/ftp-management.component';
 import { TimezoneTransformPipe } from "./files/ftp-management/timezone.pipe";
+import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 
 @NgModule({
   declarations: [
@@ -108,8 +109,7 @@ import { TimezoneTransformPipe } from "./files/ftp-management/timezone.pipe";
     MatButtonToggleModule,
     QuillModule,
     MatCheckboxModule,
-  
-    
+    AngularStickyThingsModule
   ],
   exports: [
     AssaysComponent,

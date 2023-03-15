@@ -24,7 +24,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   submittedStudies: any = [];
 
   isConfirmationModalOpen = false;
-
+  baseHref: string;
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -35,6 +35,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
         this.editorService.getAllStudies();
+        this.baseHref = this.editorService.configService.baseHref;
       }
     });
   }

@@ -1,5 +1,4 @@
 import { catchError, map } from "rxjs/operators";
-import { MetaboLightsWSURL } from "./../globals";
 import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
 import { NgRedux, select } from "@angular-redux/store";
@@ -21,6 +20,7 @@ import { IStudyDesignDescriptorWrapper } from "src/app/models/mtbl/mtbls/interfa
 import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { MTBLSStudy } from "src/app/models/mtbl/mtbls/mtbls-study";
 
 // disabling this as parameter names mirror that of actual file columns
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -29,6 +29,8 @@ import { ConfigurationService } from "src/app/configuration.service";
 })
 export class MetabolightsService extends DataService {
   @select((state) => state.study.identifier) studyIdentifier;
+  @select((state) => state.study) stateStudy;
+  study: MTBLSStudy;
   id: string;
 
   constructor(
@@ -38,9 +40,8 @@ export class MetabolightsService extends DataService {
   ) {
     super("", http);
     this.url = this.configService.config.metabolightsWSURL;
-    if (!environment.isTesting) {
-      this.studyIdentifier.subscribe((value) => (this.id = value));
-    }
+    this.studyIdentifier.subscribe((value) => (this.id = value));
+    this.stateStudy.subscribe((value) => (this.study = value));
   }
 
   /**

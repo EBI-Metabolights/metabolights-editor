@@ -37,7 +37,7 @@ export class GuidedAssaysComponent implements OnInit {
   subStep = 1;
   files: any = [];
   samples: any = {};
-
+  baseHref: string;
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
@@ -48,6 +48,7 @@ export class GuidedAssaysComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    this.baseHref = this.editorService.configService.baseHref;
   }
 
   setUpSubscriptions() {

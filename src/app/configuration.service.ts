@@ -1,3 +1,4 @@
+import { PlatformLocation } from "@angular/common";
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Environment } from "src/environment.interface";
@@ -7,11 +8,16 @@ import { environment } from "src/environments/environment";
   providedIn: "root",
 })
 export class ConfigurationService {
+  public baseHref: string;
   private configData: Environment | undefined;
-  private readonly configPath: string =
-    environment.contextPath + "/assets/configs/"; // environment.context or something ultimately
+  private configPath: string;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private platformLocation: PlatformLocation
+    ) {
+      this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+      this.configPath = this.baseHref + "assets/configs/";
+    }
 
   async loadConfiguration(): Promise<any> {
     try {
