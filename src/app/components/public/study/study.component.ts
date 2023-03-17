@@ -132,7 +132,6 @@ export class PublicStudyComponent implements OnInit {
       if(value){
         this.status = value;
       }
-      
     });
 
     this.studyReviewerLink.subscribe((value) => {
@@ -206,7 +205,9 @@ export class PublicStudyComponent implements OnInit {
       location
     );
     if (index === 6) {
-      this.editorService.validateStudy();
+      if ((this.isCurator || this.isOwner) && (this.studyStatus && this.studyStatus.toLowerCase() !== 'public' )) {
+        this.editorService.validateStudy();
+      }
       document.getElementById("tab-content-wrapper").scrollIntoView();
     }
   }

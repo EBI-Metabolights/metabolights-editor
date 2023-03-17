@@ -205,7 +205,7 @@
               </p>
             </button>
           </div>
-          <div *ngIf="submittedStudies.length < 2 || isCurator" class="column is-half has-text-right">
+          <div *ngIf="submittedStudies.length < 2 || isCurator == true" class="column is-half has-text-right">
             <a [routerLink]="['/guide/create']" class="button is-success"
               >Create new</a
             >

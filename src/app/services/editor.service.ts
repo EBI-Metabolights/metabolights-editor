@@ -732,19 +732,21 @@ export class EditorService {
       let assaySubTechnique = null;
       let assayTechnique = null;
       let assayMainTechnique = null;
-      this.validations["assays"]["assaySetup"].main_techniques.forEach((mt) => {
-        mt.techniques.forEach((t) => {
-          if (t.sub_techniques && t.sub_techniques.length > 0) {
-            t.sub_techniques.forEach((st) => {
-              if (st.template === assayInfo[1]) {
-                assaySubTechnique = st;
-                assayTechnique = t;
-                assayMainTechnique = mt;
-              }
-            });
-          }
+      if (this.validations) {
+        this.validations["assays"]["assaySetup"].main_techniques.forEach((mt) => {
+          mt.techniques.forEach((t) => {
+            if (t.sub_techniques && t.sub_techniques.length > 0) {
+              t.sub_techniques.forEach((st) => {
+                if (st.template === assayInfo[1]) {
+                  assaySubTechnique = st;
+                  assayTechnique = t;
+                  assayMainTechnique = mt;
+                }
+              });
+            }
+          });
         });
-      });
+      }
       return {
         assaySubTechnique,
         assayTechnique,
