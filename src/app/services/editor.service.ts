@@ -1,11 +1,9 @@
 import { Injectable } from "@angular/core";
 import { MetabolightsService } from "./../services/metabolights/metabolights.service";
 import { AuthService } from "./../services/metabolights/auth.service";
-import { DOIService } from "./../services/publications/doi.service";
-import { EuropePMCService } from "./../services/publications/europePMC.service";
 import { IAppState } from "./../store";
 import { NgRedux, select } from "@angular-redux/store";
-import { Router } from "@angular/router";
+import { ActivatedRouteSnapshot, Router } from "@angular/router";
 
 import { map } from "rxjs/operators";
 
@@ -221,6 +219,34 @@ export class EditorService {
       this.clearSessionData();
     }
     return false;
+  }
+
+  updateHistory(state: ActivatedRouteSnapshot) {
+    const queryParams = state.queryParamMap;
+
+    let location = window.location.origin;
+    if  (window.location.pathname.startsWith("/")){
+      location = location + window.location.pathname;
+    } else {
+      location = location + "/" + window.location.pathname;
+    }
+
+    if (queryParams.keys.length > 0) {
+      const params = Array(0);
+      for (const i of queryParams.keys) {
+        if (i !== "loginOneTimeToken") {
+          params.push(i + "=" + queryParams.get(i));
+        }
+      }
+      if (params.length > 0) {
+        location = window.location.origin + "/" + window.location.pathname + "?" + params.join("&");
+      }
+    }
+    window.history.pushState(
+      "",
+      "",
+      location
+    );
   }
 
   clearSessionData(){

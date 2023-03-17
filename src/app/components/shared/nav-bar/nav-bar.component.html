@@ -6,12 +6,10 @@
   <div class="navbar-menu">
     <div class="navbar-start">
       <a
-        *ngIf="mode != 'light'; else studyStatus"
         (click)="backToMetabolights()"
         class="navbar-item"
       >
-        <span class="material-icons"> keyboard_backspace </span>&nbsp;Back to
-        MetaboLights
+        <span class="material-icons"> keyboard_backspace </span>&nbsp;Back to MetaboLights
       </a>
       <ng-template #studyStatus>
         <a
@@ -36,7 +34,8 @@
       </ng-template>
     </div>
     <div class="navbar-end">
-      <a (click)="redirectToConsole()" class="navbar-item">
+      <a *ngIf="mode != 'light'"
+      (click)="redirectToConsole()" class="navbar-item">
         <i class="material-icons"> list </i>&nbsp;My studies
       </a>
       <a

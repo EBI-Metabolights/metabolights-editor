@@ -41,7 +41,7 @@
           src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
         />
         <span style="margin-left: 10px"
-          >My Studies
+          >My Studies - {{ loginName }}
           <small *ngIf="studies.length > 0">({{ studies.length }})</small></span
         >
         <span class="is-pulled-right">

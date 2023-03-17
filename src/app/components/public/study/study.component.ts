@@ -129,7 +129,10 @@ export class PublicStudyComponent implements OnInit {
     });
 
     this.studyStatus.subscribe((value) => {
-      this.status = value;
+      if(value){
+        this.status = value;
+      }
+      
     });
 
     this.studyReviewerLink.subscribe((value) => {

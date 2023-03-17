@@ -14,6 +14,7 @@ import { environment } from "src/environments/environment";
 export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.status.userStudies) userStudies;
+  @select((state) => state.status.user) studyUser;
 
   studies: string[] = [];
   filteredStudies: string[] = [];
@@ -22,7 +23,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   messageExpanded = false;
 
   submittedStudies: any = [];
-
+  user=null;
+  loginName = "";
   isConfirmationModalOpen = false;
   baseHref: string;
   constructor(
@@ -40,7 +42,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+
+    this.editorService.updateHistory(this.route.snapshot);
+  }
 
   toggleMessage() {
     this.messageExpanded = !this.messageExpanded;
@@ -62,6 +67,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   setUpSubscriptions() {
+    this.studyUser.subscribe((value) => {
+      this.user = value;
+      this.loginName = this.user?.email ?? "";
+    });
     this.userStudies.subscribe((value) => {
       if (value === null) {
         this.ngRedux.dispatch({
