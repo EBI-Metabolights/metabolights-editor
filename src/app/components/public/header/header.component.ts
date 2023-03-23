@@ -15,6 +15,7 @@ export class HeaderComponent {
   authUser: any = null;
   query = "";
   metabolightsWebsiteUrl: string;
+  metabolightsHeaderTitle: string;
   baseHref: string;
 
   constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
@@ -26,6 +27,17 @@ export class HeaderComponent {
         this.metabolightsWebsiteUrl = url;
       }
       this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+      if (this.platformLocation.hostname.startsWith("www.ebi")){
+        this.metabolightsHeaderTitle = "MetaboLights";
+      } else {
+        if(this.platformLocation.port !== "" && this.platformLocation.port !== "80"){
+          this.metabolightsHeaderTitle = this.platformLocation.hostname + ":"+ this.platformLocation.port;
+        } else {
+          this.metabolightsHeaderTitle = this.platformLocation.hostname;
+        }
+
+      }
+
   }
 
   setUpSubscription() {

@@ -22,6 +22,7 @@ export class LoginComponent implements OnInit {
   domain = "";
   endpoint: string;
   baseHref: string;
+  environmentName: string;
   constructor(
     private fb: FormBuilder,
     private ngRedux: NgRedux<IAppState>,
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit {
     private configService: ConfigurationService
   ) {
     this.baseHref = this.configService.baseHref;
+    this.environmentName = environment.context;
   }
 
   ngOnInit() {

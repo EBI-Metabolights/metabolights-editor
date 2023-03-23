@@ -138,12 +138,18 @@
                   href="{{ metabolightsWebsiteUrl }}/index"
                   title="Back to MetaboLights homepage"
                 >
-                  <img
-                    src="https://wwwdev.ebi.ac.uk/metabolights/img/MetaboLightsLogo.png"
+
+                  <span *ngIf="metabolightsHeaderTitle == 'MetaboLights'; else testHeader">
+                    <img
+                    src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
                     alt="MetaboLights"
                     width="64"
                     height="64"
-                  />MetaboLights
+                    />  {{ metabolightsHeaderTitle }}
+                  </span>
+                  <ng-template #testHeader>
+                    <span class="warningHeader"> {{ metabolightsHeaderTitle }}</span>
+                  </ng-template>
                 </a>
               </div>
             </div>

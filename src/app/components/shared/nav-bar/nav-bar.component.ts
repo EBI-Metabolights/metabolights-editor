@@ -5,7 +5,7 @@ import { IAppState } from "./../../../store";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
-
+import { environment } from "src/environments/environment";
 @Component({
   selector: "nav-bar",
   templateUrl: "./nav-bar.component.html",
@@ -16,6 +16,8 @@ export class NavBarComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier: string;
   baseHref: string;
   endpoint = "";
+  environmentName: string;
+
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -24,6 +26,8 @@ export class NavBarComponent implements OnInit {
     private platformLocation: PlatformLocation
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+
+    this.environmentName = environment.context;
   }
 
   ngOnInit() {

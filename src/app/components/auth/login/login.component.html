@@ -7,6 +7,9 @@
           <mat-icon>public</mat-icon> Back to MetaboLights</a
         >
     <br />
+    <span *ngIf="environmentName != null && !environmentName.toLowerCase().startsWith('prod')" style="margin-top: -25px; margin-left: 10px; color: red"
+    > (Environment: {{ environmentName }}, URL: {{ endpoint }})</span
+  >
     <br />
     <nav class="panel bg-white vw40">
       <div class="panel-heading bg-white">

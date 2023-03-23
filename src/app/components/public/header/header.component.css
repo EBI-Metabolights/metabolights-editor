@@ -15,6 +15,11 @@ ul {
   padding: 0;
 }
 
+.warningHeader {
+  color: yellow ;
+  font-weight: 200;
+}
+
 .navbar > .container {
   min-height: 1.25rem;
 }

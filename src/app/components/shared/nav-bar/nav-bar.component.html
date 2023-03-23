@@ -10,6 +10,9 @@
         class="navbar-item"
       >
         <span class="material-icons"> keyboard_backspace </span>&nbsp;Back to MetaboLights
+        <span *ngIf="environmentName != null && !environmentName.toLowerCase().startsWith('prod')" style="margin-left: 16px; color: orange"
+        > &nbsp;(Environment: {{ environmentName }}, URL: {{ endpoint }})</span
+      >
       </a>
       <ng-template #studyStatus>
         <a
@@ -32,6 +35,7 @@
           />&nbsp;MetaboLights&nbsp;Study Editor
         </a>
       </ng-template>
+
     </div>
     <div class="navbar-end">
       <a *ngIf="mode != 'light'"
