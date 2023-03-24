@@ -49,6 +49,6 @@ export class HeaderComponent {
   }
 
   sendQuery() {
-    window.location.href = "/metabolights/search?freeTextQuery=" + this.query;
+    window.location.href = this.metabolightsWebsiteUrl + "/search?freeTextQuery=" + this.query;
   }
 }
