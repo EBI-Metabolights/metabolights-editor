@@ -11,12 +11,14 @@ import { PlatformLocation } from "@angular/common";
 })
 export class HeaderComponent {
  @select((state) => state.status.user) studyUser;
+ @select((state) => state.status.bannerMessage) bannerMessage;
 
   authUser: any = null;
   query = "";
   metabolightsWebsiteUrl: string;
   metabolightsHeaderTitle: string;
   baseHref: string;
+  banner: string = null;
 
   constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
       this.setUpSubscription();
@@ -45,6 +47,10 @@ export class HeaderComponent {
       if (value != null) {
         this.authUser = value;
       }
+    });
+
+    this.bannerMessage.subscribe((value) => {
+        this.banner = value;
     });
   }
 

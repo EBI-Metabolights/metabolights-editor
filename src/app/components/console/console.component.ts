@@ -15,6 +15,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.status.userStudies) userStudies;
   @select((state) => state.status.user) studyUser;
+  @select((state) => state.status.bannerMessage) bannerMessage;
 
   studies: string[] = [];
   filteredStudies: string[] = [];
@@ -27,6 +28,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   loginName = "";
   isConfirmationModalOpen = false;
   baseHref: string;
+  banner: string = null;
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -45,6 +47,9 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   ngOnInit() {
 
     this.editorService.updateHistory(this.route.snapshot);
+    this.bannerMessage.subscribe((value) => {
+      this.banner = value;
+  });
   }
 
   toggleMessage() {

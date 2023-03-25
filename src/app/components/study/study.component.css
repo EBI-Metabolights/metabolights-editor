@@ -25,3 +25,12 @@
   border-radius: 0px;
   border: 1px solid #cce9ff;
 }
+
+.banner {
+  font-size: 14px;
+  color: red;
+  background-color: cornsilk;
+  border: 1px solid #cce9ff;
+  border-radius: 5px;
+  padding: 5px;
+}

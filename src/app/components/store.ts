@@ -18,7 +18,8 @@ import {
   SET_USER,
   RESET,
   SET_STUDY_PERMISSION,
-  RESET_STUDY_PERMISSION
+  RESET_STUDY_PERMISSION,
+  SET_BANNER_MESSAGE
 } from "./actions";
 import { SET_STUDY_ASSAY } from "./study/actions";
 
@@ -46,6 +47,7 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
   selectedLanguage: "en",
   guides: null,
   studyPermission: null,
+  bannerMessage: null
 };
 
 function toggleLoading(state) {
@@ -96,6 +98,10 @@ function reset(state, action) {
       time: "",
     },
   });
+}
+
+function setBannerHeader(state, action) {
+  return tassign(state, { bannerMessage: action.body.bannerMessage });
 }
 
 function setUserStudies(state, action) {
@@ -179,6 +185,8 @@ export function sharedReducer(
       return setStudyPermission(state, action);
     case RESET_STUDY_PERMISSION:
       return resetStudyPermission(state, action);
+    case SET_BANNER_MESSAGE:
+      return setBannerHeader(state, action);
   }
 
   return state;

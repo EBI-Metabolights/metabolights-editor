@@ -111,6 +111,11 @@
           please contact us if you have any specific requirements.
         </div>
       </article>
+      <div *ngIf="banner" style="margin: 0 0 5px 0">
+        <div class="col-md-12 ">
+          <div class="banner" > {{ banner }}</div>
+        </div>
+      </div>
     </div>
     <span *ngIf="requestedStudy != undefined">
       <div

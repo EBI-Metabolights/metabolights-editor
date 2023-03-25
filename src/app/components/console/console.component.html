@@ -6,6 +6,7 @@
 </a>
 <div class="columns" style="min-height: 100vh; margin: 60px 0">
   <div class="column is-8 is-offset-2">
+
     <div style="margin: 0 0 20px 0">
       <article class="message is-small has-shadow">
         <div (click)="toggleMessage()" class="message-header">
@@ -32,6 +33,11 @@
           please contact us if you have any specific requirements.
         </div>
       </article>
+    </div>
+    <div *ngIf="banner" style="margin: 0 0 5px 0">
+      <div class="col-md-12 ">
+        <div class="banner" > {{ banner }}</div>
+      </div>
     </div>
     <nav class="panel has-background-white">
       <p class="panel-heading">

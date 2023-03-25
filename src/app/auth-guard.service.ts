@@ -292,6 +292,11 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
         this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
         return true;
       } else {
+        if (studyPermission.submitterOfStudy === true && studyPermission.view === true && url.startsWith("/study/MTBLS")) {
+          this.editorService.redirectUrl = url;
+          this.router.navigate([url.replace("/study","")]);
+          return false;
+        }
         if (studyPermission.userName == null || studyPermission.userName.length === 0) {
           this.editorService.redirectUrl = url;
           this.router.navigate(["/login"]);

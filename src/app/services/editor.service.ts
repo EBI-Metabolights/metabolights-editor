@@ -5,7 +5,7 @@ import { IAppState } from "./../store";
 import { NgRedux, select } from "@angular-redux/store";
 import { ActivatedRouteSnapshot, Router } from "@angular/router";
 
-import { map } from "rxjs/operators";
+import { catchError, map } from "rxjs/operators";
 
 import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermisssion } from "./../services/headers";
 import Swal from "sweetalert2";
@@ -16,6 +16,7 @@ import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
 import { HttpHeaders } from "@angular/common/http";
+import { Observable } from "rxjs";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -127,6 +128,22 @@ export class EditorService {
     //   this.loadValidations();
     // }
   }
+  /**
+   * Retrieves publication information for a given study.
+   *
+   * @returns A Publication wrapper object via the Observable
+   */
+  getBannerHeader(): Observable<any> {
+    return this.dataService.http
+      .get<any>(
+        this.dataService.url.baseURL + "/ebi-internal/banner",
+        {
+          headers: httpOptions.headers,
+          observe: "body",
+        }
+      )
+      .pipe(catchError(this.dataService.handleError));
+  }
 
   async getJwtWithOneTimeToken(oneTimeToken: string) {
     const config = this.configService.config;
@@ -194,6 +211,16 @@ export class EditorService {
     const activeJwt = localStorage.getItem("jwt");
     const localUser = localStorage.getItem("user");
     const user: MetabolightsUser = JSON.parse(localUser);
+
+    this.getBannerHeader().subscribe(
+      (response) => {
+        const message = response.content;
+        this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: message} });
+        },
+        (error) => {
+          this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: null} });
+        }
+    );
     if(activeJwt !== null){
       const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
       const username = decoded.sub;
