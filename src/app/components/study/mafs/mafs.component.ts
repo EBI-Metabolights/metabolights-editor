@@ -45,8 +45,6 @@ export class MafsComponent implements OnInit {
 
     // eslint-disable-next-line @typescript-eslint/indent
     this.studyAssays.subscribe((value) => {
-      console.log(`value returned from state select:
-      ${value}`)
       this.assays = value;
       const tempMAFs = [];
       Object.values(this.assays).forEach((assay) => {

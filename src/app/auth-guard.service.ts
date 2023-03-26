@@ -58,6 +58,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
         return true;
 
       case SessionStatus.Expired:
+        console.log('Session expired !')
         this.editorService.logout(false);
         return false;
 
@@ -120,7 +121,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
       return SessionStatus.NotInit;
     }
 
-    if (
+    // Session checking code is disabled as it needs rework
+    /*if (
       now.getTime() - then.getTime() >
       this.configService.config.sessionLength
     ) {
@@ -128,6 +130,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
     } else {
       return SessionStatus.Active;
     }
+    */
+    return SessionStatus.Active;
   }
 
   isJSON(data) {

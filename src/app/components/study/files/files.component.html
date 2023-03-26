@@ -51,11 +51,11 @@
   <div>&nbsp;</div>
 
 <!--ftp management component start-->
-<app-ftp-management 
+<app-ftp-management
   *ngIf="!isReadOnly"
-  [calculation]="calculation" 
-  [ongoingStatus]="ongoingStatus" 
-  [isSyncing]="isSyncing" 
+  [calculation]="calculation"
+  [ongoingStatus]="ongoingStatus"
+  [isSyncing]="isSyncing"
   [isCalculating]="isCalculating"
   [requestedStudy]="requestedStudy"
   (checkClicked)="handleCheckClick($event)"
@@ -64,7 +64,7 @@
 <!--ftp management component end-->
 
 
-  
+
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer></span>
@@ -336,6 +336,15 @@
         </span>
       </p>
     </div>
+    <span *ngIf="filteredDerivedDataFiles.length > 0">
+      <span *ngFor="let file of filteredDerivedDataFiles">
+       <mtbls-directory
+         [level]="0"
+         [parent]="''"
+         [file]="file"
+       ></mtbls-directory>
+      </span>
+    </span>
     <span *ngIf="filteredDerivedFiles.length > 0">
       <span *ngFor="let file of filteredDerivedFiles">
         <a class="panel-block">
