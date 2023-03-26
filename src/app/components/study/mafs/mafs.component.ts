@@ -45,6 +45,7 @@ export class MafsComponent implements OnInit {
 
     // eslint-disable-next-line @typescript-eslint/indent
     this.studyAssays.subscribe((value) => {
+
       this.assays = value;
       const tempMAFs = [];
       Object.values(this.assays).forEach((assay) => {
@@ -81,8 +82,8 @@ export class MafsComponent implements OnInit {
         if (this.assays) {
           const assayName = assayFileName.filename.trim();
 
-          if (this.assays[assayName]["mafs"].length > 0) {
-            this.assays[assayName]["mafs"].forEach((mafFile) => {
+          if (this.assays && this.assays[assayName] && this.assays[assayName].hasOwnProperty("mafs")) {
+            this.assays[assayName].mafs.forEach((mafFile) => {
               if (
                 this.mafNames.indexOf(mafFile) === -1 &&
                 mafFile.indexOf("m_") === 0

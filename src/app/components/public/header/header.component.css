@@ -15,6 +15,20 @@ ul {
   padding: 0;
 }
 
+.banner {
+  font-size: 14px;
+  color: red;
+  background-color: cornsilk;
+  border: 1px solid #cce9ff;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.warningHeader {
+  color: yellow ;
+  font-weight: 200;
+}
+
 .navbar > .container {
   min-height: 1.25rem;
 }

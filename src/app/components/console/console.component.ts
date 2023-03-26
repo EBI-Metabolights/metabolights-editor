@@ -14,6 +14,8 @@ import { environment } from "src/environments/environment";
 export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.status.userStudies) userStudies;
+  @select((state) => state.status.user) studyUser;
+  @select((state) => state.status.bannerMessage) bannerMessage;
 
   studies: string[] = [];
   filteredStudies: string[] = [];
@@ -22,9 +24,11 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   messageExpanded = false;
 
   submittedStudies: any = [];
-
+  user=null;
+  loginName = "";
   isConfirmationModalOpen = false;
-
+  baseHref: string;
+  banner: string = null;
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -35,11 +39,18 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
         this.editorService.getAllStudies();
+        this.baseHref = this.editorService.configService.baseHref;
       }
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+
+    this.editorService.updateHistory(this.route.snapshot);
+    this.bannerMessage.subscribe((value) => {
+      this.banner = value;
+  });
+  }
 
   toggleMessage() {
     this.messageExpanded = !this.messageExpanded;
@@ -61,6 +72,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   setUpSubscriptions() {
+    this.studyUser.subscribe((value) => {
+      this.user = value;
+      this.loginName = this.user?.email ?? "";
+    });
     this.userStudies.subscribe((value) => {
       if (value === null) {
         this.ngRedux.dispatch({

@@ -4,11 +4,10 @@ import { EditorService } from "./../../../services/editor.service";
 import { FormBuilder } from "@angular/forms";
 import { NgRedux, select } from "@angular-redux/store";
 import { Router } from "@angular/router";
-import { MetaboLightsWSURL } from "./../../../services/globals";
 import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
-
+import { PlatformLocation } from "@angular/common";
 @Component({
   selector: "app-guides",
   templateUrl: "./guides.component.html",
@@ -40,8 +39,10 @@ export class GuidesComponent implements OnInit {
     public router: Router,
     private editorService: EditorService,
     private route: ActivatedRoute,
-    private configService: ConfigurationService
-  ) {}
+    private configService: ConfigurationService,
+    private platformLocation: PlatformLocation
+  ) {
+  }
 
   ngOnInit(): void {
     if (!environment.isTesting) {
@@ -142,11 +143,16 @@ export class GuidesComponent implements OnInit {
   }
 
   getURLBase(url) {
-    const domain = window.location.host.split(".")[0];
-    if (domain === "www" || domain === "wwwdev" || domain === "wwwint" || domain === "www-test") {
-      return "/metabolights" + url;
-    } else {
-      return url;
+    // const domain = window.location.host.split(".")[0];
+    // if (domain === "www" || domain === "wwwdev") {
+    //   return "/metabolights" + url;
+    // } else {
+    //   return url;
+    // }
+    const base = this.platformLocation.getBaseHrefFromDOM();
+    if(base.endsWith("/")){
+      return window.location.origin + base.slice(0, base.length-1) + url;
     }
+    return window.location.origin + this.platformLocation.getBaseHrefFromDOM() + url;
   }
 }

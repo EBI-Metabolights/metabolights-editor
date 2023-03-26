@@ -13,7 +13,7 @@
       <img
         style="height: 32px"
         class="is-pulled-left"
-        src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+        src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
       />&emsp;&emsp;
       <span style="margin-top: -25px"
         ><span class="is-link">{{ requestedStudy }}</span
@@ -27,7 +27,7 @@
       <span *ngIf="loading" style="flex: 0 0 100%">
         <div class="vc vh50 has-text-centered">
           <span class="has-text-centered">
-            <img src="/metabolights/editor/assets/img/loading.svg" /> <br />
+            <img src="{{ baseHref }}assets/img/loading.svg" /> <br />
             <small class="has-text-grey">LOADING ASSAY DETAILS</small>
           </span>
         </div>

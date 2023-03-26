@@ -52,14 +52,18 @@ export class MafComponent implements AfterContentInit {
   }
 
   load() {
-    this.studyMAFs.subscribe((mafs) => {
-      if (mafs) {
-        this.mafData = mafs[this.value.data.file];
-      }
-    });
+
     this.readonly.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+      }
+    });
+    this.studyMAFs.subscribe((mafs) => {
+      if(Array.isArray(mafs) && mafs.length === 0){
+        return;
+      }
+      if (mafs && this.value.data.file) {
+        this.mafData = mafs[this.value.data.file];
       }
     });
   }

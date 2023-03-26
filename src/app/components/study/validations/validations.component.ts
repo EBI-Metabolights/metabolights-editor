@@ -13,7 +13,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   @select((state) => state.study.validation) validation: any;
   @select((state) => state.status.isCurator) isCurator;
 
-  studyValidation: any = null;
+  studyValidation: any;
   noValidationsfound: any = null;
   displayOption = "error";
   defaultToastrOptions: any = {
@@ -40,7 +40,9 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
 
   setUpSubscriptions() {
     this.validation.subscribe((value) => {
-      this.studyValidation = value;
+      if (value) {
+        this.studyValidation = value;
+      }
     });
     this.isCurator.subscribe((value) => {
       if (value !== null) {

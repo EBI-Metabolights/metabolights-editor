@@ -5,6 +5,7 @@ import * as toastr from "toastr";
 import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "../../../store";
 import { environment } from "src/environments/environment";
+import { PlatformLocation } from "@angular/common";
 
 @Component({
   selector: "app-create",
@@ -28,13 +29,15 @@ export class CreateComponent implements OnInit {
     },
   ];
   isLoading = false;
-
+  baseHref: string;
   constructor(
     private editorService: EditorService,
     private router: Router,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private platformLocation: PlatformLocation
   ) {
     this.editorService.initialiseStudy(null);
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
 
   ngOnInit() {

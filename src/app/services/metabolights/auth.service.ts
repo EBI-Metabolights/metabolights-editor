@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
-import { httpOptions } from "./../headers";
+import { httpOptions, MtblsJwtPayload } from "./../headers";
 import { Router } from "@angular/router";
 import { catchError, map } from "rxjs/operators";
 import { throwError } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { ConfigurationService } from "src/app/configuration.service";
+import jwtDecode from "jwt-decode";
 
 @Injectable({
   providedIn: "root",
@@ -19,7 +20,7 @@ export class AuthService {
   login(body): any {
     return this.http
       .post(
-        this.configService.config.endpoint +
+        this.configService.config.metabolightsWSURL.baseURL +
           this.configService.config.authenticationURL.login,
         body,
         {
@@ -39,7 +40,7 @@ export class AuthService {
   authenticateToken(body): any {
     return this.http
       .post(
-        this.configService.config.endpoint +
+        this.configService.config.metabolightsWSURL.baseURL +
           this.configService.config.authenticationURL.token,
         body,
         { observe: "response" as "body" }
@@ -52,11 +53,21 @@ export class AuthService {
 
   // Validate JWT token and responds back with a valid user
   getValidatedJWTUser(response): any {
+    if (response.headers.get("jwt") !== null){
+      return this.getAuthenticatedUser(response.headers.get("jwt"), response.headers.get("user"));
+    }
+  }
+
+  getAuthenticatedUser(jwtToken: string, userName: string): any {
+    const body = { jwt: jwtToken, user: userName };
     return this.http.post(
-      this.configService.config.endpoint +
+      this.configService.config.metabolightsWSURL.baseURL +
         this.configService.config.authenticationURL.initialise,
-      { jwt: response.headers.get("jwt"), user: response.headers.get("user") },
-      httpOptions
+        body, httpOptions
+    ).
+    pipe(
+      map((res) => res),
+      catchError((err) => throwError(err))
     );
   }
 }

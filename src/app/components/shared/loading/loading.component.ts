@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { select } from "@angular-redux/store";
+import { PlatformLocation } from "@angular/common";
 
 @Component({
   selector: "mtbls-loading",
@@ -9,8 +10,11 @@ import { select } from "@angular-redux/store";
 export class LoadingComponent implements OnInit {
   @select((state) => state.status.loading) isLoading: boolean;
   @select((state) => state.status.info) loadingInformation: string;
+  baseHref: string;
 
-  constructor() {}
+  constructor(private platformLocation: PlatformLocation) {
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+  }
 
   ngOnInit() {}
 }

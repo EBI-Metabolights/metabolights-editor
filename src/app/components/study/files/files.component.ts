@@ -7,7 +7,7 @@ import { environment } from "src/environments/environment";
 import { FtpManagementService } from "src/app/services/ftp-management.service";
 import { FTPResponse } from "src/app/models/mtbl/mtbls/interfaces/generics/ftp-response.interface";
 import { interval, Subscription } from "rxjs";
-
+import { CommonModule, PlatformLocation } from '@angular/common';
 
 
 
@@ -53,7 +53,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   selectedCategory: string = null;
   fileLocation: string = null;
   status: string = null;
-
+  baseHref: string;
   access: string = null;
   curator = false;
 
@@ -66,8 +66,8 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   // ftp ops response variables
   calculation: FTPResponse = {
     status: 'Loading',
-    description: '...',
-    last_update_time: '...'
+    description: "...",
+    last_update_time: "..."
   };
   ongoingStatus: FTPResponse = {
     status: 'UNKNOWN',
@@ -99,23 +99,17 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
-    private ftpService: FtpManagementService
-  ) {}
+    private ftpService: FtpManagementService,
+    private platformLocation: PlatformLocation
+  ) {
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+  }
 
   ngOnInit() {
     this.loadFiles();
-    this.loadAccess();
-    if (!environment.isTesting) {
-      this.setUpSubscriptions();
-    }
-    this.checkFTPFolder(false, true)
 
-    this.syncStatusSubscription = this.ftpService.getSyncStatus()
-    .subscribe(statusRes => {
-      this.ongoingStatus = statusRes
-      console.log('hit');
-      this.syncStatusSubscription.unsubscribe();
-    })
+    this.setUpSubscriptions();
+
   }
 
   ngOnChanges(changes) {
@@ -139,6 +133,16 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     this.readonly.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        if (this.isReadOnly !== null && this.isReadOnly === false){
+          this.loadAccess();
+          this.checkFTPFolder(false, true);
+
+          this.syncStatusSubscription = this.ftpService.getSyncStatus()
+          .subscribe(statusRes => {
+            this.ongoingStatus = statusRes;
+            this.syncStatusSubscription.unsubscribe();
+          });
+        }
       }
     });
     this.studyStatus.subscribe((value) => {

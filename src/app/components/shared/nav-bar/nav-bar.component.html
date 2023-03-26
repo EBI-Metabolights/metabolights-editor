@@ -6,12 +6,13 @@
   <div class="navbar-menu">
     <div class="navbar-start">
       <a
-        *ngIf="mode != 'light'; else studyStatus"
         (click)="backToMetabolights()"
         class="navbar-item"
       >
-        <span class="material-icons"> keyboard_backspace </span>&nbsp;Back to
-        MetaboLights
+        <span class="material-icons"> keyboard_backspace </span>&nbsp;Back to MetaboLights
+        <span *ngIf="environmentName != null && !environmentName.toLowerCase().startsWith('prod')" style="margin-left: 16px; color: orange"
+        > &nbsp;(Environment: {{ environmentName }}, URL: {{ endpoint }})</span
+      >
       </a>
       <ng-template #studyStatus>
         <a
@@ -30,19 +31,21 @@
         >
           <img
             height="20px"
-            src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+            src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
           />&nbsp;MetaboLights&nbsp;Study Editor
         </a>
       </ng-template>
+
     </div>
     <div class="navbar-end">
-      <a (click)="redirectToConsole()" class="navbar-item">
+      <a *ngIf="mode != 'light'"
+      (click)="redirectToConsole()" class="navbar-item">
         <i class="material-icons"> list </i>&nbsp;My studies
       </a>
       <a
         *ngIf="mode != 'light'"
         target="_blank"
-        [href]="domain + (studyIdentifier | async)"
+        [href]="baseHref + (studyIdentifier | async)"
         class="navbar-item"
       >
         <i class="material-icons"> visibility </i>&nbsp;Preview

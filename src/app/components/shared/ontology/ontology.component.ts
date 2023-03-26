@@ -30,7 +30,6 @@ import {
   tap,
 } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
-import { MetaboLightsWSURL } from "../../../services/globals";
 
 import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
@@ -53,7 +52,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @ViewChild("input", { read: MatAutocompleteTrigger })
   valueInput: MatAutocompleteTrigger;
 
-  domain = "";
+  wsDomain = "";
   loading = false;
   termsLoading = false;
   isforcedOntology = false;
@@ -72,19 +71,25 @@ export class OntologyComponent implements OnInit, OnChanges {
   filteredvalues: Observable<Ontology[]>;
   allvalues: Array<Ontology> = [];
   ontologyDetails: any = {};
+  readonly = false;
+  baseHref: string;
 
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService
-  ) {}
+  ) {
+
+  }
 
   ngOnInit() {
-    this.domain = this.configService.config.metabolightsWSURL.domain;
+    this.baseHref = this.configService.baseHref;
+    this.wsDomain = this.configService.config.metabolightsWSURL.domain;
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
+    this.readonly = this.editorService.ngRedux.getState().study.readonly;
 
-    if (this.validations["data-type"] === "ontology") {
+    if (this.readonly === false && this.validations["data-type"] === "ontology") {
       if (this.validations["recommended-ontologies"]) {
         this.isforcedOntology =
           this.validations["recommended-ontologies"]["is-forced-ontology"];
@@ -94,7 +99,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
         if (this.url !== "") {
           this.editorService
-            .getOntologyTerms(this.domain + this.url)
+            .getOntologyTerms(this.wsDomain + this.url)
             .subscribe((terms) => {
               this.allvalues = [];
               const jsonConvert: JsonConvert = new JsonConvert();
@@ -139,7 +144,7 @@ export class OntologyComponent implements OnInit, OnChanges {
               this.searchedMore = false;
               this.loading = true;
               this.editorService
-                .getOntologyTerms(this.domain + this.url + term)
+                .getOntologyTerms(this.wsDomain + this.url + term)
                 .subscribe((terms) => {
                   this.allvalues = [];
                   this.loading = false;
@@ -251,7 +256,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.loading = true;
     this.editorService
       .getOntologyTerms(
-        this.domain +
+        this.wsDomain +
           this.url +
           term +
           "&queryFields=MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"

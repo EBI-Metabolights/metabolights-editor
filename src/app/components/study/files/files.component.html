@@ -1,7 +1,7 @@
 <span *ngIf="filesLoading; else showContent">
   <div class="vc vh30">
     <span class="has-text-centered">
-      <img src="/metabolights/editor/assets/img/loading.svg" /><br />
+      <img src="{{ baseHref }}assets/img/loading.svg" /><br />
       <small class="has-text-grey">LOADING FILES</small>
     </span>
   </div>
@@ -23,7 +23,7 @@
       <span *ngIf="refreshingData">
         <img
           style="height: 10px; margin-left: 10px"
-          src="/metabolights/editor/assets/img/loading.svg"
+          src="{{ baseHref }}assets/img/loading.svg"
         />
       </span>
     </span>
@@ -67,12 +67,12 @@
 
   <!---ISA Metadata Panel start-->
   <nav class="panel">
-    <span #spacer></span>
+    <span #spacer1></span>
     <p
       class="panel-heading"
       style="z-index: 1000; padding: 7px 10px"
       stickyThing
-      [spacer]="spacer"
+      [spacer]="spacer1"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
       isReadOnly
     >
@@ -133,20 +133,20 @@
                     <span *ngIf="file.files; else openFolder">
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder.png"
+                        src="{{ baseHref }}assets/img/folder.png"
                       />
                     </span>
                     <ng-template #openFolder>
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder-open.png"
+                        src="{{ baseHref }}assets/img/folder-open.png"
                       />
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/file.png"
+                      src="{{ baseHref }}assets/img/file.png"
                     />
                   </ng-template>
                 </span>
@@ -198,11 +198,11 @@
 
   <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
-    <span #spacer1></span>
+    <span #spacer2></span>
     <span *ngIf="rawFilesLoading; else rawFilesLoaded">
       <img
         style="height: 10px; margin-left: 10px"
-        src="/metabolights/editor/assets/img/loading.svg"
+        src="{{ baseHref }}assets/img/loading.svg"
       />
     </span>
     <ng-template #rawFilesLoaded>
@@ -210,7 +210,7 @@
         class="panel-heading"
         style="z-index: 1000; padding: 10px"
         stickyThing
-        [spacer]="spacer1"
+        [spacer]="spacer2"
         [attr.marginTop]="!isReadOnly ? '35' : '0'"
       >
         <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
@@ -269,12 +269,12 @@
 
   <!-- Audit files panel start-->
   <nav *ngIf="auditFiles.length > 0" class="panel">
-    <span #spacer2></span>
+    <span #spacer3></span>
     <p
       class="panel-heading"
       style="z-index: 1000; padding: 10px"
       stickyThing
-      [spacer]="spacer2"
+      [spacer]="spacer3"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
       <label>
@@ -295,11 +295,12 @@
 
   <!-- Inferred Data panel start-->
   <nav *ngIf="derivedFiles.length > 0" class="panel">
+    <span #spacer4></span>
     <p
       class="panel-heading"
       style="z-index: 1000; padding: 10px"
       stickyThing
-      [spacer]="spacer"
+      [spacer]="spacer4"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
       <label>
@@ -362,20 +363,20 @@
                     <span *ngIf="file.files; else openFolder">
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder.png"
+                        src="{{ baseHref }}assets/img/folder.png"
                       />
                     </span>
                     <ng-template #openFolder>
                       <img
                         class="file-img"
-                        src="/metabolights/editor/assets/img/folder-open.png"
+                        src="{{ baseHref }}assets/img/folder-open.png"
                       />
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/file.png"
+                      src="{{ baseHref }}assets/img/file.png"
                     />
                   </ng-template>
                 </span>
@@ -420,12 +421,12 @@
         for help.</small
       >
     </div>
-    <span #spacer3></span>
+    <span #spacer5></span>
     <p
       class="panel-heading"
       style="z-index: 1000; padding: 10px"
       stickyThing
-      [spacer]="spacer3"
+      [spacer]="spacer5"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
       <label>
@@ -487,13 +488,13 @@
                   <span *ngIf="isFolder(file); else fileIcon">
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/folder.png"
+                      src="{{ baseHref }}assets/img/folder.png"
                     />
                   </span>
                   <ng-template #fileIcon>
                     <img
                       class="file-img"
-                      src="/metabolights/editor/assets/img/file.png"
+                      src="{{ baseHref }}assets/img/file.png"
                     />
                   </ng-template>
                 </span>

@@ -6,6 +6,7 @@
 </a>
 <div class="columns" style="min-height: 100vh; margin: 60px 0">
   <div class="column is-8 is-offset-2">
+
     <div style="margin: 0 0 20px 0">
       <article class="message is-small has-shadow">
         <div (click)="toggleMessage()" class="message-header">
@@ -33,15 +34,20 @@
         </div>
       </article>
     </div>
+    <div *ngIf="banner" style="margin: 0 0 5px 0">
+      <div class="col-md-12 ">
+        <div class="banner" > {{ banner }}</div>
+      </div>
+    </div>
     <nav class="panel has-background-white">
       <p class="panel-heading">
         <img
           style="height: 32px"
           class="is-pulled-left"
-          src="/metabolights/editor/assets/img/MetaboLightsLogo.png"
+          src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
         />
         <span style="margin-left: 10px"
-          >My Studies
+          >My Studies - {{ loginName }}
           <small *ngIf="studies.length > 0">({{ studies.length }})</small></span
         >
         <span class="is-pulled-right">
@@ -175,7 +181,7 @@
       </ng-template>
     </nav>
     <p *ngIf="loadingStudies" class="has-text-centered">
-      <img src="/metabolights/editor/assets/img/loading.svg" /> <br />
+      <img src="{{ baseHref }}assets/img/loading.svg" /> <br />
       Loading studies
     </p>
   </div>
@@ -205,7 +211,7 @@
               </p>
             </button>
           </div>
-          <div *ngIf="submittedStudies.length < 2 || isCurator" class="column is-half has-text-right">
+          <div *ngIf="submittedStudies.length < 2 || isCurator == true" class="column is-half has-text-right">
             <a [routerLink]="['/guide/create']" class="button is-success"
               >Create new</a
             >

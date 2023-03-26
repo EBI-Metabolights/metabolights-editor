@@ -56,6 +56,7 @@ export class MetaComponent implements OnInit {
 
   form: FormGroup;
   isLoading = false;
+  baseHref: string;
 
   constructor(
     private fb: FormBuilder,
@@ -69,6 +70,7 @@ export class MetaComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    this.baseHref = this.editorService.configService.baseHref;
   }
 
   ngOnInit() {}

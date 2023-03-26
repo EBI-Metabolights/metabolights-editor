@@ -7,26 +7,57 @@ import {
 } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { disambiguateUserObj } from "../editor.service";
+import { NgRedux } from "@angular-redux/store";
+import { IAppState } from "src/app/store";
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
-  constructor() {}
+  constructor(private ngRedux: NgRedux<IAppState>) {}
 
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-    if (request.headers.has("user_token")) {
-      if (request.headers.get("user_token") === "dummy") {
-        if (localStorage.getItem("user") !== null) {
+    let userToken = localStorage.getItem("userToken");
+    if(userToken === null) {
+      const user = localStorage.getItem("user");
+      if ( user !== null) {
+        userToken = disambiguateUserObj(this.getUserObj());
+        localStorage.setItem("userToken", userToken);
+      }
+    }
+    if (userToken !== null){
+      request = request.clone({
+        setHeaders: {
+          user_token: userToken,
+        },
+      });
+    }else {
+      request = request.clone({
+        setHeaders: {
+          user_token: "",
+        },
+      });
+    }
+    const jwt = localStorage.getItem("jwt");
+    if (jwt !== null) {
+      request = request.clone({
+        setHeaders: {
+          Authorization: "Bearer " + jwt
+        },
+      });
+    }
+    const permissions = this.ngRedux.getState().status.studyPermission;
+
+    if (permissions && permissions.obfuscationCode && permissions.studyStatus.toUpperCase() === "INREVIEW"){
+        const user = this.ngRedux.getState().status.user;
+        if (user === null || (user !== null && user.userName === permissions.userName)) {
           request = request.clone({
             setHeaders: {
-              user_token: disambiguateUserObj(this.getUserObj()),
-             
-            },
+              obfuscation_code: permissions.obfuscationCode
+            }
           });
         }
-      }
     }
     return next.handle(request);
   }

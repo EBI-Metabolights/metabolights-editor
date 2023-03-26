@@ -3,7 +3,6 @@ import { ActivatedRoute } from "@angular/router";
 import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "../../store";
 import { EditorService } from "./../../services/editor.service";
-import { MetaboLightsWSURL } from "./../../services/globals";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -20,6 +19,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.study.obfuscationCode) studyObfuscationCode;
 
+  @select((state) => state.status.bannerMessage) bannerMessage;
   @select((state) => state.study.investigationFailed) investigationFailed;
 
   studyError = false;
@@ -29,9 +29,10 @@ export class StudyComponent implements OnInit, OnDestroy {
   status = "submitted";
   validation: any = {};
   obfuscationCode: string = null;
-  domain: string = null;
+  endpoint: string = null;
   messageExpanded = false;
-
+  baseHref: string;
+  banner: string = null;
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private router: Router,
@@ -51,23 +52,27 @@ export class StudyComponent implements OnInit, OnDestroy {
      * to one of the @select objects IE studyStatus. Since the state is not initialised in the TestBed, nor is there any easy way to do so,
      * this .subscribe call fails and throws an error, preventing tests from running.
      */
-    if (!environment.isTesting) {
       this.setUpSubscriptions();
-    }
   }
 
   setUpSubscriptions() {
+    this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
     this.studyObfuscationCode.subscribe((value) => {
       this.obfuscationCode = value;
+    });
+    this.bannerMessage.subscribe((value) => {
+      this.banner = value;
     });
     this.studyIdentifier.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
       }
     });
-    this.domain = this.configService.config.metabolightsWSURL.domain;
-
+    this.endpoint = this.configService.config.endpoint;
+    if (this.configService.config.endpoint.endsWith("/") === false){
+      this.endpoint = this.endpoint + "/";
+    }
     this.investigationFailed.subscribe((value) => {
       this.studyError = value;
       this.selectCurrentTab(5, "files");

@@ -7,7 +7,9 @@ import { NgRedux, select } from "@angular-redux/store";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
-
+import { MtblsJwtPayload } from "src/app/services/headers";
+import jwtDecode  from "jwt-decode";
+import { stringify } from "querystring";
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
@@ -18,14 +20,19 @@ export class LoginComponent implements OnInit {
   isFormBusy = false;
   invalidCredentials = false;
   domain = "";
-
+  endpoint: string;
+  baseHref: string;
+  environmentName: string;
   constructor(
     private fb: FormBuilder,
     private ngRedux: NgRedux<IAppState>,
     public router: Router,
     private editorService: EditorService,
     private configService: ConfigurationService
-  ) {}
+  ) {
+    this.baseHref = this.configService.baseHref;
+    this.environmentName = environment.context;
+  }
 
   ngOnInit() {
     if (!environment.isTesting) {
@@ -36,12 +43,17 @@ export class LoginComponent implements OnInit {
       secret: ["", Validators.required],
     });
     this.domain = this.configService.config.metabolightsWSURL.domain;
+    this.endpoint = this.configService.config.endpoint;
+    if (this.endpoint.endsWith("/") === false){
+      this.endpoint = this.endpoint + "/";
+    }
   }
 
   resetForm() {
     this.form.reset();
     this.invalidCredentials = false;
   }
+
 
   login(event) {
     event.preventDefault();
@@ -69,8 +81,12 @@ export class LoginComponent implements OnInit {
     this.editorService.login(body).subscribe(
       (response) => {
         this.editorService.getValidatedJWTUser(response).subscribe((data) => {
+          const jwt = response.headers.get("jwt");
+          const decoded = jwtDecode<MtblsJwtPayload>(jwt);
+          const expiration = decoded.exp;
+          localStorage.setItem("jwt", jwt);
+          localStorage.setItem("jwtExpirationTime", expiration.toString());
           this.editorService.initialise(data, true);
-
           this.router.navigate([this.editorService.redirectUrl]);
         });
       },
@@ -83,3 +99,4 @@ export class LoginComponent implements OnInit {
     );
   }
 }
+

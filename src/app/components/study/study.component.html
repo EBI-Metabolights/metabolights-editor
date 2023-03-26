@@ -63,12 +63,12 @@
           included read-only link with your reviewers and/or journals. Take care
           to only share this link with trusted parties: <br />
           <span *ngIf="obfuscationCode; else loadingIcon"
-            ><a [href]="domain + 'reviewer' + obfuscationCode">{{
-              domain + "reviewer" + obfuscationCode
+            ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
+              endpoint + "reviewer" + obfuscationCode
             }}</a></span
           >
           <ng-template #loadingIcon>
-            <img src="/metabolights/editor/assets/img/loading.svg" />
+            <img src="{{ baseHref }}assets/img/loading.svg" />
           </ng-template>
           <br />
           <br />
@@ -76,7 +76,7 @@
           public.
           <br /><br />
           The link
-          <a [href]="domain + requestedStudy">{{ domain + requestedStudy }}</a>
+          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
           is the official link for referencing your MetaboLights study in any
           paper, website or other communication.
         </p>
@@ -111,6 +111,11 @@
           please contact us if you have any specific requirements.
         </div>
       </article>
+      <div *ngIf="banner" style="margin: 0 0 5px 0">
+        <div class="col-md-12 ">
+          <div class="banner" > {{ banner }}</div>
+        </div>
+      </div>
     </div>
     <span *ngIf="requestedStudy != undefined">
       <div

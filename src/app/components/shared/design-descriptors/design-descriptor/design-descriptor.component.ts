@@ -57,6 +57,7 @@ export class DesignDescriptorComponent implements OnInit {
   status = "";
 
   loading = false;
+  baseHref: string;
 
   constructor(
     private fb: FormBuilder,
@@ -68,6 +69,7 @@ export class DesignDescriptorComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    this.baseHref = this.editorService.configService.baseHref;
   }
 
   setUpSubscriptions() {

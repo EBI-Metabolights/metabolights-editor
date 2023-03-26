@@ -1,4 +1,9 @@
+.is-rounded {
+  border-radius: 4px !important;
+}
+
 .message-header {
+  font-size: large;
   align-items: center;
   background-color: #eef6fc;
   border-radius: 0;
@@ -12,7 +17,7 @@
 }
 
 .message-body {
-  border-color: #dbdbdb;
+  border-color: blue;
   border-radius: 0px;
   border-style: solid;
   border-width: 0;
@@ -21,16 +26,8 @@
 }
 
 .message {
+  font-size: large;
   background-color: #ffffffb5;
   border-radius: 0px;
   border: 1px solid #cce9ff;
-}
-
-.banner {
-  font-size: 14px;
-  color: red;
-  background-color: cornsilk;
-  border: 1px solid #cce9ff;
-  border-radius: 5px;
-  padding: 5px;
 }

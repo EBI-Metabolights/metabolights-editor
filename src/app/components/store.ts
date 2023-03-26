@@ -17,7 +17,11 @@ import {
   SET_GUIDES,
   SET_USER,
   RESET,
+  SET_STUDY_PERMISSION,
+  RESET_STUDY_PERMISSION,
+  SET_BANNER_MESSAGE
 } from "./actions";
+import { SET_STUDY_ASSAY } from "./study/actions";
 
 export interface IsInitialised {
   ready: boolean;
@@ -42,6 +46,8 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
   mappings: null,
   selectedLanguage: "en",
   guides: null,
+  studyPermission: null,
+  bannerMessage: null
 };
 
 function toggleLoading(state) {
@@ -94,6 +100,10 @@ function reset(state, action) {
   });
 }
 
+function setBannerHeader(state, action) {
+  return tassign(state, { bannerMessage: action.body.bannerMessage });
+}
+
 function setUserStudies(state, action) {
   return tassign(state, { userStudies: action.body.studies });
 }
@@ -108,6 +118,13 @@ function setSelectedLanguage(state, action) {
 
 function setGuides(state, action) {
   return tassign(state, { guides: action.body.guides });
+}
+
+function setStudyPermission(state, action) {
+  return tassign(state, { studyPermission: action.body.studyPermission });
+}
+function resetStudyPermission(state, action) {
+  return tassign(state, { studyPermission: null });
 }
 
 function setLoadingConfiguration(state, action) {
@@ -164,6 +181,12 @@ export function sharedReducer(
       return setSelectedLanguage(state, action);
     case SET_GUIDES:
       return setGuides(state, action);
+    case SET_STUDY_PERMISSION:
+      return setStudyPermission(state, action);
+    case RESET_STUDY_PERMISSION:
+      return resetStudyPermission(state, action);
+    case SET_BANNER_MESSAGE:
+      return setBannerHeader(state, action);
   }
 
   return state;

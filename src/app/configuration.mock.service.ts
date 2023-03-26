@@ -13,7 +13,7 @@ export class MockConfigurationService {
       loginURL: "login",
       clearJavaSession: true,
       javaLogoutURL:
-        "http://localhost:8080/metabolights/j_spring_security_logout",
+        "http://localhost:8080/metabolights/logout",
       redirectURL: "console",
       metabolightsWSURL: {
         domain: "https://www.ebi.ac.uk/metabolights/",
@@ -34,6 +34,7 @@ export class MockConfigurationService {
         token: "/webservice/labs/authenticateToken",
         initialise: "/webservice/labs-workspace/initialise",
         studiesList: "/webservice/study/myStudies",
+        getJwtWithOneTimeToken: ""
       },
       videoURL: {
         all: "",

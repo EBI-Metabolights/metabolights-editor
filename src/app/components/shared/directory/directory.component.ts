@@ -23,8 +23,10 @@ export class DirectoryComponent implements OnInit {
   selectedUploadFiles: any[] = [];
 
   isReadOnly = false;
-
-  constructor(private editorService: EditorService) {}
+  baseHref: string;
+  constructor(private editorService: EditorService) {
+    this.baseHref =this.editorService.configService.baseHref;
+  }
 
   ngOnInit() {
     if (!environment.isTesting) {

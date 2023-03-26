@@ -111,12 +111,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
 
   hit = false;
-
+  baseHref: string;
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
     private editorService: EditorService
-  ) {}
+  ) {
+    this.baseHref =this.editorService.configService.baseHref;
+  }
 
   ngOnInit() {
     if (!environment.isTesting) {

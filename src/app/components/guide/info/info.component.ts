@@ -18,7 +18,7 @@ export class InfoComponent implements OnInit {
   requestedStudy: string = null;
   uploadFiles: any[] = [];
   isLoading = false;
-
+  baseHref: string;
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private router: Router,
@@ -29,6 +29,7 @@ export class InfoComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    this.baseHref = this.editorService.configService.baseHref;
   }
 
   setUpSubscriptions() {

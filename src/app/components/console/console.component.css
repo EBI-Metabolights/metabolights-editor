@@ -2,6 +2,15 @@
   border-radius: 4px !important;
 }
 
+.banner {
+  font-size: 14px;
+  color: red;
+  background-color: cornsilk;
+  border: 1px solid #cce9ff;
+  border-radius: 5px;
+  padding: 5px;
+}
+
 .message-header {
   align-items: center;
   background-color: #eef6fc;
