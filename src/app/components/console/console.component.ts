@@ -22,7 +22,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   loadingStudies = false;
   filterValue: string = null;
   messageExpanded = false;
-
+  curator = false;
   submittedStudies: any = [];
   user=null;
   loginName = "";
@@ -49,7 +49,11 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.editorService.updateHistory(this.route.snapshot);
     this.bannerMessage.subscribe((value) => {
       this.banner = value;
-  });
+    });
+    this.isCurator.subscribe((value) => {
+      this.curator = value;
+    });
+
   }
 
   toggleMessage() {
