@@ -180,7 +180,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
         if (files === "") {
           files = f.file;
         } else {
-          files = files + "," + f.file;
+          files = files + "|" + f.file;
         }
       });
       return files;
