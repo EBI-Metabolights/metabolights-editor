@@ -9,7 +9,6 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { MockMetabolightsService } from "src/app/services/metabolights/metabolights.service.mock";
 
 import { FilesComponent } from "./files.component";
-import { MockFtpManagementComponent } from "./ftp-management/ftp-management.mock.component";
 
 describe("FilesComponent", () => {
   let component: FilesComponent;
@@ -18,22 +17,12 @@ describe("FilesComponent", () => {
   let dataService: MetabolightsService;
   let ftpService: FtpManagementService;
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      declarations: [FilesComponent, MockFtpManagementComponent],
-      imports: [HttpClientTestingModule],
-      providers: [
-        { provide: EditorService, useClass: MockEditorService },
-        { provide: MetabolightsService, useClass: MockMetabolightsService },
-        { provide: FtpManagementService, useClass: MockFtpManagementService}
-      ],
-    }).compileComponents();
-  }));
+
 
   beforeEach(() => {
     editorService = TestBed.inject(EditorService);
     dataService = TestBed.inject(MetabolightsService);
-    ftpService = TestBed.inject(FtpManagementService)
+    ftpService = TestBed.inject(FtpManagementService);
     fixture = TestBed.createComponent(FilesComponent);
     component = fixture.componentInstance;
     spyOn(component, "loadAccess").and.stub();
@@ -42,32 +31,9 @@ describe("FilesComponent", () => {
     fixture.detectChanges();
   });
 
-  
+
 
   it("should create", () => {
     expect(component).toBeTruthy();
-  });
-
-  describe('synchronise tests', () => {
-
-    afterEach(() => {
-      component.ngOnDestroy();
-    })
-
-    // I am mystified as to why this very simple test doesn't work.
-    xit('should make at least one call to check the status of the sync operation', async(() => {
-      spyOn(component, 'checkSyncStatus');
-      spyOn(ftpService, 'getSyncStatus').and.returnValue(of({
-        status: 'COMPLETED_SUCCESS',
-        description: '',
-        last_update_time: 'October 31st 1970'
-    }));
-      component.sync();
-      fixture.detectChanges();
-      expect(ftpService.getSyncStatus).toHaveBeenCalledTimes(2);
-      component.syncIntervalSubscription.unsubscribe();
-    }));
-
-
   });
 });

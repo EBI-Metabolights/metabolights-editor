@@ -1,0 +1,28 @@
+<article class="message article-box" #trackHeight>
+  <!--message header start-->
+  <div class="message-header">
+    <p>{{ title }}</p>
+    <span><mat-icon [matTooltip]="helpMessage" >help</mat-icon></span>
+  </div>
+  <!--message header end-->
+  <div class="message-body padding">
+    <div class=" container ">
+
+      <div class="interior-container right" #trackStatusHeight>
+        <a
+        class="button is-info"
+        [ngClass]="startButtonClass"
+        (click)="onStartButtonClick()" >
+          <span **ngIf="serverReady"><mat-icon>{{ startButtonIcon }}</mat-icon></span>
+          {{ serverReady ? startButtonLabel : "Connecting..."}} </a>
+          <div class="status-container">
+            <div class="response"><b>LAST UPDATE:</b> {{lastResponse.task.last_update_time > 0 ? (lastResponse.task.last_update_time * 1000| date: 'MMM d, y, H:mm:ss z') : "-"}}</div>
+            <div class="response"><b>STATUS:</b><i> {{lastResponse.task.last_status | asyncTaskStatusTransform }} {{ lastResponse.new_task ? "(New Task)" : ""}}</i></div>
+            <div class="response top"><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
+            <div class="response bottom"><b>DESCRIPTION:</b><br>
+            {{ lastResponse.message }}</div>
+          </div>
+      </div>
+    </div>
+    </div>
+</article>

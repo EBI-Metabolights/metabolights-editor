@@ -120,7 +120,7 @@ export class PublicStudyComponent implements OnInit {
         }
 
         if (this.isCurator || this.isOwner) {
-          this.editorService.validateStudy();
+          this.editorService.getValidationReport();
         }
     });
 
@@ -161,8 +161,8 @@ export class PublicStudyComponent implements OnInit {
         this.requestedTab = 0;
         this.tab = "descriptors";
       }
+      this.selectCurrentTab(this.requestedTab, this.tab);
     });
-    this.selectCurrentTab(this.requestedTab, this.tab);
   }
 
   selectCurrentTab(index, tab) {
@@ -205,8 +205,8 @@ export class PublicStudyComponent implements OnInit {
       location
     );
     if (index === 6) {
-      if ((this.isCurator || this.isOwner) && (this.studyStatus && this.studyStatus.toLowerCase() !== 'public' )) {
-        this.editorService.validateStudy();
+      if ((this.isCurator || this.isOwner) && (this.status && this.status.toLowerCase() !== 'public' )) {
+        this.editorService.getValidationReport();
       }
       document.getElementById("tab-content-wrapper").scrollIntoView();
     }

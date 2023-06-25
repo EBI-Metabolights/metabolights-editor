@@ -1134,23 +1134,14 @@ export class MetabolightsService extends DataService {
    * @param level The level of validation messages to return IE Success, Warning, Failure. Defaults to all if no argument supplied.
    * @returns A summary of the validation run, via the Observable.
    */
-  validateStudy(section, level): Observable<IValidationSummaryWrapper> {
-    if (section === "" || !section) {
-      section = "all";
-    }
-    if (level === "" || !level) {
-      level = "all";
-    }
+  getValidationReport(): Observable<IValidationSummaryWrapper> {
+
     return this.http
       .get<IValidationSummaryWrapper>(
         this.url.baseURL +
-          "/studies" +
-          "/" +
+          "/studies/" +
           this.id +
-          "/validate-study?section=" +
-          section +
-          "&level=" +
-          level,
+          "/validation-report",
         httpOptions
       )
       .pipe(catchError(this.handleError));

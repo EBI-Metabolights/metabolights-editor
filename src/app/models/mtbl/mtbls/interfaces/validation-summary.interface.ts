@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 export interface IValidationSummaryWrapper {
   validation: IValidationSummary;
 }
@@ -5,6 +6,8 @@ export interface IValidationSummaryWrapper {
 export interface IValidationSummary {
   status: string;
   timing: number;
+  last_update_time: string;
+  last_update_timestamp: number;
   validations: IValidationSection[];
 }
 

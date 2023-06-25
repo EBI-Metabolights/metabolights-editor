@@ -49,11 +49,10 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { CalculationTransformPipe } from "./files/ftp-management/calculation-transform.pipe";
-import { SyncOpTransformPipe } from "./files/ftp-management/sync-op-transform.pipe";
-import { FtpManagementComponent } from './files/ftp-management/ftp-management.component';
-import { TimezoneTransformPipe } from "./files/ftp-management/timezone.pipe";
+import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.pipe";
 import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
+import { RsyncComponent } from './files/rsync/rsync.component';
+import { ValidationStatusTransformPipe } from "./validations/validation-status-transform.pipe";
 
 @NgModule({
   declarations: [
@@ -77,10 +76,9 @@ import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
     ValidationsComponent,
     ValidationDetailComponent,
     ValidationDetailCommentComponent,
-    CalculationTransformPipe,
-    SyncOpTransformPipe,
-    TimezoneTransformPipe,
-    FtpManagementComponent
+    RsyncStatusTransformPipe,
+    ValidationStatusTransformPipe,
+    RsyncComponent
   ],
   imports: [
     CommonModule,
@@ -131,11 +129,7 @@ import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
     StatusComponent,
     ValidationsComponent,
     ValidationDetailComponent,
-    ValidationDetailCommentComponent,
-    CalculationTransformPipe,
-    SyncOpTransformPipe,
-    TimezoneTransformPipe,
-    FtpManagementComponent
+    ValidationDetailCommentComponent
   ],
   providers: [
     AuthGuard,

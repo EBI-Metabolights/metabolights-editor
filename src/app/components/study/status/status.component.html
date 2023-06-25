@@ -80,6 +80,13 @@
           validation criteria, please change the study status to ‘Curation’ /
           ‘Submission complete’
         </p>
+        <br>
+        <div *ngIf="validation.status != 'success'">
+          <p class="error-message">
+            Before changing status of your study, please validate your study and fix all errors.
+          </p>
+        </div>
+
       </span>
       <br />
       <span *ngIf="!isReadOnly">

@@ -1,22 +1,53 @@
-<p>
-  <mat-form-field>
-    <mat-label>Display Options</mat-label>
-    <mat-select [(value)]="displayOption">
-      <mat-option [value]="'error'">Errors</mat-option>
-      <mat-option [value]="'warning'">Warning</mat-option>
-      <mat-option [value]="'info'">Info</mat-option>
-      <mat-option [value]="'success'">Success</mat-option>
-      <mat-option [value]="'all'">All</mat-option>
-    </mat-select>
-  </mat-form-field>
-</p>
 
-<div class="is-pulled-right">
+  <div class="field is-grouped is-grouped-multiline px-20 mb-10">
+  <div class="display-options">
+    <mat-form-field>
+      <mat-label>Display Options</mat-label>
+      <mat-select [(value)]="displayOption">
+        <mat-option [value]="'error'">Errors</mat-option>
+        <mat-option [value]="'warning'">Warning</mat-option>
+        <mat-option [value]="'info'">Info</mat-option>
+        <mat-option [value]="'success'">Success</mat-option>
+        <mat-option [value]="'all'">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+  <div class="is-pulled-right">
+    <div class="tags has-addons">
+      <span class="tag is-dark">Validation</span>
+      <span class="tag" [ngClass]="validationStatusClass"> {{ studyValidation !== undefined ? (studyValidation.status | validationStatusTransform) : "-" }} </span>
+    </div>
+</div>
+
+  <div class="is-pulled-right">
+    <span *ngIf="studyValidation !== undefined && studyValidation.status !== 'not ready'">
+      <div class="tags has-addons">
+        <span class="tag is-dark">Last Validation Time</span>
+        <span class="tag" [ngClass]="validationStatusClass"> <small> {{ studyValidation !== undefined && studyValidation.last_update_timestamp > 0 ? (studyValidation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
+      </div>
+    </span>
+
+  </div>
+</div>
+
+<div class="validation-panel">
+  <app-async-task
+  title="Validate Your Study"
+  helpMessage="Validate Study Metadata and Data Files."
+  startButtonLabel="Start Validation"
+  startButtonIcon="schedule"
+  [startTaskUrl]="startValidationTaskUrl"
+  [pollTaskStatusUrl]="getValidationTaskStatusUrl"
+  pollingInterval=10000
+  (taskDone)="validationTaskDone($event)"
+  ></app-async-task>
+</div>
+
+<!-- <div class="is-pulled-left">
   <a (click)="refreshValidations()" class="button is-light">
     <mat-icon>refresh</mat-icon> Refresh
   </a>
-</div>
-<br /><br />
+</div> -->
 <div>&nbsp;</div>
 <ng-container *ngIf="studyValidation; else NoValidationsFound">
   <span *ngFor="let validation of studyValidation.validations; let i = index">

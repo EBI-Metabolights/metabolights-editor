@@ -12,6 +12,7 @@ import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 @Component({
   selector: "mtbls-status",
@@ -20,6 +21,7 @@ import { environment } from "src/environments/environment";
 })
 export class StatusComponent implements OnInit {
   @select((state) => state.study.status) studyStatus;
+  @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier;
 
@@ -32,17 +34,18 @@ export class StatusComponent implements OnInit {
   curator = false;
   toStatus = "Submitted";
   requestedStudy: string = null;
-
+  validation: IValidationSummary;
   constructor(
     private editorService: EditorService,
     private route: ActivatedRoute
   ) {
-    if (!environment.isTesting) {
       this.setUpSubscriptions();
-    }
   }
 
   setUpSubscriptions() {
+    this.studyValidation.subscribe((value) => {
+      this.validation = value;
+    });
     this.studyStatus.subscribe((value) => {
       if (value != null) {
         this.status = value;
@@ -68,7 +71,7 @@ export class StatusComponent implements OnInit {
 
   changeStatus(toStatus) {
     if (!this.isReadOnly) {
-      if (toStatus == null) {
+      if (toStatus === null) {
         toStatus = this.toStatus;
       }
       Swal.fire({
@@ -107,6 +110,18 @@ export class StatusComponent implements OnInit {
   ngOnInit() {}
 
   openModal() {
+    if (!this.curator && this.status && this.status.toLowerCase() === "submitted") {
+      if (this.validation.status === 'error' || this.validation.status === 'not ready') {
+        toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
+          timeOut: "5000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
+      }
+      return;
+    }
     this.isModalOpen = true;
   }
 

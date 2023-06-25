@@ -1,5 +1,5 @@
 import { select } from '@angular-redux/store';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -24,47 +24,61 @@ export class FtpManagementService {
 
   private url = '';
 
+
   /**
    * constructor
+   *
    * @param http http client for request making.
    * @param configService internal config service for retrieving API configuration values.
    */
   constructor(private http: HttpClient, private configService: ConfigurationService) {
     if (!environment.isTesting) {
       this.studyIdentifier.subscribe((value) => (
-        this.url = `${configService.config.metabolightsWSURL.baseURL}/studies/${value}/ftp`));
+        this.url = `${configService.config.metabolightsWSURL.baseURL}/studies/${value}/study-folders/rsync-task`));
     }
    }
 
-   /**
-    * Synchronise a study folder with its FTP directory. Triggers the transfer of files from 
-    * FTP to the study directory.
-    * @returns status (indicating whether the process has started or not)
-    */
-   public synchronise(): Observable<GenericHttpResponse> {
-      return this.http.post<GenericHttpResponse>(`${this.url}/sync`,{}, httpOptions)
-   }
+  public startRsync(dryRun: boolean=true, syncType: string, targetStagingArea: string): Observable<FTPResponse> {
+    const syncOptions = this.syncOptions(String(dryRun), syncType, targetStagingArea);
+    return this.http.post<FTPResponse>(`${this.url}`,{}, syncOptions);
+  }
+
+
+  public getRyncStatus(dryRun: boolean=true, syncType: string, targetStagingArea: string): Observable<FTPResponse> {
+    const syncOptions = this.syncOptions(String(dryRun), syncType, targetStagingArea);
+    return this.http.get<FTPResponse>(`${this.url}`, syncOptions);
+  }
+
+  public syncOptions(dryRun: string, syncType: string, targetStaging: string, sourceStagingArea: string="private-ftp") {
+
+    return {
+      headers: new HttpHeaders({
+        //'Content-Type':  'application/json',
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Accept: "application/json",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        user_token: "dummy",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Authorization: "Bearer dummy",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        source_staging_area: sourceStagingArea,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        target_staging_area: targetStaging,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        sync_type: syncType,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        dry_run: dryRun
+      }),
+    };
+  }
 
    /**
-    * Get the status of an already underway synchronise action. 
+    * Get the status of an already underway synchronise action.
+    *
     * @returns FTPResponse object giving insight to the status of the process.
     */
-   public getSyncStatus(): Observable<FTPResponse> {
-     return this.http
-      .get<FTPResponse>(`${this.url}/sync-status`, httpOptions)
-   }
-
-   /**
-    * 'Calculates' any difference between the study directory and the FTP directory.
-    * Note this will only retrieve the pre-existing calculation unless the 'force' flag is 
-    * set to True.
-    * @returns FTP response object giving insight into the current 'calculation'
-    */
-   public syncCalculation(force = false): Observable<FTPResponse> {
-     return this.http.post<FTPResponse>(`${this.url}/sync-calculation?force=${force.toString()}`, {}, httpOptions)
-   }
-
-   public set service_url(newrl: string) {
-    this.url = newrl;
+   public getSyncStatus(syncType: string, targetStagingArea: string): Observable<FTPResponse> {
+    const syncOptions = this.syncOptions("true", syncType, targetStagingArea);
+    return this.http.get<FTPResponse>(`${this.url}`, syncOptions);
    }
 }

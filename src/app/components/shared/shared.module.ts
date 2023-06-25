@@ -22,6 +22,9 @@ import { FTPUploadComponent } from "./upload/ftp/ftp.component";
 import { AsperaUploadComponent } from "./upload/aspera/aspera.component";
 import { MatIconModule } from "@angular/material/icon";
 import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatExpansionModule } from "@angular/material/expansion";
+import { MatTooltipModule } from "@angular/material/tooltip";
+
 import { DesignDescriptorsComponent } from "./design-descriptors/design-descriptors.component";
 import { DesignDescriptorComponent } from "./design-descriptors/design-descriptor/design-descriptor.component";
 import { TitleComponent } from "./title/title.component";
@@ -50,6 +53,8 @@ import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
 import { EditTableDirective } from "src/app/directives/edit-table.directive";
 import { QuillModule } from "ngx-quill";
 import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
+import { AsyncTaskComponent } from './async-task/async-task.component';
+import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transform.pipe";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -84,6 +89,8 @@ import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.compo
     OntologyDetailsComponent,
     EditTableDirective,
     NoStudyPageComponent,
+    AsyncTaskComponent,
+    AsyncStatusTransformPipe
   ],
   imports: [
     CommonModule,
@@ -104,6 +111,8 @@ import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.compo
     AngularStickyThingsModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatExpansionModule,
+    MatTooltipModule,
     QuillModule,
   ],
   exports: [
@@ -131,6 +140,7 @@ import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.compo
     PersonComponent,
     OntologyComponent,
     OntologyDetailsComponent,
+    AsyncTaskComponent,
   ],
   providers: [
     AuthGuard,

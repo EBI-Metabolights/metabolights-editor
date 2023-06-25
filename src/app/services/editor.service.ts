@@ -16,7 +16,7 @@ import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
 import { HttpHeaders } from "@angular/common/http";
-import { Observable } from "rxjs";
+import { Observable, interval } from "rxjs";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -613,7 +613,7 @@ export class EditorService {
         });
         this.loadStudyFiles(false);
         if (!readonly) {
-          this.validateStudy();
+          this.getValidationReport();
           this.ngRedux.dispatch({
             type: "SET_STUDY_READONLY",
             body: {
@@ -640,14 +640,14 @@ export class EditorService {
         });
         this.loadStudyFiles(false);
         if (!readonly) {
-          this.validateStudy();
+          this.getValidationReport();
         }
       }
     );
   }
 
-  validateStudy() {
-    this.dataService.validateStudy(null, null).subscribe(
+  getValidationReport() {
+    this.dataService.getValidationReport().subscribe(
       (response) => {
         this.toggleLoading(false);
         this.ngRedux.dispatch({
@@ -661,6 +661,46 @@ export class EditorService {
         this.toggleLoading(false);
       }
     );
+  }
+
+  getValidationReportRetry(retry: number = 5, period: number=3000) {
+    let repeat = 0;
+    this.dataService.getValidationReport().subscribe(reportResponse => {
+      if (reportResponse.validation.status === "not ready"){
+        const validationReportPollInvertal = interval(period);
+        const validationReportLoadSubscription = validationReportPollInvertal.subscribe(x => {
+          this.dataService.getValidationReport().subscribe(nextReportResponse => {
+            repeat = repeat + 1;
+          if (nextReportResponse.validation.status !== "not ready"){
+            validationReportLoadSubscription.unsubscribe();
+            this.ngRedux.dispatch({
+              type: "SET_STUDY_VALIDATION",
+              body: {
+                validation: nextReportResponse.validation,
+              }
+            });
+          }
+          if (repeat > retry) {
+            validationReportLoadSubscription.unsubscribe();
+            this.ngRedux.dispatch({
+              type: "SET_STUDY_VALIDATION",
+              body: {
+                validation: nextReportResponse.validation,
+              }
+            });
+          }
+          });
+        });
+      } else {
+        this.ngRedux.dispatch({
+          type: "SET_STUDY_VALIDATION",
+          body: {
+            validation: reportResponse.validation,
+          },
+        });
+      }
+    });
+
   }
 
   loadStudyFiles(fource) {

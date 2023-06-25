@@ -50,21 +50,51 @@
   </span>
   <div>&nbsp;</div>
 
+    <div class="notification is-warning">
+      <small
+        ><mat-icon>info</mat-icon>  You can check whether you have any files in your FTP upload directory that are not present in your study directory.
+        If you do have new files in your FTP upload directory, you can sync them to the study directory.
+        Please note that the sync operations may take some time to complete. If you cannot see your recently uploaded files please contact us at
+        <a
+          [href]="
+            'mailto:metabolights-help@ebi.ac.uk?subject=Regarding sync from FTP folder - ' +
+            requestedStudy
+          "
+          >metabolights-help@ebi.ac.uk</a
+        >
+        for help.</small
+      >
+    </div>
 <!--ftp management component start-->
-<app-ftp-management
+<div class="container parent">
+  <app-rsync
   *ngIf="!isReadOnly"
-  [calculation]="calculation"
-  [ongoingStatus]="ongoingStatus"
-  [isSyncing]="isSyncing"
-  [isCalculating]="isCalculating"
-  [requestedStudy]="requestedStudy"
-  (checkClicked)="handleCheckClick($event)"
-  (syncClicked)="handleSyncClick($event)"
-  ></app-ftp-management>
-<!--ftp management component end-->
+  title="Metadata Files"
+  helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
+  [studyId]="studyIdentifier"
+  sourceStagingArea="ftp-private"
+  targetStagingArea="rw-study"
+  syncType="metadata"
+  runSyncOnCluster="false"
+  runDryRunOnCluster="false"
+  pollingInterval=5000
+  (filesSynchronized)="onFilesSynchronized($event)"
+  ></app-rsync>
 
-
-
+    <app-rsync
+    *ngIf="!isReadOnly"
+    title="Study Data Files"
+    helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
+    [studyId]="studyIdentifier"
+    sourceStagingArea="ftp-private"
+    targetStagingArea="readonly-study"
+    syncType="data"
+    runSyncOnCluster="false"
+    runDryRunOnCluster="false"
+    pollingInterval=10000
+    (filesSynchronized)="onFilesSynchronized($event)"
+    ></app-rsync>
+</div>
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>

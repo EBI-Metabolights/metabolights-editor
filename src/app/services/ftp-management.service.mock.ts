@@ -21,12 +21,4 @@ export class MockFtpManagementService {
         )
         return observable
     }
-
-    syncCalculation(force): Observable<FTPResponse> {
-        return of({
-            status: 'SYNC_NEEDED',
-            description: 'file_to_sync.txt',
-            last_update_time: 'October 31st 1970'
-        })
-    }
 }

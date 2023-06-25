@@ -1,0 +1,36 @@
+<article class="message article-box" #trackHeight>
+  <!--message header start-->
+  <div class="message-header">
+    <p>{{ title }}</p>
+    <span><mat-icon matTooltip="{{ helpMessage }}">help</mat-icon></span>
+  </div>
+  <!--message header end-->
+  <div class="message-body padding">
+    <div class=" container ">
+
+      <div class="interior-container right" #trackStatusHeight>
+        <a
+        class="button is-info"
+        [ngClass]="dryRunButtonClass"
+        (click)="onDryRunClick()" >
+          <mat-icon>search</mat-icon>
+          Check Updates </a>
+
+          <a
+          class="button is-info"
+          [ngClass]="syncButtonClass"
+          (click)="onSyncClick()">
+            <mat-icon>sync</mat-icon>
+            Start Synchronisation </a>
+          <div class="status-container">
+            <div class="response"><b>LAST UPDATE:</b> {{lastResponse.last_update_timestamp > 0 ? (lastResponse.last_update_timestamp * 1000| date: 'MMM d, y, H:mm:ss z') : "-"}}</div>
+            <div class="response top"><b>LAST TASK:</b> {{currentTaskName}} {{ lastResponse.new_task ? "(New Task)" : ""}}</div>
+            <div class="response"><b>STATUS:</b><i> {{lastResponse.status | rsyncStatusTransform}}</i></div>
+            <div class="response top"><b>TASK ID:</b> <small> {{lastResponse.task_id}} </small> </div>
+            <div class="response bottom"><b>DESCRIPTION:</b><br>
+            {{ lastResponse.description }}</div>
+          </div>
+      </div>
+    </div>
+    </div>
+</article>

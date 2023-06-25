@@ -3,6 +3,10 @@ import { NgRedux, select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { failedValidation } from "src/app/models/mtbl/mtbls/mocks/mock-validation";
+import { ConfigurationService } from "src/app/configuration.service";
+import { IValidationSummary, IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
+import { retry } from "rxjs-compat/operator/retry";
 
 @Component({
   selector: "study-validations",
@@ -12,10 +16,12 @@ import { failedValidation } from "src/app/models/mtbl/mtbls/mocks/mock-validatio
 export class ValidationsComponent implements OnInit, AfterViewInit {
   @select((state) => state.study.validation) validation: any;
   @select((state) => state.status.isCurator) isCurator;
-
-  studyValidation: any;
+  @select((state) => state.study.identifier) studyIdentifier: any;
+  requestedStudy: any;
+  studyValidation: IValidationSummary;
   noValidationsfound: any = null;
   displayOption = "error";
+  validationStatusClass = "not ready";
   defaultToastrOptions: any = {
     timeOut: "2500",
     positionClass: "toast-top-center",
@@ -23,16 +29,23 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     extendedTimeOut: 0,
     tapToDismiss: false,
   };
-
+  startValidationTaskUrl: string;
+  getValidationTaskStatusUrl: string;
   /**Extraordinary bad practice to have a testing flag, but attempts to mock out the select have failed.
    * The state library itself is also long unmaintained. */
   isTesting = false;
 
   curator = false;
 
-  constructor(private editorService: EditorService) {}
+  validationReportLoadSubscription: any;
+  validationReportPollInvertal: any;
 
-  ngOnInit() {}
+  constructor(private editorService: EditorService,
+    public configService: ConfigurationService) {}
+
+  ngOnInit() {
+
+  }
 
   ngAfterViewInit() {
     this.setUpSubscriptions();
@@ -42,12 +55,30 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     this.validation.subscribe((value) => {
       if (value) {
         this.studyValidation = value;
+        if (this.studyValidation.status === 'error'){
+          this.validationStatusClass = "is-danger";
+        } else if (this.studyValidation.status === 'success'){
+          this.validationStatusClass = "is-success";
+        } else if (this.studyValidation.status === 'warning'){
+            this.validationStatusClass = "is-success";
+        } else if (this.studyValidation.status === 'not ready'){
+          this.validationStatusClass = "is-warning";
+        } else {
+          this.validationStatusClass = "is-warning";
+        }
       }
     });
     this.isCurator.subscribe((value) => {
       if (value !== null) {
         this.curator = value;
       }
+    });
+    this.studyIdentifier.subscribe((value) => {
+      this.requestedStudy = value;
+      this.startValidationTaskUrl = this.configService.config.metabolightsWSURL.baseURL
+        + "/studies/" + this.requestedStudy + "/validation-task";
+      this.getValidationTaskStatusUrl = this.configService.config.metabolightsWSURL.baseURL
+      + "/studies/" + this.requestedStudy + "/validation-task";
     });
   }
 
@@ -84,7 +115,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
           "Successfully overriden the validation",
           this.defaultToastrOptions
         );
-        this.refreshValidations();
+        // this.refreshValidations();
       },
       (err) => {
         toastr.error(
@@ -118,7 +149,12 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
         "Successfully posted the comment",
         this.defaultToastrOptions
       );
-      this.refreshValidations();
+      // this.refreshValidations();
     });
+  }
+
+
+  validationTaskDone($event) {
+    this.editorService.getValidationReportRetry(10);
   }
 }

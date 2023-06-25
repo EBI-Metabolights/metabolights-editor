@@ -134,6 +134,24 @@
               </div>
             </div>
           </span>
+          <span class="clickable" *ngIf="validation.status == 'not ready'">
+            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+              <div class="tags has-addons">
+                <span class="tag is-dark">Validation</span>
+                <span class="tag is-warning"> Not Ready </span>
+              </div>
+            </div>
+          </span>
+        </div>
+        <div class="is-pulled-right">
+          <span class="clickable" *ngIf="validation.status == 'error'">
+            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+              <div class="tags has-addons">
+                <span class="tag is-dark">Last Validation Time</span>
+                <span class="tag is-danger"> <small> {{ validation !== undefined && validation.last_update_timestamp > 0 ? (validation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
+              </div>
+            </div>
+          </span>
         </div>
         <div style="margin-left: auto" class="is-pulled-right">
           <mtbls-delete></mtbls-delete>

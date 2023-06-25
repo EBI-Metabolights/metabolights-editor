@@ -90,7 +90,16 @@
             <div (click)="selectCurrentTab(6, 'validations')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Validation</span>
-                <span class="tag is-danger"> Failed </span>
+                <span class="tag is-danger"> Failed ( {{ validation !== undefined && validation.last_update_timestamp > 0 ? (validation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} )</span>
+              </div>
+            </div>
+          </span>
+
+          <span class="clickable" *ngIf="validation.status == 'not ready'">
+            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+              <div class="tags has-addons">
+                <span class="tag is-dark">Validation</span>
+                <span class="tag is-warning"> No Validation Report </span>
               </div>
             </div>
           </span>
