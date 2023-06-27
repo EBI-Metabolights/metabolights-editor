@@ -1,5 +1,5 @@
 variables:
-     EDITOR_VERSION: "2.0.0"
+     VERSION: "2.0.0"
      BUILD_SCRIPTS_ROOT_PATH: "/home/gitlab-runner/ci_cd/standalone/editor"
 workflow:
   rules:
@@ -27,7 +27,7 @@ build:
   script:
     - npm install --save --legacy-peer-deps
     - >
-      echo "{\"version\": \"$EDITOR_VERSION\", \"releaseName\": \"$RELEASE_NAME-$CI_COMMIT_SHORT_SHA\"}" > src/assets/configs/version.json
+      echo "{\"version\": \"$VERSION\", \"releaseName\": \"$RELEASE_NAME-$CI_COMMIT_SHORT_SHA\"}" > src/assets/configs/version.json
     - bash "$BUILD_SCRIPTS_ROOT_PATH/$CI_COMMIT_REF_NAME/update_config_file.sh"
     - npm run build -- --configuration $CONFIGURAION_NAME
     - mkdir -p dist/metabolights && mv dist/metabolights-editor dist/metabolights/editor
