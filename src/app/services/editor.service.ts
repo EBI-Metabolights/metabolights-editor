@@ -409,9 +409,39 @@ export class EditorService {
     return this.dataService.addComment(data);
   }
 
+
+  loadApiVersionInfo(){
+    this.dataService.getApiInfo().subscribe(versionInfo => {
+      console.log("Loaded API version: " + versionInfo.about.api.version);
+      this.ngRedux.dispatch({
+        type: "SET_BACKEND_VERSION",
+        body: {
+          backendVersion: versionInfo,
+        },
+      });
+    },
+    (err) => {
+      const noVersion = {
+        app: {
+          version: "",
+          name: ""
+        },
+        api: {
+          version: "",
+        }
+      };
+      this.ngRedux.dispatch({
+        type: "SET_BACKEND_VERSION",
+        body: {
+          backendVersion: noVersion,
+        },
+      });
+    }
+    );
+  }
+
   loadVersionInfo(){
     const url = this.baseHref + "assets/configs/version.json";
-    console.log("Loading version");
     this.dataService.http.get<VersionInfo>(url).subscribe(versionInfo => {
       console.log("Loaded version: " + versionInfo.version + "-" + versionInfo.releaseName);
       this.ngRedux.dispatch({

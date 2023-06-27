@@ -55,13 +55,14 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
     releaseName: ""
   },
   backendVersion: {
-    app: {
-      version: "",
-      releaseName: ""
-    },
-    api: {
-      version: "",
-      releaseName: ""
+    about: {
+      app: {
+        version: "",
+        name: ""
+      },
+      api: {
+        version: "",
+      }
     }
   }
 };

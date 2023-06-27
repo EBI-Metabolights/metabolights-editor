@@ -22,6 +22,7 @@ import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MTBLSStudy } from "src/app/models/mtbl/mtbls/mtbls-study";
+import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common";
 
 
 
@@ -178,9 +179,9 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
-  info() {
+  getApiInfo(): Observable<ApiVersionInfo> {
     return this.http
-      .get(this.url.baseURL, httpOptions)
+      .get<ApiVersionInfo>(this.url.baseURL, httpOptions)
       .pipe(catchError(this.handleError));
   }
 

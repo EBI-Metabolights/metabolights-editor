@@ -69,6 +69,7 @@ export class AppComponent implements OnInit {
       localStorage.removeItem("mtblsuser");
     }
     this.editorService.loadVersionInfo();
+    this.editorService.loadApiVersionInfo();
     this.editorService.loadGuides();
   }
 
