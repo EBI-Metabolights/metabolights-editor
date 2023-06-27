@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { catchError, map } from "rxjs/operators";
 import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
@@ -21,6 +22,19 @@ import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MTBLSStudy } from "src/app/models/mtbl/mtbls/mtbls-study";
+
+
+
+interface DeleteFileDetail {
+  file: string;
+  status: string;
+  message: string;
+}
+
+interface DeleteFilesResponse {
+    errors: DeleteFileDetail[];
+    deleted_files: DeleteFileDetail[];
+}
 
 // disabling this as parameter names mirror that of actual file columns
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -277,12 +291,12 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
-  deleteStudyFiles(id, body, location, force) {
+  deleteStudyFiles(id, body, location, force): Observable<DeleteFilesResponse> {
     const studyId = id ? id : this.id;
     const forcequery = force ? force : false;
     const locationQuery = location ? location : "study";
     return this.http
-      .post(
+      .post<DeleteFilesResponse>(
         this.url.baseURL +
           "/studies" +
           "/" +

@@ -15,6 +15,11 @@ export interface Environment {
   videoURL: VideoURL; // Object containing links to all help videos.
 }
 
+export interface VersionInfo {
+  version: string;
+  releaseName: string;
+}
+
 export interface VideoURL {
   all: string;
   aspera: string;

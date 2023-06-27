@@ -17,6 +17,8 @@ import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
 import { HttpHeaders } from "@angular/common/http";
 import { Observable, interval } from "rxjs";
+import { VersionInfo } from "src/environment.interface";
+import { PlatformLocation } from "@angular/common";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -45,7 +47,7 @@ export class EditorService {
   @select((state) => state.study.studyAssays) studyAssays;
   @select((state) => state.study) stateStudy;
   study: MTBLSStudy;
-
+  baseHref: string;
   redirectUrl = "";
   currentStudyIdentifier: string = null;
   validations: any = {};
@@ -65,8 +67,10 @@ export class EditorService {
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
-    public configService: ConfigurationService
+    public configService: ConfigurationService,
+    private platformLocation: PlatformLocation
   ) {
+    this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.redirectUrl = this.configService.config.redirectURL;
     this.studyIdentifier.subscribe((value) => {
       this.currentStudyIdentifier = value;
@@ -403,6 +407,33 @@ export class EditorService {
    */
   addComment(data) {
     return this.dataService.addComment(data);
+  }
+
+  loadVersionInfo(){
+    const url = this.baseHref + "assets/configs/version.json";
+    console.log("Loading version");
+    this.dataService.http.get<VersionInfo>(url).subscribe(versionInfo => {
+      console.log("Loaded version: " + versionInfo.version + "-" + versionInfo.releaseName);
+      this.ngRedux.dispatch({
+        type: "SET_EDITOR_VERSION",
+        body: {
+          editorVersion: versionInfo,
+        },
+      });
+    },
+    (err) => {
+      const noVersion = {
+        version: "",
+        releaseName: ""
+      };
+      this.ngRedux.dispatch({
+        type: "SET_EDITOR_VERSION",
+        body: {
+          editorVersion: noVersion,
+        },
+      });
+    }
+    );
   }
 
   loadGuides() {

@@ -13,6 +13,8 @@ import {
   INITIALISE,
   SET_USER_STUDIES,
   SET_GUIDES_MAPPINGS,
+  SET_EDITOR_VERSION,
+  SET_BACKEND_VERSION,
   SET_SELECTED_LANGUAGE,
   SET_GUIDES,
   SET_USER,
@@ -47,7 +49,21 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
   selectedLanguage: "en",
   guides: null,
   studyPermission: null,
-  bannerMessage: null
+  bannerMessage: null,
+  editorVersion: {
+    version: "",
+    releaseName: ""
+  },
+  backendVersion: {
+    app: {
+      version: "",
+      releaseName: ""
+    },
+    api: {
+      version: "",
+      releaseName: ""
+    }
+  }
 };
 
 function toggleLoading(state) {
@@ -110,6 +126,13 @@ function setUserStudies(state, action) {
 
 function setGuidesMappings(state, action) {
   return tassign(state, { mappings: action.body.mappings });
+}
+
+function setEditorVersion(state, action) {
+  return tassign(state, { editorVersion: action.body.editorVersion });
+}
+function setBackendVersion(state, action) {
+  return tassign(state, { backendVersion: action.body.backendVersion });
 }
 
 function setSelectedLanguage(state, action) {
@@ -177,6 +200,10 @@ export function sharedReducer(
       return setUserStudies(state, action);
     case SET_GUIDES_MAPPINGS:
       return setGuidesMappings(state, action);
+    case SET_EDITOR_VERSION:
+      return setEditorVersion(state, action);
+    case SET_BACKEND_VERSION:
+      return setBackendVersion(state, action);
     case SET_SELECTED_LANGUAGE:
       return setSelectedLanguage(state, action);
     case SET_GUIDES:

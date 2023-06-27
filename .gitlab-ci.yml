@@ -1,0 +1,53 @@
+variables:
+     EDITOR_VERSION: "2.0.0"
+     BUILD_SCRIPTS_ROOT_PATH: "/home/gitlab-runner/ci_cd/standalone/editor"
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "development-pipeline-test"
+stages:
+  - build
+  - configure
+  - deploy
+
+docker_build_dev:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "development-pipeline-test"
+      variables:
+        CONFIGURAION_NAME: development
+        RELEASE_NAME: dev.${CI_JOB_ID}
+    - if: $CI_COMMIT_BRANCH == "master"
+      variables:
+        CONFIGURAION_NAME: production
+        RELEASE_NAME: rc.${CI_JOB_ID}
+    - if: $CI_COMMIT_BRANCH == "test"
+      variables:
+        CONFIGURAION_NAME: test
+        RELEASE_NAME: test.${CI_JOB_ID}
+  script:
+    - npm install --save --legacy-peer-deps
+    - >
+      echo "{\"version\": \"$EDITOR_VERSION\", \"releaseName\": \"$RELEASE_NAME-$CI_COMMIT_SHORT_SHA\"}" > src/assets/configs/version.json
+    - bash "$BUILD_SCRIPTS_ROOT_PATH/$CI_COMMIT_REF_NAME/update_config_file.sh"
+    - npm run build -- --configuration $CONFIGURAION_NAME
+    - mkdir -p dist/metabolights && mv dist/metabolights-editor dist/metabolights/editor
+    - cd dist && zip -r editor.zip metabolights && cd .. && mv dist/editor.zip .
+  cache:
+    key:
+      files:
+        - package-lock.json
+    paths:
+      - node_modules
+
+  artifacts:
+      paths:
+      - editor.zip
+
+deploy_editor:
+  stage: deploy
+  only:
+      - development
+      - test
+      - development-pipeline-test
+  script:
+    - bash "$BUILD_SCRIPTS_ROOT_PATH/$CI_COMMIT_REF_NAME/deploy.sh"

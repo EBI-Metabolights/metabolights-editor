@@ -68,7 +68,7 @@ export class AppComponent implements OnInit {
       localStorage.removeItem("mtblsjwt");
       localStorage.removeItem("mtblsuser");
     }
-
+    this.editorService.loadVersionInfo();
     this.editorService.loadGuides();
   }
 

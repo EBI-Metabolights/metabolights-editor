@@ -1,3 +1,7 @@
 .navbar {
   min-height: 1.25rem !important;
 }
+.version {
+  display: grid;
+  align-items: center;
+}

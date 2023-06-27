@@ -182,13 +182,34 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       )
       .subscribe((data) => {
         this.closeDeleteConfirmation();
-        toastr.success("File(s) deleted successfully", "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
+        if (data.errors.length === 0) {
+          let message: string;
+          if (data.deleted_files.length > 1) {
+            message = "Selected "+ data.deleted_files.length +" files were deleted successfully";
+          } else {
+            message = "Selected file was deleted successfully";
+          }
+          toastr.success(message, "Success", {
+            timeOut: "2500",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        } else {
+          const failedFiles = [];
+          for (const item of data.errors) {
+            failedFiles.push(item.file);
+          }
+          toastr.error("File deletion is failed for : " + failedFiles.join(", "), "Error", {
+            timeOut: "2500",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
+
         this.loadFilesPassively();
       });
   }
