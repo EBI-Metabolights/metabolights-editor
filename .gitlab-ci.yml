@@ -9,21 +9,21 @@ stages:
   - configure
   - deploy
 
-docker_build_dev:
+build:
   stage: build
   rules:
     - if: $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "development-pipeline-test"
       variables:
         CONFIGURAION_NAME: development
-        RELEASE_NAME: dev.${CI_JOB_ID}
+        RELEASE_NAME: dev.${CI_PIPELINE_ID}
     - if: $CI_COMMIT_BRANCH == "master"
       variables:
         CONFIGURAION_NAME: production
-        RELEASE_NAME: rc.${CI_JOB_ID}
+        RELEASE_NAME: rc.${CI_PIPELINE_ID}
     - if: $CI_COMMIT_BRANCH == "test"
       variables:
         CONFIGURAION_NAME: test
-        RELEASE_NAME: test.${CI_JOB_ID}
+        RELEASE_NAME: test.${CI_PIPELINE_ID}
   script:
     - npm install --save --legacy-peer-deps
     - >
