@@ -15,6 +15,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NgReduxModule } from "@angular-redux/store";
 import { AsperaDownloadComponent } from "./download/aspera/aspera.component";
 import { FtpDownloadComponent } from "./download/ftp/ftp.component";
+import { HttpDownloadComponent } from "./download/http/http.component";
 import { RouterModule } from "@angular/router";
 import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatSortModule } from "@angular/material/sort";
@@ -70,6 +71,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
     DownloadComponent,
     AsperaDownloadComponent,
     FtpDownloadComponent,
+    HttpDownloadComponent,
     PageNotFoundComponent,
     HelpComponent,
     LoadingComponent,
@@ -123,6 +125,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
     DownloadComponent,
     AsperaDownloadComponent,
     FtpDownloadComponent,
+    HttpDownloadComponent,
     PageNotFoundComponent,
     HelpComponent,
     LoadingComponent,

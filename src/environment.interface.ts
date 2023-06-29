@@ -13,6 +13,7 @@ export interface Environment {
   europePMCURL: EuropePMCURL; // Object containing url for europePMC service.
   authenticationURL: AuthenticationURL; // Object containing the different authentication and authorization endpoints.
   videoURL: VideoURL; // Object containing links to all help videos.
+  resourcesURL: string;
 }
 
 export interface VersionInfo {

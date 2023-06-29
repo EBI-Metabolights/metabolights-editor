@@ -7,27 +7,33 @@
   </div>
 </span>
 <ng-template #showContent>
-  <span *ngIf="!isReadOnly">
-    <mtbls-upload
+  <div>
+
+    <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
+    <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
+    <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
+    <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
       [type]="'any'"
       [multiple]="true"
       [mode]="'button'"
       (complete)="loadFilesPassively()"
       [size]="'is'"
-    ></mtbls-upload
-    >&nbsp;
-    <a (click)="loadFilesPassively()" class="button is-light">
-      <mat-icon>refresh</mat-icon> Refresh
-    </a>
-    <span>
-      <span *ngIf="refreshingData">
-        <img
-          style="height: 10px; margin-left: 10px"
-          src="{{ baseHref }}assets/img/loading.svg"
-        />
+    ></mtbls-upload>
+    <span *ngIf="!isReadOnly" class="refresh-button" >
+      <a (click)="loadFilesPassively()" class="button is-light">
+        <mat-icon>refresh</mat-icon> Refresh
+      </a>
+      <span>
+        <span *ngIf="refreshingData">
+          <img
+            style="height: 10px; margin-left: 10px"
+            src="{{ baseHref }}assets/img/loading.svg"
+          />
+        </span>
       </span>
     </span>
-    <span *ngIf="curator" class="is-pulled-right">
+
+    <span *ngIf="!isReadOnly && curator" class="is-pulled-right">
       <a
         *ngIf="access == 'Read'"
         (click)="toggleFolderAccess()"
@@ -43,11 +49,9 @@
         <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
       </a>
     </span>
-  </span>
-  <span *ngIf="status == 'Public'">
-    <mtbls-download-ftp></mtbls-download-ftp>
-    <mtbls-download-aspera></mtbls-download-aspera>
-  </span>
+  </div>
+
+
   <div>&nbsp;</div>
 
     <div class="notification is-warning">

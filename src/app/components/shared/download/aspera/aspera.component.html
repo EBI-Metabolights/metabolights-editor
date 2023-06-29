@@ -1,15 +1,15 @@
-<button (click)="openDownloadModal()" class="button is-default is-pulled-left">
+<button (click)="openDownloadModal()" class="button is-default is-pulled-left aspera-button">
   Aspera Download</button
->&nbsp;
+>
 <small class="had-text-dark">
   <a (click)="toggleHelp()">
     <mat-icon
-      class="mat-icon notranslate material-icons mat-icon-no-color"
+      class="mat-icon notranslate material-icons mat-icon-no-color help-icon"
       role="img"
       aria-hidden="true"
       >help</mat-icon
     >
-    Help
+
   </a>
 </small>
 <div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">

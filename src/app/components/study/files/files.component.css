@@ -147,3 +147,16 @@ img {
 .response mat-icon {
   color: grey;
 }
+
+.upload-button {
+  margin-left: 10px;
+}
+
+.refresh-button {
+  margin-left: 10px;
+}
+.aspera-download-button {
+
+  margin-left: 10px;
+  margin-right: 0px;
+}
