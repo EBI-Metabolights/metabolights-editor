@@ -40,7 +40,7 @@
     </div>
     <div class="column is-one-fifths has-text-right">
       <span class="has-text-grey-light">
-        <span>
+        <span *ngIf="downloadEnabled">
           <mtbls-download
             [type]="'icon'"
             [value]="parent + file.file"
@@ -48,10 +48,12 @@
           >&emsp;
         </span>
         <mtbls-file-delete
-          *ngIf="!isReadOnly"
-          (fileDeleted)="emitFileDeleted()"
+          *ngIf="!isReadOnly && deletionEnabled && !readonlyFolder"
+          (fileDeleted)="handleDeletedFile($event)"
           [type]="'icon'"
           [value]="parent + file.file"
+          [parentDirectoryComponent]="parentDirectoryComponent"
+          [file]="file"
         ></mtbls-file-delete>
       </span>
     </div>
@@ -62,5 +64,8 @@
     [level]="level + 1"
     [parent]="parent + file.file + '/'"
     [file]="sfile"
+    [parentDirectoryComponent]="this"
+    [deletionEnabled]="!readonlyFolder"
+    [readonlyFolder]="readonlyFolder"
   ></mtbls-directory>
 </span>

@@ -12,7 +12,6 @@ export class MockConfigurationService {
       endpoint: "test",
       loginURL: "login",
       clearJavaSession: true,
-      resourcesURL: "",
       javaLogoutURL: "http://localhost:8080/metabolights/logout",
       redirectURL: "console",
       metabolightsWSURL: {

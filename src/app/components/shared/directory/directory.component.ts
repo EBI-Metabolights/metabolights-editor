@@ -2,15 +2,21 @@ import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
+import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 @Component({
   selector: "mtbls-directory",
   templateUrl: "./directory.component.html",
   styleUrls: ["./directory.component.css"],
 })
 export class DirectoryComponent implements OnInit {
-  @Input("file") file: any;
-  @Input("parent") parent: any;
+  @Input("file") file: StudyFile;
   @Input("level") level: any;
+  @Input("parent") parent: any;
+  @Input("parentDirectoryComponent") parentDirectoryComponent: DirectoryComponent = null;
+  @Input("collapse") collapse = false;
+  @Input("deletionEnabled") deletionEnabled = true;
+  @Input("downloadEnabled") downloadEnabled = true;
+  @Input("readonlyFolder") readonlyFolder = false;
 
   @Output() fileDeleted = new EventEmitter<any>();
 
@@ -29,9 +35,10 @@ export class DirectoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!environment.isTesting) {
-      this.setUpSubscription();
-    }
+    this.setUpSubscription();
+    // if (this.collapse){
+    //   this.expandDirectory(this.file);
+    // }
   }
 
   setUpSubscription() {
@@ -46,8 +53,17 @@ export class DirectoryComponent implements OnInit {
     return file.directory;
   }
 
-  emitFileDeleted() {
-    this.fileDeleted.emit();
+  handleDeletedFile($event) {
+    if ($event.parentDirectoryComponent != null){
+      const files = $event.parentDirectoryComponent.file.files;
+      const newFiles = [];
+      files.forEach(d => d.file !== $event.file.file ? newFiles.push(Object.assign({}, d)): true);
+
+      $event.parentDirectoryComponent.file.files = newFiles;
+    } else {
+      this.fileDeleted.emit($event);
+    }
+
   }
 
   expandDirectory(directory) {

@@ -2,6 +2,7 @@ import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
+import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 
 import { DirectoryComponent } from "./directory.component";
 
@@ -24,9 +25,12 @@ describe("DirectoryComponent", () => {
     editorService = TestBed.inject(EditorService);
     component.file = {
       status: "sactive",
-      files: ["file1?", "file2?"],
+      files: [],
       file: "directoryname",
       createdAt: "11/11/2011",
+      timestamp: "",
+      directory: false,
+      type: ""
     };
     fixture.detectChanges();
   });

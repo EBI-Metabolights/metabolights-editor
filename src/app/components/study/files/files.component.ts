@@ -7,6 +7,7 @@ import { MetabolightsService } from "../../../services/metabolights/metabolights
 import { environment } from "src/environments/environment";
 import { FtpManagementService } from "src/app/services/ftp-management.service";
 import { CommonModule, PlatformLocation } from '@angular/common';
+import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 
 
 
@@ -62,6 +63,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
 
   isReadOnly = false;
 
+  MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES'];
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
@@ -145,15 +147,15 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   deleteSelected() {
     if (this.selectedCategory !== null) {
       if (this.selectedCategory === "meta") {
-        this.executeDelete(this.selectedMetaFiles);
+        this.executeDelete(this.selectedMetaFiles, this.filteredMetaFiles, this.metaFiles);
       } else if (this.selectedCategory === "audit") {
-        this.executeDelete(this.selectedAuditFiles);
+        this.executeDelete(this.selectedAuditFiles, this.filteredAuditFiles, this.auditFiles);
       } else if (this.selectedCategory === "derived") {
-        this.executeDelete(this.selectedDerivedFiles);
+        this.executeDelete(this.selectedDerivedFiles, this.filteredDerivedFiles, this.derivedFiles);
       } else if (this.selectedCategory === "upload") {
-        this.executeDelete(this.selectedUploadFiles);
+        this.executeDelete(this.selectedUploadFiles, this.selectedUploadFiles, this.uploadFiles);
       } else if (this.selectedCategory === "raw") {
-        this.executeDelete(this.selectedRawFiles);
+        this.executeDelete(this.selectedRawFiles, this.selectedRawFiles, this.rawFiles);
       }
     }
   }
@@ -171,8 +173,22 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     this.selectedDerivedFiles = [];
     this.selectedUploadFiles = [];
   }
-
-  executeDelete(files) {
+  handleDeletedFile($event, allFiles, filteredFiles, selectedFiles){
+    const key = $event.file;
+    const index = selectedFiles.findIndex((e) => e.file === key.file);
+    if (index >= 0){
+      selectedFiles.splice(index, 1);
+    }
+    const filteredIndex = filteredFiles.findIndex((e) => e.file === key.file);
+    if (filteredIndex >= 0){
+      filteredFiles.splice(filteredIndex, 1);
+    }
+    const allFilesIndex = allFiles.findIndex((e) => e.file === key.file);
+    if (allFilesIndex >= 0){
+      allFiles.splice(allFilesIndex, 1);
+    }
+  }
+  executeDelete(files, filteredFiles, allFiles) {
     this.editorService
       .deleteStudyFiles(
         null,
@@ -182,6 +198,20 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       )
       .subscribe((data) => {
         this.closeDeleteConfirmation();
+        data.deleted_files.forEach((key) => {
+          const index = files.findIndex((e) => e.file === key.file);
+          if (index >= 0){
+            files.splice(index, 1);
+          }
+          const filteredIndex = filteredFiles.findIndex((e) => e.file === key.file);
+          if (filteredIndex >= 0){
+            filteredFiles.splice(filteredIndex, 1);
+          }
+          const allFilesIndex = allFiles.findIndex((e) => e.file === key.file);
+          if (allFilesIndex >= 0){
+            allFiles.splice(allFilesIndex, 1);
+          }
+        });
         if (data.errors.length === 0) {
           let message: string;
           if (data.deleted_files.length > 1) {
@@ -210,7 +240,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
           });
         }
 
-        this.loadFilesPassively();
+        // this.loadFilesPassively();
       });
   }
 
@@ -501,6 +531,20 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     }
   }
 
+  autoCollapsedFolder(file): boolean {
+    return file.file === "FILES";
+  }
+
+  deletionEnabled(file: StudyFile): boolean {
+    return !this.MANAGED_FOLDERS.includes(file.file);
+  }
+
+  downloadEnabled(file: StudyFile) {
+    return !this.MANAGED_FOLDERS.includes(file.file) && !file.directory;
+  }
+  readonlyFolder(file: StudyFile) {
+    return file.directory && file.file.startsWith("INTERNAL_FILES");
+  }
   aFilter(term, source) {
     let target = [];
     if (term === "") {

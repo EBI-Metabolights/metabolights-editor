@@ -9,6 +9,7 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MtblsJwtPayload } from "src/app/services/headers";
 import jwtDecode  from "jwt-decode";
+import * as toastr from "toastr";
 import { stringify } from "querystring";
 @Component({
   selector: "app-login",
@@ -84,15 +85,55 @@ export class LoginComponent implements OnInit {
           const jwt = response.headers.get("jwt");
           const decoded = jwtDecode<MtblsJwtPayload>(jwt);
           const expiration = decoded.exp;
+          const user = decoded.sub;
           localStorage.setItem("jwt", jwt);
           localStorage.setItem("jwtExpirationTime", expiration.toString());
           this.editorService.initialise(data, true);
+          toastr.success(user + " successfully logged in.", "Successful login...", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
           this.router.navigate([this.editorService.redirectUrl]);
         });
       },
       (err) => {
-        if (err.status === 403) {
+        if (err.status === 0) {
           this.invalidCredentials = true;
+          toastr.error("Failed to connect remote server. Please try later.", "Error", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        } else if (err.status === 403) {
+          this.invalidCredentials = true;
+          toastr.error("Invalid username or passoword.", "Error", {
+            timeOut: "4000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        } else if (err.status >= 500) {
+          toastr.error("Remote server internal error. Please try later.", "Error", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        } else if (err.status >= 400) {
+          toastr.error("Login error.", "Error", {
+            timeOut: "4000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
         }
         this.isFormBusy = false;
       }

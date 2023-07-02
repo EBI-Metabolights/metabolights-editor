@@ -1,5 +1,5 @@
 export interface IStudyFiles {
-  study: string[];
+  study: StudyFile[];
   latest: StudyFile[];
   private: StudyFile[];
   uploadPath: string;
@@ -12,5 +12,6 @@ export interface StudyFile {
   timestamp: string;
   type: string;
   status: string;
-  folder: string;
+  directory: boolean;
+  files: StudyFile[];
 }

@@ -27,7 +27,7 @@
           </button>
         </div>
         <div class="column is-half has-text-right">
-          <button (click)="deleteSelected()" class="button is-danger">
+          <button (click)="deleteSelected()" class="button is-danger" *[ngClass]="deleteButtonClass" [disabled]="inProgress" >
             OK! Delete Permanently
           </button>
         </div>

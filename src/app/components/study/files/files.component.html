@@ -287,10 +287,14 @@
       <span *ngIf="filteredRawFiles.length > 0; else noRawFiles">
         <span *ngFor="let file of filteredRawFiles">
           <mtbls-directory
-            (fileDeleted)="loadFilesPassively()"
             [level]="0"
             [parent]="''"
             [file]="file"
+            [collapse]="autoCollapsedFolder(file)"
+            [deletionEnabled]="deletionEnabled(file)"
+            [downloadEnabled]="downloadEnabled(file)"
+            [readonlyFolder]="readonlyFolder(file)"
+            (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"
           ></mtbls-directory>
         </span>
       </span>
@@ -312,7 +316,7 @@
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
       <label>
-        <small>AUDIT FILES</small>
+        <small>SYSTEM FILES</small>
       </label>
     </p>
     <span *ngIf="filteredAuditFiles.length > 0">
@@ -321,6 +325,10 @@
           [level]="0"
           [parent]="''"
           [file]="file"
+          [deletionEnabled]="deletionEnabled(file)"
+          [downloadEnabled]="downloadEnabled(file)"
+          [readonlyFolder]="readonlyFolder(file)"
+          (fileDeleted)="handleDeletedFile($event, auditFiles, filteredAuditFiles, selectedAuditFiles)"
         ></mtbls-directory>
       </span>
     </span>
@@ -377,6 +385,10 @@
          [level]="0"
          [parent]="''"
          [file]="file"
+         [deletionEnabled]="deletionEnabled(file)"
+         [downloadEnabled]="downloadEnabled(file)"
+         [readonlyFolder]="readonlyFolder(file)"
+         (fileDeleted)="handleDeletedFile($event, derivedFiles, filteredDerivedFiles, selectedDerivedFiles)"
        ></mtbls-directory>
       </span>
     </span>

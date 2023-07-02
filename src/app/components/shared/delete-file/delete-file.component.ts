@@ -5,6 +5,8 @@ import * as toastr from "toastr";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
+import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { DirectoryComponent } from "../directory/directory.component";
 
 @Component({
   selector: "mtbls-file-delete",
@@ -14,9 +16,14 @@ import { environment } from "src/environments/environment";
 export class DeleteFileComponent implements OnInit {
   @Input("value") file: string;
   @Input("type") type: string;
-  @select((state) => state.study.obfuscationCode) obfuscationCode;
-  @Output() fileDeleted = new EventEmitter<any>();
 
+  @Input("parentDirectoryComponent") parentDirectoryComponent: DirectoryComponent;
+  @Input("file") studyFile: StudyFile;
+
+  @select((state) => state.study.obfuscationCode) obfuscationCode;
+  @Output() fileDeleted = new EventEmitter<{file: StudyFile; parentDirectoryComponent: DirectoryComponent}>();
+  inProgress = false;
+  deleteButtonClass = "";
   code = "";
   isDeleteModalOpen = false;
   fileLocation = "";
@@ -51,6 +58,11 @@ export class DeleteFileComponent implements OnInit {
   }
 
   deleteSelected() {
+    if (this.inProgress) {
+      return;
+    }
+    this.deleteButtonClass = "disabled-button";
+    this.inProgress = true;
     this.editorService
       .deleteStudyFiles(
         null,
@@ -67,8 +79,8 @@ export class DeleteFileComponent implements OnInit {
             extendedTimeOut: 0,
             tapToDismiss: false,
           });
+          this.fileDeleted.emit({file: this.studyFile, parentDirectoryComponent: this.parentDirectoryComponent});
         } else {
-
           const item = data.errors[0];
           toastr.error(item.message, "Error", {
             timeOut: "2500",
@@ -78,9 +90,16 @@ export class DeleteFileComponent implements OnInit {
             tapToDismiss: false,
           });
         }
-        this.fileDeleted.emit(this.file);
+        this.inProgress = false;
+        this.deleteButtonClass = "";
         this.closeDeleteConfirmation();
-      });
+      },
+      (err) => {
+        this.inProgress = false;
+        this.deleteButtonClass = "";
+        this.closeDeleteConfirmation();
+      }
+      );
   }
 
   compileBody(filesList) {
