@@ -16,6 +16,7 @@ import { DirectoryComponent } from "../directory/directory.component";
 export class DeleteFileComponent implements OnInit {
   @Input("value") file: string;
   @Input("type") type: string;
+  @Input("fileLocation") fileLocation = "study";
 
   @Input("parentDirectoryComponent") parentDirectoryComponent: DirectoryComponent;
   @Input("file") studyFile: StudyFile;
@@ -23,10 +24,8 @@ export class DeleteFileComponent implements OnInit {
   @select((state) => state.study.obfuscationCode) obfuscationCode;
   @Output() fileDeleted = new EventEmitter<{file: StudyFile; parentDirectoryComponent: DirectoryComponent}>();
   inProgress = false;
-  deleteButtonClass = "";
   code = "";
   isDeleteModalOpen = false;
-  fileLocation = "";
   forceMetaDataDelete = false;
 
   constructor(
@@ -49,7 +48,6 @@ export class DeleteFileComponent implements OnInit {
 
   confirmDelete() {
     this.forceMetaDataDelete = false;
-    this.fileLocation = "study";
     this.isDeleteModalOpen = true;
   }
 
@@ -61,7 +59,6 @@ export class DeleteFileComponent implements OnInit {
     if (this.inProgress) {
       return;
     }
-    this.deleteButtonClass = "disabled-button";
     this.inProgress = true;
     this.editorService
       .deleteStudyFiles(
@@ -91,12 +88,10 @@ export class DeleteFileComponent implements OnInit {
           });
         }
         this.inProgress = false;
-        this.deleteButtonClass = "";
         this.closeDeleteConfirmation();
       },
       (err) => {
         this.inProgress = false;
-        this.deleteButtonClass = "";
         this.closeDeleteConfirmation();
       }
       );

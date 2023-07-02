@@ -238,7 +238,7 @@ export class MetabolightsService extends DataService {
    *
    * @param force: whether to force the webservice to return the list in cases of large study directories.
    */
-  getStudyFilesFetch(force): Observable<IStudyFiles> {
+  getStudyFilesFetch(force, readonly: boolean = true): Observable<IStudyFiles> {
     const studyId = this.id;
     if (force) {
       return this.http
@@ -247,7 +247,7 @@ export class MetabolightsService extends DataService {
             "/studies" +
             "/" +
             studyId +
-            "/files-fetch?force=true",
+            "/files-fetch?force=true&readonlyMode=" + readonly,
           httpOptions
         )
         .pipe(catchError(this.handleError));
@@ -261,6 +261,7 @@ export class MetabolightsService extends DataService {
     }
   }
 
+
   /**
    * This is the same as the method above, except includes a few new parameters for directory listing.
    *
@@ -271,6 +272,19 @@ export class MetabolightsService extends DataService {
    * @returns observable of a wrapper containing the studies file information.
    */
   getStudyFilesList(id, include_sub_dir, dir, parent): Observable<IStudyFiles> {
+    return this.getStudyFilesListFromLocation(id, include_sub_dir, dir, parent, null);
+  }
+
+  /**
+   * This is the same as the method above, except includes a few new parameters for directory listing.
+   *
+   * @param id MTBLS ID of the study.
+   * @param include_sub_dir Include subdirectories in the study directory listing output
+   * @param dir If supplied will only list the contents of that directory (if it exists)
+   * @param parent Parent directory for the above parameter
+   * @returns observable of a wrapper containing the studies file information.
+   */
+  getStudyFilesListFromLocation(id, include_sub_dir, dir, parent, location: 'study'): Observable<IStudyFiles> {
     const studyId = id ? id : this.id;
     const includeSubDir = include_sub_dir ? include_sub_dir : null;
     const directory = dir ? dir : null;
@@ -287,10 +301,15 @@ export class MetabolightsService extends DataService {
         query = query + "&directory=" + directory.file;
       }
     }
+    if (location) {
+      query = query + "&location=" + location;
+    }
     return this.http
       .get<IStudyFiles>(query, httpOptions)
       .pipe(catchError(this.handleError));
   }
+
+
 
   deleteStudyFiles(id, body, location, force): Observable<DeleteFilesResponse> {
     const studyId = id ? id : this.id;

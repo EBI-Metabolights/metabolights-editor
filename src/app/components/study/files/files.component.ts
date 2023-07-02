@@ -30,10 +30,11 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   auditFiles: any[] = [];
   derivedFiles: any[] = [];
   uploadFiles: any[] = [];
+
+  ftpLocation = "upload";
   filesLoading = false;
   rawFilesLoading = false;
   validationsId = "upload";
-
   filteredMetaFiles: any[] = [];
   filteredRawFiles: any[] = [];
   filteredAuditFiles: any[] = [];
@@ -458,7 +459,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   }
 
   passiveUpdate() {
-    this.dataService.getStudyFilesFetch(true).subscribe(
+    this.dataService.getStudyFilesFetch(true, this.readonly).subscribe(
       (data) => {
         this.sortFiles(data);
       },

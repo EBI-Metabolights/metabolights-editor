@@ -89,7 +89,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem("jwt", jwt);
           localStorage.setItem("jwtExpirationTime", expiration.toString());
           this.editorService.initialise(data, true);
-          toastr.success(user + " successfully logged in.", "Successful login...", {
+          toastr.success(user + " logged in successfully.", "Successful login", {
             timeOut: "5000",
             positionClass: "toast-top-center",
             preventDuplicates: true,

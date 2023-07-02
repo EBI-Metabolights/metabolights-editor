@@ -52,6 +52,7 @@
           (fileDeleted)="handleDeletedFile($event)"
           [type]="'icon'"
           [value]="parent + file.file"
+          [fileLocation]="location"
           [parentDirectoryComponent]="parentDirectoryComponent"
           [file]="file"
         ></mtbls-file-delete>
@@ -66,6 +67,9 @@
     [file]="sfile"
     [parentDirectoryComponent]="this"
     [deletionEnabled]="!readonlyFolder"
+    [downloadContents]="downloadContents"
+    [downloadEnabled]="!sfile.directory && downloadContents"
     [readonlyFolder]="readonlyFolder"
+    [location]="location"
   ></mtbls-directory>
 </span>

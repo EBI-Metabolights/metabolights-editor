@@ -8,7 +8,7 @@ export class MockMetabolightsService {
   id: string;
   http: HttpClient;
 
-  getStudyFilesFetch(bool: true) {
+  getStudyFilesFetch(bool: true, d: true) {
     const obj = {
       study: [],
       latest: "latest",

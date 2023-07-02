@@ -764,10 +764,10 @@ export class EditorService {
 
   }
 
-  loadStudyFiles(fource) {
+  loadStudyFiles(force, readonly: boolean = true) {
     // console.log("Loading Study files..")
     // console.log("Force files list calculation - "+fource)
-    this.dataService.getStudyFilesFetch(fource).subscribe(
+    this.dataService.getStudyFilesFetch(force, readonly).subscribe(
       (data) => {
         // console.log("Got the files list  !")
         this.ngRedux.dispatch({
@@ -847,6 +847,10 @@ export class EditorService {
 
   loadStudyDirectory(dir, parent) {
     return this.dataService.getStudyFilesList(null, false, dir, parent);
+  }
+
+  loadStudyDirectoryFromLocation(dir, parent, location) {
+    return this.dataService.getStudyFilesListFromLocation(null, false, dir, parent, location);
   }
 
   extractAssayDetails(assay) {

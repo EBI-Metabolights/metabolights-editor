@@ -16,7 +16,9 @@ export class DirectoryComponent implements OnInit {
   @Input("collapse") collapse = false;
   @Input("deletionEnabled") deletionEnabled = true;
   @Input("downloadEnabled") downloadEnabled = true;
+  @Input("downloadContents") downloadContents = true;
   @Input("readonlyFolder") readonlyFolder = false;
+  @Input("location") location = null;
 
   @Output() fileDeleted = new EventEmitter<any>();
 
@@ -72,7 +74,7 @@ export class DirectoryComponent implements OnInit {
         delete directory.files;
       } else {
         this.editorService
-          .loadStudyDirectory(directory, this.parent)
+          .loadStudyDirectoryFromLocation(directory, this.parent, this.location)
           .subscribe((data) => {
             directory.files = data.study;
           });
