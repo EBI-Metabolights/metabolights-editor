@@ -9,7 +9,7 @@ export class ValidationStatusTransformPipe implements PipeTransform {
         error: 'Failed',
         success: 'Success',
         warning: 'Success',
-        "not ready": 'Not Ready'
+        "not ready": 'Required'
       };
 
     transform(value: string): string {

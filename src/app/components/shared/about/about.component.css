@@ -1,0 +1,17 @@
+.version {
+  color: black;
+}
+.label {
+  color: black;
+  font-weight: normal;
+}
+.centered {
+  color: black;
+  text-align: center;
+  margin-top: -2px;
+}
+
+.icon {
+
+  color: white;
+}

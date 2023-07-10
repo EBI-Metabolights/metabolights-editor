@@ -41,7 +41,7 @@ export class NavBarComponent implements OnInit {
     this.endpoint = this.configService.config.endpoint;
     this.editorVersionState.subscribe((value) => {
       if (value) {
-        this.editorVersion = value.version + "-" +value.releaseName;
+        this.editorVersion = value.version + "-" + value.releaseName;
       } else {
         console.log("Version is not defined " );
       }

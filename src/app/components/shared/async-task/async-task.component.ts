@@ -26,6 +26,7 @@ export class AsyncTaskComponent implements OnInit {
 
   lastSuccessfulTaskId = "";
   lastResponse: AsyncTaskResponse;
+  lastResponseMessage: string;
   initialTaskTracking = true;
   pollTaskInterval: any;
   serverStatusCheckIntervalSubscription: any;
@@ -36,7 +37,7 @@ export class AsyncTaskComponent implements OnInit {
   DONE_STATES = ["SUCCESS"];
   startButtonClass = "start-button-disabled";
   serverReady = false;
-
+  showTaskId = false;
   constructor(private http: HttpClient) {
   }
 
@@ -110,6 +111,11 @@ export class AsyncTaskComponent implements OnInit {
 
   updateLastTaskResponse(response: AsyncTaskResponse): void {
     this.lastResponse = response;
+    if (this.lastResponse == null ||  this.lastResponse.message == null || this.lastResponse.message.length === 0){
+      this.lastResponseMessage = "...";
+    } else {
+      this.lastResponseMessage = this.lastResponse.message;
+    }
     if (this.initialTaskTracking) {
       if (this.lastResponse.task.task_done_time > 0){
         this.lastResponse.task.last_update_time = this.lastResponse.task.task_done_time;

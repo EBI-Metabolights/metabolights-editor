@@ -36,6 +36,7 @@ export class RsyncComponent implements OnInit {
 
   lastEmittedTaskId = "invalid";
   lastResponse: FTPResponse;
+  lastResponseDescription: string;
   initialTaskTracking = true;
 
   isRunning = false;
@@ -49,6 +50,7 @@ export class RsyncComponent implements OnInit {
   syncButtonClass = "ftp-button";
   serverReady = false;
   currentTaskName = "";
+  showTaskId = false;
   constructor(
     private ftpService: FtpManagementService,
   ) {
@@ -119,6 +121,11 @@ export class RsyncComponent implements OnInit {
 
   updateLastRsyncResponse(response: FTPResponse): void {
     this.lastResponse = response;
+    if (this.lastResponse == null ||  this.lastResponse.description == null || this.lastResponse.description.length === 0){
+      this.lastResponseDescription = "...";
+    } else {
+      this.lastResponseDescription = this.lastResponse.description;
+    }
     this.currentTaskName = "";
     if (this.serverReady && this.currentMode === RsyncMode.dryRun) {
       this.currentTaskName = "Check Updates";

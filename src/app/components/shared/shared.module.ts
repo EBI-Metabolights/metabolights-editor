@@ -6,6 +6,7 @@ import { DirectoryComponent } from "./directory/directory.component";
 import { DownloadComponent } from "./download/download.component";
 import { PageNotFoundComponent } from "./errors/page-not-found/page-not-found.component";
 import { HelpComponent } from "./help/help.component";
+import { AboutComponent } from "./about/about.component";
 import { LoadingComponent } from "./loading/loading.component";
 import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { QuickLinkComponent } from "./quick-link/quick-link.component";
@@ -74,6 +75,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
     HttpDownloadComponent,
     PageNotFoundComponent,
     HelpComponent,
+    AboutComponent,
     LoadingComponent,
     NavBarComponent,
     QuickLinkComponent,
@@ -128,6 +130,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
     HttpDownloadComponent,
     PageNotFoundComponent,
     HelpComponent,
+    AboutComponent,
     LoadingComponent,
     NavBarComponent,
     QuickLinkComponent,

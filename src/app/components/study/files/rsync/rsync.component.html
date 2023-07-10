@@ -26,9 +26,9 @@
             <div class="response"><b>LAST UPDATE:</b> {{lastResponse.last_update_timestamp > 0 ? (lastResponse.last_update_timestamp * 1000| date: 'MMM d, y, H:mm:ss z') : "-"}}</div>
             <div class="response top"><b>LAST TASK:</b> {{currentTaskName}} {{ lastResponse.new_task ? "(New Task)" : ""}}</div>
             <div class="response"><b>STATUS:</b><i> {{lastResponse.status | rsyncStatusTransform}}</i></div>
-            <div class="response top"><b>TASK ID:</b> <small> {{lastResponse.task_id}} </small> </div>
+            <div class="response top" *ngIf="showTaskId"><b>TASK ID:</b> <small> {{lastResponse.task_id}} </small> </div>
             <div class="response bottom"><b>DESCRIPTION:</b><br>
-            {{ lastResponse.description }}</div>
+            {{ lastResponseDescription }}</div>
           </div>
       </div>
     </div>

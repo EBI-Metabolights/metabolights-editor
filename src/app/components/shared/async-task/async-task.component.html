@@ -18,9 +18,9 @@
           <div class="status-container">
             <div class="response"><b>LAST UPDATE:</b> {{lastResponse.task.last_update_time > 0 ? (lastResponse.task.last_update_time * 1000| date: 'MMM d, y, H:mm:ss z') : "-"}}</div>
             <div class="response"><b>STATUS:</b><i> {{lastResponse.task.last_status | asyncTaskStatusTransform }} {{ lastResponse.new_task ? "(New Task)" : ""}}</i></div>
-            <div class="response top"><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
+            <div class="response top" *ngIf="showTaskId" ><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
             <div class="response bottom"><b>DESCRIPTION:</b><br>
-            {{ lastResponse.message }}</div>
+            {{ lastResponseMessage }}</div>
           </div>
       </div>
     </div>

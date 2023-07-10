@@ -1,0 +1,40 @@
+<span class="clickable centered" (click)="openModal()">
+  <i class="material-icons icon"> info_outline </i>
+</span>
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <div class="centered">
+        About MetaboLights Editor
+      </div>
+      <div class="label">
+        Editor Version: <span class="version" *ngIf="editorVersion"> v{{editorVersion}}
+        </span>
+      </div>
+
+      <div class="label">
+        API Version: <span class="version">v{{apiVersion}}</span>
+      </div>
+
+
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <div class="columns is-gapless full-width">
+        <div class="column is-two-third">
+          <a
+            href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!"
+            class="button is-default"
+          >
+            <mat-icon style="font-size: 0.93em" class="mat-icon material-icons">feedback</mat-icon
+            >
+            Contact us
+          </a>
+        </div>
+        <div class="column is-one-third has-text-right">
+          <button (click)="closeModal()" class="button is-info">OK</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
