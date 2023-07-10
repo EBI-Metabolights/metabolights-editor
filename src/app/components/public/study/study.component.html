@@ -95,11 +95,11 @@
             </div>
           </span>
 
-          <span class="clickable" *ngIf="validation.status == 'not ready'">
+          <span class="clickable" *ngIf="validation.status == 'not ready' && notReadyValidationMessage != null">
             <div (click)="selectCurrentTab(6, 'validations')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Validation</span>
-                <span class="tag is-warning"> No Validation Report </span>
+                <span class="tag is-warning"> {{ notReadyValidationMessage }} </span>
               </div>
             </div>
           </span>

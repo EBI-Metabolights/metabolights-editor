@@ -9,8 +9,8 @@
 <ng-template #showContent>
   <div>
 
-    <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
     <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
+    <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
     <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
     <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
       [type]="'any'"

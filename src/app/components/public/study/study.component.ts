@@ -45,6 +45,8 @@ export class PublicStudyComponent implements OnInit {
   baseHref: any = "";
   reviewerLink: string = null;
   permissions: StudyPermisssion = null;
+  notReadyValidationMessage: string = null;
+
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private editorService: EditorService,
@@ -82,6 +84,7 @@ export class PublicStudyComponent implements OnInit {
     } else {
       this.loadStudy(null);
     }
+    this.calculateNotReadyValidationMessage();
   }
 
   ngOnInit() {
@@ -110,6 +113,7 @@ export class PublicStudyComponent implements OnInit {
 
     this.studyValidation.subscribe((value) => {
       this.validation = value;
+      this.calculateNotReadyValidationMessage();
     });
 
     this.studyFiles.subscribe((value) => {
@@ -131,6 +135,7 @@ export class PublicStudyComponent implements OnInit {
     this.studyStatus.subscribe((value) => {
       if(value){
         this.status = value;
+        this.calculateNotReadyValidationMessage();
       }
     });
 
@@ -220,5 +225,18 @@ export class PublicStudyComponent implements OnInit {
       ret = false;
     }
     return ret;
+  }
+
+  calculateNotReadyValidationMessage(){
+    if (this.validation.status.toLowerCase() === 'not ready' && this.status !== null) {
+      if (this.status.toLowerCase() === 'public') {
+        this.notReadyValidationMessage = null;
+      } else {
+        this.notReadyValidationMessage = 'Required';
+      }
+    } else {
+      this.notReadyValidationMessage = "Required";
+    }
+
   }
 }

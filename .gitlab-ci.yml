@@ -46,8 +46,6 @@ build:
 deploy_editor:
   stage: deploy
   only:
-      - development
       - test
-      - development-pipeline-test
   script:
     - bash "$BUILD_SCRIPTS_ROOT_PATH/$CI_COMMIT_REF_NAME/deploy.sh"
