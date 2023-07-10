@@ -228,7 +228,8 @@ export class PublicStudyComponent implements OnInit {
   }
 
   calculateNotReadyValidationMessage(){
-    if (this.validation.status.toLowerCase() === 'not ready' && this.status !== null) {
+    if (this.validation != null && this.validation.status != null &&
+      this.validation.status.toLowerCase() === 'not ready' && this.status !== null) {
       if (this.status.toLowerCase() === 'public') {
         this.notReadyValidationMessage = null;
       } else {
