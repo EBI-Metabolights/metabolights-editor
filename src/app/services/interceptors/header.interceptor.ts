@@ -9,15 +9,23 @@ import { Observable } from "rxjs";
 import { disambiguateUserObj } from "../editor.service";
 import { NgRedux } from "@angular-redux/store";
 import { IAppState } from "src/app/store";
+import { ConfigurationService } from "src/app/configuration.service";
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
-  constructor(private ngRedux: NgRedux<IAppState>) {}
+  constructor(private ngRedux: NgRedux<IAppState>, private configService: ConfigurationService,) {}
 
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
+    const domain = this.configService?.config?.metabolightsWSURL?.domain;
+    const origin = this.configService.config?.origin;
+    const targetUrl = origin + request.url ;
+    if (request.url == null || (!targetUrl.startsWith(domain) && !request.url.startsWith(domain))){
+      return next.handle(request);
+    }
+
     let userToken = localStorage.getItem("userToken");
     if(userToken === null) {
       const user = localStorage.getItem("user");
