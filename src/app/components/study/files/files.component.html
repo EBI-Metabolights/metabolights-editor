@@ -439,7 +439,7 @@
 
     <app-rsync
     *ngIf="!isReadOnly"
-    title="Study Data Files"
+    title="Data Files"
     helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
     [studyId]="studyIdentifier"
     sourceStagingArea="ftp-private"
@@ -465,15 +465,14 @@
       <label>
         <small>UPLOAD FOLDER</small>
       </label>
-      <!-- <span class="is-pulled-right">
+      <span class="is-pulled-right">
         <a
-          target="_blank"
-          (click)="copyFiles()"
+          (click)="loadFiles()"
           class="button is-small is-light"
         >
-          <mat-icon>refresh</mat-icon> Copy files to study folder
+          <mat-icon>refresh</mat-icon> Refresh
         </a>
-      </span> -->
+      </span>
       <!-- <span
         *ngIf="!isReadOnly"
         class="is-pulled-right"
