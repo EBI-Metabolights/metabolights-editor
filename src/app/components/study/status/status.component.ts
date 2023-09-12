@@ -71,7 +71,7 @@ export class StatusComponent implements OnInit {
 
   changeStatus(toStatus) {
     if (!this.isReadOnly) {
-      if (toStatus === null) {
+      if (toStatus == null) {
         toStatus = this.toStatus;
       }
       Swal.fire({
