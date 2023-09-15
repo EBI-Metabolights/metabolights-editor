@@ -767,7 +767,7 @@ export class EditorService {
   loadStudyFiles(force, readonly: boolean = true) {
     // console.log("Loading Study files..")
     // console.log("Force files list calculation - "+fource)
-    this.dataService.getStudyFilesFetch(force, readonly).subscribe(
+    this.dataService.getStudyFilesList(this.currentStudyIdentifier, true, false, null, null).subscribe(
       (data) => {
         // console.log("Got the files list  !")
         this.ngRedux.dispatch({
@@ -788,7 +788,7 @@ export class EditorService {
         this.loadStudyAssays(data);
       },
       (error) => {
-        this.dataService
+/*         this.dataService
           .getStudyFilesList(null, null, null, null)
           .subscribe((data) => {
             this.ngRedux.dispatch({
@@ -805,7 +805,7 @@ export class EditorService {
             });
             data = this.deleteProperties(data);
             this.ngRedux.dispatch({ type: "SET_STUDY_FILES", body: data });
-          });
+          }); */
       }
     );
   }
@@ -837,8 +837,8 @@ export class EditorService {
     return this.dataService.getStudyFiles(id, includeRawFiles);
   }
 
-  getStudyFilesList(id, include_sub_dir, dir) {
-    return this.dataService.getStudyFilesList(id, include_sub_dir, dir, null);
+  getStudyFilesList(id, include_sub_dir, includeInternal: boolean = false, dir) {
+    return this.dataService.getStudyFilesList(id, include_sub_dir,includeInternal, dir, null);
   }
 
   syncFiles(data) {
@@ -846,7 +846,7 @@ export class EditorService {
   }
 
   loadStudyDirectory(dir, parent) {
-    return this.dataService.getStudyFilesList(null, false, dir, parent);
+    return this.dataService.getStudyFilesList(null, false, false, dir, parent);
   }
 
   loadStudyDirectoryFromLocation(dir, parent, location) {

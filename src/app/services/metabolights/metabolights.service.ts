@@ -7,7 +7,7 @@ import { IAppState } from "./../../store";
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { Router } from "@angular/router";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
 import { IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
@@ -271,12 +271,13 @@ export class MetabolightsService extends DataService {
    * @param parent Parent directory for the above parameter
    * @returns observable of a wrapper containing the studies file information.
    */
-  getStudyFilesList(id, include_sub_dir, dir, parent): Observable<IStudyFiles> {
-    return this.getStudyFilesListFromLocation(id, include_sub_dir, dir, parent, null);
+  getStudyFilesList(id, include_sub_dir, includeInternal, dir, parent): Observable<IStudyFiles> {
+    return this.getStudyFilesListFromLocation(id, include_sub_dir, includeInternal, dir, 'study', parent);
   }
 
   /**
-   * This is the same as the method above, except includes a few new parameters for directory listing.
+   * This is the same as the method above, except includes a few new parameters for directory listing,
+   * including recursively listing all directories and files.
    *
    * @param id MTBLS ID of the study.
    * @param include_sub_dir Include subdirectories in the study directory listing output
@@ -284,16 +285,14 @@ export class MetabolightsService extends DataService {
    * @param parent Parent directory for the above parameter
    * @returns observable of a wrapper containing the studies file information.
    */
-  getStudyFilesListFromLocation(id, include_sub_dir, dir, parent, location: 'study'): Observable<IStudyFiles> {
+  getStudyFilesListFromLocation(id, includeSubDir: boolean, includeInternalFiles: boolean = false, dir, location: string = 'study', parent?: string,): Observable<IStudyFiles> {
     const studyId = id ? id : this.id;
-    const includeSubDir = include_sub_dir ? include_sub_dir : null;
     const directory = dir ? dir : null;
     let query = this.url.baseURL + "/studies" + "/" + studyId + "/files/tree?";
-    if (includeSubDir) {
-      query = query + "include_sub_dir=" + includeSubDir;
-    } else {
-      query = query + "include_sub_dir=false";
-    }
+
+    query = query + "include_sub_dir=" + String(includeSubDir)
+    query = query + "&include_internal_files=" + String(includeInternalFiles)
+    
     if (directory) {
       if (parent) {
         query = query + "&directory=" + parent + directory.file;

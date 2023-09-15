@@ -10,6 +10,7 @@ import {
   EventEmitter,
   AfterViewChecked,
   OnChanges,
+  DoCheck,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
@@ -67,6 +68,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   dataSource: MatTableDataSource<any>;
   data: any = null;
   files: any = null;
+  getFilesBuffer: any = null
 
   loading = false;
 
@@ -86,6 +88,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ontologyColumns: any = [];
 
   isCellTypeFile = false;
+
+  isCellMaf = false;
   isCellTypeOntology = false;
   selectedCellOntology: Ontology = null;
   selectedOntologyCell: any = null;
@@ -109,6 +113,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   isEditColumnMissingModalOpen = false;
 
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
+
+  templateExecutionCounter = 0;
 
   hit = false;
   baseHref: string;
@@ -142,6 +148,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
   }
 
+  /**
+   * Get all files held in the study folder. This does not check upload directory. The fles returned are the result of a recursive search
+   * and so should encompass all study files.
+   * @param header Which column header has been selected
+   * @returns File objects - subject to a ternary statement 
+   */
   getFiles(header) {
     // if(this.fileColumns.indexOf(header) > -1){
     // 	if(this.data.header[header]){
@@ -151,7 +163,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     // 		})
     // 	}
     // }
-    return this.files;
+    let fileObjs = []
+    this.isCellMaf ? fileObjs = this.getMafFiles() : fileObjs = this.files
+    return fileObjs;
   }
 
   initialise() {
@@ -862,12 +876,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (!this.isReadOnly) {
       this.isCellTypeFile = false;
       this.isCellTypeOntology = false;
+      this.isCellMaf = false;
       this.isEditModalOpen = true;
       this.selectedCell["row"] = row;
       this.selectedCell["column"] = column;
 
       if (this.fileColumns.indexOf(column.header) > -1) {
         this.isCellTypeFile = true;
+        if(column.header === 'Metabolite Assignment File') {
+          this.isCellMaf = true;
+        }
       }
 
       if (this.ontologyColumns.indexOf(column.header) > -1) {
@@ -1328,7 +1346,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     );
   }
 
-  onChanges() {}
+  onChanges() {
+
+  }
 
   triggerChanges() {
     this.updated.emit();
@@ -1345,5 +1365,20 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         this.triggerChanges();
       }
     }
+
+  }
+
+  /**
+   * This method still needs fixing
+   * @returns All maf files in a study
+   */
+  getMafFiles() {
+    this.templateExecutionCounter += 1
+    //console.log(`template method execution number ${this.templateExecutionCounter}`)
+    const maf_files = this.files.filter((fileObject) =>
+     
+     fileObject.type === 'metadata_maf' &&
+     fileObject.extension === '.tsv')
+    return maf_files
   }
 }
