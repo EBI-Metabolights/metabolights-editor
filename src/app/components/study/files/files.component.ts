@@ -459,7 +459,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   }
 
   passiveUpdate() {
-    this.dataService.getStudyFilesFetch(true, this.readonly).subscribe(
+    this.dataService.getStudyFilesFetch(true, this.isReadOnly).subscribe(
       (data) => {
         this.sortFiles(data);
       },
