@@ -5,6 +5,7 @@ import { NotFoundError } from "./error/not-found-error";
 import { ForbiddenError } from "./error/forbidden-error";
 import { InternalServerError } from "./error/internal-server-error";
 import { HttpClient } from "@angular/common/http";
+import { MaintenanceError } from "./error/maintenance-error";
 
 export class DataService {
   constructor(public url: any, public http: HttpClient) {}
@@ -24,6 +25,10 @@ export class DataService {
 
     if (error.status === 500) {
       return throwError(new InternalServerError(error));
+    }
+
+    if (error.status === 501) {
+      return throwError(new MaintenanceError(error));
     }
 
     return throwError(new AppError(error));
