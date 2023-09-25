@@ -196,7 +196,10 @@ export class EditorService {
       return response;
     } catch (err) {
       console.log(err);
-      toastr.error(err.message, "Error", {
+      const errorMessage = err.error.message
+      ? err.error.message
+      : err.message ? err.message : "Study permission check error.";
+      toastr.error(err.error.message, "Error", {
         timeOut: "2500",
         positionClass: "toast-top-center",
         preventDuplicates: true,
