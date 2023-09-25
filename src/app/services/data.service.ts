@@ -6,15 +6,18 @@ import { ForbiddenError } from "./error/forbidden-error";
 import { InternalServerError } from "./error/internal-server-error";
 import { HttpClient } from "@angular/common/http";
 import { MaintenanceError } from "./error/maintenance-error";
+import { PermissionError } from "./error/permission-error";
 
 export class DataService {
   constructor(public url: any, public http: HttpClient) {}
 
   public handleError(error: Response) {
-    if (error.status === 400) {
+    if (error.status === 400 || error.status === 417 || error.status === 412) {
       return throwError(new BadInput(error));
     }
-
+    if (error.status === 401) {
+      return throwError(new PermissionError(error));
+    }
     if (error.status === 403) {
       return throwError(new ForbiddenError(error));
     }
@@ -27,7 +30,7 @@ export class DataService {
       return throwError(new InternalServerError(error));
     }
 
-    if (error.status === 501) {
+    if (error.status === 503) {
       return throwError(new MaintenanceError(error));
     }
 

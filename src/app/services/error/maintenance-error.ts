@@ -12,7 +12,7 @@ export class MaintenanceError {
     const errorStatus = error.statusText ? error.statusText : "";
     toastr.error(
       errorMessage,
-      "",
+      errorStatus,
       {
         timeOut: "5000",
         positionClass: "toast-bottom-right",
