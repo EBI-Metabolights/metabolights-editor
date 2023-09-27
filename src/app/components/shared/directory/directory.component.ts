@@ -19,6 +19,8 @@ export class DirectoryComponent implements OnInit {
   @Input("downloadContents") downloadContents = true;
   @Input("readonlyFolder") readonlyFolder = false;
   @Input("location") location = null;
+  @Input("managedFolders") managedFolders = [];
+
 
   @Output() fileDeleted = new EventEmitter<any>();
 
@@ -80,6 +82,10 @@ export class DirectoryComponent implements OnInit {
           });
       }
     }
+  }
+
+  isManagedFolder(path){
+    return this.managedFolders.includes(path);
   }
 
   isChecked(filename, category) {

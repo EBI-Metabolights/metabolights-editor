@@ -48,7 +48,7 @@
           >&emsp;
         </span>
         <mtbls-file-delete
-          *ngIf="!isReadOnly && deletionEnabled && !readonlyFolder"
+          *ngIf="!isReadOnly && deletionEnabled && !readonlyFolder && !isManagedFolder(parent + file.file) "
           (fileDeleted)="handleDeletedFile($event)"
           [type]="'icon'"
           [value]="parent + file.file"
@@ -70,6 +70,7 @@
     [downloadContents]="downloadContents"
     [downloadEnabled]="!sfile.directory && downloadContents"
     [readonlyFolder]="readonlyFolder"
+    [managedFolders]="managedFolders"
     [location]="location"
   ></mtbls-directory>
 </span>

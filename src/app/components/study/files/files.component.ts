@@ -23,6 +23,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   @select((state) => state.study.identifier) studyIdentifier: any;
   @Input("validations") validations: any;
 
+
   containerHeight: any = 279;
 
   rawFiles: any[] = [];
@@ -64,7 +65,9 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
 
   isReadOnly = false;
 
-  MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES'];
+  MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES', 'ARCHIVED_AUDIT_FILES'];
+  MANAGED_SUB_FOLDERS=['AUDIT_FILES/ARCHIVED_AUDIT_FILES', "INTERNAL_FILES/logs"];
+
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
@@ -544,7 +547,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     return !this.MANAGED_FOLDERS.includes(file.file) && !file.directory;
   }
   readonlyFolder(file: StudyFile) {
-    return file.directory && file.file.startsWith("INTERNAL_FILES");
+    return this.curator  ? false : file.directory && file.file.startsWith("INTERNAL_FILES");
   }
   aFilter(term, source) {
     let target = [];
@@ -557,6 +560,10 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       );
       return target;
     }
+  }
+
+  getManagedSubFolders(){
+    return this.MANAGED_SUB_FOLDERS;
   }
 
   copyFiles() {
