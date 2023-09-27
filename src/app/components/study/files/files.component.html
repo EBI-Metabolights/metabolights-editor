@@ -450,6 +450,21 @@
     pollingInterval=10000
     (filesSynchronized)="onFilesSynchronized($event)"
     ></app-rsync>
+  <div *ngIf="!isReadOnly && curator">
+    <app-rsync
+    title="Internal Files"
+    helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
+    [studyId]="studyIdentifier"
+    sourceStagingArea="ftp-private"
+    targetStagingArea="rw-study"
+    syncType="internal"
+    runSyncOnCluster="false"
+    runDryRunOnCluster="false"
+    pollingInterval=10000
+    (filesSynchronized)="onFilesSynchronized($event)"
+    ></app-rsync>
+  </div>
+
 </div>
   <!-- FTP panel start-->
   <nav *ngIf="!isReadOnly" class="panel">

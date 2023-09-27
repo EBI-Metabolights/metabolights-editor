@@ -866,9 +866,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       this.selectedCell["row"] = row;
       this.selectedCell["column"] = column;
 
-      if (this.fileColumns.indexOf(column.header) > -1) {
-        this.isCellTypeFile = true;
-      }
+      // if (this.fileColumns.indexOf(column.header) > -1) {
+      //   this.isCellTypeFile = true;
+      // }
 
       if (this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;
@@ -1174,9 +1174,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
       this.selectedColumn = column;
 
-      if (this.fileColumns.indexOf(column.header) > -1) {
-        this.isCellTypeFile = true;
-      }
+      // if (this.fileColumns.indexOf(column.header) > -1) {
+      //   this.isCellTypeFile = true;
+      // }
 
       if (this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;

@@ -189,6 +189,9 @@
             "kubernetes": {
               "browserTarget": "metabolights-editor:build:kubernetes"
             },
+            "staging": {
+              "browserTarget": "metabolights-editor:build:staging"
+            },
             "test": {
               "browserTarget": "metabolights-editor:build:test"
             }
