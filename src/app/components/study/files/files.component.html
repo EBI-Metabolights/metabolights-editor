@@ -7,52 +7,114 @@
   </div>
 </span>
 <ng-template #showContent>
-  <div>
-
-    <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
-    <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
-    <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
-    <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
-      [type]="'any'"
-      [multiple]="true"
-      [mode]="'button'"
-      (complete)="loadFilesPassively()"
-      [size]="'is'"
-    ></mtbls-upload>
-    <span *ngIf="!isReadOnly" class="refresh-button" >
-      <a (click)="loadFilesPassively()" class="button is-light">
-        <mat-icon>refresh</mat-icon> Refresh
-      </a>
-      <span>
-        <span *ngIf="refreshingData">
-          <img
-            style="height: 10px; margin-left: 10px"
-            src="{{ baseHref }}assets/img/loading.svg"
-          />
-        </span>
-      </span>
-    </span>
-
-    <span *ngIf="!isReadOnly && curator" class="is-pulled-right">
+  <div *ngIf="!isReadOnly" class="notification is-warning message">
+    <small
+      ><mat-icon>warning</mat-icon> Please ensure your study folder is up-to-date. Start synchronization to update study folder.
+      Please note that the sync operations may take some time to complete. If your synchronization is not completed successfully, please contact us
       <a
-        *ngIf="access == 'Read'"
-        (click)="toggleFolderAccess()"
-        class="button is-light"
+        [href]="
+          'mailto:metabolights-help@ebi.ac.uk?subject=Regarding sync from FTP folder - ' +
+          requestedStudy
+        "
+        >metabolights-help@ebi.ac.uk</a
       >
-        <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
-      </a>
-      <a
-        *ngIf="access == 'Write'"
-        (click)="toggleFolderAccess()"
-        class="button is-light"
-      >
-        <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
-      </a>
-    </span>
+      for help.</small
+    >
   </div>
 
 
-  <div>&nbsp;</div>
+  <!--ftp management component start-->
+<div class="container parent resync-section">
+  <app-rsync
+  *ngIf="!isReadOnly"
+  title="Metadata Files"
+  helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
+  [studyId]="studyIdentifier"
+  sourceStagingArea="ftp-private"
+  targetStagingArea="rw-study"
+  syncType="metadata"
+  runSyncOnCluster="false"
+  runDryRunOnCluster="false"
+  pollingInterval=5000
+  (filesSynchronized)="onFilesSynchronized($event)"
+  ></app-rsync>
+
+    <app-rsync
+    *ngIf="!isReadOnly"
+    title="Data Files"
+    helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
+    [studyId]="studyIdentifier"
+    sourceStagingArea="ftp-private"
+    targetStagingArea="readonly-study"
+    syncType="data"
+    runSyncOnCluster="false"
+    runDryRunOnCluster="false"
+    pollingInterval=10000
+    (filesSynchronized)="onFilesSynchronized($event)"
+    ></app-rsync>
+  <div *ngIf="!isReadOnly && curator">
+    <app-rsync
+    title="Internal Files"
+    helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
+    [studyId]="studyIdentifier"
+    sourceStagingArea="ftp-private"
+    targetStagingArea="rw-study"
+    syncType="internal"
+    runSyncOnCluster="false"
+    runDryRunOnCluster="false"
+    pollingInterval=10000
+    (filesSynchronized)="onFilesSynchronized($event)"
+    ></app-rsync>
+  </div>
+
+</div>
+<mat-divider class="file-divider" [inset]="true"></mat-divider>
+
+<div>
+
+  <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
+  <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
+  <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
+  <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
+    [type]="'any'"
+    [multiple]="true"
+    [mode]="'button'"
+    (complete)="loadFilesPassively()"
+    [size]="'is'"
+  ></mtbls-upload>
+  <span *ngIf="!isReadOnly" class="refresh-button" >
+    <a (click)="loadFilesPassively()" class="button is-light">
+      <mat-icon>refresh</mat-icon> Refresh
+    </a>
+    <span>
+      <span *ngIf="refreshingData">
+        <img
+          style="height: 10px; margin-left: 10px"
+          src="{{ baseHref }}assets/img/loading.svg"
+        />
+      </span>
+    </span>
+  </span>
+
+  <span *ngIf="!isReadOnly && curator" class="is-pulled-right">
+    <a
+      *ngIf="access == 'Read'"
+      (click)="toggleFolderAccess()"
+      class="button is-light"
+    >
+      <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
+    </a>
+    <a
+      *ngIf="access == 'Write'"
+      (click)="toggleFolderAccess()"
+      class="button is-light"
+    >
+      <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
+    </a>
+  </span>
+</div>
+
+<mat-divider class="file-divider" [inset]="true"></mat-divider>
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>
@@ -64,13 +126,13 @@
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
       isReadOnly
     >
-      <label>
+      <label class="section-header">
         <input
           [checked]="filteredMetaFiles.length == selectedMetaFiles.length"
           (change)="selectFiles($event, 'meta', null, true)"
           type="checkbox"
           name=""
-        />&nbsp;&nbsp;<small>ISA METADATA</small>
+        />&nbsp;&nbsp;ISA METADATA
       </label>
       <span class="is-pulled-right">
         <mtbls-download [value]="selectedDownloadFiles()"></mtbls-download>
@@ -184,8 +246,7 @@
         [attr.marginTop]="!isReadOnly ? '35' : '0'"
       >
         <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
-        <label>
-          <small>RAW / DERIVED FILES</small>
+        <label class="section-header">RAW / DERIVED FILES
         </label>
         <span *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
@@ -251,8 +312,8 @@
       [spacer]="spacer3"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
-      <label>
-        <small>SYSTEM FILES</small>
+      <label class="section-header">
+        SYSTEM FILES
       </label>
     </p>
     <span *ngIf="filteredAuditFiles.length > 0">
@@ -282,13 +343,13 @@
       [spacer]="spacer4"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
-      <label>
+      <label class="section-header">
         <input
           [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length"
           (change)="selectFiles($event, 'derived', null, true)"
           type="checkbox"
           name=""
-        />&nbsp;&nbsp;<small>DERIVED DATA</small>
+        />&nbsp;&nbsp;DERIVED DATA
       </label>
       <span
         *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly"
@@ -386,87 +447,15 @@
   </nav>
   <!-- Inferred data penel end-->
 
-  <div *ngIf="!isReadOnly" class="notification is-warning">
-    <small
-      ><mat-icon>info</mat-icon> FTP Upload folder is a temporary location where
-      we store a copy of your uploaded files and sync them to your study folder
-      (listed above). You can check whether you have any files in your FTP upload directory that are not present in your study directory.
-      If you do have new files in your FTP upload directory, you can sync them to the study directory.
-      Please note that the sync operations may take some time to complete. If you cannot see your recently uploaded files, please contact us
-      <a
-        [href]="
-          'mailto:metabolights-help@ebi.ac.uk?subject=Regarding sync from FTP folder - ' +
-          requestedStudy
-        "
-        >metabolights-help@ebi.ac.uk</a
-      >
-      for help.</small
-    >
-  </div>
+
+  <mat-divider class="file-divider" [inset]="true"></mat-divider>
 
 
   <!-- i_Investigation.txt warning start-->
-  <div *ngIf="!isReadOnly" class="notification is-warning">
-    <small
-      ><mat-icon>info</mat-icon> If uploaded ISA Investigation file
-      (i_Investigation.txt) does not sync with your study, contact
-      us
-      <a
-        [href]="
-          'mailto:metabolights-help@ebi.ac.uk?subject=Regarding updating investigation sheet - ' +
-          requestedStudy
-        "
-        >metabolights-help@ebi.ac.uk</a
-      >
-      for help.</small
-    >
+  <div *ngIf="!isReadOnly" class="notification is-warning message">
+    <small>This section shows your FTP folder contents. Please start synchronization to use the updated files on FTP folder.</small>
   </div>
   <!-- i_Investigation.txt warning end-->
-<!--ftp management component start-->
-<div class="container parent">
-  <app-rsync
-  *ngIf="!isReadOnly"
-  title="Metadata Files"
-  helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
-  [studyId]="studyIdentifier"
-  sourceStagingArea="ftp-private"
-  targetStagingArea="rw-study"
-  syncType="metadata"
-  runSyncOnCluster="false"
-  runDryRunOnCluster="false"
-  pollingInterval=5000
-  (filesSynchronized)="onFilesSynchronized($event)"
-  ></app-rsync>
-
-    <app-rsync
-    *ngIf="!isReadOnly"
-    title="Data Files"
-    helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
-    [studyId]="studyIdentifier"
-    sourceStagingArea="ftp-private"
-    targetStagingArea="readonly-study"
-    syncType="data"
-    runSyncOnCluster="false"
-    runDryRunOnCluster="false"
-    pollingInterval=10000
-    (filesSynchronized)="onFilesSynchronized($event)"
-    ></app-rsync>
-  <div *ngIf="!isReadOnly && curator">
-    <app-rsync
-    title="Internal Files"
-    helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
-    [studyId]="studyIdentifier"
-    sourceStagingArea="ftp-private"
-    targetStagingArea="rw-study"
-    syncType="internal"
-    runSyncOnCluster="false"
-    runDryRunOnCluster="false"
-    pollingInterval=10000
-    (filesSynchronized)="onFilesSynchronized($event)"
-    ></app-rsync>
-  </div>
-
-</div>
   <!-- FTP panel start-->
   <nav *ngIf="!isReadOnly" class="panel">
 
@@ -478,8 +467,8 @@
       [spacer]="spacer5"
       [attr.marginTop]="!isReadOnly ? '35' : '0'"
     >
-      <label>
-        <small>UPLOAD FOLDER</small>
+      <label class="section-header">
+        FTP UPLOAD FOLDER
       </label>
       <span class="is-pulled-right">
         <a

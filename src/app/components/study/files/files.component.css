@@ -37,6 +37,25 @@ img {
   /* align-items: center; */
 }
 
+.section-header {
+  font-weight: bold;
+  font-size: small;
+}
+
+.message {
+  padding: 5px;
+  margin-bottom: 12px;
+}
+.file-divider {
+  margin-bottom: 12px;
+  margin-top: 12px;
+  margin-left: 0px !important;
+}
+
+.resync-section {
+  padding-bottom: 0px !important;
+}
+
 .container.parent {
   padding-bottom: 2%;
   display:flex;

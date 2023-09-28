@@ -568,7 +568,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       .addColumns(this.data.file, { data: columns }, this.validationsId, null)
       .subscribe(
         (res) => {
-          toastr.success("Characteristic added successfully", "Success", {
+          toastr.success("Characteristic/Factor columns are added successfully", "Success", {
             timeOut: "2500",
             positionClass: "toast-top-center",
             preventDuplicates: true,
