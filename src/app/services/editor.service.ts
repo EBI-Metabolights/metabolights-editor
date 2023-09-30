@@ -149,6 +149,18 @@ export class EditorService {
       .pipe(catchError(this.dataService.handleError));
   }
 
+  checkMaintenaceMode(): Observable<any> {
+    return this.dataService.http
+      .get<any>(
+        this.dataService.url.baseURL + "/ebi-internal/ws-status",
+        {
+          headers: httpOptions.headers,
+          observe: "body",
+        }
+      )
+      .pipe(catchError(this.dataService.handleError));
+  }
+
   async getJwtWithOneTimeToken(oneTimeToken: string) {
     const config = this.configService.config;
     const url = config.metabolightsWSURL.baseURL + config.authenticationURL.getJwtWithOneTimeToken;
@@ -228,6 +240,16 @@ export class EditorService {
           this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: null} });
         }
     );
+    this.checkMaintenaceMode().subscribe(
+      (response) => {
+        const result = response.content;
+        this.ngRedux.dispatch({ type: "SET_MAINTENANCE_MODE", body: { maintenanceMode: result} });
+        },
+        (error) => {
+          this.ngRedux.dispatch({ type: "SET_MAINTENANCE_MODE", body: { maintenanceMode: false} });
+        }
+    );
+
     if(activeJwt !== null){
       const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
       const username = decoded.sub;

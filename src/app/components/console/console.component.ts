@@ -16,6 +16,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.userStudies) userStudies;
   @select((state) => state.status.user) studyUser;
   @select((state) => state.status.bannerMessage) bannerMessage;
+  @select((state) => state.status.maintenanceMode) maintenanceMode;
 
   studies: string[] = [];
   filteredStudies: string[] = [];
@@ -29,6 +30,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   isConfirmationModalOpen = false;
   baseHref: string;
   banner: string = null;
+  underMaintenance = false;
+
   constructor(
     private route: ActivatedRoute,
     public router: Router,
@@ -49,6 +52,9 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.editorService.updateHistory(this.route.snapshot);
     this.bannerMessage.subscribe((value) => {
       this.banner = value;
+    });
+    this.maintenanceMode.subscribe((value) => {
+      this.underMaintenance = value;
     });
     this.isCurator.subscribe((value) => {
       this.curator = value;

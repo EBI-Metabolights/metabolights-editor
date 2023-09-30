@@ -25,6 +25,9 @@
   border-radius: 0px;
   border: 1px solid #cce9ff;
 }
+.files-tab {
+  padding: 0px;
+}
 
 .banner {
   font-size: 14px;

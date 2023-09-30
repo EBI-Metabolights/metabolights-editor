@@ -12,6 +12,7 @@ import { PlatformLocation } from "@angular/common";
 export class HeaderComponent {
  @select((state) => state.status.user) studyUser;
  @select((state) => state.status.bannerMessage) bannerMessage;
+ @select((state) => state.status.maintenanceMode) maintenanceMode;
 
   authUser: any = null;
   query = "";
@@ -19,7 +20,7 @@ export class HeaderComponent {
   metabolightsHeaderTitle: string;
   baseHref: string;
   banner: string = null;
-
+  underMaintenance = false;
   constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
       this.setUpSubscription();
       const url = this.configService.config.endpoint;
@@ -48,7 +49,9 @@ export class HeaderComponent {
         this.authUser = value;
       }
     });
-
+    this.maintenanceMode.subscribe((value) => {
+      this.underMaintenance = value;
+    });
     this.bannerMessage.subscribe((value) => {
         this.banner = value;
     });

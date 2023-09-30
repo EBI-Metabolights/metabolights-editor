@@ -48,6 +48,13 @@ export class ErrorMessageService {
         input: "",
         content: "Login inputs are not valid."
       });
+
+      this.messages.set("E-0002-001",
+      {
+        header: "MetaboLights is under maintenance.",
+        input: "",
+        content: "MetaboLights is under maintenace. Please try later to access studies."
+      });
   }
 
   getErrorMessage(id: string){

@@ -20,6 +20,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   @select((state) => state.study.obfuscationCode) studyObfuscationCode;
 
   @select((state) => state.status.bannerMessage) bannerMessage;
+  @select((state) => state.status.maintenanceMode) maintenanceMode;
+
   @select((state) => state.study.investigationFailed) investigationFailed;
 
   studyError = false;
@@ -33,6 +35,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   messageExpanded = false;
   baseHref: string;
   banner: string = null;
+  underMaintenance = false;
+
   constructor(
     private ngRedux: NgRedux<IAppState>,
     private router: Router,
@@ -63,6 +67,9 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.bannerMessage.subscribe((value) => {
       this.banner = value;
+    });
+    this.maintenanceMode.subscribe((value) => {
+      this.underMaintenance = value;
     });
     this.studyIdentifier.subscribe((value) => {
       if (value !== null) {

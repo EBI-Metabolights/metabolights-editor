@@ -21,7 +21,8 @@ import {
   RESET,
   SET_STUDY_PERMISSION,
   RESET_STUDY_PERMISSION,
-  SET_BANNER_MESSAGE
+  SET_BANNER_MESSAGE,
+  SET_MAINTENANCE_MODE
 } from "./actions";
 import { SET_STUDY_ASSAY } from "./study/actions";
 
@@ -50,6 +51,8 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
   guides: null,
   studyPermission: null,
   bannerMessage: null,
+
+  maintenanceMode: false,
   editorVersion: {
     version: "",
     releaseName: ""
@@ -119,6 +122,9 @@ function reset(state, action) {
 
 function setBannerHeader(state, action) {
   return tassign(state, { bannerMessage: action.body.bannerMessage });
+}
+function setMaintenanceMode(state, action) {
+  return tassign(state, { maintenanceMode: action.body.maintenanceMode });
 }
 
 function setUserStudies(state, action) {
@@ -215,6 +221,8 @@ export function sharedReducer(
       return resetStudyPermission(state, action);
     case SET_BANNER_MESSAGE:
       return setBannerHeader(state, action);
+    case SET_MAINTENANCE_MODE:
+      return setMaintenanceMode(state, action);
   }
 
   return state;

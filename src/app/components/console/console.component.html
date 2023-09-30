@@ -50,7 +50,7 @@
           >My Studies - {{ loginName }}
           <small *ngIf="studies.length > 0">({{ studies.length }})</small></span
         >
-        <span class="is-pulled-right">
+        <span class="is-pulled-right" *ngIf="!underMaintenance">
           <small style="font-size: 0.8em !important"
             ><mtbls-help target="createStudy"></mtbls-help></small
           >&nbsp;
@@ -149,7 +149,7 @@
                   ></small>
                 </p>
               </div>
-              <div>
+              <div *ngIf="!underMaintenance">
                 <a
                   [routerLink]="['/guide/info', study.accession]"
                   class="button is-rounded"
