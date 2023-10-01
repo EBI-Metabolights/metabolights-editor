@@ -1,5 +1,6 @@
 nginx.conf
-
+e2e
+src/assets/configs/*.config.json
 dist
 .github
 node_modules

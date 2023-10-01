@@ -29,23 +29,7 @@ build:
         CONFIGURAION_NAME: staging
         RELEASE_NAME: staging.${CI_PIPELINE_ID}
   script:
-    - npm install --save --legacy-peer-deps
-    - >
-      echo "{\"version\": \"$VERSION\", \"releaseName\": \"$RELEASE_NAME-$CI_COMMIT_SHORT_SHA\"}" > src/assets/configs/version.json
-    - bash "$BUILD_SCRIPTS_ROOT_PATH/$CI_COMMIT_REF_NAME/update_config_file.sh"
-    - npm run build -- --configuration $CONFIGURAION_NAME
-    - mkdir -p dist/metabolights && mv dist/metabolights-editor dist/metabolights/editor
-    - cd dist && zip -r editor.zip metabolights && cd .. && mv dist/editor.zip .
-  cache:
-    key:
-      files:
-        - package-lock.json
-    paths:
-      - node_modules
-
-  artifacts:
-      paths:
-      - editor.zip
+    - bash "$BUILD_SCRIPTS_ROOT_PATH/build.sh"
 
 deploy_editor:
   stage: deploy
@@ -53,4 +37,4 @@ deploy_editor:
       - test
       - staging
   script:
-    - bash "$BUILD_SCRIPTS_ROOT_PATH/$CI_COMMIT_REF_NAME/deploy.sh"
+    - bash "$BUILD_SCRIPTS_ROOT_PATH/deploy.sh"

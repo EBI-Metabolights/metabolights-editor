@@ -22,7 +22,7 @@ export class ConfigurationService {
   async loadConfiguration(): Promise<any> {
     try {
       const response = await this.http
-        .get(`${this.configPath + environment.context + ".config.json"}`)
+        .get(`${this.configPath + "config.json"}`)
         .toPromise();
       this.configData = response as Environment;
     } catch (err) {
