@@ -52,6 +52,30 @@
                 }
               ]
             },
+            "master": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "3mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            },
             "development": {
               "fileReplacements": [
                 {
@@ -147,30 +171,6 @@
                   "maximumError": "5mb"
                 }
               ]
-            },
-            "kubernetes": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.kubernetes.ts"
-                }
-              ],
-              "optimization": true,
-              "outputHashing": "all",
-              "sourceMap": false,
-              "extractCss": true,
-              "namedChunks": false,
-              "aot": true,
-              "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "3mb",
-                  "maximumError": "5mb"
-                }
-              ]
             }
           }
         },
@@ -186,14 +186,14 @@
             "development": {
               "browserTarget": "metabolights-editor:build:development"
             },
-            "kubernetes": {
-              "browserTarget": "metabolights-editor:build:kubernetes"
-            },
             "staging": {
               "browserTarget": "metabolights-editor:build:staging"
             },
             "test": {
               "browserTarget": "metabolights-editor:build:test"
+            },
+            "master": {
+              "browserTarget": "metabolights-editor:build:production"
             }
           }
         },
