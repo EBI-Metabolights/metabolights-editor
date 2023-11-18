@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  context: "kubernetes",
+  context: "production",
   isTesting: false,
   contextPath: "/metabolights/editor",
 };

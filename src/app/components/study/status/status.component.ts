@@ -110,20 +110,32 @@ export class StatusComponent implements OnInit {
   ngOnInit() {}
 
   openModal() {
-    if (!this.curator && this.status && this.status.toLowerCase() === "submitted") {
-      if (this.validation.status === 'error' || this.validation.status === 'not ready') {
-        toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
-          timeOut: "5000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      }
-      return;
+    if  (this.curator){
+      this.isModalOpen = true;
+    } else {
+      if (this.status != null && this.status.toLowerCase() === "submitted") {
+        if (this.validation.status === 'error' || this.validation.status === 'not ready') {
+          toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        } else {
+          this.isModalOpen = true;
+        }
+    } else {
+      toastr.error("You can not update your study status.", "Error", {
+        timeOut: "5000",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+      });
     }
-    this.isModalOpen = true;
   }
+}
 
   closeModal() {
     this.isModalOpen = false;
