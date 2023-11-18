@@ -11,9 +11,10 @@ RUN npm run build -- --configuration $CONFIGURATION
 FROM nginx:stable
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
 
-COPY --from=build /app-root/dist /usr/share/nginx/html
+COPY --from=build /app-root/dist /dist
+ARG BASE_CONTEXT=/metabolights
 ARG EXPOSED_PORT=8008
-RUN mkdir -p /usr/share/nginx/html/metabolights && mv /usr/share/nginx/html/metabolights-editor/ /usr/share/nginx/html/metabolights/editor
-EXPOSE $CONFIGURATION
+RUN mkdir -p /usr/share/nginx/html/$BASE_CONTEXT && mv /dist/metabolights-editor/ /usr/share/nginx/html/$BASE_CONTEXT/editor
+EXPOSE $EXPOSED_PORT
 
 ENTRYPOINT ["nginx", "-g", "daemon off;"]
