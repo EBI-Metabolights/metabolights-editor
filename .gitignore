@@ -8,8 +8,7 @@ nginx.conf
 /src/assets/guides/*
 
 # Don't expose configs
-/src/assets/configs/config.json
-/src/assets/configs/*.config.json
+/src/assets/configs/*config.json
 
 # Only exists if Bazel was run
 /bazel-out
