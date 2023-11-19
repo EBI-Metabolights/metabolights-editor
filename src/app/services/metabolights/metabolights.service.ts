@@ -128,8 +128,12 @@ export class MetabolightsService extends DataService {
 
   // Study validation details
   getLanguageMappings() {
+    let url = this.url.guides;
+    if (this.url.guides.endsWith("/") === false){
+      url = this.url.guides + "/";
+    }
     return this.http
-      .get(this.url.guides + "mapping.json")
+      .get(url + "mapping.json")
       .pipe(catchError(this.handleError));
   }
 
