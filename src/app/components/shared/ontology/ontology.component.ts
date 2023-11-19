@@ -144,7 +144,7 @@ export class OntologyComponent implements OnInit, OnChanges {
               this.searchedMore = false;
               this.loading = true;
               this.editorService
-                .getOntologyTerms(this.wsDomain + this.url + term)
+                .getOntologyTerms(this.wsDomain + "/" + this.url + term)
                 .subscribe((terms) => {
                   this.allvalues = [];
                   this.loading = false;
@@ -256,7 +256,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.loading = true;
     this.editorService
       .getOntologyTerms(
-        this.wsDomain +
+        this.wsDomain + "/" +
           this.url +
           term +
           "&queryFields=MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"

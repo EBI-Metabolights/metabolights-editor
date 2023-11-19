@@ -546,7 +546,7 @@ export class MetabolightsService extends DataService {
     return this.http
       .get<IOntologyWrapper>(
         this.url.baseURL +
-          "/studies".replace("studies", "ebi-internal") +
+          "/ebi-internal" +
           "/ontology?term=" +
           term +
           "&branch=" +
