@@ -83,7 +83,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.baseHref = this.configService.baseHref;
-    this.wsDomain = this.configService.config.metabolightsWSURL.domain;
+    this.wsDomain = this.configService.config.endpoint;
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
@@ -99,7 +99,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
         if (this.url !== "") {
           this.editorService
-            .getOntologyTerms(this.wsDomain + this.url)
+            .getOntologyTerms(this.wsDomain + "/" + this.url)
             .subscribe((terms) => {
               this.allvalues = [];
               const jsonConvert: JsonConvert = new JsonConvert();
