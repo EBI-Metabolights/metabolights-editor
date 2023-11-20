@@ -25,7 +25,7 @@ export class HeaderComponent {
       this.setUpSubscription();
       const url = this.configService.config.endpoint;
       if(url.endsWith("/")){
-        this.metabolightsWebsiteUrl = url.slice(0, url.length - 1);
+        this.metabolightsWebsiteUrl = url.slice(0, -1);
       } else {
         this.metabolightsWebsiteUrl = url;
       }

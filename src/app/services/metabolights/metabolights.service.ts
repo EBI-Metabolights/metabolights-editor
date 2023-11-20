@@ -55,6 +55,15 @@ export class MetabolightsService extends DataService {
   ) {
     super("", http);
     this.url = this.configService.config.metabolightsWSURL;
+    if(this.url.ontologyDetails.endsWith("/")){
+      this.url.ontologyDetails=  this.url.ontologyDetails.slice(0, -1);
+    }
+    if(this.url.baseURL.endsWith("/")){
+      this.url.baseURL=  this.url.baseURL.slice(0, -1);
+    }
+    if(this.url.guides.endsWith("/")){
+      this.url.guides=  this.url.guides.slice(0, -1);
+    }
     this.studyIdentifier.subscribe((value) => (this.id = value));
     this.stateStudy.subscribe((value) => (this.study = value));
   }

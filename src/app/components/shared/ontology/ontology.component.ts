@@ -52,7 +52,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @ViewChild("input", { read: MatAutocompleteTrigger })
   valueInput: MatAutocompleteTrigger;
 
-  wsDomain = "";
+  baseURL = "";
   loading = false;
   termsLoading = false;
   isforcedOntology = false;
@@ -81,9 +81,21 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   }
 
+  join(path1: string, path2: string){
+
+    if (path2.startsWith("/")){
+      path2 = path2.slice(1);
+    }
+    if (path1.endsWith("/")){
+      path1 = path1.slice(0,-1);
+    }
+    return path1 + "/" + path2;
+
+  }
+
   ngOnInit() {
     this.baseHref = this.configService.baseHref;
-    this.wsDomain = this.configService.config.endpoint;
+    this.baseURL = this.configService.config.metabolightsWSURL.baseURL;
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
@@ -99,7 +111,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
         if (this.url !== "") {
           this.editorService
-            .getOntologyTerms(this.wsDomain + "/" + this.url)
+            .getOntologyTerms( this.join(this.baseURL, this.url))
             .subscribe((terms) => {
               this.allvalues = [];
               const jsonConvert: JsonConvert = new JsonConvert();
@@ -144,7 +156,7 @@ export class OntologyComponent implements OnInit, OnChanges {
               this.searchedMore = false;
               this.loading = true;
               this.editorService
-                .getOntologyTerms(this.wsDomain + "/" + this.url + term)
+                .getOntologyTerms(this.join(this.join(this.baseURL, this.url), term))
                 .subscribe((terms) => {
                   this.allvalues = [];
                   this.loading = false;
@@ -256,8 +268,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.loading = true;
     this.editorService
       .getOntologyTerms(
-        this.wsDomain + "/" +
-          this.url +
+          this.join(this.baseURL, this.url) +
           term +
           "&queryFields=MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
       )

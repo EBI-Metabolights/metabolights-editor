@@ -14,10 +14,13 @@ export class DOIService extends DataService {
   constructor(http: HttpClient, private configService: ConfigurationService) {
     super("", http);
     this.url = this.configService.config.doiWSURL;
+    if(this.url.article.endsWith("/")){
+      this.url.article =  this.url.article.slice(0, -1);
+    }
   }
 
   getArticleInfo(doi): Observable<ICrossRefDOI> {
-    return this.http.get<ICrossRefDOI>(this.url.article + doi).pipe(
+    return this.http.get<ICrossRefDOI>(this.url.article + "/" + doi).pipe(
       map((res) => this.extractArticleDetails(res)),
       catchError(this.handleError)
     );
@@ -25,7 +28,7 @@ export class DOIService extends DataService {
 
   getArticleKeyWords(doi): Observable<ICrossRefDOI> {
     return this.http
-      .get<ICrossRefDOI>(this.url.article + doi)
+      .get<ICrossRefDOI>(this.url.article + "/" + doi)
       .pipe(catchError(this.handleError));
   }
 

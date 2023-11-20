@@ -8,17 +8,17 @@ export class RsyncStatusTransformPipe implements PipeTransform {
     register = {
         NO_TASK: '-',
         UNKNOWN: 'Unknown',
-        SYNC_NEEDED: 'Done. Sync Needed',
-        SYNC_NOT_NEEDED: 'Done. Sync not Needed',
+        SYNC_NEEDED: 'Task completed. Sync Needed',
+        SYNC_NOT_NEEDED: 'Task completed. Sync not Needed',
         CALCULATING: 'Processing ...',
         CALCULATION_FAILURE: 'Check failure',
-        NOT_FOUND: "Not Found",
-        PENDING: 'In Queue ...',
-        RUNNING: 'Running ...',
-        COMPLETED_SUCCESS: "Done. Sync Completed",
+        NOT_FOUND: "No Task Found",
+        PENDING: 'Task is in Queue ...',
+        RUNNING: 'TAsk is running ...',
+        COMPLETED_SUCCESS: "Task completed. Sync Completed",
         SYNC_FAILURE: "Sync failure",
         START_FAILURE: "Start failure",
-        JOB_SUBMITTED: "Submitted ...",
+        JOB_SUBMITTED: "Task has been submitted ...",
         JOB_SUBMISSION_FAILED: "Start failure"
       };
 

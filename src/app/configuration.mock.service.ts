@@ -15,14 +15,13 @@ export class MockConfigurationService {
       javaLogoutURL: "http://localhost:8080/metabolights/logout",
       redirectURL: "console",
       metabolightsWSURL: {
-        domain: "https://www.ebi.ac.uk/metabolights/",
         baseURL: "https://www.ebi.ac.uk/metabolights/ws",
         guides:
-          "https://raw.githubusercontent.com/EBI-Metabolights/guides/test/",
-        ontologyDetails: "https://www.ebi.ac.uk/ols/api/ontologies/",
+          "https://raw.githubusercontent.com/EBI-Metabolights/guides/test",
+        ontologyDetails: "https://www.ebi.ac.uk/ols/api/ontologies",
       },
       doiWSURL: {
-        article: "https://api.crossref.org/works/",
+        article: "https://api.crossref.org/works",
       },
       europePMCURL: {
         article:

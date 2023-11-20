@@ -7,12 +7,12 @@ import { Pipe, PipeTransform } from "@angular/core";
 export class AsyncStatusTransformPipe implements PipeTransform {
     register = {
         PENDING: '-',
-        INITIATED: 'In Queue ...',
-        STARTED: 'Started ...',
-        SUCCESS: 'Done',
+        INITIATED: 'Task is in queue ...',
+        STARTED: 'Task has started ...',
+        SUCCESS: 'Task has completed.',
         RETRY: 'Retrying ... ',
-        FAILURE: "Failed",
-        REVOKED: "Canceled"
+        FAILURE: "Task has failed.",
+        REVOKED: "Task has canceled."
       };
 
     transform(value: string): string {

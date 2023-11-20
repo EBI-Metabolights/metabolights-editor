@@ -10,6 +10,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { MtblsJwtPayload } from "src/app/services/headers";
 import jwtDecode  from "jwt-decode";
 import * as toastr from "toastr";
+import {PlatformLocation} from '@angular/common';
 import { stringify } from "querystring";
 @Component({
   selector: "app-login",
@@ -29,10 +30,14 @@ export class LoginComponent implements OnInit {
     private ngRedux: NgRedux<IAppState>,
     public router: Router,
     private editorService: EditorService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private platformLocation: PlatformLocation
   ) {
     this.baseHref = this.configService.baseHref;
-    this.environmentName = environment.context;
+    this.environmentName = this.platformLocation.getBaseHrefFromDOM();
+    this.environmentName = this.environmentName.replace("/metabolights/", "");
+    this.environmentName = this.environmentName.replace("/", "");
+
   }
 
   ngOnInit() {
@@ -43,7 +48,6 @@ export class LoginComponent implements OnInit {
       email: ["", [Validators.required, Validators.email]],
       secret: ["", Validators.required],
     });
-    this.domain = this.configService.config.metabolightsWSURL.domain;
     this.endpoint = this.configService.config.endpoint;
     if (this.endpoint.endsWith("/") === false){
       this.endpoint = this.endpoint + "/";

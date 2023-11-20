@@ -48,8 +48,10 @@ export class GuidesComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-    this.domain = this.configService.config.metabolightsWSURL.domain;
     this.repo = this.configService.config.metabolightsWSURL.guides;
+    if(this.repo.endsWith("/")){
+      this.repo =  this.repo.slice(0, -1);
+    }
   }
 
   setUpSubscriptions() {
@@ -98,7 +100,7 @@ export class GuidesComponent implements OnInit {
       if (img.indexOf("ftp://") > -1) {
         return img;
       }
-      return this.repo + "media/images/" + img;
+      return this.repo + "/media/images/" + img;
     }
   }
 
@@ -143,15 +145,9 @@ export class GuidesComponent implements OnInit {
   }
 
   getURLBase(url) {
-    // const domain = window.location.host.split(".")[0];
-    // if (domain === "www" || domain === "wwwdev") {
-    //   return "/metabolights" + url;
-    // } else {
-    //   return url;
-    // }
     const base = this.platformLocation.getBaseHrefFromDOM();
     if(base.endsWith("/")){
-      return window.location.origin + base.slice(0, base.length-1) + url;
+      return window.location.origin + base.slice(0, -1) + url;
     }
     return window.location.origin + this.platformLocation.getBaseHrefFromDOM() + url;
   }

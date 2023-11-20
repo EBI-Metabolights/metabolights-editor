@@ -17,7 +17,7 @@
         "recommended-ontologies": {
           "is-forced-ontology": "false",
           "ontology": {
-            "url": "ws/ebi-internal/ontology?term=",
+            "url": "/ebi-internal/ontology?term=",
             "allowFreeText": true
           }
         }
@@ -252,7 +252,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "true",
             "ontology": {
-              "url": "ws/ebi-internal/ontology?branch=role&term=",
+              "url": "/ebi-internal/ontology?branch=role&term=",
               "allowFreeText": false
             }
           }
@@ -355,7 +355,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "true",
             "ontology": {
-              "url": "ws/ebi-internal/ontology?branch=publication&term=",
+              "url": "/ebi-internal/ontology?branch=publication&term=",
               "allowFreeText": true
             }
           }
@@ -381,7 +381,7 @@
       "recommended-ontologies": {
         "is-forced-ontology": "false",
         "ontology": {
-          "url": "ws/ebi-internal/ontology?branch=design%20descriptor&term=",
+          "url": "/ebi-internal/ontology?branch=design%20descriptor&term=",
           "allowFreeText": true
         }
       }
@@ -1278,7 +1278,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "false",
             "ontology": {
-              "url": "ws/ebi-internal/ontology?branch=factor&term=",
+              "url": "/ebi-internal/ontology?branch=factor&term=",
               "allowFreeText": true
             }
           }
@@ -1326,7 +1326,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "false",
             "ontology": {
-              "url": "ws/ebi-internal/ontology?branch=factor&term=",
+              "url": "/ebi-internal/ontology?branch=factor&term=",
               "allowFreeText": true
             }
           }
@@ -1365,7 +1365,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "ws/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
                 "allowFreeText": true
               }
             }
@@ -1396,7 +1396,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "ws/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
                 "allowFreeText": true
               }
             }
@@ -1427,7 +1427,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "ws/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
                 "allowFreeText": true
               }
             }
@@ -1458,7 +1458,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "ws/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
                 "allowFreeText": true
               }
             }
@@ -1493,7 +1493,7 @@
         "recommended-ontologies": {
           "is-forced-ontology": "false",
           "ontology": {
-            "url": "ws/ebi-internal/ontology?branch=factor&term=",
+            "url": "/ebi-internal/ontology?branch=factor&term=",
             "allowFreeText": true
           }
         }
@@ -1512,7 +1512,7 @@
         "recommended-ontologies": {
           "is-forced-ontology": "false",
           "ontology": {
-            "url": "ws/ebi-internal/ontology?branch=unit&term=",
+            "url": "/ebi-internal/ontology?branch=unit&term=",
             "allowFreeText": true
           }
         }
