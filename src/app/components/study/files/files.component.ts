@@ -99,9 +99,6 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     this.readonly.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
-        if (this.isReadOnly !== null && this.isReadOnly === false){
-          this.loadAccess();
-        }
       }
     });
     this.studyStatus.subscribe((value) => {
@@ -116,7 +113,11 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       }
     });
   }
-
+  getFolderStatus(){
+    if (this.isReadOnly !== null && this.isReadOnly === false){
+      this.loadAccess();
+    }
+  }
   changeforceMetaDataDeleteValue(event) {
     this.forceMetaDataDelete = event.currentTarget.checked;
   }

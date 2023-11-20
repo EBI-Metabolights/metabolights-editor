@@ -71,30 +71,30 @@ export class RsyncComponent implements OnInit {
         dry_run: true
     };
     this.updateLastRsyncResponse(initialResponse);
-    this.ftpService.getRyncStatus(true, this.syncType, this.targetStagingArea).subscribe(dryRunResponse => {
-      this.ftpService.getRyncStatus(false, this.syncType, this.targetStagingArea).subscribe(syncResponse => {
-        this.serverReady = true;
-        if (this.RUNNING_STATES.includes(syncResponse.status)) {
-          this.currentMode = this.rsyncMode.sync;
-          this.startRsync(false, this.syncType, this.targetStagingArea);
-        } else if (this.RUNNING_STATES.includes(dryRunResponse.status)){
-          this.currentMode = this.rsyncMode.dryRun;
-          this.startRsync(true, this.syncType, this.targetStagingArea);
-        } else if (this.RESULT_READY_STATES.includes(syncResponse.status)){
-          this.updateLastRsyncResponse(syncResponse);
-        } else if (this.RESULT_READY_STATES.includes(dryRunResponse.status)){
-          this.updateLastRsyncResponse(dryRunResponse);
-        } else if (this.DONE_STATES.includes(syncResponse.status)){
-          this.updateLastRsyncResponse(syncResponse);
-        } else if (this.DONE_STATES.includes(dryRunResponse.status)){
-          this.updateLastRsyncResponse(dryRunResponse);
-        } else {
-          if (this.lastResponse.task_done_timestamp > 0) {
-            this.updateLastRsyncResponse(this.lastResponse);
-          }
-        }
-      });
-    });
+    // this.ftpService.getRyncStatus(true, this.syncType, this.targetStagingArea).subscribe(dryRunResponse => {
+    //   this.ftpService.getRyncStatus(false, this.syncType, this.targetStagingArea).subscribe(syncResponse => {
+    //     this.serverReady = true;
+    //     if (this.RUNNING_STATES.includes(syncResponse.status)) {
+    //       this.currentMode = this.rsyncMode.sync;
+    //       this.startRsync(false, this.syncType, this.targetStagingArea);
+    //     } else if (this.RUNNING_STATES.includes(dryRunResponse.status)){
+    //       this.currentMode = this.rsyncMode.dryRun;
+    //       this.startRsync(true, this.syncType, this.targetStagingArea);
+    //     } else if (this.RESULT_READY_STATES.includes(syncResponse.status)){
+    //       this.updateLastRsyncResponse(syncResponse);
+    //     } else if (this.RESULT_READY_STATES.includes(dryRunResponse.status)){
+    //       this.updateLastRsyncResponse(dryRunResponse);
+    //     } else if (this.DONE_STATES.includes(syncResponse.status)){
+    //       this.updateLastRsyncResponse(syncResponse);
+    //     } else if (this.DONE_STATES.includes(dryRunResponse.status)){
+    //       this.updateLastRsyncResponse(dryRunResponse);
+    //     } else {
+    //       if (this.lastResponse.task_done_timestamp > 0) {
+    //         this.updateLastRsyncResponse(this.lastResponse);
+    //       }
+    //     }
+    //   });
+    // });
   }
 
   startRsync(dryRun: boolean=false, syncType: string, targetStagingArea: string): void {

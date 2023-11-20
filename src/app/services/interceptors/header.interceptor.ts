@@ -19,14 +19,11 @@ export class HeaderInterceptor implements HttpInterceptor {
     request: HttpRequest<unknown>,
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
-    const domain = this.configService?.config?.metabolightsWSURL?.domain;
+    const endpoint = this.configService?.config?.endpoint;
     const origin = this.configService.config?.origin;
     const targetUrl = origin + request.url ;
-    if (request.url == null || (!targetUrl.startsWith(domain) && !request.url.startsWith(domain))){
-      return next.handle(request);
-    }
-
-    let userToken = localStorage.getItem("userToken");
+    if (request.url.startsWith(endpoint) || targetUrl.startsWith(endpoint)){
+      let userToken = localStorage.getItem("userToken");
     if(userToken === null) {
       const user = localStorage.getItem("user");
       if ( user !== null) {
@@ -66,6 +63,7 @@ export class HeaderInterceptor implements HttpInterceptor {
             }
           });
         }
+    }
     }
     return next.handle(request);
   }

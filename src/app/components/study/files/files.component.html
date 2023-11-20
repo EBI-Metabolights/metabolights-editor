@@ -35,6 +35,12 @@
     </span>
 
     <span *ngIf="!isReadOnly && curator" class="is-pulled-right">
+      <a *ngIf="access == null"
+        (click)="getFolderStatus()"
+        class="button is-light"
+      >
+        <mat-icon>refresh</mat-icon> <small>FTP Folder Status</small>
+      </a>
       <a
         *ngIf="access == 'Read'"
         (click)="toggleFolderAccess()"

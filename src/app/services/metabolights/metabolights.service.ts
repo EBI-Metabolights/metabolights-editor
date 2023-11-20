@@ -168,8 +168,12 @@ export class MetabolightsService extends DataService {
 
   // Study validation details
   getGuides(language) {
+    let url = this.url.guides;
+    if (this.url.guides.endsWith("/") === false){
+      url = this.url.guides + "/";
+    }
     return this.http
-      .get(this.url.guides + "I10n/" + language + ".json")
+      .get(url + "I10n/" + language + ".json")
       .pipe(catchError(this.handleError));
   }
 
@@ -575,8 +579,12 @@ export class MetabolightsService extends DataService {
    * @returns The ontology details via the Observable.
    */
   getOntologyDetails(value): Observable<any> {
+    let ontologyUrl = this.url.ontologyDetails;
+    if (ontologyUrl.endsWith("/") === false){
+      ontologyUrl = ontologyUrl + "/";
+    }
     const url =
-      this.url.ontologyDetails +
+    ontologyUrl +
       value.termSource.name +
       "/terms/" +
       encodeURI(encodeURIComponent(value.termAccession));
