@@ -59,6 +59,7 @@ img {
 .container.parent {
   padding-bottom: 2%;
   display:flex;
+  flex-flow: wrap;
   flex:1;
   justify-content:center;
   align-items:center;
@@ -68,6 +69,7 @@ img {
 @media only screen and (max-width: 1000px) {
   .container.parent {
     flex-direction:column;
+    flex-flow: wrap;
   }
 }
 .article-box {
