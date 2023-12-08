@@ -113,7 +113,7 @@
       </article>
       <div *ngIf="banner" style="margin: 0 0 5px 0">
         <div class="col-md-12 ">
-          <div class="banner" > {{ banner }}</div>
+          <div class="banner"[innerHTML]="banner"></div>
         </div>
       </div>
     </div>
