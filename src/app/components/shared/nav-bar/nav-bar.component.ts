@@ -33,7 +33,8 @@ export class NavBarComponent implements OnInit {
     private platformLocation: PlatformLocation
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
-    this.environmentName = this.baseHref.replace("/metabolights/", "");
+    this.environmentName = this.environmentName.replace("/metabolights/", "");
+    this.environmentName = this.environmentName.replace("/editor", "");
     this.environmentName = this.environmentName.replace("/", "");
   }
 
