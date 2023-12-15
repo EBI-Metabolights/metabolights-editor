@@ -38,7 +38,6 @@ export class LoginComponent implements OnInit {
     this.environmentName = this.environmentName.replace("/metabolights", "");
     this.environmentName = this.environmentName.replace("/editor", "");
     this.environmentName = this.environmentName.replace("/", "");
-
   }
 
   ngOnInit() {
