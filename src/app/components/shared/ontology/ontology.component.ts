@@ -156,7 +156,7 @@ export class OntologyComponent implements OnInit, OnChanges {
               this.searchedMore = false;
               this.loading = true;
               this.editorService
-                .getOntologyTerms(this.join(this.join(this.baseURL, this.url), term))
+                .getOntologyTerms(this.join(this.baseURL, this.url) + term)
                 .subscribe((terms) => {
                   this.allvalues = [];
                   this.loading = false;
@@ -270,7 +270,7 @@ export class OntologyComponent implements OnInit, OnChanges {
       .getOntologyTerms(
           this.join(this.baseURL, this.url) +
           term +
-          "&queryFields=MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
+          "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
       )
       .subscribe((terms) => {
         this.allvalues = [];
