@@ -96,6 +96,9 @@ export class OntologyComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.baseHref = this.configService.baseHref;
     this.baseURL = this.configService.config.metabolightsWSURL.baseURL;
+    if (this.baseURL.endsWith("/")){
+      this.baseURL = this.baseURL.slice(0,-1);
+    }
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
@@ -111,7 +114,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
         if (this.url !== "") {
           this.editorService
-            .getOntologyTerms( this.join(this.baseURL, this.url))
+            .getOntologyTerms(this.baseURL + this.url)
             .subscribe((terms) => {
               this.allvalues = [];
               const jsonConvert: JsonConvert = new JsonConvert();
@@ -156,7 +159,7 @@ export class OntologyComponent implements OnInit, OnChanges {
               this.searchedMore = false;
               this.loading = true;
               this.editorService
-                .getOntologyTerms(this.join(this.baseURL, this.url) + term)
+                .getOntologyTerms(this.baseURL + this.url + term)
                 .subscribe((terms) => {
                   this.allvalues = [];
                   this.loading = false;
@@ -268,8 +271,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.loading = true;
     this.editorService
       .getOntologyTerms(
-          this.join(this.baseURL, this.url) +
-          term +
+          this.baseURL + this.url + term +
           "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
       )
       .subscribe((terms) => {
