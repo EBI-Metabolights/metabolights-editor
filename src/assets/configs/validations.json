@@ -494,7 +494,14 @@
                   "error": "Please provide a description of the Chromatography Instrument. This field must be at least 20 characters long",
                   "type": "string"
                 }
-              ]
+              ],
+              "recommended-ontologies": {
+                "is-forced-ontology": "false",
+                "ontology": {
+                  "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Instrument%20Model&term=",
+                  "allowFreeText": true
+                }
+              }
             },
             "Parameter Value[Column model]": {
               "data-type": "string",
@@ -511,7 +518,13 @@
                   "error": "Please provide a description of the model and make of the of Column used. This field must be at least 20 characters long",
                   "type": "string"
                 }
-              ]
+              ],
+              "recommended-ontologies": {
+                "is-forced-ontology": "false",
+                "ontology": {
+                  "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Column%20model&term=",
+                  "allowFreeText": true
+                }
             },
             "Parameter Value[Column type]": {
               "data-type": "string",
