@@ -525,6 +525,7 @@
                   "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Column%20model&term=",
                   "allowFreeText": true
                 }
+              }
             },
             "Parameter Value[Column type]": {
               "data-type": "string",
