@@ -494,14 +494,7 @@
                   "error": "Please provide a description of the Chromatography Instrument. This field must be at least 20 characters long",
                   "type": "string"
                 }
-              ],
-              "recommended-ontologies": {
-                "is-forced-ontology": "false",
-                "ontology": {
-                  "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Instrument%20Model&term=",
-                  "allowFreeText": true
-                }
-              }
+              ]
             },
             "Parameter Value[Column model]": {
               "data-type": "string",
@@ -518,14 +511,7 @@
                   "error": "Please provide a description of the model and make of the of Column used. This field must be at least 20 characters long",
                   "type": "string"
                 }
-              ],
-              "recommended-ontologies": {
-                "is-forced-ontology": "false",
-                "ontology": {
-                  "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Column%20model&term=",
-                  "allowFreeText": true
-                }
-              }
+              ]
             },
             "Parameter Value[Column type]": {
               "data-type": "string",
@@ -1630,6 +1616,108 @@
           "conditional": false,
           "id": "metabolite_assignment_file",
           "cell": "(element) => element['metabolite_assignment_file'].filename ? element['metabolite_assignment_file'].filename : ''"
+        },
+        {
+          "columnDef": "Parameter Value[Chromatography Instrument]",
+          "sticky": "false",
+          "header": "Parameter Value[Chromatography Instrument]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the chromatography instrument used",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Instrument%20Model&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Parameter Value[Instrument]",
+          "sticky": "false",
+          "header": "Parameter Value[Instrument]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the mass spectrometry instrument used",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Instrument%20Model&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        }
+        ,
+        {
+          "columnDef": "Parameter Value[Ion source]",
+          "sticky": "false",
+          "header": "Parameter Value[Ion source]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the mass spectrometry ion source",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Ion%20Source&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        }
+        ,
+        {
+          "columnDef": "Parameter Value[Mass analyzer]",
+          "sticky": "false",
+          "header": "Parameter Value[Mass analyzer]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the mass spectrometry mass analyzer",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Mass%20Analyzer&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
         }
       ],
       "assaySetup": {
