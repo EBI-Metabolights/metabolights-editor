@@ -442,8 +442,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   detectControlListColumns() {
     Object.keys(this.data.header).forEach((col) => {
       if (!this.controlListColumns.has(col)) {
-        const definition = this.getControlListDefinition(col);
-        if (definition && col["data-type"] !== "ontology") {
+        const definition = this.getValidationDefinition(col);
+        if (definition && definition["data-type"] !== "ontology"
+          && "ontology-details" in definition
+          && "recommended-ontologies" in definition["ontology-details"]
+          && definition["ontology-details"]["recommended-ontologies"]) {
           this.controlListColumns.set(col, definition);
         }
       }
@@ -906,6 +909,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (!this.isReadOnly) {
       this.isCellTypeFile = false;
       this.isCellTypeOntology = false;
+      this.isCellTypeControlList = false;
       this.isEditModalOpen = true;
       this.selectedCell["row"] = row;
       this.selectedCell["column"] = column;
@@ -916,6 +920,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
       if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
         this.isCellTypeControlList = true;
+        this.cellControlListValue();
       } else if (this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;
         this.cellOntologyValue();
@@ -948,7 +953,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         columnIndex = columnIndex.index;
       }
     }
-    if (this.isCellTypeOntology) {
+    if (this.isCellTypeControlList) {
+      const selectedOntology =
+        this.getOntologyComponentValue("editControlListCell").values[0];
+      cellsToUpdate = [
+        {
+          row: this.selectedCell["row"].index,
+          column: columnIndex,
+          value: selectedOntology.annotationValue,
+        }
+      ];
+    } else if (this.isCellTypeOntology) {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyCell").values[0];
       cellsToUpdate = [
@@ -1162,6 +1177,29 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.editCellform.markAsDirty();
   }
 
+
+  cellControlListValue() {
+    const columnIndex = this.data.header[this.selectedCell["column"].header];
+
+    const cellValue =
+      this.selectedCell["row"][this.selectedCell["column"].header];
+    if (cellValue && cellValue !== "" && cellValue !== undefined) {
+      const newOntology = new Ontology();
+      newOntology.annotationValue =
+        this.selectedCell["row"][this.selectedCell["column"].header];
+      newOntology.termAccession = "";
+      newOntology.termSource = new OntologySourceReference();
+      newOntology.termSource.description = "";
+      newOntology.termSource.file = "";
+      newOntology.termSource.name = "";
+      newOntology.termSource.provenance_name = "";
+      newOntology.termSource.version = "";
+      this.selectedCellOntology = newOntology;
+    } else {
+      this.selectedCellOntology = null;
+    }
+  }
+
   cellOntologyValue() {
     const columnIndex = this.data.header[this.selectedCell["column"].header];
     let termSourceRef = null;
@@ -1191,10 +1229,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       newOntology.termSource.provenance_name = "";
       newOntology.termSource.version = "";
       this.selectedCellOntology = newOntology;
+    } else {
+      this.selectedCellOntology = null;
     }
   }
 
-  getControlListDefinition(header) {
+  getValidationDefinition(header) {
     let selectedColumn = null;
     const tableTechnique = this.tableData.meta?.assayTechnique?.name;
     this.validation.default_order.forEach((col) => {
@@ -1215,9 +1255,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     let selectedColumn = null;
     const tableTechnique = this.tableData.meta?.assayTechnique?.name;
     const validation = this.validation;
+    const detail = "ontology-details";
     if ("default_order" in validation) {
       this.validation.default_order.forEach((col) => {
-        if (col.header === header && col["data-type"] === "ontology") {
+        if (col.header === header &&  detail in col && col[detail] && "recommended-ontologies" in col[detail]) {
           if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
             if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
               selectedColumn = col;

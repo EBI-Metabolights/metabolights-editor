@@ -104,7 +104,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
     this.readonly = this.editorService.ngRedux.getState().study.readonly;
 
-    if (this.readonly === false && this.validations["data-type"] === "ontology") {
+    if (this.readonly === false && "recommended-ontologies" in this.validations) {
       if (this.validations["recommended-ontologies"]) {
         this.isforcedOntology =
           this.validations["recommended-ontologies"]["is-forced-ontology"];

@@ -1365,7 +1365,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=Characteristics[Organism]&term=",
                 "allowFreeText": true
               }
             }
@@ -1396,7 +1396,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=Characteristics[Organism%20part]&term=",
                 "allowFreeText": true
               }
             }
@@ -1427,7 +1427,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=Characteristics[Variant]&term=",
                 "allowFreeText": true
               }
             }
@@ -1458,7 +1458,7 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=taxonomy&term=",
+                "url": "/ebi-internal/ontology?branch=Characteristics[Sample type]&term=",
                 "allowFreeText": true
               }
             }
@@ -1468,8 +1468,27 @@
         {
           "columnDef": "protocol",
           "sticky": "true",
+          "data-type": "string",
           "header": "Protocol REF",
-          "cell": "(element) => element.executesProtocol.name"
+          "cell": "(element) => element.executesProtocol.name",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry|NMR spectroscopy",
+            "description": "",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Sample%20Protocol%20REF&term=",
+                "allowFreeText": true
+              }
+            }
+          }
         },
         {
           "columnDef": "source",
@@ -1666,6 +1685,131 @@
             }
           },
           "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Parameter Value[Autosampler model]",
+          "sticky": "false",
+          "header": "Parameter Value[Autosampler model]",
+          "data-type": "string",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the Liquid Chromatography autosampler model used.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Autosampler%20Model&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element.name"
+        },
+        {
+          "columnDef": "Parameter Value[Column model]",
+          "sticky": "false",
+          "header": "Parameter Value[Column model]",
+          "data-type": "string",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the LC column model used.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Column%20model&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element.name"
+        },
+        {
+          "columnDef": "Parameter Value[Column type]",
+          "sticky": "false",
+          "header": "Parameter Value[Column type]",
+          "data-type": "string",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the chromatography column type used",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Column%20type&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element.name"
+        },
+        {
+          "columnDef": "Parameter Value[Guard column]",
+          "sticky": "false",
+          "header": "Parameter Value[Guard column]",
+          "data-type": "string",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the LC guard column used.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Guard%20Column%20model&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element.name"
+        },
+        {
+          "columnDef": "Parameter Value[Scan polarity]",
+          "sticky": "false",
+          "header": "Parameter Value[Scan polarity]",
+          "data-type": "string",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the scan polarity.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Scan%20Polarity&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element.name"
         },
         {
           "columnDef": "Parameter Value[Instrument]",
