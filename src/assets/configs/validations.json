@@ -1477,6 +1477,31 @@
           "header": "Source Name",
           "conditional": false,
           "cell": "(element) => element "
+        },
+        {
+          "columnDef": "unit",
+          "sticky": "false",
+          "header": "Unit",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry|NMR spectroscopy",
+            "description": "Unit of current value. Example: hour, percent, microliter, etc.",
+            "placeholder": "hour, percent, UO:microliter",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=unit&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
         }
       ],
       "category": {
@@ -1624,7 +1649,7 @@
           "data-type": "ontology",
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "true",
+            "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1647,9 +1672,10 @@
           "sticky": "false",
           "header": "Parameter Value[Instrument]",
           "data-type": "ontology",
+          "techniqueNames": ["LCMS"],
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "true",
+            "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1666,8 +1692,7 @@
             }
           },
           "cell": "(element) => element"
-        }
-        ,
+        },
         {
           "columnDef": "Parameter Value[Ion source]",
           "sticky": "false",
@@ -1675,7 +1700,7 @@
           "data-type": "ontology",
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "true",
+            "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1701,7 +1726,7 @@
           "data-type": "ontology",
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "true",
+            "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1713,6 +1738,132 @@
               "is-forced-ontology": "false",
               "ontology": {
                 "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Mass%20Analyzer&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        } ,
+        {
+          "columnDef": "Parameter Value[NMR tube type]",
+          "sticky": "false",
+          "header": "Parameter Value[NMR tube type]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "NMR spectroscopy",
+            "description": "Please select the NMR tube type",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=NMR%20tube%20type&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Parameter Value[Solvent]",
+          "sticky": "false",
+          "header": "Parameter Value[Solvent]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "NMR spectroscopy",
+            "description": "Please select the NMR solvent",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=NMR%20solvent&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Parameter Value[Instrument]_NMR",
+          "sticky": "false",
+          "header": "Parameter Value[Instrument]",
+          "techniqueNames": ["NMR"],
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "NMR spectroscopy",
+            "description": "Please select the NMR Instrument",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=NMR%20Instrument&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Parameter Value[NMR Probe]",
+          "sticky": "false",
+          "header": "Parameter Value[NMR Probe]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "NMR spectroscopy",
+            "description": "Please select the NMR Probe",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=NMR%20probe&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "unit",
+          "sticky": "false",
+          "header": "Unit",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry|NMR spectroscopy",
+            "description": "Unit of current value. Example: tesla, mm, percent, percent, etc.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=unit&term=",
                 "allowFreeText": true
               }
             }

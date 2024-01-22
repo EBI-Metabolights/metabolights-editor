@@ -83,10 +83,13 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   ontologyCols: any = {};
   fileColumns: any = [];
+  controlListColumns: Map<string, any> = new Map<string, any>();
+  controlListValues: Map<string, Ontology[]> = new Map<string, Ontology[]>();
   ontologyColumns: any = [];
 
   isCellTypeFile = false;
   isCellTypeOntology = false;
+  isCellTypeControlList = false;
   selectedCellOntology: Ontology = null;
   selectedOntologyCell: any = null;
 
@@ -109,7 +112,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   isEditColumnMissingModalOpen = false;
 
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
-
+  ontologies = [];
   hit = false;
   baseHref: string;
   constructor(
@@ -118,6 +121,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     private editorService: EditorService
   ) {
     this.baseHref =this.editorService.configService.baseHref;
+    // const ontology3 = new Ontology();
+    // ontology3.name = "normal phase";
+
+    // this.ontologies.push(ontology3);
+    // const ontology = new Ontology();
+    // ontology.name = "reverse phase";
+    // this.ontologies.push(ontology);
+    // const ontology2 = new Ontology();
+    // ontology2.name = "HILIC";
+    // this.ontologies.push(ontology2);
   }
 
   ngOnInit() {
@@ -129,6 +142,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   setUpSubscriptions() {
     this.studyValidations.subscribe((value) => {
       this.validations = value;
+      if (this.validations && this.validation) {
+        this.detectControlListColumns();
+      }
     });
     this.studyFiles.subscribe((value) => {
       if (value) {
@@ -152,6 +168,23 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     // 	}
     // }
     return this.files;
+  }
+
+  getControlList(header) {
+    if(this.controlListColumns.has(header)){
+      if (this.controlListValues.has(header)) {
+        return this.controlListValues.get(header);
+      } else {
+        // const controlList = this.editorService.getControlLists(
+        //   this.controlListColumns.get(header)["ontology-details"]
+        // );
+        // this.controlListValues.set(header, controlList);
+        // return controlList;
+
+        return this.ontologies;
+      }
+    }
+    return [];
   }
 
   initialise() {
@@ -401,6 +434,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       ) {
         if (this.fileColumns.indexOf(col) === -1) {
           this.fileColumns.push(col);
+        }
+      }
+    });
+  }
+
+  detectControlListColumns() {
+    Object.keys(this.data.header).forEach((col) => {
+      if (!this.controlListColumns.has(col)) {
+        const definition = this.getControlListDefinition(col);
+        if (definition && col["data-type"] !== "ontology") {
+          this.controlListColumns.set(col, definition);
         }
       }
     });
@@ -870,7 +914,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       //   this.isCellTypeFile = true;
       // }
 
-      if (this.ontologyColumns.indexOf(column.header) > -1) {
+      if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
+        this.isCellTypeControlList = true;
+      } else if (this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;
         this.cellOntologyValue();
       }
@@ -1148,13 +1194,41 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
   }
 
-  columnValidations(header, id) {
+  getControlListDefinition(header) {
     let selectedColumn = null;
+    const tableTechnique = this.tableData.meta?.assayTechnique?.name;
     this.validation.default_order.forEach((col) => {
-      if (col.header === header && col["data-type"] === "ontology") {
-        selectedColumn = col;
+      if (col.header === header) {
+        if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
+          if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
+            selectedColumn = col;
+          }
+        } else {
+          selectedColumn = col;
+        }
       }
     });
+    return selectedColumn;
+  }
+
+  columnValidations(header, id) {
+    let selectedColumn = null;
+    const tableTechnique = this.tableData.meta?.assayTechnique?.name;
+    const validation = this.validation;
+    if ("default_order" in validation) {
+      this.validation.default_order.forEach((col) => {
+        if (col.header === header && col["data-type"] === "ontology") {
+          if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
+            if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
+              selectedColumn = col;
+            }
+          } else {
+            selectedColumn = col;
+          }
+        }
+      });
+    }
+
     if (selectedColumn) {
       return selectedColumn[id];
     } else {
