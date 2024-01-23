@@ -110,7 +110,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   selectedMissingKey = null;
   selectedMissingVal = null;
   isEditColumnMissingModalOpen = false;
-
+  assayTechnique: string = null;
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
   ontologies = [];
   hit = false;
@@ -142,9 +142,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   setUpSubscriptions() {
     this.studyValidations.subscribe((value) => {
       this.validations = value;
-      if (this.validations && this.validation) {
-        this.detectControlListColumns();
-      }
     });
     this.studyFiles.subscribe((value) => {
       if (value) {
@@ -918,6 +915,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       //   this.isCellTypeFile = true;
       // }
 
+      if (this.controlListColumns.size === 0 && this.validations && this.validation && this.data && this.data.header) {
+        this.detectControlListColumns();
+      }
       if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
         this.isCellTypeControlList = true;
         this.cellControlListValue();
@@ -1236,11 +1236,15 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getValidationDefinition(header) {
     let selectedColumn = null;
-    const tableTechnique = this.tableData.meta?.assayTechnique?.name;
+    if (this.tableData.name.startsWith("a_") && this.assayTechnique === null) {
+      const result = this.editorService.extractAssayDetails(this.tableData);
+      this.assayTechnique = result.assayTechnique;
+    }
+    // const tableTechnique = this.tableData.meta?.assayTechnique?.name;
     this.validation.default_order.forEach((col) => {
       if (col.header === header) {
-        if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
-          if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
+        if (this.assayTechnique !== null && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
+          if (col["techniqueNames"].indexOf(this.assayTechnique) > -1 ){
             selectedColumn = col;
           }
         } else {

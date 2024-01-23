@@ -130,8 +130,8 @@
     <span *ngIf="selectedCells.length > 0 && selectedOntologyCell">
       &nbsp;<span
         *ngIf="
-          selectedOntologyCell.termSource.name != '' &&
-          selectedOntologyCell.termAccession != ''
+          selectedOntologyCell.termSource.name !== '' &&
+          selectedOntologyCell.annotationValue !== ''
         "
       >
         &nbsp;<small class="tag is-normal is-default"

@@ -592,12 +592,15 @@ export class MetabolightsService extends DataService {
     if (ontologyUrl.endsWith("/") === false){
       ontologyUrl = ontologyUrl + "/";
     }
+    if (value.termSource.name === undefined || value.termSource.name === "") {
+      console.log("Empty ontology for accession" + value);
+    }
     const url =
     ontologyUrl +
       value.termSource.name +
       "/terms/" +
       encodeURI(encodeURIComponent(value.termAccession));
-    return this.http.get(url, httpOptions).pipe(catchError(this.handleError));
+    return this.http.get(url, httpOptions);
   }
 
   /**

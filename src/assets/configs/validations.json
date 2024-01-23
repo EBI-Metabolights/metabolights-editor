@@ -355,7 +355,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "true",
             "ontology": {
-              "url": "/ebi-internal/ontology?branch=publication&term=",
+              "url": "/ebi-internal/ontology?branch=Study%20Publication%20Status&term=",
               "allowFreeText": true
             }
           }
@@ -381,7 +381,7 @@
       "recommended-ontologies": {
         "is-forced-ontology": "false",
         "ontology": {
-          "url": "/ebi-internal/ontology?branch=design%20descriptor&term=",
+          "url": "/ebi-internal/ontology?branch=Study%20Design%20Type&term=",
           "allowFreeText": true
         }
       }
@@ -1278,7 +1278,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "false",
             "ontology": {
-              "url": "/ebi-internal/ontology?branch=factor&term=",
+              "url": "/ebi-internal/ontology?branch=Study%20Factor%20Type&term=",
               "allowFreeText": true
             }
           }
@@ -1326,7 +1326,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "false",
             "ontology": {
-              "url": "/ebi-internal/ontology?branch=factor&term=",
+              "url": "/ebi-internal/ontology?branch=Study%20Factor%20Type&term=",
               "allowFreeText": true
             }
           }
@@ -1537,7 +1537,7 @@
         "recommended-ontologies": {
           "is-forced-ontology": "false",
           "ontology": {
-            "url": "/ebi-internal/ontology?branch=factor&term=",
+            "url": "/ebi-internal/ontology?branch=Study%20Factor%20Type&term=",
             "allowFreeText": true
           }
         }
