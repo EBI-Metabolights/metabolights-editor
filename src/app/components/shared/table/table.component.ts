@@ -110,7 +110,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   selectedMissingKey = null;
   selectedMissingVal = null;
   isEditColumnMissingModalOpen = false;
-  assayTechnique: string = null;
+  assayTechnique: {name: string; sub: string; main: string} = {name: null, sub:null, main:null};
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
   ontologies = [];
   hit = false;
@@ -439,7 +439,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   detectControlListColumns() {
     Object.keys(this.data.header).forEach((col) => {
       if (!this.controlListColumns.has(col)) {
-        const definition = this.getValidationDefinition(col);
+        const formattedColumnName = col.replace(/\.[0-9]+$/, "");
+        const definition = this.getValidationDefinition(formattedColumnName);
         if (definition && definition["data-type"] !== "ontology"
           && "ontology-details" in definition
           && "recommended-ontologies" in definition["ontology-details"]
@@ -1236,15 +1237,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getValidationDefinition(header) {
     let selectedColumn = null;
-    if (this.tableData.name.startsWith("a_") && this.assayTechnique === null) {
+    if (this.tableData.name.startsWith("a_") && this.assayTechnique.name === null) {
       const result = this.editorService.extractAssayDetails(this.tableData);
-      this.assayTechnique = result.assayTechnique;
+      this.assayTechnique.name = result.assayTechnique?.name;
+      this.assayTechnique.sub = result.assaySubTechnique?.name;
+      this.assayTechnique.main = result.assayMainTechnique?.name;
     }
     // const tableTechnique = this.tableData.meta?.assayTechnique?.name;
     this.validation.default_order.forEach((col) => {
       if (col.header === header) {
-        if (this.assayTechnique !== null && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
-          if (col["techniqueNames"].indexOf(this.assayTechnique) > -1 ){
+        if (this.assayTechnique.name !== null && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
+          if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1 ){
             selectedColumn = col;
           }
         } else {
@@ -1257,7 +1260,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   columnValidations(header, id) {
     let selectedColumn = null;
-    const tableTechnique = this.tableData.meta?.assayTechnique?.name;
+    const tableTechnique = this.assayTechnique.name;
     const validation = this.validation;
     const detail = "ontology-details";
     if ("default_order" in validation) {

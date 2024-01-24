@@ -1889,6 +1889,58 @@
           "cell": "(element) => element"
         } ,
         {
+          "columnDef": "Protocol REF_LCMS",
+          "sticky": "false",
+          "header": "Protocol REF",
+          "data-type": "string",
+          "techniqueNames": ["LCMS"],
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectroscopy",
+            "description": "Please select the protocol reference name for LC-MS assay.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=LC-MS%20Protocol%20REF&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Protocol REF_GCMS",
+          "sticky": "false",
+          "header": "Protocol REF",
+          "data-type": "string",
+          "techniqueNames": ["GCMS"],
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectroscopy",
+            "description": "Please select the protocol reference name for GC-MS assay.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=GC-MS%20Protocol%20REF&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
           "columnDef": "Parameter Value[NMR tube type]",
           "sticky": "false",
           "header": "Parameter Value[NMR tube type]",
@@ -1983,6 +2035,57 @@
               "is-forced-ontology": "false",
               "ontology": {
                 "url": "/ebi-internal/ontology?branch=NMR%20probe&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Parameter Value[Pulse sequence name]",
+          "sticky": "false",
+          "header": "Parameter Value[Pulse sequence name]",
+          "data-type": "string",
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "NMR spectroscopy",
+            "description": "Please select the NMR tube type",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=NMR%20Pulse%20Sequence%20Name&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
+        {
+          "columnDef": "Protocol REF_NMR",
+          "sticky": "false",
+          "header": "Protocol REF",
+          "data-type": "string",
+          "techniqueNames": ["NMR"],
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "true",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "NMR spectroscopy",
+            "description": "Please select the protocol reference name for NMR assay.",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=NMR%20Protocol%20REF&term=",
                 "allowFreeText": true
               }
             }
