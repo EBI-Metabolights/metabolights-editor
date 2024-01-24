@@ -43,6 +43,7 @@ export class FactorComponent implements OnInit {
   isModalOpen = false;
   isTimeLineModalOpen = false;
   isDeleteModalOpen = false;
+  isDeleting = false;
 
   form: FormGroup;
   isFormBusy = false;
@@ -164,11 +165,13 @@ export class FactorComponent implements OnInit {
 
   delete() {
     if (!this.isStudyReadOnly) {
+      this.isDeleting = true;
       this.editorService.deleteFactor(this.factor.factorName).subscribe(
         (res) => {
           this.updateFactors(res, "Factor deleted.");
           this.isDeleteModalOpen = false;
           this.isModalOpen = false;
+          this.isDeleting = false;
         },
         (err) => {
           this.isFormBusy = false;
