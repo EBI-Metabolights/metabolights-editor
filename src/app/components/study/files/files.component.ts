@@ -431,9 +431,9 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     this.loadFiles();
   }
 
-  loadFiles() {
+  loadFiles(sync: boolean = false) {
     this.resetData();
-    this.filesLoading = true;
+    sync ? this.filesLoading = false : this.filesLoading = true;
     this.rawFilesLoading = true;
     this.refreshingData = true;
 
@@ -592,6 +592,6 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   }
 
   onFilesSynchronized($event): void {
-    this.loadFiles();
+    this.loadFiles(true);
   }
 }
