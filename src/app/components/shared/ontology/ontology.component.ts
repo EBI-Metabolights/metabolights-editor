@@ -404,11 +404,11 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   reset() {
-    this.inputValue = "";
-    this.allvalues = [];
-    this.valueCtrl.setValue(null);
+    // this.inputValue = "";
+    // this.allvalues = [];
     this.values = [];
-    this.retrieveMore();
+    this.valueCtrl.setValue(null);
+    // this.retrieveMore();
   }
 
   triggerChanges() {

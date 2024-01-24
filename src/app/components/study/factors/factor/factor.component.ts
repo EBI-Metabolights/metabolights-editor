@@ -101,7 +101,7 @@ export class FactorComponent implements OnInit {
       if (this.addNewFactor) {
         this.factor = new MTBLSFactor();
         if (this.factorTypeComponent) {
-          this.factorTypeComponent.values = [];
+          this.factorTypeComponent.reset();
         }
       }
       this.initialiseForm();
