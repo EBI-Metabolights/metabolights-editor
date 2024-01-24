@@ -1237,7 +1237,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getValidationDefinition(header) {
     let selectedColumn = null;
-    if (this.tableData.name.startsWith("a_") && this.assayTechnique.name === null) {
+    if (this.tableData?.data?.file && this.tableData.data.file.startsWith("a_") && this.assayTechnique.name === null) {
       const result = this.editorService.extractAssayDetails(this.tableData);
       this.assayTechnique.name = result.assayTechnique?.name;
       this.assayTechnique.sub = result.assaySubTechnique?.name;
