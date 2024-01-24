@@ -252,7 +252,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "true",
             "ontology": {
-              "url": "/ebi-internal/ontology?branch=role&term=",
+              "url": "/ebi-internal/ontology?branch=Study%Person%Role&term=",
               "allowFreeText": false
             }
           }
@@ -343,7 +343,7 @@
           "is-hidden": "false",
           "technique": "mass spectrometry|NMR spectroscopy",
           "description": "The status of this publication, e.g. Published, Submitted, etc.",
-          "placeholder": "In preparation, Published, etc",
+          "placeholder": "In preparation, published, etc",
           "rules": [
             {
               "condition": "min",
@@ -1737,7 +1737,7 @@
           "cell": "(element) => element.name"
         },
         {
-          "columnDef": "Parameter Value[Column type]",
+          "columnDef": "LC_MS_Parameter Value[Column type]",
           "sticky": "false",
           "header": "Parameter Value[Column type]",
           "data-type": "string",
@@ -1754,7 +1754,33 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=Liquid%20Chromatography%20Column%20type&term=",
+                "url": "/ebi-internal/ontology?branch=LC-MS%20Parameter%20Value[Column type]&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element.name"
+        },
+        {
+          "columnDef": "GC_MS_Parameter Value[Column type]",
+          "sticky": "false",
+          "header": "Parameter Value[Column type]",
+          "data-type": "string",
+          "techniqueNames": ["GCMS"],
+          "ontology-details": {
+            "data-type": "string",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the chromatography column type used",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=GC-MS%20Parameter%20Value[Column type]&term=",
                 "allowFreeText": true
               }
             }
@@ -1855,14 +1881,38 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Ion%20Source&term=",
+                "url": "/ebi-internal/ontology?branch=LC-MS%20Parameter%20Value[Ion%20source]&term=",
                 "allowFreeText": true
               }
             }
           },
           "cell": "(element) => element"
-        }
-        ,
+        },
+        {
+          "columnDef": "GC-MS_Parameter Value[Ion source]",
+          "sticky": "false",
+          "header": "Parameter Value[Ion source]",
+          "data-type": "ontology",
+          "ontology-details": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry",
+            "description": "Please select the mass spectrometry ion source",
+            "placeholder": "",
+            "rules": [
+            ],
+            "recommended-ontologies": {
+              "is-forced-ontology": "false",
+              "ontology": {
+                "url": "/ebi-internal/ontology?branch=GC-MS%20Parameter%20Value[Ion%20source]&term=",
+                "allowFreeText": true
+              }
+            }
+          },
+          "cell": "(element) => element"
+        },
         {
           "columnDef": "Parameter Value[Mass analyzer]",
           "sticky": "false",
@@ -1881,13 +1931,13 @@
             "recommended-ontologies": {
               "is-forced-ontology": "false",
               "ontology": {
-                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Mass%20Analyzer&term=",
+                "url": "/ebi-internal/ontology?branch=Parameter%20Value[Mass%20analyzer]&term=",
                 "allowFreeText": true
               }
             }
           },
           "cell": "(element) => element"
-        } ,
+        },
         {
           "columnDef": "Protocol REF_LCMS",
           "sticky": "false",
