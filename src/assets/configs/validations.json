@@ -1295,7 +1295,7 @@
           "is-read-only": "false",
           "is-hidden": "false",
           "technique": "mass spectrometry|NMR spectroscopy",
-          "description": "The name of the Factor driving this study, e.g. Dose, Collection Time Point, Compound, and so forth",
+          "description": "The name of the Factor driving this study, e.g. (Factor name: BMI and factor type: EFO:body mass index), (Factor name: Biological replicate, Factor type EFO:biological replicate) so forth",
           "placeholder": "Dose, Genotype, Collection time point",
           "rules": [
             {
@@ -1531,7 +1531,7 @@
         "label": "Characteristic",
         "is-hidden": "false",
         "technique": "mass spectrometry|NMR spectroscopy",
-        "description": "Characteristic category type. Example: Organism, Organism part, Variant // this needs different examples",
+        "description": "Characteristic category type other than Organism, Organism part, Variant and Sample type. ",
         "placeholder": "Example: Organism, Organism part, Variant",
         "rules": [],
         "recommended-ontologies": {
@@ -1545,7 +1545,7 @@
       "unit": {
         "data-type": "ontology",
         "sort-order": "2",
-        "is-required": "true",
+        "is-required": "false",
         "is-read-only": "false",
         "label": "Add unit (if applicable)",
         "is-hidden": "false",

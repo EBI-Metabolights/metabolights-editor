@@ -128,15 +128,12 @@
       />
     </span>
     <span *ngIf="selectedCells.length > 0 && selectedOntologyCell">
-      &nbsp;<span
-        *ngIf="
-          selectedOntologyCell.termSource.name !== '' &&
-          selectedOntologyCell.annotationValue !== ''
-        "
+      <span
+        *ngIf=" selectedOntologyCell.annotationValue !== ''"
       >
         &nbsp;<small class="tag is-normal is-default"
-          >{{ selectedOntologyCell.annotationValue }} |
-          {{ selectedOntologyCell.termSource.name }}
+          >{{ selectedOntologyCell.termSource.name }}:{{ selectedOntologyCell.annotationValue }}
+
         </small>
       </span>
     </span>

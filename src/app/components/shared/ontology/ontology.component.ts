@@ -10,8 +10,7 @@ import {
   EventEmitter,
   ViewChild,
 } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ValidateRules } from "./ontology.validator";
+import { FormGroup } from "@angular/forms";
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
 import { FormControl } from "@angular/forms";
 import {
@@ -19,15 +18,12 @@ import {
   MatAutocompleteTrigger,
 } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
-import { Observable, fromEvent } from "rxjs";
+import { Observable } from "rxjs";
 import {
   map,
-  filter,
   debounceTime,
   distinctUntilChanged,
   startWith,
-  switchAll,
-  tap,
 } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
 
@@ -45,6 +41,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("validations") validations: any;
   @Input("values") values: Ontology[] = [];
   @Input("inline") isInline: boolean;
+  @Input("controlListTerm") controlListTerm = false;
   @Input("id") id: string;
 
   @Output() changed = new EventEmitter<any>();
@@ -165,7 +162,12 @@ export class OntologyComponent implements OnInit, OnChanges {
                       val ? this._filter(val) : this.allvalues.slice()
                     )
                   );
-                });
+                },
+                (err) => {
+                  console.log(err);
+                  this.loading = false;
+                }
+                );
             }
           } else {
             this.inputValue = "";
@@ -292,18 +294,24 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.allvalues = [];
         this.loading = false;
         const jsonConvert: JsonConvert = new JsonConvert();
-        terms.OntologyTerm.forEach((ontTerm) => {
-          this.allvalues.push(jsonConvert.deserializeObject(ontTerm, Ontology));
-        });
-        this.fetchOntologyDetails();
-        this.termsLoading = false;
-        this.searchedMore = true;
-        this.filteredvalues = this.valueCtrl.valueChanges.pipe(
-          startWith(null),
-          map((value: Ontology | null) =>
-            value ? this._filter(value) : this.allvalues.slice()
-          )
-        );
+        if (terms && "OntologyTerm" in terms){
+          terms.OntologyTerm.forEach((ontTerm) => {
+            this.allvalues.push(jsonConvert.deserializeObject(ontTerm, Ontology));
+          });
+          this.fetchOntologyDetails();
+          this.termsLoading = false;
+          this.searchedMore = true;
+          this.filteredvalues = this.valueCtrl.valueChanges.pipe(
+            startWith(null),
+            map((value: Ontology | null) =>
+              value ? this._filter(value) : this.allvalues.slice()
+            )
+          );
+        }
+      },
+      (err) => {
+        console.log(err);
+        this.loading = false;
       });
   }
 
@@ -340,14 +348,13 @@ export class OntologyComponent implements OnInit, OnChanges {
         if (this.indexOfObject(this.values, "annotationValue", value) === -1) {
           const newOntology = new Ontology();
           newOntology.annotationValue = value.trim();
-          newOntology.termAccession =
-            "http://www.ebi.ac.uk/metabolights/ontology/placeholder";
+          newOntology.termAccession = "";
           newOntology.termSource = new OntologySourceReference();
-          newOntology.termSource.description = "User defined terms";
-          newOntology.termSource.file = "https://www.ebi.ac.uk/metabolights/";
-          newOntology.termSource.name = "MTBLS";
-          newOntology.termSource.provenance_name = "metabolights";
-          newOntology.termSource.version = "1.0";
+          newOntology.termSource.description = "";
+          newOntology.termSource.file = "";
+          newOntology.termSource.name = "";
+          newOntology.termSource.provenance_name = "";
+          newOntology.termSource.version = "";
           this.setValue(newOntology);
         }
         const inputElement = document.getElementById(
@@ -416,11 +423,13 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   private _filter(value: Ontology): Ontology[] {
-    if (value.annotationValue) {
+    if (value && value.annotationValue) {
       const filterValue = value.annotationValue.toLowerCase();
       return this.allvalues.filter(
         (val) => val.annotationValue.toLowerCase().indexOf(filterValue) === 0
       );
+    } else {
+      return this.allvalues.slice();
     }
   }
 }

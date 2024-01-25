@@ -84,9 +84,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ontologyCols: any = {};
   fileColumns: any = [];
   controlListColumns: Map<string, any> = new Map<string, any>();
-  controlListValues: Map<string, Ontology[]> = new Map<string, Ontology[]>();
+  controlListNames: Map<string, string> = new Map<string, string>();
   ontologyColumns: any = [];
-
+  isFormBusy = false;
   isCellTypeFile = false;
   isCellTypeOntology = false;
   isCellTypeControlList = false;
@@ -169,17 +169,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getControlList(header) {
     if(this.controlListColumns.has(header)){
-      if (this.controlListValues.has(header)) {
-        return this.controlListValues.get(header);
-      } else {
-        // const controlList = this.editorService.getControlLists(
-        //   this.controlListColumns.get(header)["ontology-details"]
-        // );
-        // this.controlListValues.set(header, controlList);
-        // return controlList;
 
-        return this.ontologies;
-      }
     }
     return [];
   }
@@ -397,6 +387,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
 
     if (cellsToUpdate.length > 0) {
+      this.isFormBusy = true;
       this.editorService
         .updateCells(
           this.data.file,
@@ -414,6 +405,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
               tapToDismiss: false,
             });
             this.loading = false;
+            this.isFormBusy = false;
           },
           (err) => {
             console.error(err);
@@ -445,7 +437,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           && "ontology-details" in definition
           && "recommended-ontologies" in definition["ontology-details"]
           && definition["ontology-details"]["recommended-ontologies"]) {
-          this.controlListColumns.set(col, definition);
+            const prefix = definition["ontology-details"]["recommended-ontologies"].ontology?.url;
+            let branch = "";
+            const branchParam = prefix.split("branch=");
+            if (branchParam.length > 1) {
+              branch = decodeURI(branchParam[1].split("&")[0]);
+            }
+            if (branch.length > 0) {
+              this.controlListNames.set(col, branch);
+              this.controlListColumns.set(col, definition);
+            }
         }
       }
     });
@@ -609,6 +610,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   addColumns(columns) {
+    this.isFormBusy = true;
     this.editorService
       .addColumns(this.data.file, { data: columns }, this.validationsId, null)
       .subscribe(
@@ -620,10 +622,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             extendedTimeOut: 0,
             tapToDismiss: false,
           });
+          this.isFormBusy = false;
           return true;
         },
         (err) => {
           console.log(err);
+          this.isFormBusy = false;
           return false;
         }
       );
@@ -654,6 +658,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   updateRows(rows) {
+    this.isFormBusy = true;
     this.editorService
       .updateRows(this.data.file, { data: rows }, this.validationsId, null)
       .subscribe(
@@ -665,12 +670,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             extendedTimeOut: 0,
             tapToDismiss: false,
           });
+          this.isFormBusy = false;
         },
-        (err) => {}
+        (err) => {
+          this.isFormBusy = false;
+        }
       );
   }
 
   addRows(rows, index) {
+    this.isFormBusy = true;
     this.editorService
       .addRows(
         this.data.file,
@@ -692,8 +701,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             }
           );
           this.rowsUpdated.emit();
+          this.isFormBusy = false;
         },
-        (err) => {}
+        (err) => {
+          this.isFormBusy = false;
+        }
       );
   }
 
@@ -722,6 +734,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   deleteSelectedRows() {
+    this.isFormBusy = true;
     this.editorService
       .deleteRows(
         this.data.file,
@@ -740,8 +753,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             tapToDismiss: false,
           });
           this.rowsUpdated.emit();
+          this.isFormBusy = false;
         },
-        (err) => {}
+        (err) => {
+          this.isFormBusy = false;
+        }
       );
   }
 
@@ -1001,7 +1017,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         },
       ];
     }
-
+    this.isFormBusy = true;
     this.editorService
       .updateCells(
         this.data.file,
@@ -1019,9 +1035,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             tapToDismiss: false,
           });
           this.isEditModalOpen = false;
+          this.isFormBusy = false;
         },
         (err) => {
           console.error(err);
+          this.isFormBusy = false;
         }
       );
   }
@@ -1076,7 +1094,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         );
       }
     });
-
+    this.isFormBusy = true;
     this.editorService
       .updateCells(
         this.data.file,
@@ -1094,9 +1112,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             tapToDismiss: false,
           });
           this.closeEditMissingColValModal();
+          this.isFormBusy = false;
         },
         (err) => {
           console.error(err);
+          this.isFormBusy = false;
         }
       );
   }
@@ -1149,7 +1169,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         });
       });
     }
-
+    this.isFormBusy = true;
     this.editorService
       .updateCells(
         this.data.file,
@@ -1160,16 +1180,18 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       .subscribe(
         (res) => {
           toastr.success("Cells updated successfully", "Success", {
-            timeOut: "2500",
+            timeOut: "4000",
             positionClass: "toast-top-center",
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
           });
           this.isEditColumnModalOpen = false;
+          this.isFormBusy = false;
         },
         (err) => {
           console.error(err);
+          this.isFormBusy = false;
         }
       );
   }
@@ -1180,16 +1202,29 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
 
   cellControlListValue() {
-    const columnIndex = this.data.header[this.selectedCell["column"].header];
-
-    const cellValue =
-      this.selectedCell["row"][this.selectedCell["column"].header];
+    const selectedCellColumn = this.selectedCell["column"].header;
+    const cellValue = this.selectedCell["row"][this.selectedCell["column"].header];
     if (cellValue && cellValue !== "" && cellValue !== undefined) {
       const newOntology = new Ontology();
-      newOntology.annotationValue =
-        this.selectedCell["row"][this.selectedCell["column"].header];
-      newOntology.termAccession = "";
       newOntology.termSource = new OntologySourceReference();
+      const value = this.selectedCell["row"][this.selectedCell["column"].header];
+      newOntology.annotationValue = value;
+      if (this.controlListNames.has(selectedCellColumn)){
+        const controlListName = this.controlListNames.get(selectedCellColumn);
+        if (controlListName in this.editorService.defaultControlLists){
+          const defaultControlList = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+          const values = defaultControlList.filter((val) => val.annotationValue === value);
+          if (values.length > 0) {
+            newOntology.termAccession = values[0].termAccession;
+            newOntology.termSource.name = values[0].termSource.name;
+            newOntology.termSource.provenance_name = values[0].termSource.provenanceName;
+            newOntology.termSource.file = values[0].termSource.file;
+            this.selectedCellOntology = newOntology;
+            return;
+          }
+        }
+      }
+      newOntology.termAccession = "";
       newOntology.termSource.description = "";
       newOntology.termSource.file = "";
       newOntology.termSource.name = "";
@@ -1202,31 +1237,21 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   cellOntologyValue() {
-    const columnIndex = this.data.header[this.selectedCell["column"].header];
-    let termSourceRef = null;
-    Object.keys(this.data.header).forEach((val) => {
-      if (this.data.header[val] === columnIndex + 1) {
-        termSourceRef = val;
-      }
-    });
+    const columnIndex = this.data.header[this.selectedCell["column"].header].index;
+    const termSourceRefColumnName = this.data.columns[columnIndex + 1].header;
+    const termAccessionColumnName = this.data.columns[columnIndex + 2].header;;
 
-    let termSourceAccession = null;
-    Object.keys(this.data.header).forEach((val) => {
-      if (this.data.header[val] === columnIndex + 2) {
-        termSourceAccession = val;
-      }
-    });
     const cellValue =
       this.selectedCell["row"][this.selectedCell["column"].header];
     if (cellValue && cellValue !== "" && cellValue !== undefined) {
       const newOntology = new Ontology();
       newOntology.annotationValue =
         this.selectedCell["row"][this.selectedCell["column"].header];
-      newOntology.termAccession = termSourceAccession;
+      newOntology.termAccession = this.selectedCell["row"][termAccessionColumnName];
       newOntology.termSource = new OntologySourceReference();
       newOntology.termSource.description = "";
       newOntology.termSource.file = "";
-      newOntology.termSource.name = termSourceRef;
+      newOntology.termSource.name = this.selectedCell["row"][termSourceRefColumnName];
       newOntology.termSource.provenance_name = "";
       newOntology.termSource.version = "";
       this.selectedCellOntology = newOntology;
@@ -1259,13 +1284,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   columnValidations(header, id) {
+    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
     let selectedColumn = null;
     const tableTechnique = this.assayTechnique.name;
     const validation = this.validation;
     const detail = "ontology-details";
     if ("default_order" in validation) {
       this.validation.default_order.forEach((col) => {
-        if (col.header === header &&  detail in col && col[detail] && "recommended-ontologies" in col[detail]) {
+        if (col.header === formattedColumnName &&  detail in col && col[detail] && "recommended-ontologies" in col[detail]) {
           if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
             if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
               selectedColumn = col;
@@ -1360,7 +1386,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         );
       }
     });
-
+    this.isFormBusy = true;
     this.editorService
       .updateCells(
         this.data.file,
@@ -1378,9 +1404,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             tapToDismiss: false,
           });
           this.isEditColumnModalOpen = false;
+          this.isFormBusy = false;
         },
         (err) => {
           console.error(err);
+          this.isFormBusy = false;
         }
       );
   }
@@ -1400,22 +1428,23 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.selectedCells.length > 0) {
       firstCell = this.selectedCells[0];
     }
-    const tableHeader = this.data.header;
-    const columns = Object.keys(tableHeader).sort(
-      (a, b) => tableHeader[a] - tableHeader[b]
-    );
-    const columnIndex = tableHeader[firstCell[0]];
+    const columnName = firstCell[0];
+    const columnIndex = this.data.header[columnName].index;
+    // const columns = Object.keys(tableHeader).sort(
+    //   (a, b) => tableHeader[a] - tableHeader[b]
+    // );
+    // const columnIndex = tableHeader[firstCell[0]];
     if (firstCell) {
       if (this.ontologyCols[firstCell[0]]) {
         const sOntology = new Ontology();
         sOntology.annotationValue = this.data.rows[firstCell[1]][firstCell[0]];
         sOntology.termAccession =
-          this.data.rows[firstCell[1]][columns[columnIndex + 2]];
+          this.data.rows[firstCell[1]][this.data.columns[columnIndex + 2].header];
         sOntology.termSource = new OntologySourceReference();
         sOntology.termSource.description = "";
         sOntology.termSource.file = "";
         sOntology.termSource.name =
-          this.data.rows[firstCell[1]][columns[columnIndex + 1]];
+          this.data.rows[firstCell[1]][this.data.columns[columnIndex + 1].header];
         sOntology.termSource.provenance_name = "";
         sOntology.termSource.version = "";
         this.selectedOntologyCell = sOntology;
