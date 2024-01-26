@@ -301,11 +301,9 @@
                   <mtbls-ontology
                     [id]="'editOntologyColumn'"
                     [validations]="
-                      columnValidations(
-                        selectedColumn['header'],
-                        'ontology-details'
-                      )
+                      columnValidations(selectedColumn['header'])
                     "
+                    [controlList]="columnControlList(selectedColumn['header'])"
                     (changed)="onChanges($event)"
                     [values]="[]"
                     [inline]="true"
@@ -380,10 +378,10 @@
                     [id]="'editOntologyCell'"
                     [validations]="
                       columnValidations(
-                        selectedCell['column']['header'],
-                        'ontology-details'
+                        selectedCell['column']['header']
                       )
                     "
+                    [controlList]="columnControlList(selectedCell['column']['header'])"
                     (changed)="onEditCellChanges($event)"
                     [values]="[selectedCellOntology]"
                     [inline]="true"
@@ -416,10 +414,10 @@
                     [id]="'editControlListCell'"
                     [validations]="
                       columnValidations(
-                        selectedCell['column']['header'],
-                        'ontology-details'
+                        selectedCell['column']['header']
                       )
                     "
+                    [controlList]="columnControlList(selectedCell['column']['header'])"
                     (changed)="onEditCellChanges($event)"
                     [values]="[selectedCellOntology]"
                     [inline]="true"
@@ -506,7 +504,7 @@
             <mtbls-ontology
               [id]="'editMissingOntology'"
               [validations]="
-                columnValidations(selectedMissingKey, 'ontology-details')
+                columnValidations(selectedMissingKey)
               "
               (changed)="onChanges($event)"
               [values]="[selectedMissingVal]"

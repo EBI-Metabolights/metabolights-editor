@@ -24,6 +24,7 @@ import {
   debounceTime,
   distinctUntilChanged,
   startWith,
+  concatAll,
 } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
 
@@ -41,7 +42,8 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("validations") validations: any;
   @Input("values") values: Ontology[] = [];
   @Input("inline") isInline: boolean;
-  @Input("controlListTerm") controlListTerm = false;
+  @Input("sourceValueType") sourceValueType = "ontology";
+  @Input("controlList") controlList: {name: string; values: Ontology[]} = {name: '', values: []};
   @Input("id") id: string;
 
   @Output() changed = new EventEmitter<any>();
@@ -65,11 +67,13 @@ export class OntologyComponent implements OnInit, OnChanges {
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
   valueCtrl = new FormControl();
-  filteredvalues: Observable<Ontology[]>;
+  filteredValuesObserver: Observable<Ontology[]>;
+  currentOptions = [];
   allvalues: Array<Ontology> = [];
   ontologyDetails: any = {};
   readonly = false;
   baseHref: string;
+
 
   constructor(
     private editorService: EditorService,
@@ -99,86 +103,8 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
+    this.url = "/internal-ebi/ontology";
     this.readonly = this.editorService.ngRedux.getState().study.readonly;
-
-
-    this.getDefaultTerms();
-
-    this.valueCtrl.valueChanges
-      .pipe(distinctUntilChanged(), debounceTime(200))
-      .subscribe(
-        (value) => {
-          if (value && value !== "") {
-            this.inputValue = value;
-            // this.allvalues = [];
-            this.values = this.values.filter((el) => el !== null);
-
-            if (this.values.length < 2) {
-              let term = "";
-              let ontologyFilter = null;
-              try {
-                if (typeof value === "string"){
-                  if( value && value.indexOf(":") > -1) {
-                    term = value.split(":")[1];
-                    ontologyFilter = value.split(":")[0];
-                  } else {
-                    term = value;
-                  }
-                } else if ("annotationValue" in value) {
-                  term = value.annotationValue;
-                }
-              } catch(err) {
-                console.log(err);
-              }
-
-              this.termsLoading = false;
-              this.searchedMore = false;
-              this.loading = true;
-              this.editorService
-                .getOntologyTerms(this.baseURL + this.url + term)
-                .subscribe((terms) => {
-                  this.allvalues = [];
-                  this.loading = false;
-                  const jsonConvert: JsonConvert = new JsonConvert();
-                  if (terms.OntologyTerm) {
-                    terms.OntologyTerm.forEach((t) => {
-                      const tempOntTerm = jsonConvert.deserializeObject(
-                        t,
-                        Ontology
-                      );
-                      if (ontologyFilter) {
-                        if (tempOntTerm.termSource.name === ontologyFilter) {
-                          this.allvalues.push(tempOntTerm);
-                        }
-                      } else {
-                        this.allvalues.push(tempOntTerm);
-                      }
-                    });
-                  }
-                  this.fetchOntologyDetails();
-                  this.filteredvalues = this.valueCtrl.valueChanges.pipe(
-                    startWith(null),
-                    map((val: Ontology | null) =>
-                      val ? this._filter(val) : this.allvalues.slice()
-                    )
-                  );
-                },
-                (err) => {
-                  console.log(err);
-                  this.loading = false;
-                }
-                );
-            }
-          } else {
-            this.inputValue = "";
-            this.getDefaultTerms();
-          }
-        },
-        (err) => console.error(err)
-      );
-  }
-
-  getDefaultTerms() {
     if (this.readonly === false && "recommended-ontologies" in this.validations) {
       if (this.validations["recommended-ontologies"]) {
         this.isforcedOntology =
@@ -187,30 +113,149 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.addOnBlur =
           this.validations["recommended-ontologies"].ontology.allowFreeText;
         this.endPoints = this.validations["recommended-ontologies"].ontology;
-        if (this.url !== "") {
-          this.editorService
-            .getOntologyTerms(this.baseURL + this.url)
-            .subscribe((terms) => {
-              this.allvalues = [];
-              if (terms.OntologyTerm) {
-                const jsonConvert: JsonConvert = new JsonConvert();
-                terms.OntologyTerm.forEach((term) => {
-                  this.allvalues.push(
-                    jsonConvert.deserializeObject(term, Ontology)
-                  );
-                });
-              }
-              this.fetchOntologyDetails();
-              this.filteredvalues = this.valueCtrl.valueChanges.pipe(
-                startWith(null),
-                map((value: Ontology | null) =>
-                  value ? this._filter(value) : this.allvalues.slice()
-                )
-              );
-            });
-        }
       }
     }
+    this.getDefaultTerms();
+    // this.filteredvalues = this.valueCtrl.valueChanges.pipe(
+    //   map((value: Ontology | null) =>
+    //     value ? this._filter(value) : this.allvalues.slice()
+    //   )
+    // );
+
+    this.valueCtrl.valueChanges.pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe( (value) => this.searchTerm(value, false));
+
+
+    // this.valueCtrl.setValue("");
+    // this.searchTerm(null);
+
+    this.valueCtrl.setValue("");
+
+  }
+
+  searchTerm(value: any, remoteSearch: boolean = false){
+    if (value === null || value === undefined || value.length === 0) {
+      this.currentOptions = this.controlList.values.slice();
+      this.searchedMore = false;
+      return this.currentOptions;
+    }
+    this.inputValue = value;
+    this.values = this.values.filter((el) => el !== null);
+    let urlSuffix = "";
+    if (remoteSearch){
+      urlSuffix = "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}";
+    }
+    this.searchedMore = false;
+    this.allvalues = [];
+    if (value && value !== "") {
+      if (this.values.length < 2) {
+        let term = "";
+        let ontologyFilter = null;
+        try {
+          if (typeof value === "string"){
+            if( value && value.indexOf(":") > -1) {
+              term = value.split(":")[1];
+              ontologyFilter = value.split(":")[0];
+            } else {
+              term = value;
+            }
+          } else if ("annotationValue" in value) {
+            term = value.annotationValue;
+          }
+        } catch(err) {
+          console.log(err);
+        }
+
+        this.termsLoading = true;
+        this.loading = true;
+        this.isFormBusy = true;
+        this.currentOptions = [];
+        this.editorService
+          .getOntologyTerms(this.baseURL + this.url + term + urlSuffix)
+          .subscribe((terms) => {
+            this.allvalues = [];
+            this.termsLoading = false;
+            this.loading = false;
+            const jsonConvert: JsonConvert = new JsonConvert();
+            if (terms.OntologyTerm) {
+              terms.OntologyTerm.forEach((t) => {
+                const tempOntTerm = jsonConvert.deserializeObject(
+                  t,
+                  Ontology
+                );
+                if (ontologyFilter) {
+                  if (tempOntTerm.termSource.name === ontologyFilter) {
+                    this.allvalues.push(tempOntTerm);
+                  }
+                } else {
+                  this.allvalues.push(tempOntTerm);
+                }
+              });
+            }
+            this.fetchOntologyDetails();
+            this.searchedMore = remoteSearch;
+            this.isFormBusy = false;
+            // this.filteredvalues = this.valueCtrl.valueChanges.pipe(
+            //   startWith(null),
+            //   map((val: Ontology | null) =>
+            //     val ? this._filter(val) : this.allvalues.slice()
+            //   )
+            // );
+            this.currentOptions = this.allvalues.slice();
+
+          },
+          (err) => {
+            console.log(err);
+            this.loading = false;
+            this.termsLoading = false;
+            this.searchedMore = false;
+            this.isFormBusy = false;
+          }
+          );
+      }
+    } else {
+      this.getDefaultTerms();
+    }
+  }
+  getDefaultTerms() {
+    if (!this.readonly && this.controlList.values !== null){
+      this.allvalues = this.controlList.values;
+      this.searchedMore = false;
+    }
+
+
+    // if (this.readonly === false && "recommended-ontologies" in this.validations) {
+    //   if (this.validations["recommended-ontologies"]) {
+    //     this.isforcedOntology =
+    //       this.validations["recommended-ontologies"]["is-forced-ontology"];
+    //     this.url = this.validations["recommended-ontologies"].ontology.url;
+    //     this.addOnBlur =
+    //       this.validations["recommended-ontologies"].ontology.allowFreeText;
+    //     this.endPoints = this.validations["recommended-ontologies"].ontology;
+    //     if (this.url !== "") {
+    //       this.editorService
+    //         .getOntologyTerms(this.baseURL + this.url)
+    //         .subscribe((terms) => {
+    //           this.allvalues = [];
+    //           if (terms.OntologyTerm) {
+    //             const jsonConvert: JsonConvert = new JsonConvert();
+    //             terms.OntologyTerm.forEach((term) => {
+    //               this.allvalues.push(
+    //                 jsonConvert.deserializeObject(term, Ontology)
+    //               );
+    //             });
+    //           }
+    //           this.fetchOntologyDetails();
+    //           this.filteredvalues = this.valueCtrl.valueChanges.pipe(
+    //             startWith(null),
+    //             map((value: Ontology | null) =>
+    //               value ? this._filter(value) : this.allvalues.slice()
+    //             )
+    //           );
+    //         });
+    //     }
+    //   }
+    // }
   }
 
 
@@ -229,7 +274,8 @@ export class OntologyComponent implements OnInit, OnChanges {
       inputElement.value = "";
       this.triggerChanges();
     } else {
-      this.retrieveMore();
+      // this.retrieveMore();
+      this.searchTerm(this.inputValue, true);
       setTimeout(() => {
         this.valueInput.openPanel();
       });
@@ -237,6 +283,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   showMore(e, accession) {
+    this.termsLoading = true;
     this.editorService
       .getOntologyTermDescription(
         "https://www.ebi.ac.uk/ols/api/ontologies/" +
@@ -247,9 +294,11 @@ export class OntologyComponent implements OnInit, OnChanges {
       .subscribe(
         (response) => {
           accession.info = response;
+          this.termsLoading = false;
         },
         (error) => {
           accession.info = "-";
+          this.termsLoading = false;
         }
       );
   }
@@ -281,38 +330,35 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   retrieveMore() {
-    this.termsLoading = true;
-    this.allvalues = [];
-    const term = this.inputValue;
-    this.loading = true;
-    this.editorService
-      .getOntologyTerms(
-          this.baseURL + this.url + term +
-          "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
-      )
-      .subscribe((terms) => {
-        this.allvalues = [];
-        this.loading = false;
-        const jsonConvert: JsonConvert = new JsonConvert();
-        if (terms && "OntologyTerm" in terms){
-          terms.OntologyTerm.forEach((ontTerm) => {
-            this.allvalues.push(jsonConvert.deserializeObject(ontTerm, Ontology));
-          });
-          this.fetchOntologyDetails();
-          this.termsLoading = false;
-          this.searchedMore = true;
-          this.filteredvalues = this.valueCtrl.valueChanges.pipe(
-            startWith(null),
-            map((value: Ontology | null) =>
-              value ? this._filter(value) : this.allvalues.slice()
-            )
-          );
-        }
-      },
-      (err) => {
-        console.log(err);
-        this.loading = false;
-      });
+
+    // this.termsLoading = true;
+
+    // this.allvalues = [];
+
+    // this.loading = true;
+    // this.editorService
+    //   .getOntologyTerms(
+    //       this.baseURL + this.url + term +
+    //       "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}"
+    //   )
+    //   .subscribe((terms) => {
+    //     this.allvalues = [];
+    //     this.loading = false;
+    //     const jsonConvert: JsonConvert = new JsonConvert();
+    //     if (terms && "OntologyTerm" in terms){
+    //       terms.OntologyTerm.forEach((ontTerm) => {
+    //         this.allvalues.push(jsonConvert.deserializeObject(ontTerm, Ontology));
+    //       });
+    //       this.fetchOntologyDetails();
+    //     }
+    //     this.searchedMore = true;
+    //     this.termsLoading = false;
+    //   },
+    //   (err) => {
+    //     console.log(err);
+    //     this.loading = false;
+    //     this.termsLoading = false;
+    //   });
   }
 
   indexOfObject(array, key, value): any {
@@ -334,7 +380,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (index >= 0) {
       this.values.splice(index, 1);
     }
-    if (this.values.length === 0) {
+    if (this.values.length === 0 && (this.inputValue === null || this.inputValue === "")) {
       this.getDefaultTerms();
     }
     this.triggerChanges();

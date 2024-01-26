@@ -57,6 +57,7 @@ import { QuillModule } from "ngx-quill";
 import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
 import { AsyncTaskComponent } from './async-task/async-task.component';
 import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transform.pipe";
+import { BrowserModule } from "@angular/platform-browser";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -98,6 +99,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
   ],
   imports: [
     CommonModule,
+    BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     NgReduxModule,

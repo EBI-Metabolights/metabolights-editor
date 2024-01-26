@@ -13,7 +13,7 @@
         class="button is-info"
         [ngClass]="startButtonClass"
         (click)="onStartButtonClick()" >
-          <span **ngIf="serverReady"><mat-icon>{{ startButtonIcon }}</mat-icon></span>
+          <span *ngIf="serverReady"><mat-icon>{{ startButtonIcon }}</mat-icon></span>
           {{ serverReady ? startButtonLabel : "Connecting..."}} </a>
           <div class="status-container">
             <div class="response"><b>LAST UPDATE:</b> {{lastResponse.task.last_update_time > 0 ? (lastResponse.task.last_update_time * 1000| date: 'MMM d, y, H:mm:ss z') : "-"}}</div>

@@ -39,6 +39,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChild(MatTable) table: MatTable<any>;
   @Input("tableData") tableData: any;
   @Input("validationsId") validationsId: any;
+  @Input("enableControlList") enableControlList = true;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -85,6 +86,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   fileColumns: any = [];
   controlListColumns: Map<string, any> = new Map<string, any>();
   controlListNames: Map<string, string> = new Map<string, string>();
+  controlLists: Map<string, {name: string; values: Ontology[]}> = new Map<string, {name: string; values: Ontology[]}>();
   ontologyColumns: any = [];
   isFormBusy = false;
   isCellTypeFile = false;
@@ -105,7 +107,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   isDeleteModalOpen = false;
   editCellform: FormGroup;
   editColumnform: FormGroup;
-
+  defaultControlList = Object.freeze({name: "", values: Object.freeze([])});
   selectedMissingCol = null;
   selectedMissingKey = null;
   selectedMissingVal = null;
@@ -433,7 +435,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       if (!this.controlListColumns.has(col)) {
         const formattedColumnName = col.replace(/\.[0-9]+$/, "");
         const definition = this.getValidationDefinition(formattedColumnName);
-        if (definition && definition["data-type"] !== "ontology"
+        if (definition
           && "ontology-details" in definition
           && "recommended-ontologies" in definition["ontology-details"]
           && definition["ontology-details"]["recommended-ontologies"]) {
@@ -445,7 +447,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             }
             if (branch.length > 0) {
               this.controlListNames.set(col, branch);
-              this.controlListColumns.set(col, definition);
+              this.controlListColumns.set(col, Object.freeze(definition));
             }
         }
       }
@@ -932,7 +934,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       //   this.isCellTypeFile = true;
       // }
 
-      if (this.controlListColumns.size === 0 && this.validations && this.validation && this.data && this.data.header) {
+      if (this.enableControlList && this.controlListColumns.size === 0
+        && this.validations && this.validation && this.data && this.data.header) {
         this.detectControlListColumns();
       }
       if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
@@ -1237,7 +1240,13 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   cellOntologyValue() {
-    const columnIndex = this.data.header[this.selectedCell["column"].header].index;
+    const data = this.data.header[this.selectedCell["column"].header];
+    let columnIndex = 0;
+    if (typeof data === 'number') {
+      columnIndex = data;
+    } else {
+      columnIndex = data.index;
+    }
     const termSourceRefColumnName = this.data.columns[columnIndex + 1].header;
     const termAccessionColumnName = this.data.columns[columnIndex + 2].header;;
 
@@ -1282,32 +1291,51 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
     return selectedColumn;
   }
-
-  columnValidations(header, id) {
-    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
-    let selectedColumn = null;
-    const tableTechnique = this.assayTechnique.name;
-    const validation = this.validation;
-    const detail = "ontology-details";
-    if ("default_order" in validation) {
-      this.validation.default_order.forEach((col) => {
-        if (col.header === formattedColumnName &&  detail in col && col[detail] && "recommended-ontologies" in col[detail]) {
-          if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
-            if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
-              selectedColumn = col;
-            }
-          } else {
-            selectedColumn = col;
-          }
+  columnControlList(header) {
+    if (header && this.controlListNames.has(header)){
+      if (this.controlLists.has(header)) {
+        return this.controlLists.get(header);
+      } else {
+        const controlListName = this.controlListNames.get(header);
+        if (controlListName in this.editorService.defaultControlLists) {
+          const ontologies = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+          this.controlLists.set(header, {name: header, values: ontologies});
+          return this.controlLists.get(header);
         }
-      });
+      }
     }
+    return this.defaultControlList;
+  }
 
-    if (selectedColumn) {
-      return selectedColumn[id];
-    } else {
-      return this.validations.default_ontology_validation["ontology-details"];
+  columnValidations(header) {
+    if (header && this.controlListColumns.size > 0 && this.controlListColumns.has(header)){
+      return this.controlListColumns.get(header)["ontology-details"];
     }
+    return this.validations.default_ontology_validation["ontology-details"];
+    // const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+    // let selectedColumn = null;
+    // const tableTechnique = this.assayTechnique.name;
+    // const validation = this.validation;
+    // const detail = "ontology-details";
+    // if ("default_order" in validation) {
+    //   this.validation.default_order.forEach((col) => {
+    //     if (col.header === formattedColumnName &&  detail in col && col[detail] && "recommended-ontologies" in col[detail]) {
+    //       if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
+    //         if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
+    //           selectedColumn = col;
+    //         }
+    //       } else {
+    //         selectedColumn = col;
+    //       }
+    //     }
+    //   });
+    // }
+
+    // if (selectedColumn) {
+    //   return selectedColumn[id];
+    // } else {
+    //   return this.validations.default_ontology_validation["ontology-details"];
+    // }
   }
 
   closeEditModal() {
@@ -1429,7 +1457,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       firstCell = this.selectedCells[0];
     }
     const columnName = firstCell[0];
-    const columnIndex = this.data.header[columnName].index;
+    // const columnIndex = this.data.header[columnName].index;
+    const data = this.data.header[columnName];
+    let columnIndex = 0;
+    if (typeof data === 'number') {
+      columnIndex = data;
+    } else {
+      columnIndex = data.index;
+    }
     // const columns = Object.keys(tableHeader).sort(
     //   (a, b) => tableHeader[a] - tableHeader[b]
     // );

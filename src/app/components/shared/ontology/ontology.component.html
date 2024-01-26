@@ -31,7 +31,7 @@
         <!-- (optionSelected)="selected($event)" -->
         <mat-option
           class="bb"
-          *ngFor="let value of filteredvalues | async"
+          *ngFor="let value of currentOptions"
           [value]="value"
         >
           <div class="columns np">
@@ -40,9 +40,9 @@
             </span>
             <span class="is-pulled-right column np has-text-right">
               <span
-                *ngIf="value.termSource.provenanceName"
+                *ngIf="value.termSource.provenance_name"
                 class="tag is-info"
-                >{{ value.termSource.provenanceName }}</span
+                >{{ value.termSource.provenance_name }}</span
               >&nbsp;
               <span *ngIf="value.termSource.name" class="tag is-success">{{
                 value.termSource.name
@@ -83,7 +83,7 @@
               </div>
             </span>
           </div>
-          <!-- <div *ngIf="value.termSource.name != 'MTBLS'" class="columns">
+          <div *ngIf="value.termSource.name != 'MTBLS'" class="columns">
             <span>
               <div *ngIf="!value.info && value.info == null; else displayInfo">
                 <a (mouseenter)="showMore($event, value)"> more info... </a>
@@ -126,7 +126,7 @@
                 </ng-template>
               </ng-template>
             </span>
-          </div> -->
+          </div>
         </mat-option>
         <span *ngIf="!searchedMore">
           <span *ngIf="termsLoading; else showMore">
