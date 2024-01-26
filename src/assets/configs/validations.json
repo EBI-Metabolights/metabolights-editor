@@ -1864,7 +1864,7 @@
           "cell": "(element) => element"
         },
         {
-          "columnDef": "Parameter Value[Ion source]",
+          "columnDef": "LC-MS_Parameter Value[Ion source]",
           "sticky": "false",
           "header": "Parameter Value[Ion source]",
           "data-type": "ontology",
@@ -1893,13 +1893,14 @@
           "sticky": "false",
           "header": "Parameter Value[Ion source]",
           "data-type": "ontology",
+          "techniqueNames": ["GCMS"],
           "ontology-details": {
             "data-type": "ontology",
             "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
-            "description": "Please select the mass spectrometry ion source",
+            "description": "Please select ion source for GC-MS assay.",
             "placeholder": "",
             "rules": [
             ],

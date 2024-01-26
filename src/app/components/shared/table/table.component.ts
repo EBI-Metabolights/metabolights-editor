@@ -1278,18 +1278,22 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       this.assayTechnique.main = result.assayMainTechnique?.name;
     }
     // const tableTechnique = this.tableData.meta?.assayTechnique?.name;
+    let techniqueSpecificColumn = null;
     this.validation.default_order.forEach((col) => {
       if (col.header === header) {
         if (this.assayTechnique.name !== null && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
           if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1 ){
             selectedColumn = col;
+            if (techniqueSpecificColumn === null ) {
+              techniqueSpecificColumn = col;
+            }
           }
         } else {
           selectedColumn = col;
         }
       }
     });
-    return selectedColumn;
+    return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
   columnControlList(header) {
     if (header && this.controlListNames.has(header)){
