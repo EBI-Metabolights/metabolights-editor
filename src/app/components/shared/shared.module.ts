@@ -10,7 +10,6 @@ import { AboutComponent } from "./about/about.component";
 import { LoadingComponent } from "./loading/loading.component";
 import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { QuickLinkComponent } from "./quick-link/quick-link.component";
-import { TableComponent } from "./table/table.component";
 import { UploadComponent } from "./upload/upload.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NgReduxModule } from "@angular-redux/store";
@@ -58,6 +57,8 @@ import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.compo
 import { AsyncTaskComponent } from './async-task/async-task.component';
 import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transform.pipe";
 import { BrowserModule } from "@angular/platform-browser";
+import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
+import { TableComponent } from "./table/table.component";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -80,6 +81,7 @@ import { BrowserModule } from "@angular/platform-browser";
     LoadingComponent,
     NavBarComponent,
     QuickLinkComponent,
+    PaginatedTableComponent,
     TableComponent,
     UploadComponent,
     FTPUploadComponent,
@@ -136,6 +138,7 @@ import { BrowserModule } from "@angular/platform-browser";
     LoadingComponent,
     NavBarComponent,
     QuickLinkComponent,
+    PaginatedTableComponent,
     TableComponent,
     UploadComponent,
     FTPUploadComponent,

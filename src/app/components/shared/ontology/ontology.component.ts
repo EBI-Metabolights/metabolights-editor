@@ -43,6 +43,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("values") values: Ontology[] = [];
   @Input("inline") isInline: boolean;
   @Input("sourceValueType") sourceValueType = "ontology";
+  @Input("initialSearchKeyword") initialSearchKeyword = "";
   @Input("controlList") controlList: {name: string; values: Ontology[]} = {name: '', values: []};
   @Input("id") id: string;
 
@@ -115,6 +116,8 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
       }
     }
+    this.isFormBusy = false;
+    this.searchedMore = false;
     this.getDefaultTerms();
     // this.filteredvalues = this.valueCtrl.valueChanges.pipe(
     //   map((value: Ontology | null) =>
@@ -129,7 +132,16 @@ export class OntologyComponent implements OnInit, OnChanges {
     // this.valueCtrl.setValue("");
     // this.searchTerm(null);
 
-    this.valueCtrl.setValue("");
+    this.valueCtrl.setValue(this.initialSearchKeyword);
+    if(this.initialSearchKeyword && this.initialSearchKeyword.length > 0){
+      // const inputElement = document.getElementById("test") as HTMLInputElement;
+      // inputElement.value = this.initialSearchKeyword;
+      // this.inputValue = this.initialSearchKeyword;
+
+      setTimeout(() => {
+        this.valueInput.openPanel();
+      });
+    }
 
   }
 

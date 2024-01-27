@@ -10,15 +10,16 @@ import {
   EventEmitter,
   AfterViewChecked,
   OnChanges,
+  AfterViewInit,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
-import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
+import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
+import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
 import { NgRedux, select } from "@angular-redux/store";
@@ -26,14 +27,18 @@ import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { environment } from "src/environments/environment";
+import { ServerDataSource } from "./paginated-table.datasource";
+import { IsaTableDataSourceService } from "src/app/services/remote.datasource.service";
+import { tap } from "rxjs/operators";
+import { PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
-  selector: "mtbls-table",
-  templateUrl: "./table.component.html",
-  styleUrls: ["./table.component.css"],
+  selector: "mtbls-paginated-table",
+  templateUrl: "./paginated-table.component.html",
+  styleUrls: ["./paginated-table.component.css"],
 })
-export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
+export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
@@ -59,13 +64,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     },
   ];
 
+  dataSource: ServerDataSource;
+  currentMetadata: PaginatedTableMetadata;
+  currentPage: any[];
   rowsToAdd: any = 1;
   isReadOnly = true;
 
   validations: any = {};
   mlPageSizeOptions: any = [10, 100];
 
-  dataSource: MatTableDataSource<any>;
+  // dataSource: MatTableDataSource<any>;
   data: any = null;
   files: any = null;
 
@@ -117,29 +125,44 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ontologies = [];
   hit = false;
   baseHref: string;
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private isaTableDataSourceService: IsaTableDataSourceService
   ) {
     this.baseHref =this.editorService.configService.baseHref;
-    // const ontology3 = new Ontology();
-    // ontology3.name = "normal phase";
-
-    // this.ontologies.push(ontology3);
-    // const ontology = new Ontology();
-    // ontology.name = "reverse phase";
-    // this.ontologies.push(ontology);
-    // const ontology2 = new Ontology();
-    // ontology2.name = "HILIC";
-    // this.ontologies.push(ontology2);
   }
 
   ngOnInit() {
+    this.dataSource = new ServerDataSource(this.isaTableDataSourceService);
+    this.dataSource.data.subscribe((val) => this.currentPage = val);
+    this.dataSource.metadata.subscribe((val) => this.currentMetadata = val);
+
+    this.dataSource.loadIsaTableRows(this.tableData.data.file, '', 'asc', 0, 50);
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
   }
+  ngAfterViewInit() {
+
+    this.paginator.page
+        .pipe(
+            tap(() => this.loadIsaTablePage())
+        )
+        .subscribe();
+
+}
+
+loadIsaTablePage() {
+    this.dataSource.loadIsaTableRows(
+        this.tableData.data.file,
+        '',
+        '',
+        this.paginator.pageIndex,
+        this.paginator.pageSize);
+}
 
   setUpSubscriptions() {
     this.studyValidations.subscribe((value) => {
@@ -182,11 +205,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.data) {
       this.hit = true;
       this.displayedTableColumns = this.data.displayedColumns;
-      this.dataSource = new MatTableDataSource<any>(this.data.rows);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.filterPredicate = (data, filter) =>
-        this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
-      this.dataSource.sort = this.sort;
+      // this.dataSource = new MatTableDataSource<any>(this.data.rows);
+      // this.dataSource.paginator = this.paginator;
+      // this.dataSource.filterPredicate = (data, filter) =>
+        // this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
+      // this.dataSource.sort = this.sort;
       this.detectFileColumns();
       this.validateTableOntologyColumns();
       if (this.view === "expanded") {
@@ -196,28 +219,28 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   ngAfterViewChecked() {
-    setTimeout(() => {
-      if (this.dataSource && !this.dataSource.paginator) {
-        if (this.dataSource.filteredData.length > 500) {
-          this.paginator.pageSizeOptions = [
-            50,
-            100,
-            500,
-            this.dataSource.filteredData.length,
-          ];
-          this.paginator.pageSize = 50;
-        } else {
-          // this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
-          this.paginator.pageSizeOptions = [
-            10,
-            100,
-            this.dataSource.filteredData.length,
-          ];
-          this.paginator.pageSize = this.dataSource.filteredData.length;
-        }
-        this.dataSource.paginator = this.paginator;
-      }
-    });
+    // setTimeout(() => {
+    //   if (this.dataSource && !this.paginator) {
+    //     if (this.dataSource.filteredData.length > 500) {
+    //       this.paginator.pageSizeOptions = [
+    //         50,
+    //         100,
+    //         500,
+    //         this.dataSource.filteredData.length,
+    //       ];
+    //       this.paginator.pageSize = 50;
+    //     } else {
+    //       // this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
+    //       this.paginator.pageSizeOptions = [
+    //         10,
+    //         100,
+    //         this.dataSource.filteredData.length,
+    //       ];
+    //       this.paginator.pageSize = this.dataSource.filteredData.length;
+    //     }
+    //     this.dataSource.paginator = this.paginator;
+    //   }
+    // });
   }
 
   onCopy(e) {
@@ -545,8 +568,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   applyFilter(filterValue: string) {
-    this.dataSource.data = this.tableData.data.rows;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    // this.dataSource.data = this.tableData.data.rows;
+    // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   onKeydown(event, filterValue: string) {
@@ -556,16 +579,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         this.filters.push(filterValue);
         event.target.value = "";
       }
-      this.dataSource.filter = "";
-      this.filters.forEach((f) => {
-        data = data.concat(
-          this.dataSource.data.filter(
-            (d) =>
-              this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
-          )
-        );
-      });
-      this.dataSource.data = data;
+      // this.dataSource.filter = "";
+      // this.filters.forEach((f) => {
+      //   data = data.concat(
+      //     this.dataSource.data.filter(
+      //       (d) =>
+      //         this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
+      //     )
+      //   );
+      // });
+      // this.dataSource.data = data;
     }
   }
 
@@ -594,21 +617,21 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   removeFilter(filter) {
-    this.filters = this.filters.filter((e) => e !== filter);
-    this.dataSource.filter = "";
-    if (this.filters.length > 0) {
-      let data = [];
-      this.filters.forEach((f) => {
-        data = data.concat(
-          this.dataSource.data.filter(
-            (d) => this.getDataString(d).indexOf(f.toLowerCase()) > -1
-          )
-        );
-      });
-      this.dataSource.data = data;
-    } else {
-      this.dataSource.data = this.data.data.rows;
-    }
+    // this.filters = this.filters.filter((e) => e !== filter);
+    // this.dataSource.filter = "";
+    // if (this.filters.length > 0) {
+    //   let data = [];
+    //   this.filters.forEach((f) => {
+    //     data = data.concat(
+    //       this.dataSource.data.filter(
+    //         (d) => this.getDataString(d).indexOf(f.toLowerCase()) > -1
+    //       )
+    //     );
+    //   });
+    //   this.dataSource.data = data;
+    // } else {
+    //   this.dataSource.data = this.data.data.rows;
+    // }
   }
 
   addColumns(columns) {
@@ -790,11 +813,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   highlightFilteredRows(term) {
-    this.selectedRows = this.selectedRows.concat(
-      this.dataSource.data
-        .filter((f) => this.getDataString(f).indexOf(term.toLowerCase()) !== -1)
-        .map((p) => p.index)
-    );
+    // this.selectedRows = this.selectedRows.concat(
+    //   this.dataSource.data
+    //     .filter((f) => this.getDataString(f).indexOf(term.toLowerCase()) !== -1)
+    //     .map((p) => p.index)
+    // );
   }
 
   isSelected(row, column) {
@@ -1145,10 +1168,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     let sRows = [];
     if (this.selectedRows.length > 0) {
       this.selectedRows.forEach((r) => {
-        sRows.push(this.dataSource.data[r]);
+        sRows.push(this.currentPage[r]);
       });
     } else {
-      sRows = this.dataSource.data;
+      sRows = this.currentPage;
     }
     const cellsToUpdate = [];
     let columnIndex = this.data.header[this.selectedColumn.header];
@@ -1520,28 +1543,28 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   filterDuplicate(value) {
-    this.selectedRows = [];
-    this.filters = [];
-    this.dataSource.data = this.tableData.data.rows;
-    let data = [];
-    if (this.filters.indexOf(value) < 0) {
-      this.filters.push(value);
-    }
-    this.dataSource.filter = "";
-    this.filters.forEach((f) => {
-      data = data.concat(
-        this.dataSource.data.filter(
-          (d) =>
-            this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
-        )
-      );
-    });
-    this.dataSource.data = data;
-    this.selectedRows = this.selectedRows.concat(
-      this.dataSource.data
-        .filter((f) => f["Sample Name"] === value)
-        .map((p) => p.index)
-    );
+    // this.selectedRows = [];
+    // this.filters = [];
+    // this.dataSource.data = this.tableData.data.rows;
+    // let data = [];
+    // if (this.filters.indexOf(value) < 0) {
+    //   this.filters.push(value);
+    // }
+    // this.dataSource.filter = "";
+    // this.filters.forEach((f) => {
+    //   data = data.concat(
+    //     this.dataSource.data.filter(
+    //       (d) =>
+    //         this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
+    //     )
+    //   );
+    // });
+    // this.dataSource.data = data;
+    // this.selectedRows = this.selectedRows.concat(
+    //   this.dataSource.data
+    //     .filter((f) => f["Sample Name"] === value)
+    //     .map((p) => p.index)
+    // );
   }
 
   onChanges() {}
