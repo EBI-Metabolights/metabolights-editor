@@ -37,7 +37,7 @@ export class DesignDescriptorComponent implements OnInit {
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
   isStudyReadOnly = false;
-
+  defaultControlList: {name: string; values: any[]} = {name: "", values: []};
   validations: any = {};
 
   validationsId = "studyDesignDescriptors";
@@ -114,6 +114,7 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   updateAndClose() {
+    this.isFormBusy = true;
     this.editorService.getDesignDescriptors().subscribe((res) => {
       this.ngRedux.dispatch({
         type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
@@ -121,7 +122,12 @@ export class DesignDescriptorComponent implements OnInit {
           studyDesignDescriptors: res.studyDesignDescriptors,
         },
       });
-    });
+      this.isFormBusy = false;
+    },
+    (err) => {
+      this.isFormBusy = false;
+    }
+    );
     this.closeImportModal();
   }
 
@@ -135,7 +141,7 @@ export class DesignDescriptorComponent implements OnInit {
       this.status = "";
       this.status = "Mapping keyword to an ontology term";
       this.editorService
-        .getExactMatchOntologyTerm(keyword, "design%20descriptor")
+        .getExactMatchOntologyTerm(keyword, "Study%20Design%20Type")
         .subscribe((terms) => {
           if (terms.OntologyTerm.length > 0) {
             const jsonConvert: JsonConvert = new JsonConvert();
@@ -146,11 +152,14 @@ export class DesignDescriptorComponent implements OnInit {
               ),
             };
             this.status = "Adding keyword to the study design descriptors list";
+            this.isFormBusy = true;
+            this.loading = true;
             this.editorService.saveDesignDescriptor(descriptor).subscribe(
               (res) => {
                 this.status = "";
                 this.selectedkeywords.push(keyword);
                 this.loading = false;
+                this.isFormBusy = false;
               },
               (err) => {
                 this.loading = false;
@@ -163,14 +172,13 @@ export class DesignDescriptorComponent implements OnInit {
               "Exact ontology match not found. Create new MetaboLights Onotology term";
             const newOntology = new Ontology();
             newOntology.annotationValue = keyword;
-            newOntology.termAccession =
-              "http://www.ebi.ac.uk/metabolights/ontology/placeholder";
+            newOntology.termAccession = "";
             newOntology.termSource = new OntologySourceReference();
             newOntology.termSource.description = "User defined terms";
-            newOntology.termSource.file = "https://www.ebi.ac.uk/metabolights/";
-            newOntology.termSource.name = "MTBLS";
-            newOntology.termSource.provenance_name = "metabolights";
-            newOntology.termSource.version = "1.0";
+            newOntology.termSource.file = "";
+            newOntology.termSource.name = "";
+            newOntology.termSource.provenance_name = "";
+            newOntology.termSource.version = "";
             const jsonConvert: JsonConvert = new JsonConvert();
             const descriptor = {
               studyDesignDescriptor: jsonConvert.deserialize(
@@ -179,11 +187,14 @@ export class DesignDescriptorComponent implements OnInit {
               ),
             };
             this.status = "Adding keyword to the study design descriptors list";
+            this.loading = true;
+            this.isFormBusy = true;
             this.editorService.saveDesignDescriptor(descriptor).subscribe(
               (res) => {
                 this.selectedkeywords.push(keyword);
                 this.loading = false;
                 this.status = "";
+                this.isFormBusy = false;
               },
               (err) => {
                 this.loading = false;
@@ -275,14 +286,20 @@ export class DesignDescriptorComponent implements OnInit {
               }
             );
         } else {
-          this.editorService.saveDesignDescriptor(this.compileBody()).subscribe(
+          const ontology = this.compileBody();
+          this.loading = true;
+          this.isFormBusy = true;
+          this.editorService.saveDesignDescriptor(ontology).subscribe(
             (res) => {
               this.updateDesignDescriptors(res, "Design descriptor saved.");
               this.descriptorComponent.values = [];
               this.isModalOpen = false;
+              this.loading = false;
+              this.isFormBusy = false;
             },
             (err) => {
               this.isFormBusy = false;
+              this.loading = false;
             }
           );
         }
@@ -291,6 +308,7 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   updateDesignDescriptors(data, message) {
+    this.isFormBusy = true;
     this.editorService.getDesignDescriptors().subscribe((res) => {
       this.ngRedux.dispatch({
         type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
@@ -298,7 +316,12 @@ export class DesignDescriptorComponent implements OnInit {
           studyDesignDescriptors: res.studyDesignDescriptors,
         },
       });
-    });
+      this.isFormBusy = false;
+    },
+    (err) => {
+      this.isFormBusy = false;
+    }
+    );
 
     this.form.markAsPristine();
     this.initialiseForm();
@@ -320,11 +343,13 @@ export class DesignDescriptorComponent implements OnInit {
       if (!value) {
         value = this.descriptor.annotationValue;
       }
+      this.isFormBusy = true;
       this.editorService.deleteDesignDescriptor(value).subscribe(
         (res) => {
           this.updateDesignDescriptors(res, "Design descriptor deleted.");
           this.isDeleteModalOpen = false;
           this.isModalOpen = false;
+          this.isFormBusy = false;
         },
         (err) => {
           this.isFormBusy = false;
@@ -335,12 +360,13 @@ export class DesignDescriptorComponent implements OnInit {
 
   compileBody() {
     const jsonConvert: JsonConvert = new JsonConvert();
-    return {
+    const body = {
       studyDesignDescriptor: jsonConvert.deserialize(
         this.descriptorComponent.values[0],
         Ontology
       ),
     };
+    return body;
   }
 
   fieldValidation(fieldId) {
@@ -364,4 +390,14 @@ export class DesignDescriptorComponent implements OnInit {
     }
     return this.validations[this.validationsId];
   }
+
+  controlList() {
+    if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
+      && this.editorService.defaultControlLists && "Study Design Type" in this.editorService.defaultControlLists){
+      this.defaultControlList.values = this.editorService.defaultControlLists["Study Design Type"].OntologyTerm;
+      this.defaultControlList.name = "Study Design Type";
+    }
+    return this.defaultControlList;
+  }
+
 }

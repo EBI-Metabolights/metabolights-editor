@@ -306,7 +306,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   savePastedCellContent(e, pvalue) {
-    this.loading = true;
     const cellsToUpdate = [];
     if (!this.isEditModalOpen) {
       if (this.selectedCells.length === 1) {
@@ -388,6 +387,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
     }
 
+    this.loading = true;
     if (cellsToUpdate.length > 0) {
       this.isFormBusy = true;
       this.editorService
@@ -486,11 +486,13 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
       count = count + 1;
     });
+    const possibleValueKeys: Map<string, Set<string>> = new Map<string, Set<string>>();
+    const possibleValues: Map<string, [string, string, string][]> = new Map<string, [string, string, string][]>();
     Object.keys(this.ontologyCols).forEach((column) => {
       if (this.ontologyColumns.indexOf(column) === -1) {
         this.ontologyColumns.push(column);
       }
-      this.ontologyCols[column].values = {};
+      this.ontologyCols[column].values = new Map<string, [string, string, string][]>();
       this.ontologyCols[column].missingTerms = new Set<string>();
       this.data.rows.forEach((row) => {
         if (
@@ -498,46 +500,44 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||
             this.isEmpty(row[this.ontologyCols[column].accession]))
         ) {
-          this.ontologyCols[column].missingTerms.add(row[column]);
-        }
-        if (!this.isEmpty(row[column])) {
-          if (!this.ontologyCols[column].values[row[column]]) {
-            if (row[column].replace(" ", "") !== "") {
-              this.ontologyCols[column].values[row[column]] = [null, null];
-            }
-            if (
-              !this.isEmpty(row[this.ontologyCols[column].ref]) &&
-              !this.isEmpty(row[this.ontologyCols[column].accession])
-            ) {
-              this.ontologyCols[column].values[row[column]] = [
-                row[this.ontologyCols[column].ref],
-                row[this.ontologyCols[column].accession],
-              ];
-            }
-          } else {
-            if (
-              !this.isEmpty(row[this.ontologyCols[column].ref]) &&
-              !this.isEmpty(row[this.ontologyCols[column].accession])
-            ) {
-              this.ontologyCols[column].values[row[column]] = [
-                row[this.ontologyCols[column].ref],
-                row[this.ontologyCols[column].accession],
-              ];
-            }
+          if (!this.ontologyCols[column].missingTerms.has(row[column])){
+            this.ontologyCols[column].missingTerms.add(row[column]);
           }
+        }
+        const term = row[column] ? row[column].trim() : "";
+        const ref = row[this.ontologyCols[column].ref] ? row[this.ontologyCols[column].ref].trim() : "";
+        const accession = row[this.ontologyCols[column].accession] ? row[this.ontologyCols[column].accession].trim() : "";
+
+        const lowerCaseValue = row[column].trim().toLowerCase();
+        if (term.length > 0 && ref.length > 0 && accession.length > 0) {
+
+            const key = term +":"+ ref +":" + accession;
+            if (!(possibleValueKeys.has(lowerCaseValue))){
+              possibleValueKeys.set(lowerCaseValue, new Set<string>());
+              possibleValues.set(lowerCaseValue, []);
+            }
+            if (!possibleValueKeys.get(lowerCaseValue).has(key)) {
+              possibleValues.get(lowerCaseValue).push([ref, accession, term]);
+              possibleValueKeys.get(lowerCaseValue).add(key);
+            }
+            this.ontologyCols[column].values.set(row[column], possibleValues.get(lowerCaseValue));
+
         }
       });
     });
   }
 
   hasAnyMissingValues() {
-    let hasMV = false;
-    Object.keys(this.ontologyCols).forEach((key) => {
-      if (this.ontologyCols[key].missingTerms.size > 0) {
-        hasMV = true;
-      }
-    });
-    return hasMV;
+    if(this.enableControlList) {
+      let hasMV = false;
+      Object.keys(this.ontologyCols).forEach((key) => {
+        if (this.ontologyCols[key].missingTerms.size > 0) {
+          hasMV = true;
+        }
+      });
+      return hasMV;
+    }
+    return false;
   }
 
   getDef(column) {
@@ -787,6 +787,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.selectedMissingKey = null;
     this.selectedMissingVal = null;
     this.isEditColumnMissingModalOpen = false;
+    this.isFormBusy = false;
   }
 
   highlightFilteredRows(term) {
@@ -937,17 +938,18 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
       // }
-
-      if (this.enableControlList && this.controlListColumns.size === 0
-        && this.validations && this.validation && this.data && this.data.header) {
-        this.detectControlListColumns();
-      }
-      if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
-        this.isCellTypeControlList = true;
-        this.cellControlListValue();
-      } else if (this.ontologyColumns.indexOf(column.header) > -1) {
-        this.isCellTypeOntology = true;
-        this.cellOntologyValue();
+      if(this.enableControlList) {
+        if (this.controlListColumns.size === 0
+          && this.validations && this.validation && this.data && this.data.header) {
+          this.detectControlListColumns();
+        }
+        if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
+          this.isCellTypeControlList = true;
+          this.cellControlListValue();
+        } else if (this.ontologyColumns.indexOf(column.header) > -1) {
+          this.isCellTypeOntology = true;
+          this.cellOntologyValue();
+        }
       }
 
       this.editCellform = this.fb.group({
@@ -977,7 +979,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         columnIndex = columnIndex.index;
       }
     }
-    if (this.isCellTypeControlList) {
+    if (this.enableControlList && this.isCellTypeControlList) {
       const selectedOntology =
         this.getOntologyComponentValue("editControlListCell").values[0];
       const value = selectedOntology ? selectedOntology.annotationValue : "";
@@ -988,7 +990,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           value,
         }
       ];
-    } else if (this.isCellTypeOntology) {
+    } else if (this.enableControlList && this.isCellTypeOntology) {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyCell").values[0];
 
@@ -1012,7 +1014,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           value: termAccession,
         },
       ];
-    } else if (this.isCellTypeFile) {
+    } else if (this.enableControlList && this.isCellTypeFile) {
       cellsToUpdate = [
         {
           row: this.selectedCell["row"].index,
@@ -1129,10 +1131,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             tapToDismiss: false,
           });
           this.closeEditMissingColValModal();
-          if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
-            this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
-          }
+
           this.isFormBusy = false;
+          if (this.selectedMissingCol && "missingTerms" in this.selectedMissingCol) {
+            if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
+              this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
+            }
+          }
+
         },
         (err) => {
           console.error(err);
@@ -1381,7 +1387,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       //   this.isCellTypeFile = true;
       // }
 
-      if (this.ontologyColumns.indexOf(column.header) > -1) {
+      if (this.enableControlList && this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;
       }
 
@@ -1395,6 +1401,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   closeEditColumnModal() {
     this.isEditColumnModalOpen = false;
+    this.isFormBusy = false;
+    this.loading = false;
   }
 
   copy(text: string) {
@@ -1409,7 +1417,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   isEmpty(val) {
-    return val === "" || val === "undefined" || val === null;
+    const result = val === undefined || val === "undefined" || val === null || (typeof val === "string" && val.trim().length === 0);
+    return result;
   }
 
   getUnique(arr) {
@@ -1431,12 +1440,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           {
             row: row.index,
             column: refIndex,
-            value: col.values[val][0],
+            value: col.values.get(val)[0][0],
           },
           {
             row: row.index,
             column: accIndex,
-            value: col.values[val][1],
+            value: col.values.get(val)[0][1],
           }
         );
       }

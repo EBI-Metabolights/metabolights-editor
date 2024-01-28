@@ -39,7 +39,8 @@ export class FactorComponent implements OnInit {
   isStudyReadOnly = false;
 
   validationsId = "factors.factor";
-
+  defaultControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultControlListName = "Study Factor Type";
   isModalOpen = false;
   isTimeLineModalOpen = false;
   isDeleteModalOpen = false;
@@ -56,6 +57,9 @@ export class FactorComponent implements OnInit {
     private editorService: EditorService,
     private ngRedux: NgRedux<IAppState>
   ) {
+    if (!this.defaultControlList) {
+      this.defaultControlList = {name: "", values: []};
+    }
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
@@ -229,5 +233,13 @@ export class FactorComponent implements OnInit {
 
   setFieldValue(name, value) {
     return this.form.get(name).setValue(value);
+  }
+  controlList() {
+    if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
+      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
+      this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
+      this.defaultControlList.name = this.defaultControlListName;
+    }
+    return this.defaultControlList;
   }
 }

@@ -1,7 +1,7 @@
 <div *ngIf="addNewFactor || factor == null; else showFactorDetails">
   <span *ngIf="!isDropdown; else showDropdownOption">
     <a
-      class="button is-light is-pulled-right is-small hover-button"
+      class="button is-primary is-pulled-right is-small"
       (click)="openModal()"
       >+ Add factor</a
     >
@@ -136,6 +136,7 @@
         <mtbls-ontology
           #factorType
           [validations]="fieldValidation('factorType')"
+          [controlList]="controlList()"
           (changed)="onChanges($event)"
           [values]="[factor.factorType]"
           [inline]="true"

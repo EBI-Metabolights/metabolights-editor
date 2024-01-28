@@ -252,7 +252,7 @@
           "recommended-ontologies": {
             "is-forced-ontology": "true",
             "ontology": {
-              "url": "/ebi-internal/ontology?branch=Study%Person%Role&term=",
+              "url": "/ebi-internal/ontology?branch=Study%20Person%20Role&term=",
               "allowFreeText": false
             }
           }
@@ -1537,7 +1537,7 @@
         "recommended-ontologies": {
           "is-forced-ontology": "false",
           "ontology": {
-            "url": "/ebi-internal/ontology?branch=Study%20Factor%20Type&term=",
+            "url": "/ebi-internal/ontology?branch=Characteristics&term=",
             "allowFreeText": true
           }
         }

@@ -2,7 +2,7 @@
   *ngIf="publication == null || addNewPublication; else showPublicationDetails"
 >
   <a
-    class="button is-light is-pulled-right is-small hover-button"
+    class="button is-primary is-pulled-right is-small hover-button"
     (click)="openModal()"
     >+ Add Publication</a
   >
@@ -247,6 +247,7 @@
           class="mt-20"
           #publicationStatus
           [validations]="fieldValidation('status')"
+          [controlList]="controlList()"
           (changed)="onChanges($event)"
           [values]="[publication.status]"
           [inline]="true"

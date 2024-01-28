@@ -105,7 +105,7 @@ export class EditorService {
                 name: term.onto_name,
                 description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
                 file: term.provenance_name,
-                provenanceName: term.provenance_name,
+                provenance_name: term.provenance_name,
                 version: ""
               },
               wormsID: ""
@@ -1332,7 +1332,7 @@ export class EditorService {
       let branch = "";
       const branchParam = url.split("branch=");
       if (branchParam.length > 1) {
-        branch = decodeURI(branchParam[1].split("&")[0]);
+        branch = decodeURI(branchParam[1]).split("&")[0];
       }
       let term = "";
       const termParam = url.split("term=");
@@ -1411,20 +1411,17 @@ export class EditorService {
   }
 
   getOntologyDetails(value) {
-
-    if (value.termSource.name !== "MTBLS") {
-      if (!this.ontologyDetails[value.termAccession]) {
-        return this.dataService.getOntologyDetails(value).pipe(
-          map((result) => {
-            this.ontologyDetails[value.termAccession] = result;
-            return result;
-          })
-        );
-      } else {
-        return of(this.ontologyDetails[value.termAccession]).pipe(
-          observeOn(asapScheduler)
-        );
-      }
+    if (!this.ontologyDetails[value.termAccession]) {
+      return this.dataService.getOntologyDetails(value).pipe(
+        map((result) => {
+          this.ontologyDetails[value.termAccession] = result;
+          return result;
+        })
+      );
+    } else {
+      return of(this.ontologyDetails[value.termAccession]).pipe(
+        observeOn(asapScheduler)
+      );
     }
 
   }

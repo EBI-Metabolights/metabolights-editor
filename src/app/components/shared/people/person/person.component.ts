@@ -52,7 +52,8 @@ export class PersonComponent implements OnInit {
   isReadOnly = false;
 
   validations: any = {};
-
+  defaultControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultControlListName = "Study Person Role";
   requestedStudy: string = null;
 
   form: FormGroup;
@@ -358,5 +359,13 @@ export class PersonComponent implements OnInit {
 
   getFieldValue(name) {
     return this.form.get(name).value;
+  }
+  controlList() {
+    if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
+      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
+      this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
+      this.defaultControlList.name = this.defaultControlListName;
+    }
+    return this.defaultControlList;
   }
 }

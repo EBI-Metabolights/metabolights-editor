@@ -97,6 +97,7 @@
           <mtbls-ontology
             [id]="'characteristicCategory'"
             [validations]="fieldValidation('category')"
+            [controlList]="controlList('Characteristics')"
             (changed)="onChanges($event)"
             [values]="[]"
             [inline]="true"
@@ -138,6 +139,7 @@
           class="mt-20"
           #factorUnit
           [validations]="fieldValidation('unit')"
+          [controlList]="controlList('unit')"
           (changed)="onChanges($event)"
           [values]="[]"
           [inline]="true"

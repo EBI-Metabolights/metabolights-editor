@@ -1,6 +1,6 @@
 <span *ngIf="person == null || addNewPerson; else showPersonDetails">
   <a
-    class="button is-light is-pulled-right is-small"
+    class="button is-primary is-pulled-right is-small"
     [ngClass]="{ 'hover-button': !isReadOnly }"
     (click)="openModal()"
     >+ Add person</a
@@ -296,6 +296,7 @@
             class="mt-20"
             #personRoles
             [validations]="fieldValidation('roles')"
+            [controlList]="controlList()"
             (changed)="onChanges($event)"
             [values]="person.roles"
             [inline]="true"

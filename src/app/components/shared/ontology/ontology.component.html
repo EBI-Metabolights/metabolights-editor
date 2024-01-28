@@ -124,7 +124,7 @@
                       *ngFor="let key of getObjectKeys(value.info.annotation)"
                     >
                       <small>
-                        <b style="text-transform: capitalize">{{
+                        <b>{{
                           key.replace("_", " ")
                         }}</b>
                         : {{ value.info.annotation[key].join(" ") }} <br />
@@ -141,6 +141,19 @@
             </span>
           </div>
         </mat-option>
+        <span *ngIf="!searchedMore && (currentOptions.length > 0) ">
+          <span *ngIf="termsLoading; else showMore">
+            <mat-option>
+              <img
+                style="height: 10px; margin-left: 10px"
+                src="{{ baseHref }}assets/img/loading.svg"
+              />
+            </mat-option>
+          </span>
+          <ng-template #showMore>
+            <mat-option><small>search more terms on ontology sources</small></mat-option>
+          </ng-template>
+        </span>
       </mat-autocomplete>
       <mat-hint
         >{{ validations.description }}

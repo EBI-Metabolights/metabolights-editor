@@ -5,7 +5,7 @@ import { DataService } from "./../data.service";
 import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "./../../store";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Router } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
 import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
@@ -600,6 +600,33 @@ export class MetabolightsService extends DataService {
       value.termSource.name +
       "/terms/" +
       encodeURI(encodeURIComponent(value.termAccession));
+    const mtblsPrefix = "http://www.ebi.ac.uk/metabolights/ontology/";
+    if (value?.termSource?.name === "MTBLS" && value?.termAccession?.startsWith(mtblsPrefix)) {
+      const parts = value.termAccession.split("/");
+
+      const mtblsUrl =  this.url.baseURL
+                      + "/mtbls-ontology/terms/"
+                      + parts[(parts.length - 1)] ;
+
+      return this.http.get(mtblsUrl).pipe(
+
+        map((res: any) => {
+          if (res) {
+            const result = {
+              description: [res.termDescription],
+              iri: res.termAccessionNumber,
+              label: value.annotationValue,
+              ontology_name: "mtbls",
+              ontology_prefix: "MTBLS",
+              short_form: parts[(parts.length - 1)],
+              id: parts[(parts.length - 1)].replace("_", ":"),
+              annotation : {}
+            };
+            return result;
+          }
+          return {};
+        }));
+    }
     return this.http.get(url, httpOptions);
   }
 

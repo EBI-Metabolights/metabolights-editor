@@ -144,11 +144,31 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
 
   }
+  setCurrentOptions(values: Ontology[] = []) {
 
+    this.currentOptions = values.filter((value) => {
+      if (values) {
+        let match = false;
+        this.values.forEach((ontology) => {
+          if (!match && ontology.annotationValue  && ontology.annotationValue === value.annotationValue
+            && ontology.termAccession && ontology.termAccession === value.termAccession
+            && ontology.termSource && ontology.termSource === value.termSource
+            ) {
+              match = true;
+            }
+        });
+        if (match) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
   searchTerm(value: any, remoteSearch: boolean = false){
     if (value === null || value === undefined || value.length === 0) {
-      this.currentOptions = this.controlList.values.slice();
+      this.setCurrentOptions(this.controlList.values);
       this.searchedMore = false;
+      this.loading = false;
       return this.currentOptions;
     }
     this.inputValue = value;
@@ -166,13 +186,13 @@ export class OntologyComponent implements OnInit, OnChanges {
         try {
           if (typeof value === "string"){
             if( value && value.indexOf(":") > -1) {
-              term = value.split(":")[1];
+              term = encodeURI(value.split(":")[1]);
               ontologyFilter = value.split(":")[0];
             } else {
-              term = value;
+              term = encodeURI(value);
             }
           } else if ("annotationValue" in value) {
-            term = value.annotationValue;
+            term = encodeURI(value.annotationValue);
           }
         } catch(err) {
           console.log(err);
@@ -181,7 +201,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.termsLoading = true;
         this.loading = true;
         this.isFormBusy = true;
-        this.currentOptions = [];
+        this.setCurrentOptions([]);
         this.editorService
           .getOntologyTerms(this.baseURL + this.url + term + urlSuffix)
           .subscribe((terms) => {
@@ -213,7 +233,7 @@ export class OntologyComponent implements OnInit, OnChanges {
             //     val ? this._filter(val) : this.allvalues.slice()
             //   )
             // );
-            this.currentOptions = this.allvalues.slice();
+            this.setCurrentOptions(this.allvalues);
 
           },
           (err) => {
@@ -230,7 +250,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
   }
   getDefaultTerms() {
-    if (!this.readonly && this.controlList.values !== null){
+    if (!this.readonly && this.controlList && this.controlList.values !== null){
       this.allvalues = this.controlList.values;
       this.searchedMore = false;
     }
@@ -298,7 +318,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.termsLoading = true;
     this.editorService
       .getOntologyTermDescription(
-        "https://www.ebi.ac.uk/ols/api/ontologies/" +
+        "https://www.ebi.ac.uk/ols4/api/ontologies/" +
           accession.termSource.name +
           "/terms/" +
           encodeURI(encodeURIComponent(accession.termAccession))
@@ -392,8 +412,9 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (index >= 0) {
       this.values.splice(index, 1);
     }
-    if (this.values.length === 0 && (this.inputValue === null || this.inputValue === "")) {
+    if (this.values.length === 0 && !(this.inputValue && this.inputValue.length > 0)) {
       this.getDefaultTerms();
+      this.valueCtrl.setValue("");
     }
     this.triggerChanges();
   }

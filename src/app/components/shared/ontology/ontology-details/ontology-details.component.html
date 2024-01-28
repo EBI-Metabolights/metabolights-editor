@@ -1,14 +1,11 @@
 <span
-  *ngIf="
-    value.termSource && value.termSource.name == 'MTBLS';
-    else displayExtOnt
-  "
+  *ngIf="!(value?.termAccession); else displayExtOnt"
 >
-  {{ value.annotationValue }}
+{{value.annotationValue}}
 </span>
 <ng-template #displayExtOnt>
   <span class="clickable" (click)="displayOntologyInfo()">
-    {{ value.annotationValue }}
+    {{ value.termSource.name ? value.termSource.name + ':'+ value.annotationValue :value.annotationValue }}
     <mat-spinner
       style="display: inline"
       [diameter]="16"
@@ -41,7 +38,7 @@
         </p>
         <span *ngFor="let key of getObjectKeys(details.annotation)">
           <span *ngIf="details.annotation && details.annotation[key]">
-            <b style="text-transform: capitalize">{{
+            <b>{{
               key.replace("_", " ")
             }}</b>
             : {{ details.annotation[key].join(" ") }} <br />
