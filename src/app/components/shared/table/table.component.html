@@ -35,35 +35,39 @@
             ><b>{{ formatHeader(key) }}</b
             >:</small
           >
-          <span class="container">
-            <span *ngFor="let val of ontologyCols[key].missingTerms" class="row justify-content-center">
-              <div class="control col-md-4">
-                <div class="tags has-addons my-2 row">
-                  <span
-                    (click)="
-                      openEditMissingColValModal(ontologyCols[key], key, val)
-                    "
-                    class="col-md-4 tag is-primary clickable"
-                  >
-                    <i class="material-icons"> edit </i>
-                  </span>
+          <span class="card-content">
+            <span class="content">
+              <div class="field is-grouped is-grouped-multiline">
+                <span *ngFor="let val of ontologyCols[key].missingTerms">
+                  <div class="missing-ontology is-grouped is-grouped-multiline">
+                    <span
+                      (click)="
+                        openEditMissingColValModal(ontologyCols[key], key, val)
+                      "
+                      class="tag is-small is-primary clickable"
+                    >
+                      <i class="material-icons "> edit </i>
+                    </span>
 
-                  <span
-                    *ngIf="ontologyCols[key].values && ontologyCols[key].values.has(val) && ontologyCols[key].values.get(val).length > 0"
-                    (click)="autoPopulate(ontologyCols[key], key, val)"
-                    class="col-md-4 tag is-info clickable"
-                  >
-                    <i class="material-icons"> compare_arrows </i>
-                  </span>
-                  <span class="col-md-4 tag is-default is-small">
-                    {{ val }}
-                  </span>
-                  <!-- <span class="tag ">
-                    {{ontologyCols[key]['values'][val][0]}}:{{ontologyCols[key]['values'][val][1]}}
-                  </span> -->
-                </div>
+                    <span
+                      *ngIf="ontologyCols[key].values && ontologyCols[key].values.has(val) && ontologyCols[key].values.get(val).length > 0"
+                      (click)="autoPopulate(ontologyCols[key], key, val)"
+                      class="tag is-small is-info clickable"
+                    >
+                      <i class="material-icons "> compare_arrows </i>
+                    </span>
+                    <span class="tag is-small missing-tag">
+                      {{ val }}
+                    </span>
+                    <!-- <span class="tag ">
+                      {{ontologyCols[key]['values'][val][0]}}:{{ontologyCols[key]['values'][val][1]}}
+                    </span> -->
+                  </div>
+              </span>
               </div>
+
             </span>
+
           </span>
 
         </p>

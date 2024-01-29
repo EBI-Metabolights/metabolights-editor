@@ -233,3 +233,12 @@ a.dropdown-item {
 .button.is-light {
   border-radius: 2px;
 }
+
+.missing-ontology {
+  margin-right: 10px;
+}
+
+.missing-tag {
+  margin-top: 0px;
+  vertical-align: top;
+}

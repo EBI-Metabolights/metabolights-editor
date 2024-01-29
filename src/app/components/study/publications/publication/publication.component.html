@@ -30,13 +30,15 @@
         >
           <mat-icon>edit</mat-icon> Edit </a
         >&nbsp;
-        <a
+        <a *ngIf="publication.doi && publication.doi.length > 0"
           class="button is-small custom-button"
           [href]="'//dx.doi.org/' + publication.doi"
           target="_blank"
         >
           <mat-icon>insert_link</mat-icon>
         </a>
+        <span *ngIf="publication?.status?.annotationValue?.length > 0" class="tag is-default is-small publication-status"><ontology-details [value]="publication.status"></ontology-details></span>
+
       </div>
     </article>
   </div>
