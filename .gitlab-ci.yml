@@ -30,5 +30,6 @@ deploy:
   - test
   - staging
   - master
+  - migration
   script:
   - bash "$BUILD_SCRIPTS_ROOT_PATH/metabolights-editor/deploy.sh"
