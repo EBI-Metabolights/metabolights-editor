@@ -1089,52 +1089,57 @@ export class EditorService {
   }
 
   updateMAF(f) {
-    this.dataService.getTable(f).subscribe((mdata) => {
-      const mcolumns = [];
-      const maf = {};
+    const maf: any = {data: {file: f}};
 
-      mcolumns.push({
-        columnDef: "Structure",
-        sticky: "true",
-        header: "Structure",
-        structure: true,
-        cell: (element) => eval("element['database_identifier']"),
-      });
+    this.ngRedux.dispatch({ type: "SET_STUDY_MAF", body: maf });
 
-      Object.keys(mdata.header).forEach((key) => {
-        const fn = "element['" + key + "']";
-        mcolumns.push({
-          columnDef: key, //.toLowerCase().split(" ").join("_")
-          sticky: "false",
-          header: key,
-          cell: (element) => eval(fn),
-        });
-      });
+    // this.dataService.getTable(f).subscribe((mdata) => {
+    //   const mcolumns = [];
+    //   const maf = {};
 
-      let mdisplayedColumns = mcolumns.map((a) => a.columnDef);
-      mdisplayedColumns.unshift("Select");
-      mdisplayedColumns.sort((a, b) => {
-        // assert that the values are numbers, which they have to be as all header values in maf sheet objects are numbers.
-        const assertA = mdata.header[a] as number;
-        const assertB = mdata.header[b] as number;
-        return assertA - assertB;
-      });
-      mdisplayedColumns = mdisplayedColumns.filter(
-        (key) =>
-          key.indexOf("Term Accession Number") < 0 &&
-          key.indexOf("Term Source REF") < 0
-      );
+    //   mcolumns.push({
+    //     columnDef: "Structure",
+    //     sticky: "true",
+    //     header: "Structure",
+    //     structure: true,
+    //     cell: (element) => eval("element['database_identifier']"),
+    //   });
 
-      mdata["columns"] = mcolumns;
-      mdata["displayedColumns"] = mdisplayedColumns;
-      mdata["rows"] = mdata.data.rows;
-      mdata["file"] = f;
-      delete mdata.data;
+    //   Object.keys(mdata.header).forEach((key) => {
+    //     const fn = "element['" + key + "']";
+    //     mcolumns.push({
+    //       columnDef: key, //.toLowerCase().split(" ").join("_")
+    //       sticky: "false",
+    //       header: key,
+    //       cell: (element) => eval(fn),
+    //     });
+    //   });
 
-      maf["data"] = mdata;
-      this.ngRedux.dispatch({ type: "SET_STUDY_MAF", body: maf });
-    });
+    //   let mdisplayedColumns = mcolumns.map((a) => a.columnDef);
+    //   mdisplayedColumns.unshift("Select");
+    //   mdisplayedColumns.sort((a, b) => {
+    //     // assert that the values are numbers, which they have to be as all header values in maf sheet objects are numbers.
+    //     const assertA = mdata.header[a] as number;
+    //     const assertB = mdata.header[b] as number;
+    //     return assertA - assertB;
+    //   });
+    //   mdisplayedColumns = mdisplayedColumns.filter(
+    //     (key) =>
+    //       key.indexOf("Term Accession Number") < 0 &&
+    //       key.indexOf("Term Source REF") < 0
+    //   );
+
+    //   mdata["columns"] = mcolumns;
+    //   mdata["displayedColumns"] = mdisplayedColumns;
+    //   mdata["rows"] = mdata.data.rows;
+    //   mdata["file"] = f;
+    //   delete mdata.data;
+
+    //   maf["data"] = mdata;
+    //   this.ngRedux.dispatch({ type: "SET_STUDY_MAF", body: maf });
+    // });
   }
+
 
   search(term, type) {
     return this.dataService.search(term, type).pipe(map((data) => data));
@@ -1557,6 +1562,11 @@ export class EditorService {
       })
     );
   }
+
+  updateMAFTableCells(filename, body) {
+    return this.dataService.updateCells(filename, body);
+  }
+
   commitUpdatedTableCells(filename, tableType, result) {
     let source: any = {};
     let sourceFile: any = {};

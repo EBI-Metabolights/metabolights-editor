@@ -19,7 +19,31 @@ export class MafComponent implements AfterContentInit {
   @ViewChild(TableComponent) mafTable: TableComponent;
 
   isReadOnly = false;
-
+  columnNames = [
+    'database_identifier',
+    'chemical_formula',
+    'smiles',
+    'inchi',
+    'metabolite_identification',
+    'mass_to_charge',
+    'fragmentation',
+    'modifications',
+    'charge',
+    'retention_time',
+    'taxid',
+    'species',
+    'database',
+    'database_version',
+    'reliability',
+    'uri',
+    'search_engine',
+    'search_engine_score',
+    'smallmolecule_abundance_sub',
+    'smallmolecule_abundance_stdev_sub',
+    'smallmolecule_abundance_std_error_sub',
+    'chemical_shift',
+    'multiplicity'
+  ]
   currentID = null;
 
   mafData: any = null;

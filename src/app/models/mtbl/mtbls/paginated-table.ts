@@ -13,19 +13,31 @@ export class PaginatedTableColumnSort {
   sort: 'asc' | 'desc' = 'asc';
   sortDataType: 'string' | 'number' = 'string';
 }
+
+export class PaginatedTableColumn {
+  columnDef: string = null;
+  header: string = null;
+  sticky: "false" | "true" = "false";
+  targetColumnIndex = -1;
+  calculated = false;
+}
 export class PaginatedTableMetadata {
   file = "";
-  currentPage = 0;
-  currentRowCount = 0;
-  defaultPageCount = 50;
-  totalRowCount = 0;
-  totalPageCount = 0;
+  pageNumber = 0;
+  pageSize = 0;
+  defaultPageSize = 50;
+  totalSize = 0;
+  columnNames: string[] = [];
+  columns: PaginatedTableColumn[] = [];
   currentFilters: PaginatedTableColumnFilter[] = [];
   currentSortOptions: PaginatedTableColumnSort[] = [];
 }
 
 export class PaginatedTableData<T> {
   metadata: PaginatedTableMetadata = new PaginatedTableMetadata();
-  data: T[] = [];
+  rows: T[] = [];
 }
 
+export class PaginatedTableResult<T> {
+  content:  PaginatedTableData<T> = null;
+}

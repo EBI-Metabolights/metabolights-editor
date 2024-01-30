@@ -30,7 +30,7 @@ import { environment } from "src/environments/environment";
 import { ServerDataSource } from "./paginated-table.datasource";
 import { IsaTableDataSourceService } from "src/app/services/remote.datasource.service";
 import { tap } from "rxjs/operators";
-import { PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
+import { PaginatedTableColumn, PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -43,8 +43,10 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
   @Input("tableData") tableData: any;
+  @Input("columnNames") columnNames: string[] = null;
   @Input("validationsId") validationsId: any;
-  @Input("enableControlList") enableControlList = true;
+  @Input("enableControlList") enableControlList = false;
+  @Input("structureColumnEnabled") structureColumnEnabled = false;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -56,6 +58,7 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   @Output() rowEdit = new EventEmitter<any>();
 
   @select((state) => state.study.readonly) readonly;
+  @select((state) => state.study.identifier) studyIdentifier;
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -66,12 +69,16 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
 
   dataSource: ServerDataSource;
   currentMetadata: PaginatedTableMetadata;
+  currentMetadataRowIndices = new Map<number, number>();
+  currentMetadataColumnIndices = new Map<number, number>();
+  currentMetadataColumnNameIndices = new Map<string, number>();
+
   currentPage: any[];
   rowsToAdd: any = 1;
   isReadOnly = true;
 
   validations: any = {};
-  mlPageSizeOptions: any = [10, 100];
+  mlPageSizeOptions: any = [50, 100, 500, 1000];
 
   // dataSource: MatTableDataSource<any>;
   data: any = null;
@@ -125,7 +132,7 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   ontologies = [];
   hit = false;
   baseHref: string;
-
+  studyId: string;
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
@@ -136,11 +143,53 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   }
 
   ngOnInit() {
+    this.structureColumnEnabled = true;
     this.dataSource = new ServerDataSource(this.isaTableDataSourceService);
-    this.dataSource.data.subscribe((val) => this.currentPage = val);
-    this.dataSource.metadata.subscribe((val) => this.currentMetadata = val);
+    this.studyIdentifier.subscribe((val) => {
+      this.studyId = val;
+    });
+    this.dataSource.data.subscribe((val: any) => {
+      this.currentMetadataRowIndices.clear();
+      if(val && this.structureColumnEnabled) {
+        this.currentPage = val.map((col) => {
+          col.structure = "";
+          return col;
+        });
+      } else {
+        this.currentPage = val;
+      }
+      if (this.currentPage) {
+        this.currentPage.forEach((element, idx) => {
+        this.currentMetadataRowIndices.set(element.index, idx);
+      });
+      }
 
-    this.dataSource.loadIsaTableRows(this.tableData.data.file, '', 'asc', 0, 50);
+    });
+    this.dataSource.metadata.subscribe((val) => {
+      this.currentMetadataColumnIndices.clear();
+      this.currentMetadataColumnNameIndices.clear();
+      if(val && this.structureColumnEnabled) {
+        val.columnNames = ["structure"].concat(val.columnNames);
+        const structureColumn = new PaginatedTableColumn();
+        structureColumn.columnDef = "structure";
+        structureColumn.header = "structure";
+        structureColumn.sticky = "true";
+        structureColumn.calculated = true;
+        val.columns = [structureColumn].concat(val.columns);
+        this.currentMetadata = val;
+      } else {
+        this.currentMetadata = val;
+      }
+      if(val) {
+        this.currentMetadata.columns.forEach((element, idx) => {
+          this.currentMetadataColumnIndices.set(element.targetColumnIndex, idx);
+          this.currentMetadataColumnNameIndices.set(element.columnDef, element.targetColumnIndex);
+        });
+      }
+
+    });
+
+    this.dataSource.loadIsaTableRows(this.studyId, this.tableData.data.file, '', 'asc', 0, 50, this.columnNames);
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
@@ -157,11 +206,13 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
 
 loadIsaTablePage() {
     this.dataSource.loadIsaTableRows(
+        this.studyId,
         this.tableData.data.file,
         '',
         '',
         this.paginator.pageIndex,
-        this.paginator.pageSize);
+        this.paginator.pageSize,
+        this.columnNames);
 }
 
   setUpSubscriptions() {
@@ -201,10 +252,10 @@ loadIsaTablePage() {
 
   initialise() {
     this.deSelect();
-    this.data = this.tableData.data;
+    // this.data = this.tableData.data;
     if (this.data) {
       this.hit = true;
-      this.displayedTableColumns = this.data.displayedColumns;
+      // this.displayedTableColumns = this.data.displayedColumns;
       // this.dataSource = new MatTableDataSource<any>(this.data.rows);
       // this.dataSource.paginator = this.paginator;
       // this.dataSource.filterPredicate = (data, filter) =>
@@ -282,17 +333,17 @@ loadIsaTablePage() {
         this.selectedCells.forEach((cell) => {
           i = i + 1;
           if (i < this.selectedCells.length) {
-            content = content + this.data.rows[cell[1]][cell[0]] + "\n";
+            content = content + this.currentPage[cell[1]][cell[0]] + "\n";
           } else {
-            content = content + this.data.rows[cell[1]][cell[0]];
+            content = content + this.currentPage[cell[1]][cell[0]];
           }
         });
       } else if (this.selectedColumns.length > 0) {
         if (this.selectedColumns.length === 1) {
           let i = 0;
-          this.data.rows.forEach((row) => {
+          this.currentPage.forEach((row) => {
             i = i + 1;
-            if (i < this.data.rows.length) {
+            if (i < this.currentPage.length) {
               content = content + row[this.selectedColumns[0]] + "\n";
             } else {
               content = content + row[this.selectedColumns[0]];
@@ -313,7 +364,7 @@ loadIsaTablePage() {
   getHeaderIndex(columnIndex) {
     if (this.isObject(columnIndex)) {
       if (columnIndex.index !== null) {
-        columnIndex = columnIndex.index;
+        columnIndex = columnIndex.targetColumnIndex;
       }
     }
     return columnIndex;
@@ -339,12 +390,12 @@ loadIsaTablePage() {
         const pastedValues = clipboardData.getData("Text").split(/\r\n|\n|\r/);
         let currentRow = this.selectedCells[0][1];
         pastedValues.forEach((value) => {
-          if (currentRow < this.data.rows.length) {
+          const targetColIdx = this.currentMetadataColumnNameIndices.get(this.selectedCells[0][0]);
+          const targetRowIdx = this.currentMetadataRowIndices.get(this.currentPage[currentRow].index);
+          if (currentRow < this.currentPage.length) {
             cellsToUpdate.push({
-              row: currentRow,
-              column: this.getHeaderIndex(
-                this.data.header[this.selectedCells[0][0]]
-              ),
+              row: targetRowIdx,
+              column: targetColIdx,
               value: pvalue ? pvalue : value,
             });
             currentRow = currentRow + 1;
@@ -364,14 +415,14 @@ loadIsaTablePage() {
             .split(/\r\n|\n|\r/);
           if (pastedValues.length === 1) {
             let currentRow = 0;
-            this.data.rows.forEach((value) => {
-              if (currentRow < this.data.rows.length) {
+            pastedValues.forEach((value) => {
+              const targetColIdx = this.currentMetadataColumnNameIndices.get(this.selectedColumns[0]);
+              const targetRowIdx = this.currentMetadataRowIndices.get(this.currentPage[currentRow].index);
+              if (currentRow < this.currentPage.length) {
                 cellsToUpdate.push({
-                  row: currentRow,
-                  column: this.getHeaderIndex(
-                    this.data.header[this.selectedColumns[0]]
-                  ),
-                  value: pvalue ? pvalue : pastedValues[0],
+                  row: targetRowIdx,
+                  column: targetColIdx,
+                  value: pvalue ? pvalue : this.selectedColumns[0],
                 });
                 currentRow = currentRow + 1;
               }
@@ -379,12 +430,12 @@ loadIsaTablePage() {
           } else {
             let currentRow = 0;
             pastedValues.forEach((value) => {
-              if (currentRow < this.data.rows.length) {
+              const targetColIdx = this.currentMetadataColumnNameIndices.get(this.selectedColumns[0]);
+              const targetRowIdx = this.currentMetadataRowIndices.get(this.currentPage[currentRow].index);
+              if (currentRow < this.currentPage.length) {
                 cellsToUpdate.push({
-                  row: currentRow,
-                  column: this.getHeaderIndex(
-                    this.data.header[this.selectedColumns[0]]
-                  ),
+                  row: targetRowIdx,
+                  column: targetColIdx,
                   value: pvalue ? pvalue : value,
                 });
                 currentRow = currentRow + 1;
@@ -397,12 +448,14 @@ loadIsaTablePage() {
             .getData("Text")
             .split(/\r\n|\n|\r/)[0];
           let currentRow = 0;
-          this.selectedCells.forEach((cell) => {
-            if (currentRow < this.data.rows.length) {
+          this.selectedCells.forEach((value) => {
+            const targetColIdx = this.currentMetadataColumnNameIndices.get(this.selectedCells[0][0]);
+            const targetRowIdx = this.currentMetadataRowIndices.get(this.currentPage[currentRow].index);
+            if (currentRow < this.currentPage.length) {
               cellsToUpdate.push({
-                row: cell[1],
-                column: this.getHeaderIndex(this.data.header[cell[0]]),
-                value: pvalue ? pvalue : pastedValue,
+                row: targetRowIdx,
+                column: targetColIdx,
+                value: pvalue ? pvalue : value,
               });
               currentRow = currentRow + 1;
             }
@@ -414,11 +467,9 @@ loadIsaTablePage() {
     if (cellsToUpdate.length > 0) {
       this.isFormBusy = true;
       this.editorService
-        .updateCells(
-          this.data.file,
-          { data: cellsToUpdate },
-          this.validationsId,
-          null
+        .updateMAFTableCells(
+          this.currentMetadata.file,
+          { data: cellsToUpdate }
         )
         .subscribe(
           (res) => {
@@ -431,10 +482,12 @@ loadIsaTablePage() {
             });
             this.loading = false;
             this.isFormBusy = false;
+            this.updateTableData(cellsToUpdate);
           },
           (err) => {
             console.error(err);
             this.loading = false;
+            this.isFormBusy = false;
           }
         );
     }
@@ -515,7 +568,7 @@ loadIsaTablePage() {
       }
       this.ontologyCols[column].values = {};
       this.ontologyCols[column].missingTerms = new Set<string>();
-      this.data.rows.forEach((row) => {
+      this.currentPage.forEach((row) => {
         if (
           !this.isEmpty(row[column]) &&
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||
@@ -573,12 +626,12 @@ loadIsaTablePage() {
   }
 
   onKeydown(event, filterValue: string) {
-    let data = [];
+    // let data = [];
     if (event.key === "Enter") {
-      if (this.filters.indexOf(filterValue) < 0) {
-        this.filters.push(filterValue);
-        event.target.value = "";
-      }
+      // if (this.filters.indexOf(filterValue) < 0) {
+      //   this.filters.push(filterValue);
+      //   event.target.value = "";
+      // }
       // this.dataSource.filter = "";
       // this.filters.forEach((f) => {
       //   data = data.concat(
@@ -660,7 +713,7 @@ loadIsaTablePage() {
 
   addNRows() {
     if (this.rowsToAdd > 0) {
-      let index = this.data.rows.length;
+      let index = this.currentPage.length;
       if (this.selectedRows.length > 0) {
         index = this.selectedRows[0] + 1;
       }
@@ -675,7 +728,7 @@ loadIsaTablePage() {
   }
 
   addRow() {
-    let index = this.data.rows.length;
+    let index = this.currentPage.length;
     if (this.selectedRows.length > 0) {
       index = this.selectedRows[0];
     }
@@ -735,8 +788,8 @@ loadIsaTablePage() {
   }
 
   getEmptyRow() {
-    if (this.data.rows.length > 0) {
-      const obj = tassign({}, this.data.rows[0]);
+    if (this.currentPage.length > 0) {
+      const obj = tassign({}, this.currentPage[0]);
       Object.keys(obj).forEach((key) => {
         let isStableColumn = false;
         this.stableColumns.forEach((col) => {
@@ -820,7 +873,7 @@ loadIsaTablePage() {
     // );
   }
 
-  isSelected(row, column) {
+  isSelected(row, column, rowIdx) {
     if (row && column && this.selectedCells.length > 0) {
       return (
         this.selectedCells.filter(
@@ -849,7 +902,8 @@ loadIsaTablePage() {
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;
-    const colIndex = this.selectedColumns.indexOf(entryIndex);
+    const targetColIndex = this.currentMetadataColumnNameIndices.get(entryIndex);
+    const colIndex = this.currentMetadataRowIndices.get(targetColIndex);
     if (event.altKey) {
       if (colIndex > -1) {
         this.selectedRows.splice(colIndex, 1);
@@ -884,7 +938,7 @@ loadIsaTablePage() {
       }
       this.selectedColumns = this.selectedColumns.concat(currentSelection);
     } else {
-      if (colIndex < 0) {
+      if (colIndex >= 0) {
         this.selectedColumns = [entryIndex];
       } else {
         this.selectedColumns = [];
@@ -939,7 +993,7 @@ loadIsaTablePage() {
     this.lastRowSelection = row;
   }
 
-  cellClick(row: any, column: any, event) {
+  cellClick(row: any, column: any, event, rowIdx) {
     if (event.altKey) {
       this.selectedCells.push([column.columnDef, row.index]);
     } else {
@@ -948,7 +1002,7 @@ loadIsaTablePage() {
     this.getOntologyObject();
   }
 
-  editCell(row: any, column: any, event) {
+  editCell(row: any, column: any, event, rowIdx) {
     if (!this.isReadOnly) {
       this.isCellTypeFile = false;
       this.isCellTypeOntology = false;
@@ -994,7 +1048,7 @@ loadIsaTablePage() {
 
   saveCell() {
     let cellsToUpdate = [];
-    let columnIndex = this.data.header[this.selectedCell["column"].header];
+    let columnIndex = this.selectedCell["column"].targetColumnIndex;
     if (this.isObject(columnIndex)) {
       if (columnIndex.index !== null) {
         columnIndex = columnIndex.index;
@@ -1054,11 +1108,9 @@ loadIsaTablePage() {
     }
     this.isFormBusy = true;
     this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
+      .updateMAFTableCells(
+        this.currentMetadata.file,
+        { data: cellsToUpdate }
       )
       .subscribe(
         (res) => {
@@ -1071,6 +1123,7 @@ loadIsaTablePage() {
           });
           this.isEditModalOpen = false;
           this.isFormBusy = false;
+          this.updateTableData(cellsToUpdate);
         },
         (err) => {
           console.error(err);
@@ -1079,6 +1132,22 @@ loadIsaTablePage() {
       );
   }
 
+  updateTableData(cells: any) {
+    cells.forEach(element => {
+      let tableRowIndex = -1;
+      if(this.currentMetadataRowIndices.has(element.row)) {
+        tableRowIndex = this.currentMetadataRowIndices.get(element.row);
+      }
+      let tableColIndex = -1;
+      if(this.currentMetadataRowIndices.has(element.column)) {
+        tableColIndex = this.currentMetadataColumnIndices.get(element.column);
+      }
+      if (tableColIndex > -1 && tableRowIndex > -1) {
+        const colName = this.currentMetadata.columnNames[tableColIndex];
+        this.currentPage[tableRowIndex][colName] = element.value;
+      }
+    });
+  }
   saveColumnSelectedMissingRowsValues() {
     const selectedMissingOntology = this.getOntologyComponentValue(
       "editMissingOntology"
@@ -1113,7 +1182,7 @@ loadIsaTablePage() {
       }
     }
 
-    this.data.rows.forEach((row) => {
+    this.currentPage.forEach((row) => {
       if (row[this.selectedMissingKey] === this.selectedMissingVal) {
         cellsToUpdate.push(
           {
@@ -1136,11 +1205,9 @@ loadIsaTablePage() {
     });
     this.isFormBusy = true;
     this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
+      .updateMAFTableCells(
+        this.currentMetadata.file,
+        { data: cellsToUpdate }
       )
       .subscribe(
         (res) => {
@@ -1155,6 +1222,7 @@ loadIsaTablePage() {
           if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
             this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
           }
+          this.updateTableData(cellsToUpdate);
           this.isFormBusy = false;
         },
         (err) => {
@@ -1174,12 +1242,7 @@ loadIsaTablePage() {
       sRows = this.currentPage;
     }
     const cellsToUpdate = [];
-    let columnIndex = this.data.header[this.selectedColumn.header];
-    if (this.isObject(columnIndex)) {
-      if (columnIndex.index !== null) {
-        columnIndex = columnIndex.index;
-      }
-    }
+    const columnIndex = this.selectedColumn.targetColumnIndex;
     if (this.isCellTypeOntology) {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyColumn").values[0];
@@ -1214,11 +1277,9 @@ loadIsaTablePage() {
     }
     this.isFormBusy = true;
     this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
+      .updateMAFTableCells(
+        this.currentMetadata.file,
+        { data: cellsToUpdate }
       )
       .subscribe(
         (res) => {
@@ -1231,6 +1292,7 @@ loadIsaTablePage() {
           });
           this.isEditColumnModalOpen = false;
           this.isFormBusy = false;
+          this.updateTableData(cellsToUpdate);
         },
         (err) => {
           console.error(err);
@@ -1448,7 +1510,7 @@ loadIsaTablePage() {
     const accIndex = this.getHeaderIndex(this.data.header[col.accession]);
     const refIndex = this.getHeaderIndex(this.data.header[col.ref]);
     const columnIndex = this.getHeaderIndex(this.data.header[key]);
-    this.data.rows.forEach((row) => {
+    this.currentPage.forEach((row) => {
       if (row[key] === val) {
         cellsToUpdate.push(
           {
@@ -1466,11 +1528,9 @@ loadIsaTablePage() {
     });
     this.isFormBusy = true;
     this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
+      .updateMAFTableCells(
+        this.currentMetadata.file,
+        { data: cellsToUpdate }
       )
       .subscribe(
         (res) => {
@@ -1486,6 +1546,7 @@ loadIsaTablePage() {
           if(col.missingTerms.has(val)){
             col.missingTerms.delete(val);
           }
+          this.updateTableData(cellsToUpdate);
         },
         (err) => {
           console.error(err);
@@ -1511,35 +1572,30 @@ loadIsaTablePage() {
     }
     const columnName = firstCell[0];
     // const columnIndex = this.data.header[columnName].index;
-    const data = this.data.header[columnName];
-    let columnIndex = 0;
-    if (typeof data === 'number') {
-      columnIndex = data;
-    } else {
-      columnIndex = data.index;
-    }
+    const columnIndex = this.currentMetadata.columnNames.indexOf(columnName);
+
     // const columns = Object.keys(tableHeader).sort(
     //   (a, b) => tableHeader[a] - tableHeader[b]
     // );
     // const columnIndex = tableHeader[firstCell[0]];
-    if (firstCell) {
-      if (this.ontologyCols[firstCell[0]]) {
-        const sOntology = new Ontology();
-        sOntology.annotationValue = this.data.rows[firstCell[1]][firstCell[0]];
-        sOntology.termAccession =
-          this.data.rows[firstCell[1]][this.data.columns[columnIndex + 2].header];
-        sOntology.termSource = new OntologySourceReference();
-        sOntology.termSource.description = "";
-        sOntology.termSource.file = "";
-        sOntology.termSource.name =
-          this.data.rows[firstCell[1]][this.data.columns[columnIndex + 1].header];
-        sOntology.termSource.provenance_name = "";
-        sOntology.termSource.version = "";
-        this.selectedOntologyCell = sOntology;
-      } else {
-        this.selectedOntologyCell = null;
-      }
-    }
+    // if (firstCell) {
+    //   if (this.ontologyCols[firstCell[0]]) {
+    //     const sOntology = new Ontology();
+    //     sOntology.annotationValue = this.data.rows[firstCell[1]][firstCell[0]];
+    //     sOntology.termAccession =
+    //       this.data.rows[firstCell[1]][this.data.columns[columnIndex + 2].header];
+    //     sOntology.termSource = new OntologySourceReference();
+    //     sOntology.termSource.description = "";
+    //     sOntology.termSource.file = "";
+    //     sOntology.termSource.name =
+    //       this.data.rows[firstCell[1]][this.data.columns[columnIndex + 1].header];
+    //     sOntology.termSource.provenance_name = "";
+    //     sOntology.termSource.version = "";
+    //     this.selectedOntologyCell = sOntology;
+    //   } else {
+    //     this.selectedOntologyCell = null;
+    //   }
+    // }
   }
 
   filterDuplicate(value) {

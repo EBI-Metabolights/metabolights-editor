@@ -1,197 +1,48 @@
-<div *ngIf="data" class="columns is-vcentered">
-  <span class="column is-6 fadeIn nmrl">
-    <span class="has-text-grey">
-      <small>File: {{ data.file }}</small>
-    </span>
-  </span>
-  <span class="column is-6 fadeIn has-text-right nmrl">
-    <mat-paginator
-      [pageSizeOptions]="mlPageSizeOptions"
-      showFirstLastButtons
-    ></mat-paginator>
-  </span>
-</div>
-<div *ngIf="!isReadOnly" class="my-2">
-  <div *ngIf="hasAnyMissingValues()" class="notification is-warning">
-    <small
-      >The terms below are provided in your table but do not have associated
-      ontologies. If you wish to add ontology terms please use
-      <i class="material-icons">edit</i> to edit or
-      <i class="material-icons">compare_arrows</i> to autofill using existing
-      values.</small
-    >
-    <br /><br />
-    <span *ngFor="let key of getKeys(ontologyCols)">
-      <span *ngIf="ontologyCols[key]['missingTerms'].size > 0">
-        <p *ngIf="getKeys(ontologyCols[key]['values']).length > 0">
-          <small
-            ><b>{{ formatHeader(key) }}</b
-            >:</small
-          >
-          <span class="field is-grouped is-grouped-multiline">
-            <span *ngFor="let val of getKeys(ontologyCols[key]['values'])">
-              <div
-              *ngIf="ontologyCols[key]['missingTerms'].has(val)"
-              class="control">
-                <div class="tags has-addons my-2">
-                  <span
-                    (click)="
-                      openEditMissingColValModal(ontologyCols[key], key, val)
-                    "
-                    class="tag is-primary clickable"
-                  >
-                    <i class="material-icons"> edit </i>
-                  </span>
-                  <span class="tag is-default is-small">
-                    {{ val }}
-                  </span>
-                  <span
-                    (click)="autoPopulate(ontologyCols[key], key, val)"
-                    *ngIf="
-                      ontologyCols[key]['values'][val][0] != null ||
-                      ontologyCols[key]['values'][val][1] != null
-                    "
-                    class="tag is-info clickable"
-                  >
-                    <i class="material-icons"> compare_arrows </i>
-                  </span>
-                  <span class="tag ">
-                    {{ontologyCols[key]['values'][val][0]}}:{{ontologyCols[key]['values'][val][1]}}
-                  </span>
-                </div>
-              </div>
-            </span>
-          </span>
 
-        </p>
-      </span>
-    </span>
-  </div>
-</div>
+
 <span *ngIf="!isReadOnly" #spacer></span>
-<div
-  *ngIf="!isReadOnly"
-  class="columns mb0 is-vcentered prevent-deselect"
-  style="
-    z-index: 1000;
-    background-color: white;
-    padding: 10px;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-  "
-  stickyThing
-  [spacer]="spacer"
-  marginTop="50"
->
-  <span class="column is-12 fadeIn nmrl">
-    <a class="button is-small is-light" (click)="toggleView()">
-      <span *ngIf="view == 'compact'; else expandedTable"> Expand Table </span>
-      <ng-template #expandedTable> Compact Table </ng-template>
-    </a>
-    &nbsp;
-    <div style="display: inline-flex; width: 13%" class="field has-addons">
-      <p class="control">
-        <input [(ngModel)]="rowsToAdd" class="input is-small" type="text" />
-      </p>
-      <p class="control">
-        <a (click)="addNRows()" class="button is-small is-light">
-          <mat-icon>add</mat-icon> Rows
-        </a>
-      </p>
-    </div>
-    &nbsp;
-    <span *ngIf="data">
-      <mtbls-upload
-        [fileTypes]="fileTypes"
-        [type]="'file'"
-        [multiple]="false"
-        [file]="data.file"
-      ></mtbls-upload>
-    </span>
-    &nbsp;
-    <span *ngIf="data && data.file">
-      <mtbls-download [value]="data.file"></mtbls-download>
-    </span>
-    &nbsp;
-    <span
-      *ngIf="
-        selectedRows.length > 0 ||
-        selectedColumns.length > 0 ||
-        selectedCells.length > 0
-      "
-    >
-      <span *ngIf="selectedRows.length > 0">
-        <a (click)="openDeleteModal()" class="button is-small is-light">
-          <mat-icon>delete</mat-icon> Delete
-        </a> </span
-      >&nbsp;
-      <small class="has-text-grey-light"
-        ><mat-icon>info</mat-icon> items selected</small
-      >
-    </span>
-    <span *ngIf="loading">
-      <small class="has-text-grey-lighter">Saving</small
-      ><img
-        style="height: 10px; margin-left: 10px"
-        src="{{ baseHref }}assets/img/loading.svg"
-      />
-    </span>
-    <span *ngIf="selectedCells.length > 0 && selectedOntologyCell">
-      <span
-        *ngIf=" selectedOntologyCell.annotationValue !== ''"
-      >
-        &nbsp;<small class="tag is-normal is-default"
-          >{{ selectedOntologyCell.termSource.name }}:{{ selectedOntologyCell.annotationValue }}
 
-        </small>
-      </span>
-    </span>
-  </span>
-</div>
-<div class="menu-bar columns">
-  <span class="column is-12 is-paddingless nmrl">
-    <mat-form-field class="full-width bback">
-      <input
-        autocomplete="off"
-        matInput
-        (keyup)="applyFilter($event.target.value)"
-        (keydown)="onKeydown($event, $event.target.value)"
-        placeholder="Filter"
-      />
-    </mat-form-field>
-  </span>
-</div>
-<div class="menu-bar columns">
-  <span class="column is-12 is-paddingless nmrl">
-    <div
-      style="margin-bottom: 0.75rem"
-      *ngIf="filters.length > 0"
-      class="field is-grouped is-grouped-multiline"
-    >
-      <div *ngFor="let filter of filters" class="control">
-        <div class="tags has-addons">
-          <span class="tag is-link">{{ filter }}</span>
-          <a (click)="highlightFilteredRows(filter)" class="tag addon-tag"
-            ><mat-icon class="prevent-deselect"
-              >center_focus_strong</mat-icon
-            ></a
-          >
-          <a (click)="removeFilter(filter)" class="tag is-delete"></a>
-        </div>
-      </div>
-    </div>
-  </span>
-</div>
-<span *ngIf="tableData && data">
+<span >
   <div class="wrapper mat-elevation-z1 prevent-deselect">
-    <table
+    <div class="spinner-container">
+      <mat-spinner
+      [diameter]="20"
+      [strokeWidth]="3"
+      *ngIf="dataSource.loading$ | async"
+    ></mat-spinner>
+    </div>
+    <div class="spinner-container">
+      <mat-spinner
+      [diameter]="20"
+      [strokeWidth]="3"
+      *ngIf="isFormBusy"
+    ></mat-spinner>
+    </div>
+    <div class="rows is-vcentered ml5">
+      <span class="row is-6 fadeIn nmrl">
+        <span class="has-text-grey">
+          <small>File: {{ currentMetadata?.file }}</small>
+        </span>
+      </span>
+      <span class="row is-6 fadeIn has-text-right nmrl ml5">
+        <mat-paginator
+          [length]="currentMetadata?.totalSize"
+          [pageSize]="100"
+          [pageSizeOptions]="mlPageSizeOptions"
+          showFirstLastButtons
+        ></mat-paginator>
+      </span>
+    </div>
+
+    <mat-table
+      *ngIf="currentMetadata && currentPage"
       editTable
       (copy)="onCopy($event)"
       (paste)="onPaste($event)"
       (cut)="onCut($event)"
-      class="mat-elevation-z1 tableclass"
+      class="mat-elevation-z1 tableclass table-margin"
       [dataSource]="dataSource"
       matSort
-      mat-table
     >
       <ng-container matColumnDef="Select" sticky>
         <th
@@ -209,7 +60,7 @@
         ></td>
       </ng-container>
       <ng-container
-        *ngFor="let column of data.columns"
+        *ngFor="let column of currentMetadata?.columns"
         [sticky]="column.sticky"
         [matColumnDef]="column.columnDef"
       >
@@ -221,19 +72,19 @@
           *matHeaderCellDef
           mat-sort-header
         >
-          {{ formatHeader(column.header) }}
+          {{ formatHeader(column.columnDef) }}
         </th>
-        <span *ngIf="!column.structure; else isStructure">
+        <span *ngIf="!column.calculated; else isStructure">
           <td
             (keydown)="onKeyDown($event)"
-            (dblclick)="editCell(row, column, $event)"
-            (click)="cellClick(row, column, $event)"
+            (dblclick)="editCell(row, column, $event, rowIdx)"
+            (click)="cellClick(row, column, $event, rowIdx)"
             class="clickable mlc-table"
-            [ngClass]="{ selected: isSelected(row, column) }"
+            [ngClass]="{ selected: isSelected(row, column, rowIdx) }"
             mat-cell
-            *matCellDef="let row"
+            *matCellDef="let row; let rowIdx = index"
           >
-            {{ row[column.header] }}
+            {{ row[column.columnDef] }}
           </td>
         </span>
         <ng-template #isStructure>
@@ -267,13 +118,13 @@
       <tr
         class="header-row"
         mat-header-row
-        *matHeaderRowDef="displayedTableColumns"
+        *matHeaderRowDef="currentMetadata?.columnNames"
       ></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedTableColumns"></tr>
-    </table>
+      <tr mat-row *matRowDef="let row; columns: currentMetadata?.columnNames"></tr>
+    </mat-table>
   </div>
   <div class="wrapper mat-elevation-z1">
-    <span *ngIf="dataSource && currentPage.length === 0">
+    <span *ngIf="dataSource && currentPage?.length === 0">
       <div>&nbsp;</div>
       <p class="has-text-centered">
         <small

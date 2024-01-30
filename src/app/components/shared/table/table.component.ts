@@ -682,6 +682,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   addRows(rows, index) {
     this.isFormBusy = true;
+    this.loading = true;
     this.editorService
       .addRows(
         this.data.file,
@@ -704,9 +705,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           );
           this.rowsUpdated.emit();
           this.isFormBusy = false;
+          this.loading = false;
         },
         (err) => {
           this.isFormBusy = false;
+          this.loading = false;
         }
       );
   }

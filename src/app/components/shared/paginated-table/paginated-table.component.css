@@ -19,6 +19,10 @@ table {
   background-color: inherit;
 }
 
+.table-nav {
+  margin: 5px;
+}
+
 .pointer {
   cursor: pointer;
 }
@@ -90,6 +94,9 @@ th span {
   margin-top: 20px;
 }
 
+.ml5 {
+  margin-left: 5px;
+}
 .mb0 {
   margin-bottom: 0px;
 }
