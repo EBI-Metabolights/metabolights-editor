@@ -368,7 +368,7 @@
       "is-read-only": "false",
       "is-hidden": "false",
       "technique": "mass spectrometry|NMR spectroscopy",
-      "description": "Add terms describing study design type eg. Celiac disease, Metabolic fingerprinting, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolomics",
+      "description": "Add terms describing study design type eg. Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolomics",
       "placeholder": "Metabolomics, Lipidomics",
       "rules": [
         {
@@ -1555,6 +1555,7 @@
         "rules": [],
         "recommended-ontologies": {
           "is-forced-ontology": "false",
+          "is-required": "false",
           "ontology": {
             "url": "/ebi-internal/ontology?branch=unit&term=",
             "allowFreeText": true
@@ -2146,6 +2147,7 @@
         {
           "columnDef": "unit",
           "sticky": "false",
+          "is-required": "false",
           "header": "Unit",
           "data-type": "ontology",
           "ontology-details": {

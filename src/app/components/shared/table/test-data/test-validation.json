@@ -367,7 +367,7 @@
     "is-read-only": "false",
     "is-hidden": "false",
     "technique": "mass spectrometry|NMR spectroscopy",
-    "description": "Add terms describing study design type eg. Celiac disease, Metabolic fingerprinting, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolomics",
+    "description": "Add terms describing study design type eg. Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolomics",
     "placeholder": "Metabolomics, Lipidomics",
     "rules": [
       {
@@ -1500,7 +1500,7 @@
     "unit": {
       "data-type": "ontology",
       "sort-order": "2",
-      "is-required": "true",
+      "is-required": "false",
       "is-read-only": "false",
       "label": "Add unit (if applicable)",
       "is-hidden": "false",
