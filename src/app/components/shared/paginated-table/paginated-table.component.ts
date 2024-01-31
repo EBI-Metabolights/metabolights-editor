@@ -96,7 +96,7 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   lastColSelection = null;
 
   displayedTableColumns: any = [];
-
+  displayedTableColumnNames: any = [];
   ontologyCols: any = {};
   fileColumns: any = [];
   controlListColumns: Map<string, any> = new Map<string, any>();
@@ -150,15 +150,23 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
     });
     this.dataSource.data.subscribe((val: any) => {
       this.currentMetadataRowIndices.clear();
-      if(val && this.structureColumnEnabled) {
-        this.currentPage = val.map((col) => {
-          col.structure = "";
-          return col;
+      this.currentPage = val.map((col) => {
+        col.structure = "";
+        return col;
+      });
+
+      if(val) {
+        this.currentPage = val.map((row) => {
+          if (this.structureColumnEnabled) {
+            row.structure = "";
+          }
+          row.Select = "Data";
+          return row;
         });
       } else {
         this.currentPage = val;
       }
-      if (this.currentPage) {
+      if (val) {
         this.currentPage.forEach((element, idx) => {
         this.currentMetadataRowIndices.set(element.index, idx);
       });
@@ -168,23 +176,34 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
     this.dataSource.metadata.subscribe((val) => {
       this.currentMetadataColumnIndices.clear();
       this.currentMetadataColumnNameIndices.clear();
-      if(val && this.structureColumnEnabled) {
-        val.columnNames = ["structure"].concat(val.columnNames);
-        const structureColumn = new PaginatedTableColumn();
-        structureColumn.columnDef = "structure";
-        structureColumn.header = "structure";
-        structureColumn.sticky = "true";
-        structureColumn.calculated = true;
-        val.columns = [structureColumn].concat(val.columns);
-        this.currentMetadata = val;
-      } else {
-        this.currentMetadata = val;
-      }
       if(val) {
+        this.displayedTableColumnNames = val.columnNames.slice();
+        this.displayedTableColumns = val.columns.slice();
+        // const seclectColumn = new PaginatedTableColumn();
+        // seclectColumn.columnDef = "Select";
+        // seclectColumn.header = "";
+        // seclectColumn.sticky = "true";
+        // this.displayedTableColumns.unshift(seclectColumn);
+        this.currentMetadata = val;
+        let addedColumns = 0;
+        if(this.structureColumnEnabled) {
+          this.displayedTableColumnNames.unshift("structure");
+          const structureColumn = new PaginatedTableColumn();
+          structureColumn.columnDef = "structure";
+          structureColumn.header = "structure";
+          structureColumn.sticky = "true";
+          structureColumn.calculated = true;
+          this.displayedTableColumns.unshift(structureColumn);
+          this.currentMetadata.columns.unshift(structureColumn);
+          addedColumns += 1;
+        }
+        this.displayedTableColumnNames.unshift("Select");
         this.currentMetadata.columns.forEach((element, idx) => {
-          this.currentMetadataColumnIndices.set(element.targetColumnIndex, idx);
+          this.currentMetadataColumnIndices.set(element.targetColumnIndex, idx - addedColumns);
           this.currentMetadataColumnNameIndices.set(element.columnDef, element.targetColumnIndex);
         });
+      } else {
+        this.currentMetadata = val;
       }
 
     });
@@ -205,6 +224,7 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
 }
 
 loadIsaTablePage() {
+    const columnNames = this.currentMetadata.columns.filter((col) => !col.calculated ).map((col) => col.columnDef);
     this.dataSource.loadIsaTableRows(
         this.studyId,
         this.tableData.data.file,
@@ -532,7 +552,7 @@ loadIsaTablePage() {
 
   toggleView() {
     if (this.view === "compact") {
-      this.displayedTableColumns = Object.keys(this.data.header);
+      this.displayedTableColumns = Object.keys(this.data.columnDef);
       this.view = "expanded";
     } else {
       this.displayedTableColumns = this.data.displayedColumns;
@@ -690,7 +710,7 @@ loadIsaTablePage() {
   addColumns(columns) {
     this.isFormBusy = true;
     this.editorService
-      .addColumns(this.data.file, { data: columns }, this.validationsId, null)
+      .addColumns(this.currentMetadata.file, { data: columns }, this.validationsId, null)
       .subscribe(
         (res) => {
           toastr.success("Characteristic/Factor columns are added successfully", "Success", {
@@ -713,7 +733,7 @@ loadIsaTablePage() {
 
   addNRows() {
     if (this.rowsToAdd > 0) {
-      let index = this.currentPage.length;
+      let index = this.currentMetadata.totalSize;
       if (this.selectedRows.length > 0) {
         index = this.selectedRows[0] + 1;
       }
@@ -728,9 +748,9 @@ loadIsaTablePage() {
   }
 
   addRow() {
-    let index = this.currentPage.length;
+    let index = this.currentMetadata.totalSize;
     if (this.selectedRows.length > 0) {
-      index = this.selectedRows[0];
+      index = this.selectedRows[0] + 1;
     }
     this.addRows([this.getEmptyRow()], index);
   }
@@ -738,7 +758,7 @@ loadIsaTablePage() {
   updateRows(rows) {
     this.isFormBusy = true;
     this.editorService
-      .updateRows(this.data.file, { data: rows }, this.validationsId, null)
+      .updateRows(this.currentMetadata.file, { data: rows }, this.validationsId, null)
       .subscribe(
         (res) => {
           toastr.success("Row updated successfully", "Success", {
@@ -760,7 +780,7 @@ loadIsaTablePage() {
     this.isFormBusy = true;
     this.editorService
       .addRows(
-        this.data.file,
+        this.currentMetadata.file,
         { data: { rows, index: index ? index : 0 } },
         this.validationsId,
         null
@@ -779,6 +799,7 @@ loadIsaTablePage() {
             }
           );
           this.rowsUpdated.emit();
+          this.loadIsaTablePage();
           this.isFormBusy = false;
         },
         (err) => {
@@ -790,7 +811,8 @@ loadIsaTablePage() {
   getEmptyRow() {
     if (this.currentPage.length > 0) {
       const obj = tassign({}, this.currentPage[0]);
-      Object.keys(obj).forEach((key) => {
+      this.currentMetadata.columns.forEach(column => {
+        const key = column.columnDef;
         let isStableColumn = false;
         this.stableColumns.forEach((col) => {
           if (key.indexOf(col) > -1) {
@@ -800,13 +822,16 @@ loadIsaTablePage() {
         if (!isStableColumn) {
           obj[key] = "";
         }
+        if (column.columnDef === "index" || column.calculated) {
+          delete obj[key];
+        }
       });
+
       return obj;
     } else {
-      const obj = tassign({}, this.data.header);
-      Object.keys(obj).forEach((key) => {
-        obj[key] = "";
-      });
+
+      const obj = {};
+      this.columnNames.forEach((col) => obj[col] = "");
       return obj;
     }
   }
@@ -815,7 +840,7 @@ loadIsaTablePage() {
     this.isFormBusy = true;
     this.editorService
       .deleteRows(
-        this.data.file,
+        this.currentMetadata.file,
         this.getUnique(this.selectedRows).join(","),
         this.validationsId,
         null
@@ -1139,7 +1164,7 @@ loadIsaTablePage() {
         tableRowIndex = this.currentMetadataRowIndices.get(element.row);
       }
       let tableColIndex = -1;
-      if(this.currentMetadataRowIndices.has(element.column)) {
+      if(this.currentMetadataColumnIndices.has(element.column)) {
         tableColIndex = this.currentMetadataColumnIndices.get(element.column);
       }
       if (tableColIndex > -1 && tableRowIndex > -1) {

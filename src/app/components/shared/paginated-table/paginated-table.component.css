@@ -19,10 +19,6 @@ table {
   background-color: inherit;
 }
 
-.table-nav {
-  margin: 5px;
-}
-
 .pointer {
   cursor: pointer;
 }
@@ -94,9 +90,6 @@ th span {
   margin-top: 20px;
 }
 
-.ml5 {
-  margin-left: 5px;
-}
 .mb0 {
   margin-bottom: 0px;
 }
@@ -188,10 +181,12 @@ a.dropdown-item {
 
 .row-selector {
   width: 10px;
+  min-width: 10px;
 }
 
 .table-selector {
   width: 10px;
+  min-width: 10px;
 }
 
 .selected {
@@ -239,4 +234,13 @@ a.dropdown-item {
 
 .button.is-light {
   border-radius: 2px;
+}
+
+.missing-ontology {
+  margin-right: 10px;
+}
+
+.missing-tag {
+  margin-top: 0px;
+  vertical-align: top;
 }
