@@ -55,6 +55,7 @@ import { AuthService } from "./services/metabolights/auth.service";
 import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
+import { NgxsModule } from "@ngxs/store";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -102,6 +103,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
     AngularStickyThingsModule,
     DragDropModule,
     NgReduxRouterModule.forRoot(),
+    NgxsModule.forRoot([], {}),
     QuillModule.forRoot({
       modules: {
         clipboard: {
