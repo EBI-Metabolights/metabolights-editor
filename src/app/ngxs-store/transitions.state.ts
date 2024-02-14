@@ -2,7 +2,6 @@ import { Injectable } from "@angular/core";
 import { Action, State, StateContext, StateToken } from "@ngxs/store";
 import { Loading, SetLoadingInfo, SetTabIndex } from "./transitions.actions";
 
-const APPLICATION_STATE_TOKEN = new StateToken<unknown>('transitions')
 
 export interface TransitionStateModel {
     loading: boolean,

@@ -7,6 +7,7 @@ import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { SetLoadingInfo } from "src/app/ngxs-store/transitions.actions";
+import { User } from "src/app/ngxs-store/user.actions";
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
   selector: "mtbls-console",
@@ -44,7 +45,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   ) {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
-        this.editorService.getAllStudies();
+        if (environment.useNewState) this.store.dispatch(new User.Studies.Get())
+        else this.editorService.getAllStudies();
         this.baseHref = this.editorService.configService.baseHref;
       }
     });
@@ -99,7 +101,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
             },
           });
         }
-        this.editorService.getAllStudies();
+        if (environment.useNewState) this.store.dispatch(new User.Studies.Get())
+        else this.editorService.getAllStudies();
       } else {
         this.editorService.toggleLoading(false);
         this.studies = value;

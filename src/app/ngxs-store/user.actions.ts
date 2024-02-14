@@ -6,12 +6,24 @@ export interface Owner {
 }
 
 export namespace User {
-    export class Set {
-        static readonly type = '[user] Set'
-        constructor(user: Owner){}
-    }
 
     export class Get {
         static readonly type = '[user] Get'
     }
+    export class Set {
+        static readonly type = '[user] Set'
+        constructor(public user: Owner){}
+    }
+
+    export namespace Studies {
+        export class Get {
+            static readonly type = '[user] Get Studies'
+        }
+        export class Set {
+            static readonly type = '[user] Set Studies'
+            constructor(public studies: any[]){}
+        }
+
+    }
 }
+

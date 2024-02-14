@@ -23,6 +23,7 @@ import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
 import { Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/transitions.actions";
 import { env } from "process";
+import { User } from "../ngxs-store/user.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -414,12 +415,8 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user: user.owner,
-        },
-      });
+      if (environment.useNewState) this.store.dispatch(new User.Set(user.owner));
+      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user.owner, },});
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
@@ -440,12 +437,8 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user,
-        },
-      });
+      if (environment.useNewState) this.store.dispatch(new User.Set(user));
+      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user, },});
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
