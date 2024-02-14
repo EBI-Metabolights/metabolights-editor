@@ -5,6 +5,8 @@ import { AfterContentInit, Component, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
+import { Store } from "@ngxs/store";
+import { SetLoadingInfo } from "src/app/ngxs-store/transitions.actions";
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
   selector: "mtbls-console",
@@ -37,6 +39,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     public router: Router,
     public http: HttpClient,
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private editorService: EditorService
   ) {
     this.route.queryParams.subscribe((params) => {
@@ -88,12 +91,14 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     });
     this.userStudies.subscribe((value) => {
       if (value === null) {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading user studies",
-          },
-        });
+        if (environment.useNewState){this.store.dispatch(new SetLoadingInfo("Loading user studies"))} else{
+          this.ngRedux.dispatch({
+            type: "SET_LOADING_INFO",
+            body: {
+              info: "Loading user studies",
+            },
+          });
+        }
         this.editorService.getAllStudies();
       } else {
         this.editorService.toggleLoading(false);

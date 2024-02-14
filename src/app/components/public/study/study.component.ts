@@ -13,6 +13,8 @@ import {AuthGuard} from '../../../auth-guard.service';
 import {browserRefresh} from '../../../app.component';
 import { StudyPermisssion } from "src/app/services/headers";
 import { PlatformLocation } from "@angular/common";
+import { Store } from "@ngxs/store";
+import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
 
 @Component({
   selector: "study",
@@ -49,6 +51,7 @@ export class PublicStudyComponent implements OnInit {
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private editorService: EditorService,
     private authGuardService: AuthGuard,
     private router: Router,
@@ -171,12 +174,8 @@ export class PublicStudyComponent implements OnInit {
   }
 
   selectCurrentTab(index, tab) {
-    this.ngRedux.dispatch({
-      type: "SET_TAB_INDEX",
-      body: {
-        currentTabIndex: index,
-      },
-    });
+    if (environment.useNewState) this.store.dispatch(new SetTabIndex(index))
+    else this.ngRedux.dispatch({ type: "SET_TAB_INDEX", body: {currentTabIndex: index,},});
 
 
     const queryParams = this.route.snapshot.queryParamMap;

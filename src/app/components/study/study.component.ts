@@ -6,6 +6,8 @@ import { EditorService } from "./../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
+import { Store } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-study",
@@ -39,6 +41,7 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private editorService: EditorService,
@@ -134,12 +137,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   }
 
   selectCurrentTab(index, tab) {
-    this.ngRedux.dispatch({
-      type: "SET_TAB_INDEX",
-      body: {
-        currentTabIndex: index,
-      },
-    });
+    if (environment.useNewState) this.store.dispatch(new SetTabIndex(index))
+    else this.ngRedux.dispatch({ type: "SET_TAB_INDEX", body: {currentTabIndex: index,},});
     const urlSplit = window.location.pathname
       .replace(/\/$/, "")
       .split("/")

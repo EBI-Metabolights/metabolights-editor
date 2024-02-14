@@ -29,6 +29,7 @@
     "@angular/router": "~10.0.7",
     "@babel/polyfill": "^7.4.4",
     "@mdi/font": "^4.7.95",
+    "@ngxs/store": "^3.7.2",
     "@w11k/angular-sticky-things": "^1.1.2",
     "bulma": "^0.7.4",
     "bulma-extensions": "^6.2.5",
