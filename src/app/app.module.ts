@@ -56,6 +56,8 @@ import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
 import { NgxsModule } from "@ngxs/store";
+import { TransitionsState } from "./ngxs-store/transitions.state";
+import { UserState } from "./ngxs-store/user.state";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -103,7 +105,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
     AngularStickyThingsModule,
     DragDropModule,
     NgReduxRouterModule.forRoot(),
-    NgxsModule.forRoot([], {}),
+    NgxsModule.forRoot([UserState, TransitionsState], { developmentMode: true }),
     QuillModule.forRoot({
       modules: {
         clipboard: {

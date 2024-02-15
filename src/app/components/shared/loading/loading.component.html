@@ -7,7 +7,9 @@
         <br />
         <small>
           <p class="has-text-info">
-            <mat-icon>comment</mat-icon>{{ loadingInformation | async }}
+            <!-- <mat-icon>comment</mat-icon>{{ loadingInformation | async }} -->
+            <mat-icon>comment</mat-icon>{{ loadingInformation$ | async }}
+
           </p>
         </small>
       </span>

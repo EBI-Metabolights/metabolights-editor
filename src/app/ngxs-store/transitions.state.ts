@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Action, State, StateContext, StateToken } from "@ngxs/store";
+import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
 import { Loading, SetLoadingInfo, SetTabIndex } from "./transitions.actions";
 
 
@@ -63,5 +63,10 @@ export class TransitionsState {
             ...state,
             loading: false
         })
+    }
+
+    @Selector()
+    static loadingInformation(state: TransitionStateModel): string {
+        return state.loadingInformation
     }
 }
