@@ -18,13 +18,11 @@ export class ConfigurationService {
   constructor(private http: HttpClient,
     private platformLocation: PlatformLocation
     ) {
-      console.log('constructor init')
       this.baseHref = this.platformLocation.getBaseHrefFromDOM();
       this.configPath = this.baseHref + "assets/configs/";
     }
 
   async loadConfiguration(): Promise<any> {
-    console.log('hit')
     try {
       const response = await this.http
         .get(`${this.configPath + "config.json"}`)

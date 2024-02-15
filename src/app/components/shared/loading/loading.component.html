@@ -1,4 +1,6 @@
-<div class="modal" [ngClass]="{ 'is-active': (isLoading | async) }">
+<!--<div class="modal" [ngClass]="{ 'is-active': (isLoading | async) }">-->
+  <div class="modal" [ngClass]="{ 'is-active': (loading$ | async) }">
+
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body vc vh50 has-text-centered">

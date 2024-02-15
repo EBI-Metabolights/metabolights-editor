@@ -7,7 +7,9 @@ import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
-import { Store } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
+import { TransitionsState } from "src/app/ngxs-store/transitions.state";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "mtbls-study",
@@ -26,6 +28,8 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   @select((state) => state.study.investigationFailed) investigationFailed;
 
+
+  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
   studyError = false;
   requestedTab = 0;
   tab = "descriptors";

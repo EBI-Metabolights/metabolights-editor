@@ -13,8 +13,10 @@ import {AuthGuard} from '../../../auth-guard.service';
 import {browserRefresh} from '../../../app.component';
 import { StudyPermisssion } from "src/app/services/headers";
 import { PlatformLocation } from "@angular/common";
-import { Store } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
+import { TransitionsState } from "src/app/ngxs-store/transitions.state";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "study",
@@ -31,6 +33,8 @@ export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.status.userStudies) userStudies;
   @select((state) => state.study.reviewerLink) studyReviewerLink;
+
+  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
 
   loading: any = true;
   requestedTab = 0;

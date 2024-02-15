@@ -14,6 +14,7 @@ export class LoadingComponent implements OnInit {
   @select((state) => state.status.loading) isLoading: boolean;
   @select((state) => state.status.info) loadingInformation: string;
 
+  @Select(TransitionsState.loading) loading$: Observable<boolean>
   @Select(TransitionsState.loadingInformation) loadingInformation$: Observable<string>;
   baseHref: string;
 

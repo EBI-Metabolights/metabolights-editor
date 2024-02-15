@@ -630,7 +630,7 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-
+    console.log('hit toggle loading in editor service')
     if (environment.useNewState) {
       status !== null ? (
         status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())

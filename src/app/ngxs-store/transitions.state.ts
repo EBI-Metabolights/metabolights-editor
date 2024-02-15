@@ -23,6 +23,7 @@ export class TransitionsState {
     @Action(SetLoadingInfo)
     setLoadingInfo(ctx: StateContext<TransitionStateModel>, action: SetLoadingInfo) {
         const state = ctx.getState();
+        console.log(action.info)
         ctx.setState({
             ...state,
             loadingInformation: action.info
@@ -59,6 +60,7 @@ export class TransitionsState {
     @Action(Loading.Disable)
     disableLoading(ctx: StateContext<TransitionStateModel>) {
         const state = ctx.getState();
+        console.log('Loading.Disable hit')
         ctx.setState({
             ...state,
             loading: false
@@ -66,7 +68,18 @@ export class TransitionsState {
     }
 
     @Selector()
+    static loading(state: TransitionStateModel): boolean {
+        console.log(`hit loading selector & ${state.loading}`)
+        return state.loading
+    }
+
+    @Selector()
     static loadingInformation(state: TransitionStateModel): string {
         return state.loadingInformation
+    }
+
+    @Selector()
+    static currentTabIndex(state: TransitionStateModel): string {
+        return state.currentTabIndex
     }
 }
