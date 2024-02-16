@@ -17,6 +17,9 @@ import { Select, Store } from "@ngxs/store";
 import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
 import { TransitionsState } from "src/app/ngxs-store/transitions.state";
 import { Observable } from "rxjs";
+import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { UserState } from "src/app/ngxs-store/user.state";
+import { Owner, User } from "src/app/ngxs-store/user.actions";
 
 @Component({
   selector: "study",
@@ -25,16 +28,18 @@ import { Observable } from "rxjs";
 })
 export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.status.user) user;
+  @select((state) => state.status.user) user; //potentially unused
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.investigationFailed) investigationFailed;
   @select((state) => state.study.files) studyFiles;
-  @select((state) => state.status.userStudies) userStudies;
+  @select((state) => state.status.userStudies) userStudies; //Potentially unused
   @select((state) => state.study.reviewerLink) studyReviewerLink;
 
+  @Select(UserState.user) user$: Observable<Owner>; // potentially unused
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
+  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]> // Potentially unused
 
   loading: any = true;
   requestedTab = 0;

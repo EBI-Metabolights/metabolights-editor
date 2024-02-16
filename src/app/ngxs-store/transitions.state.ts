@@ -60,7 +60,6 @@ export class TransitionsState {
     @Action(Loading.Disable)
     disableLoading(ctx: StateContext<TransitionStateModel>) {
         const state = ctx.getState();
-        console.log('Loading.Disable hit')
         ctx.setState({
             ...state,
             loading: false
@@ -69,7 +68,6 @@ export class TransitionsState {
 
     @Selector()
     static loading(state: TransitionStateModel): boolean {
-        console.log(`hit loading selector & ${state.loading}`)
         return state.loading
     }
 

@@ -12,6 +12,10 @@ import { EuropePMCService } from "../../../services/publications/europePMC.servi
 import * as toastr from "toastr";
 
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { UserState } from "src/app/ngxs-store/user.state";
+import { Observable } from "rxjs";
+import { Owner } from "src/app/ngxs-store/user.actions";
 
 @Component({
   selector: "app-meta",
@@ -25,6 +29,9 @@ export class MetaComponent implements OnInit {
   @select((state) => state.study.abstract) studyDescription;
 
   @select((state) => state.study.studyDesignDescriptors)
+
+  @Select(UserState.user) user$: Observable<Owner>;
+
   studyDesignDescriptors: any[];
 
   requestedStudy: string = null;
@@ -67,9 +74,10 @@ export class MetaComponent implements OnInit {
     private europePMCService: EuropePMCService
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
@@ -95,6 +103,29 @@ export class MetaComponent implements OnInit {
       this.user = value;
       this.user.checked = false;
     });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier.subscribe((value) => {
+      if (value !== null) {
+        this.requestedStudy = value;
+      }
+    });
+    this.studyTitle.subscribe((value) => {
+      if (value && value !== "") {
+        this.currentTitle = value;
+      }
+    });
+    this.studyDescription.subscribe((value) => {
+      if (value && value !== "") {
+        this.currentDescription = value;
+      }
+    });
+    this.user$.subscribe((value) => {
+      this.user = value;
+      this.user.checked = false;
+    });
+
   }
 
   getCurrentStudyMetaData() {}
