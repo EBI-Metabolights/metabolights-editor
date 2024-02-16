@@ -6,7 +6,7 @@ import { MockMetabolightsService } from "../services/metabolights/metabolights.s
 import { User } from "./user.actions";
 
 
-fdescribe('User', () => {
+describe('User', () => {
     let store: Store;
 
     beforeEach(() => {
@@ -18,11 +18,26 @@ fdescribe('User', () => {
     });
 
     it('gets a list of user studies, and dispatches a follow up action to persist those studies', () => {
-        store.dispatch(new User.Studies.Get);
+        store.dispatch(new User.Studies.Get());
 
         const studies = store.selectSnapshot(state => state.user.userStudies)
-        expect(studies.length).toBe(1);
-    })
+        expect(studies.length).toBe(2);
+    });
+
+    it('should set a user', () => {
+        const user = {
+            apiToken: 'token',
+            role: 'user',
+            email: 'user@name.org',
+            status: 'faulted'
+        }
+        store.dispatch(new User.Set(user));
+
+        const stateUser = store.selectSnapshot(state => state.user.user);
+        expect(stateUser).toBeTruthy();
+        expect(stateUser.email).toBe('user@name.org');
+    });
+
 
 
 })

@@ -3,7 +3,7 @@ import { HttpClient, HttpHandler } from "@angular/common/http";
 import { of } from "rxjs";
 import { httpOptions } from "../headers";
 import { Observable } from "rxjs-compat";
-import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { IStudyDetail, IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 
 export class MockMetabolightsService {
   @select((state) => state.study.identifier) studyIdentifier;
@@ -25,7 +25,7 @@ export class MockMetabolightsService {
    * Return a static list of IStudyDetail objects via an Observable
    * @returns Observable of IstudyDetail objects.
    */
-  getAllStudies(): Observable<IStudyDetail[]> {
+  getAllStudies(): Observable<IStudyDetailWrapper> {
 
     const studies = [ 
       {  
@@ -47,7 +47,7 @@ export class MockMetabolightsService {
           "updated": "20231002233501"  
           }
     ]
-    return of(studies)
+    return of({data: studies})
   }
 
 
