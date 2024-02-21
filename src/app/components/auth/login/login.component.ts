@@ -12,8 +12,6 @@ import jwtDecode  from "jwt-decode";
 import * as toastr from "toastr";
 import {PlatformLocation} from '@angular/common';
 import { stringify } from "querystring";
-import { Store } from "@ngxs/store";
-import { Loading } from "src/app/ngxs-store/transitions.actions";
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
@@ -30,7 +28,6 @@ export class LoginComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private ngRedux: NgRedux<IAppState>,
-    private store: Store,
     public router: Router,
     private editorService: EditorService,
     private configService: ConfigurationService,
@@ -44,12 +41,8 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (environment.useNewState) {
-      this.store.dispatch(new Loading.Disable())
-    } else {
-      if (!environment.isTesting) {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-      }
+    if (!environment.isTesting) {
+      this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
     }
     this.form = this.fb.group({
       email: ["", [Validators.required, Validators.email]],

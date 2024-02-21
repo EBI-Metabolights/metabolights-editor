@@ -6,8 +6,6 @@ import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "../../../store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
-import { Store } from "@ngxs/store";
-import { Loading } from "src/app/ngxs-store/transitions.actions";
 
 @Component({
   selector: "app-create",
@@ -36,7 +34,6 @@ export class CreateComponent implements OnInit {
     private editorService: EditorService,
     private router: Router,
     private ngRedux: NgRedux<IAppState>,
-    private store: Store,
     private platformLocation: PlatformLocation
   ) {
     this.editorService.initialiseStudy(null);
@@ -44,12 +41,8 @@ export class CreateComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (environment.useNewState) {
-      this.store.dispatch(new Loading.Disable())
-    } else {
-      if (!environment.isTesting) {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-      }
+    if (!environment.isTesting) {
+      this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
     }
   }
 
