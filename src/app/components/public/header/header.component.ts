@@ -3,6 +3,10 @@ import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
+import { UserState } from "src/app/ngxs-store/user.state";
+import { Observable } from "rxjs";
+import { Owner } from "src/app/ngxs-store/user.actions";
+import { Select } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-header",
@@ -14,6 +18,8 @@ export class HeaderComponent {
  @select((state) => state.status.bannerMessage) bannerMessage;
  @select((state) => state.status.maintenanceMode) maintenanceMode;
 
+ @Select(UserState.user) user$: Observable<Owner>;
+
   authUser: any = null;
   query = "";
   metabolightsWebsiteUrl: string;
@@ -22,7 +28,7 @@ export class HeaderComponent {
   banner: string = null;
   underMaintenance = false;
   constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
-      this.setUpSubscription();
+      environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscription();
       const url = this.configService.config.endpoint;
       if(url.endsWith("/")){
         this.metabolightsWebsiteUrl = url.slice(0, -1);
@@ -55,6 +61,21 @@ export class HeaderComponent {
     this.bannerMessage.subscribe((value) => {
         this.banner = value;
     });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.user$.subscribe((value) => {
+      if (value != null) {
+        this.authUser = value;
+      }
+    });
+    this.maintenanceMode.subscribe((value) => {
+      this.underMaintenance = value;
+    });
+    this.bannerMessage.subscribe((value) => {
+        this.banner = value;
+    });
+
   }
 
   sendQuery() {
