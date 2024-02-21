@@ -54,18 +54,34 @@ export class MetabolightsService extends DataService {
     ngRedux?: NgRedux<IAppState>
   ) {
     super("", http);
-    this.url = this.configService.config.metabolightsWSURL;
-    if(this.url.ontologyDetails.endsWith("/")){
-      this.url.ontologyDetails=  this.url.ontologyDetails.slice(0, -1);
-    }
-    if(this.url.baseURL.endsWith("/")){
-      this.url.baseURL=  this.url.baseURL.slice(0, -1);
-    }
-    if(this.url.guides.endsWith("/")){
-      this.url.guides=  this.url.guides.slice(0, -1);
-    }
-    this.studyIdentifier.subscribe((value) => (this.id = value));
-    this.stateStudy.subscribe((value) => (this.study = value));
+       // Create a promise to wait for configLoaded to become true
+       const configLoadedPromise = new Promise<void>((resolve, reject) => {
+        const subscription = this.configService.configLoaded$.subscribe(loaded => {
+            if (loaded == true) {
+                resolve(); // Resolve the promise when configLoaded becomes true
+                subscription.unsubscribe(); // Unsubscribe to prevent memory leaks
+            }
+        });
+    });
+
+    // Await the promise to wait for configLoaded to become true
+    configLoadedPromise.then(() => {
+        // Initialization logic once configLoaded is true
+        this.url = this.configService.config.metabolightsWSURL;
+        if (this.url.ontologyDetails.endsWith("/")) {
+            this.url.ontologyDetails = this.url.ontologyDetails.slice(0, -1);
+        }
+        if (this.url.baseURL.endsWith("/")) {
+            this.url.baseURL = this.url.baseURL.slice(0, -1);
+        }
+        if (this.url.guides.endsWith("/")) {
+            this.url.guides = this.url.guides.slice(0, -1);
+            console.log(this.url.guides)
+        }
+        this.studyIdentifier.subscribe((value) => (this.id = value));
+        this.stateStudy.subscribe((value) => (this.study = value));
+    });
+
   }
 
   /**
