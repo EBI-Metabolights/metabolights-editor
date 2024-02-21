@@ -8,6 +8,8 @@ import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
+import { Store } from "@ngxs/store";
+import { Loading } from "src/app/ngxs-store/transitions.actions";
 @Component({
   selector: "app-guides",
   templateUrl: "./guides.component.html",
@@ -36,6 +38,7 @@ export class GuidesComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     public router: Router,
     private editorService: EditorService,
     private route: ActivatedRoute,
@@ -52,6 +55,14 @@ export class GuidesComponent implements OnInit {
     if(this.repo.endsWith("/")){
       this.repo =  this.repo.slice(0, -1);
     }
+  }
+
+  /**
+   * Subscribe to each of the components selectors. Also dispatches a Loading.Disable action to derender the loading view.
+   */
+  setUpStoreSubscriptions() {
+    this.store.dispatch(new Loading.Disable())
+    
   }
 
   setUpSubscriptions() {
