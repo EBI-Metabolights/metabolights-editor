@@ -4,7 +4,6 @@ import { Owner, User } from "./user.actions";
 import { Injectable } from "@angular/core";
 import { MetabolightsService } from "../services/metabolights/metabolights.service";
 
-
 export interface UserStateModel {
     user: Owner,
     userStudies: IStudyDetail[]
