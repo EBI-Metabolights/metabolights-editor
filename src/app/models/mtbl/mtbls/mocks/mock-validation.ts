@@ -88,8 +88,6 @@ export const successfulValidation = {
       ],
       message: "Successful validation",
       status: "success",
-      last_update_time: 'never',
-      last_update_timestamp: 0
     },
   ],
 };
@@ -215,7 +213,4 @@ export const failedValidation = {
       status: "error",
     },
   ],
-  last_update_time: 'never',
-  last_update_timestamp: 0
-
 };
