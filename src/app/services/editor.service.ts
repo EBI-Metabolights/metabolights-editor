@@ -20,10 +20,6 @@ import { Observable, of, interval, asapScheduler, asyncScheduler } from "rxjs";
 import { VersionInfo } from "src/environment.interface";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
-import { Store } from "@ngxs/store";
-import { Loading, SetLoadingInfo } from "../ngxs-store/transitions.actions";
-import { env } from "process";
-import { User } from "../ngxs-store/user.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -73,7 +69,6 @@ export class EditorService {
 
   constructor(
     public ngRedux: NgRedux<IAppState>,
-    public store: Store,
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
@@ -415,8 +410,12 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
-      if (environment.useNewState) this.store.dispatch(new User.Set(user.owner));
-      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user.owner, },});
+      this.ngRedux.dispatch({
+        type: "SET_USER",
+        body: {
+          user: user.owner,
+        },
+      });
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
@@ -437,8 +436,12 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
-      if (environment.useNewState) this.store.dispatch(new User.Set(user));
-      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user, },});
+      this.ngRedux.dispatch({
+        type: "SET_USER",
+        body: {
+          user,
+        },
+      });
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
@@ -457,9 +460,12 @@ export class EditorService {
 
     this.dataService.getValidations().subscribe(
       (validations) => {
-        if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading study validations"))
-        else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: { info: "Loading study validations",},});
-        
+        this.ngRedux.dispatch({
+          type: "SET_LOADING_INFO",
+          body: {
+            info: "Loading study validations",
+          },
+        });
         this.ngRedux.dispatch({
           type: "LOAD_VALIDATION_RULES",
           body: {
@@ -630,25 +636,15 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-    console.log('hit toggle loading in editor service')
-    if (environment.useNewState) {
-      status !== null ? (
-        status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
-        ) : this.store.dispatch(new Loading.Toggle())
-    } else {
-      if (status !== null) {
-        if (status) {
-          this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
-        } else {
-          this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-        }
+    if (status !== null) {
+      if (status) {
+        this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
       } else {
-        this.store.dispatch(new Loading.Toggle())
-        this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
       }
+    } else {
+      this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
     }
-
-
   }
 
   initialiseStudy(route) {
@@ -679,10 +675,12 @@ export class EditorService {
             investigationFailed: false,
           },
         });
-
-        if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading investigation details"))
-        else this.ngRedux.dispatch({ type: "SET_LOADING_INFO", body: { info: "Loading investigation details",},});
-
+        this.ngRedux.dispatch({
+          type: "SET_LOADING_INFO",
+          body: {
+            info: "Loading investigation details",
+          },
+        });
         this.ngRedux.dispatch({
           type: "SET_CONFIGURATION",
           body: {
@@ -989,8 +987,12 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading samples data"))
-          else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: {info: "Loading Samples data",},});
+          this.ngRedux.dispatch({
+            type: "SET_LOADING_INFO",
+            body: {
+              info: "Loading Samples data",
+            },
+          });
           samplesExist = true;
           this.updateSamples(file.file);
         }
@@ -1008,9 +1010,12 @@ export class EditorService {
   }
 
   loadStudyAssays(files) {
-
-    if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading assays information"))
-    else this.ngRedux.dispatch({ type: "SET_LOADING_INFO", body: {info: "Loading assays information",},});
+    this.ngRedux.dispatch({
+      type: "SET_LOADING_INFO",
+      body: {
+        info: "Loading assays information",
+      },
+    });
     files.study.forEach((file) => {
       if (file.file.indexOf("a_") === 0 && file.status === "active") {
         this.updateAssay(file.file);
