@@ -5,7 +5,7 @@ import { DataService } from "./../data.service";
 import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "./../../store";
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { Router } from "@angular/router";
 import { HttpClient } from "@angular/common/http";
 import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
@@ -54,18 +54,34 @@ export class MetabolightsService extends DataService {
     ngRedux?: NgRedux<IAppState>
   ) {
     super("", http);
-    this.url = this.configService.config.metabolightsWSURL;
-    if(this.url.ontologyDetails.endsWith("/")){
-      this.url.ontologyDetails=  this.url.ontologyDetails.slice(0, -1);
-    }
-    if(this.url.baseURL.endsWith("/")){
-      this.url.baseURL=  this.url.baseURL.slice(0, -1);
-    }
-    if(this.url.guides.endsWith("/")){
-      this.url.guides=  this.url.guides.slice(0, -1);
-    }
-    this.studyIdentifier.subscribe((value) => (this.id = value));
-    this.stateStudy.subscribe((value) => (this.study = value));
+       // Create a promise to wait for configLoaded to become true
+       const configLoadedPromise = new Promise<void>((resolve, reject) => {
+        const subscription = this.configService.configLoaded$.subscribe(loaded => {
+            if (loaded == true) {
+                resolve(); // Resolve the promise when configLoaded becomes true
+                subscription.unsubscribe(); // Unsubscribe to prevent memory leaks
+            }
+        });
+    });
+
+    // Await the promise to wait for configLoaded to become true
+    configLoadedPromise.then(() => {
+        // Initialization logic once configLoaded is true
+        this.url = this.configService.config.metabolightsWSURL;
+        if (this.url.ontologyDetails.endsWith("/")) {
+            this.url.ontologyDetails = this.url.ontologyDetails.slice(0, -1);
+        }
+        if (this.url.baseURL.endsWith("/")) {
+            this.url.baseURL = this.url.baseURL.slice(0, -1);
+        }
+        if (this.url.guides.endsWith("/")) {
+            this.url.guides = this.url.guides.slice(0, -1);
+            console.log(this.url.guides)
+        }
+        this.studyIdentifier.subscribe((value) => (this.id = value));
+        this.stateStudy.subscribe((value) => (this.study = value));
+    });
+
   }
 
   /**
@@ -592,12 +608,42 @@ export class MetabolightsService extends DataService {
     if (ontologyUrl.endsWith("/") === false){
       ontologyUrl = ontologyUrl + "/";
     }
+    if (value.termSource.name === undefined || value.termSource.name === "") {
+      console.log("Empty ontology for accession" + value);
+    }
     const url =
     ontologyUrl +
       value.termSource.name +
       "/terms/" +
       encodeURI(encodeURIComponent(value.termAccession));
-    return this.http.get(url, httpOptions).pipe(catchError(this.handleError));
+    const mtblsPrefix = "http://www.ebi.ac.uk/metabolights/ontology/";
+    if (value?.termSource?.name === "MTBLS" && value?.termAccession?.startsWith(mtblsPrefix)) {
+      const parts = value.termAccession.split("/");
+
+      const mtblsUrl =  this.url.baseURL
+                      + "/mtbls-ontology/terms/"
+                      + parts[(parts.length - 1)] ;
+
+      return this.http.get(mtblsUrl).pipe(
+
+        map((res: any) => {
+          if (res) {
+            const result = {
+              description: [res.termDescription],
+              iri: res.termAccessionNumber,
+              label: value.annotationValue,
+              ontology_name: "mtbls",
+              ontology_prefix: "MTBLS",
+              short_form: parts[(parts.length - 1)],
+              id: parts[(parts.length - 1)].replace("_", ":"),
+              annotation : {}
+            };
+            return result;
+          }
+          return {};
+        }));
+    }
+    return this.http.get(url, httpOptions);
   }
 
   /**

@@ -7,6 +7,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { IValidationSummary, IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
 import { retry } from "rxjs-compat/operator/retry";
+import { ValidationStatusTransformPipe } from "./validation-status-transform.pipe";
 
 @Component({
   selector: "study-validations",
@@ -17,11 +18,12 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   @select((state) => state.study.validation) validation: any;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
+  validationMessageTransform = new ValidationStatusTransformPipe();
   requestedStudy: any;
   studyValidation: IValidationSummary;
   noValidationsfound: any = null;
   displayOption = "error";
-  validationStatusClass = "not ready";
+  validationStatusClass: string;
   defaultToastrOptions: any = {
     timeOut: "2500",
     positionClass: "toast-top-center",
@@ -81,7 +83,9 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
       + "/studies/" + this.requestedStudy + "/validation-task";
     });
   }
-
+  statusMessage(){
+    return this.studyValidation ? this.validationMessageTransform.transform(this.studyValidation.status) : "";
+  }
   refreshValidations() {
     this.editorService.refreshValidations().subscribe(
       (res) => {

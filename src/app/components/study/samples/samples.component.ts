@@ -24,12 +24,14 @@ export class SamplesComponent  {
 
   @select((state) => state.study.readonly) readonly;
 
+  @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
   @ViewChildren(OntologyComponent)
   private ontologyComponents: QueryList<OntologyComponent>;
 
-  @ViewChild(TableComponent, { static: true })
-  sampleTable: TableComponent;
-
+  defaultCharacteristicControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultCharacteristicControlListName = "Characteristics";
+  defaultUnitControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultUnitControlListName = "unit";
   isReadOnly = false;
 
   selectedFactor: MTBLSFactor = null;
@@ -62,9 +64,13 @@ export class SamplesComponent  {
 
 
   constructor(private editorService: EditorService, private fb: FormBuilder) {
-    if (!environment.isTesting) {
-      this.setUpSubscriptions();
+    if (!this.defaultCharacteristicControlList) {
+      this.defaultCharacteristicControlList = {name: "", values: []};
     }
+    if (!this.defaultUnitControlList) {
+      this.defaultUnitControlList = {name: "", values: []};
+    }
+    this.setUpSubscriptions();
   }
 
   onChanges($event) {
@@ -346,5 +352,19 @@ export class SamplesComponent  {
 
   fieldValidation(fieldId) {
     return this.validation[fieldId];
+  }
+  controlList(name: string) {
+    let controlList = this.defaultCharacteristicControlList;
+    let controlListName = this.defaultCharacteristicControlListName;
+    if(name === "unit") {
+      controlList = this.defaultUnitControlList;
+      controlListName = this.defaultUnitControlListName;
+    }
+    if (!(controlList && controlList.name.length > 0)
+      && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists){
+        controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+        controlList.name = controlListName;
+    }
+    return controlList;
   }
 }

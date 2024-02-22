@@ -1,5 +1,6 @@
 .tags .tag {
   margin-bottom: 1rem;
+  text-transform: none;
 }
 
 .pointer {

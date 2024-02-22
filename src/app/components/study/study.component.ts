@@ -6,6 +6,10 @@ import { EditorService } from "./../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
+import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
+import { Select, Store } from "@ngxs/store";
+import { TransitionsState } from "src/app/ngxs-store/transitions.state";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "mtbls-study",
@@ -24,6 +28,8 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   @select((state) => state.study.investigationFailed) investigationFailed;
 
+
+  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
   studyError = false;
   requestedTab = 0;
   tab = "descriptors";
@@ -39,6 +45,7 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private router: Router,
     private route: ActivatedRoute,
     private editorService: EditorService,
@@ -134,12 +141,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   }
 
   selectCurrentTab(index, tab) {
-    this.ngRedux.dispatch({
-      type: "SET_TAB_INDEX",
-      body: {
-        currentTabIndex: index,
-      },
-    });
+    if (environment.useNewState) this.store.dispatch(new SetTabIndex(index))
+    else this.ngRedux.dispatch({ type: "SET_TAB_INDEX", body: {currentTabIndex: index,},});
     const urlSplit = window.location.pathname
       .replace(/\/$/, "")
       .split("/")

@@ -15,7 +15,7 @@
   <div class="is-pulled-right">
     <div class="tags has-addons">
       <span class="tag is-dark">Validation</span>
-      <span class="tag" [ngClass]="validationStatusClass"> {{ studyValidation !== undefined ? (studyValidation.status | validationStatusTransform) : "-" }} </span>
+      <span class="tag" [ngClass]="validationStatusClass"> {{ statusMessage() }} </span>
     </div>
 </div>
 

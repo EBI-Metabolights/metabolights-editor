@@ -5,7 +5,7 @@ import { IAppState } from "./../store";
 import { NgRedux, select } from "@angular-redux/store";
 import { ActivatedRouteSnapshot, Router } from "@angular/router";
 
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, observeOn } from "rxjs/operators";
 
 import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermisssion } from "./../services/headers";
 import Swal from "sweetalert2";
@@ -16,9 +16,14 @@ import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
 import { HttpHeaders } from "@angular/common/http";
-import { Observable, interval } from "rxjs";
+import { Observable, of, interval, asapScheduler, asyncScheduler } from "rxjs";
 import { VersionInfo } from "src/environment.interface";
 import { PlatformLocation } from "@angular/common";
+import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
+import { Store } from "@ngxs/store";
+import { Loading, SetLoadingInfo } from "../ngxs-store/transitions.actions";
+import { env } from "process";
+import { User } from "../ngxs-store/user.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -46,11 +51,14 @@ export class EditorService {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.study.studyAssays) studyAssays;
   @select((state) => state.study) stateStudy;
+  @select((state) => state.status.controlLists) controlLists;
+
   study: MTBLSStudy;
   baseHref: string;
   redirectUrl = "";
   currentStudyIdentifier: string = null;
   validations: any = {};
+  defaultControlLists: any = {};
   files: any = [];
   samples_columns_order: any = {
     "Sample Name": 1,
@@ -61,9 +69,11 @@ export class EditorService {
     "Protocol REF": 6,
     "Source Name": 7,
   };
+  ontologyDetails: any = {};
 
   constructor(
     public ngRedux: NgRedux<IAppState>,
+    public store: Store,
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
@@ -83,6 +93,31 @@ export class EditorService {
     });
     this.studyFiles.subscribe((value) => {
       this.files = value;
+    });
+
+    this.controlLists.subscribe((value) => {
+      if (value) {
+        Object.keys(value).forEach((label: string)=>{
+          this.defaultControlLists[label] = {OntologyTerm: []};
+          value[label].forEach(term => {
+            this.defaultControlLists[label].OntologyTerm.push({
+              annotationDefinition: term.definition,
+              annotationValue: term.name,
+              termAccession: term.iri,
+              comments: [],
+              termSource: {
+                comments: [],
+                name: term.onto_name,
+                description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
+                file: term.provenance_name,
+                provenance_name: term.provenance_name,
+                version: ""
+              },
+              wormsID: ""
+            });
+          });
+        });
+      }
     });
   }
 
@@ -148,6 +183,25 @@ export class EditorService {
       )
       .pipe(catchError(this.dataService.handleError));
   }
+
+
+
+    /**
+   * Retrieves publication information for a given study.
+   *
+   * @returns A Publication wrapper object via the Observable
+   */
+    getDefaultControlLists(): Observable<any> {
+      return this.dataService.http
+        .get<any>(
+          this.dataService.url.baseURL + "/ebi-internal/control-lists",
+          {
+            headers: httpOptions.headers,
+            observe: "body",
+          }
+        )
+        .pipe(catchError(this.dataService.handleError));
+    }
 
   checkMaintenaceMode(): Observable<any> {
     return this.dataService.http
@@ -230,6 +284,16 @@ export class EditorService {
     const activeJwt = localStorage.getItem("jwt");
     const localUser = localStorage.getItem("user");
     const user: MetabolightsUser = JSON.parse(localUser);
+
+    this.getDefaultControlLists().subscribe(
+      (response) => {
+        const controlLists = response.controlLists;
+        this.ngRedux.dispatch({ type: "SET_DEFAULT_CONTROL_LISTS", body: { controlLists} });
+        },
+        (error) => {
+          this.ngRedux.dispatch({ type: "SET_DEFAULT_CONTROL_LISTS", body: { controlLists: {}} });
+        }
+    );
 
     this.getBannerHeader().subscribe(
       (response) => {
@@ -351,12 +415,8 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user: user.owner,
-        },
-      });
+      if (environment.useNewState) this.store.dispatch(new User.Set(user.owner));
+      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user.owner, },});
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
@@ -377,12 +437,8 @@ export class EditorService {
       this.ngRedux.dispatch({
         type: "INITIALISE",
       });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user,
-        },
-      });
+      if (environment.useNewState) this.store.dispatch(new User.Set(user));
+      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user, },});
       this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
@@ -395,14 +451,15 @@ export class EditorService {
   }
 
   loadValidations() {
+    if (this.validations) {
+      return;
+    }
+
     this.dataService.getValidations().subscribe(
       (validations) => {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading study validations",
-          },
-        });
+        if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading study validations"))
+        else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: { info: "Loading study validations",},});
+        
         this.ngRedux.dispatch({
           type: "LOAD_VALIDATION_RULES",
           body: {
@@ -573,15 +630,25 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-    if (status !== null) {
-      if (status) {
-        this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
-      } else {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-      }
+    console.log('hit toggle loading in editor service')
+    if (environment.useNewState) {
+      status !== null ? (
+        status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
+        ) : this.store.dispatch(new Loading.Toggle())
     } else {
-      this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+      if (status !== null) {
+        if (status) {
+          this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
+        } else {
+          this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+        }
+      } else {
+        this.store.dispatch(new Loading.Toggle())
+        this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+      }
     }
+
+
   }
 
   initialiseStudy(route) {
@@ -612,12 +679,10 @@ export class EditorService {
             investigationFailed: false,
           },
         });
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading investigation details",
-          },
-        });
+
+        if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading investigation details"))
+        else this.ngRedux.dispatch({ type: "SET_LOADING_INFO", body: { info: "Loading investigation details",},});
+
         this.ngRedux.dispatch({
           type: "SET_CONFIGURATION",
           body: {
@@ -894,7 +959,7 @@ export class EditorService {
           mt.techniques.forEach((t) => {
             if (t.sub_techniques && t.sub_techniques.length > 0) {
               t.sub_techniques.forEach((st) => {
-                if (st.template === assayInfo[1]) {
+                if (st.template === assayInfo[1] || (assayInfo.length > 1 && st.template === assayInfo[2])) {
                   assaySubTechnique = st;
                   assayTechnique = t;
                   assayMainTechnique = mt;
@@ -924,12 +989,8 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
-            body: {
-              info: "Loading Samples data",
-            },
-          });
+          if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading samples data"))
+          else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: {info: "Loading Samples data",},});
           samplesExist = true;
           this.updateSamples(file.file);
         }
@@ -947,12 +1008,9 @@ export class EditorService {
   }
 
   loadStudyAssays(files) {
-    this.ngRedux.dispatch({
-      type: "SET_LOADING_INFO",
-      body: {
-        info: "Loading assays information",
-      },
-    });
+
+    if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading assays information"))
+    else this.ngRedux.dispatch({ type: "SET_LOADING_INFO", body: {info: "Loading assays information",},});
     files.study.forEach((file) => {
       if (file.file.indexOf("a_") === 0 && file.status === "active") {
         this.updateAssay(file.file);
@@ -969,7 +1027,6 @@ export class EditorService {
       this.updateMAF(filename);
     }
   }
-
   updateAssay(file) {
     this.dataService.getTable(file).subscribe((data) => {
       const assay = {};
@@ -1264,12 +1321,104 @@ export class EditorService {
     return this.dataService.getOntologyTermDescription(value);
   }
 
-  getOntologyTerms(url) {
+
+  getOntologyTerms(url): Observable<any> {
+    if (this.defaultControlLists && url.indexOf("/ebi-internal/ontology") > 0) {
+      let branch = "";
+      const branchParam = url.split("branch=");
+      if (branchParam.length > 1) {
+        branch = decodeURI(branchParam[1]).split("&")[0];
+      }
+      let term = "";
+      const termParam = url.split("term=");
+      if (termParam.length > 1) {
+        term = decodeURI(termParam[1].split("&")[0]);
+      }
+      let queryFields = "";
+      const queryFieldsParam = url.split("queryFields=");
+      if (queryFieldsParam.length > 1) {
+        queryFields = decodeURI(queryFieldsParam[1].split("&")[0]);
+      }
+      if (queryFields.length === 0){
+        if (term.length === 0 ) {
+          if (branch.length > 0 && branch in this.defaultControlLists) {
+            return of(this.defaultControlLists[branch]).pipe(
+              observeOn(asapScheduler)
+            );
+          } else {
+            console.log("Empty branch search and term search returns empty list.");
+            return of({OntologyTerm: []}).pipe(
+              observeOn(asapScheduler)
+            );
+          }
+        } else {
+          const lowerCaseTerm = term.toLowerCase();
+          const containsFilter = (val: Ontology) => val.annotationValue.toLowerCase().indexOf(lowerCaseTerm) > -1;
+          const startsWithFilter = (val: Ontology) => val.annotationValue.toLowerCase().startsWith(lowerCaseTerm);
+          const exactMatchFilter = (val: Ontology) => val.annotationValue.toLowerCase() === lowerCaseTerm;
+
+          const containsMatches = this.filterDefaultControlList(containsFilter, branch, term);
+          const startsWithMatches = containsMatches.filter(startsWithFilter);
+          const exactMatches = startsWithMatches.filter(exactMatchFilter);
+          // const exactMatches = this.filterDefaultControlList(exactMatchFilter, branch, term);
+          // const startsWithMatches = this.filterDefaultControlList(startsWithFilter, branch, term);
+          const matchMap: Map<string, any> = new Map<string, any>();
+          const filtereValues = [];
+          exactMatches.forEach(element => {
+            if (!matchMap.has(element.termAccession)){
+              matchMap.set(element.termAccession, element);
+              filtereValues.push(element);
+            }
+          });
+          startsWithMatches.forEach(element => {
+            if (!matchMap.has(element.termAccession)){
+              matchMap.set(element.termAccession, element);
+              filtereValues.push(element);
+            }
+          });
+          containsMatches.forEach(element => {
+            if (!matchMap.has(element.termAccession)){
+              matchMap.set(element.termAccession, element);
+              filtereValues.push(element);
+            }
+          });
+          if (filtereValues && filtereValues.length > 0){
+            return of({OntologyTerm: filtereValues}).pipe(
+              observeOn(asapScheduler)
+            );
+          }
+        }
+      }
+
+    }
     return this.dataService.getOntologyTerms(url);
   }
 
+  filterDefaultControlList(filter_method: CallableFunction, branch: string, term: string) {
+      if (branch && branch.length > 0 && branch in this.defaultControlLists) {
+          if (term && term.length > 0 ){
+            return this.defaultControlLists[branch].OntologyTerm.filter(filter_method);
+          } else {
+            return this.defaultControlLists[branch].OntologyTerm;
+          }
+      }
+      return [];
+  }
+
   getOntologyDetails(value) {
-    return this.dataService.getOntologyDetails(value);
+    if (!this.ontologyDetails[value.termAccession]) {
+      return this.dataService.getOntologyDetails(value).pipe(
+        map((result) => {
+          this.ontologyDetails[value.termAccession] = result;
+          return result;
+        })
+      );
+    } else {
+      return of(this.ontologyDetails[value.termAccession]).pipe(
+        observeOn(asapScheduler)
+      );
+    }
+
   }
 
   // Study Design Descriptors
@@ -1396,11 +1545,50 @@ export class EditorService {
 
   updateCells(filename, body, tableType, metaInfo) {
     return this.dataService.updateCells(filename, body).pipe(
-      map((data) => {
-        this.updateTableState(filename, tableType, metaInfo);
-        return data;
+      map((result) => {
+        // this.updateTableState(filename, tableType, metaInfo);
+        this.commitUpdatedTableCells(filename, tableType, result);
+        return result;
       })
     );
+  }
+  commitUpdatedTableCells(filename, tableType, result) {
+    let source: any = {};
+    let sourceFile: any = {};
+    let fileExist = false;
+    if (tableType === "samples") {
+      source = this.study.samples;
+      fileExist = this.study.samples.name === filename;
+      sourceFile = fileExist ? source : "";
+    } else if (tableType === "assays") {
+      source = this.study.assays;
+      fileExist = filename in source;
+      sourceFile = fileExist ? source[filename] : "";
+    } else if (tableType === "maf") {
+      source = this.study.mafs;
+      fileExist = filename in source;
+      sourceFile = fileExist ? source[filename] : "";
+    }
+    if ( result.success && result.updates && result.updates.length > 0) {
+      // console.log("committed values" + result.message);
+      const table = sourceFile.data;
+      const headerIndices: Map<number, string> = new Map<number, string>();
+      table.columns.forEach((val, idx)=> {
+        headerIndices.set(val.header, idx);
+      });
+      result.updates.forEach((update) => {
+        const remoteHeader = result.header[update["column"]];
+        const currentIndex = headerIndices.get(remoteHeader);
+        const currentHeader = table.columns[currentIndex].columnDef;
+        if (currentHeader === remoteHeader) {
+          table.rows[update["row"]][currentHeader] = update["value"];
+        } else {
+          console.log("Value '" + update["value"] + "' at row "+ update["row"]
+            + ". Update column names do not match. Remote header: "
+            + remoteHeader + " current header: " + currentHeader);
+        }
+      });
+    }
   }
 
   //Publications

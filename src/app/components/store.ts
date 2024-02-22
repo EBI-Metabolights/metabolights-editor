@@ -22,7 +22,8 @@ import {
   SET_STUDY_PERMISSION,
   RESET_STUDY_PERMISSION,
   SET_BANNER_MESSAGE,
-  SET_MAINTENANCE_MODE
+  SET_MAINTENANCE_MODE,
+  SET_DEFAULT_CONTROL_LISTS
 } from "./actions";
 import { SET_STUDY_ASSAY } from "./study/actions";
 
@@ -127,6 +128,11 @@ function setMaintenanceMode(state, action) {
   return tassign(state, { maintenanceMode: action.body.maintenanceMode });
 }
 
+function setControlLists(state, action) {
+  return tassign(state, { controlLists: action.body.controlLists });
+}
+
+
 function setUserStudies(state, action) {
   return tassign(state, { userStudies: action.body.studies });
 }
@@ -223,6 +229,8 @@ export function sharedReducer(
       return setBannerHeader(state, action);
     case SET_MAINTENANCE_MODE:
       return setMaintenanceMode(state, action);
+    case SET_DEFAULT_CONTROL_LISTS:
+      return setControlLists(state, action);
   }
 
   return state;

@@ -4,7 +4,7 @@
       <mat-chip-list #chipList>
         <span *ngFor="let value of values">
           <mat-chip
-            *ngIf="value && value.annotationValue != null"
+            *ngIf="value && value.annotationValue"
             [selectable]="selectable"
             [removable]="removable"
             (removed)="remove(value)"
@@ -29,9 +29,22 @@
         (optionSelected)="optionSelected($event)"
       >
         <!-- (optionSelected)="selected($event)" -->
+        <span *ngIf="!searchedMore">
+          <span *ngIf="termsLoading; else showMore">
+            <mat-option>
+              <img
+                style="height: 10px; margin-left: 10px"
+                src="{{ baseHref }}assets/img/loading.svg"
+              />
+            </mat-option>
+          </span>
+          <ng-template #showMore>
+            <mat-option><small>search more terms on ontology sources</small></mat-option>
+          </ng-template>
+        </span>
         <mat-option
           class="bb"
-          *ngFor="let value of filteredvalues | async"
+          *ngFor="let value of currentOptions"
           [value]="value"
         >
           <div class="columns np">
@@ -40,9 +53,9 @@
             </span>
             <span class="is-pulled-right column np has-text-right">
               <span
-                *ngIf="value.termSource.provenanceName"
+                *ngIf="value.termSource.provenance_name"
                 class="tag is-info"
-                >{{ value.termSource.provenanceName }}</span
+                >{{ value.termSource.provenance_name }}</span
               >&nbsp;
               <span *ngIf="value.termSource.name" class="tag is-success">{{
                 value.termSource.name
@@ -111,7 +124,7 @@
                       *ngFor="let key of getObjectKeys(value.info.annotation)"
                     >
                       <small>
-                        <b style="text-transform: capitalize">{{
+                        <b>{{
                           key.replace("_", " ")
                         }}</b>
                         : {{ value.info.annotation[key].join(" ") }} <br />
@@ -128,7 +141,7 @@
             </span>
           </div>
         </mat-option>
-        <span *ngIf="!searchedMore">
+        <span *ngIf="!searchedMore && (currentOptions.length > 0) ">
           <span *ngIf="termsLoading; else showMore">
             <mat-option>
               <img
@@ -138,7 +151,7 @@
             </mat-option>
           </span>
           <ng-template #showMore>
-            <mat-option><small>more terms</small></mat-option>
+            <mat-option><small>search more terms on ontology sources</small></mat-option>
           </ng-template>
         </span>
       </mat-autocomplete>

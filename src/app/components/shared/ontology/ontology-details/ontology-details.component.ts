@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../../services/editor.service";
+import * as toastr from "toastr";
 
 @Component({
   selector: "ontology-details",
@@ -31,7 +32,8 @@ export class OntologyDetailsComponent implements OnInit {
 
   displayOntologyInfo() {
     this.isLoading = true;
-    this.editorService.getOntologyDetails(this.value).subscribe(
+    const value = Object.assign({}, this.value);
+    this.editorService.getOntologyDetails(value).subscribe(
       (response) => {
         this.details = response;
         this.isLoading = false;
@@ -40,6 +42,13 @@ export class OntologyDetailsComponent implements OnInit {
       (error) => {
         this.isLoading = false;
         this.details = null;
+        toastr.error("'" +value.annotationValue + "' ontology detail is not found", "Error", {
+          timeOut: "3000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
       }
     );
   }

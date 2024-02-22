@@ -2,7 +2,7 @@
   *ngIf="publication == null || addNewPublication; else showPublicationDetails"
 >
   <a
-    class="button is-light is-pulled-right is-small hover-button"
+    class="button is-primary is-pulled-right is-small hover-button"
     (click)="openModal()"
     >+ Add Publication</a
   >
@@ -30,13 +30,15 @@
         >
           <mat-icon>edit</mat-icon> Edit </a
         >&nbsp;
-        <a
+        <a *ngIf="publication.doi && publication.doi.length > 0"
           class="button is-small custom-button"
           [href]="'//dx.doi.org/' + publication.doi"
           target="_blank"
         >
           <mat-icon>insert_link</mat-icon>
         </a>
+        <span *ngIf="publication?.status?.annotationValue?.length > 0" class="tag is-default is-small publication-status"><ontology-details [value]="publication.status"></ontology-details></span>
+
       </div>
     </article>
   </div>
@@ -247,6 +249,7 @@
           class="mt-20"
           #publicationStatus
           [validations]="fieldValidation('status')"
+          [controlList]="controlList()"
           (changed)="onChanges($event)"
           [values]="[publication.status]"
           [inline]="true"

@@ -1,5 +1,5 @@
 <div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
-  <a class="button is-light is-pulled-right is-small" (click)="openModal()"
+  <a class="button is-primary is-pulled-right is-small" (click)="openModal()"
     >+ Add</a
   >
 </div>
@@ -55,6 +55,7 @@
           <mtbls-ontology
             #descriptorComponent
             [validations]="validation"
+            [controlList]="controlList()"
             (changed)="onChanges($event)"
             [values]="[descriptor]"
             [inline]="true"
@@ -64,6 +65,7 @@
           <mtbls-ontology
             #descriptorComponent
             [validations]="validation"
+            [controlList]="controlList()"
             (changed)="onChanges($event)"
             [values]="[]"
             [inline]="true"

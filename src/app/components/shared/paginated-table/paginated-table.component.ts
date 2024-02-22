@@ -10,15 +10,16 @@ import {
   EventEmitter,
   AfterViewChecked,
   OnChanges,
+  AfterViewInit,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
-import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
+import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
+import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
 import { NgRedux, select } from "@angular-redux/store";
@@ -26,14 +27,18 @@ import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { environment } from "src/environments/environment";
+import { ServerDataSource } from "./paginated-table.datasource";
+import { IsaTableDataSourceService } from "src/app/services/remote.datasource.service";
+import { tap } from "rxjs/operators";
+import { PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
-  selector: "mtbls-table",
-  templateUrl: "./table.component.html",
-  styleUrls: ["./table.component.css"],
+  selector: "mtbls-paginated-table",
+  templateUrl: "./paginated-table.component.html",
+  styleUrls: ["./paginated-table.component.css"],
 })
-export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
+export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
@@ -59,13 +64,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     },
   ];
 
+  dataSource: ServerDataSource;
+  currentMetadata: PaginatedTableMetadata;
+  currentPage: any[];
   rowsToAdd: any = 1;
   isReadOnly = true;
 
   validations: any = {};
   mlPageSizeOptions: any = [10, 100];
 
-  dataSource: MatTableDataSource<any>;
+  // dataSource: MatTableDataSource<any>;
   data: any = null;
   files: any = null;
 
@@ -117,29 +125,44 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ontologies = [];
   hit = false;
   baseHref: string;
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private isaTableDataSourceService: IsaTableDataSourceService
   ) {
     this.baseHref =this.editorService.configService.baseHref;
-    // const ontology3 = new Ontology();
-    // ontology3.name = "normal phase";
-
-    // this.ontologies.push(ontology3);
-    // const ontology = new Ontology();
-    // ontology.name = "reverse phase";
-    // this.ontologies.push(ontology);
-    // const ontology2 = new Ontology();
-    // ontology2.name = "HILIC";
-    // this.ontologies.push(ontology2);
   }
 
   ngOnInit() {
+    this.dataSource = new ServerDataSource(this.isaTableDataSourceService);
+    this.dataSource.data.subscribe((val) => this.currentPage = val);
+    this.dataSource.metadata.subscribe((val) => this.currentMetadata = val);
+
+    this.dataSource.loadIsaTableRows(this.tableData.data.file, '', 'asc', 0, 50);
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
   }
+  ngAfterViewInit() {
+
+    this.paginator.page
+        .pipe(
+            tap(() => this.loadIsaTablePage())
+        )
+        .subscribe();
+
+}
+
+loadIsaTablePage() {
+    this.dataSource.loadIsaTableRows(
+        this.tableData.data.file,
+        '',
+        '',
+        this.paginator.pageIndex,
+        this.paginator.pageSize);
+}
 
   setUpSubscriptions() {
     this.studyValidations.subscribe((value) => {
@@ -182,11 +205,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.data) {
       this.hit = true;
       this.displayedTableColumns = this.data.displayedColumns;
-      this.dataSource = new MatTableDataSource<any>(this.data.rows);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.filterPredicate = (data, filter) =>
-        this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
-      this.dataSource.sort = this.sort;
+      // this.dataSource = new MatTableDataSource<any>(this.data.rows);
+      // this.dataSource.paginator = this.paginator;
+      // this.dataSource.filterPredicate = (data, filter) =>
+        // this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
+      // this.dataSource.sort = this.sort;
       this.detectFileColumns();
       this.validateTableOntologyColumns();
       if (this.view === "expanded") {
@@ -196,28 +219,28 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   ngAfterViewChecked() {
-    setTimeout(() => {
-      if (this.dataSource && !this.dataSource.paginator) {
-        if (this.dataSource.filteredData.length > 500) {
-          this.paginator.pageSizeOptions = [
-            50,
-            100,
-            500,
-            this.dataSource.filteredData.length,
-          ];
-          this.paginator.pageSize = 50;
-        } else {
-          // this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
-          this.paginator.pageSizeOptions = [
-            10,
-            100,
-            this.dataSource.filteredData.length,
-          ];
-          this.paginator.pageSize = this.dataSource.filteredData.length;
-        }
-        this.dataSource.paginator = this.paginator;
-      }
-    });
+    // setTimeout(() => {
+    //   if (this.dataSource && !this.paginator) {
+    //     if (this.dataSource.filteredData.length > 500) {
+    //       this.paginator.pageSizeOptions = [
+    //         50,
+    //         100,
+    //         500,
+    //         this.dataSource.filteredData.length,
+    //       ];
+    //       this.paginator.pageSize = 50;
+    //     } else {
+    //       // this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
+    //       this.paginator.pageSizeOptions = [
+    //         10,
+    //         100,
+    //         this.dataSource.filteredData.length,
+    //       ];
+    //       this.paginator.pageSize = this.dataSource.filteredData.length;
+    //     }
+    //     this.dataSource.paginator = this.paginator;
+    //   }
+    // });
   }
 
   onCopy(e) {
@@ -306,6 +329,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   savePastedCellContent(e, pvalue) {
+    this.loading = true;
     const cellsToUpdate = [];
     if (!this.isEditModalOpen) {
       if (this.selectedCells.length === 1) {
@@ -387,7 +411,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
     }
 
-    this.loading = true;
     if (cellsToUpdate.length > 0) {
       this.isFormBusy = true;
       this.editorService
@@ -486,13 +509,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
       count = count + 1;
     });
-    const possibleValueKeys: Map<string, Set<string>> = new Map<string, Set<string>>();
-    const possibleValues: Map<string, [string, string, string][]> = new Map<string, [string, string, string][]>();
     Object.keys(this.ontologyCols).forEach((column) => {
       if (this.ontologyColumns.indexOf(column) === -1) {
         this.ontologyColumns.push(column);
       }
-      this.ontologyCols[column].values = new Map<string, [string, string, string][]>();
+      this.ontologyCols[column].values = {};
       this.ontologyCols[column].missingTerms = new Set<string>();
       this.data.rows.forEach((row) => {
         if (
@@ -500,44 +521,46 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||
             this.isEmpty(row[this.ontologyCols[column].accession]))
         ) {
-          if (!this.ontologyCols[column].missingTerms.has(row[column])){
-            this.ontologyCols[column].missingTerms.add(row[column]);
-          }
+          this.ontologyCols[column].missingTerms.add(row[column]);
         }
-        const term = row[column] ? row[column].trim() : "";
-        const ref = row[this.ontologyCols[column].ref] ? row[this.ontologyCols[column].ref].trim() : "";
-        const accession = row[this.ontologyCols[column].accession] ? row[this.ontologyCols[column].accession].trim() : "";
-
-        const lowerCaseValue = row[column].trim().toLowerCase();
-        if (term.length > 0 && ref.length > 0 && accession.length > 0) {
-
-            const key = term +":"+ ref +":" + accession;
-            if (!(possibleValueKeys.has(lowerCaseValue))){
-              possibleValueKeys.set(lowerCaseValue, new Set<string>());
-              possibleValues.set(lowerCaseValue, []);
+        if (!this.isEmpty(row[column])) {
+          if (!this.ontologyCols[column].values[row[column]]) {
+            if (row[column].replace(" ", "") !== "") {
+              this.ontologyCols[column].values[row[column]] = [null, null];
             }
-            if (!possibleValueKeys.get(lowerCaseValue).has(key)) {
-              possibleValues.get(lowerCaseValue).push([ref, accession, term]);
-              possibleValueKeys.get(lowerCaseValue).add(key);
+            if (
+              !this.isEmpty(row[this.ontologyCols[column].ref]) &&
+              !this.isEmpty(row[this.ontologyCols[column].accession])
+            ) {
+              this.ontologyCols[column].values[row[column]] = [
+                row[this.ontologyCols[column].ref],
+                row[this.ontologyCols[column].accession],
+              ];
             }
-            this.ontologyCols[column].values.set(row[column], possibleValues.get(lowerCaseValue));
-
+          } else {
+            if (
+              !this.isEmpty(row[this.ontologyCols[column].ref]) &&
+              !this.isEmpty(row[this.ontologyCols[column].accession])
+            ) {
+              this.ontologyCols[column].values[row[column]] = [
+                row[this.ontologyCols[column].ref],
+                row[this.ontologyCols[column].accession],
+              ];
+            }
+          }
         }
       });
     });
   }
 
   hasAnyMissingValues() {
-    if(this.enableControlList) {
-      let hasMV = false;
-      Object.keys(this.ontologyCols).forEach((key) => {
-        if (this.ontologyCols[key].missingTerms.size > 0) {
-          hasMV = true;
-        }
-      });
-      return hasMV;
-    }
-    return false;
+    let hasMV = false;
+    Object.keys(this.ontologyCols).forEach((key) => {
+      if (this.ontologyCols[key].missingTerms.size > 0) {
+        hasMV = true;
+      }
+    });
+    return hasMV;
   }
 
   getDef(column) {
@@ -545,8 +568,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   applyFilter(filterValue: string) {
-    this.dataSource.data = this.tableData.data.rows;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    // this.dataSource.data = this.tableData.data.rows;
+    // this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   onKeydown(event, filterValue: string) {
@@ -556,16 +579,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         this.filters.push(filterValue);
         event.target.value = "";
       }
-      this.dataSource.filter = "";
-      this.filters.forEach((f) => {
-        data = data.concat(
-          this.dataSource.data.filter(
-            (d) =>
-              this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
-          )
-        );
-      });
-      this.dataSource.data = data;
+      // this.dataSource.filter = "";
+      // this.filters.forEach((f) => {
+      //   data = data.concat(
+      //     this.dataSource.data.filter(
+      //       (d) =>
+      //         this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
+      //     )
+      //   );
+      // });
+      // this.dataSource.data = data;
     }
   }
 
@@ -594,21 +617,21 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   removeFilter(filter) {
-    this.filters = this.filters.filter((e) => e !== filter);
-    this.dataSource.filter = "";
-    if (this.filters.length > 0) {
-      let data = [];
-      this.filters.forEach((f) => {
-        data = data.concat(
-          this.dataSource.data.filter(
-            (d) => this.getDataString(d).indexOf(f.toLowerCase()) > -1
-          )
-        );
-      });
-      this.dataSource.data = data;
-    } else {
-      this.dataSource.data = this.data.data.rows;
-    }
+    // this.filters = this.filters.filter((e) => e !== filter);
+    // this.dataSource.filter = "";
+    // if (this.filters.length > 0) {
+    //   let data = [];
+    //   this.filters.forEach((f) => {
+    //     data = data.concat(
+    //       this.dataSource.data.filter(
+    //         (d) => this.getDataString(d).indexOf(f.toLowerCase()) > -1
+    //       )
+    //     );
+    //   });
+    //   this.dataSource.data = data;
+    // } else {
+    //   this.dataSource.data = this.data.data.rows;
+    // }
   }
 
   addColumns(columns) {
@@ -787,15 +810,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.selectedMissingKey = null;
     this.selectedMissingVal = null;
     this.isEditColumnMissingModalOpen = false;
-    this.isFormBusy = false;
   }
 
   highlightFilteredRows(term) {
-    this.selectedRows = this.selectedRows.concat(
-      this.dataSource.data
-        .filter((f) => this.getDataString(f).indexOf(term.toLowerCase()) !== -1)
-        .map((p) => p.index)
-    );
+    // this.selectedRows = this.selectedRows.concat(
+    //   this.dataSource.data
+    //     .filter((f) => this.getDataString(f).indexOf(term.toLowerCase()) !== -1)
+    //     .map((p) => p.index)
+    // );
   }
 
   isSelected(row, column) {
@@ -938,18 +960,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
       // }
-      if(this.enableControlList) {
-        if (this.controlListColumns.size === 0
-          && this.validations && this.validation && this.data && this.data.header) {
-          this.detectControlListColumns();
-        }
-        if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
-          this.isCellTypeControlList = true;
-          this.cellControlListValue();
-        } else if (this.ontologyColumns.indexOf(column.header) > -1) {
-          this.isCellTypeOntology = true;
-          this.cellOntologyValue();
-        }
+
+      if (this.enableControlList && this.controlListColumns.size === 0
+        && this.validations && this.validation && this.data && this.data.header) {
+        this.detectControlListColumns();
+      }
+      if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
+        this.isCellTypeControlList = true;
+        this.cellControlListValue();
+      } else if (this.ontologyColumns.indexOf(column.header) > -1) {
+        this.isCellTypeOntology = true;
+        this.cellOntologyValue();
       }
 
       this.editCellform = this.fb.group({
@@ -979,7 +1000,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         columnIndex = columnIndex.index;
       }
     }
-    if (this.enableControlList && this.isCellTypeControlList) {
+    if (this.isCellTypeControlList) {
       const selectedOntology =
         this.getOntologyComponentValue("editControlListCell").values[0];
       const value = selectedOntology ? selectedOntology.annotationValue : "";
@@ -990,7 +1011,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           value,
         }
       ];
-    } else if (this.enableControlList && this.isCellTypeOntology) {
+    } else if (this.isCellTypeOntology) {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyCell").values[0];
 
@@ -1014,7 +1035,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           value: termAccession,
         },
       ];
-    } else if (this.enableControlList && this.isCellTypeFile) {
+    } else if (this.isCellTypeFile) {
       cellsToUpdate = [
         {
           row: this.selectedCell["row"].index,
@@ -1131,14 +1152,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             tapToDismiss: false,
           });
           this.closeEditMissingColValModal();
-
-          this.isFormBusy = false;
-          if (this.selectedMissingCol && "missingTerms" in this.selectedMissingCol) {
-            if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
-              this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
-            }
+          if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
+            this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
           }
-
+          this.isFormBusy = false;
         },
         (err) => {
           console.error(err);
@@ -1151,10 +1168,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     let sRows = [];
     if (this.selectedRows.length > 0) {
       this.selectedRows.forEach((r) => {
-        sRows.push(this.dataSource.data[r]);
+        sRows.push(this.currentPage[r]);
       });
     } else {
-      sRows = this.dataSource.data;
+      sRows = this.currentPage;
     }
     const cellsToUpdate = [];
     let columnIndex = this.data.header[this.selectedColumn.header];
@@ -1387,7 +1404,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       //   this.isCellTypeFile = true;
       // }
 
-      if (this.enableControlList && this.ontologyColumns.indexOf(column.header) > -1) {
+      if (this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;
       }
 
@@ -1401,8 +1418,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   closeEditColumnModal() {
     this.isEditColumnModalOpen = false;
-    this.isFormBusy = false;
-    this.loading = false;
   }
 
   copy(text: string) {
@@ -1417,8 +1432,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   isEmpty(val) {
-    const result = val === undefined || val === "undefined" || val === null || (typeof val === "string" && val.trim().length === 0);
-    return result;
+    return val === "" || val === "undefined" || val === null;
   }
 
   getUnique(arr) {
@@ -1440,12 +1454,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           {
             row: row.index,
             column: refIndex,
-            value: col.values.get(val)[0][0],
+            value: col.values[val][0],
           },
           {
             row: row.index,
             column: accIndex,
-            value: col.values.get(val)[0][1],
+            value: col.values[val][1],
           }
         );
       }
@@ -1529,28 +1543,28 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   filterDuplicate(value) {
-    this.selectedRows = [];
-    this.filters = [];
-    this.dataSource.data = this.tableData.data.rows;
-    let data = [];
-    if (this.filters.indexOf(value) < 0) {
-      this.filters.push(value);
-    }
-    this.dataSource.filter = "";
-    this.filters.forEach((f) => {
-      data = data.concat(
-        this.dataSource.data.filter(
-          (d) =>
-            this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
-        )
-      );
-    });
-    this.dataSource.data = data;
-    this.selectedRows = this.selectedRows.concat(
-      this.dataSource.data
-        .filter((f) => f["Sample Name"] === value)
-        .map((p) => p.index)
-    );
+    // this.selectedRows = [];
+    // this.filters = [];
+    // this.dataSource.data = this.tableData.data.rows;
+    // let data = [];
+    // if (this.filters.indexOf(value) < 0) {
+    //   this.filters.push(value);
+    // }
+    // this.dataSource.filter = "";
+    // this.filters.forEach((f) => {
+    //   data = data.concat(
+    //     this.dataSource.data.filter(
+    //       (d) =>
+    //         this.getDataString(d).toLowerCase().indexOf(f.toLowerCase()) > -1
+    //     )
+    //   );
+    // });
+    // this.dataSource.data = data;
+    // this.selectedRows = this.selectedRows.concat(
+    //   this.dataSource.data
+    //     .filter((f) => f["Sample Name"] === value)
+    //     .map((p) => p.index)
+    // );
   }
 
   onChanges() {}

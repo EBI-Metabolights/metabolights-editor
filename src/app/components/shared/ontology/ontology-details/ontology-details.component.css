@@ -5,3 +5,8 @@
   word-wrap: break-word;
   white-space: pre-wrap;
 }
+
+.tags .tag {
+  margin-bottom: 1.5rem;
+  text-transform: none;
+}
