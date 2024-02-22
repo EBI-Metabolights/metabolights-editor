@@ -11,6 +11,7 @@ import { Owner, User } from "src/app/ngxs-store/user.actions";
 import { UserState } from "src/app/ngxs-store/user.state";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { Observable } from "rxjs";
+
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
   selector: "mtbls-console",
