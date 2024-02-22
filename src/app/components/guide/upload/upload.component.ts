@@ -13,10 +13,6 @@ import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
-import { UserState } from "src/app/ngxs-store/user.state";
-import { Observable } from "rxjs";
-import { Owner } from "src/app/ngxs-store/user.actions";
-import { Select } from "@ngxs/store";
 
 @Component({
   selector: "raw-upload",
@@ -27,8 +23,6 @@ export class RawUploadComponent implements OnInit {
   @select((state) => state.status.user) studyUser;
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.files) studyFiles;
-
-  @Select(UserState.user) user$: Observable<Owner>;
   user: any = null;
   requestedStudy: string = null;
   files: any = {};
@@ -42,29 +36,14 @@ export class RawUploadComponent implements OnInit {
     private platformLocation: PlatformLocation
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting && !environment.useNewState) {
+    if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
-    
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
 
   setUpSubscriptions() {
     this.studyUser.subscribe((value) => {
-      this.user = value;
-      this.user.checked = true;
-    });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
-    });
-    this.studyFiles.subscribe((value) => {
-      this.files = value;
-    });
-  }
-
-  setUpSubscriptionsNgxs() {
-    this.user$.subscribe((value) => {
       this.user = value;
       this.user.checked = true;
     });
