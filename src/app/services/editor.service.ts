@@ -24,6 +24,7 @@ import { Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/transitions.actions";
 import { env } from "process";
 import { User } from "../ngxs-store/user.actions";
+import { Identifier } from "../ngxs-store/study/general-metadata.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -617,7 +618,8 @@ export class EditorService {
   }
 
   loadStudyId(id) {
-    return this.ngRedux.dispatch({
+    if (environment.useNewState) return this.store.dispatch(new Identifier.Set(id))
+    else return this.ngRedux.dispatch({
       type: "SET_STUDY_IDENTIFIER",
       body: {
         study: id,
