@@ -1,10 +1,15 @@
 import { select } from "@angular-redux/store";
+import { Select } from "@ngxs/store";
+import { GeneralMetadataState } from "../ngxs-store/study/general-metadata.state";
+import { Observable } from "rxjs";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export class MockEditorService {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.validations) studyValidations;
   @select((state) => state.study.files) studyFiles;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
 
   currentStudyIdentifier: string = null;
   validations: any = {};

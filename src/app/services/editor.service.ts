@@ -20,11 +20,12 @@ import { Observable, of, interval, asapScheduler, asyncScheduler } from "rxjs";
 import { VersionInfo } from "src/environment.interface";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
-import { Store } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/transitions.actions";
 import { env } from "process";
 import { User } from "../ngxs-store/user.actions";
 import { Identifier } from "../ngxs-store/study/general-metadata.actions";
+import { GeneralMetadataState } from "../ngxs-store/study/general-metadata.state";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -53,6 +54,9 @@ export class EditorService {
   @select((state) => state.study.studyAssays) studyAssays;
   @select((state) => state.study) stateStudy;
   @select((state) => state.status.controlLists) controlLists;
+  
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
 
   study: MTBLSStudy;
   baseHref: string;
@@ -82,8 +86,51 @@ export class EditorService {
     private platformLocation: PlatformLocation
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+    if (environment.useNewState) { this.setUpSubscriptionsNgxs(); } else {
+      this.studyIdentifier.subscribe((value) => {
+        this.currentStudyIdentifier = value;
+      });
+      this.stateStudy.subscribe((value) => {
+        this.study = value;
+      });
+      this.studyValidations.subscribe((value) => {
+        this.validations = value;
+      });
+      this.studyFiles.subscribe((value) => {
+        this.files = value;
+      });
+  
+      this.controlLists.subscribe((value) => {
+        if (value) {
+          Object.keys(value).forEach((label: string)=>{
+            this.defaultControlLists[label] = {OntologyTerm: []};
+            value[label].forEach(term => {
+              this.defaultControlLists[label].OntologyTerm.push({
+                annotationDefinition: term.definition,
+                annotationValue: term.name,
+                termAccession: term.iri,
+                comments: [],
+                termSource: {
+                  comments: [],
+                  name: term.onto_name,
+                  description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
+                  file: term.provenance_name,
+                  provenance_name: term.provenance_name,
+                  version: ""
+                },
+                wormsID: ""
+              });
+            });
+          });
+        }
+      });
+    }
     this.redirectUrl = this.configService.config.redirectURL;
-    this.studyIdentifier.subscribe((value) => {
+   
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
       this.currentStudyIdentifier = value;
     });
     this.stateStudy.subscribe((value) => {

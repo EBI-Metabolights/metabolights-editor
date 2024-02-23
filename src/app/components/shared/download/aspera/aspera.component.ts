@@ -2,6 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
@@ -13,6 +16,9 @@ export class AsperaDownloadComponent implements OnInit {
   @select((state) => state.study.uploadLocation) uploadLocation;
   @select((state) => state.study.validations) validations: any;
   @select((state) => state.study.identifier) studyIdentifier: any;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
 
@@ -38,9 +44,10 @@ export class AsperaDownloadComponent implements OnInit {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
   ngOnInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
 
   }
 
@@ -52,6 +59,18 @@ export class AsperaDownloadComponent implements OnInit {
       this.requestedStudy = value;
     });
   }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
+      if (value != null) {
+        this.requestedStudy = value;
+      }
+    });
+    this.studyIdentifier.subscribe((value) => {
+      this.requestedStudy = value;
+    });
+  }
+
 
   toggleHelp() {
     this.displayHelpModal = !this.displayHelpModal;

@@ -8,6 +8,9 @@ import { environment } from "src/environments/environment";
 import { FtpManagementService } from "src/app/services/ftp-management.service";
 import { CommonModule, PlatformLocation } from '@angular/common';
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Select } from "@ngxs/store";
+import { Observable } from "rxjs";
 
 
 
@@ -21,6 +24,9 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
   @Input("validations") validations: any;
 
 
@@ -79,7 +85,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   ngOnInit() {
     this.loadFiles();
 
-    this.setUpSubscriptions();
+    environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
 
   }
 
@@ -113,6 +119,26 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
       }
     });
   }
+
+  setUpSubscriptionsNgxs() {
+    this.readonly.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
+    this.studyStatus.subscribe((value) => {
+      this.status = value;
+    });
+    this.studyIdentifier$.subscribe((value) => {
+      this.requestedStudy = value;
+    });
+    this.isCurator.subscribe((value) => {
+      if (value !== null) {
+        this.curator = value;
+      }
+    });
+  }
+
   getFolderStatus(){
     if (this.isReadOnly !== null && this.isReadOnly === false){
       this.loadAccess();

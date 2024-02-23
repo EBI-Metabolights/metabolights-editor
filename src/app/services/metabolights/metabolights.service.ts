@@ -23,6 +23,8 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MTBLSStudy } from "src/app/models/mtbl/mtbls/mtbls-study";
 import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Select } from "@ngxs/store";
 
 
 
@@ -45,6 +47,9 @@ interface DeleteFilesResponse {
 export class MetabolightsService extends DataService {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study) stateStudy;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
   study: MTBLSStudy;
   id: string;
 
@@ -78,10 +83,19 @@ export class MetabolightsService extends DataService {
             this.url.guides = this.url.guides.slice(0, -1);
             console.log(this.url.guides)
         }
-        this.studyIdentifier.subscribe((value) => (this.id = value));
-        this.stateStudy.subscribe((value) => (this.study = value));
+        if (environment.useNewState) this.setUpSubscriptionsNgxs();
+        else {
+          this.studyIdentifier.subscribe((value) => (this.id = value));
+          this.stateStudy.subscribe((value) => (this.study = value));
+        }
+
     });
 
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => (this.id = value));
+    this.stateStudy.subscribe((value) => (this.study = value));
   }
 
   /**

@@ -13,6 +13,9 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Select } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-title",
@@ -24,6 +27,9 @@ export class TitleComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.readonly) readonly;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
 
   isReadOnly = false;
   requestedStudy: string = null;
@@ -41,9 +47,10 @@ export class TitleComponent implements OnInit {
     private editorService: EditorService,
     private ngRedux: NgRedux<IAppState>
   ) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -63,6 +70,40 @@ export class TitleComponent implements OnInit {
       this.validations = value;
     });
     this.studyIdentifier.subscribe((value) => {
+      if (value != null) {
+        this.requestedStudy = value;
+        if (document.title.indexOf("|") > -1) {
+          document.title =
+            this.requestedStudy + " | " + document.title.split(" | ")[1];
+        } else {
+          document.title = this.requestedStudy + " | ";
+        }
+      }
+    });
+    this.readonly.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyTitle.subscribe((value) => {
+      if (value === "") {
+        this.title = "Please add your study title here";
+      } else {
+        this.title = value;
+        if (document.title.indexOf("|") > -1) {
+          document.title = document.title.split(" | ")[0] + " | " + this.title;
+        } else {
+          document.title = " | " + this.title;
+        }
+      }
+    });
+    this.studyValidations.subscribe((value) => {
+      this.validations = value;
+    });
+    this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
         if (document.title.indexOf("|") > -1) {

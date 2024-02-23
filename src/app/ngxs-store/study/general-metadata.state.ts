@@ -1,4 +1,4 @@
-import { Action, State, StateContext } from "@ngxs/store";
+import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
 import { Identifier } from "./general-metadata.actions";
@@ -39,6 +39,15 @@ export class GeneralMetadataState {
 
     @Action(Identifier.Set)
     SetStudyIdentifier(ctx: StateContext<GeneralMetadataStateModel>, action: Identifier.Set) {
-        
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            id: action.id
+        })
+    }
+
+    @Selector()
+    static id(state: GeneralMetadataStateModel): string {
+        return state.id
     }
 }

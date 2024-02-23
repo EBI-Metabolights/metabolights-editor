@@ -20,6 +20,7 @@ import { Observable } from "rxjs";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { UserState } from "src/app/ngxs-store/user.state";
 import { Owner, User } from "src/app/ngxs-store/user.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 
 @Component({
   selector: "study",
@@ -40,6 +41,7 @@ export class PublicStudyComponent implements OnInit {
   @Select(UserState.user) user$: Observable<Owner>; // potentially unused
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
   @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]> // Potentially unused
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
 
   loading: any = true;
   requestedTab = 0;
@@ -92,9 +94,9 @@ export class PublicStudyComponent implements OnInit {
     }
 
     if (reviewMode === true) {
-      this.loadStudy(studyId);
+      environment.useNewState ? this.loadStudyNgxs(studyId) : this.loadStudy(studyId);
     } else {
-      this.loadStudy(null);
+      environment.useNewState ? this.loadStudyNgxs(null) : this.loadStudy(null);
     }
     this.calculateNotReadyValidationMessage();
   }
@@ -118,6 +120,80 @@ export class PublicStudyComponent implements OnInit {
       });
     }
     this.studyIdentifier.subscribe((value) => {
+      if (value !== null) {
+        this.requestedStudy = value;
+      }
+    });
+
+    this.studyValidation.subscribe((value) => {
+      this.validation = value;
+      this.calculateNotReadyValidationMessage();
+    });
+
+    this.studyFiles.subscribe((value) => {
+      this.files = value;
+      this.loading = false;
+        if(this.status === undefined || this.status === null || this.status === "Public"){
+          return;
+        }
+
+        if (this.isCurator || this.isOwner) {
+          this.editorService.getValidationReport();
+        }
+    });
+
+    this.investigationFailed.subscribe((value) => {
+      this.studyError = value;
+    });
+
+    this.studyStatus.subscribe((value) => {
+      if(value){
+        this.status = value;
+        this.calculateNotReadyValidationMessage();
+      }
+    });
+
+    this.studyReviewerLink.subscribe((value) => {
+      this.reviewerLink = value;
+    });
+
+    this.route.params.subscribe((params) => {
+      if (params.tab === "files") {
+        this.requestedTab = 5;
+        this.tab = "files";
+      } else if (params.tab === "metabolites") {
+        this.requestedTab = 4;
+        this.tab = "metabolites";
+      } else if (params.tab === "assays") {
+        this.requestedTab = 3;
+        this.tab = "assays";
+      } else if (params.tab === "samples") {
+        this.requestedTab = 2;
+        this.tab = "samples";
+      } else if (params.tab === "protocols") {
+        this.requestedTab = 1;
+        this.tab = "protocols";
+      } else if (params.tab === "validations") {
+        this.requestedTab = 6;
+        this.tab = "validations";
+      } else {
+        this.requestedTab = 0;
+        this.tab = "descriptors";
+      }
+      this.selectCurrentTab(this.requestedTab, this.tab);
+    });
+  }
+
+  loadStudyNgxs(studyId) {
+    this.editorService.toggleLoading(false);
+    if (studyId) {
+      this.editorService.loadStudyInReview(studyId);
+    } else {
+      this.editorService.loadPublicStudy({
+        id: this.route.snapshot.paramMap.get("study"),
+      });
+    }
+    this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
       }

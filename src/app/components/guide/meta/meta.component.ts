@@ -16,6 +16,7 @@ import { Select } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/user.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 
 @Component({
   selector: "app-meta",
@@ -31,6 +32,7 @@ export class MetaComponent implements OnInit {
   @select((state) => state.study.studyDesignDescriptors)
 
   @Select(UserState.user) user$: Observable<Owner>;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
 
   studyDesignDescriptors: any[];
 
@@ -106,7 +108,7 @@ export class MetaComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyIdentifier.subscribe((value) => {
+    this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
       }

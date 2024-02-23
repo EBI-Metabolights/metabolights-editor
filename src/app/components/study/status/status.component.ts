@@ -13,6 +13,9 @@ import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Select } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-status",
@@ -26,6 +29,9 @@ export class StatusComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
 
   @select((state) => state.study.readonly) readonly;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
   isReadOnly = false;
 
   isModalOpen = false;
@@ -39,7 +45,7 @@ export class StatusComponent implements OnInit {
     private editorService: EditorService,
     private route: ActivatedRoute
   ) {
-      this.setUpSubscriptions();
+      environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
   }
 
   setUpSubscriptions() {
@@ -58,6 +64,33 @@ export class StatusComponent implements OnInit {
       }
     });
     this.studyIdentifier.subscribe((value) => {
+      if (value != null) {
+        this.requestedStudy = value;
+      }
+    });
+    this.readonly.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyValidation.subscribe((value) => {
+      this.validation = value;
+    });
+    this.studyStatus.subscribe((value) => {
+      if (value != null) {
+        this.status = value;
+        this.toStatus = value;
+      }
+    });
+    this.isCurator.subscribe((value) => {
+      if (value != null) {
+        this.curator = value;
+      }
+    });
+    this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
       }

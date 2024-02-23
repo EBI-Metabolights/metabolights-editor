@@ -9,6 +9,9 @@ import Swal from "sweetalert2";
 import { tassign } from "tassign";
 import { SamplesComponent } from "./../../study/samples/samples.component";
 import { environment } from "src/environments/environment";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
 
 @Component({
   selector: "guide-assays",
@@ -20,6 +23,8 @@ export class GuidedAssaysComponent implements OnInit {
   @select((state) => state.study.files) studyFiles;
   @select((state) => state.study.assays) studyAssays;
   @select((state) => state.study.samples) studySamples;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
 
   @ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
@@ -45,9 +50,10 @@ export class GuidedAssaysComponent implements OnInit {
     private router: Router
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
@@ -81,6 +87,12 @@ export class GuidedAssaysComponent implements OnInit {
     this.studySamples.subscribe((value) => {
       this.samples = value;
     });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
+      if (value != null) this.requestedStudy = value
+    })
   }
 
   ngOnInit() {}
