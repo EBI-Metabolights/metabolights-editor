@@ -33,6 +33,7 @@ export class MetaComponent implements OnInit {
 
   @Select(UserState.user) user$: Observable<Owner>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>
 
   studyDesignDescriptors: any[];
 
@@ -113,7 +114,7 @@ export class MetaComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
-    this.studyTitle.subscribe((value) => {
+    this.studyTitle$.subscribe((value) => {
       if (value && value !== "") {
         this.currentTitle = value;
       }

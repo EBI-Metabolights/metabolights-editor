@@ -11,7 +11,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import {SessionStatus} from '../../../models/mtbl/mtbls/enums/session-status.enum';
 import {AuthGuard} from '../../../auth-guard.service';
 import {browserRefresh} from '../../../app.component';
-import { StudyPermisssion } from "src/app/services/headers";
+import { StudyPermission } from "src/app/services/headers";
 import { PlatformLocation } from "@angular/common";
 import { Select, Store } from "@ngxs/store";
 import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
@@ -21,6 +21,7 @@ import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.
 import { UserState } from "src/app/ngxs-store/user.state";
 import { Owner, User } from "src/app/ngxs-store/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "study",
@@ -42,6 +43,7 @@ export class PublicStudyComponent implements OnInit {
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
   @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]> // Potentially unused
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>
 
   loading: any = true;
   requestedTab = 0;
@@ -57,7 +59,7 @@ export class PublicStudyComponent implements OnInit {
   endpoint = "";
   baseHref: any = "";
   reviewerLink: string = null;
-  permissions: StudyPermisssion = null;
+  permissions: StudyPermission = null;
   notReadyValidationMessage: string = null;
 
   constructor(
@@ -216,7 +218,7 @@ export class PublicStudyComponent implements OnInit {
         }
     });
 
-    this.investigationFailed.subscribe((value) => {
+    this.investigationFailed$.subscribe((value) => {
       this.studyError = value;
     });
 

@@ -1,8 +1,18 @@
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { Identifier } from "./general-metadata.actions";
+import { GetGeneralMetadata, Identifier, People, Publications, SetStudyAbstract, SetStudyReleaseDate, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
+import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
+import { Loading, SetLoadingInfo } from "../transitions.actions";
+import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
+import { SetReadonly, SetStudyError } from "../application.actions";
+import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
+import { AssayList } from "./assay/assay.actions";
+import { Protocols } from "./protocols/protocols.actions"
+import { Descriptors } from "./descriptors/descriptors.action";
+import { Operations } from "./files/files.actions";
+import { EditorValidationRules, ValidationReport } from "./validation/validation.actions";
 
 
 export interface GeneralMetadataStateModel {
@@ -13,8 +23,8 @@ export interface GeneralMetadataStateModel {
     releaseDate: Date;
     status: string;
     reviewerLink: any;
-    publications: MTBLSPublication[];
-    people: MTBLSPerson[];
+    publications: IPublication[];
+    people: IPerson[];
 }
 
 @State<GeneralMetadataStateModel>({
@@ -34,7 +44,49 @@ export interface GeneralMetadataStateModel {
 })
 @Injectable()
 export class GeneralMetadataState {
-    constructor() {
+    constructor(
+        private generalMetadataService: GeneralMetadataService,
+        private store: Store
+        ) {
+    }
+
+    @Action(GetGeneralMetadata)
+    GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
+        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).subscribe(
+            (gm_response) => {
+                this.store.dispatch(new SetStudyError(false));
+                this.store.dispatch(new SetLoadingInfo("Loading investigation details"));
+                this.store.dispatch(new SetReadonly(action.readonly));
+                this.store.dispatch(new AssayList.Set(gm_response.isaInvestigation.studies[0].assays));
+                this.store.dispatch(new Protocols.Set(gm_response.isaInvestigation.studies[0].protocols));
+                this.store.dispatch(new Descriptors.Set(gm_response.isaInvestigation.studies[0].studyDesignDescriptors));
+                //this.store.dispatch(new SetConfiguration());
+                this.store.dispatch(EditorValidationRules.Get);
+
+                ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
+                ctx.dispatch(new SetStudyAbstract(gm_response.isaInvestigation.studies[0].description));
+                ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
+                ctx.dispatch(new SetStudyReleaseDate(new Date(gm_response.isaInvestigation.publicReleaseDate)));
+                ctx.dispatch(new SetStudyStatus(gm_response.mtblsStudy.studyStatus));
+                ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
+                ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
+                ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
+                
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly))
+                // todo get validation report and conditionally dispatch readonly
+                this.store.dispatch(new Loading.Disable());
+            }, 
+            (error) => {
+                this.store.dispatch(new SetStudyError(false));
+                this.store.dispatch(new Loading.Disable());
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
+                if (!action.readonly) {
+                    this.store.dispatch(new ValidationReport.Get())
+                } //todo Dispatch ValidationReport.Get
+
+
+
+            })
     }
 
     @Action(Identifier.Set)
@@ -46,8 +98,88 @@ export class GeneralMetadataState {
         })
     }
 
+    @Action(Title.Set)
+    SetTitle(ctx: StateContext<GeneralMetadataStateModel>, action: Title.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            title: action.title
+        });
+    }
+
+    @Action(SetStudyAbstract)
+    SetAbstract(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyAbstract) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            description: action.abstract
+        });
+    }
+
+    @Action(SetStudySubmissionDate)
+    SetSubmissionDate(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudySubmissionDate) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            submissionDate: action.date
+        });
+    }
+
+    @Action(SetStudyReleaseDate)
+    SetReleaseDate(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyReleaseDate) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            releaseDate: action.date
+        });
+    }
+
+    @Action(SetStudyStatus)
+    SetStatus(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyStatus) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            description: action.status
+        });
+    }
+
+    @Action(SetStudyReviewerLink)
+    SetReviewerLink(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyReviewerLink) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            description: action.link
+        });
+    }
+
+    @Action(Publications.Set)
+    SetPublications(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            publications: action.publications
+        });
+    }
+
+    @Action(People.Set)
+    SetPeople(ctx: StateContext<GeneralMetadataStateModel>, action: People.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            people: action.people
+        });
+    }
+
+
+
+
     @Selector()
     static id(state: GeneralMetadataStateModel): string {
         return state.id
+    }
+
+    @Selector()
+    static title(state: GeneralMetadataStateModel): string {
+        return state.title
     }
 }

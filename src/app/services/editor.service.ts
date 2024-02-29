@@ -7,7 +7,7 @@ import { ActivatedRouteSnapshot, Router } from "@angular/router";
 
 import { catchError, map, observeOn } from "rxjs/operators";
 
-import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermisssion } from "./../services/headers";
+import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermission } from "./../services/headers";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
@@ -24,8 +24,9 @@ import { Select, Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/transitions.actions";
 import { env } from "process";
 import { User } from "../ngxs-store/user.actions";
-import { Identifier } from "../ngxs-store/study/general-metadata.actions";
+import { GetGeneralMetadata, Identifier } from "../ngxs-store/study/general-metadata.actions";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata.state";
+import { read } from "fs";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -305,7 +306,7 @@ export class EditorService {
   async getStudyPermission(key: string, path: string) {
     const url = this.configService.config.metabolightsWSURL.baseURL + path + key;
     try {
-      const response = await this.authService.http.get<StudyPermisssion>(url,
+      const response = await this.authService.http.get<StudyPermission>(url,
         {
           headers: httpOptions.headers,
           observe: "body",
@@ -717,6 +718,11 @@ export class EditorService {
     this.ngRedux.dispatch({ type: "SET_PROTOCOL_EXPAND", body: value });
   }
 
+  loadStudyNgxs(studyID, readonly) {
+    this.store.dispatch(new GetGeneralMetadata(studyID, readonly))
+  }
+
+  //REMOVE POST STATE MIGRATION
   loadStudy(studyID, readonly) {
     this.toggleLoading(true);
     this.loadStudyId(studyID);
@@ -846,6 +852,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   getValidationReport() {
     this.dataService.getValidationReport().subscribe(
       (response) => {
@@ -903,6 +910,7 @@ export class EditorService {
 
   }
 
+  // REMOVE POST STATE MIGRATION
   loadStudyFiles(force, readonly: boolean = true) {
     // console.log("Loading Study files..")
     // console.log("Force files list calculation - "+fource)
@@ -1188,6 +1196,7 @@ export class EditorService {
     return this.dataService.validateMAF(f).pipe(map((data) => data));
   }
 
+  // REMOVE POST STATE MIGRATION
   updateSamples(file) {
     const samples = {};
     samples["name"] = file;

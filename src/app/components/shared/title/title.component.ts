@@ -29,6 +29,8 @@ export class TitleComponent implements OnInit {
   @select((state) => state.study.readonly) readonly;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>
+
 
 
   isReadOnly = false;
@@ -88,7 +90,7 @@ export class TitleComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyTitle.subscribe((value) => {
+    this.studyTitle$.subscribe((value) => {
       if (value === "") {
         this.title = "Please add your study title here";
       } else {

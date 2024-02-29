@@ -11,6 +11,7 @@ import { Select, Store } from "@ngxs/store";
 import { TransitionsState } from "src/app/ngxs-store/transitions.state";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-study",
@@ -31,7 +32,8 @@ export class StudyComponent implements OnInit, OnDestroy {
 
 
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
 
   studyError = false;
   requestedTab = 0;
@@ -152,7 +154,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     if (this.configService.config.endpoint.endsWith("/") === false){
       this.endpoint = this.endpoint + "/";
     }
-    this.investigationFailed.subscribe((value) => {
+    this.investigationFailed$.subscribe((value) => {
       this.studyError = value;
       this.selectCurrentTab(5, "files");
     });

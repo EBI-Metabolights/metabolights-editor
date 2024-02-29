@@ -1,6 +1,13 @@
+import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface"
+import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface"
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person"
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication"
 
+
+export class GetGeneralMetadata {
+    static readonly type ='[general] Get All General Metadata'
+    constructor(public studyId: string, public readonly: boolean) {}
+}
 export namespace Identifier {
     export class Set {
         static readonly type = '[general] Set Study Identifier'
@@ -45,24 +52,24 @@ export class SetStudyReviewerLink {
 export namespace Publications {
     export class Set {
         static readonly type = '[general] Set Study Publications'
-        constructor(public publications: MTBLSPublication[]) {}
+        constructor(public publications: IPublication[]) {}
     }
     
     export class Add {
         static readonly type = '[general] Add Study Publication'
-        constructor(public publication: MTBLSPublication) {}
+        constructor(public publication: IPublication) {}
     }
 }
 
 export namespace People {
     export class Set {
         static readonly type = '[general] Set Study People'
-        constructor(public people: MTBLSPerson[]) {}
+        constructor(public people: IPerson[]) {}
     }
 
     export class Add {
         static readonly type = '[general] Add Study Person'
-        constructor(public person: MTBLSPerson) {}
+        constructor(public person: IPerson) {}
     }
 
 }
