@@ -17,6 +17,7 @@ import { UserState } from "src/app/ngxs-store/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 
 @Component({
   selector: "app-meta",
@@ -29,13 +30,15 @@ export class MetaComponent implements OnInit {
   @select((state) => state.study.title) studyTitle;
   @select((state) => state.study.abstract) studyDescription;
 
-  @select((state) => state.study.studyDesignDescriptors)
+  @select((state) => state.study.studyDesignDescriptors)  studyDesignDescriptors: any[];
+
 
   @Select(UserState.user) user$: Observable<Owner>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
+  @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
 
-  studyDesignDescriptors: any[];
+
 
   requestedStudy: string = null;
   user: any = null;
@@ -119,7 +122,7 @@ export class MetaComponent implements OnInit {
         this.currentTitle = value;
       }
     });
-    this.studyDescription.subscribe((value) => {
+    this.studyDescription$.subscribe((value) => {
       if (value && value !== "") {
         this.currentDescription = value;
       }
@@ -196,6 +199,8 @@ export class MetaComponent implements OnInit {
   skipMetaData() {
     this.router.navigate(["/guide/assays", this.requestedStudy]);
   }
+  
+  //NEEDS STATE REFACTOR
   saveMetaData() {
     this.isLoading = true;
     if (this.isManuscriptValid()) {

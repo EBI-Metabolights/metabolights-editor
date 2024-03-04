@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Action, Select, State, StateContext, Store } from "@ngxs/store";
+import { Action, Select, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Organisms, Samples } from "./samples.actions";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
@@ -172,4 +172,16 @@ export class SampleState {
             organisms: action.organisms
         })
     }
+
+    @Selector()
+    static samples(state: SamplesStateModel): Record<string, any> {
+        return state.samples
+    }
+
+    @Selector()
+    static organisms(state: SamplesStateModel): Record<string, any> {
+        return state.organisms
+    }
+
+
 }

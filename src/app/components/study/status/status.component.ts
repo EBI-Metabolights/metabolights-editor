@@ -16,6 +16,8 @@ import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validat
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { Select } from "@ngxs/store";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-status",
@@ -30,7 +32,10 @@ export class StatusComponent implements OnInit {
 
   @select((state) => state.study.readonly) readonly;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
   isReadOnly = false;
 
@@ -76,11 +81,11 @@ export class StatusComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyValidation.subscribe((value) => {
+    this.studyValidation$.subscribe((value) => {
       this.validation = value;
     });
-    this.studyStatus.subscribe((value) => {
-      if (value != null) {
+    this.studyStatus$.subscribe((value) => {
+      if (value !== null) {
         this.status = value;
         this.toStatus = value;
       }
@@ -95,7 +100,7 @@ export class StatusComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
-    this.readonly.subscribe((value) => {
+    this.readonly$.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
       }

@@ -5,6 +5,9 @@ import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
+import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
+import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
 
 @Component({
   selector: "mtbls-mafs",
@@ -18,7 +21,10 @@ export class MafsComponent implements OnInit {
   @select((state) => state.study.studyAssays) assayFiles;
   @select((state) => state.study.mafs) studyMAFs;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(AssayState.assayList) assayFiles$: Observable<IAssay[]>;
+  @Select(AssayState.assays) studyAssays$: Observable<Record<string, any>>;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(MAFState.mafs) studyMAFs$: Observable<Record<string, any>>;
 
 
   assays: any = [];
@@ -103,7 +109,7 @@ export class MafsComponent implements OnInit {
       });
     }
 
-    this.studyMAFs.subscribe((value) => {
+    this.studyMAFs$.subscribe((value) => {
       if (this.mafNames) {
         this.mafNames.forEach((mafFile) => {
           this.mafs.push(value[mafFile]);
@@ -124,12 +130,12 @@ export class MafsComponent implements OnInit {
       }
     });
 
-    this.assayFiles.subscribe((assayfiles) => {
+    this.assayFiles$.subscribe((assayfiles) => {
       this.studyAssayFiles = assayfiles;
     });
 
     // eslint-disable-next-line @typescript-eslint/indent
-    this.studyAssays.subscribe((value) => {
+    this.studyAssays$.subscribe((value) => {
 
       this.assays = value;
       const tempMAFs = [];

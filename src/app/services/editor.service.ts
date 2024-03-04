@@ -27,6 +27,11 @@ import { User } from "../ngxs-store/user.actions";
 import { GetGeneralMetadata, Identifier } from "../ngxs-store/study/general-metadata.actions";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata.state";
 import { read } from "fs";
+import { AssayState } from "../ngxs-store/study/assay/assay.state";
+import { IAssay } from "../models/mtbl/mtbls/interfaces/assay.interface";
+import { FilesState } from "../ngxs-store/study/files/files.state";
+import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
+import { ValidationState } from "../ngxs-store/study/validation/validation.state";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -57,6 +62,10 @@ export class EditorService {
   @select((state) => state.status.controlLists) controlLists;
   
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+
+
 
 
   study: MTBLSStudy;
@@ -137,10 +146,10 @@ export class EditorService {
     this.stateStudy.subscribe((value) => {
       this.study = value;
     });
-    this.studyValidations.subscribe((value) => {
+    this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
-    this.studyFiles.subscribe((value) => {
+    this.studyFiles$.subscribe((value) => {
       this.files = value;
     });
 

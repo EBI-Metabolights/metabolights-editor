@@ -1,7 +1,7 @@
 <span *ngIf="inline; else showCard">
-  <div *ngIf="(descriptors | async)?.length > 0; else emptyMessage">
+  <div *ngIf="(descriptors$ | async)?.length > 0; else emptyMessage">
     <div id="meta" class="field is-grouped is-grouped-multiline">
-      <div *ngFor="let descriptor of descriptors | async">
+      <div *ngFor="let descriptor of descriptors$ | async">
         <mtbls-design-descriptor
           [readOnly]="readOnly"
           [value]="descriptor"
@@ -26,9 +26,9 @@
     </header>
     <div class="card-content">
       <div class="content">
-        <div *ngIf="(descriptors | async)?.length > 0; else emptyMessage">
+        <div *ngIf="(descriptors$ | async)?.length > 0; else emptyMessage">
           <div id="meta" class="field is-grouped is-grouped-multiline">
-            <div *ngFor="let descriptor of descriptors | async">
+            <div *ngFor="let descriptor of descriptors$ | async">
               <mtbls-design-descriptor
                 [readOnly]="readOnly"
                 [value]="descriptor"

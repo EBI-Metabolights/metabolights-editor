@@ -25,7 +25,9 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
+
 
   @Input("validations") validations: any;
 
@@ -126,7 +128,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
         this.isReadOnly = value;
       }
     });
-    this.studyStatus.subscribe((value) => {
+    this.studyStatus$.subscribe((value) => {
       this.status = value;
     });
     this.studyIdentifier$.subscribe((value) => {

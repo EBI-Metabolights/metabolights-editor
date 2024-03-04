@@ -102,4 +102,19 @@ export class FilesState {
         let result = state.files.study.filter(file => file.file.startsWith('a_'));
         return result
     }
+
+    @Selector()
+    static obfuscationCode(state: FilesStateModel) {
+        return state.obfuscationCode;
+    }
+
+    @Selector()
+    static uploadLocation(state: FilesStateModel) {
+        return state.uploadLocation;
+    }
+
+    @Selector()
+    static files(state: FilesStateModel) {
+        return state.files;
+    }
 }

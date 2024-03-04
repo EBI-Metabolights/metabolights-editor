@@ -12,6 +12,10 @@ import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
+import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 
 @Component({
   selector: "guide-assays",
@@ -24,7 +28,11 @@ export class GuidedAssaysComponent implements OnInit {
   @select((state) => state.study.assays) studyAssays;
   @select((state) => state.study.samples) studySamples;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
 
   @ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
@@ -92,7 +100,31 @@ export class GuidedAssaysComponent implements OnInit {
   setUpSubscriptionsNgxs() {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) this.requestedStudy = value
-    })
+    });
+    this.studyFiles$.subscribe((value) => {
+      if (value != null) {
+        this.files = value;
+      } else {
+        this.editorService.loadStudyFiles(false);
+      }
+    });
+    this.assays$.subscribe((value) => {
+      this.assays = Object.values(value);
+      if (this.assays.length > 0) {
+        this.assays.sort((a, b) => {
+          if (a.name < b.name) {
+            return -1;
+          }
+          if (a.name > b.name) {
+            return 1;
+          }
+          return 0;
+        });
+      }
+    });
+    this.studySamples$.subscribe((value) => {
+      this.samples = value;
+    });
   }
 
   ngOnInit() {}

@@ -22,6 +22,10 @@ import { UserState } from "src/app/ngxs-store/user.state";
 import { Owner, User } from "src/app/ngxs-store/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 @Component({
   selector: "study",
@@ -39,11 +43,16 @@ export class PublicStudyComponent implements OnInit {
   @select((state) => state.status.userStudies) userStudies; //Potentially unused
   @select((state) => state.study.reviewerLink) studyReviewerLink;
 
-  @Select(UserState.user) user$: Observable<Owner>; // potentially unused
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
+  @Select(UserState.user) user$: Observable<Owner>; // potentially unused
   @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]> // Potentially unused
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+  @Select(GeneralMetadataState.reviewerLink) studyReviewerLink$: Observable<string>;
   @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+
 
   loading: any = true;
   requestedTab = 0;
@@ -201,12 +210,12 @@ export class PublicStudyComponent implements OnInit {
       }
     });
 
-    this.studyValidation.subscribe((value) => {
+    this.studyValidation$.subscribe((value) => {
       this.validation = value;
       this.calculateNotReadyValidationMessage();
     });
 
-    this.studyFiles.subscribe((value) => {
+    this.studyFiles$.subscribe((value) => {
       this.files = value;
       this.loading = false;
         if(this.status === undefined || this.status === null || this.status === "Public"){
@@ -222,14 +231,14 @@ export class PublicStudyComponent implements OnInit {
       this.studyError = value;
     });
 
-    this.studyStatus.subscribe((value) => {
+    this.studyStatus$.subscribe((value) => {
       if(value){
         this.status = value;
         this.calculateNotReadyValidationMessage();
       }
     });
 
-    this.studyReviewerLink.subscribe((value) => {
+    this.studyReviewerLink$.subscribe((value) => {
       this.reviewerLink = value;
     });
 

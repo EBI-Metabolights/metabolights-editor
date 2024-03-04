@@ -16,6 +16,8 @@ import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { Select } from "@ngxs/store";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-title",
@@ -28,10 +30,10 @@ export class TitleComponent implements OnInit {
   @select((state) => state.study.validations) studyValidations: any;
   @select((state) => state.study.readonly) readonly;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>
-
-
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
   isReadOnly = false;
   requestedStudy: string = null;
@@ -102,7 +104,7 @@ export class TitleComponent implements OnInit {
         }
       }
     });
-    this.studyValidations.subscribe((value) => {
+    this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
     this.studyIdentifier$.subscribe((value) => {

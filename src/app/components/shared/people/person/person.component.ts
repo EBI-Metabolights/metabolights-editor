@@ -26,6 +26,8 @@ import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { Select } from "@ngxs/store";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-person",
@@ -53,7 +55,10 @@ export class PersonComponent implements OnInit {
 
   @select((state) => state.study.readonly) readonly;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+
 
   isReadOnly = false;
 
@@ -111,10 +116,10 @@ export class PersonComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyValidations.subscribe((value) => {
+    this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
-    this.readonly.subscribe((value) => {
+    this.readonly$.subscribe((value) => {
       if (value !== null) {
         if (value) {
           this.isReadOnly = value;

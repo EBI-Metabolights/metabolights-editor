@@ -12,6 +12,7 @@ import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { environment } from "src/environments/environment";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
 @Component({
   selector: "study-validations",
@@ -24,6 +25,8 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   @select((state) => state.study.identifier) studyIdentifier: any;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+
 
   validationMessageTransform = new ValidationStatusTransformPipe();
   requestedStudy: any;
@@ -92,7 +95,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.validation.subscribe((value) => {
+    this.studyValidation$.subscribe((value) => {
       if (value) {
         this.studyValidation = value;
         if (this.studyValidation.status === 'error'){

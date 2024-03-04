@@ -5,6 +5,8 @@ import { PlatformLocation } from "@angular/common";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
@@ -18,6 +20,8 @@ export class AsperaDownloadComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier: any;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+
 
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
@@ -66,8 +70,8 @@ export class AsperaDownloadComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
+    this.editorValidationRules$.subscribe((value) => {
+      this.validation = value[this.validationsId];
     });
   }
 

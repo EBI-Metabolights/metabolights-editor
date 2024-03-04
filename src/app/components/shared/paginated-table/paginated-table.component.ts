@@ -31,6 +31,12 @@ import { ServerDataSource } from "./paginated-table.datasource";
 import { IsaTableDataSourceService } from "src/app/services/remote.datasource.service";
 import { tap } from "rxjs/operators";
 import { PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
+import { Observable } from "rxjs";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { Select } from "@ngxs/store";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -56,6 +62,13 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   @Output() rowEdit = new EventEmitter<any>();
 
   @select((state) => state.study.readonly) readonly;
+
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+
+
+
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -141,9 +154,10 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
     this.dataSource.metadata.subscribe((val) => this.currentMetadata = val);
 
     this.dataSource.loadIsaTableRows(this.tableData.data.file, '', 'asc', 0, 50);
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
   ngAfterViewInit() {
 
@@ -179,6 +193,24 @@ loadIsaTablePage() {
       }
     });
   }
+
+
+  setUpSubscriptionsNgxs() {
+    this.editorValidationRules$.subscribe((value) => {
+      this.validations = value;
+    });
+    this.studyFiles$.subscribe((value) => {
+      if (value) {
+        this.files = value.study;
+      }
+    });
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
 
   getFiles(header) {
     // if(this.fileColumns.indexOf(header) > -1){

@@ -21,6 +21,7 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.
 import { Select } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { env } from "process";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
 @Component({
   selector: "add-assay",
@@ -32,6 +33,7 @@ export class AddAssayComponent implements OnInit {
   @select((state) => state.study.validations) studyValidations;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
 
   requestedStudy: string = null;
   validations: any = null;
@@ -78,7 +80,7 @@ export class AddAssayComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
-    this.studyValidations.subscribe((value) => {
+    this.editorValidationRules$.subscribe((value) => {
       if (value) {
         this.validations = value;
         this.assaySetup = value.assays.assaySetup;

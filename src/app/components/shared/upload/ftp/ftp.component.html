@@ -41,26 +41,26 @@
     <section class="modal-card-body">
       Using FTP Client:
       <table
-        *ngIf="validations | async"
+        *ngIf="editorValidationRules$ | async"
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
         <tbody>
           <tr>
             <th>User</th>
             <td>
-              {{ (validations | async)[this.validationsId]["ftp"]["user"] }}
+              {{ (editorValidationRules$ | async)[this.validationsId]["ftp"]["user"] }}
             </td>
           </tr>
           <tr>
             <th>Password</th>
             <td>
-              {{ (validations | async)[this.validationsId]["ftp"]["secret"] }}
+              {{ (editorValidationRules$ | async)[this.validationsId]["ftp"]["secret"] }}
             </td>
           </tr>
           <tr>
             <th>Server</th>
             <td>
-              {{ (validations | async)[this.validationsId]["ftp"]["server"] }}
+              {{ (editorValidationRules$ | async)[this.validationsId]["ftp"]["server"] }}
             </td>
           </tr>
           <tr>

@@ -18,6 +18,8 @@ import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/user.actions";
 import { Select } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 
 @Component({
   selector: "raw-upload",
@@ -31,6 +33,8 @@ export class RawUploadComponent implements OnInit {
 
   @Select(UserState.user) user$: Observable<Owner>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+
 
 
   user: any = null;
@@ -75,7 +79,7 @@ export class RawUploadComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       this.requestedStudy = value;
     });
-    this.studyFiles.subscribe((value) => {
+    this.studyFiles$.subscribe((value) => {
       this.files = value;
     });
   }

@@ -2,6 +2,9 @@ import { select } from "@angular-redux/store";
 import { Select } from "@ngxs/store";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata.state";
 import { Observable } from "rxjs";
+import { FilesState } from "../ngxs-store/study/files/files.state";
+import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
+import { ValidationState } from "../ngxs-store/study/validation/validation.state";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export class MockEditorService {
@@ -10,6 +13,10 @@ export class MockEditorService {
   @select((state) => state.study.files) studyFiles;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+
+
 
   currentStudyIdentifier: string = null;
   validations: any = {};

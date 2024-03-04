@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Action, State, StateContext, Store } from "@ngxs/store";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MAF } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
 
@@ -26,7 +26,7 @@ export class MAFState {
         ctx.setState({
             ...state,
             mafs: tempMAFS
-        });
+        })
 
     }
 
@@ -80,6 +80,11 @@ export class MAFState {
             }
         )
         
+    }
+
+    @Selector()
+    static mafs(state: MAFStateModel): Record<string, any> {
+        return state.mafs
     }
 
 }

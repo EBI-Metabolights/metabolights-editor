@@ -26,6 +26,12 @@ import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { environment } from "src/environments/environment";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -51,6 +57,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Output() rowEdit = new EventEmitter<any>();
 
   @select((state) => state.study.readonly) readonly;
+
+
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -136,9 +147,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   ngOnInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+
   }
 
   setUpSubscriptions() {
@@ -151,6 +164,22 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
     });
     this.readonly.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.editorValidationRules$.subscribe((value) => {
+      this.validations = value;
+    });
+    this.studyFiles$.subscribe((value) => {
+      if (value) {
+        this.files = value.study;
+      }
+    });
+    this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
       }

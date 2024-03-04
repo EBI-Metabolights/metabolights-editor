@@ -19,6 +19,13 @@ import { EuropePMCService } from "../../../../services/publications/europePMC.se
 import { FormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Observable } from "rxjs";
+import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 @Component({
   selector: "mtbls-design-descriptor",
   templateUrl: "./design-descriptor.component.html",
@@ -30,6 +37,11 @@ export class DesignDescriptorComponent implements OnInit {
 
   @select((state) => state.study.readonly) studyReadonly;
   @select((state) => state.study.studyDesignDescriptors) studyDescriptors;
+
+  @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
+  @Select(GeneralMetadataState.publications) studyPublications$: Observable<IPublication[]>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(DescriptorsState.studyDesignDescriptors) descriptors$: Observable<Ontology[]>;
 
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;
@@ -66,9 +78,10 @@ export class DesignDescriptorComponent implements OnInit {
     private doiService: DOIService,
     private europePMCService: EuropePMCService
   ) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
@@ -83,6 +96,23 @@ export class DesignDescriptorComponent implements OnInit {
       this.descriptors = value;
     });
     this.studyReadonly.subscribe((value) => {
+      if (value != null) {
+        this.isStudyReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.editorValidationRules$.subscribe((value) => {
+      this.validations = value;
+    });
+    this.studyPublications$.subscribe((value) => {
+      this.publications = value;
+    });
+    this.descriptors$.subscribe((value) => {
+      this.descriptors = value;
+    });
+    this.studyReadonly$.subscribe((value) => {
       if (value != null) {
         this.isStudyReadOnly = value;
       }
@@ -113,6 +143,8 @@ export class DesignDescriptorComponent implements OnInit {
     return false;
   }
 
+
+  //NEEDS STATE REFACTOR
   updateAndClose() {
     this.isFormBusy = true;
     this.editorService.getDesignDescriptors().subscribe((res) => {

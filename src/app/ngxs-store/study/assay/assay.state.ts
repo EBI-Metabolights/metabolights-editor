@@ -99,31 +99,36 @@ export class AssayState {
                 assay["mafs"] = mafFiles;
                 ctx.dispatch(new Assay.Set(assay))
             
-    })
-}
+        })
+    }
 
-@Action(Assay.Set)
-SetStudyAssay(ctx: StateContext<AssayStateModel>, action: Assay.Set) {
-    const state = ctx.getState();
-    const tempAssays = Object.assign({}, state.assays);
-    tempAssays[action.assay.name] = action.assay;
-    ctx.setState({
-        ...state,
-        assays: tempAssays
-    });
-}
+    @Action(Assay.Set)
+    SetStudyAssay(ctx: StateContext<AssayStateModel>, action: Assay.Set) {
+        const state = ctx.getState();
+        const tempAssays = Object.assign({}, state.assays);
+        tempAssays[action.assay.name] = action.assay;
+        ctx.setState({
+            ...state,
+            assays: tempAssays
+        });
+    }
 
-@Action(AssayList.Set)
-SetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Set) {
-    const state = ctx.getState();
-    ctx.setState({
-        ...state,
-        assayList: action.assays
-    });
-}
+    @Action(AssayList.Set)
+    SetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            assayList: action.assays
+        });
+    }
 
-@Selector()
-static assayList(state: AssayStateModel): IAssay[] {
-    return state.assayList
-}
+    @Selector()
+    static assayList(state: AssayStateModel): IAssay[] {
+        return state.assayList
+    }
+
+    @Selector()
+    static assays(state: AssayStateModel): Record<string, any> {
+        return state.assays
+    }
 }

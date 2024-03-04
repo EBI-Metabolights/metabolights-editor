@@ -13,6 +13,13 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { validateStudyDescription } from "./description.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Observable } from "rxjs";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
+import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-description",
@@ -26,6 +33,10 @@ export class DescriptionComponent implements OnChanges, OnInit {
   @select((state) => state.study.studyDesignDescriptors)
   studyDesignDescriptors: any[];
   @select((state) => state.study.readonly) readonly;
+
+  @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
   isReadOnly = false;
 
@@ -46,9 +57,10 @@ export class DescriptionComponent implements OnChanges, OnInit {
     private editorService: EditorService,
     private ngRedux: NgRedux<IAppState>
   ) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -63,6 +75,24 @@ export class DescriptionComponent implements OnChanges, OnInit {
       }
     });
     this.readonly.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.editorValidationRules$.subscribe((value) => {
+      this.validations = value;
+    });
+    this.studyDescription$.subscribe((value) => {
+      if (value === "") {
+        this.description = "Please add your study title here";
+      } else {
+        this.description = value;
+      }
+    });
+    this.readonly$.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
       }

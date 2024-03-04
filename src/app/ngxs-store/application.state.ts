@@ -1,6 +1,6 @@
 import { Action, Selector, State, StateContext } from "@ngxs/store"
 import { StudyPermission } from "../services/headers"
-import { SetStudyError } from "./application.actions"
+import { SetReadonly, SetStudyError } from "./application.actions"
 import { Injectable } from "@angular/core"
 
 export interface MtblsEditorVersion {
@@ -32,7 +32,8 @@ export interface ApplicationStateModel {
     bannerMessage: string,
     maintenanceMode: boolean,
     controlLists: Record<string, any[]>,
-    investigationFailed: boolean
+    investigationFailed: boolean,
+    readonly: boolean
 
 }
 @Injectable()
@@ -61,7 +62,8 @@ export interface ApplicationStateModel {
         bannerMessage: null,
         maintenanceMode: false,
         controlLists: null, 
-        investigationFailed: null
+        investigationFailed: null,
+        readonly: null
     }
 })
 export class ApplicationState {
@@ -78,6 +80,20 @@ export class ApplicationState {
     @Selector()
     static investigationFailed(state: ApplicationStateModel): boolean {
         return state.investigationFailed
+    }
+
+    @Action(SetReadonly)
+    SetReadOnly(ctx: StateContext<ApplicationStateModel>, action: SetReadonly) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            readonly: action.readonly
+        });
+    }
+
+    @Selector()
+    static readonly(state: ApplicationStateModel): boolean {
+        return state.readonly
     }
 
 }

@@ -26,7 +26,9 @@ export class ReleaseDateComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.readonly) readonly;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.releaseDate) studyReleaseDate$: Observable<Date>;
+
 
 
   isReadOnly = false;
@@ -68,9 +70,9 @@ export class ReleaseDateComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyReleaseDate.subscribe((value) => {
+    this.studyReleaseDate$.subscribe((value) => {
       if (value !== null) {
-        if (value !== "") {
+        if (value.toString() !== "") {
           this.releaseDate = value;
         } else {
           this.editorService.metaInfo().subscribe((response) => {

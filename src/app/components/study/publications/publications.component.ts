@@ -11,6 +11,11 @@ import { MetabolightsService } from "../../../services/metabolights/metabolights
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Observable } from "rxjs";
+import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-publications",
@@ -22,13 +27,18 @@ export class PublicationsComponent implements OnInit {
   @Input("validations") studyValidations: any;
   @select((state) => state.study.readonly) readonly;
 
+  @Select(GeneralMetadataState.publications) studyPublications$: Observable<IPublication[]>;
+  @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
+
+
   isReadOnly = false;
   publications: any = null;
 
   constructor() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -40,6 +50,18 @@ export class PublicationsComponent implements OnInit {
         this.isReadOnly = value;
       }
     });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyPublications$.subscribe((value) => {
+      this.publications = value;
+    });
+    this.studyReadonly$.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+
   }
 
   ngOnInit() {}

@@ -5,6 +5,10 @@ import { TableComponent } from "./../../../shared/table/table.component";
 import { select } from "@angular-redux/store";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
+import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
 
 @Component({
   selector: "mtbls-maf",
@@ -17,6 +21,10 @@ export class MafComponent implements AfterContentInit {
   @select((state) => state.study.mafs) studyMAFs;
   @select((state) => state.study.readonly) readonly;
   @ViewChild(TableComponent) mafTable: TableComponent;
+
+  @Select(MAFState.mafs) studyMAFs$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  
 
   isReadOnly = false;
 
@@ -46,9 +54,10 @@ export class MafComponent implements AfterContentInit {
   constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
   ngAfterContentInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.load();
     }
+    if (environment.useNewState) this.loadNgxs();
   }
 
   load() {
@@ -59,6 +68,22 @@ export class MafComponent implements AfterContentInit {
       }
     });
     this.studyMAFs.subscribe((mafs) => {
+      if(Array.isArray(mafs) && mafs.length === 0){
+        return;
+      }
+      if (mafs && this.value.data.file) {
+        this.mafData = mafs[this.value.data.file];
+      }
+    });
+  }
+
+  loadNgxs() {
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
+    this.studyMAFs$.subscribe((mafs) => {
       if(Array.isArray(mafs) && mafs.length === 0){
         return;
       }

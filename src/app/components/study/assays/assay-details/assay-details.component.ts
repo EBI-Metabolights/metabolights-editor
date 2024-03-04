@@ -11,6 +11,12 @@ import Swal from "sweetalert2";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { environment } from "src/environments/environment";
+import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { env } from "process";
+import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 
 @Component({
   selector: "assay-details",
@@ -24,6 +30,10 @@ export class AssayDetailsComponent implements OnInit {
   @ViewChild(TableComponent) assayTable: TableComponent;
 
   @select((state) => state.study.readonly) readonly;
+
+  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
 
   @Output() assayDelete = new EventEmitter<any>();
 
@@ -45,13 +55,22 @@ export class AssayDetailsComponent implements OnInit {
   duplicateSampleNamesInAssay: any = [];
 
   constructor(private editorService: EditorService) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpConstructorSubscription();
     }
+    if (environment.useNewState) this.setUpConstructorSubscriptionNgxs();
   }
 
   setUpConstructorSubscription() {
     this.readonly.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpConstructorSubscriptionNgxs() {
+    this.readonly$.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
       }
@@ -70,10 +89,23 @@ export class AssayDetailsComponent implements OnInit {
     });
   }
 
+  setUpOnInitSubscriptionsNgxs() {
+    this.assays$.subscribe((value) => {
+      this.assay = value[this.assayName];
+    });
+    this.studySamples$.subscribe((value) => {
+      if (value.data) {
+        this.sampleNames = value.data.rows.map((r) => r["Sample Name"]);
+        this.filteredSampleNames = this.sampleNames;
+      }
+    });
+  }
+
   ngOnInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpOnInitSubscriptions();
     }
+    if (environment.useNewState) this.setUpOnInitSubscriptionsNgxs();
   }
 
   onSamplesFilterKeydown(event, filterValue: string) {

@@ -19,6 +19,8 @@ export class DeleteComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+
 
 
   isModalOpen = false;
@@ -58,7 +60,7 @@ export class DeleteComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyStatus.subscribe((value) => {
+    this.studyStatus$.subscribe((value) => {
       if (value != null) {
         this.status = value;
       }

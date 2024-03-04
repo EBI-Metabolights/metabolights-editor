@@ -73,8 +73,14 @@ export class GeneralMetadataState {
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
                 
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly))
-                // todo get validation report and conditionally dispatch readonly
-                this.store.dispatch(new Loading.Disable());
+
+                if (action.readonly) {
+                    this.store.dispatch(new SetReadonly(true));
+                    this.store.dispatch(new Loading.Disable());
+                } else {
+                    this.store.dispatch(new ValidationReport.Get());
+                    this.store.dispatch(new SetReadonly(false));
+                }
             }, 
             (error) => {
                 this.store.dispatch(new SetStudyError(false));
@@ -82,8 +88,7 @@ export class GeneralMetadataState {
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
                 if (!action.readonly) {
                     this.store.dispatch(new ValidationReport.Get())
-                } //todo Dispatch ValidationReport.Get
-
+                } 
 
 
             })
@@ -181,5 +186,35 @@ export class GeneralMetadataState {
     @Selector()
     static title(state: GeneralMetadataStateModel): string {
         return state.title
+    }
+
+    @Selector()
+    static description(state: GeneralMetadataStateModel): string {
+        return state.description
+    }
+
+    @Selector()
+    static releaseDate(state: GeneralMetadataStateModel): Date {
+        return state.releaseDate
+    }
+
+    @Selector()
+    static status(state: GeneralMetadataStateModel): string {
+        return state.status
+    }
+
+    @Selector()
+    static reviewerLink(state: GeneralMetadataStateModel): string {
+        return state.reviewerLink
+    }
+
+    @Selector()
+    static publications(state: GeneralMetadataStateModel): IPublication[] {
+        return state.publications
+    }
+
+    @Selector()
+    static people(state: GeneralMetadataStateModel): IPerson[] {
+        return state.people
     }
 }

@@ -3,10 +3,11 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { EditorValidationRules, ValidationReport } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
 import { Loading, SetLoadingInfo } from "../../transitions.actions";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 export interface ValidationStateModel {
     rules: Record<string, any>;
-    report: Record<string, any>
+    report: IValidationSummary
 }
 
 @State<ValidationStateModel>({
@@ -73,5 +74,10 @@ export class ValidationState {
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
         return state.rules
+    }
+
+    @Selector()
+    static report(state: ValidationStateModel): Record<string, any> {
+        return state.report
     }
 }

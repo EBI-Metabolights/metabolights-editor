@@ -12,6 +12,9 @@ import { TransitionsState } from "src/app/ngxs-store/transitions.state";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
 import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 @Component({
   selector: "mtbls-study",
@@ -33,7 +36,11 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
   @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
+  @Select(FilesState.obfuscationCode) studyObfuscationCode$: Observable<string>;
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+
 
   studyError = false;
   requestedTab = 0;
@@ -136,7 +143,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   setUpSubscriptionsNgxs() {
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
-    this.studyObfuscationCode.subscribe((value) => {
+    this.studyObfuscationCode$.subscribe((value) => {
       this.obfuscationCode = value;
     });
     this.bannerMessage.subscribe((value) => {
@@ -159,11 +166,11 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.selectCurrentTab(5, "files");
     });
 
-    this.studyStatus.subscribe((value) => {
+    this.studyStatus$.subscribe((value) => {
       this.status = value;
     });
 
-    this.studyValidation.subscribe((value) => {
+    this.studyValidation$.subscribe((value) => {
       this.validation = value;
     });
 
