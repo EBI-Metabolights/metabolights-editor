@@ -13,8 +13,8 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
 

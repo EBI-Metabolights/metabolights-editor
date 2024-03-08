@@ -27,3 +27,10 @@ export namespace User {
     }
 }
 
+export namespace Curator {
+    export class Set {
+        static readonly type = '[user] Set Curator'
+        constructor(public curator: boolean) {}
+    }
+}
+

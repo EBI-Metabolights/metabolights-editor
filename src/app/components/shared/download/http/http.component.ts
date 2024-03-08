@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
 

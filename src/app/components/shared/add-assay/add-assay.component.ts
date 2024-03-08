@@ -17,7 +17,7 @@ import { EditorService } from "../../../services/editor.service";
 import { NgRedux, select } from "@angular-redux/store";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { env } from "process";

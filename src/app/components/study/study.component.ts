@@ -6,12 +6,12 @@ import { EditorService } from "./../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
-import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
+import { SetTabIndex } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { Select, Store } from "@ngxs/store";
-import { TransitionsState } from "src/app/ngxs-store/transitions.state";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { Observable } from "rxjs";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
@@ -38,6 +38,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
   @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
+  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
+  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
   @Select(FilesState.obfuscationCode) studyObfuscationCode$: Observable<string>;
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
 
@@ -146,10 +148,10 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.studyObfuscationCode$.subscribe((value) => {
       this.obfuscationCode = value;
     });
-    this.bannerMessage.subscribe((value) => {
+    this.bannerMessage$.subscribe((value) => {
       this.banner = value;
     });
-    this.maintenanceMode.subscribe((value) => {
+    this.maintenanceMode$.subscribe((value) => {
       this.underMaintenance = value;
     });
     this.studyIdentifier$.subscribe((value) => {

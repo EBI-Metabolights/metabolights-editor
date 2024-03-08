@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from "@angular/core";
 import { select } from "@angular-redux/store";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { Observable } from "rxjs";
 

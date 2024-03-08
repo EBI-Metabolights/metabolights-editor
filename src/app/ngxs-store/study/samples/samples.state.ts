@@ -3,7 +3,7 @@ import { Action, Select, Selector, State, StateContext, Store } from "@ngxs/stor
 import { Organisms, Samples } from "./samples.actions";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
-import { Loading, SetLoadingInfo } from "../../transitions.actions";
+import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import Swal from "sweetalert2";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";

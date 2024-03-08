@@ -14,10 +14,11 @@ import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { Observable } from "rxjs";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
   selector: "mtbls-status",
@@ -36,6 +37,8 @@ export class StatusComponent implements OnInit {
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+
 
   isReadOnly = false;
 
@@ -90,7 +93,7 @@ export class StatusComponent implements OnInit {
         this.toStatus = value;
       }
     });
-    this.isCurator.subscribe((value) => {
+    this.isCurator$.subscribe((value) => {
       if (value != null) {
         this.curator = value;
       }

@@ -14,7 +14,8 @@ import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-release-date",
@@ -28,6 +29,7 @@ export class ReleaseDateComponent implements OnInit {
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.releaseDate) studyReleaseDate$: Observable<Date>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
 
 
@@ -87,7 +89,7 @@ export class ReleaseDateComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
-    this.readonly.subscribe((value) => {
+    this.readonly$.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
       }

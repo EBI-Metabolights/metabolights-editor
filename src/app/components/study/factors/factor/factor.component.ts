@@ -21,7 +21,7 @@ import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-factor",

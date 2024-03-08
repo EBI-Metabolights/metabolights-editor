@@ -35,7 +35,7 @@ import { Observable } from "rxjs";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { Select } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */

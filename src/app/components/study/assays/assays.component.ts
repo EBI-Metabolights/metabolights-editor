@@ -5,7 +5,7 @@ import { Select } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-assays",

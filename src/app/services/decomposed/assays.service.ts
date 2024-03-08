@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Select, Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ConfigurationService } from 'src/app/configuration.service';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata.state';
+import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { TableService } from './table.service';
 import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';

@@ -14,10 +14,10 @@ import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-title",

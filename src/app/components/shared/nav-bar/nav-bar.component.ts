@@ -9,9 +9,10 @@ import { environment } from "src/environments/environment";
 import { VersionInfo } from "src/environment.interface";
 import { Observable } from "rxjs";
 import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { env } from "process";
+import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 @Component({
   selector: "nav-bar",
   templateUrl: "./nav-bar.component.html",
@@ -23,7 +24,10 @@ export class NavBarComponent implements OnInit {
   @select((state) => state.status.editorVersion) editorVersionState: Observable<VersionInfo>;
   @select((state) => state.status.backendVersion) apiVersionState: Observable<ApiVersionInfo>;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ApplicationState.editorVersion) editorVersion$: Observable<MtblsEditorVersion>;
+  @Select(ApplicationState.backendVersion) apiVersion$: Observable<MtblsBackendVersion>;
+
 
   editorVersion: string;
   apiVersion: string;
@@ -71,14 +75,14 @@ export class NavBarComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.editorVersionState.subscribe((value) => {
+    this.editorVersion$.subscribe((value) => {
       if (value) {
         this.editorVersion = value.version + "-" + value.releaseName;
       } else {
         console.log("Version is not defined " );
       }
     });
-    this.apiVersionState.subscribe((value) => {
+    this.apiVersion$.subscribe((value) => {
       if (value) {
         this.apiVersion = value.about.api.version;
       } else {

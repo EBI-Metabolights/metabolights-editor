@@ -25,7 +25,7 @@ import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
 
 @Component({

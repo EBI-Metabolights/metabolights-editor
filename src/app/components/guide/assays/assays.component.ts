@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import { tassign } from "tassign";
 import { SamplesComponent } from "./../../study/samples/samples.component";
 import { environment } from "src/environments/environment";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";

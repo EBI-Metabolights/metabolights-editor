@@ -10,7 +10,7 @@ import { TableComponent } from "./../../shared/table/table.component";
 import { MTBLSCharacteristic } from "./../../../models/mtbl/mtbls/mtbls-characteristic";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { environment } from "src/environments/environment";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Select } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Observable } from "rxjs";

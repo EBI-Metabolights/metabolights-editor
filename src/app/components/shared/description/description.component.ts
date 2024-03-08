@@ -14,12 +14,12 @@ import { validateStudyDescription } from "./description.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-description",
@@ -30,8 +30,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
   @select((state) => state.study.abstract) studyDescription;
   @select((state) => state.study.validations) studyValidations: any;
 
-  @select((state) => state.study.studyDesignDescriptors)
-  studyDesignDescriptors: any[];
+
   @select((state) => state.study.readonly) readonly;
 
   @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;

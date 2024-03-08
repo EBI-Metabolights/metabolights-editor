@@ -4,7 +4,7 @@ import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Select } from "@ngxs/store";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { env } from "process";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
@@ -21,7 +21,8 @@ export class DesignDescriptorsComponent implements OnInit {
 
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(DescriptorsState.studyDesignDescriptors) descriptors$: Observable<Ontology[]>;
-
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  
   @Input("inline") inline: boolean;
   @Input("readOnly") readOnly: boolean;
   isReadOnly = false;

@@ -9,10 +9,11 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { retry } from "rxjs-compat/operator/retry";
 import { ValidationStatusTransformPipe } from "./validation-status-transform.pipe";
 import { Observable } from "rxjs";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 import { environment } from "src/environments/environment";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
   selector: "study-validations",
@@ -26,6 +27,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>
 
 
   validationMessageTransform = new ValidationStatusTransformPipe();
@@ -111,7 +113,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
         }
       }
     });
-    this.isCurator.subscribe((value) => {
+    this.isCurator$.subscribe((value) => {
       if (value !== null) {
         this.curator = value;
       }

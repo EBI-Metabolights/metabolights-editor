@@ -14,7 +14,7 @@ import { environment } from "src/environments/environment";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { env } from "process";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 

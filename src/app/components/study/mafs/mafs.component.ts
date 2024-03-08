@@ -4,7 +4,7 @@ import { environment } from "src/environments/environment";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";

@@ -9,7 +9,7 @@ import { NgRedux, select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
@@ -32,6 +32,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
   @Select(ProtocolsState.protocols) studyProtocols$: Observable<MTBLSProtocol[]>;
 
   isStudyReadOnly = false;
@@ -126,7 +127,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       });
     });
 
-    this.isProtocolsExpanded.subscribe((value) => {
+    this.isProtocolsExpanded$.subscribe((value) => {
       this.expand = !value;
     });
   }

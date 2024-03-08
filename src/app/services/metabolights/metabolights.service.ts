@@ -23,7 +23,7 @@ import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MTBLSStudy } from "src/app/models/mtbl/mtbls/mtbls-study";
 import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 
 
@@ -49,6 +49,7 @@ export class MetabolightsService extends DataService {
   @select((state) => state.study) stateStudy;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  
 
   study: MTBLSStudy;
   id: string;
@@ -103,6 +104,7 @@ export class MetabolightsService extends DataService {
    *
    * @returns Our validations config file via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   getValidations(): Observable<any> {
     return this.http.get("assets/configs/validations.json").pipe(
       map((res) => res),
@@ -205,7 +207,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
-  // Study validation details
+  // REMOVE POST STATE MIGRATION
   getGuides(language) {
     let url = this.url.guides;
     if (this.url.guides.endsWith("/") === false){
@@ -217,6 +219,7 @@ export class MetabolightsService extends DataService {
   }
 
   /*Returns a list of all studies, with greater detail, for a given user. */
+  // REMOVE POST STATE MIGRATION
   getAllStudies(): Observable<IStudyDetailWrapper> {
     return this.http
       .get<IStudyDetailWrapper>(

@@ -1,8 +1,8 @@
 import { TestBed } from "@angular/core/testing";
 import { NgxsModule, Store } from "@ngxs/store";
 import { UserState } from "./user.state";
-import { MetabolightsService } from "../services/metabolights/metabolights.service";
-import { MockMetabolightsService } from "../services/metabolights/metabolights.service.mock";
+import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
+import { MockMetabolightsService } from "../../../services/metabolights/metabolights.service.mock";
 import { User } from "./user.actions";
 
 

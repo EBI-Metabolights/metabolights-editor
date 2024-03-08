@@ -7,7 +7,7 @@ import { ConfigurationService } from '../configuration.service';
 import { FTPResponse } from '../models/mtbl/mtbls/interfaces/generics/ftp-response.interface';
 import { GenericHttpResponse } from '../models/mtbl/mtbls/interfaces/generics/generic-http-response.interface';
 import { httpOptions } from './headers';
-import { GeneralMetadataState } from '../ngxs-store/study/general-metadata.state';
+import { GeneralMetadataState } from '../ngxs-store/study/general-metadata/general-metadata.state';
 import { Select } from '@ngxs/store';
 
 

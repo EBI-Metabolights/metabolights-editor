@@ -3,10 +3,11 @@ import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
-import { UserState } from "src/app/ngxs-store/user.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
-import { Owner } from "src/app/ngxs-store/user.actions";
+import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { Select } from "@ngxs/store";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-header",
@@ -19,6 +20,8 @@ export class HeaderComponent {
  @select((state) => state.status.maintenanceMode) maintenanceMode;
 
  @Select(UserState.user) user$: Observable<Owner>;
+ @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
+ @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
 
   authUser: any = null;
   query = "";
@@ -69,10 +72,10 @@ export class HeaderComponent {
         this.authUser = value;
       }
     });
-    this.maintenanceMode.subscribe((value) => {
+    this.maintenanceMode$.subscribe((value) => {
       this.underMaintenance = value;
     });
-    this.bannerMessage.subscribe((value) => {
+    this.bannerMessage$.subscribe((value) => {
         this.banner = value;
     });
 

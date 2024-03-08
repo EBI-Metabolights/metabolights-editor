@@ -13,11 +13,11 @@ import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
-import { UserState } from "src/app/ngxs-store/user.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
-import { Owner } from "src/app/ngxs-store/user.actions";
+import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { Select } from "@ngxs/store";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 

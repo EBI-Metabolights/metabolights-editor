@@ -1,6 +1,6 @@
 import { select } from "@angular-redux/store";
 import { Select } from "@ngxs/store";
-import { GeneralMetadataState } from "../ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { FilesState } from "../ngxs-store/study/files/files.state";
 import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";

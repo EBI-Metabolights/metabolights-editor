@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -15,7 +15,6 @@ declare let AW4: any;
   styleUrls: ["./aspera.component.css"],
 })
 export class AsperaDownloadComponent implements OnInit {
-  @select((state) => state.study.uploadLocation) uploadLocation;
   @select((state) => state.study.validations) validations: any;
   @select((state) => state.study.identifier) studyIdentifier: any;
 

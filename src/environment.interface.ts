@@ -34,7 +34,7 @@ export interface VideoURL {
   editor: string;
 }
 
-interface MWSURL {
+export interface MWSURL {
   baseURL: string; // the base url for the metabolights webservice ie localhost:4200/metabolighrs/ws
   guides: string; // the url for the guides, usually found in our raw github repo.
   ontologyDetails: string; // the url for ebi's OLS service, usually https://www.ebi.ac.uk/ols/api/ontologies/

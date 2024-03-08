@@ -6,11 +6,12 @@ import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
-import { SetLoadingInfo } from "src/app/ngxs-store/transitions.actions";
-import { Owner, User } from "src/app/ngxs-store/user.actions";
-import { UserState } from "src/app/ngxs-store/user.state";
+import { SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { Observable } from "rxjs";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -27,6 +28,9 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   @Select(UserState.user) user$: Observable<Owner>
   @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
+  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
 
   studies: IStudyDetail[] = [];
   filteredStudies: IStudyDetail[] = [];
@@ -64,15 +68,29 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   ngOnInit() {
 
     this.editorService.updateHistory(this.route.snapshot);
-    this.bannerMessage.subscribe((value) => {
-      this.banner = value;
-    });
-    this.maintenanceMode.subscribe((value) => {
-      this.underMaintenance = value;
-    });
-    this.isCurator.subscribe((value) => {
-      this.curator = value;
-    });
+    if (environment.useNewState) {
+      this.bannerMessage$.subscribe((value) => {
+        this.banner = value;
+      });
+      this.maintenanceMode$.subscribe((value) => {
+        this.underMaintenance = value;
+      });
+      this.isCurator$.subscribe((value) => {
+        this.curator = value;
+      });
+
+    } else {
+      this.bannerMessage.subscribe((value) => {
+        this.banner = value;
+      });
+      this.maintenanceMode.subscribe((value) => {
+        this.underMaintenance = value;
+      });
+      this.isCurator.subscribe((value) => {
+        this.curator = value;
+      });
+    }
+    
 
   }
 

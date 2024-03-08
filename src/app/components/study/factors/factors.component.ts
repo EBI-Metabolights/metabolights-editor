@@ -5,7 +5,7 @@ import { Select } from "@ngxs/store";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
 import { Observable } from "rxjs";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-factors",

@@ -5,8 +5,9 @@ import { EditorService } from "../../../services/editor.service";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
   selector: "mtbls-delete",
@@ -20,6 +21,8 @@ export class DeleteComponent implements OnInit {
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+
 
 
 
@@ -65,7 +68,7 @@ export class DeleteComponent implements OnInit {
         this.status = value;
       }
     });
-    this.isCurator.subscribe((value) => {
+    this.isCurator$.subscribe((value) => {
       if (value != null) {
         this.curator = value;
       }

@@ -13,10 +13,10 @@ import * as toastr from "toastr";
 
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
-import { UserState } from "src/app/ngxs-store/user.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
-import { Owner } from "src/app/ngxs-store/user.actions";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 
 @Component({
@@ -29,8 +29,6 @@ export class MetaComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.title) studyTitle;
   @select((state) => state.study.abstract) studyDescription;
-
-  @select((state) => state.study.studyDesignDescriptors)  studyDesignDescriptors: any[];
 
 
   @Select(UserState.user) user$: Observable<Owner>;

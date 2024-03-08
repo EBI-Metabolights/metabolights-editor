@@ -4,15 +4,15 @@ import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
 import { GetGeneralMetadata, Identifier, People, Publications, SetStudyAbstract, SetStudyReleaseDate, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
-import { Loading, SetLoadingInfo } from "../transitions.actions";
+import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
-import { SetReadonly, SetStudyError } from "../application.actions";
+import { SetReadonly, SetStudyError } from "../../non-study/application/application.actions";
 import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
-import { AssayList } from "./assay/assay.actions";
-import { Protocols } from "./protocols/protocols.actions"
-import { Descriptors } from "./descriptors/descriptors.action";
-import { Operations } from "./files/files.actions";
-import { EditorValidationRules, ValidationReport } from "./validation/validation.actions";
+import { AssayList } from "../assay/assay.actions";
+import { Protocols } from "../protocols/protocols.actions"
+import { Descriptors } from "../descriptors/descriptors.action";
+import { Operations } from "../files/files.actions";
+import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 
 
 export interface GeneralMetadataStateModel {

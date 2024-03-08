@@ -6,7 +6,7 @@ import { catchError, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/validation-summary.interface';
 import { httpOptions } from '../headers';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata.state';
+import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { Select } from '@ngxs/store';
 
 @Injectable({

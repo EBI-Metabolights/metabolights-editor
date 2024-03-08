@@ -8,7 +8,7 @@ import { catchError } from 'rxjs/operators';
 import { httpOptions } from '../headers';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { Select, Store } from '@ngxs/store';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata.state';
+import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 
 @Injectable({
   providedIn: 'root'

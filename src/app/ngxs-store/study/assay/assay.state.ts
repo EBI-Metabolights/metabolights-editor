@@ -6,7 +6,7 @@ import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
-import { SetLoadingInfo } from "../../transitions.actions";
+import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { MAF } from "../maf/maf.actions";
 
 export interface AssayStateModel {

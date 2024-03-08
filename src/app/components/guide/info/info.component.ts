@@ -5,7 +5,7 @@ import { IAppState } from "../../../store";
 import { EditorService } from "./../../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
 import { env } from "process";

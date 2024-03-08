@@ -4,7 +4,7 @@ import { of } from "rxjs";
 import { httpOptions } from "../headers";
 import { Observable } from "rxjs-compat";
 import { IStudyDetail, IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
 
 export class MockMetabolightsService {

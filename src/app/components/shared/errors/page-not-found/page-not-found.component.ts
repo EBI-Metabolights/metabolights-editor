@@ -3,7 +3,7 @@ import { Component, OnInit } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
-import { Loading } from "src/app/ngxs-store/transitions.actions";
+import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 
 @Component({
   selector: "app-page-not-found",

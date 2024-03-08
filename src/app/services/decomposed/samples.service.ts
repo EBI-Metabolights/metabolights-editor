@@ -7,7 +7,7 @@ import { httpOptions } from '../headers';
 import { catchError } from 'rxjs/operators';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { Observable } from 'rxjs';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata.state';
+import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 
 @Injectable({
   providedIn: 'root'

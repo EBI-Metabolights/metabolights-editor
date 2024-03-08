@@ -14,14 +14,14 @@ import {browserRefresh} from '../../../app.component';
 import { StudyPermission } from "src/app/services/headers";
 import { PlatformLocation } from "@angular/common";
 import { Select, Store } from "@ngxs/store";
-import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
-import { TransitionsState } from "src/app/ngxs-store/transitions.state";
+import { SetTabIndex } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { Observable } from "rxjs";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
-import { UserState } from "src/app/ngxs-store/user.state";
-import { Owner, User } from "src/app/ngxs-store/user.actions";
-import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata.state";
-import { ApplicationState } from "src/app/ngxs-store/application.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
@@ -84,7 +84,9 @@ export class PublicStudyComponent implements OnInit {
   ) {
 
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
-    this.permissions = this.ngRedux.getState().status.studyPermission;
+
+    if (environment.useNewState) this.permissions = this.store.snapshot().application.studyPermission
+    else this.permissions = this.ngRedux.getState().status.studyPermission;
 
     const curatorStatus = localStorage.getItem("isCurator");
     const userName = localStorage.getItem("username");
