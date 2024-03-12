@@ -22,13 +22,10 @@ import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
 import { Select, Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/non-study/transitions/transitions.actions";
-import { env } from "process";
 import { User } from "../ngxs-store/non-study/user/user.actions";
 import { GetGeneralMetadata, Identifier } from "../ngxs-store/study/general-metadata/general-metadata.actions";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
-import { read } from "fs";
 import { AssayState } from "../ngxs-store/study/assay/assay.state";
-import { IAssay } from "../models/mtbl/mtbls/interfaces/assay.interface";
 import { FilesState } from "../ngxs-store/study/files/files.state";
 import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
 import { ValidationState } from "../ngxs-store/study/validation/validation.state";
@@ -686,8 +683,8 @@ export class EditorService {
   }
 
   loadStudyId(id) {
-    if (environment.useNewState) return this.store.dispatch(new Identifier.Set(id))
-    else return this.ngRedux.dispatch({
+    if (environment.useNewState) this.store.dispatch(new Identifier.Set(id))
+    else this.ngRedux.dispatch({
       type: "SET_STUDY_IDENTIFIER",
       body: {
         study: id,
@@ -700,7 +697,6 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-    console.log('hit toggle loading in editor service')
     if (environment.useNewState) {
       status !== null ? (
         status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
@@ -743,6 +739,8 @@ export class EditorService {
   }
 
   loadStudyNgxs(studyID, readonly) {
+    this.toggleLoading(true);
+    this.loadStudyId(studyID);
     this.store.dispatch(new GetGeneralMetadata(studyID, readonly))
   }
 

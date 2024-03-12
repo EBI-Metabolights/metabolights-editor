@@ -109,7 +109,7 @@ export class MafsComponent implements OnInit {
       });
     }
 
-    this.studyMAFs$.subscribe((value) => {
+    this.studyMAFs.subscribe((value) => {
       if (this.mafNames) {
         this.mafNames.forEach((mafFile) => {
           this.mafs.push(value[mafFile]);
@@ -187,7 +187,7 @@ export class MafsComponent implements OnInit {
       });
     }
 
-    this.studyMAFs.subscribe((value) => {
+    this.studyMAFs$.subscribe((value) => {
       if (this.mafNames) {
         this.mafNames.forEach((mafFile) => {
           this.mafs.push(value[mafFile]);

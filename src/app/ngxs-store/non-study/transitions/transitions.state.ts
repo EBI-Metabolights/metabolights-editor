@@ -23,7 +23,6 @@ export class TransitionsState {
     @Action(SetLoadingInfo)
     setLoadingInfo(ctx: StateContext<TransitionStateModel>, action: SetLoadingInfo) {
         const state = ctx.getState();
-        console.log(action.info)
         ctx.setState({
             ...state,
             loadingInformation: action.info

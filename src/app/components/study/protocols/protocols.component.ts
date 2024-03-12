@@ -68,10 +68,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     this.studyValidations.subscribe((value) => {
       if (value) {
         this.validations = value;
-        this.validation.default.sort(
+        this.validationRulesGetter.default.sort(
           (a, b) => a["sort-order"] - b["sort-order"]
         );
-        this.defaultProtocols = this.validation.default.map(
+        this.defaultProtocols = this.validationRulesGetter.default.map(
           (protocol) => protocol.title
         );
       }
@@ -105,12 +105,14 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     this.editorValidationRules$.subscribe((value) => {
       if (value) {
         this.validations = value;
-        this.validation.default.sort(
-          (a, b) => a["sort-order"] - b["sort-order"]
+    
+        // Create a sorted copy of the array using slice() to clone and sort() for sorting
+        const sortedDefault = this.validationRulesGetter.default.slice().sort(
+          (a, b) => a['sort-order'] - b['sort-order']
         );
-        this.defaultProtocols = this.validation.default.map(
-          (protocol) => protocol.title
-        );
+    
+        // Use the sorted array for mapping
+        this.defaultProtocols = sortedDefault.map(protocol => protocol.title);
       }
     });
 
@@ -164,7 +166,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     return selectedProtocol;
   }
 
-  get validation() {
+  get validationRulesGetter() {
     return this.validations ? this.validations[this.validationsId] : null;
   }
 

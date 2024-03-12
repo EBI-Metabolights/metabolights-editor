@@ -39,9 +39,10 @@ export class ValidationState {
     @Action(EditorValidationRules.Set)
     SetValidationRules(ctx: StateContext<ValidationStateModel>, action: EditorValidationRules.Set) {
         const state = ctx.getState();
+
         ctx.setState({
             ...state,
-            rules: action.rules
+            rules: action.rules["study"]
         });
     }
 
@@ -66,7 +67,7 @@ export class ValidationState {
         const state = ctx.getState();
         ctx.setState({
             ...state,
-            report: action.report
+            report: action.report.validation
         })
 
     }

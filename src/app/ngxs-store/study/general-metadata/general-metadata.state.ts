@@ -72,7 +72,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
                 
-                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly))
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
 
                 if (action.readonly) {
                     this.store.dispatch(new SetReadonly(true));
@@ -144,7 +144,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         ctx.setState({
             ...state,
-            description: action.status
+            status: action.status
         });
     }
 
@@ -153,7 +153,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         ctx.setState({
             ...state,
-            description: action.link
+            reviewerLink: action.link
         });
     }
 

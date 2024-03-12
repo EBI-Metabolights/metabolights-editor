@@ -25,9 +25,7 @@ export class UserState {
     
     @Action(User.Studies.Get)
     GetUserStudies(ctx: StateContext<UserStateModel>, action: User.Studies.Get) {
-        console.log('hit user.studies.get action')
         this.userService.getAllStudies().subscribe((response) => {
-            console.log(`response data: ${response.data}`)
             const sorted = response.data.sort(
                 (a, b) => +new Date(b["releaseDate"]) - +new Date(a["releaseDate"])
             )
@@ -37,7 +35,6 @@ export class UserState {
 
     @Action(User.Studies.Set)
     SetUserStudies(ctx: StateContext<UserStateModel>, action: User.Studies.Set) {
-        console.log('hit user.studies.set action ')
         const state = ctx.getState();
         ctx.setState({
             ...state,

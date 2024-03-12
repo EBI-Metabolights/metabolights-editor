@@ -22,7 +22,7 @@ export class MAFState {
     SetStudyMAF(ctx: StateContext<MAFStateModel>, action: MAF.Set) {
         const state = ctx.getState();
         const tempMAFS = Object.assign({}, state.mafs);
-        tempMAFS[action.maf.file] = action.maf;
+        tempMAFS[action.maf.data.file] = action.maf;
         ctx.setState({
             ...state,
             mafs: tempMAFS

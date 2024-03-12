@@ -4,7 +4,7 @@ import { Assay, AssayList } from "./assay.actions";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
-import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { MAF } from "../maf/maf.actions";
@@ -24,23 +24,35 @@ export interface AssayStateModel {
 @Injectable()
 export class AssayState {
 
-    @Select()
-
     @Select(FilesState.getAssaySheets) assaySheets$: Observable<StudyFile[]>
+    @Select(FilesState.files) files$: Observable<IStudyFiles>
 
     constructor(private store: Store, private assaysService: AssaysService) { }
 
     @Action(AssayList.Get)
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
         this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
-        this.assaySheets$.subscribe(
-            (sheets) => {
-                sheets.forEach((sheet) => {
+
+        this.files$.subscribe(
+            (files) => {
+                let assayfiles = files.study.filter(file => file.file.startsWith('a_'));
+                assayfiles.forEach((sheet) => {
                     ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
-                });
+                })
             }
         )
+         
+        /* this.assaySheets$.subscribe(
+            (sheets) => {
+                if(sheets !== undefined) {
+                    sheets.forEach((sheet) => {
+                        ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
+                    });
+                }
 
+            }
+        )
+ */
     }
 
     @Action(Assay.OrganiseAndPersist)

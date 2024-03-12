@@ -39,10 +39,13 @@ export class OrganismsComponent implements OnInit {
   setUpSubscriptionsNgxs() {
     this.studyOrganisms$.subscribe((value) => {
       this.organisms = [];
-      Object.keys(value).forEach((key) => {
-        value[key].name = key;
-        this.organisms.push(value[key]);
-      });
+      if (value !== null) {
+        Object.keys(value).forEach((key) => {
+          value[key].name = key;
+          this.organisms.push(value[key]);
+        });
+      }
+
     });
   }
 }

@@ -99,7 +99,7 @@ export class FilesState {
 
     @Selector()
     static getAssaySheets(state: FilesStateModel) {
-        let result = state.files.study.filter(file => file.file.startsWith('a_'));
+        let result = state.files.study.filter(file => file.type === 'metadata_assay' || file.file.startsWith('a_'));
         return result
     }
 

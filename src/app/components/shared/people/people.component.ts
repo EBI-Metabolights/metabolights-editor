@@ -17,6 +17,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
+import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
 
 @Component({
   selector: "mtbls-people",
@@ -27,7 +28,7 @@ export class PeopleComponent implements OnInit {
   @select((state) => state.study.people) people;
   @select((state) => state.study.readonly) readonly;
   
-  @Select(GeneralMetadataState.people) studyPublications$: Observable<IPublication[]>;
+  @Select(GeneralMetadataState.people) people$: Observable<IPerson[]>;
   @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
 
 
