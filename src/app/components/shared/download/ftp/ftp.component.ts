@@ -1,6 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Select } from "@ngxs/store";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "mtbls-download-ftp",
@@ -9,19 +12,30 @@ import { environment } from "src/environments/environment";
 })
 export class FtpDownloadComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
+  
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
 
   requestedStudy: any = null;
 
   constructor() {}
 
   ngOnInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscription();
     }
+    if (environment.useNewState) this.setUpSubscriptionNgxs();
   }
 
   setUpSubscription() {
     this.studyIdentifier.subscribe((value) => {
+      if (value != null) {
+        this.requestedStudy = value;
+      }
+    });
+  }
+
+  setUpSubscriptionNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
       }

@@ -6,6 +6,10 @@ import { MetabolightsService } from "../../../../services/metabolights/metabolig
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { uptime } from "process";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 declare let AW4: any;
 
 /* the aspera code here is such a mystery that I'm afraid to tinker with it, so I'm disabling basically
@@ -25,6 +29,10 @@ declare let AW4: any;
 export class AsperaUploadComponent implements OnInit {
   @select((state) => state.study.uploadLocation) uploadLocation;
   @select((state) => state.study.validations) validations: any;
+
+  @Select(FilesState.obfuscationCode) uploadLocation$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+
 
   @Input("type") type = "file";
   @Input("allowMultipleSelection") allowMultipleSelection = false;
@@ -65,11 +73,23 @@ export class AsperaUploadComponent implements OnInit {
     });
   }
 
+  setUpSubscriptionsNgxs() {
+    this.uploadLocation$.subscribe((value) => {
+      this.uploadPath = value;
+    });
+    this.editorValidationRules$.subscribe((value) => {
+      if (value) {
+        this.validation = value[this.validationsId];
+      }
+    });
+  }
+
   ngOnInit() {
     this.videoURL = this.configService.config.videoURL.aspera;
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   toggleHelp() {

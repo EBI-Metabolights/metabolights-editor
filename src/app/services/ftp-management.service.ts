@@ -7,6 +7,8 @@ import { ConfigurationService } from '../configuration.service';
 import { FTPResponse } from '../models/mtbl/mtbls/interfaces/generics/ftp-response.interface';
 import { GenericHttpResponse } from '../models/mtbl/mtbls/interfaces/generics/generic-http-response.interface';
 import { httpOptions } from './headers';
+import { GeneralMetadataState } from '../ngxs-store/study/general-metadata/general-metadata.state';
+import { Select } from '@ngxs/store';
 
 
 @Injectable({
@@ -20,6 +22,8 @@ import { httpOptions } from './headers';
  */
 export class FtpManagementService {
   @select((state) => state.study.identifier) studyIdentifier;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+
   id: string;
 
   private url = '';
@@ -32,13 +36,24 @@ export class FtpManagementService {
    * @param configService internal config service for retrieving API configuration values.
    */
   constructor(private http: HttpClient, private configService: ConfigurationService) {
+      if (environment.useNewState) this.setUpSubscriptionNgxs(); 
+      else {
+        this.studyIdentifier.subscribe((value) => {
+          if (value != null) {
+            this.url = `${configService.config.metabolightsWSURL.baseURL}/studies/${value}/study-folders/rsync-task`;
+          }
+        });
+      }
 
-      this.studyIdentifier.subscribe((value) => {
-        if (value != null) {
-          this.url = `${configService.config.metabolightsWSURL.baseURL}/studies/${value}/study-folders/rsync-task`;
-        }
-      });
    }
+
+  setUpSubscriptionNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
+      if (value != null) {
+        this.url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${value}/study-folders/rsync-task`;
+      }
+    });
+  }
 
   public startRsync(dryRun: boolean=true, syncType: string, targetStagingArea: string): Observable<FTPResponse> {
     const syncOptions = this.syncOptions(String(dryRun), syncType, targetStagingArea);

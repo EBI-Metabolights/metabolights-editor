@@ -8,6 +8,12 @@ import { IValidationSummary, IValidationSummaryWrapper } from "src/app/models/mt
 import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
 import { retry } from "rxjs-compat/operator/retry";
 import { ValidationStatusTransformPipe } from "./validation-status-transform.pipe";
+import { Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Select } from "@ngxs/store";
+import { environment } from "src/environments/environment";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
   selector: "study-validations",
@@ -18,6 +24,12 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   @select((state) => state.study.validation) validation: any;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier: any;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+
+
   validationMessageTransform = new ValidationStatusTransformPipe();
   requestedStudy: any;
   studyValidation: IValidationSummary;
@@ -50,7 +62,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.setUpSubscriptions();
+   environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
   }
 
   setUpSubscriptions() {
@@ -83,6 +95,38 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
       + "/studies/" + this.requestedStudy + "/validation-task";
     });
   }
+
+  setUpSubscriptionsNgxs() {
+    this.studyValidation$.subscribe((value) => {
+      if (value) {
+        this.studyValidation = value;
+        if (this.studyValidation.status === 'error'){
+          this.validationStatusClass = "is-danger";
+        } else if (this.studyValidation.status === 'success'){
+          this.validationStatusClass = "is-success";
+        } else if (this.studyValidation.status === 'warning'){
+            this.validationStatusClass = "is-success";
+        } else if (this.studyValidation.status === 'not ready'){
+          this.validationStatusClass = "is-warning";
+        } else {
+          this.validationStatusClass = "is-warning";
+        }
+      }
+    });
+    this.isCurator$.subscribe((value) => {
+      if (value !== null) {
+        this.curator = value;
+      }
+    });
+    this.studyIdentifier$.subscribe((value) => {
+      this.requestedStudy = value;
+      this.startValidationTaskUrl = this.configService.config.metabolightsWSURL.baseURL
+        + "/studies/" + this.requestedStudy + "/validation-task";
+      this.getValidationTaskStatusUrl = this.configService.config.metabolightsWSURL.baseURL
+      + "/studies/" + this.requestedStudy + "/validation-task";
+    });
+  }
+
   statusMessage(){
     return this.studyValidation ? this.validationMessageTransform.transform(this.studyValidation.status) : "";
   }

@@ -7,6 +7,9 @@ import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { DirectoryComponent } from "../directory/directory.component";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-file-delete",
@@ -22,6 +25,9 @@ export class DeleteFileComponent implements OnInit {
   @Input("file") studyFile: StudyFile;
 
   @select((state) => state.study.obfuscationCode) obfuscationCode;
+
+  @Select(FilesState.obfuscationCode) obfuscationCode$: Observable<string>;
+  
   @Output() fileDeleted = new EventEmitter<{file: StudyFile; parentDirectoryComponent: DirectoryComponent}>();
   inProgress = false;
   code = "";
@@ -33,9 +39,10 @@ export class DeleteFileComponent implements OnInit {
     private metabolightsService: MetabolightsService,
     private editorService: EditorService
   ) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -43,6 +50,13 @@ export class DeleteFileComponent implements OnInit {
       this.code = value;
     });
   }
+
+  setUpSubscriptionsNgxs() {
+    this.obfuscationCode$.subscribe((value) => {
+      this.code = value;
+    });
+  }
+
 
   ngOnInit() {}
 
@@ -55,6 +69,8 @@ export class DeleteFileComponent implements OnInit {
     this.isDeleteModalOpen = false;
   }
 
+
+  // needs state refactor
   deleteSelected() {
     if (this.inProgress) {
       return;

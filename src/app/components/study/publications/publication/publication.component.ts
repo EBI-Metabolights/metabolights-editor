@@ -23,6 +23,10 @@ import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "mtbls-publication",
@@ -36,6 +40,10 @@ export class PublicationComponent implements OnInit {
   @ViewChild(OntologyComponent) statusComponent: OntologyComponent;
 
   @select((state) => state.study.readonly) readonly;
+
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+
   isReadOnly = false;
 
   form: FormGroup;
@@ -77,6 +85,17 @@ export class PublicationComponent implements OnInit {
       this.validations = value;
     });
     this.readonly.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.editorValidationRules$.subscribe((value) => {
+      this.validations = value;
+    });
+    this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
       }

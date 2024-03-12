@@ -12,6 +12,12 @@ import { MetabolightsService } from "../../../services/metabolights/metabolights
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Observable } from "rxjs";
+import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
+import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
 
 @Component({
   selector: "mtbls-people",
@@ -21,6 +27,11 @@ import { environment } from "src/environments/environment";
 export class PeopleComponent implements OnInit {
   @select((state) => state.study.people) people;
   @select((state) => state.study.readonly) readonly;
+  
+  @Select(GeneralMetadataState.people) people$: Observable<IPerson[]>;
+  @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
+
+
   isReadOnly = false;
   validationsId = "people";
 
@@ -30,9 +41,10 @@ export class PeopleComponent implements OnInit {
     private ngRedux: NgRedux<IAppState>
   ) {}
   ngOnInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscription();
     }
+    if (environment.useNewState) this.setUpSubscriptionNgxs();
   }
 
   setUpSubscription() {
@@ -42,4 +54,14 @@ export class PeopleComponent implements OnInit {
       }
     });
   }
+
+  setUpSubscriptionNgxs() {
+    this.studyReadonly$.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+
 }

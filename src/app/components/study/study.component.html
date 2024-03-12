@@ -125,6 +125,9 @@
       >
         <mtbls-status></mtbls-status>
         <mtbls-release-date></mtbls-release-date>&emsp;
+        <!--Start of validation label-->
+        <div *ngIf="validation !== null">
+
         <div class="is-pulled-right">
           <span class="clickable" *ngIf="validation.status == 'error'">
             <div (click)="selectCurrentTab(6, 'validations')" class="control">
@@ -153,6 +156,9 @@
             </div>
           </span>
         </div>
+      </div>
+
+        <!-- End of Validation Label-->
         <div style="margin-left: auto" class="is-pulled-right">
           <mtbls-delete></mtbls-delete>
         </div>

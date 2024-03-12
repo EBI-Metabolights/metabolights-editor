@@ -56,8 +56,17 @@ import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
 import { NgxsModule } from "@ngxs/store";
-import { TransitionsState } from "./ngxs-store/transitions.state";
-import { UserState } from "./ngxs-store/user.state";
+import { TransitionsState } from "./ngxs-store/non-study/transitions/transitions.state";
+import { UserState } from "./ngxs-store/non-study/user/user.state";
+import { ApplicationState } from "./ngxs-store/non-study/application/application.state";
+import { GeneralMetadataState } from "./ngxs-store/study/general-metadata/general-metadata.state";
+import { FilesState } from "./ngxs-store/study/files/files.state";
+import { AssayState } from "./ngxs-store/study/assay/assay.state";
+import { MAFState } from "./ngxs-store/study/maf/maf.state";
+import { SampleState } from "./ngxs-store/study/samples/samples.state";
+import { ProtocolsState } from "./ngxs-store/study/protocols/protocols.state";
+import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.state";
+import { ValidationState } from "./ngxs-store/study/validation/validation.state";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -105,7 +114,20 @@ export function configLoader(injector: Injector): () => Promise<any> {
     AngularStickyThingsModule,
     DragDropModule,
     NgReduxRouterModule.forRoot(),
-    NgxsModule.forRoot([UserState, TransitionsState], { developmentMode: true }),
+    NgxsModule.forRoot([
+      UserState, 
+      TransitionsState,
+      ApplicationState,
+      GeneralMetadataState,
+      FilesState,
+      AssayState,
+      MAFState,
+      SampleState,
+      ProtocolsState,
+      DescriptorsState,
+      ValidationState
+    ], 
+    { developmentMode: true }),
     QuillModule.forRoot({
       modules: {
         clipboard: {

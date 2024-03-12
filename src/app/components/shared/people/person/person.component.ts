@@ -23,6 +23,11 @@ import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 
 import { OntologyComponent } from "../../ontology/ontology.component";
 import { environment } from "src/environments/environment";
+import { Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Select } from "@ngxs/store";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-person",
@@ -49,6 +54,12 @@ export class PersonComponent implements OnInit {
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
 
   @select((state) => state.study.readonly) readonly;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+
+
   isReadOnly = false;
 
   validations: any = {};
@@ -78,9 +89,10 @@ export class PersonComponent implements OnInit {
     private editorService: EditorService,
     private ngRedux: NgRedux<IAppState>
   ) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -97,6 +109,26 @@ export class PersonComponent implements OnInit {
       }
     });
     this.studyIdentifier.subscribe((value) => {
+      if (value !== null) {
+        this.requestedStudy = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.editorValidationRules$.subscribe((value) => {
+      this.validations = value;
+    });
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        if (value) {
+          this.isReadOnly = value;
+        } else {
+          this.isReadOnly = false;
+        }
+      }
+    });
+    this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
       }

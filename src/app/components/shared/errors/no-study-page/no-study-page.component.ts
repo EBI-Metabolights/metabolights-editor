@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorMessageService } from 'src/app/services/error-message.service';
 import { EditorService } from 'src/app/services/editor.service';
 import { environment } from 'src/environments/environment';
-import { Loading } from 'src/app/ngxs-store/transitions.actions';
+import { Loading } from 'src/app/ngxs-store/non-study/transitions/transitions.actions';
 import { Store } from '@ngxs/store';
 
 @Component({

@@ -13,10 +13,13 @@ import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
-import { UserState } from "src/app/ngxs-store/user.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
-import { Owner } from "src/app/ngxs-store/user.actions";
+import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { Select } from "@ngxs/store";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 
 @Component({
   selector: "raw-upload",
@@ -29,6 +32,11 @@ export class RawUploadComponent implements OnInit {
   @select((state) => state.study.files) studyFiles;
 
   @Select(UserState.user) user$: Observable<Owner>;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+
+
+
   user: any = null;
   requestedStudy: string = null;
   files: any = {};
@@ -68,10 +76,10 @@ export class RawUploadComponent implements OnInit {
       this.user = value;
       this.user.checked = true;
     });
-    this.studyIdentifier.subscribe((value) => {
+    this.studyIdentifier$.subscribe((value) => {
       this.requestedStudy = value;
     });
-    this.studyFiles.subscribe((value) => {
+    this.studyFiles$.subscribe((value) => {
       this.files = value;
     });
   }

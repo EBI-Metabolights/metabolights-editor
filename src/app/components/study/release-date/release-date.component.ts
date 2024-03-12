@@ -12,6 +12,10 @@ import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "mtbls-release-date",
@@ -23,6 +27,12 @@ export class ReleaseDateComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.readonly) readonly;
 
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.releaseDate) studyReleaseDate$: Observable<Date>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+
+
+
   isReadOnly = false;
 
   isModalOpen = false;
@@ -30,9 +40,10 @@ export class ReleaseDateComponent implements OnInit {
   requestedStudy: string = null;
   releaseDate: Date = null;
   constructor(private editorService: EditorService) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -54,6 +65,31 @@ export class ReleaseDateComponent implements OnInit {
       }
     });
     this.readonly.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyReleaseDate$.subscribe((value) => {
+      if (value !== null) {
+        if (value.toString() !== "") {
+          this.releaseDate = value;
+        } else {
+          this.editorService.metaInfo().subscribe((response) => {
+            this.releaseDate = response.data[1].split(":")[1];
+            this.updateReleaseDateSilent(this.releaseDate);
+          });
+        }
+      }
+    });
+    this.studyIdentifier$.subscribe((value) => {
+      if (value != null) {
+        this.requestedStudy = value;
+      }
+    });
+    this.readonly$.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
       }

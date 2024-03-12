@@ -15,6 +15,9 @@ import * as toastr from "toastr";
 import { JsonConvert } from "json2typescript";
 import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
 import { environment } from "src/environments/environment";
+import { Select } from "@ngxs/store";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { Observable } from "rxjs";
 
 @Component({
   selector: "mtbls-protocol",
@@ -31,6 +34,9 @@ export class ProtocolComponent implements OnInit {
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
 
   @select((state) => state.study.isProtocolsExpanded) isProtocolsExpanded;
+
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
 
   isStudyReadOnly = false;
   isModalOpen = false;
@@ -58,9 +64,10 @@ export class ProtocolComponent implements OnInit {
     private editorService: EditorService,
     private ngRedux: NgRedux<IAppState>
   ) {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptions() {
@@ -69,6 +76,18 @@ export class ProtocolComponent implements OnInit {
     });
 
     this.studyReadonly.subscribe((value) => {
+      if (value !== null) {
+        this.isStudyReadOnly = value;
+      }
+    });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.isProtocolsExpanded$.subscribe((value) => {
+      this.expand = !value;
+    });
+
+    this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isStudyReadOnly = value;
       }

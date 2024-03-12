@@ -6,10 +6,15 @@ import { EditorService } from "./../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
-import { SetTabIndex } from "src/app/ngxs-store/transitions.actions";
+import { SetTabIndex } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { Select, Store } from "@ngxs/store";
-import { TransitionsState } from "src/app/ngxs-store/transitions.state";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 @Component({
   selector: "mtbls-study",
@@ -30,6 +35,15 @@ export class StudyComponent implements OnInit, OnDestroy {
 
 
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
+  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
+  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
+  @Select(FilesState.obfuscationCode) studyObfuscationCode$: Observable<string>;
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+
+
   studyError = false;
   requestedTab = 0;
   tab = "descriptors";
@@ -63,7 +77,7 @@ export class StudyComponent implements OnInit, OnDestroy {
      * to one of the @select objects IE studyStatus. Since the state is not initialised in the TestBed, nor is there any easy way to do so,
      * this .subscribe call fails and throws an error, preventing tests from running.
      */
-      this.setUpSubscriptions();
+      environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
   }
 
   setUpSubscriptions() {
@@ -126,6 +140,69 @@ export class StudyComponent implements OnInit, OnDestroy {
       }
       this.selectCurrentTab(this.requestedTab, this.tab);
     });
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.baseHref = this.configService.baseHref;
+    this.editorService.initialiseStudy(this.route);
+    this.studyObfuscationCode$.subscribe((value) => {
+      this.obfuscationCode = value;
+    });
+    this.bannerMessage$.subscribe((value) => {
+      this.banner = value;
+    });
+    this.maintenanceMode$.subscribe((value) => {
+      this.underMaintenance = value;
+    });
+    this.studyIdentifier$.subscribe((value) => {
+      if (value !== null) {
+        this.requestedStudy = value;
+      }
+    });
+    this.endpoint = this.configService.config.endpoint;
+    if (this.configService.config.endpoint.endsWith("/") === false){
+      this.endpoint = this.endpoint + "/";
+    }
+    this.investigationFailed$.subscribe((value) => {
+      this.studyError = value;
+      this.selectCurrentTab(5, "files");
+    });
+
+    this.studyStatus$.subscribe((value) => {
+      this.status = value;
+    });
+
+    this.studyValidation$.subscribe((value) => {
+      this.validation = value;
+    });
+
+    this.route.params.subscribe((params) => {
+      this.requestedStudy = params.id;
+      if (params.tab === "files") {
+        this.requestedTab = 5;
+        this.tab = "files";
+      } else if (params.tab === "metabolites") {
+        this.requestedTab = 4;
+        this.tab = "metabolites";
+      } else if (params.tab === "assays") {
+        this.requestedTab = 3;
+        this.tab = "assays";
+      } else if (params.tab === "samples") {
+        this.requestedTab = 2;
+        this.tab = "samples";
+      } else if (params.tab === "protocols") {
+        this.requestedTab = 1;
+        this.tab = "protocols";
+      } else if (params.tab === "validations") {
+        this.requestedTab = 6;
+        this.tab = "validations";
+      } else {
+        this.requestedTab = 0;
+        this.tab = "descriptors";
+      }
+      this.selectCurrentTab(this.requestedTab, this.tab);
+    });
+
   }
 
   ngOnDestroy() {

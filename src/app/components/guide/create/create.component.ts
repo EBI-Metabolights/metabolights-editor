@@ -7,7 +7,7 @@ import { IAppState } from "../../../store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
 import { Store } from "@ngxs/store";
-import { Loading } from "src/app/ngxs-store/transitions.actions";
+import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 
 @Component({
   selector: "app-create",

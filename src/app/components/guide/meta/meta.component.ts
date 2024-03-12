@@ -13,9 +13,11 @@ import * as toastr from "toastr";
 
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
-import { UserState } from "src/app/ngxs-store/user.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
-import { Owner } from "src/app/ngxs-store/user.actions";
+import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 
 @Component({
   selector: "app-meta",
@@ -28,11 +30,13 @@ export class MetaComponent implements OnInit {
   @select((state) => state.study.title) studyTitle;
   @select((state) => state.study.abstract) studyDescription;
 
-  @select((state) => state.study.studyDesignDescriptors)
 
   @Select(UserState.user) user$: Observable<Owner>;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
+  @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
 
-  studyDesignDescriptors: any[];
+
 
   requestedStudy: string = null;
   user: any = null;
@@ -106,17 +110,17 @@ export class MetaComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
-    this.studyIdentifier.subscribe((value) => {
+    this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
       }
     });
-    this.studyTitle.subscribe((value) => {
+    this.studyTitle$.subscribe((value) => {
       if (value && value !== "") {
         this.currentTitle = value;
       }
     });
-    this.studyDescription.subscribe((value) => {
+    this.studyDescription$.subscribe((value) => {
       if (value && value !== "") {
         this.currentDescription = value;
       }
@@ -193,6 +197,8 @@ export class MetaComponent implements OnInit {
   skipMetaData() {
     this.router.navigate(["/guide/assays", this.requestedStudy]);
   }
+  
+  //NEEDS STATE REFACTOR
   saveMetaData() {
     this.isLoading = true;
     if (this.isManuscriptValid()) {

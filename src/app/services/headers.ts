@@ -24,7 +24,7 @@ export interface MetabolightsUser {
   status: string;
 }
 
-export interface StudyPermisssion {
+export interface StudyPermission {
   userName: string;
   userRole: string;
   submitterOfStudy: boolean;

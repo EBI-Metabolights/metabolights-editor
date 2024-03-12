@@ -3,6 +3,9 @@ import { EditorService } from "../../../services/editor.service";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
 @Component({
   selector: "mtbls-directory",
   templateUrl: "./directory.component.html",
@@ -26,6 +29,8 @@ export class DirectoryComponent implements OnInit {
 
   @select((state) => state.study.readonly) readonly;
 
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+
   selectedMetaFiles: any[] = [];
   selectedRawFiles: any[] = [];
   selectedAuditFiles: any[] = [];
@@ -39,7 +44,8 @@ export class DirectoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.setUpSubscription();
+    if (environment.useNewState) this.setUpSubscriptionNgxs();
+    else this.setUpSubscription();
     // if (this.collapse){
     //   this.expandDirectory(this.file);
     // }
@@ -52,6 +58,13 @@ export class DirectoryComponent implements OnInit {
       }
     });
   }
+
+  setUpSubscriptionNgxs() {
+    this.readonly$.subscribe((value) => {
+      if (value != null) {
+        this.isReadOnly = value;
+      }
+    });  }
 
   isFolder(file) {
     return file.directory;

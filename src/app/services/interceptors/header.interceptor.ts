@@ -10,10 +10,15 @@ import { disambiguateUserObj } from "../editor.service";
 import { NgRedux } from "@angular-redux/store";
 import { IAppState } from "src/app/store";
 import { ConfigurationService } from "src/app/configuration.service";
+import { Store } from "@ngxs/store";
+import { environment } from "src/environments/environment";
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
-  constructor(private ngRedux: NgRedux<IAppState>, private configService: ConfigurationService,) {}
+  constructor(
+    private ngRedux: NgRedux<IAppState>, 
+    private configService: ConfigurationService,
+    private store: Store) {}
 
   intercept(
     request: HttpRequest<unknown>,
@@ -52,7 +57,9 @@ export class HeaderInterceptor implements HttpInterceptor {
         },
       });
     }
-    const permissions = this.ngRedux.getState().status.studyPermission;
+    let permissions =  null
+    if (environment.useNewState) permissions = this.store.snapshot().application.studyPermission
+    else permissions = this.ngRedux.getState().status.studyPermission;
 
     if (permissions && permissions.obfuscationCode && permissions.studyStatus.toUpperCase() === "INREVIEW"){
         const user = this.ngRedux.getState().status.user;
