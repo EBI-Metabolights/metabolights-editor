@@ -20,14 +20,26 @@ export namespace Title {
         static readonly type = '[general] Set Study Title'
         constructor(public title: string) {}
     }
+    export class Update {
+        static readonly type = '[general] Update Study Title'
+        constructor(public title: string) {}
+    }
 }
 
 
+export namespace StudyAbstract {
+    export class Update {
+        static readonly type = '[application] Update Study Abstract'
+        constructor(public description: string) {}
+    }
 
-export class SetStudyAbstract {
-    static readonly type = '[general] Set Study Abstract'
-    constructor(public abstract: string) {}
+    export class Set {
+        static readonly type = '[general] Set Study Abstract'
+        constructor(public abstract: string) {}
+    }
 }
+
+
 
 export class SetStudySubmissionDate {
     static readonly type = '[general] Set Study Submission Date'

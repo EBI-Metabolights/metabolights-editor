@@ -47,4 +47,34 @@ export class GeneralMetadataService extends DataService{
       .get<IStudySummary>(this.url.baseURL + "/studies" + "/" + id, httpOptions)
       .pipe(catchError(this.handleError));
   }
+
+  /**
+   * Update a study's title.
+   * @param body - The new title.
+   * @param id - The MTBLSXYZ identifier of the study.
+   * @returns Observable of response, which is the new title confirmed by the webservice.
+   */
+  updateTitle(body, id): Observable<{ title: string }> {
+    return this.http
+      .put<{ title: string }>(
+        this.url.baseURL + "/studies" + "/" + id + "/title",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  updateAbstract(body, id): Observable<{ description: string }> {
+    return this.http
+      .put<{ description: string }>(
+        this.url.baseURL + "/studies" + "/" + id + "/description",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+
+
+  
 }

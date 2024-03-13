@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { GetGeneralMetadata, Identifier, People, Publications, SetStudyAbstract, SetStudyReleaseDate, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, Title } from "./general-metadata.actions";
+import { GetGeneralMetadata, Identifier, People, Publications, SetStudyReleaseDate, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, StudyAbstract, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -64,7 +64,7 @@ export class GeneralMetadataState {
                 this.store.dispatch(EditorValidationRules.Get);
 
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
-                ctx.dispatch(new SetStudyAbstract(gm_response.isaInvestigation.studies[0].description));
+                ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));
                 ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
                 ctx.dispatch(new SetStudyReleaseDate(new Date(gm_response.isaInvestigation.publicReleaseDate)));
                 ctx.dispatch(new SetStudyStatus(gm_response.mtblsStudy.studyStatus));
@@ -112,13 +112,36 @@ export class GeneralMetadataState {
         });
     }
 
-    @Action(SetStudyAbstract)
-    SetAbstract(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyAbstract) {
+    @Action(Title.Update)
+    UpdateTitle(ctx: StateContext<GeneralMetadataStateModel>, action: Title.Update) {
+        const state = ctx.getState();
+        this.generalMetadataService.updateTitle({title: action.title}, state.id).subscribe(
+            (res) => {
+                ctx.dispatch(new Title.Set(res.title));
+            }
+        )
+    }
+
+    @Action(StudyAbstract.Set)
+    SetAbstract(ctx: StateContext<GeneralMetadataStateModel>, action: StudyAbstract.Set) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
             description: action.abstract
         });
+    }
+
+    @Action(StudyAbstract.Update)
+    UpdateAbstract(ctx: StateContext<GeneralMetadataStateModel>, action: StudyAbstract.Update) {
+        const state = ctx.getState();
+        this.generalMetadataService.updateAbstract({description: action.description}, state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new StudyAbstract.Set(response.description));
+            },
+            (error) => {
+                console.error('Error in updating the study description.')
+            }
+        )
     }
 
     @Action(SetStudySubmissionDate)

@@ -448,6 +448,7 @@ export class MetabolightsService extends DataService {
    * @param body The new study title
    * @returns An object containing the new study title as confirmation, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   saveTitle(body): Observable<{ title: string }> {
     return this.http
       .put<{ title: string }>(
@@ -464,6 +465,7 @@ export class MetabolightsService extends DataService {
    * @param body The new abstract for the study.
    * @returns An object containing the new description as confirmation, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   saveAbstract(body): Observable<{ description: string }> {
     return this.http
       .put<{ description: string }>(
@@ -777,6 +779,7 @@ export class MetabolightsService extends DataService {
    *
    * @returns An object or list of objects representing study design descriptors, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   getDesignDescriptors(): Observable<IStudyDesignDescriptorWrapper> {
     return this.http
       .get<IStudyDesignDescriptorWrapper>(
@@ -792,6 +795,7 @@ export class MetabolightsService extends DataService {
    * @param body The new design descriptor.
    * @returns An object representing a study design descriptor, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   saveDesignDescriptor(body): Observable<IStudyDesignDescriptorWrapper> {
     return this.http
       .post<IStudyDesignDescriptorWrapper>(

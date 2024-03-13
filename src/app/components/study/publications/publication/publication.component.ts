@@ -23,10 +23,12 @@ import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
 import { environment } from "src/environments/environment";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-publication",
@@ -43,6 +45,15 @@ export class PublicationComponent implements OnInit {
 
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  @Select(GeneralMetadataState.id) id$: Observable<string>;
+  @Select(GeneralMetadataState.title) title$: Observable<string>;
+  @Select(GeneralMetadataState.description) description$: Observable<string>;
+  
+  private title: string = ""
+  private description: string = ""
+
+  toastrSettings: Record<string, any> = {};
 
   isReadOnly = false;
 
@@ -70,7 +81,8 @@ export class PublicationComponent implements OnInit {
     private doiService: DOIService,
     private europePMCService: EuropePMCService,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
@@ -92,6 +104,9 @@ export class PublicationComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe((settings) => {
+      this.toastrSettings = settings;
+    });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
@@ -100,6 +115,19 @@ export class PublicationComponent implements OnInit {
         this.isReadOnly = value;
       }
     });
+    this.title$.subscribe((value) => {
+      if (value !== null && value !== this.title) {
+        toastr.success("Title updated.", "Success", this.toastrSettings);
+        this.closeUpdateTitleModal();
+        this.isFormBusy = false;
+      }
+    });
+    this.description$.subscribe((value) => {
+      if (value !== null && value !== this.description) {
+        toastr.success("Study abstract updated.", "Success", this.toastrSettings);
+        this.closeUpdateAbstractModal();
+      }
+    })
   }
 
   openImportAuthorsModal() {
@@ -248,6 +276,7 @@ export class PublicationComponent implements OnInit {
     this.isModalOpen = true;
   }
 
+  // REMOVE POST STATE MIGRATION
   updateStudyTitle() {
     if (!this.isReadOnly) {
       this.editorService
@@ -264,6 +293,10 @@ export class PublicationComponent implements OnInit {
           this.closeUpdateTitleModal();
         });
     }
+  }
+
+  updateStudyTitleNgxs() {
+    this.store.dispatch(new Title.Update(this.getFieldValue("title")));
   }
 
   getAbstract() {
@@ -365,6 +398,7 @@ export class PublicationComponent implements OnInit {
     }
   }
 
+  // REMOVE POST STATE MIGRATION
   updateStudyAbstract() {
     if (!this.isReadOnly) {
       this.editorService
@@ -386,6 +420,11 @@ export class PublicationComponent implements OnInit {
           }
         );
     }
+  }
+
+  updateStudyAbstractNgxs() {
+    if (!this.readonly)  this.store.dispatch(new StudyAbstract.Update(this.publicationAbstract));
+
   }
 
   save() {

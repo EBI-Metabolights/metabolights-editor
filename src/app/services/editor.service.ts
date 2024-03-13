@@ -1339,7 +1339,7 @@ export class EditorService {
     return data;
   }
 
-  // Meta data
+  // REMOVE POST STATE MIGRATION
   saveTitle(body) {
     return this.dataService.saveTitle(body).pipe(
       map((data) => {
@@ -1349,6 +1349,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   saveAbstract(body) {
     return this.dataService.saveAbstract(body).pipe(
       map((data) => {
