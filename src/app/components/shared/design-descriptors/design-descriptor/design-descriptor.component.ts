@@ -153,6 +153,8 @@ export class DesignDescriptorComponent implements OnInit {
               this.descriptors = stateDescriptors
               // pull out to method
               this.refreshDesignDescriptors("Design descriptor updated.");
+              this.isFormBusy = false;
+              this.closeImportModal();
           }
         }
       }
@@ -216,8 +218,7 @@ export class DesignDescriptorComponent implements OnInit {
   updateAndCloseNgxs() {
     this.store.dispatch(new Descriptors.Get(this.studyId));
     // MAY NEED REVISITING
-    this.isFormBusy = false;
-    this.closeImportModal();
+
   }
 
   toggleSelection(keyword) {
