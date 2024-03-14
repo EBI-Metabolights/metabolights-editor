@@ -60,7 +60,7 @@ export class DescriptorsState {
     DeleteDesignDescriptor(ctx: StateContext<DescriptorsStateModel>, action: Descriptors.Delete) {
         this.descriptorsService.deleteDesignDescriptor(action.annotationValue, action.id).subscribe(
             (response) => {
-                
+                ctx.dispatch( new Descriptors.Get(action.id));
             }
         )
     }

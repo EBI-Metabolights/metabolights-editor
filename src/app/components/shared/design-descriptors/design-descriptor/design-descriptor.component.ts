@@ -216,8 +216,7 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   updateAndCloseNgxs() {
-    this.store.dispatch(new Descriptors.Get(this.studyId));
-    // MAY NEED REVISITING
+    //DELETE POST STATE MIGRATION + TEMPLATE REFERENCE
 
   }
 
@@ -469,7 +468,7 @@ export class DesignDescriptorComponent implements OnInit {
   // changed the name from the above method as the wording is confusing, we arent updating anything
   refreshDesignDescriptors(message) {
     this.isFormBusy = true;
-    this.store.dispatch(new Descriptors.Get(this.studyId));
+    //this.store.dispatch(new Descriptors.Get(this.studyId));
 
     // MAY NEED REVISITING
     this.isFormBusy = false;
