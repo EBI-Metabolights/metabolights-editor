@@ -115,7 +115,7 @@ export class GeneralMetadataState {
     @Action(Title.Update)
     UpdateTitle(ctx: StateContext<GeneralMetadataStateModel>, action: Title.Update) {
         const state = ctx.getState();
-        this.generalMetadataService.updateTitle({title: action.title}, state.id).subscribe(
+        this.generalMetadataService.updateTitle(action.title, state.id).subscribe(
             (res) => {
                 ctx.dispatch(new Title.Set(res.title));
             }

@@ -3,6 +3,9 @@ import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.i
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person"
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication"
 
+export interface Title {
+    title: string
+}
 
 export class GetGeneralMetadata {
     static readonly type ='[general] Get All General Metadata'
@@ -22,7 +25,7 @@ export namespace Title {
     }
     export class Update {
         static readonly type = '[general] Update Study Title'
-        constructor(public title: string) {}
+        constructor(public title: Title) {}
     }
 }
 
