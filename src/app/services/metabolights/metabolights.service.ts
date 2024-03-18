@@ -724,6 +724,7 @@ export class MetabolightsService extends DataService {
    * @param id ID of the study we want to fetch protocols for IE MTBLS9999
    * @returns an observable of a list of protocol objects.
    */
+  // REMOVE POST STATE MIGRATION
   getProtocols(id): Observable<IProtocolWrapper> {
     const studyId = id ? id : this.id;
     return this.http
@@ -1291,6 +1292,7 @@ export class MetabolightsService extends DataService {
   }
 
   // Release date
+  // REMOVE POST STATE MIGRATION
   changeReleasedate(releaseDate) {
     return this.http
       .put(

@@ -127,7 +127,7 @@ export class DesignDescriptorComponent implements OnInit {
     this.descriptors$.subscribe((stateDescriptors) => {
       // As a new 'pattern' this is complicated
       if (stateDescriptors !== null) {
-        if (this.descriptors == null) this.descriptors = stateDescriptors
+        if (this.descriptors === null) this.descriptors = stateDescriptors
         else { 
           const descriptorComparisonResult = elucidateListComparisonResult(areOntologyListsDifferent(this.descriptors, stateDescriptors));
           switch(descriptorComparisonResult) {
@@ -468,7 +468,6 @@ export class DesignDescriptorComponent implements OnInit {
   // changed the name from the above method as the wording is confusing, we arent updating anything
   refreshDesignDescriptors(message) {
     this.isFormBusy = true;
-    //this.store.dispatch(new Descriptors.Get(this.studyId));
 
     // MAY NEED REVISITING
     this.isFormBusy = false;

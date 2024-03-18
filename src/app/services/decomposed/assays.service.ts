@@ -8,6 +8,9 @@ import { BaseConfigDependentService } from './base-config-dependent.service';
 import { TableService } from './table.service';
 import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { httpOptions } from '../headers';
+import { catchError } from 'rxjs/operators';
+import { IAssay } from 'src/app/models/mtbl/mtbls/interfaces/assay.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -71,5 +74,15 @@ export class AssaysService extends BaseConfigDependentService {
       assayTechnique: "",
       assayMainTechnique: "",
     };
+  }
+
+  addAssay(body: any): Observable<IAssay> {
+    return this.http
+    .post<IAssay>(
+      this.url.baseURL + "/studies" + "/" + this.id + "/assays",
+      body,
+      httpOptions
+    )
+    .pipe(catchError(this.handleError));
   }
 }

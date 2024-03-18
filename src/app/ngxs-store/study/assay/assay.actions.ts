@@ -4,7 +4,7 @@ export namespace AssayList {
 
     export class Get {
         static readonly type = '[assay] Get Assay List'
-        constructor() {}
+        constructor(public id: string = null) {}
     }
 
     export class Set {
@@ -15,6 +15,10 @@ export namespace AssayList {
 }
 
 export namespace Assay {
+    export class Add {
+        static readonly type = '[assay] Add New Assay'
+        constructor(public assay: any) {}
+    }
     export class OrganiseAndPersist {
         static readonly type = '[assay] Organise and Persist Assay Sheet'
         constructor(public assaySheetFilename: string) {}

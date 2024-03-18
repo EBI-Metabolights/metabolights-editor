@@ -49,9 +49,17 @@ export class SetStudySubmissionDate {
     constructor(public date: Date) {}
 }
 
-export class SetStudyReleaseDate {
-    static readonly type = '[general] Set Study Release Date'
-    constructor(public date: Date) {}
+export namespace StudyReleaseDate {
+    export class Set {
+        static readonly type = '[general] Set Study Release Date'
+        constructor(public date: Date) {}
+    }
+
+    export class Update {
+        static readonly type = '[general] Update Study Release Date'
+        constructor(public date: string) {}
+    }
+    
 }
 
 export class SetStudyStatus {

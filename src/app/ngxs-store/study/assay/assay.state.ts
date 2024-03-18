@@ -8,6 +8,10 @@ import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/stu
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { MAF } from "../maf/maf.actions";
+import { FilesLists, Operations } from "../files/files.actions";
+import { ApplicationState } from "../../non-study/application/application.state";
+import { Protocols } from "../protocols/protocols.actions";
+import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 
 export interface AssayStateModel {
     assayList: IAssay[],
@@ -26,33 +30,49 @@ export class AssayState {
 
     @Select(FilesState.getAssaySheets) assaySheets$: Observable<StudyFile[]>
     @Select(FilesState.files) files$: Observable<IStudyFiles>
+    @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
-    constructor(private store: Store, private assaysService: AssaysService) { }
+    constructor(private store: Store, private assaysService: AssaysService, private generalMetadataService: GeneralMetadataService) { }
 
     @Action(AssayList.Get)
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
         this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
+        if (action.id) {
+            this.generalMetadataService.getStudyGeneralMetadata(action.id).subscribe(
+                (response) => {
+                    let assayFiles = response.isaInvestigation.studies[0].assays;
+                    ctx.dispatch(new AssayList.Set(assayFiles));
+                    assayFiles.forEach((sheet) => {
+                        ctx.dispatch(new Assay.OrganiseAndPersist(sheet.filename));
+                    });
+                }    
+            )
 
-        this.files$.subscribe(
+        } else {
+         this.files$.subscribe(
             (files) => {
                 let assayfiles = files.study.filter(file => file.file.startsWith('a_'));
                 assayfiles.forEach((sheet) => {
                     ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
-                })
+                });
+                //ctx.dispatch(new AssayList.Set(assayfiles))
             }
-        )
-         
-        /* this.assaySheets$.subscribe(
-            (sheets) => {
-                if(sheets !== undefined) {
-                    sheets.forEach((sheet) => {
-                        ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
+        ); 
+        }
+    }
+
+    @Action(Assay.Add)
+    AddNewAssay(ctx: StateContext<AssayStateModel>, action: Assay.Add) {
+        this.readonly$.subscribe(
+            (readonly) => {
+                this.assaysService.addAssay(action.assay).subscribe(
+                    (response) => {
+                        this.store.dispatch(new Operations.GetFreshFilesList(false, readonly));
+                        this.store.dispatch(new Protocols.Get());
+                        //ctx.dispatch(new AssayList.Get());
                     });
                 }
-
-            }
-        )
- */
+            )
     }
 
     @Action(Assay.OrganiseAndPersist)

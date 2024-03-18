@@ -42,7 +42,7 @@ export class DescriptorsState {
         this.descriptorsService.saveDesignDescriptor(action.descriptor, action.id).subscribe(
             (response) => {
                 // this will not work as intended, the response from this endpoint is the new design descriptor solely, not the whole list
-                ctx.dispatch(new Descriptors.Set(response.studyDesignDescriptors, true));
+                ctx.dispatch(new Descriptors.Set([response], true));
             }
         )
     }
@@ -51,7 +51,7 @@ export class DescriptorsState {
     UpdateDesignDescriptor(ctx: StateContext<DescriptorsStateModel>, action: Descriptors.Update) {
         this.descriptorsService.updateDesignDescriptor(action.annotationValue, action.descriptor, action.id).subscribe(
             (response) => {
-                ctx.dispatch(new Descriptors.Set(response.studyDesignDescriptors, true));
+                ctx.dispatch(new Descriptors.Set([response], true));
             }
         )
     }

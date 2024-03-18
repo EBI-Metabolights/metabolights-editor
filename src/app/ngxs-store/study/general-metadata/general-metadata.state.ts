@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { GetGeneralMetadata, Identifier, People, Publications, SetStudyReleaseDate, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, StudyAbstract, Title } from "./general-metadata.actions";
+import { GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -66,7 +66,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));
                 ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
-                ctx.dispatch(new SetStudyReleaseDate(new Date(gm_response.isaInvestigation.publicReleaseDate)));
+                ctx.dispatch(new StudyReleaseDate.Set(new Date(gm_response.isaInvestigation.publicReleaseDate)));
                 ctx.dispatch(new SetStudyStatus(gm_response.mtblsStudy.studyStatus));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
@@ -153,13 +153,22 @@ export class GeneralMetadataState {
         });
     }
 
-    @Action(SetStudyReleaseDate)
-    SetReleaseDate(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyReleaseDate) {
+    @Action(StudyReleaseDate.Set)
+    SetReleaseDate(ctx: StateContext<GeneralMetadataStateModel>, action: StudyReleaseDate.Set) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
             releaseDate: action.date
         });
+    }
+
+    @Action(StudyReleaseDate.Update)
+    UpdateReleaseDate(ctx: StateContext<GeneralMetadataStateModel>, action: StudyReleaseDate.Update) {
+        const state = ctx.getState();
+        this.generalMetadataService.changeReleaseDate(action.date, state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new StudyReleaseDate.Set(new Date(response.releaseDate)));
+            })
     }
 
     @Action(SetStudyStatus)

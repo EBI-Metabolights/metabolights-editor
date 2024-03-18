@@ -4,8 +4,10 @@ import { Observable } from 'rxjs';
 import { IStudySummary } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
 import { DataService } from '../data.service';
 import { httpOptions } from '../headers';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ConfigurationService } from 'src/app/configuration.service';
+import { IReleaseDate } from 'src/app/models/mtbl/mtbls/interfaces/release-date.interface';
+import { IProtocolWrapper } from 'src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -74,7 +76,30 @@ export class GeneralMetadataService extends DataService{
       .pipe(catchError(this.handleError));
   }
 
+  changeReleaseDate(releaseDate, id): Observable<IReleaseDate> {
+    return this.http
+    .put<IReleaseDate>(
+      this.url.baseURL + "/studies" + "/" + id + "/release-date",
+      { release_date: releaseDate },
+      httpOptions
+    )
+    .pipe(
+      map(data => this.convertSnakeCaseToCamelCase(data)),
+      catchError(this.handleError));
+  }
+
+  getProtocols(id): Observable<IProtocolWrapper> {
+    return this.http
+      .get<IProtocolWrapper>(
+        this.url.baseURL + "/studies" + "/" + id + "/protocols",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+}
+
 
 
   
-}
+

@@ -979,6 +979,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   loadStudyProtocols() {
     this.dataService.getProtocols(null).subscribe((data) => {
       this.ngRedux.dispatch({
@@ -1521,6 +1522,7 @@ export class EditorService {
   }
 
   // Assays
+  // REMOVE POST STATE MIGRATION
   addAssay(body) {
     return this.dataService.addAssay(body).pipe(map((data) => data));
   }
@@ -1755,6 +1757,7 @@ export class EditorService {
   }
 
   // Release date change
+  // REMOVE POST STATE MIGRATION
   changeReleasedate(releaseDate) {
     return this.dataService.changeReleasedate(releaseDate);
   }
