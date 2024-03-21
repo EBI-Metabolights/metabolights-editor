@@ -13,10 +13,13 @@ import { TableComponent } from "./../../../shared/table/table.component";
 import { environment } from "src/environments/environment";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { env } from "process";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
+import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
+import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 
 @Component({
   selector: "assay-details",
@@ -34,8 +37,11 @@ export class AssayDetailsComponent implements OnInit {
   @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
 
   @Output() assayDelete = new EventEmitter<any>();
+
+  private studyId: string = null
 
   isReadOnly = false;
 
@@ -54,7 +60,7 @@ export class AssayDetailsComponent implements OnInit {
   existingSampleNamesInAssay: any = [];
   duplicateSampleNamesInAssay: any = [];
 
-  constructor(private editorService: EditorService) {
+  constructor(private editorService: EditorService, private store: Store) {
     if (!environment.isTesting && !environment.useNewState) {
       this.setUpConstructorSubscription();
     }
@@ -99,6 +105,7 @@ export class AssayDetailsComponent implements OnInit {
         this.filteredSampleNames = this.sampleNames;
       }
     });
+    this.studyIdentifier$.subscribe(id => this.studyId = id);
   }
 
   ngOnInit() {
@@ -170,17 +177,34 @@ export class AssayDetailsComponent implements OnInit {
       cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
-        this.editorService.deleteAssay(name).subscribe((resp) => {
-          this.assayDelete.emit(name);
-          this.editorService.loadStudyFiles(true);
-          window.location.reload();
-          Swal.fire({
-            title: "Assay deleted!",
-            text: "",
-            type: "success",
-            confirmButtonText: "OK",
-          }).then(() => {});
-        });
+        if (environment.useNewState) {
+          this.store.dispatch(new Assay.Delete(name)).subscribe(
+            (completed) => {
+              this.assayDelete.emit(name);
+              this.store.dispatch(new AssayList.Get(this.studyId));
+              this.store.dispatch(new Protocols.Get());
+              Swal.fire({
+                title: "Assay deleted!",
+                text: "",
+                type: "success",
+                confirmButtonText: "OK",
+              }).then(() => {});
+            }
+          )
+        } else {
+          this.editorService.deleteAssay(name).subscribe((resp) => {
+            this.assayDelete.emit(name);
+            this.editorService.loadStudyFiles(true);
+            window.location.reload();
+            Swal.fire({
+              title: "Assay deleted!",
+              text: "",
+              type: "success",
+              confirmButtonText: "OK",
+            }).then(() => {});
+          });
+        }
+
       }
     });
   }

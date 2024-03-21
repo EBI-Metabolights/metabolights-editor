@@ -25,4 +25,14 @@ export class TableService extends BaseConfigDependentService{
       .pipe(catchError(this.handleError));
   }
 
+  addColumns(filename, body, id) {
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + id + "/columns/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
 }

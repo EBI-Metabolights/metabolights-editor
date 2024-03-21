@@ -735,6 +735,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  //REMOVE POST STATE MIGRATION
   saveProtocol(body) {
     return this.http
       .post(
@@ -745,6 +746,8 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+
+  // REMOVE POST STATE MIGRATION
   updateProtocol(title, body) {
     return this.http
       .put(
@@ -760,6 +763,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteProtocol(title) {
     return this.http
       .delete(
@@ -859,6 +863,7 @@ export class MetabolightsService extends DataService {
    *
    * @returns Either a single factor object, or a list of them.
    */
+  // REMOVE POST STATE MIGRATION
   getFactors(): Observable<IFactorsWrapper> {
     return this.http
       .get<IFactorsWrapper>(
@@ -868,6 +873,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   saveFactor(body) {
     return this.http
       .post(
@@ -878,6 +884,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   updateFactor(factorName, body) {
     return this.http
       .put(
@@ -893,6 +900,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteFactor(factorName) {
     return this.http
       .delete(
@@ -986,6 +994,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   addAssay(body) {
     return this.http
       .post(
@@ -996,6 +1005,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteAssay(name) {
     return this.http
       .delete(
@@ -1179,6 +1189,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   addColumns(filename, body) {
     return this.http
       .post(

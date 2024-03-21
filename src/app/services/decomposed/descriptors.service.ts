@@ -6,6 +6,8 @@ import { Observable } from 'rxjs';
 import { IStudyDesignDescriptorWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface';
 import { httpOptions } from '../headers';
 import { catchError } from 'rxjs/operators';
+import { IFactorsWrapper } from 'src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface';
+import { IfStmt } from '@angular/compiler';
 
 @Injectable({
   providedIn: 'root'
@@ -87,6 +89,59 @@ export class DescriptorsService extends BaseConfigDependentService{
           id +
           "/descriptors?term=" +
           annotationValue,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+    /**
+   * Return the factor or factors for a given study.
+   *
+   * @returns Either a single factor object, or a list of them.
+   */
+  getFactors(id): Observable<IFactorsWrapper> {
+    return this.http
+      .get<IFactorsWrapper>(
+        this.url.baseURL + "/studies" + "/" + id + "/factors",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  saveFactor(id, body): Observable<IFactorsWrapper> {
+    return this.http
+      .post<IFactorsWrapper>(
+        this.url.baseURL + "/studies" + "/" + id + "/factors",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  updateFactor(id, factorName, body): Observable<IFactorsWrapper> {
+    return this.http
+      .put<IFactorsWrapper>(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/factors?name=" +
+          factorName,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteFactor(id, factorName) {
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/factors?name=" +
+          factorName,
         httpOptions
       )
       .pipe(catchError(this.handleError));

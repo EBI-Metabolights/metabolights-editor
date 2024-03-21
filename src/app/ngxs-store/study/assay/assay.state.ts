@@ -145,6 +145,26 @@ export class AssayState {
         });
     }
 
+    @Action(Assay.Delete)
+    DeleteStudyAssay(ctx: StateContext<AssayStateModel>, action: Assay.Delete) {
+        const state = ctx.getState();
+        this.assaysService.deleteAssay(action.assay).subscribe(
+            (deleted) => {
+                
+            }
+        )
+    }
+
+    @Action(Assay.AddColumn)
+    AddColumnsToAssaySheet(ctx: StateContext<AssayStateModel>, action: Assay.AddColumn) {
+        const state = ctx.getState();
+        this.assaysService.addColumnToAssaySheet(action.assay, action.body, action.id).subscribe(
+            (response) => {
+                ctx.dispatch(new Assay.OrganiseAndPersist(action.assay));
+            }
+        );
+    }
+
     @Action(AssayList.Set)
     SetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Set) {
         const state = ctx.getState();

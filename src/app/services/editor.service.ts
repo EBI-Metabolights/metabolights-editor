@@ -1063,6 +1063,7 @@ export class EditorService {
     };
   }
 
+
   loadStudySamples() {
     if (this.files === null) {
       this.loadStudyFiles(false);
@@ -1088,6 +1089,7 @@ export class EditorService {
     }
   }
 
+  // DELETE POST STATE MIGRATION
   loadStudyAssays(files) {
 
     if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading assays information"))
@@ -1108,6 +1110,8 @@ export class EditorService {
       this.updateMAF(filename);
     }
   }
+
+  // REMOVE POST STATE MIGRATION
   updateAssay(file) {
     this.dataService.getTable(file).subscribe((data) => {
       const assay = {};
@@ -1164,6 +1168,7 @@ export class EditorService {
     });
   }
 
+  // REMOVE POST STATE MIGRATION
   updateMAF(f) {
     this.dataService.getTable(f).subscribe((mdata) => {
       const mcolumns = [];
@@ -1527,6 +1532,7 @@ export class EditorService {
     return this.dataService.addAssay(body).pipe(map((data) => data));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteAssay(name) {
     return this.dataService.deleteAssay(name).pipe(
       map((data) => {
@@ -1581,16 +1587,19 @@ export class EditorService {
   saveFactor(body) {
     return this.dataService.saveFactor(body);
   }
-
+  
+  // REMOVE POST STATE MIGRATION
   updateFactor(factorName, body) {
     return this.dataService.updateFactor(factorName, body);
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteFactor(factorName) {
     return this.dataService.deleteFactor(factorName);
   }
 
   // table
+  // REMOVE POST STATE MIGRATION
   addColumns(filename, body, tableType, metaInfo) {
     return this.dataService.addColumns(filename, body).pipe(
       map((data) => {

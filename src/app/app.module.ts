@@ -68,6 +68,7 @@ import { ProtocolsState } from "./ngxs-store/study/protocols/protocols.state";
 import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.state";
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
+import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -154,6 +155,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
     LabsWorkspaceService,
     { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true},
     {
       provide: APP_BASE_HREF,
       useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),

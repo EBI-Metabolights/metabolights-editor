@@ -40,6 +40,15 @@ export class AssaysService extends BaseConfigDependentService {
     return this.tableService.getTable(filename, this.id);
   }
 
+  deleteAssay(name): Observable<Object> {
+    return this.http
+      .delete(
+        this.url.baseURL + "/studies" + "/" + this.id + "/assays/" + name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
   extractAssayDetails(assay): Record<string, any> {
     if (assay.name.split(this.id)[1]) {
       const assayInfo = assay.name
@@ -85,4 +94,9 @@ export class AssaysService extends BaseConfigDependentService {
     )
     .pipe(catchError(this.handleError));
   }
+
+  addColumnToAssaySheet(filename: string, body: Record<string, any>, id): Observable<any> {
+    return this.tableService.addColumns(filename, body, id);
+  }
+  
 }

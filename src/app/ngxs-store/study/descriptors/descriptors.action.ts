@@ -31,12 +31,27 @@ export namespace Descriptors {
 export namespace Factors {
     export class Set {
         static readonly type = '[descriptors] Set Factors'
-        constructor(public rawFactors: any[]) {}
+        constructor(public rawFactors: any[], public extend: boolean = false) {}
+    }
+
+    export class Get {
+        static readonly type = '[descriptors] Get Factors'
+        constructor(public id: string){}
+    }
+
+    export class Add {
+        static readonly type = '[descriptors] Add New Factor'
+        constructor(public id: string, public factor: Record<string, any>) {}
     }
 
     export class Update {
-        static readonly type = '[descriptors] Update Study Factors'
-        constructor(public factor: MTBLSFactor) {}
+        static readonly type = '[descriptors] Update Study Factor'
+        constructor(public id: string, public name: string, public factor: Record<string, any>) {}
+    }
+
+    export class Delete {
+        static readonly type = '[descriptors] Delete Study Factor'
+        constructor(public id: string, public factorName: string) {}
     }
 
 }

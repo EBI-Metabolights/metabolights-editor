@@ -25,4 +25,47 @@ export class ProtocolsService extends BaseConfigDependentService {
       )
       .pipe(catchError(this.handleError));
   }
+
+  updateProtocol(title, body, id) {
+    return this.http
+      .put(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/protocols?name=" +
+          title,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  saveProtocol(body, id) {
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + id + "/protocols",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteProtocol(title, id) {
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/protocols?name=" +
+          title +
+          "&force=false",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+
+
 }

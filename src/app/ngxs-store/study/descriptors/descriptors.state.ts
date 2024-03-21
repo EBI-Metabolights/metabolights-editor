@@ -32,6 +32,9 @@ export class DescriptorsState {
         this.descriptorsService.getDesignDescriptors(action.id).subscribe(
             (response) => {
                 ctx.dispatch(new Descriptors.Set(response.studyDesignDescriptors)) 
+            },
+            (error) => {
+                console.error(`Could not retrieve descriptors`)
             }
         )
         
@@ -41,8 +44,10 @@ export class DescriptorsState {
     SaveDesignDescriptor(ctx: StateContext<DescriptorsStateModel>, action: Descriptors.New) {
         this.descriptorsService.saveDesignDescriptor(action.descriptor, action.id).subscribe(
             (response) => {
-                // this will not work as intended, the response from this endpoint is the new design descriptor solely, not the whole list
                 ctx.dispatch(new Descriptors.Set([response], true));
+            },
+            (error) => {
+                console.error(`Could not add descriptor`)
             }
         )
     }
@@ -52,6 +57,9 @@ export class DescriptorsState {
         this.descriptorsService.updateDesignDescriptor(action.annotationValue, action.descriptor, action.id).subscribe(
             (response) => {
                 ctx.dispatch(new Descriptors.Set([response], true));
+            },
+            (error) => {
+                console.error(`Could not update descriptor ${action.annotationValue}`)
             }
         )
     }
@@ -61,6 +69,9 @@ export class DescriptorsState {
         this.descriptorsService.deleteDesignDescriptor(action.annotationValue, action.id).subscribe(
             (response) => {
                 ctx.dispatch( new Descriptors.Get(action.id));
+            },
+            (error) => {
+                console.error(`Could not delete descriptor ${action.annotationValue}`)
             }
         )
     }
@@ -84,15 +95,69 @@ export class DescriptorsState {
     @Action(Factors.Set)
     SetFactors(ctx: StateContext<DescriptorsStateModel>, action: Factors.Set) {
         const state = ctx.getState();
-        const temp = [];
+        let temp = [];
         const jsonConvert: JsonConvert = new JsonConvert();
         action.rawFactors.forEach((protocol) => {
             temp.push(jsonConvert.deserialize(protocol, MTBLSFactor));
         });
+        let currentFactors = state.factors
+        if (action.extend) temp = temp.concat(currentFactors)
         ctx.setState({
             ...state,
             factors: temp
         })
+    }
+
+    @Action(Factors.Get)
+    GetFactors(ctx: StateContext<DescriptorsStateModel>, action: Factors.Get) {
+        const state = ctx.getState();
+        this.descriptorsService.getFactors(action.id).subscribe(
+            (response) => {
+                ctx.dispatch(new Factors.Set(response.factors));
+            },
+            (error) => {
+                console.error("Could not retrieve factors.")
+            }
+        )
+    }
+
+    @Action(Factors.Update)
+    UpdateFactor(ctx: StateContext<DescriptorsStateModel>, action: Factors.Update) {
+        const state = ctx.getState();
+        this.descriptorsService.updateFactor(action.id, action.name, action.factor).subscribe(
+            (response) => {
+                //ctx.dispatch(new Factors.Set(response.factors, true));
+                ctx.dispatch(new Factors.Get(action.id));
+            },
+            (error) => {
+                console.error(`Could not update factor ${action.name}`);
+            }
+        )
+    }
+
+    @Action(Factors.Add)
+    AddFactor(ctx: StateContext<DescriptorsStateModel>, action: Factors.Add) {
+        const state = ctx.getState();
+        this.descriptorsService.saveFactor(action.id, action.factor).subscribe(
+            (response) => {
+                ctx.dispatch(new Factors.Set([response], true));
+            },
+            (error) => {
+                console.error(`Could not add factor`);
+            }
+        )
+    }
+
+    @Action(Factors.Delete)
+    DeleteFactor(ctx: StateContext<DescriptorsStateModel>, action: Factors.Delete) {
+        this.descriptorsService.deleteFactor(action.id, action.factorName).subscribe(
+            (response) => {
+                ctx.dispatch(new Factors.Get(action.id));
+            },
+            (error) => {
+                console.error(`Could not delete factor ${action.factorName}`);
+            }
+            )
     }
 
     @Selector()

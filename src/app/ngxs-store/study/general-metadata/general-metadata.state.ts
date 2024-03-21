@@ -10,7 +10,7 @@ import { SetReadonly, SetStudyError } from "../../non-study/application/applicat
 import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
 import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
-import { Descriptors } from "../descriptors/descriptors.action";
+import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 
@@ -60,6 +60,7 @@ export class GeneralMetadataState {
                 this.store.dispatch(new AssayList.Set(gm_response.isaInvestigation.studies[0].assays));
                 this.store.dispatch(new Protocols.Set(gm_response.isaInvestigation.studies[0].protocols));
                 this.store.dispatch(new Descriptors.Set(gm_response.isaInvestigation.studies[0].studyDesignDescriptors));
+                this.store.dispatch(new Factors.Set(gm_response.isaInvestigation.studies[0].factors))
                 //this.store.dispatch(new SetConfiguration());
                 this.store.dispatch(EditorValidationRules.Get);
 

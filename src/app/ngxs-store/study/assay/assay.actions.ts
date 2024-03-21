@@ -27,4 +27,14 @@ export namespace Assay {
         static readonly type = '[assay] Set Study Assay'
         constructor(public assay: any) {}
     }
+
+    export class Delete {
+        static readonly type = '[assay] Delete Study Assay'
+        constructor(public assay: string) {}
+    }
+
+    export class AddColumn {
+        static readonly type = '[assay] Add Columns to Assay Sheet'
+        constructor(public assay: string, public body: Record<string, any>, public tableType: string, public id: string, public metaInfo: any = null ){}
+    }
 }
