@@ -1,0 +1,24 @@
+<p>Summary Information will go here </p>
+<br>
+<mat-slide-toggle
+class="example-margin"
+[color]="'success'"
+(click)="checked = !checked"
+[checked]="checked"
+>
+{{ checked === true ? "Cards" : "Table"}}
+</mat-slide-toggle>
+<br>
+<!-- Cards section start -->
+<div *ngIf="checked === true">
+    <div *ngFor="let violation of report.violations; let i = index;">
+        <prototype-detail [violation]="violation"></prototype-detail>
+        <br>
+    </div>
+</div>
+<!-- Cards section end -->
+
+<!--Table section start-->
+<div *ngIf="checked === false" class="prototype-table w-95">
+    <prototype-table [violations]="report.violations"></prototype-table>
+</div>

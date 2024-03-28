@@ -11,7 +11,7 @@ import { MtblsJwtPayload } from "src/app/services/headers";
 import jwtDecode  from "jwt-decode";
 import * as toastr from "toastr";
 import {PlatformLocation} from '@angular/common';
-import { stringify } from "querystring";
+//import { stringify } from "querystring";
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",

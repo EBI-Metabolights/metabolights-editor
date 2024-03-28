@@ -1,0 +1,51 @@
+<div class="parent">
+
+    <div class="container">
+        <div class="content">
+            <div class="row-container">
+                <div class="row-key">Title: </div> <div class="row-content"> <h2>{{ violation.title }}</h2> </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="row-container">
+                <div class="row-key">Description: </div> <div class="row-content"> {{ violation.description }} </div> 
+            </div>
+        </div>
+        <div class="content">
+            <div class="row-container">
+                <div class="row-key">Location: </div> <div class="row-content"> {{ violation.sourceFile}}</div>
+            </div>
+        </div>
+        <div class="sidebar" > 
+            <div class="type" [ngClass]="{
+            'error': violation.type === 'ERROR',
+            'warning': violation.type === 'WARNING',
+            'info': violation.type === 'INFO',
+            'success': violation.type === 'SUCCESS'
+          }"><b>{{ violation.type }}</b> </div>
+          <div class="button-container"> 
+    
+            <button (click)="openInfoModal()" class="button bc-item rounded-top-button is-info"><mat-icon>info</mat-icon> Details</button>
+            <a   [href]="
+            'mailto:metabolights-help@ebi.ac.uk?subject=Regarding validation rule - ' +
+            violation.identifier
+          " class="button bc-item is-info"><mat-icon>mail</mat-icon> Contact</a>
+            <button class="button bc-item rounded-bottom-button is-info" (click)="openRawModal()"><mat-icon>visibility</mat-icon> View Raw</button>
+    
+    
+          </div>
+    
+        </div>
+    
+    </div>
+    <div class="violations-footer">
+        <small> ID: {{ violation.identifier}} </small>  | <small>Timestamp: December 25th, 9999, 00:00:00 UTC</small> | <small>Report Hash ID: 4e9a2bef74a8e-9c1a3b2c34d5f6a7b8c</small>
+    </div>
+</div>
+<div *ngIf="isRawModalOpen === true">
+    <raw-violation-modal [violation]="violation" (closeEvent)="closeRawModal()">
+    </raw-violation-modal>
+</div>
+<div *ngIf="isInfoModalOpen === true">
+    <violation-info-modal [violation]="violation" (closeEvent)="closeInfoModal()"></violation-info-modal>
+</div>

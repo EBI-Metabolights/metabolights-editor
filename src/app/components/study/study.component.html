@@ -216,6 +216,13 @@
                 >
                   <a>Study Validations</a>
                 </li>
+                <li *ngIf="isCurator">
+                  <li
+                  (click)="selectCurrentTab(7, 'prototype')"
+                  [ngClass]="{ 'is-active': (currentIndex | async) === 7 }"
+                >
+                  <a>Prototype</a>
+                </li>
               </ul>
             </div>
           </div>
@@ -270,6 +277,13 @@
                 >
                   <study-validations></study-validations>
                 </div>
+                <div class="tab-content fadeIn animated"
+                    *ngIf="((currentIndex | async) === 7) && isCurator === true)">
+                  
+                  <validations-prototype>
+
+                  </validations-prototype>
+                  </div>
               </div>
             </div>
           </div>

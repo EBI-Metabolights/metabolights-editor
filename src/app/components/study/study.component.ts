@@ -21,6 +21,7 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   @select((state) => state.status.bannerMessage) bannerMessage;
   @select((state) => state.status.maintenanceMode) maintenanceMode;
+  @select((state) => state.status.isCurator) isCurator$;
 
   @select((state) => state.study.investigationFailed) investigationFailed;
 
@@ -36,6 +37,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   baseHref: string;
   banner: string = null;
   underMaintenance = false;
+
+  protected isCurator = false;
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
@@ -62,6 +65,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   setUpSubscriptions() {
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
+    this.isCurator$.subscribe((value) => this.isCurator = value)
     this.studyObfuscationCode.subscribe((value) => {
       this.obfuscationCode = value;
     });

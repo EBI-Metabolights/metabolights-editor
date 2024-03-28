@@ -1,0 +1,26 @@
+table {
+    width: 100%;
+}
+::ng-deep .mat-cell, ::ng-deep .mat-header-cell {
+    padding: 16px;
+  }
+
+  .parent {
+    width: 100%;
+    align-items: center;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically, if you also need vertical centering */
+  }
+
+.green-background { background-color:#23d160; }
+.red-background { background-color: #ff3760 ;}
+.blue-background { background-color: #3273dc; }
+.yellow-background { background-color: #ffdd57; }
+
+td, th {
+    text-align: center;
+  }

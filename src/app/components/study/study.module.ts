@@ -33,6 +33,8 @@ import { SharedModule } from "../shared/shared.module";
 import { HttpClientModule } from "@angular/common/http";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
+import {MatListModule} from '@angular/material/list';
+
 import { ValidationDetailCommentComponent } from "./validations/validation-detail/comment/validation-detail-comment.component";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatTooltipModule } from "@angular/material/tooltip";
@@ -53,6 +55,13 @@ import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.p
 import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { RsyncComponent } from './files/rsync/rsync.component';
 import { ValidationStatusTransformPipe } from "./validations/validation-status-transform.pipe";
+import { ValidationsPrototypeComponent } from './validations-protoype/validations-prototype/validations-prototype.component';
+import { PrototypeDetailComponent } from './validations-protoype/prototype-detail/prototype-detail.component';
+import { RawViolationModalComponent } from './validations-protoype/raw-violation-modal/raw-violation-modal.component';
+import { ValidationInfoModalComponent } from './validations-protoype/validation-info-modal/validation-info-modal.component';
+import { PrototypeTableComponent } from './validations-protoype/prototype-table/prototype-table.component';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+import { MatSortModule } from "@angular/material/sort";
 
 @NgModule({
   declarations: [
@@ -78,7 +87,12 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     ValidationDetailCommentComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
-    RsyncComponent
+    RsyncComponent,
+    ValidationsPrototypeComponent,
+    PrototypeDetailComponent,
+    RawViolationModalComponent,
+    ValidationInfoModalComponent,
+    PrototypeTableComponent
   ],
   imports: [
     CommonModule,
@@ -107,7 +121,10 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     MatButtonToggleModule,
     QuillModule,
     MatCheckboxModule,
-    AngularStickyThingsModule
+    AngularStickyThingsModule,
+    MatListModule,
+    MatSlideToggleModule,
+    MatSortModule
   ],
   exports: [
     AssaysComponent,
@@ -129,7 +146,12 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     StatusComponent,
     ValidationsComponent,
     ValidationDetailComponent,
-    ValidationDetailCommentComponent
+    ValidationDetailCommentComponent,
+    ValidationsPrototypeComponent,
+    PrototypeDetailComponent,
+    RawViolationModalComponent,
+    ValidationInfoModalComponent,
+    PrototypeTableComponent
   ],
   providers: [
     AuthGuard,
