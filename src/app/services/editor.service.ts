@@ -1609,6 +1609,7 @@ export class EditorService {
     );
   }
 
+  // DELETE POST STATE MIGRATION
   addRows(filename, body, tableType, metaInfo) {
     return this.dataService.addRows(filename, body).pipe(
       map((data) => {
@@ -1618,6 +1619,7 @@ export class EditorService {
     );
   }
 
+  // DELETE POST STATE MIGRATION
   updateRows(filename, body, tableType, metaInfo) {
     return this.dataService.updateRows(filename, body).pipe(
       map((data) => {
@@ -1667,6 +1669,8 @@ export class EditorService {
     if ( result.success && result.updates && result.updates.length > 0) {
       // console.log("committed values" + result.message);
       const table = sourceFile.data;
+      const deepCopiedData = JSON.parse(JSON.stringify(table));
+
       const headerIndices: Map<number, string> = new Map<number, string>();
       table.columns.forEach((val, idx)=> {
         headerIndices.set(val.header, idx);

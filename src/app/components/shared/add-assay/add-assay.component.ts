@@ -179,15 +179,15 @@ export class AddAssayComponent implements OnInit {
     body.assay.columns = tempColumns;
 
     if (environment.useNewState) {
-      this.store.dispatch(new Assay.Add(body)).subscribe(
+      this.store.dispatch(new Assay.Add(body, this.requestedStudy)).subscribe(
         (completed) => {
           this.selectedAssayTypeOption = null;
           this.selectedAssayVariantOption = null;
           this.selectedAssayVariantColumnOption = [];
           this.isAddAssayModalOpen = false;
           
-          this.store.dispatch(new AssayList.Get(this.requestedStudy));
-          this.store.dispatch(new Protocols.Get());
+          //this.store.dispatch(new AssayList.Get(this.requestedStudy));
+          //this.store.dispatch(new Protocols.Get());
         }
       )
     }

@@ -189,6 +189,7 @@ export class MafsComponent implements OnInit {
 
     this.studyMAFs$.subscribe((value) => {
       if (this.mafNames) {
+        if (this.mafs.length > 0) { this.mafs = []}
         this.mafNames.forEach((mafFile) => {
           this.mafs.push(value[mafFile]);
         });

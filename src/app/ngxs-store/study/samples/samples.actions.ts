@@ -16,6 +16,26 @@ export namespace Samples {
         static readonly type = '[samples] Organise and Persist Sample Sheet'
         constructor(public sampleSheetFilename: string) {}
     }
+
+    export class AddRows {
+        static readonly type = '[samples] Add Table Rows'
+        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>) {}
+    }
+
+    export class DeleteRows {
+        static readonly type = '[samples] Delete Table Rows'
+        constructor(public filename: string, public rowIds: any) {}
+    }
+
+    export class AddColumns {
+        static readonly type = '[samples] Add Table Columns'
+        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>){}
+    }
+
+    export class UpdateCells {
+        static readonly type = '[samples] Update Cells'
+        constructor(public filename: string, public cellsToUpdate: Record<string, any>){}
+    }
 }
 
 export namespace Organisms {

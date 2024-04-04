@@ -151,6 +151,7 @@ export class AssayDetailsComponent implements OnInit {
       dataToWrite.push(tempRow);
     });
     this.assayTable.addRows(dataToWrite, 0);
+    this.addSamplesModalOpen = false;
   }
 
   validateAssaySheet() {
@@ -178,10 +179,10 @@ export class AssayDetailsComponent implements OnInit {
     }).then((willDelete) => {
       if (willDelete.value) {
         if (environment.useNewState) {
-          this.store.dispatch(new Assay.Delete(name)).subscribe(
+          this.store.dispatch(new Assay.Delete(name, this.studyId)).subscribe(
             (completed) => {
               this.assayDelete.emit(name);
-              this.store.dispatch(new AssayList.Get(this.studyId));
+              //this.store.dispatch(new AssayList.Get(this.studyId));
               this.store.dispatch(new Protocols.Get());
               Swal.fire({
                 title: "Assay deleted!",

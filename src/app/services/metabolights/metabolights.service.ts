@@ -1200,6 +1200,8 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+
+  // DELETE POST STATE MIGRATION
   addRows(filename, body) {
     return this.http
       .post(
@@ -1210,6 +1212,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // DELETE POST STATE MIGRATION
   updateRows(filename, body) {
     return this.http
       .put(
@@ -1220,6 +1223,8 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+
+  //DELETE POST STATE MIGRATION
   deleteRows(filename, rowIds) {
     return this.http
       .delete(
@@ -1236,6 +1241,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // DELETE POST STATE MIGRATION
   updateCells(filename, body) {
     return this.http
       .put(

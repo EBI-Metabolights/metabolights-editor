@@ -77,9 +77,67 @@ export class MAFState {
           
                 maf["data"] = mdata;
                 ctx.dispatch(new MAF.Set(maf))
+            },
+            (error) => {
+                console.log("Unable to get MAF sheet")
+                console.log(error)
             }
         )
         
+    }
+
+    @Action(MAF.AddRows)
+    AddRows(ctx: StateContext<MAFStateModel>, action: MAF.AddRows) {
+        this.mafService.addRows(action.filename, action.body).subscribe(
+            (response) => {
+                ctx.dispatch(new MAF.Organise(action.filename));
+            },
+            (error) => {
+                console.log("Unable to add rows to MAF sheet.")
+                console.log(error)
+            }
+        )
+    }
+
+    @Action(MAF.UpdateRows)
+    UpdateRows(ctx: StateContext<MAFStateModel>, action: MAF.UpdateRows) {
+        this.mafService.updateRow(action.filename, action.body).subscribe(
+            (response) => {
+                ctx.dispatch(new MAF.Organise(action.filename));
+            },
+            (error) => {
+                console.log("Unable to update rows in MAF sheet.")
+                console.log(error)
+            }
+        )
+    }
+
+    @Action(MAF.DeleteRows)
+    DeleteRows(ctx: StateContext<MAFStateModel>, action: MAF.DeleteRows) {
+        this.mafService.deleteRows(action.filename, action.rowIds).subscribe(
+            (response) => {
+                ctx.dispatch(new MAF.Organise(action.filename));
+            },
+            (error) => {
+                console.log('Unable to delete rows from MAF sheet.')
+                console.log(error)
+            }
+        )
+    }
+
+    @Action(MAF.UpdateCells)
+    UpdateCells(ctx: StateContext<MAFStateModel>, action: MAF.UpdateCells) {
+        this.mafService.updateCells(action.filename, action.cellsToUpdate).subscribe(
+            (response) => {
+                // do some commitUpdatedTableCellsNgxs type processing
+                // or
+                ctx.dispatch(new MAF.Organise(action.filename));
+            },
+            (error) => {
+                console.log("Unable to edit cells in MAF sheet");
+                console.log(error);
+            }
+        )
     }
 
     @Selector()

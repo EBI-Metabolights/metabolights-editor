@@ -164,6 +164,58 @@ export class SampleState {
         });
     }
 
+    @Action(Samples.AddRows)
+    AddRows(ctx: StateContext<SamplesStateModel>, action: Samples.AddRows) {
+      this.samplesService.addRows(action.filename, action.body).subscribe(
+        (response) => {
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename));
+        },
+        (error) => {
+          console.log(`Unable to add new row to sample sheet ${error.toString()}} `)
+        }
+      )
+    }
+
+    @Action(Samples.DeleteRows)
+    DeleteRows(ctx: StateContext<SamplesStateModel>, action: Samples.DeleteRows) {
+      this.samplesService.deleteRows(action.filename, action.rowIds).subscribe(
+        (response) => {
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename))
+        },
+        (error) => {
+          console.log('Unable to delete rows from sample sheet.')
+          console.log(error)
+        }
+      )
+    }
+
+    @Action(Samples.AddColumns)
+    AddColumns(ctx: StateContext<SamplesStateModel>, action: Samples.AddColumns) {
+      this.samplesService.addColumns(action.filename, action.body).subscribe(
+        (response) => {
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename));
+        },
+        (error) => {
+          console.log(`Unable to add new column to sample sheet ${error.toString()}`);
+        }
+      )
+    }
+
+    @Action(Samples.UpdateCells)
+    UpdateCells(ctx: StateContext<SamplesStateModel>, action: Samples.UpdateCells) {
+      this.samplesService.updateCells(action.filename, action.cellsToUpdate).subscribe(
+        (response) => {
+          // maybe do some processing and setting here akin to commitUpdatedTableCells
+          //or
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename));
+        },
+        (error) => {
+          console.log('Unable to edit cells in sample sheet.');
+          console.log(error)
+        }
+      )
+    }
+
     @Action(Organisms.Set)
     SetStudyOrganisms(ctx: StateContext<SamplesStateModel>, action: Organisms.Set) { 
         const state = ctx.getState();

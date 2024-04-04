@@ -40,8 +40,8 @@ export class FilesState {
                 ctx.dispatch(new FilesLists.SetStudyFiles(data))
                 // todo: LOAD STUDY SAMPLES
                 this.store.dispatch(new Samples.Get());
-                // todo: LOAD STUDY ASSAYS
-                this.store.dispatch(new AssayList.Get())
+                // todo: LOAD STUDY ASSAYS\
+                this.store.dispatch(new AssayList.Get(action.id))
             },
             (error) => {
                 ctx.dispatch(new Operations.GetFilesTree(null, null, null, null, null))

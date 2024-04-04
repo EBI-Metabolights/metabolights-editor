@@ -95,8 +95,21 @@ export class AssaysService extends BaseConfigDependentService {
     .pipe(catchError(this.handleError));
   }
 
-  addColumnToAssaySheet(filename: string, body: Record<string, any>, id): Observable<any> {
+  addColumnToAssaySheet(filename: string, body: Record<string, any>, id: string): Observable<any> {
     return this.tableService.addColumns(filename, body, id);
+  }
+
+  addRows(filename: string, body: Record<string, any>): Observable<any> {
+    return this.tableService.addRows(filename, body, this.id);
+  }
+
+  deleteRows(filename: string, rowIds: any): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, this.id);
+  }
+
+  updateCells(filename, body): Observable<any> {
+    return this.tableService.updateCells(filename, body, this.id);
+
   }
   
 }

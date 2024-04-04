@@ -27,11 +27,16 @@ import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { TableRowAction, TableType } from "./table-type.type";
+import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
+import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
+import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
+import { env } from "process";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -62,6 +67,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -69,6 +76,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       extensions: ["*"],
     },
   ];
+
+  private toastrSettings: Record<string, any> = null;
 
   rowsToAdd: any = 1;
   isReadOnly = true;
@@ -131,19 +140,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private store: Store
   ) {
     this.baseHref =this.editorService.configService.baseHref;
-    // const ontology3 = new Ontology();
-    // ontology3.name = "normal phase";
-
-    // this.ontologies.push(ontology3);
-    // const ontology = new Ontology();
-    // ontology.name = "reverse phase";
-    // this.ontologies.push(ontology);
-    // const ontology2 = new Ontology();
-    // ontology2.name = "HILIC";
-    // this.ontologies.push(ontology2);
   }
 
   ngOnInit() {
@@ -171,6 +171,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe(value => this.toastrSettings = value)
+
+
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
@@ -642,7 +645,23 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   addColumns(columns) {
     this.isFormBusy = true;
-    this.editorService
+    if (environment.useNewState) {
+      this.store.dispatch(new Samples.AddColumns(this.data.file, { data: columns}, null)).subscribe(
+        (completed) => {
+          this.isFormBusy = false;
+          toastr.success("Characteristic/Factor columns added successfully", "Success", this.toastrSettings);
+          this.isFormBusy = false;
+          return true;
+        },
+        (error) => {
+          console.log(error);
+          this.isFormBusy = false;
+          return false;
+        }
+      )
+
+    } else {
+      this.editorService
       .addColumns(this.data.file, { data: columns }, this.validationsId, null)
       .subscribe(
         (res) => {
@@ -662,6 +681,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           return false;
         }
       );
+    }
+
   }
 
   addNRows() {
@@ -690,7 +711,19 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   updateRows(rows) {
     this.isFormBusy = true;
-    this.editorService
+    if (environment.useNewState) {
+      let actionClass = this.getTableUpdateAction('update', this.getTableType(this.data.file));
+      this.store.dispatch(new actionClass(this.data.file, { data: rows }, null)).subscribe(
+        (completed) => {
+          toastr.success("Row updated successfully", "Success", this.toastrSettings);
+          this.isFormBusy = false;
+        },
+        (error) => {
+          this.isFormBusy = false;
+        }
+      )
+    } else {
+      this.editorService
       .updateRows(this.data.file, { data: rows }, this.validationsId, null)
       .subscribe(
         (res) => {
@@ -707,11 +740,28 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.isFormBusy = false;
         }
       );
+    }
+
   }
 
-  addRows(rows, index) {
+  // ADJUST POST STATE MIGRATION
+  addRows(rows, index, tableType?: TableType) {
     this.isFormBusy = true;
-    this.editorService
+    if (environment.useNewState) {
+      if (tableType === undefined) { tableType = this.getTableType(this.data.file)}
+      let actionClass = this.getTableUpdateAction('add', tableType)
+       this.store.dispatch(new actionClass(this.data.file, { data: { rows, index: index ? index : 0 } }, null)).subscribe(
+        (completed) => {
+          toastr.success(`Rows added successfully to the end of the ${tableType} sheet`, "Success", this.toastrSettings);
+          this.rowsUpdated.emit();
+          this.isFormBusy = false;
+        },
+        (error) => {
+          this.isFormBusy = false;
+        }
+      )
+    } else {
+      this.editorService
       .addRows(
         this.data.file,
         { data: { rows, index: index ? index : 0 } },
@@ -738,6 +788,35 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.isFormBusy = false;
         }
       );
+    }
+
+  }
+
+  getTableType(filename: string): TableType {
+    if (filename.startsWith('a_')) return 'assay'
+    if (filename.startsWith('m_')) return 'maf'
+    if (filename.startsWith('s_')) return 'samples'
+  }
+
+  getTableUpdateAction(action: TableRowAction, tableType: TableType): any {
+    switch(action) {
+      case 'add':
+        if (tableType === 'samples') return Samples.AddRows
+        if (tableType === 'assay') return Assay.AddRows
+        if (tableType === 'maf') return MAF.AddRows
+      case 'update': 
+        if (tableType === 'maf') return MAF.UpdateRows
+      case 'delete':
+        if (tableType === 'samples') return Samples.DeleteRows
+        if (tableType === 'assay') return Assay.DeleteRows
+        if (tableType === 'maf') return MAF.DeleteRows
+    }
+  }
+
+  getCellUpdateAction(tableType): any {
+    if (tableType === 'samples') return Samples.UpdateCells
+    if (tableType === 'assay') return Assay.UpdateCells
+    if (tableType === 'maf') return MAF.UpdateCells
   }
 
   getEmptyRow() {
@@ -766,7 +845,21 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   deleteSelectedRows() {
     this.isFormBusy = true;
-    this.editorService
+    if (environment.useNewState) {
+     let actionClass = this.getTableUpdateAction('delete', this.getTableType(this.data.file));
+     this.store.dispatch(new actionClass(this.data.file, this.getUnique(this.selectedRows).join(","))).subscribe(
+      (completed) => {
+        this.isDeleteModalOpen = false;
+        toastr.success("Rows delete successfully", "Success", this.toastrSettings);
+        this.rowsUpdated.emit();
+        this.isFormBusy = false;
+      },
+      (error) => {
+        this.isFormBusy = false;
+      }
+    )
+    } else {
+      this.editorService
       .deleteRows(
         this.data.file,
         this.getUnique(this.selectedRows).join(","),
@@ -790,6 +883,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.isFormBusy = false;
         }
       );
+    }
+    
   }
 
   closeDelete() {
@@ -1061,7 +1156,23 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       ];
     }
     this.isFormBusy = true;
-    this.editorService
+    if (environment.useNewState) {
+      let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
+      this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+        (completed) => {
+          toastr.success("Cells updated successfully", "Success", this.toastrSettings);
+          this.isEditModalOpen = false;
+          this.isFormBusy = false
+        },
+        (error) => {
+          console.error(error);
+          this.isFormBusy = false;
+        }
+      )
+
+
+    } else {
+      this.editorService
       .updateCells(
         this.data.file,
         { data: cellsToUpdate },
@@ -1085,6 +1196,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.isFormBusy = false;
         }
       );
+    }
+
   }
 
   saveColumnSelectedMissingRowsValues() {

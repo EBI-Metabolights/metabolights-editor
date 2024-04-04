@@ -9,6 +9,7 @@ import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { deepCopy } from "src/app/ngxs-store/utils";
 
 @Component({
   selector: "mtbls-maf",
@@ -273,12 +274,13 @@ export class MafComponent implements AfterContentInit {
    * one man */
   /* eslint-disable @typescript-eslint/dot-notation */
   saveCell() {
-    this.selectedRow["metabolite_identification"] = this.form.get("name").value;
-    this.selectedRow["inchi"] = this.form.get("inchi").value;
-    this.selectedRow["database_identifier"] = this.form.get("databaseId").value;
-    this.selectedRow["smiles"] = this.form.get("smiles").value;
-    this.selectedRow["chemical_formula"] = this.form.get("formula").value;
-    this.mafTable.updateRows([this.selectedRow]);
+    let copyRow = deepCopy(this.selectedRow);
+    copyRow["metabolite_identification"] = this.form.get("name").value;
+    copyRow["inchi"] = this.form.get("inchi").value;
+    copyRow["database_identifier"] = this.form.get("databaseId").value;
+    copyRow["smiles"] = this.form.get("smiles").value;
+    copyRow["chemical_formula"] = this.form.get("formula").value;
+    this.mafTable.updateRows([copyRow]);
   }
 
   closeRowEditModal() {
