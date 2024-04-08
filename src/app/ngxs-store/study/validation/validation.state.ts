@@ -4,6 +4,7 @@ import { EditorValidationRules, ValidationReport } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { interval } from "rxjs";
 
 export interface ValidationStateModel {
     rules: Record<string, any>;
@@ -56,7 +57,6 @@ export class ValidationState {
             (error) => {
                 console.error(`Could not get validation report: ${error}`)
                 this.store.dispatch(new Loading.Disable());
-
             }
         );
 
@@ -68,8 +68,47 @@ export class ValidationState {
         ctx.setState({
             ...state,
             report: action.report.validation
-        })
+        });
+    }
 
+    @Action(ValidationReport.Refresh)
+    RefreshValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Refresh) {
+        const state = ctx.getState();
+        this.validationService.refreshValidations().subscribe(
+            (response) => {
+                this.store.dispatch(new SetLoadingInfo("Loading study validations"));
+                ctx.dispatch(EditorValidationRules.Get);
+            },
+            (error) => {
+                console.log("Unable to start new validation run.")
+                console.log(error)
+            }
+        )
+    }
+
+    @Action(ValidationReport.ContinualRetry)
+    ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry){
+        let repeat = 0;
+        this.validationService.getValidationReport().subscribe(reportResponse => {
+          if (reportResponse.validation.status === "not ready"){
+            const validationReportPollInvertal = interval(action.interval);
+            const validationReportLoadSubscription = validationReportPollInvertal.subscribe(x => {
+              this.validationService.getValidationReport().subscribe(nextReportResponse => {
+                repeat = repeat + 1;
+              if (nextReportResponse.validation.status !== "not ready"){
+                validationReportLoadSubscription.unsubscribe();
+                ctx.dispatch(new ValidationReport.Set(nextReportResponse))
+              }
+              if (repeat > action.retries) {
+                validationReportLoadSubscription.unsubscribe();
+                ctx.dispatch(new ValidationReport.Set(nextReportResponse))
+              }
+              });
+            });
+          } else {
+                ctx.dispatch(new ValidationReport.Set(reportResponse))
+          }
+        });
     }
 
     @Selector()

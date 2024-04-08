@@ -17,7 +17,7 @@ import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interfa
 import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
@@ -50,7 +50,9 @@ export class ProtocolComponent implements OnInit {
 
 
   private studyId: string =  null;
-  private toastrSettings: Record<string, any> = {}
+  private toastrSettings: Record<string, any> = {};
+
+  private protocolSubscription: Subscription;
 
   isStudyReadOnly = false;
   isModalOpen = false;
@@ -289,6 +291,7 @@ export class ProtocolComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    this.protocolSubscription.unsubscribe();
     this.form.removeControl("description");
   }
 
@@ -533,11 +536,11 @@ export class ProtocolComponent implements OnInit {
            * we can't change the components current protocol via the state without destroying
            * the component that has the modal rendered. 
            */
-          let observ = this.store.select(ProtocolsState.specificProtocol(name))
-          observ
+          this.protocolSubscription = this.store.select(ProtocolsState.specificProtocol(name))
           .subscribe(
             (protocol) => {
               this.protocol = protocol;
+              console.log(`Opening modal with ${protocol.name}`)
               this.openModal(this.protocol);
             }
           )

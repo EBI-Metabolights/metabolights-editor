@@ -33,6 +33,7 @@ import {  BannerMessage, DefaultControlLists, GuidesMappings, MaintenanceMode, S
 import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
 import { SampleState } from "../ngxs-store/study/samples/samples.state";
 import { MAFState } from "../ngxs-store/study/maf/maf.state";
+import { EditorValidationRules } from "../ngxs-store/study/validation/validation.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -531,12 +532,16 @@ export class EditorService {
         if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading study validations"))
         else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: { info: "Loading study validations",},});
         
-        this.ngRedux.dispatch({
-          type: "LOAD_VALIDATION_RULES",
-          body: {
-            validations,
-          },
-        });
+        if (environment.useNewState) this.store.dispatch(new EditorValidationRules.Set(validations))
+        else {           
+          this.ngRedux.dispatch({
+            type: "LOAD_VALIDATION_RULES",
+            body: {
+              validations,
+            },
+          }); 
+        }
+
       },
       (err) => {
         console.log(err);
@@ -544,10 +549,12 @@ export class EditorService {
     );
   }
 
+  //REMOVE POST STATE MIGRATIOn
   refreshValidations() {
     return this.dataService.refreshValidations();
   }
 
+  // REMOVE POST STATE MIGRATION
   overrideValidations(data) {
     return this.dataService.overrideValidations(data);
   }
