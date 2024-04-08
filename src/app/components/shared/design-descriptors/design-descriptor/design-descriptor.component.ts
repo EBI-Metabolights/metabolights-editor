@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
-import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
+import { Ontology, areOntologyListsDifferent, elucidateListComparisonResult } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { NgRedux, select } from "@angular-redux/store";
 import { IAppState } from "../../../../store";
 import * as toastr from "toastr";
@@ -19,13 +19,14 @@ import { EuropePMCService } from "../../../../services/publications/europePMC.se
 import { FormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { environment } from "src/environments/environment";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
+import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 @Component({
   selector: "mtbls-design-descriptor",
   templateUrl: "./design-descriptor.component.html",
@@ -39,7 +40,11 @@ export class DesignDescriptorComponent implements OnInit {
   @select((state) => state.study.studyDesignDescriptors) studyDescriptors;
 
   @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+
   @Select(GeneralMetadataState.publications) studyPublications$: Observable<IPublication[]>;
+  @Select(GeneralMetadataState.id) identifier$: Observable<string>;
+
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(DescriptorsState.studyDesignDescriptors) descriptors$: Observable<Ontology[]>;
 
@@ -47,6 +52,9 @@ export class DesignDescriptorComponent implements OnInit {
   @Input("readOnly") readOnly: boolean;
 
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
+
+  private studyId: string = ""
+  private toastrSettings: Record<string, any> = {};
 
   isStudyReadOnly = false;
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
@@ -75,6 +83,7 @@ export class DesignDescriptorComponent implements OnInit {
     private fb: FormBuilder,
     private editorService: EditorService,
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private doiService: DOIService,
     private europePMCService: EuropePMCService
   ) {
@@ -103,14 +112,53 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
+    this.identifier$.subscribe((id) => {
+      if(id !== null) this.studyId = id
+    });
+    this.toastrSettings$.subscribe((settings) => {
+      this.toastrSettings = settings
+    })
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
     });
-    this.descriptors$.subscribe((value) => {
-      this.descriptors = value;
+    this.descriptors$.subscribe((stateDescriptors) => {
+      // As a new 'pattern' this is complicated
+      if (stateDescriptors !== null) {
+        if (this.descriptors === null) this.descriptors = stateDescriptors
+        else { 
+          const descriptorComparisonResult = elucidateListComparisonResult(areOntologyListsDifferent(this.descriptors, stateDescriptors));
+          switch(descriptorComparisonResult) {
+            case 'Positive':
+              this.descriptors = stateDescriptors
+              // pull out to method
+              this.refreshDesignDescriptors("Design descriptor deleted.");
+              this.isDeleteModalOpen = false;
+              this.isModalOpen = false;
+              this.isFormBusy = false;
+            case 'Negative':
+              this.descriptors = stateDescriptors
+              // pull out to method
+              this.refreshDesignDescriptors("Design descriptor saved.");
+              this.descriptorComponent.values = [];
+              this.isModalOpen = false;
+              this.loading = false;
+              this.isFormBusy = false;
+            case 'Null':
+              this.descriptors = stateDescriptors
+              console.log('No change');
+            case 'Zero':
+              this.descriptors = stateDescriptors
+              // pull out to method
+              this.refreshDesignDescriptors("Design descriptor updated.");
+              this.isFormBusy = false;
+              this.closeImportModal();
+          }
+        }
+      }
+      
     });
     this.studyReadonly$.subscribe((value) => {
       if (value != null) {
@@ -144,26 +192,35 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
 
-  //NEEDS STATE REFACTOR
+  // REMOVE POST STATE MIGRATION
   updateAndClose() {
-    this.isFormBusy = true;
-    this.editorService.getDesignDescriptors().subscribe((res) => {
-      this.ngRedux.dispatch({
-        type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
-        body: {
-          studyDesignDescriptors: res.studyDesignDescriptors,
-        },
-      });
-      this.isFormBusy = false;
-    },
-    (err) => {
-      this.isFormBusy = false;
+    if (environment.useNewState) this.updateAndCloseNgxs();
+    else {
+      this.isFormBusy = true;
+      this.editorService.getDesignDescriptors().subscribe((res) => {
+        this.ngRedux.dispatch({
+          type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
+          body: {
+            studyDesignDescriptors: res.studyDesignDescriptors,
+          },
+        });
+        this.isFormBusy = false;
+      },
+      (err) => {
+        this.isFormBusy = false;
+      }
+      );
+      this.closeImportModal();
     }
-    );
-    this.closeImportModal();
+
   }
 
-  toogleSelection(keyword) {
+  updateAndCloseNgxs() {
+    //DELETE POST STATE MIGRATION + TEMPLATE REFERENCE
+
+  }
+
+  toggleSelection(keyword) {
     const index = this.selectedkeywords.indexOf(keyword);
     if (index > -1) {
       this.selectedkeywords.splice(index, 1);
@@ -186,19 +243,24 @@ export class DesignDescriptorComponent implements OnInit {
             this.status = "Adding keyword to the study design descriptors list";
             this.isFormBusy = true;
             this.loading = true;
-            this.editorService.saveDesignDescriptor(descriptor).subscribe(
-              (res) => {
-                this.status = "";
-                this.selectedkeywords.push(keyword);
-                this.loading = false;
-                this.isFormBusy = false;
-              },
-              (err) => {
-                this.loading = false;
-                this.status = "";
-                this.isFormBusy = false;
-              }
-            );
+            // needs changing to dispatch
+            if (environment.useNewState) this.store.dispatch(new Descriptors.New(descriptor, this.studyId));
+            else { // REMOVE POST STATE MIGRATION
+              this.editorService.saveDesignDescriptor(descriptor).subscribe(
+                (res) => {
+                  this.status = "";
+                  this.selectedkeywords.push(keyword);
+                  this.loading = false;
+                  this.isFormBusy = false;
+                },
+                (err) => {
+                  this.loading = false;
+                  this.status = "";
+                  this.isFormBusy = false;
+                }
+              );
+            }
+
           } else {
             this.status =
               "Exact ontology match not found. Create new MetaboLights Onotology term";
@@ -221,19 +283,25 @@ export class DesignDescriptorComponent implements OnInit {
             this.status = "Adding keyword to the study design descriptors list";
             this.loading = true;
             this.isFormBusy = true;
-            this.editorService.saveDesignDescriptor(descriptor).subscribe(
-              (res) => {
-                this.selectedkeywords.push(keyword);
-                this.loading = false;
-                this.status = "";
-                this.isFormBusy = false;
-              },
-              (err) => {
-                this.loading = false;
-                this.isFormBusy = false;
-                this.status = "";
-              }
-            );
+
+            // needs changing to dispatch
+            if (environment.useNewState) this.store.dispatch(new Descriptors.New(descriptor, this.studyId));
+            else { // REMOVE POST STATE MIGRATION
+              this.editorService.saveDesignDescriptor(descriptor).subscribe(
+                (res) => {
+                  this.selectedkeywords.push(keyword);
+                  this.loading = false;
+                  this.status = "";
+                  this.isFormBusy = false;
+                },
+                (err) => {
+                  this.loading = false;
+                  this.isFormBusy = false;
+                  this.status = "";
+                }
+              );
+            }
+
           }
         });
     }
@@ -339,35 +407,77 @@ export class DesignDescriptorComponent implements OnInit {
     }
   }
 
-  updateDesignDescriptors(data, message) {
-    this.isFormBusy = true;
-    this.editorService.getDesignDescriptors().subscribe((res) => {
-      this.ngRedux.dispatch({
-        type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
-        body: {
-          studyDesignDescriptors: res.studyDesignDescriptors,
-        },
-      });
-      this.isFormBusy = false;
-    },
-    (err) => {
-      this.isFormBusy = false;
-    }
-    );
+  saveNgxs() {
+    if (!this.isStudyReadOnly && this.descriptorComponent.values[0]) {
+      this.isFormBusy = true;
+      if (!this.addNewDescriptor){ // If we are updating an exisiting descriptor
+        this.store.dispatch(
+          new Descriptors.Update(
+            this.descriptor.annotationValue, this.compileBody(), this.studyId)
+            )
+          // After this point, the change will be fed through to the selector - we must do any callback stuff in there
+      } else { // If we are saving a  new descriptor
+        this.loading = true;
+        this.isFormBusy = true;
+        this.store.dispatch(
+          new Descriptors.New(
+            this.compileBody(), this.studyId
+          )
+        )
+        // After this point, the change will be fed through to the selector - we must do any callback stuff in there
 
+      }
+    }
+  }
+
+  updateDesignDescriptors(data, message) {
+    if (environment.useNewState) this.refreshDesignDescriptors(message)
+    else {
+      this.isFormBusy = true;
+      this.editorService.getDesignDescriptors().subscribe((res) => {
+        this.ngRedux.dispatch({
+          type: "UPDATE_STUDY_DESIGN_DESCRIPTORS",
+          body: {
+            studyDesignDescriptors: res.studyDesignDescriptors,
+          },
+        });
+        this.isFormBusy = false;
+      },
+      (err) => {
+        this.isFormBusy = false;
+      }
+      );
+  
+      this.form.markAsPristine();
+      this.initialiseForm();
+      this.isModalOpen = true;
+  
+      this.descriptorComponent.reset();
+  
+      toastr.success(message, "Success", {
+        timeOut: "2500",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+      });
+    }
+    
+  }
+
+  // changed the name from the above method as the wording is confusing, we arent updating anything
+  refreshDesignDescriptors(message) {
+    this.isFormBusy = true;
+
+    // MAY NEED REVISITING
+    this.isFormBusy = false;
     this.form.markAsPristine();
     this.initialiseForm();
     this.isModalOpen = true;
 
     this.descriptorComponent.reset();
+    toastr.success(message, "Success", this.toastrSettings);
 
-    toastr.success(message, "Success", {
-      timeOut: "2500",
-      positionClass: "toast-top-center",
-      preventDuplicates: true,
-      extendedTimeOut: 0,
-      tapToDismiss: false,
-    });
   }
 
   delete(value) {
@@ -387,6 +497,16 @@ export class DesignDescriptorComponent implements OnInit {
           this.isFormBusy = false;
         }
       );
+    }
+  }
+
+  deleteNgxs(value) {
+    if (!this.isStudyReadOnly) {
+      if (!value) {
+        value = this.descriptor.annotationValue;
+      }
+      this.isFormBusy = true;
+      this.store.dispatch(new Descriptors.Delete(value, this.studyId));
     }
   }
 

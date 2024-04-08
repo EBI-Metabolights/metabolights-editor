@@ -18,10 +18,13 @@ import { NgRedux, select } from "@angular-redux/store";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { env } from "process";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
+import { Operations } from "src/app/ngxs-store/study/files/files.actions";
+import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 
 @Component({
   selector: "add-assay",
@@ -52,7 +55,8 @@ export class AddAssayComponent implements OnInit {
     private fb: FormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store
   ) {
     if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
@@ -174,20 +178,36 @@ export class AddAssayComponent implements OnInit {
     }
     body.assay.columns = tempColumns;
 
-    this.editorService.addAssay(body).subscribe((res) => {
-      this.selectedAssayTypeOption = null;
-      this.selectedAssayVariantOption = null;
-      this.selectedAssayVariantColumnOption = [];
-      this.isAddAssayModalOpen = false;
-      this.editorService.loadStudyFiles(true);
-      this.editorService.loadStudyProtocols();
-      window.location.reload();
-
-      Swal.fire({
-        title: "Assay added!",
-        text: "",
-        type: "success",
+    if (environment.useNewState) {
+      this.store.dispatch(new Assay.Add(body, this.requestedStudy)).subscribe(
+        (completed) => {
+          this.selectedAssayTypeOption = null;
+          this.selectedAssayVariantOption = null;
+          this.selectedAssayVariantColumnOption = [];
+          this.isAddAssayModalOpen = false;
+          
+          //this.store.dispatch(new AssayList.Get(this.requestedStudy));
+          //this.store.dispatch(new Protocols.Get());
+        }
+      )
+    }
+    else {
+      this.editorService.addAssay(body).subscribe((res) => {
+        this.selectedAssayTypeOption = null;
+        this.selectedAssayVariantOption = null;
+        this.selectedAssayVariantColumnOption = [];
+        this.isAddAssayModalOpen = false;
+        this.editorService.loadStudyFiles(true);
+        this.editorService.loadStudyProtocols();
+        window.location.reload();
+  
+        Swal.fire({
+          title: "Assay added!",
+          text: "",
+          type: "success",
+        });
       });
-    });
+    }
+
   }
 }

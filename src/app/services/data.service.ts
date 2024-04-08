@@ -36,4 +36,17 @@ export class DataService {
 
     return throwError(new AppError(error));
   }
+
+  public convertSnakeCaseToCamelCase(data: any): any {
+    if (Array.isArray(data)) {
+      return data.map(item => this.convertSnakeCaseToCamelCase(item));
+    } else if (data !== null && data.constructor === Object) {
+      return Object.keys(data).reduce((accumulator, currentKey) => {
+        const camelCaseKey = currentKey.replace(/_([a-z])/g, (match, group1) => group1.toUpperCase());
+        accumulator[camelCaseKey] = this.convertSnakeCaseToCamelCase(data[currentKey]);
+        return accumulator;
+      }, {});
+    }
+    return data;
+  }
 }

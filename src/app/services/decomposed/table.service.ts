@@ -25,4 +25,61 @@ export class TableService extends BaseConfigDependentService{
       .pipe(catchError(this.handleError));
   }
 
+  addColumns(filename, body, id): Observable<any> {
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + id + "/columns/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  addRows(filename, body, id): Observable<any> {
+    return this.http
+      .post(
+        this.url.baseURL + "/studies" + "/" + id + "/rows/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  updateRows(filename, body, id) {
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + id + "/rows/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  deleteRows(filename, rowIds, id) {
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/rows/" +
+          filename +
+          "?row_num=" +
+          rowIds,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  updateCells(filename, body, id) {
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + id + "/cells/" + filename,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+
 }

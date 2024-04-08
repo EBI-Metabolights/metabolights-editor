@@ -43,7 +43,8 @@ export class AssaysComponent {
       if (this.studyAssayFiles) {
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.studyAssayFiles.length; i++) {
-          this.assays.push({});
+          if (this.studyAssayFiles.length !== this.assays.length) this.assays.push({});
+          else break
         }
       }
     });
@@ -58,6 +59,7 @@ export class AssaysComponent {
           if (this.assaysNames.indexOf(assayName) === -1 && value[assayName]) {
             this.assays[i] = value[assayName];
             this.assaysNames.push(assayName);
+
           }
           i++;
         });
@@ -74,11 +76,13 @@ export class AssaysComponent {
 
   setUpSubscriptionsNgxs() {
     this.assayFiles$.subscribe((assayfiles) => {
+      //console.log(`number of assay files returned from state select: ${assayfiles.length}`)
       this.studyAssayFiles = assayfiles;
       if (this.studyAssayFiles) {
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.studyAssayFiles.length; i++) {
-          this.assays.push({});
+          if (this.studyAssayFiles.length !== this.assays.length) this.assays.push({});
+          else break
         }
       }
     });
@@ -87,15 +91,21 @@ export class AssaysComponent {
     this.studyAssays$.subscribe((value) => {
       if (this.studyAssayFiles) {
         // @ts-ignore
+        console.log(`Number of sheets returned by state select: ${value.length}`)
         let i = 0;
         this.studyAssayFiles.forEach((assayFileName) => {
           const assayName = assayFileName.filename.trim();
           if (this.assaysNames.indexOf(assayName) === -1 && value[assayName]) {
+
+            this.assays = [...this.assays];
             this.assays[i] = value[assayName];
-            this.assaysNames.push(assayName);
+            this.assaysNames = [...this.assaysNames, assayName];
           }
           i++;
         });
+        console.log(`Total number of assay sheets in component: ${this.assays.length}`);
+        this.assays = this.assays.filter(obj => Object.keys(obj).length > 0);
+
       }
       // eslint-disable-next-line @typescript-eslint/indent
     });

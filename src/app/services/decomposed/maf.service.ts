@@ -31,4 +31,21 @@ export class MafService extends BaseConfigDependentService {
   getMAFSheet(filename): Observable<ITableWrapper> {
     return this.tableService.getTable(filename, this.id);
   }
-}
+
+  addRows(filename, body): Observable<any> {
+    return this.tableService.addRows(filename, body, this.id)
+  }
+
+  updateRow(filename, body): Observable<any> {
+    return this.tableService.updateRows(filename, body, this.id)
+  }
+
+  deleteRows(filename: string, rowIds: any): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, this.id);
+  }
+
+
+  updateCells(filename, body): Observable<any> {
+    return this.tableService.updateCells(filename, body, this.id);
+
+  }}

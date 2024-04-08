@@ -8,6 +8,7 @@ import { catchError } from 'rxjs/operators';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { Observable } from 'rxjs';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
+import { TableService } from './table.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,20 +32,37 @@ export class SamplesService extends BaseConfigDependentService {
   
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private store: Store) {  
+    http: HttpClient, configService: ConfigurationService, private tableService: TableService, private store: Store) {  
       super(http, configService);
       this.studyIdentifier$.subscribe((id) => {
         if (id !== null) this.id = id
       });
   }
 
-  getTable(fileName): Observable<ITableWrapper> {
+  getTable(filename): Observable<ITableWrapper> {
     return this.http
       .get<ITableWrapper>(
-        this.url.baseURL + "/studies" + "/" + this.id + "/" + fileName,
+        this.url.baseURL + "/studies" + "/" + this.id + "/" + filename,
         httpOptions
       )
       .pipe(catchError(this.handleError));
+  }
+
+  addRows(filename, body): Observable<any> {
+    return this.tableService.addRows(filename, body, this.id);
+  }
+
+  deleteRows(filename: string, rowIds: any): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, this.id);
+  }
+
+  addColumns(filename, body): Observable<any> {
+    return this.tableService.addColumns(filename, body, this.id);
+  }
+
+  updateCells(filename, body): Observable<any> {
+    return this.tableService.updateCells(filename, body, this.id);
+
   }
 
 

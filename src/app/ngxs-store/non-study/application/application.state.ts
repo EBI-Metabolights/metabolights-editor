@@ -35,7 +35,8 @@ export interface ApplicationStateModel {
     controlLists: Record<string, any[]>,
     investigationFailed: boolean,
     readonly: boolean
-    isProtocolsExpanded: boolean
+    isProtocolsExpanded: boolean,
+    toastrSettings: Record<string, any>
 
 }
 @Injectable()
@@ -66,7 +67,14 @@ export interface ApplicationStateModel {
         controlLists: null, 
         investigationFailed: null,
         readonly: null,
-        isProtocolsExpanded: false
+        isProtocolsExpanded: false,
+        toastrSettings: {
+            timeOut: "2500",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          }
     }
 })
 export class ApplicationState {
@@ -355,6 +363,11 @@ export class ApplicationState {
     @Selector()
     static isProtocolsExpanded(state: ApplicationStateModel) {
         return state.isProtocolsExpanded
+    }
+
+    @Selector()
+    static toastrSettings(state: ApplicationStateModel) {
+        return state.toastrSettings
     }
 
 

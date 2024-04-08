@@ -3,6 +3,9 @@ import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.i
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person"
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication"
 
+export interface Title {
+    title: string
+}
 
 export class GetGeneralMetadata {
     static readonly type ='[general] Get All General Metadata'
@@ -20,23 +23,43 @@ export namespace Title {
         static readonly type = '[general] Set Study Title'
         constructor(public title: string) {}
     }
+    export class Update {
+        static readonly type = '[general] Update Study Title'
+        constructor(public title: Title) {}
+    }
 }
 
 
+export namespace StudyAbstract {
+    export class Update {
+        static readonly type = '[application] Update Study Abstract'
+        constructor(public description: string) {}
+    }
 
-export class SetStudyAbstract {
-    static readonly type = '[general] Set Study Abstract'
-    constructor(public abstract: string) {}
+    export class Set {
+        static readonly type = '[general] Set Study Abstract'
+        constructor(public abstract: string) {}
+    }
 }
+
+
 
 export class SetStudySubmissionDate {
     static readonly type = '[general] Set Study Submission Date'
     constructor(public date: Date) {}
 }
 
-export class SetStudyReleaseDate {
-    static readonly type = '[general] Set Study Release Date'
-    constructor(public date: Date) {}
+export namespace StudyReleaseDate {
+    export class Set {
+        static readonly type = '[general] Set Study Release Date'
+        constructor(public date: Date) {}
+    }
+
+    export class Update {
+        static readonly type = '[general] Update Study Release Date'
+        constructor(public date: string) {}
+    }
+    
 }
 
 export class SetStudyStatus {

@@ -50,6 +50,6 @@ export namespace Operations {
 
     export class GetFreshFilesList {
         static readonly type = '[files] Get Fresh Files List'
-        constructor(public force: boolean, public readonly: boolean = false) {}
+        constructor(public force: boolean, public readonly: boolean = false, public id: string = null) {}
     }
 }

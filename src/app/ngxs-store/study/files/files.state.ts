@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { FilesLists, ObfuscationCode, Operations, UploadLocation } from "./files.actions";
 import { FilesService } from "src/app/services/decomposed/files.service";
@@ -26,7 +26,7 @@ export interface FilesStateModel {
 @Injectable()
 export class FilesState {
 
-    constructor(private filesService: FilesService) {
+    constructor(private filesService: FilesService, private store: Store) {
     }
 
     @Action(Operations.GetFreshFilesList)
@@ -39,9 +39,9 @@ export class FilesState {
                 data = this.filesService.deleteProperties(data);
                 ctx.dispatch(new FilesLists.SetStudyFiles(data))
                 // todo: LOAD STUDY SAMPLES
-                ctx.dispatch(new Samples.Get());
-                // todo: LOAD STUDY ASSAYS
-                ctx.dispatch(new AssayList.Get())
+                this.store.dispatch(new Samples.Get());
+                // todo: LOAD STUDY ASSAYS\
+                this.store.dispatch(new AssayList.Get(action.id))
             },
             (error) => {
                 ctx.dispatch(new Operations.GetFilesTree(null, null, null, null, null))

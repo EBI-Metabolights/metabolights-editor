@@ -33,6 +33,7 @@ import {  BannerMessage, DefaultControlLists, GuidesMappings, MaintenanceMode, S
 import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
 import { SampleState } from "../ngxs-store/study/samples/samples.state";
 import { MAFState } from "../ngxs-store/study/maf/maf.state";
+import { EditorValidationRules } from "../ngxs-store/study/validation/validation.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -531,12 +532,16 @@ export class EditorService {
         if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading study validations"))
         else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: { info: "Loading study validations",},});
         
-        this.ngRedux.dispatch({
-          type: "LOAD_VALIDATION_RULES",
-          body: {
-            validations,
-          },
-        });
+        if (environment.useNewState) this.store.dispatch(new EditorValidationRules.Set(validations))
+        else {           
+          this.ngRedux.dispatch({
+            type: "LOAD_VALIDATION_RULES",
+            body: {
+              validations,
+            },
+          }); 
+        }
+
       },
       (err) => {
         console.log(err);
@@ -544,10 +549,12 @@ export class EditorService {
     );
   }
 
+  //REMOVE POST STATE MIGRATIOn
   refreshValidations() {
     return this.dataService.refreshValidations();
   }
 
+  // REMOVE POST STATE MIGRATION
   overrideValidations(data) {
     return this.dataService.overrideValidations(data);
   }
@@ -979,6 +986,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   loadStudyProtocols() {
     this.dataService.getProtocols(null).subscribe((data) => {
       this.ngRedux.dispatch({
@@ -1062,6 +1070,7 @@ export class EditorService {
     };
   }
 
+
   loadStudySamples() {
     if (this.files === null) {
       this.loadStudyFiles(false);
@@ -1087,6 +1096,7 @@ export class EditorService {
     }
   }
 
+  // DELETE POST STATE MIGRATION
   loadStudyAssays(files) {
 
     if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading assays information"))
@@ -1107,6 +1117,8 @@ export class EditorService {
       this.updateMAF(filename);
     }
   }
+
+  // REMOVE POST STATE MIGRATION
   updateAssay(file) {
     this.dataService.getTable(file).subscribe((data) => {
       const assay = {};
@@ -1163,6 +1175,7 @@ export class EditorService {
     });
   }
 
+  // REMOVE POST STATE MIGRATION
   updateMAF(f) {
     this.dataService.getTable(f).subscribe((mdata) => {
       const mcolumns = [];
@@ -1339,7 +1352,7 @@ export class EditorService {
     return data;
   }
 
-  // Meta data
+  // REMOVE POST STATE MIGRATION
   saveTitle(body) {
     return this.dataService.saveTitle(body).pipe(
       map((data) => {
@@ -1349,6 +1362,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   saveAbstract(body) {
     return this.dataService.saveAbstract(body).pipe(
       map((data) => {
@@ -1520,10 +1534,12 @@ export class EditorService {
   }
 
   // Assays
+  // REMOVE POST STATE MIGRATION
   addAssay(body) {
     return this.dataService.addAssay(body).pipe(map((data) => data));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteAssay(name) {
     return this.dataService.deleteAssay(name).pipe(
       map((data) => {
@@ -1578,16 +1594,19 @@ export class EditorService {
   saveFactor(body) {
     return this.dataService.saveFactor(body);
   }
-
+  
+  // REMOVE POST STATE MIGRATION
   updateFactor(factorName, body) {
     return this.dataService.updateFactor(factorName, body);
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteFactor(factorName) {
     return this.dataService.deleteFactor(factorName);
   }
 
   // table
+  // REMOVE POST STATE MIGRATION
   addColumns(filename, body, tableType, metaInfo) {
     return this.dataService.addColumns(filename, body).pipe(
       map((data) => {
@@ -1597,6 +1616,7 @@ export class EditorService {
     );
   }
 
+  // DELETE POST STATE MIGRATION
   addRows(filename, body, tableType, metaInfo) {
     return this.dataService.addRows(filename, body).pipe(
       map((data) => {
@@ -1606,6 +1626,7 @@ export class EditorService {
     );
   }
 
+  // DELETE POST STATE MIGRATION
   updateRows(filename, body, tableType, metaInfo) {
     return this.dataService.updateRows(filename, body).pipe(
       map((data) => {
@@ -1655,6 +1676,8 @@ export class EditorService {
     if ( result.success && result.updates && result.updates.length > 0) {
       // console.log("committed values" + result.message);
       const table = sourceFile.data;
+      const deepCopiedData = JSON.parse(JSON.stringify(table));
+
       const headerIndices: Map<number, string> = new Map<number, string>();
       table.columns.forEach((val, idx)=> {
         headerIndices.set(val.header, idx);
@@ -1754,6 +1777,7 @@ export class EditorService {
   }
 
   // Release date change
+  // REMOVE POST STATE MIGRATION
   changeReleasedate(releaseDate) {
     return this.dataService.changeReleasedate(releaseDate);
   }

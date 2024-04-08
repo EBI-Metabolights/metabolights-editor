@@ -448,6 +448,7 @@ export class MetabolightsService extends DataService {
    * @param body The new study title
    * @returns An object containing the new study title as confirmation, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   saveTitle(body): Observable<{ title: string }> {
     return this.http
       .put<{ title: string }>(
@@ -464,6 +465,7 @@ export class MetabolightsService extends DataService {
    * @param body The new abstract for the study.
    * @returns An object containing the new description as confirmation, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   saveAbstract(body): Observable<{ description: string }> {
     return this.http
       .put<{ description: string }>(
@@ -722,6 +724,7 @@ export class MetabolightsService extends DataService {
    * @param id ID of the study we want to fetch protocols for IE MTBLS9999
    * @returns an observable of a list of protocol objects.
    */
+  // REMOVE POST STATE MIGRATION
   getProtocols(id): Observable<IProtocolWrapper> {
     const studyId = id ? id : this.id;
     return this.http
@@ -732,6 +735,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  //REMOVE POST STATE MIGRATION
   saveProtocol(body) {
     return this.http
       .post(
@@ -742,6 +746,8 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+
+  // REMOVE POST STATE MIGRATION
   updateProtocol(title, body) {
     return this.http
       .put(
@@ -757,6 +763,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteProtocol(title) {
     return this.http
       .delete(
@@ -777,6 +784,7 @@ export class MetabolightsService extends DataService {
    *
    * @returns An object or list of objects representing study design descriptors, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   getDesignDescriptors(): Observable<IStudyDesignDescriptorWrapper> {
     return this.http
       .get<IStudyDesignDescriptorWrapper>(
@@ -792,6 +800,7 @@ export class MetabolightsService extends DataService {
    * @param body The new design descriptor.
    * @returns An object representing a study design descriptor, via the Observable.
    */
+  // REMOVE POST STATE MIGRATION
   saveDesignDescriptor(body): Observable<IStudyDesignDescriptorWrapper> {
     return this.http
       .post<IStudyDesignDescriptorWrapper>(
@@ -854,6 +863,7 @@ export class MetabolightsService extends DataService {
    *
    * @returns Either a single factor object, or a list of them.
    */
+  // REMOVE POST STATE MIGRATION
   getFactors(): Observable<IFactorsWrapper> {
     return this.http
       .get<IFactorsWrapper>(
@@ -863,6 +873,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   saveFactor(body) {
     return this.http
       .post(
@@ -873,6 +884,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   updateFactor(factorName, body) {
     return this.http
       .put(
@@ -888,6 +900,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteFactor(factorName) {
     return this.http
       .delete(
@@ -981,6 +994,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   addAssay(body) {
     return this.http
       .post(
@@ -991,6 +1005,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteAssay(name) {
     return this.http
       .delete(
@@ -1174,6 +1189,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // REMOVE POST STATE MIGRATION
   addColumns(filename, body) {
     return this.http
       .post(
@@ -1184,6 +1200,8 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+
+  // DELETE POST STATE MIGRATION
   addRows(filename, body) {
     return this.http
       .post(
@@ -1194,6 +1212,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // DELETE POST STATE MIGRATION
   updateRows(filename, body) {
     return this.http
       .put(
@@ -1204,6 +1223,8 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+
+  //DELETE POST STATE MIGRATION
   deleteRows(filename, rowIds) {
     return this.http
       .delete(
@@ -1220,6 +1241,7 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  // DELETE POST STATE MIGRATION
   updateCells(filename, body) {
     return this.http
       .put(
@@ -1287,6 +1309,7 @@ export class MetabolightsService extends DataService {
   }
 
   // Release date
+  // REMOVE POST STATE MIGRATION
   changeReleasedate(releaseDate) {
     return this.http
       .put(

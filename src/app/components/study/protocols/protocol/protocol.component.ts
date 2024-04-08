@@ -15,9 +15,14 @@ import * as toastr from "toastr";
 import { JsonConvert } from "json2typescript";
 import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
 import { environment } from "src/environments/environment";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { Observable } from "rxjs";
+import { Observable, Subscription } from "rxjs";
+import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
+import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
+import { take } from "rxjs/operators";
 
 @Component({
   selector: "mtbls-protocol",
@@ -37,6 +42,17 @@ export class ProtocolComponent implements OnInit {
 
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  @Select(GeneralMetadataState.id) studyId$: Observable<string>;
+
+  //@Select(ProtocolsState.specificProtocol()) updatedProtocol$: Observable<MTBLSProtocol>;
+
+
+
+  private studyId: string =  null;
+  private toastrSettings: Record<string, any> = {};
+
+  private protocolSubscription: Subscription;
 
   isStudyReadOnly = false;
   isModalOpen = false;
@@ -62,7 +78,8 @@ export class ProtocolComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) {
     if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
@@ -72,7 +89,7 @@ export class ProtocolComponent implements OnInit {
 
   setUpSubscriptions() {
     this.isProtocolsExpanded.subscribe((value) => {
-      this.expand = !value;
+      this.expand = value;
     });
 
     this.studyReadonly.subscribe((value) => {
@@ -83,6 +100,9 @@ export class ProtocolComponent implements OnInit {
   }
 
   setUpSubscriptionsNgxs() {
+    this.studyId$.subscribe((id) => {
+      this.studyId = id;
+    })
     this.isProtocolsExpanded$.subscribe((value) => {
       this.expand = !value;
     });
@@ -92,6 +112,9 @@ export class ProtocolComponent implements OnInit {
         this.isStudyReadOnly = value;
       }
     });
+    this.toastrSettings$.subscribe((settings) => {
+      this.toastrSettings = settings;
+    })
   }
 
   toggleExpand() {
@@ -128,7 +151,18 @@ export class ProtocolComponent implements OnInit {
       column.name = col.name;
       columns.push(column);
     }
-    this.editorService
+    if (environment.useNewState) {
+       this.store.dispatch(new Assay.AddColumn(assay, { data: column }, "assay", this.studyId)).subscribe(
+        (completed) => {
+          toastr.success("Assay specifications updated", "success", this.toastrSettings);
+        },
+        (error) => {
+          console.log(error)
+        }
+      )
+    }
+    else {
+      this.editorService
       .addColumns(assay, { data: columns }, "assays", null)
       .subscribe(
         (res) => {
@@ -144,6 +178,8 @@ export class ProtocolComponent implements OnInit {
           console.log(err);
         }
       );
+    }
+
   }
 
   formatTitle(term) {
@@ -255,6 +291,7 @@ export class ProtocolComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    this.protocolSubscription.unsubscribe();
     this.form.removeControl("description");
   }
 
@@ -307,6 +344,7 @@ export class ProtocolComponent implements OnInit {
     this.form.markAsDirty();
   }
 
+  // ADJUST POST STATE MIGRATION
   save() {
     if (!this.isStudyReadOnly) {
       if (this.getFieldValue("description")) {
@@ -342,6 +380,39 @@ export class ProtocolComponent implements OnInit {
     }
   }
 
+  saveNgxs() {
+    if (!this.isStudyReadOnly) {
+      if (this.getFieldValue("description")) {
+        this.isFormBusy = true;
+        if (!this.addNewProtocol) { // If we are updating an exisiting protocol
+          this.store.dispatch(new Protocols.Update(this.protocol.name, this.compileBody())).subscribe(
+            (completed) => {
+              this.refreshProtocols("Protocol updated.", this.protocol.name);
+              this.form.removeControl("description");
+            },
+            (err) => {
+              this.isFormBusy = false;
+            }
+          )
+        } else {
+          this.store.dispatch(new Protocols.Add(this.protocol.name, this.compileBody())).subscribe(
+            (completed) => {
+              this.refreshProtocols( "Protocol saved.");
+              this.form.removeControl("description");
+              this.isModalOpen = false;
+            },
+            (error) => {
+              this.isFormBusy = false;
+            }
+          )
+        }
+      } else {
+        alert("Protocol description cannot be empty");
+      }
+    }
+  }
+
+  // ADJUST POST STATE MIGRATION
   delete() {
     if (!this.isStudyReadOnly) {
       if (!this.required) {
@@ -365,6 +436,27 @@ export class ProtocolComponent implements OnInit {
           extendedTimeOut: 0,
           tapToDismiss: false,
         });
+      }
+    }
+  }
+
+  deleteNgxs() {
+    if (!this.isStudyReadOnly) {
+      if (!this.required) {
+        this.store.dispatch(new Protocols.Delete(this.protocol.name)).subscribe(
+          (res) => {
+            this.addNewProtocol = true;
+            this.refreshProtocols("Protocol deleted.");
+            this.form.removeControl("description");
+            this.isDeleteModalOpen = false;
+            this.isModalOpen = false;
+          },
+          (error) => {
+            this.isFormBusy = false;
+          }
+        )
+      } else {
+        toastr.error("Cannot delete a default protocol", "Error", this.toastrSettings);
       }
     }
   }
@@ -403,6 +495,7 @@ export class ProtocolComponent implements OnInit {
     }
   }
 
+  // REMOVE POST STATE MIGRATION
   updateProtocols(data, message) {
     if (!this.isStudyReadOnly) {
       this.editorService.getProtocols(null).subscribe((res) => {
@@ -429,6 +522,34 @@ export class ProtocolComponent implements OnInit {
         });
       });
     }
+  }
+
+  refreshProtocols(message, name?) {
+    this.store.dispatch(new Protocols.Get()).subscribe(
+      (completed) => {
+        this.form.reset();
+        this.form.markAsPristine();
+        //this.initialiseForm();
+        if (!this.addNewProtocol) {
+          /**
+           * This is an extraordinary antipattern but don't have much of a choice,
+           * we can't change the components current protocol via the state without destroying
+           * the component that has the modal rendered. 
+           */
+          this.protocolSubscription = this.store.select(ProtocolsState.specificProtocol(name))
+          .subscribe(
+            (protocol) => {
+              this.protocol = protocol;
+              console.log(`Opening modal with ${protocol.name}`)
+              this.openModal(this.protocol);
+            }
+          )
+        
+        }
+        toastr.success(message, "Success", this.toastrSettings)
+
+      }
+    )
   }
 
   compileBody() {

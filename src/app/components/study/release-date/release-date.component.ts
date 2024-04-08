@@ -13,9 +13,10 @@ import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { StudyReleaseDate } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-release-date",
@@ -30,8 +31,9 @@ export class ReleaseDateComponent implements OnInit {
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.releaseDate) studyReleaseDate$: Observable<Date>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
 
-
+  private toastrSettings: Record<string, any> = {};
 
   isReadOnly = false;
 
@@ -39,7 +41,9 @@ export class ReleaseDateComponent implements OnInit {
   isFormBusy = false;
   requestedStudy: string = null;
   releaseDate: Date = null;
-  constructor(private editorService: EditorService) {
+
+
+  constructor(private editorService: EditorService, private store: Store) {
     if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
@@ -47,6 +51,7 @@ export class ReleaseDateComponent implements OnInit {
   }
 
   setUpSubscriptions() {
+    this.toastrSettings$.subscribe(settings => {this.toastrSettings = settings})
     this.studyReleaseDate.subscribe((value) => {
       if (value !== null) {
         if (value !== "") {
@@ -109,6 +114,7 @@ export class ReleaseDateComponent implements OnInit {
     }
   }
 
+  // ADJUST POST STATE MIGRATION
   updateReleaseDate(op, e) {
     if (!this.isReadOnly) {
       const selectedValue = new Date(e.value);
@@ -129,25 +135,37 @@ export class ReleaseDateComponent implements OnInit {
           cancelButtonText: "Back",
         }).then((willChange) => {
           if (willChange.value) {
-            this.editorService.changeReleasedate(dateTo).subscribe(
-              (data) => {
-                this.closeModal();
-                toastr.success("Study release date updated.", "Success", {
-                  timeOut: "2500",
-                  positionClass: "toast-top-center",
-                  preventDuplicates: true,
-                  extendedTimeOut: 0,
-                  tapToDismiss: false,
-                });
-                this.editorService.loadStudy(this.requestedStudy, false);
-              },
-              (err) => {
-                this.closeModal();
-                Swal.fire({
-                  title: err.json().message,
-                });
-              }
-            );
+            if (environment.useNewState) {
+              this.store.dispatch(new StudyReleaseDate.Update(dateTo)).subscribe(
+                (completed) => {
+                  this.closeModal();
+                  toastr.success("Study release date updated.", "Success", this.toastrSettings);
+
+                }
+              )
+            }
+            else {
+              this.editorService.changeReleasedate(dateTo).subscribe(
+                (data) => {
+                  this.closeModal();
+                  toastr.success("Study release date updated.", "Success", {
+                    timeOut: "2500",
+                    positionClass: "toast-top-center",
+                    preventDuplicates: true,
+                    extendedTimeOut: 0,
+                    tapToDismiss: false,
+                  });
+                  this.editorService.loadStudy(this.requestedStudy, false);
+                },
+                (err) => {
+                  this.closeModal();
+                  Swal.fire({
+                    title: err.json().message,
+                  });
+                }
+              );
+            }
+
           }
         });
       }

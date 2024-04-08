@@ -8,13 +8,14 @@ import {
 import { NgRedux, select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
 import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
+import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/application.actions";
 
 @Component({
   selector: "mtbls-protocols",
@@ -47,7 +48,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   validationsId = "protocols";
   expand = true;
 
-  constructor(private editorService: EditorService) {
+  constructor(private editorService: EditorService, private store: Store) {
     this.customProtocols = [];
     this.defaultProtocols = [];
     this.protocols = [];
@@ -152,8 +153,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     }
   }
 
+  // ADJUST POST STATE MIGRATION
   toggleExpand() {
-    this.editorService.toggleProtocolsExpand(!this.expand);
+    if (environment.useNewState) this.store.dispatch(new SetProtocolExpand(!this.expand))
+    else this.editorService.toggleProtocolsExpand(!this.expand);
   }
 
   getProtocol(name) {

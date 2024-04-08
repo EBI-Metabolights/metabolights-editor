@@ -8,6 +8,9 @@ import { BaseConfigDependentService } from './base-config-dependent.service';
 import { TableService } from './table.service';
 import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { httpOptions } from '../headers';
+import { catchError } from 'rxjs/operators';
+import { IAssay } from 'src/app/models/mtbl/mtbls/interfaces/assay.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -35,6 +38,15 @@ export class AssaysService extends BaseConfigDependentService {
 
   getAssaySheet(filename): Observable<ITableWrapper> {
     return this.tableService.getTable(filename, this.id);
+  }
+
+  deleteAssay(name): Observable<Object> {
+    return this.http
+      .delete(
+        this.url.baseURL + "/studies" + "/" + this.id + "/assays/" + name,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
   extractAssayDetails(assay): Record<string, any> {
@@ -72,4 +84,32 @@ export class AssaysService extends BaseConfigDependentService {
       assayMainTechnique: "",
     };
   }
+
+  addAssay(body: any): Observable<IAssay> {
+    return this.http
+    .post<IAssay>(
+      this.url.baseURL + "/studies" + "/" + this.id + "/assays",
+      body,
+      httpOptions
+    )
+    .pipe(catchError(this.handleError));
+  }
+
+  addColumnToAssaySheet(filename: string, body: Record<string, any>, id: string): Observable<any> {
+    return this.tableService.addColumns(filename, body, id);
+  }
+
+  addRows(filename: string, body: Record<string, any>): Observable<any> {
+    return this.tableService.addRows(filename, body, this.id);
+  }
+
+  deleteRows(filename: string, rowIds: any): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, this.id);
+  }
+
+  updateCells(filename, body): Observable<any> {
+    return this.tableService.updateCells(filename, body, this.id);
+
+  }
+  
 }

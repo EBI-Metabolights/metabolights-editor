@@ -25,4 +25,26 @@ export namespace MAF {
         constructor(public maf: any) {}
     }
 
+    export class AddRows {
+        static readonly type = '[maf] Add Rows'
+        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>) {}
+
+    }
+
+    export class UpdateRows {
+        static readonly type = '[maf] Update Rows'
+        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>) {}
+    }
+
+    export class DeleteRows {
+        static readonly type = '[maf] Delete Rows'
+        constructor(public filename: string, public rowIds: any) {}
+    }
+
+    export class UpdateCells {
+        static readonly type = '[maf] Delete Rows'
+        constructor(public filename: string, public cellsToUpdate: Record<string, any>){}
+
+    }
+
 }

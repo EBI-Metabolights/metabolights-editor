@@ -52,5 +52,31 @@ export class ValidationService extends BaseConfigDependentService {
         .pipe(catchError(this.handleError));
     }
 
+    refreshValidations(): Observable<{ success: string }> {
+      return this.http
+        .post<{ success: string }>(
+          this.url.baseURL +
+            "/ebi-internal/" +
+            this.id +
+            "/validate-study/update-file",
+          {},
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
+    }
+
+    overrideValidations(data): Observable<{ success: string }> {
+      return this.http
+        .post<{ success: string }>(
+          this.url.baseURL +
+            "/ebi-internal/" +
+            this.id +
+            "/validate-study/override",
+          data,
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
+    }
+
     
 }
