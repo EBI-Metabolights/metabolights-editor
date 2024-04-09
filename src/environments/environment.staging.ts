@@ -3,5 +3,5 @@ export const environment = {
   context: "staging",
   isTesting: false,
   contextPath: "/metabolights/editor",
-  useNewState: false
+  useNewState: true
 };
