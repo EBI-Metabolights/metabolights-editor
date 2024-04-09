@@ -11,8 +11,21 @@ import { ConfigurationService } from "src/app/configuration.service";
 import {SessionStatus} from '../../../models/mtbl/mtbls/enums/session-status.enum';
 import {AuthGuard} from '../../../auth-guard.service';
 import {browserRefresh} from '../../../app.component';
-import { StudyPermisssion } from "src/app/services/headers";
+import { StudyPermission } from "src/app/services/headers";
 import { PlatformLocation } from "@angular/common";
+import { Select, Store } from "@ngxs/store";
+import { SetTabIndex } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
+import { Observable } from "rxjs";
+import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 @Component({
   selector: "study",
@@ -21,14 +34,25 @@ import { PlatformLocation } from "@angular/common";
 })
 export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.status.user) user;
+  @select((state) => state.status.user) user; //potentially unused
   @select((state) => state.study.status) studyStatus;
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.investigationFailed) investigationFailed;
   @select((state) => state.study.files) studyFiles;
-  @select((state) => state.status.userStudies) userStudies;
+  @select((state) => state.status.userStudies) userStudies; //Potentially unused
   @select((state) => state.study.reviewerLink) studyReviewerLink;
+
+  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
+  @Select(UserState.user) user$: Observable<Owner>; // potentially unused
+  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]> // Potentially unused
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+  @Select(GeneralMetadataState.reviewerLink) studyReviewerLink$: Observable<string>;
+  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+
 
   loading: any = true;
   requestedTab = 0;
@@ -44,11 +68,12 @@ export class PublicStudyComponent implements OnInit {
   endpoint = "";
   baseHref: any = "";
   reviewerLink: string = null;
-  permissions: StudyPermisssion = null;
+  permissions: StudyPermission = null;
   notReadyValidationMessage: string = null;
 
   constructor(
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private editorService: EditorService,
     private authGuardService: AuthGuard,
     private router: Router,
@@ -59,7 +84,9 @@ export class PublicStudyComponent implements OnInit {
   ) {
 
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
-    this.permissions = this.ngRedux.getState().status.studyPermission;
+
+    if (environment.useNewState) this.permissions = this.store.snapshot().application.studyPermission
+    else this.permissions = this.ngRedux.getState().status.studyPermission;
 
     const curatorStatus = localStorage.getItem("isCurator");
     const userName = localStorage.getItem("username");
@@ -80,9 +107,9 @@ export class PublicStudyComponent implements OnInit {
     }
 
     if (reviewMode === true) {
-      this.loadStudy(studyId);
+      environment.useNewState ? this.loadStudyNgxs(studyId) : this.loadStudy(studyId);
     } else {
-      this.loadStudy(null);
+      environment.useNewState ? this.loadStudyNgxs(null) : this.loadStudy(null);
     }
     this.calculateNotReadyValidationMessage();
   }
@@ -170,13 +197,83 @@ export class PublicStudyComponent implements OnInit {
     });
   }
 
-  selectCurrentTab(index, tab) {
-    this.ngRedux.dispatch({
-      type: "SET_TAB_INDEX",
-      body: {
-        currentTabIndex: index,
-      },
+  loadStudyNgxs(studyId) {
+    this.editorService.toggleLoading(false);
+    if (studyId) {
+      this.editorService.loadStudyInReview(studyId);
+    } else {
+      this.editorService.loadPublicStudy({
+        id: this.route.snapshot.paramMap.get("study"),
+      });
+    }
+    this.studyIdentifier$.subscribe((value) => {
+      if (value !== null) {
+        this.requestedStudy = value;
+      }
     });
+
+    this.studyValidation$.subscribe((value) => {
+      this.validation = value;
+      this.calculateNotReadyValidationMessage();
+    });
+
+    this.studyFiles$.subscribe((value) => {
+      this.files = value;
+      this.loading = false;
+        if(this.status === undefined || this.status === null || this.status === "Public"){
+          return;
+        }
+
+        if (this.isCurator || this.isOwner) {
+          this.editorService.getValidationReport();
+        }
+    });
+
+    this.investigationFailed$.subscribe((value) => {
+      this.studyError = value;
+    });
+
+    this.studyStatus$.subscribe((value) => {
+      if(value){
+        this.status = value;
+        this.calculateNotReadyValidationMessage();
+      }
+    });
+
+    this.studyReviewerLink$.subscribe((value) => {
+      this.reviewerLink = value;
+    });
+
+    this.route.params.subscribe((params) => {
+      if (params.tab === "files") {
+        this.requestedTab = 5;
+        this.tab = "files";
+      } else if (params.tab === "metabolites") {
+        this.requestedTab = 4;
+        this.tab = "metabolites";
+      } else if (params.tab === "assays") {
+        this.requestedTab = 3;
+        this.tab = "assays";
+      } else if (params.tab === "samples") {
+        this.requestedTab = 2;
+        this.tab = "samples";
+      } else if (params.tab === "protocols") {
+        this.requestedTab = 1;
+        this.tab = "protocols";
+      } else if (params.tab === "validations") {
+        this.requestedTab = 6;
+        this.tab = "validations";
+      } else {
+        this.requestedTab = 0;
+        this.tab = "descriptors";
+      }
+      this.selectCurrentTab(this.requestedTab, this.tab);
+    });
+  }
+
+  selectCurrentTab(index, tab) {
+    if (environment.useNewState) this.store.dispatch(new SetTabIndex(index))
+    else this.ngRedux.dispatch({ type: "SET_TAB_INDEX", body: {currentTabIndex: index,},});
 
 
     const queryParams = this.route.snapshot.queryParamMap;

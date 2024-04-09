@@ -2,6 +2,11 @@ import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
@@ -10,9 +15,13 @@ declare let AW4: any;
   styleUrls: ["./aspera.component.css"],
 })
 export class AsperaDownloadComponent implements OnInit {
-  @select((state) => state.study.uploadLocation) uploadLocation;
   @select((state) => state.study.validations) validations: any;
   @select((state) => state.study.identifier) studyIdentifier: any;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+
+
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
 
@@ -38,9 +47,10 @@ export class AsperaDownloadComponent implements OnInit {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
   ngOnInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
 
   }
 
@@ -52,6 +62,18 @@ export class AsperaDownloadComponent implements OnInit {
       this.requestedStudy = value;
     });
   }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
+      if (value != null) {
+        this.requestedStudy = value;
+      }
+    });
+    this.editorValidationRules$.subscribe((value) => {
+      this.validation = value[this.validationsId];
+    });
+  }
+
 
   toggleHelp() {
     this.displayHelpModal = !this.displayHelpModal;

@@ -22,6 +22,9 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { catchError, map } from "rxjs/operators";
 import { throwError } from "rxjs";
 import { ErrorMessageService } from "./services/error-message.service";
+import { environment } from "src/environments/environment";
+import { Store } from "@ngxs/store";
+import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
 @Injectable({
   providedIn: "root",
 })
@@ -34,7 +37,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private ngRedux: NgRedux<IAppState>
+    private ngRedux: NgRedux<IAppState>,
+    private store: Store
   ) { }
 
 
@@ -110,9 +114,6 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
         const currentUser = localDecoded.sub;
         if (currentUser !== userName) {
           this.editorService.clearSessionData();
-          this.ngRedux.dispatch({
-            type: "RESET",
-          });
           await this.editorService.loginWithJwt(jwt, userName);
           toastr.info("User: " + userName, "Session is swithed to other user.", {
             timeOut: "5000",
@@ -228,7 +229,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
           return false;
         }
         const permissions = studyPermission;
-        this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
+        if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
+        else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
         return true;
       }
     }
@@ -241,8 +243,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
 
       }
       const permissions = studyPermission;
-      this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
-      return true;
+      if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
+      else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });      return true;
     }
     return false;
   }
@@ -274,8 +276,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
 
       if (isPublic || studyPermission.submitterOfStudy || (isCurator && isCurator.toLowerCase() === "true")) {
         const permissions = studyPermission;
-        this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
-        return true;
+        if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
+        else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });        return true;
       }
       const reviewCode = state.root.queryParams.reviewCode;
       if (reviewCode) {
@@ -289,8 +291,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
     } else {
       if (studyPermission.edit) {
         const permissions = studyPermission;
-        this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
-        return true;
+        if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
+        else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });        return true;
       } else {
         if (studyPermission.submitterOfStudy === true && studyPermission.view === true && url.startsWith("/study/MTBLS")) {
           this.editorService.redirectUrl = url;

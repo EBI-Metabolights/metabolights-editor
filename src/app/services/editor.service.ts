@@ -7,7 +7,7 @@ import { ActivatedRouteSnapshot, Router } from "@angular/router";
 
 import { catchError, map, observeOn } from "rxjs/operators";
 
-import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermisssion } from "./../services/headers";
+import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermission } from "./../services/headers";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
@@ -20,6 +20,20 @@ import { Observable, of, interval, asapScheduler, asyncScheduler } from "rxjs";
 import { VersionInfo } from "src/environment.interface";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
+import { Select, Store } from "@ngxs/store";
+import { Loading, SetLoadingInfo } from "../ngxs-store/non-study/transitions/transitions.actions";
+import { User } from "../ngxs-store/non-study/user/user.actions";
+import { GetGeneralMetadata, Identifier } from "../ngxs-store/study/general-metadata/general-metadata.actions";
+import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
+import { AssayState } from "../ngxs-store/study/assay/assay.state";
+import { FilesState } from "../ngxs-store/study/files/files.state";
+import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
+import { ValidationState } from "../ngxs-store/study/validation/validation.state";
+import {  BannerMessage, DefaultControlLists, GuidesMappings, MaintenanceMode, SetProtocolExpand, SetSelectedLanguage } from "../ngxs-store/non-study/application/application.actions";
+import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
+import { SampleState } from "../ngxs-store/study/samples/samples.state";
+import { MAFState } from "../ngxs-store/study/maf/maf.state";
+import { EditorValidationRules } from "../ngxs-store/study/validation/validation.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -45,9 +59,23 @@ export class EditorService {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.study.validations) studyValidations;
   @select((state) => state.study.files) studyFiles;
-  @select((state) => state.study.studyAssays) studyAssays;
   @select((state) => state.study) stateStudy;
   @select((state) => state.status.controlLists) controlLists;
+  
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  @Select(ApplicationState.controlLists) controlLists$: Observable<Record<string, any>>;
+
+  // Reconstituting previous state.study selector. state.study was only used in commitUpdatedTableCells
+  // so I am not including ALL study data, only the data that method uses. 
+  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
+  @Select(SampleState.samples) samples$: Observable<Record<string, any>>;
+  @Select(MAFState.mafs) mafs$: Observable<Record<string, any>>;
+
+  private assays: Record<string, any>;
+  private samples: Record<string, any>;
+  private mafs: Record<string, any>;
 
   study: MTBLSStudy;
   baseHref: string;
@@ -69,6 +97,7 @@ export class EditorService {
 
   constructor(
     public ngRedux: NgRedux<IAppState>,
+    public store: Store,
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
@@ -76,21 +105,61 @@ export class EditorService {
     private platformLocation: PlatformLocation
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
+    if (environment.useNewState) { this.setUpSubscriptionsNgxs(); } else {
+      this.studyIdentifier.subscribe((value) => {
+        this.currentStudyIdentifier = value;
+      });
+      this.stateStudy.subscribe((value) => {
+        this.study = value;
+      });
+      this.studyValidations.subscribe((value) => {
+        this.validations = value;
+      });
+      this.studyFiles.subscribe((value) => {
+        this.files = value;
+      });
+  
+      this.controlLists.subscribe((value) => {
+        if (value) {
+          Object.keys(value).forEach((label: string)=>{
+            this.defaultControlLists[label] = {OntologyTerm: []};
+            value[label].forEach(term => {
+              this.defaultControlLists[label].OntologyTerm.push({
+                annotationDefinition: term.definition,
+                annotationValue: term.name,
+                termAccession: term.iri,
+                comments: [],
+                termSource: {
+                  comments: [],
+                  name: term.onto_name,
+                  description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
+                  file: term.provenance_name,
+                  provenance_name: term.provenance_name,
+                  version: ""
+                },
+                wormsID: ""
+              });
+            });
+          });
+        }
+      });
+    }
     this.redirectUrl = this.configService.config.redirectURL;
-    this.studyIdentifier.subscribe((value) => {
+   
+  }
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
       this.currentStudyIdentifier = value;
     });
-    this.stateStudy.subscribe((value) => {
-      this.study = value;
-    });
-    this.studyValidations.subscribe((value) => {
+    this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
-    this.studyFiles.subscribe((value) => {
+    this.studyFiles$.subscribe((value) => {
       this.files = value;
     });
 
-    this.controlLists.subscribe((value) => {
+    this.controlLists$.subscribe((value) => {
       if (value) {
         Object.keys(value).forEach((label: string)=>{
           this.defaultControlLists[label] = {OntologyTerm: []};
@@ -114,6 +183,10 @@ export class EditorService {
         });
       }
     });
+    this.assays$.subscribe((assays) => this.assays = assays);
+    this.samples$.subscribe((samples) => this.samples = samples);
+    this.mafs$.subscribe((mafs) => this.mafs = mafs)
+
   }
 
   login(body) {
@@ -123,10 +196,6 @@ export class EditorService {
   logout(redirect) {
 
     this.clearSessionData();
-
-    this.ngRedux.dispatch({
-      type: "RESET",
-    });
     if (this.configService.config.clearJavaSession && redirect) {
       window.location.href = this.configService.config.javaLogoutURL;
     } else {
@@ -149,18 +218,19 @@ export class EditorService {
     return this.dataService.getMetaInfo();
   }
 
+  // ADJUST POST STATE MIGRATION
   loadStudyInReview(id) {
     this.loadStudyId(id);
-    this.loadStudy(id, true);
-    // this.loadValidations();
+    if (environment.useNewState) this.loadStudyNgxs(id, true);
+    else this.loadStudy(id, true);    // this.loadValidations();
   }
 
+  // ADJUST POST STATE MIGRATION
   loadPublicStudy(body) {
     this.loadStudyId(body.id);
-    this.loadStudy(body.id, true);
-    // if(this.study !== null && this.study.status !== null && this.study.status !== "Public"){
-    //   this.loadValidations();
-    // }
+    if (environment.useNewState) this.loadStudyNgxs(body.id, true);
+    else this.loadStudy(body.id, true);
+
   }
   /**
    * Retrieves publication information for a given study.
@@ -252,7 +322,7 @@ export class EditorService {
   async getStudyPermission(key: string, path: string) {
     const url = this.configService.config.metabolightsWSURL.baseURL + path + key;
     try {
-      const response = await this.authService.http.get<StudyPermisssion>(url,
+      const response = await this.authService.http.get<StudyPermission>(url,
         {
           headers: httpOptions.headers,
           observe: "body",
@@ -280,43 +350,48 @@ export class EditorService {
     const localUser = localStorage.getItem("user");
     const user: MetabolightsUser = JSON.parse(localUser);
 
-    this.getDefaultControlLists().subscribe(
-      (response) => {
-        const controlLists = response.controlLists;
-        this.ngRedux.dispatch({ type: "SET_DEFAULT_CONTROL_LISTS", body: { controlLists} });
-        },
-        (error) => {
-          this.ngRedux.dispatch({ type: "SET_DEFAULT_CONTROL_LISTS", body: { controlLists: {}} });
-        }
-    );
+    if (environment.useNewState) {
+      this.store.dispatch(new BannerMessage.Get());
+      this.store.dispatch(new MaintenanceMode.Get());
+      this.store.dispatch(new DefaultControlLists.Get());
 
-    this.getBannerHeader().subscribe(
-      (response) => {
-        const message = response.content;
-        this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: message} });
-        },
-        (error) => {
-          this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: null} });
-        }
-    );
-    this.checkMaintenaceMode().subscribe(
-      (response) => {
-        const result = response.content;
-        this.ngRedux.dispatch({ type: "SET_MAINTENANCE_MODE", body: { maintenanceMode: result} });
-        },
-        (error) => {
-          this.ngRedux.dispatch({ type: "SET_MAINTENANCE_MODE", body: { maintenanceMode: false} });
-        }
-    );
+     } else {
+      this.getDefaultControlLists().subscribe(
+        (response) => {
+          const controlLists = response.controlLists;
+          this.ngRedux.dispatch({ type: "SET_DEFAULT_CONTROL_LISTS", body: { controlLists} });
+          },
+          (error) => {
+            this.ngRedux.dispatch({ type: "SET_DEFAULT_CONTROL_LISTS", body: { controlLists: {}} });
+          }
+      );
+      this.getBannerHeader().subscribe(
+        (response) => {
+          const message = response.content;
+          this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: message} });
+          },
+          (error) => {
+            this.ngRedux.dispatch({ type: "SET_BANNER_MESSAGE", body: { bannerMessage: null} });
+          }
+      );
+      this.checkMaintenaceMode().subscribe(
+        (response) => {
+          const result = response.content;
+          this.ngRedux.dispatch({ type: "SET_MAINTENANCE_MODE", body: { maintenanceMode: result} });
+          },
+          (error) => {
+            this.ngRedux.dispatch({ type: "SET_MAINTENANCE_MODE", body: { maintenanceMode: false} });
+          }
+      );
+     }
+
+
 
     if(activeJwt !== null){
       const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
       const username = decoded.sub;
       if (user === null || user.email !== username){
         this.clearSessionData();
-        this.ngRedux.dispatch({
-          type: "RESET",
-        });
         await this.loginWithJwt(activeJwt, username);
         return true;
       } else {
@@ -388,6 +463,7 @@ export class EditorService {
     return this.initialise(response, true);
   }
 
+  // many new state pivots to remove in here
   initialise(data, signInRequest) {
     interface User {
       updatedAt: number;
@@ -407,21 +483,17 @@ export class EditorService {
         "user_token",
         user.owner.apiToken
       );
-      this.ngRedux.dispatch({
-        type: "INITIALISE",
-      });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user: user.owner,
-        },
-      });
-      this.ngRedux.dispatch({
+
+      if (environment.useNewState) this.store.dispatch(new User.Set(user.owner));
+      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user.owner, },});
+      
+      if (environment.useNewState) this.store.dispatch(new User.Studies.Set(null))
+      else {this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
           studies: null,
         },
-      });
+      });}
 
       this.loadValidations();
       return true;
@@ -433,21 +505,18 @@ export class EditorService {
       );
       const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
       localStorage.setItem("isCurator", isCurator);
-      this.ngRedux.dispatch({
-        type: "INITIALISE",
-      });
-      this.ngRedux.dispatch({
-        type: "SET_USER",
-        body: {
-          user,
-        },
-      });
-      this.ngRedux.dispatch({
+
+      if (environment.useNewState) this.store.dispatch(new User.Set(user));
+      else this.ngRedux.dispatch({ type: "SET_USER", body: { user: user, },});
+
+      if (environment.useNewState) this.store.dispatch(new User.Studies.Set(null))
+      else {this.ngRedux.dispatch({
         type: "SET_USER_STUDIES",
         body: {
           studies: null,
         },
-      });
+      });}
+
       this.loadValidations();
       return true;
     }
@@ -460,18 +529,19 @@ export class EditorService {
 
     this.dataService.getValidations().subscribe(
       (validations) => {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading study validations",
-          },
-        });
-        this.ngRedux.dispatch({
-          type: "LOAD_VALIDATION_RULES",
-          body: {
-            validations,
-          },
-        });
+        if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading study validations"))
+        else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: { info: "Loading study validations",},});
+        
+        if (environment.useNewState) this.store.dispatch(new EditorValidationRules.Set(validations))
+        else {           
+          this.ngRedux.dispatch({
+            type: "LOAD_VALIDATION_RULES",
+            body: {
+              validations,
+            },
+          }); 
+        }
+
       },
       (err) => {
         console.log(err);
@@ -479,10 +549,12 @@ export class EditorService {
     );
   }
 
+  //REMOVE POST STATE MIGRATIOn
   refreshValidations() {
     return this.dataService.refreshValidations();
   }
 
+  // REMOVE POST STATE MIGRATION
   overrideValidations(data) {
     return this.dataService.overrideValidations(data);
   }
@@ -497,7 +569,7 @@ export class EditorService {
     return this.dataService.addComment(data);
   }
 
-
+  // REMOVE POST STATE MIGRATION
   loadApiVersionInfo(){
     this.dataService.getApiInfo().subscribe(versionInfo => {
       console.log("Loaded API version: " + versionInfo.about.api.version);
@@ -528,6 +600,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   loadVersionInfo(){
     const url = this.baseHref + "assets/configs/version.json";
     this.dataService.http.get<VersionInfo>(url).subscribe(versionInfo => {
@@ -554,27 +627,21 @@ export class EditorService {
     );
   }
 
+  //REMOVE POST STATE MIGRATION
   loadGuides() {
     this.dataService.getLanguageMappings().subscribe(
       (mappings) => {
-        this.ngRedux.dispatch({
-          type: "SET_GUIDES_MAPPINGS",
-          body: {
-            mappings,
-          },
-        });
+        if (environment.useNewState) this.store.dispatch(new GuidesMappings.Set(mappings))
+        else this.ngRedux.dispatch({type: "SET_GUIDES_MAPPINGS",body: { mappings,},});
+
         const selected_language = localStorage.getItem("selected_language");
         mappings["languages"].forEach((language) => {
           if (
             (selected_language && language.code === selected_language) ||
             (!selected_language && language.default)
           ) {
-            this.ngRedux.dispatch({
-              type: "SET_SELECTED_LANGUAGE",
-              body: {
-                language: language.code,
-              },
-            });
+            if (environment.useNewState) this.store.dispatch(new SetSelectedLanguage(language.code));
+            else this.ngRedux.dispatch({ type: "SET_SELECTED_LANGUAGE", body: { language: language.code, }, });
 
             this.dataService.getGuides(language.code).subscribe((guides) => {
               this.ngRedux.dispatch({
@@ -593,15 +660,14 @@ export class EditorService {
     );
   }
 
+
+  // REMOVE POST STATE MIGRATION
   loadLanguage(language) {
     this.dataService.getGuides(language).subscribe((guides) => {
       localStorage.setItem("selected_language", language);
-      this.ngRedux.dispatch({
-        type: "SET_SELECTED_LANGUAGE",
-        body: {
-          language,
-        },
-      });
+      if (environment.useNewState) this.store.dispatch(new SetSelectedLanguage(language.code));
+      else this.ngRedux.dispatch({ type: "SET_SELECTED_LANGUAGE", body: { language: language.code, }, });
+
       this.ngRedux.dispatch({
         type: "SET_GUIDES",
         body: {
@@ -611,6 +677,7 @@ export class EditorService {
     });
   }
 
+  // REMOVE POST STATE MIGRATION
   getAllStudies() {
     this.dataService.getAllStudies().subscribe((response) => {
       this.ngRedux.dispatch({
@@ -623,7 +690,8 @@ export class EditorService {
   }
 
   loadStudyId(id) {
-    return this.ngRedux.dispatch({
+    if (environment.useNewState) this.store.dispatch(new Identifier.Set(id))
+    else this.ngRedux.dispatch({
       type: "SET_STUDY_IDENTIFIER",
       body: {
         study: id,
@@ -636,17 +704,27 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-    if (status !== null) {
-      if (status) {
-        this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
-      } else {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-      }
+    if (environment.useNewState) {
+      status !== null ? (
+        status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
+        ) : this.store.dispatch(new Loading.Toggle())
     } else {
-      this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+      if (status !== null) {
+        if (status) {
+          this.ngRedux.dispatch({ type: "ENABLE_LOADING" });
+        } else {
+          this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
+        }
+      } else {
+        this.store.dispatch(new Loading.Toggle())
+        this.ngRedux.dispatch({ type: "TOGGLE_LOADING" });
+      }
     }
+
+
   }
 
+  // ADJUST POST STATE MIGRATION
   initialiseStudy(route) {
     if (route === null) {
       return this.loadStudyId(null);
@@ -654,16 +732,26 @@ export class EditorService {
       route.params.subscribe((params) => {
         const studyID = params.id;
         if (this.currentStudyIdentifier !== studyID) {
-          this.loadStudy(studyID, false);
+          if (environment.useNewState) this.loadStudyNgxs(studyID, false);
+          else this.loadStudy(studyID, false);
         }
       });
     }
   }
 
+  // ADJUST POST STATE MIGRATION
   toggleProtocolsExpand(value) {
-    this.ngRedux.dispatch({ type: "SET_PROTOCOL_EXPAND", body: value });
+    if (environment.useNewState) this.store.dispatch(new SetProtocolExpand(value))
+    else this.ngRedux.dispatch({ type: "SET_PROTOCOL_EXPAND", body: value });
   }
 
+  loadStudyNgxs(studyID, readonly) {
+    this.toggleLoading(true);
+    this.loadStudyId(studyID);
+    this.store.dispatch(new GetGeneralMetadata(studyID, readonly))
+  }
+
+  //REMOVE POST STATE MIGRATION
   loadStudy(studyID, readonly) {
     this.toggleLoading(true);
     this.loadStudyId(studyID);
@@ -675,12 +763,10 @@ export class EditorService {
             investigationFailed: false,
           },
         });
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading investigation details",
-          },
-        });
+
+        if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading investigation details"))
+        else this.ngRedux.dispatch({ type: "SET_LOADING_INFO", body: { info: "Loading investigation details",},});
+
         this.ngRedux.dispatch({
           type: "SET_CONFIGURATION",
           body: {
@@ -795,6 +881,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   getValidationReport() {
     this.dataService.getValidationReport().subscribe(
       (response) => {
@@ -852,6 +939,7 @@ export class EditorService {
 
   }
 
+  // REMOVE POST STATE MIGRATION
   loadStudyFiles(force, readonly: boolean = true) {
     // console.log("Loading Study files..")
     // console.log("Force files list calculation - "+fource)
@@ -898,6 +986,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   loadStudyProtocols() {
     this.dataService.getProtocols(null).subscribe((data) => {
       this.ngRedux.dispatch({
@@ -941,6 +1030,7 @@ export class EditorService {
     return this.dataService.getStudyFilesListFromLocation(null, false, dir, parent, location);
   }
 
+  // REMOVE POST STATE MIGRATION
   extractAssayDetails(assay) {
     if (this.validations === undefined) {
       this.loadValidations();
@@ -980,6 +1070,7 @@ export class EditorService {
     };
   }
 
+
   loadStudySamples() {
     if (this.files === null) {
       this.loadStudyFiles(false);
@@ -987,12 +1078,8 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
-            body: {
-              info: "Loading Samples data",
-            },
-          });
+          if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading samples data"))
+          else this.ngRedux.dispatch({type: "SET_LOADING_INFO",body: {info: "Loading Samples data",},});
           samplesExist = true;
           this.updateSamples(file.file);
         }
@@ -1009,13 +1096,11 @@ export class EditorService {
     }
   }
 
+  // DELETE POST STATE MIGRATION
   loadStudyAssays(files) {
-    this.ngRedux.dispatch({
-      type: "SET_LOADING_INFO",
-      body: {
-        info: "Loading assays information",
-      },
-    });
+
+    if (environment.useNewState) this.store.dispatch(new SetLoadingInfo("Loading assays information"))
+    else this.ngRedux.dispatch({ type: "SET_LOADING_INFO", body: {info: "Loading assays information",},});
     files.study.forEach((file) => {
       if (file.file.indexOf("a_") === 0 && file.status === "active") {
         this.updateAssay(file.file);
@@ -1032,6 +1117,8 @@ export class EditorService {
       this.updateMAF(filename);
     }
   }
+
+  // REMOVE POST STATE MIGRATION
   updateAssay(file) {
     this.dataService.getTable(file).subscribe((data) => {
       const assay = {};
@@ -1088,6 +1175,7 @@ export class EditorService {
     });
   }
 
+  // REMOVE POST STATE MIGRATION
   updateMAF(f) {
     this.dataService.getTable(f).subscribe((mdata) => {
       const mcolumns = [];
@@ -1144,6 +1232,7 @@ export class EditorService {
     return this.dataService.validateMAF(f).pipe(map((data) => data));
   }
 
+  // REMOVE POST STATE MIGRATION
   updateSamples(file) {
     const samples = {};
     samples["name"] = file;
@@ -1263,7 +1352,7 @@ export class EditorService {
     return data;
   }
 
-  // Meta data
+  // REMOVE POST STATE MIGRATION
   saveTitle(body) {
     return this.dataService.saveTitle(body).pipe(
       map((data) => {
@@ -1273,6 +1362,7 @@ export class EditorService {
     );
   }
 
+  // REMOVE POST STATE MIGRATION
   saveAbstract(body) {
     return this.dataService.saveAbstract(body).pipe(
       map((data) => {
@@ -1444,10 +1534,12 @@ export class EditorService {
   }
 
   // Assays
+  // REMOVE POST STATE MIGRATION
   addAssay(body) {
     return this.dataService.addAssay(body).pipe(map((data) => data));
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteAssay(name) {
     return this.dataService.deleteAssay(name).pipe(
       map((data) => {
@@ -1502,16 +1594,19 @@ export class EditorService {
   saveFactor(body) {
     return this.dataService.saveFactor(body);
   }
-
+  
+  // REMOVE POST STATE MIGRATION
   updateFactor(factorName, body) {
     return this.dataService.updateFactor(factorName, body);
   }
 
+  // REMOVE POST STATE MIGRATION
   deleteFactor(factorName) {
     return this.dataService.deleteFactor(factorName);
   }
 
   // table
+  // REMOVE POST STATE MIGRATION
   addColumns(filename, body, tableType, metaInfo) {
     return this.dataService.addColumns(filename, body).pipe(
       map((data) => {
@@ -1521,6 +1616,7 @@ export class EditorService {
     );
   }
 
+  // DELETE POST STATE MIGRATION
   addRows(filename, body, tableType, metaInfo) {
     return this.dataService.addRows(filename, body).pipe(
       map((data) => {
@@ -1530,6 +1626,7 @@ export class EditorService {
     );
   }
 
+  // DELETE POST STATE MIGRATION
   updateRows(filename, body, tableType, metaInfo) {
     return this.dataService.updateRows(filename, body).pipe(
       map((data) => {
@@ -1552,11 +1649,54 @@ export class EditorService {
     return this.dataService.updateCells(filename, body).pipe(
       map((result) => {
         // this.updateTableState(filename, tableType, metaInfo);
-        this.commitUpdatedTableCells(filename, tableType, result);
+        if (environment.useNewState) this.commitUpdatedTablesCellsNgxs(filename, tableType, result)
+        else this.commitUpdatedTableCells(filename, tableType, result);
         return result;
       })
     );
   }
+
+  commitUpdatedTablesCellsNgxs(filename, tableType, result): void {
+    let source: any = {};
+    let sourceFile: any = {};
+    let fileExist = false;
+    if (tableType === "samples") {
+      source = this.samples;
+      fileExist = this.samples.name === filename;
+      sourceFile = fileExist ? source : "";
+    } else if (tableType === "assays") {
+      source = this.assays;
+      fileExist = filename in source;
+      sourceFile = fileExist ? source[filename] : "";
+    } else if (tableType === "maf") {
+      source = this.mafs;
+      fileExist = filename in source;
+      sourceFile = fileExist ? source[filename] : "";
+    }
+    if ( result.success && result.updates && result.updates.length > 0) {
+      // console.log("committed values" + result.message);
+      const table = sourceFile.data;
+      const deepCopiedData = JSON.parse(JSON.stringify(table));
+
+      const headerIndices: Map<number, string> = new Map<number, string>();
+      table.columns.forEach((val, idx)=> {
+        headerIndices.set(val.header, idx);
+      });
+      result.updates.forEach((update) => {
+        const remoteHeader = result.header[update["column"]];
+        const currentIndex = headerIndices.get(remoteHeader);
+        const currentHeader = table.columns[currentIndex].columnDef;
+        if (currentHeader === remoteHeader) {
+          table.rows[update["row"]][currentHeader] = update["value"];
+        } else {
+          console.log("Value '" + update["value"] + "' at row "+ update["row"]
+            + ". Update column names do not match. Remote header: "
+            + remoteHeader + " current header: " + currentHeader);
+        }
+      });
+    }
+  }
+
   commitUpdatedTableCells(filename, tableType, result) {
     let source: any = {};
     let sourceFile: any = {};
@@ -1637,6 +1777,7 @@ export class EditorService {
   }
 
   // Release date change
+  // REMOVE POST STATE MIGRATION
   changeReleasedate(releaseDate) {
     return this.dataService.changeReleasedate(releaseDate);
   }

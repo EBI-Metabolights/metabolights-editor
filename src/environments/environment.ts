@@ -7,6 +7,7 @@ export const environment = {
   context: "development",
   isTesting: false,
   contextPath: "/metabolights/editor",
+  useNewState: true
 };
 
 /*

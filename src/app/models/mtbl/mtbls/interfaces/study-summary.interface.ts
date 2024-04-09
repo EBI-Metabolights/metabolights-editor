@@ -13,6 +13,7 @@ export interface IMtblsStudySummaryInformation {
   read_access: boolean;
   is_curator: boolean;
   write_access: boolean;
+  reviewerLink: string;
 }
 
 /*Interface to represent the small amount of validation informations we get back from the IsaInvestigation endpoint*/

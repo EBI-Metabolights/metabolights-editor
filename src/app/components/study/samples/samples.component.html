@@ -33,6 +33,8 @@
   </div>
 -->
 <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
+    <!--Add factor dropdown start-->
+
   <div class="dropdown" [ngClass]="{ 'is-active': isFactorDropdownActive }">
     <div class="dropdown-trigger">
       <button
@@ -61,6 +63,7 @@
       </div>
     </div>
   </div>
+  <!--Add factor dropdown end-->
   &nbsp;
   <a
     (click)="openAddColumnModal('characteristic', null)"
@@ -80,8 +83,10 @@
   validationsId="samples"
 ></mtbls-table>
 
+  <!--Add column modal start-->
 <div class="modal" [ngClass]="{ 'is-active': addColumnModalOpen }">
   <div class="modal-background"></div>
+  <!--Add Characteristic Column Startt-->
   <div
     *ngIf="addColumnType && addColumnType == 'characteristic'"
     class="modal-card"
@@ -122,6 +127,9 @@
       </footer>
     </form>
   </div>
+  <!--Add Characteristic column end-->
+
+  <!--Add factor column start-->
   <div *ngIf="addColumnType && addColumnType == 'factor'" class="modal-card">
     <div *ngIf="isFormBusy" class="load-bar">
       <div class="bar"></div>
@@ -160,8 +168,11 @@
       </footer>
     </form>
   </div>
+  <!--Add factor column end-->
 </div>
+  <!--Add column modal end-->
 
+<!--Add samples modal start-->
 <div class="modal" [ngClass]="{ 'is-active': isAddSamplesModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
@@ -236,3 +247,4 @@
     </div>
   </form>
 </div>
+<!--Add samples modal end-->

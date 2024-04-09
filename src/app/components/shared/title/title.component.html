@@ -57,7 +57,7 @@
             <button
               *ngIf="form.get('title').dirty"
               [disabled]="!form.valid || isFormBusy"
-              (click)="save()"
+              (click)="saveNgxs()"
               class="button is-info"
             >
               <mat-spinner

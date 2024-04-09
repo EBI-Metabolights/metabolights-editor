@@ -5,6 +5,10 @@ import { IAppState } from "../../../store";
 import { EditorService } from "./../../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { env } from "process";
 
 @Component({
   selector: "app-info",
@@ -13,6 +17,8 @@ import { environment } from "src/environments/environment";
 })
 export class InfoComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
+
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
 
   user: any = null;
   requestedStudy: string = null;
@@ -26,9 +32,10 @@ export class InfoComponent implements OnInit {
     private editorService: EditorService
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
@@ -39,6 +46,14 @@ export class InfoComponent implements OnInit {
       }
     });
   }
+
+
+  setUpSubscriptionsNgxs() {
+    this.studyIdentifier$.subscribe((value) => {
+      if (value != null) this.requestedStudy = value
+    })
+  }
+
 
   ngOnInit() {}
 

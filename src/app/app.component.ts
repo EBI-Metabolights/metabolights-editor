@@ -6,6 +6,9 @@ import { Subscription } from "rxjs";
 import { NavigationStart, Router, RouterEvent } from "@angular/router";
 import jwtDecode from "jwt-decode";
 import { MtblsJwtPayload } from "./services/headers";
+import { Store } from "@ngxs/store";
+import { environment } from "src/environments/environment";
+import { BackendVersion, EditorVersion, Guides, GuidesMappings } from "./ngxs-store/non-study/application/application.actions";
 
 export let browserRefresh = false;
 
@@ -20,7 +23,8 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private elementRef: ElementRef,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private store: Store
   ) {
 
     this.subscription = router.events.subscribe((e) => {
@@ -68,9 +72,17 @@ export class AppComponent implements OnInit {
       localStorage.removeItem("mtblsjwt");
       localStorage.removeItem("mtblsuser");
     }
-    this.editorService.loadVersionInfo();
-    this.editorService.loadApiVersionInfo();
-    this.editorService.loadGuides();
+    if (environment.useNewState) {
+     // this.store.dispatch( )
+     this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
+     this.store.dispatch(new BackendVersion.Get());
+     this.store.dispatch(new EditorVersion.Get());
+    } else {
+      this.editorService.loadVersionInfo();
+      this.editorService.loadApiVersionInfo();
+      this.editorService.loadGuides();
+    }
+
   }
 
 

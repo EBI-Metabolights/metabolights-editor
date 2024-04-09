@@ -55,6 +55,20 @@ import { AuthService } from "./services/metabolights/auth.service";
 import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
+import { NgxsModule } from "@ngxs/store";
+import { TransitionsState } from "./ngxs-store/non-study/transitions/transitions.state";
+import { UserState } from "./ngxs-store/non-study/user/user.state";
+import { ApplicationState } from "./ngxs-store/non-study/application/application.state";
+import { GeneralMetadataState } from "./ngxs-store/study/general-metadata/general-metadata.state";
+import { FilesState } from "./ngxs-store/study/files/files.state";
+import { AssayState } from "./ngxs-store/study/assay/assay.state";
+import { MAFState } from "./ngxs-store/study/maf/maf.state";
+import { SampleState } from "./ngxs-store/study/samples/samples.state";
+import { ProtocolsState } from "./ngxs-store/study/protocols/protocols.state";
+import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.state";
+import { ValidationState } from "./ngxs-store/study/validation/validation.state";
+import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
+import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -102,6 +116,20 @@ export function configLoader(injector: Injector): () => Promise<any> {
     AngularStickyThingsModule,
     DragDropModule,
     NgReduxRouterModule.forRoot(),
+    NgxsModule.forRoot([
+      UserState, 
+      TransitionsState,
+      ApplicationState,
+      GeneralMetadataState,
+      FilesState,
+      AssayState,
+      MAFState,
+      SampleState,
+      ProtocolsState,
+      DescriptorsState,
+      ValidationState
+    ], 
+    { developmentMode: true }),
     QuillModule.forRoot({
       modules: {
         clipboard: {
@@ -126,6 +154,8 @@ export function configLoader(injector: Injector): () => Promise<any> {
     AuthService,
     LabsWorkspaceService,
     { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true},
+    { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true},
     {
       provide: APP_BASE_HREF,
       useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),

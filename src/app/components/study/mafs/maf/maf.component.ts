@@ -5,6 +5,11 @@ import { TableComponent } from "./../../../shared/table/table.component";
 import { select } from "@angular-redux/store";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
+import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
+import { Observable } from "rxjs";
+import { Select } from "@ngxs/store";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { deepCopy } from "src/app/ngxs-store/utils";
 
 @Component({
   selector: "mtbls-maf",
@@ -17,6 +22,10 @@ export class MafComponent implements AfterContentInit {
   @select((state) => state.study.mafs) studyMAFs;
   @select((state) => state.study.readonly) readonly;
   @ViewChild(TableComponent) mafTable: TableComponent;
+
+  @Select(MAFState.mafs) studyMAFs$: Observable<Record<string, any>>;
+  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  
 
   isReadOnly = false;
 
@@ -46,9 +55,10 @@ export class MafComponent implements AfterContentInit {
   constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
   ngAfterContentInit() {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.load();
     }
+    if (environment.useNewState) this.loadNgxs();
   }
 
   load() {
@@ -59,6 +69,22 @@ export class MafComponent implements AfterContentInit {
       }
     });
     this.studyMAFs.subscribe((mafs) => {
+      if(Array.isArray(mafs) && mafs.length === 0){
+        return;
+      }
+      if (mafs && this.value.data.file) {
+        this.mafData = mafs[this.value.data.file];
+      }
+    });
+  }
+
+  loadNgxs() {
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
+    this.studyMAFs$.subscribe((mafs) => {
       if(Array.isArray(mafs) && mafs.length === 0){
         return;
       }
@@ -248,12 +274,13 @@ export class MafComponent implements AfterContentInit {
    * one man */
   /* eslint-disable @typescript-eslint/dot-notation */
   saveCell() {
-    this.selectedRow["metabolite_identification"] = this.form.get("name").value;
-    this.selectedRow["inchi"] = this.form.get("inchi").value;
-    this.selectedRow["database_identifier"] = this.form.get("databaseId").value;
-    this.selectedRow["smiles"] = this.form.get("smiles").value;
-    this.selectedRow["chemical_formula"] = this.form.get("formula").value;
-    this.mafTable.updateRows([this.selectedRow]);
+    let copyRow = deepCopy(this.selectedRow);
+    copyRow["metabolite_identification"] = this.form.get("name").value;
+    copyRow["inchi"] = this.form.get("inchi").value;
+    copyRow["database_identifier"] = this.form.get("databaseId").value;
+    copyRow["smiles"] = this.form.get("smiles").value;
+    copyRow["chemical_formula"] = this.form.get("formula").value;
+    this.mafTable.updateRows([copyRow]);
   }
 
   closeRowEditModal() {

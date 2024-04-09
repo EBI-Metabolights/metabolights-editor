@@ -8,6 +8,11 @@ import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
+import { Select, Store } from "@ngxs/store";
+import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { Guides } from "src/app/ngxs-store/non-study/application/application.actions";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { Observable } from "rxjs";
 @Component({
   selector: "app-guides",
   templateUrl: "./guides.component.html",
@@ -17,6 +22,10 @@ export class GuidesComponent implements OnInit {
   @select((state) => state.status.mappings) mappings;
   @select((state) => state.status.guides) guides;
   @select((state) => state.status.selectedLanguage) selectedLanguage;
+
+  @Select(ApplicationState.selectedLanguage) selectedLanguage$: Observable<string>;
+  @Select(ApplicationState.mappings) mappings$: Observable<Record<string, any>>;
+  @Select(ApplicationState.guides) guides$: Observable<any>;
 
   domain = "";
   repo = "";
@@ -36,6 +45,7 @@ export class GuidesComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     public router: Router,
     private editorService: EditorService,
     private route: ActivatedRoute,
@@ -45,13 +55,46 @@ export class GuidesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) this.setUpSubscriptionsNgxs();
     this.repo = this.configService.config.metabolightsWSURL.guides;
     if(this.repo.endsWith("/")){
       this.repo =  this.repo.slice(0, -1);
     }
+  }
+
+  /**
+   * Subscribe to each of the components selectors. Also dispatches a Loading.Disable action to derender the loading view.
+   */
+  setUpSubscriptionsNgxs() {
+    this.store.dispatch(new Loading.Disable());
+    this.mappings$.subscribe((value) => {
+      if (value != null) {
+        this.languageMappings = value;
+      }
+    });
+
+    this.guides$.subscribe((value) => {
+      if (value != null) {
+        this.guidesSelected = value;
+        this.tabs = Object.keys(this.guidesSelected);
+        this.tab = this.route.snapshot.paramMap.get("tab");
+        if (this.tabs.indexOf(this.tab) > -1) {
+          this.setSelectedTab(this.tab);
+        } else {
+          this.setSelectedTab(this.tabs[0]);
+        }
+      }
+    });
+
+    this.selectedLanguage$.subscribe((value) => {
+      if (value != null) {
+        this.languageSelected = value;
+      }
+    });
+    
   }
 
   setUpSubscriptions() {
@@ -133,7 +176,8 @@ export class GuidesComponent implements OnInit {
   }
 
   setSelectedLanguage(language) {
-    this.editorService.loadLanguage(language);
+    if (environment.useNewState) this.store.dispatch(new Guides.Get(language, true))
+    else this.editorService.loadLanguage(language);
   }
 
   getKeys(object) {

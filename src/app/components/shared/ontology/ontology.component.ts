@@ -104,7 +104,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (this.values === null || this.values[0] === null) {
       this.values = [];
     }
-    this.url = "/internal-ebi/ontology";
+    this.url = "/ebi-internal/ontology?term=";
     this.readonly = this.editorService.ngRedux.getState().study.readonly;
     if (this.readonly === false && "recommended-ontologies" in this.validations) {
       if (this.validations["recommended-ontologies"]) {

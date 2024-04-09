@@ -40,35 +40,38 @@
   <div class="modal-card">
     <section class="modal-card-body">
       Using FTP Client:
+      <!--Start of the ftp table-->
+
+
       <table
-        *ngIf="validations | async"
         class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
       >
         <tbody>
           <tr>
             <th>User</th>
             <td>
-              {{ (validations | async)[this.validationsId]["ftp"]["user"] }}
+              {{ details.user }}
             </td>
           </tr>
           <tr>
             <th>Password</th>
             <td>
-              {{ (validations | async)[this.validationsId]["ftp"]["secret"] }}
+              {{ details.secret }}
             </td>
           </tr>
           <tr>
             <th>Server</th>
             <td>
-              {{ (validations | async)[this.validationsId]["ftp"]["server"] }}
+              {{ details.server }}
             </td>
           </tr>
           <tr>
             <th>Remote folder</th>
-            <td>{{ uploadLocation | async }}</td>
+            <td>{{ uploadLocation$ | async }}</td>
           </tr>
         </tbody>
       </table>
+      <!--End of ftp table-->
       <div style="margin-top: 20px" class="panel-block notification is-primary">
         <small>
           <i

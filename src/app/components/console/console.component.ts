@@ -5,6 +5,14 @@ import { AfterContentInit, Component, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "src/environments/environment";
+import { Select, Store } from "@ngxs/store";
+import { SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { Observable } from "rxjs";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
   selector: "mtbls-console",
@@ -18,8 +26,14 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   @select((state) => state.status.bannerMessage) bannerMessage;
   @select((state) => state.status.maintenanceMode) maintenanceMode;
 
-  studies: string[] = [];
-  filteredStudies: string[] = [];
+  @Select(UserState.user) user$: Observable<Owner>
+  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
+  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
+
+  studies: IStudyDetail[] = [];
+  filteredStudies: IStudyDetail[] = [];
   loadingStudies = false;
   filterValue: string = null;
   messageExpanded = false;
@@ -37,11 +51,15 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     public router: Router,
     public http: HttpClient,
     private ngRedux: NgRedux<IAppState>,
+    private store: Store,
     private editorService: EditorService
   ) {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
-        this.editorService.getAllStudies();
+        if (environment.useNewState) {
+          console.log('hit console.component constructor if use new state block')
+          this.store.dispatch(new User.Studies.Get());}
+        else this.editorService.getAllStudies();
         this.baseHref = this.editorService.configService.baseHref;
       }
     });
@@ -50,15 +68,29 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   ngOnInit() {
 
     this.editorService.updateHistory(this.route.snapshot);
-    this.bannerMessage.subscribe((value) => {
-      this.banner = value;
-    });
-    this.maintenanceMode.subscribe((value) => {
-      this.underMaintenance = value;
-    });
-    this.isCurator.subscribe((value) => {
-      this.curator = value;
-    });
+    if (environment.useNewState) {
+      this.bannerMessage$.subscribe((value) => {
+        this.banner = value;
+      });
+      this.maintenanceMode$.subscribe((value) => {
+        this.underMaintenance = value;
+      });
+      this.isCurator$.subscribe((value) => {
+        this.curator = value;
+      });
+
+    } else {
+      this.bannerMessage.subscribe((value) => {
+        this.banner = value;
+      });
+      this.maintenanceMode.subscribe((value) => {
+        this.underMaintenance = value;
+      });
+      this.isCurator.subscribe((value) => {
+        this.curator = value;
+      });
+    }
+    
 
   }
 
@@ -88,13 +120,16 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     });
     this.userStudies.subscribe((value) => {
       if (value === null) {
-        this.ngRedux.dispatch({
-          type: "SET_LOADING_INFO",
-          body: {
-            info: "Loading user studies",
-          },
-        });
-        this.editorService.getAllStudies();
+        if (environment.useNewState){this.store.dispatch(new SetLoadingInfo("Loading user studies"))} else{
+          this.ngRedux.dispatch({
+            type: "SET_LOADING_INFO",
+            body: {
+              info: "Loading user studies",
+            },
+          });
+        }
+        if (environment.useNewState) this.store.dispatch(new User.Studies.Get())
+        else this.editorService.getAllStudies();
       } else {
         this.editorService.toggleLoading(false);
         this.studies = value;
@@ -107,11 +142,41 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     });
   }
 
+  setUpSubscriptionsNgxs() {
+    this.user$.subscribe((value) => {
+      this.user = value;
+      this.loginName = this.user?.email ?? "";
+    });
+    this.userStudies$.subscribe((value) => {
+      if (value === null) {
+        if (environment.useNewState){this.store.dispatch(new SetLoadingInfo("Loading user studies"))} else{
+          this.ngRedux.dispatch({
+            type: "SET_LOADING_INFO",
+            body: {
+              info: "Loading user studies",
+            },
+          });
+        }
+        if (environment.useNewState) this.store.dispatch(new User.Studies.Get())
+        else this.editorService.getAllStudies();
+      } else {
+        this.editorService.toggleLoading(false);
+        this.studies = value;
+
+        this.filteredStudies = this.studies;
+        this.loadingStudies = false;
+      }
+    });
+  }
+
   ngAfterContentInit() {
     this.editorService.initialiseStudy(null);
-    if (!environment.isTesting) {
+    if (!environment.isTesting && !environment.useNewState) {
       this.setUpSubscriptions();
     }
+    if (environment.useNewState) {
+      console.log('hit usenewstate in after content init')
+      this.setUpSubscriptionsNgxs();}
   }
 
   formatDate(date) {
@@ -127,7 +192,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     } else {
       this.filteredStudies = this.studies;
     }
-    this.filteredStudies = this.filteredStudies.sort((a: any, b: any) => 0);
   }
 
   applyFilter(value) {
