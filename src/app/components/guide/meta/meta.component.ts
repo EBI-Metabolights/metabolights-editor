@@ -2,7 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { FormBuilder, FormGroup } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
-import { select } from "@angular-redux/store";
 import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPublication } from "./../../../models/mtbl/mtbls/mtbls-publication";
@@ -28,11 +27,6 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
   styleUrls: ["./meta.component.css"],
 })
 export class MetaComponent implements OnInit {
-  @select((state) => state.status.user) studyUser;
-  @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.study.title) studyTitle;
-  @select((state) => state.study.abstract) studyDescription;
-
 
   @Select(UserState.user) user$: Observable<Owner>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;

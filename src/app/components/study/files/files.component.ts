@@ -2,7 +2,6 @@
 import { Component, OnInit, Input, OnDestroy, OnChanges } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
-import { select } from "@angular-redux/store";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import { environment } from "src/environments/environment";
 import { FtpManagementService } from "src/app/services/ftp-management.service";
@@ -22,11 +21,7 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
   styleUrls: ["./files.component.css"],
 })
 export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
-  @select((state) => state.study.readonly) readonly;
-  @select((state) => state.study.status) studyStatus;
-  @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.study.identifier) studyIdentifier: any;
-
+  
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
@@ -92,7 +87,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
   ngOnInit() {
     this.loadFiles();
 
-    environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
+    this.setUpSubscriptionsNgxs();
 
   }
 
@@ -108,24 +103,7 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
     // this.isCurator.unsubscribe();
   }
 
-  setUpSubscriptions() {
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        this.isReadOnly = value;
-      }
-    });
-    this.studyStatus.subscribe((value) => {
-      this.status = value;
-    });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
-    });
-    this.isCurator.subscribe((value) => {
-      if (value !== null) {
-        this.curator = value;
-      }
-    });
-  }
+
 
   setUpSubscriptionsNgxs() {
     this.readonly$.subscribe((value) => {

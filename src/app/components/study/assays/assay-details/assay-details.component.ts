@@ -6,7 +6,6 @@ import {
   ViewChild,
   EventEmitter,
 } from "@angular/core";
-import { select } from "@angular-redux/store";
 import Swal from "sweetalert2";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
@@ -28,11 +27,8 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 })
 export class AssayDetailsComponent implements OnInit {
   @Input("assayName") assayName: any;
-  @select((state) => state.study.assays) assays;
-  @select((state) => state.study.samples) studySamples;
   @ViewChild(TableComponent) assayTable: TableComponent;
 
-  @select((state) => state.study.readonly) readonly;
 
   @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
@@ -61,19 +57,10 @@ export class AssayDetailsComponent implements OnInit {
   duplicateSampleNamesInAssay: any = [];
 
   constructor(private editorService: EditorService, private store: Store) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpConstructorSubscription();
-    }
-    if (environment.useNewState) this.setUpConstructorSubscriptionNgxs();
+
+    this.setUpConstructorSubscriptionNgxs();
   }
 
-  setUpConstructorSubscription() {
-    this.readonly.subscribe((value) => {
-      if (value != null) {
-        this.isReadOnly = value;
-      }
-    });
-  }
 
   setUpConstructorSubscriptionNgxs() {
     this.readonly$.subscribe((value) => {
@@ -83,17 +70,6 @@ export class AssayDetailsComponent implements OnInit {
     });
   }
 
-  setUpOnInitSubscriptions() {
-    this.assays.subscribe((value) => {
-      this.assay = value[this.assayName];
-    });
-    this.studySamples.subscribe((value) => {
-      if (value.data) {
-        this.sampleNames = value.data.rows.map((r) => r["Sample Name"]);
-        this.filteredSampleNames = this.sampleNames;
-      }
-    });
-  }
 
   setUpOnInitSubscriptionsNgxs() {
     this.assays$.subscribe((value) => {
@@ -109,10 +85,7 @@ export class AssayDetailsComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpOnInitSubscriptions();
-    }
-    if (environment.useNewState) this.setUpOnInitSubscriptionsNgxs();
+    this.setUpOnInitSubscriptionsNgxs();
   }
 
   onSamplesFilterKeydown(event, filterValue: string) {

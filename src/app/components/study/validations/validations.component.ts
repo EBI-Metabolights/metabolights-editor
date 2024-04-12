@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, OnInit } from "@angular/core";
-import { select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -19,9 +18,6 @@ import { ValidationReport } from "src/app/ngxs-store/study/validation/validation
   styleUrls: ["./validations.component.css"],
 })
 export class ValidationsComponent implements OnInit, AfterViewInit {
-  @select((state) => state.study.validation) validation: any;
-  @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.study.identifier) studyIdentifier: any;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
@@ -62,38 +58,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-   environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
-  }
-
-  setUpSubscriptions() {
-    this.validation.subscribe((value) => {
-      if (value) {
-        this.studyValidation = value;
-        if (this.studyValidation.status === 'error'){
-          this.validationStatusClass = "is-danger";
-        } else if (this.studyValidation.status === 'success'){
-          this.validationStatusClass = "is-success";
-        } else if (this.studyValidation.status === 'warning'){
-            this.validationStatusClass = "is-success";
-        } else if (this.studyValidation.status === 'not ready'){
-          this.validationStatusClass = "is-warning";
-        } else {
-          this.validationStatusClass = "is-warning";
-        }
-      }
-    });
-    this.isCurator.subscribe((value) => {
-      if (value !== null) {
-        this.curator = value;
-      }
-    });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
-      this.startValidationTaskUrl = this.configService.config.metabolightsWSURL.baseURL
-        + "/studies/" + this.requestedStudy + "/validation-task";
-      this.getValidationTaskStatusUrl = this.configService.config.metabolightsWSURL.baseURL
-      + "/studies/" + this.requestedStudy + "/validation-task";
-    });
+   this.setUpSubscriptionsNgxs()
   }
 
   setUpSubscriptionsNgxs() {

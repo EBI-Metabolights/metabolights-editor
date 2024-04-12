@@ -2,7 +2,6 @@ import { Component, ViewChild, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { FormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
-import { select } from "@angular-redux/store";
 import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
 import * as toastr from "toastr";
 import Swal from "sweetalert2";
@@ -27,11 +26,6 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
   styleUrls: ["./assays.component.css"],
 })
 export class GuidedAssaysComponent implements OnInit {
-  @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.study.files) studyFiles;
-  @select((state) => state.study.assays) studyAssays;
-  @select((state) => state.study.samples) studySamples;
-
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
@@ -339,7 +333,7 @@ export class GuidedAssaysComponent implements OnInit {
     if (reloadFiles) {
       this.store.dispatch(new Operations.GetFreshFilesList(true));
     } else {
-      this.store.dispatch(new AssayList.Get(this.studyIdentifier));
+      this.store.dispatch(new AssayList.Get(this.requestedStudy));
     }
   }
 }

@@ -2,7 +2,6 @@ import { AfterContentInit, Component, Input, ViewChild } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
-import { select } from "@angular-redux/store";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
 import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
@@ -19,8 +18,6 @@ import { deepCopy } from "src/app/ngxs-store/utils";
 export class MafComponent implements AfterContentInit {
   @Input("value") value: any;
 
-  @select((state) => state.study.mafs) studyMAFs;
-  @select((state) => state.study.readonly) readonly;
   @ViewChild(TableComponent) mafTable: TableComponent;
 
   @Select(MAFState.mafs) studyMAFs$: Observable<Record<string, any>>;
@@ -55,28 +52,9 @@ export class MafComponent implements AfterContentInit {
   constructor(private fb: FormBuilder, private editorService: EditorService) {}
 
   ngAfterContentInit() {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.load();
-    }
-    if (environment.useNewState) this.loadNgxs();
+    this.loadNgxs();
   }
 
-  load() {
-
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        this.isReadOnly = value;
-      }
-    });
-    this.studyMAFs.subscribe((mafs) => {
-      if(Array.isArray(mafs) && mafs.length === 0){
-        return;
-      }
-      if (mafs && this.value.data.file) {
-        this.mafData = mafs[this.value.data.file];
-      }
-    });
-  }
 
   loadNgxs() {
     this.readonly$.subscribe((value) => {
@@ -107,7 +85,7 @@ export class MafComponent implements AfterContentInit {
   }
 
   validateMAFSheet() {
-    this.load();
+    this.loadNgxs();
   }
 
   getChebiId() {

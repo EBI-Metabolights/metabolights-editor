@@ -83,7 +83,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
   imports: [
     BrowserModule,
     HttpClientModule,
-    NgxWigModule,
     StudyModule,
     SharedModule,
     GuideModule,

@@ -1,4 +1,3 @@
-import { select } from '@angular-redux/store';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
@@ -21,7 +20,6 @@ import { Select } from '@ngxs/store';
  *  - check on the status of sync operations
  */
 export class FtpManagementService {
-  @select((state) => state.study.identifier) studyIdentifier;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
 
   id: string;
@@ -36,15 +34,7 @@ export class FtpManagementService {
    * @param configService internal config service for retrieving API configuration values.
    */
   constructor(private http: HttpClient, private configService: ConfigurationService) {
-      if (environment.useNewState) this.setUpSubscriptionNgxs(); 
-      else {
-        this.studyIdentifier.subscribe((value) => {
-          if (value != null) {
-            this.url = `${configService.config.metabolightsWSURL.baseURL}/studies/${value}/study-folders/rsync-task`;
-          }
-        });
-      }
-
+      this.setUpSubscriptionNgxs(); 
    }
 
   setUpSubscriptionNgxs() {
