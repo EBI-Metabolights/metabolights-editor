@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 
 import { RsyncComponent } from './rsync.component';
 
@@ -6,7 +6,7 @@ describe('RsyncComponent', () => {
   let component: RsyncComponent;
   let fixture: ComponentFixture<RsyncComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ RsyncComponent ]
     })

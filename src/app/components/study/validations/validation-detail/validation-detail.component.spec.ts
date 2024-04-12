@@ -3,7 +3,7 @@ import { HttpClientTestingModule } from "@angular/common/http/testing";
 import {  Store } from "@ngxs/store";
 
 import { Directive, EventEmitter, Input, Output } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatExpansionModule } from "@angular/material/expansion";
@@ -29,7 +29,7 @@ describe("ValidationDetailComponent", () => {
   let configService: ConfigurationService;
   let editorService: EditorService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [
         ValidationDetailComponent,

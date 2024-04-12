@@ -8,7 +8,7 @@ import {
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import {
   ChildrenOutletContexts,
   Router,
@@ -31,7 +31,7 @@ describe("ConsoleComponent", () => {
   let component: ConsoleComponent;
   let fixture: ComponentFixture<ConsoleComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [ConsoleComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],

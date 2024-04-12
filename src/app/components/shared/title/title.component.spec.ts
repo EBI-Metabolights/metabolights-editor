@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { Store} from '@ngxs/store'
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { RouterTestingModule } from "@angular/router/testing";
@@ -16,7 +16,7 @@ describe("TitleComponent", () => {
   let fixture: ComponentFixture<TitleComponent>;
   let editorService: EditorService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [TitleComponent],
       imports: [

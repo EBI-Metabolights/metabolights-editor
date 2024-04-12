@@ -7,7 +7,7 @@ import {
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import {
@@ -36,7 +36,7 @@ describe("LoginComponent", () => {
   let fixture: ComponentFixture<LoginComponent>;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
       imports: [

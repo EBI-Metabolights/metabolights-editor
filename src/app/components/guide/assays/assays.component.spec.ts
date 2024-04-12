@@ -7,7 +7,7 @@ import {
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import {
@@ -32,7 +32,7 @@ describe("AssaysComponent", () => {
   let component: GuidedAssaysComponent;
   let fixture: ComponentFixture<GuidedAssaysComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [GuidedAssaysComponent],
       imports: [

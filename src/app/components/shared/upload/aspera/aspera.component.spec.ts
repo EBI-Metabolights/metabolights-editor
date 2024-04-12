@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
@@ -16,7 +16,7 @@ describe("AsperaUploadComponent", () => {
   let fixture: ComponentFixture<AsperaUploadComponent>;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [AsperaUploadComponent],
       imports: [

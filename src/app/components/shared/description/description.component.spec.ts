@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Store } from "@ngxs/store";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { Browser } from "selenium-webdriver";
@@ -13,7 +13,7 @@ describe("DescriptionComponent", () => {
   let component: DescriptionComponent;
   let fixture: ComponentFixture<DescriptionComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [DescriptionComponent],
       imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule],

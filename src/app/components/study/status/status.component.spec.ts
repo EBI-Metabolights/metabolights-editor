@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
@@ -11,7 +11,7 @@ describe("StatusComponent", () => {
   let fixture: ComponentFixture<StatusComponent>;
   let editorService: EditorService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [StatusComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
