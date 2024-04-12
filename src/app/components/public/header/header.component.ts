@@ -1,5 +1,4 @@
 import { Component, OnInit } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
@@ -15,10 +14,6 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent {
- @select((state) => state.status.user) studyUser;
- @select((state) => state.status.bannerMessage) bannerMessage;
- @select((state) => state.status.maintenanceMode) maintenanceMode;
-
  @Select(UserState.user) user$: Observable<Owner>;
  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
@@ -31,7 +26,7 @@ export class HeaderComponent {
   banner: string = null;
   underMaintenance = false;
   constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
-      environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscription();
+      this.setUpSubscriptionsNgxs();
       const url = this.configService.config.endpoint;
       if(url.endsWith("/")){
         this.metabolightsWebsiteUrl = url.slice(0, -1);
@@ -52,19 +47,6 @@ export class HeaderComponent {
 
   }
 
-  setUpSubscription() {
-    this.studyUser.subscribe((value) => {
-      if (value != null) {
-        this.authUser = value;
-      }
-    });
-    this.maintenanceMode.subscribe((value) => {
-      this.underMaintenance = value;
-    });
-    this.bannerMessage.subscribe((value) => {
-        this.banner = value;
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.user$.subscribe((value) => {

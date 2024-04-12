@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import { CommonModule } from "@angular/common";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
@@ -31,7 +31,7 @@ describe("ProtocolComponent", () => {
       imports: [FormsModule, ReactiveFormsModule, BrowserModule, CommonModule],
       providers: [
         { provide: EditorService, useClass: MockEditorService },
-        NgRedux,
+        Store,
       ],
     }).compileComponents();
   }));

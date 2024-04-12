@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import {
   NgModuleFactoryLoader,
   Compiler,
@@ -39,7 +39,7 @@ describe("StudyComponent", () => {
       declarations: [StudyComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,
@@ -73,7 +73,6 @@ describe("StudyComponent", () => {
     editorService = TestBed.inject(EditorService);
     fixture = TestBed.createComponent(StudyComponent);
     component = fixture.componentInstance;
-    spyOn(component, "setUpSubscriptions").and.stub();
     fixture.detectChanges();
   });
 

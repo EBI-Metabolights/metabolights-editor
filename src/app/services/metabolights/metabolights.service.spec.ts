@@ -1,10 +1,6 @@
-import { NgRedux } from "@angular-redux/store";
 import { TestBed, inject } from "@angular/core/testing";
-import { IAppState } from "src/app/store";
-import {
-  NgReduxTestingModule,
-  MockNgRedux,
-} from "@angular-redux/store/testing";
+import {  Store } from "@ngxs/store";
+
 
 import { MetabolightsService } from "./metabolights.service";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -24,6 +20,7 @@ describe("MetabolightsService", () => {
           provide: ConfigurationService,
           useClass: MockConfigurationService,
         },
+        Store
       ],
       imports: [HttpClientTestingModule],
     });

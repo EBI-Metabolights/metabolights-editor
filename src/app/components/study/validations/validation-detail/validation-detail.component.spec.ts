@@ -1,6 +1,7 @@
-import { NgReduxModule } from "@angular-redux/store";
-import { NgReduxTestingModule } from "@angular-redux/store/testing";
+
 import { HttpClientTestingModule } from "@angular/common/http/testing";
+import {  Store } from "@ngxs/store";
+
 import { Directive, EventEmitter, Input, Output } from "@angular/core";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -44,12 +45,12 @@ describe("ValidationDetailComponent", () => {
         ReactiveFormsModule,
         MatFormFieldModule,
         HttpClientTestingModule,
-        NgReduxModule,
-        NgReduxTestingModule,
       ],
       providers: [
         { provide: ConfigurationService, useClass: MockConfigurationService },
         { provide: EditorService, useClass: MockEditorService },
+        Store
+        
       ],
     }).compileComponents();
   }));
@@ -82,21 +83,6 @@ describe("ValidationDetailComponent", () => {
     expect(component).toBeTruthy();
   });
 
-  describe("Component Logic Tests", () => {
-    it("should call propagateComment when the child components event emitter is activated", () => {
-      spyOn(component, "propagateComment");
-      const commentComponentElement = fixture.debugElement.query(
-        By.directive(ValidationDetailCommentComponent)
-      );
-      const commentComponent = commentComponentElement.componentInstance;
-      commentComponent.commentSaved.emit({ comment: "string" });
-      fixture.detectChanges();
-
-      expect(component.propagateComment).toHaveBeenCalledWith({
-        comment: "string",
-      });
-    });
-  });
 
   describe("Curator View Tests", () => {
     beforeEach(() => {

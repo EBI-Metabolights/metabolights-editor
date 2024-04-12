@@ -9,6 +9,9 @@ import {
 } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../../services/editor.service";
+import { Select, Store } from "@ngxs/store";
+import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
+
 /* eslint-disable @typescript-eslint/naming-convention */
 // linter keeps falsely identifying ternary operatorss as being pure expressions
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -55,7 +58,7 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
   // whether the comment button is visible
   showCommentButton = false;
 
-  constructor(private editorService: EditorService) {}
+  constructor(private editorService: EditorService, private store: Store) {}
 
   ngOnInit(): void {
     this.disabled = this.decideIfDisabled();
@@ -132,36 +135,32 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
     const payload = {};
     payload[val_seq] = val_description;
     data.validations.push(payload);
-    this.editorService.overrideValidations(data).subscribe(
-      (res) => {
+    this.store.dispatch(new ValidationReport.Override(data)).subscribe(
+      (completed) => {
         toastr.success(
-          res.success,
+          "Success",
           "Successfully overriden the validation",
           this.defaultToastrOptions
         );
-        this.refreshValidations();
       },
-      (err) => {
+      (error) => {
         toastr.error(
           "Validation override failed",
           "Error",
           this.defaultToastrOptions
         );
       }
-    );
+    )
+
   }
 
-  propagateComment($event) {
-    this.commentSaved.emit($event);
-  }
 
   refreshValidations() {
-    this.editorService.refreshValidations().subscribe(
-      (res) => {
-        this.editorService.loadValidations();
-        toastr.success(res.success, "Success", this.defaultToastrOptions);
+    this.store.dispatch(new ValidationReport.Refresh()).subscribe((completed) => {
+      toastr.success("Success", "Refreshed.", this.defaultToastrOptions);
+
       },
-      (err) => {
+      (error) => {
         toastr.success(
           "Validation refresh job is submitted. If your study is large, validations will take some time to refresh." +
             "If your study validations are not refreshing please contact us.",
@@ -169,6 +168,7 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
           this.defaultToastrOptions
         );
       }
-    );
+    )
+
   }
 }

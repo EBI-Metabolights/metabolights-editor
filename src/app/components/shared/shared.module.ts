@@ -12,7 +12,6 @@ import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { QuickLinkComponent } from "./quick-link/quick-link.component";
 import { UploadComponent } from "./upload/upload.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { NgReduxModule } from "@angular-redux/store";
 import { AsperaDownloadComponent } from "./download/aspera/aspera.component";
 import { FtpDownloadComponent } from "./download/ftp/ftp.component";
 import { HttpDownloadComponent } from "./download/http/http.component";
@@ -104,7 +103,6 @@ import { TableComponent } from "./table/table.component";
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    NgReduxModule,
     RouterModule,
     MatPaginatorModule,
     MatSortModule,

@@ -7,8 +7,6 @@ import {
 } from "./../../../../models/mtbl/mtbls/mtbls-protocol";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 
-import { IAppState } from "../../../../store";
-import { NgRedux, select } from "@angular-redux/store";
 import { ValidateRules } from "./protocol.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import * as toastr from "toastr";
@@ -34,11 +32,8 @@ export class ProtocolComponent implements OnInit {
   @Input("required") required = false;
   @Input("validations") validations: any;
 
-  @select((state) => state.study.readonly) studyReadonly;
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
-
-  @select((state) => state.study.isProtocolsExpanded) isProtocolsExpanded;
 
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
@@ -78,25 +73,9 @@ export class ProtocolComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>,
     private store: Store
   ) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
-  }
-
-  setUpSubscriptions() {
-    this.isProtocolsExpanded.subscribe((value) => {
-      this.expand = value;
-    });
-
-    this.studyReadonly.subscribe((value) => {
-      if (value !== null) {
-        this.isStudyReadOnly = value;
-      }
-    });
+    this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptionsNgxs() {
@@ -151,35 +130,14 @@ export class ProtocolComponent implements OnInit {
       column.name = col.name;
       columns.push(column);
     }
-    if (environment.useNewState) {
-       this.store.dispatch(new Assay.AddColumn(assay, { data: column }, "assay", this.studyId)).subscribe(
-        (completed) => {
-          toastr.success("Assay specifications updated", "success", this.toastrSettings);
-        },
-        (error) => {
-          console.log(error)
-        }
-      )
-    }
-    else {
-      this.editorService
-      .addColumns(assay, { data: columns }, "assays", null)
-      .subscribe(
-        (res) => {
-          toastr.success("Assay specifications updated.", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-        },
-        (err) => {
-          console.log(err);
-        }
-      );
-    }
-
+      this.store.dispatch(new Assay.AddColumn(assay, { data: column }, "assay", this.studyId)).subscribe(
+      (completed) => {
+        toastr.success("Assay specifications updated", "success", this.toastrSettings);
+      },
+      (error) => {
+        console.log(error)
+      }
+    )
   }
 
   formatTitle(term) {
@@ -344,41 +302,6 @@ export class ProtocolComponent implements OnInit {
     this.form.markAsDirty();
   }
 
-  // ADJUST POST STATE MIGRATION
-  save() {
-    if (!this.isStudyReadOnly) {
-      if (this.getFieldValue("description")) {
-        this.isFormBusy = true;
-        if (!this.addNewProtocol) {
-          this.editorService
-            .updateProtocol(this.protocol.name, this.compileBody())
-            .subscribe(
-              (res) => {
-                this.updateProtocols(res, "Protocol updated.");
-                this.form.removeControl("description");
-                // this.isModalOpen = false;
-              },
-              (err) => {
-                this.isFormBusy = false;
-              }
-            );
-        } else {
-          this.editorService.saveProtocol(this.compileBody()).subscribe(
-            (res) => {
-              this.updateProtocols(res, "Protocol saved.");
-              this.form.removeControl("description");
-              this.isModalOpen = false;
-            },
-            (err) => {
-              this.isFormBusy = false;
-            }
-          );
-        }
-      } else {
-        alert("Protocol description cannot be empty");
-      }
-    }
-  }
 
   saveNgxs() {
     if (!this.isStudyReadOnly) {
@@ -412,33 +335,6 @@ export class ProtocolComponent implements OnInit {
     }
   }
 
-  // ADJUST POST STATE MIGRATION
-  delete() {
-    if (!this.isStudyReadOnly) {
-      if (!this.required) {
-        this.editorService.deleteProtocol(this.protocol.name).subscribe(
-          (res) => {
-            this.addNewProtocol = true;
-            this.updateProtocols(res, "Protocol deleted.");
-            this.form.removeControl("description");
-            this.isDeleteModalOpen = false;
-            this.isModalOpen = false;
-          },
-          (err) => {
-            this.isFormBusy = false;
-          }
-        );
-      } else {
-        toastr.error("Cannot delete a default protocol", "Error", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      }
-    }
-  }
 
   deleteNgxs() {
     if (!this.isStudyReadOnly) {
@@ -495,34 +391,6 @@ export class ProtocolComponent implements OnInit {
     }
   }
 
-  // REMOVE POST STATE MIGRATION
-  updateProtocols(data, message) {
-    if (!this.isStudyReadOnly) {
-      this.editorService.getProtocols(null).subscribe((res) => {
-        this.form.reset();
-        this.form.markAsPristine();
-        this.initialiseForm();
-        if (!this.addNewProtocol) {
-          const jsonConvert: JsonConvert = new JsonConvert();
-          // assert that the protocols is a list
-          const assertedProtocols = res.protocols as IProtocol[];
-          this.protocol = jsonConvert.deserialize(
-            assertedProtocols.filter((p) => p.name === this.protocol.name)[0],
-            MTBLSProtocol
-          );
-          this.openModal(this.protocol);
-        }
-
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      });
-    }
-  }
 
   refreshProtocols(message, name?) {
     this.store.dispatch(new Protocols.Get()).subscribe(

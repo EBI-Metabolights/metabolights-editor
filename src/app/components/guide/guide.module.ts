@@ -1,4 +1,3 @@
-import { NgReduxModule } from "@angular-redux/store";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
@@ -40,7 +39,6 @@ import { RawUploadComponent } from "./upload/upload.component";
     //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    NgReduxModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatButtonToggleModule,

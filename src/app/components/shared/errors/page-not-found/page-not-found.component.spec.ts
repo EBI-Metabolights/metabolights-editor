@@ -1,5 +1,5 @@
-import { NgRedux } from "@angular-redux/store";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { Store } from "@ngxs/store";
 
 import { PageNotFoundComponent } from "./page-not-found.component";
 
@@ -11,7 +11,7 @@ describe("PageNotFoundComponent", () => {
     TestBed.configureTestingModule({
       declarations: [PageNotFoundComponent],
       imports: [],
-      providers: [NgRedux],
+      providers: [Store],
     }).compileComponents();
   }));
 

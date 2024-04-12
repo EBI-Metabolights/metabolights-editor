@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
@@ -24,7 +24,7 @@ describe("PeopleComponent", () => {
         ReactiveFormsModule,
       ],
       providers: [
-        NgRedux,
+        Store,
         { provide: MetabolightsService, useClass: MockMetabolightsService },
       ],
     }).compileComponents();

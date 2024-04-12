@@ -1,5 +1,5 @@
-import { NgRedux } from "@angular-redux/store";
 import { CommonModule } from "@angular/common";
+import { Store} from '@ngxs/store'
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -29,7 +29,7 @@ describe("TitleComponent", () => {
       ],
       providers: [
         { provide: EditorService, useClass: MockEditorService },
-        NgRedux,
+        Store,
       ],
     }).compileComponents();
   }));

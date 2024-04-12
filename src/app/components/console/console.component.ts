@@ -1,10 +1,7 @@
 import { Router, ActivatedRoute } from "@angular/router";
-import { IAppState } from "./../../store";
-import { NgRedux, select } from "@angular-redux/store";
 import { AfterContentInit, Component, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
@@ -20,11 +17,6 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
   styleUrls: ["./console.component.css"],
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
-  @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.status.userStudies) userStudies;
-  @select((state) => state.status.user) studyUser;
-  @select((state) => state.status.bannerMessage) bannerMessage;
-  @select((state) => state.status.maintenanceMode) maintenanceMode;
 
   @Select(UserState.user) user$: Observable<Owner>
   @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>
@@ -50,16 +42,13 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     private route: ActivatedRoute,
     public router: Router,
     public http: HttpClient,
-    private ngRedux: NgRedux<IAppState>,
     private store: Store,
     private editorService: EditorService
   ) {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
-        if (environment.useNewState) {
-          console.log('hit console.component constructor if use new state block')
-          this.store.dispatch(new User.Studies.Get());}
-        else this.editorService.getAllStudies();
+        console.log('hit console.component constructor if use new state block')
+        this.store.dispatch(new User.Studies.Get());
         this.baseHref = this.editorService.configService.baseHref;
       }
     });
@@ -68,28 +57,17 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   ngOnInit() {
 
     this.editorService.updateHistory(this.route.snapshot);
-    if (environment.useNewState) {
-      this.bannerMessage$.subscribe((value) => {
-        this.banner = value;
-      });
-      this.maintenanceMode$.subscribe((value) => {
-        this.underMaintenance = value;
-      });
-      this.isCurator$.subscribe((value) => {
-        this.curator = value;
-      });
 
-    } else {
-      this.bannerMessage.subscribe((value) => {
-        this.banner = value;
-      });
-      this.maintenanceMode.subscribe((value) => {
-        this.underMaintenance = value;
-      });
-      this.isCurator.subscribe((value) => {
-        this.curator = value;
-      });
-    }
+    this.bannerMessage$.subscribe((value) => {
+      this.banner = value;
+    });
+    this.maintenanceMode$.subscribe((value) => {
+      this.underMaintenance = value;
+    });
+    this.isCurator$.subscribe((value) => {
+      this.curator = value;
+    });
+
     
 
   }
@@ -113,34 +91,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.isConfirmationModalOpen = false;
   }
 
-  setUpSubscriptions() {
-    this.studyUser.subscribe((value) => {
-      this.user = value;
-      this.loginName = this.user?.email ?? "";
-    });
-    this.userStudies.subscribe((value) => {
-      if (value === null) {
-        if (environment.useNewState){this.store.dispatch(new SetLoadingInfo("Loading user studies"))} else{
-          this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
-            body: {
-              info: "Loading user studies",
-            },
-          });
-        }
-        if (environment.useNewState) this.store.dispatch(new User.Studies.Get())
-        else this.editorService.getAllStudies();
-      } else {
-        this.editorService.toggleLoading(false);
-        this.studies = value;
-        this.studies.sort(
-          (a, b) => +new Date(b["releaseDate"]) - +new Date(a["releaseDate"])
-        );
-        this.filteredStudies = this.studies;
-        this.loadingStudies = false;
-      }
-    });
-  }
+
 
   setUpSubscriptionsNgxs() {
     this.user$.subscribe((value) => {
@@ -149,16 +100,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     });
     this.userStudies$.subscribe((value) => {
       if (value === null) {
-        if (environment.useNewState){this.store.dispatch(new SetLoadingInfo("Loading user studies"))} else{
-          this.ngRedux.dispatch({
-            type: "SET_LOADING_INFO",
-            body: {
-              info: "Loading user studies",
-            },
-          });
-        }
-        if (environment.useNewState) this.store.dispatch(new User.Studies.Get())
-        else this.editorService.getAllStudies();
+        this.store.dispatch(new SetLoadingInfo("Loading user studies"))
+        this.store.dispatch(new User.Studies.Get())
       } else {
         this.editorService.toggleLoading(false);
         this.studies = value;
@@ -171,12 +114,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   ngAfterContentInit() {
     this.editorService.initialiseStudy(null);
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) {
-      console.log('hit usenewstate in after content init')
-      this.setUpSubscriptionsNgxs();}
+
+
+    console.log('hit usenewstate in after content init')
+    this.setUpSubscriptionsNgxs();
   }
 
   formatDate(date) {

@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudyStatus, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, Title } from "./general-metadata.actions";
+import {  GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -13,6 +13,7 @@ import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
+import { JsonConvert } from "json2typescript";
 
 
 export interface GeneralMetadataStateModel {
@@ -68,7 +69,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));
                 ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
                 ctx.dispatch(new StudyReleaseDate.Set(new Date(gm_response.isaInvestigation.publicReleaseDate)));
-                ctx.dispatch(new SetStudyStatus(gm_response.mtblsStudy.studyStatus));
+                ctx.dispatch(new StudyStatus.Set(gm_response.mtblsStudy.studyStatus));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
@@ -172,8 +173,8 @@ export class GeneralMetadataState {
             })
     }
 
-    @Action(SetStudyStatus)
-    SetStatus(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyStatus) {
+    @Action(StudyStatus.Set)
+    SetStatus(ctx: StateContext<GeneralMetadataStateModel>, action: StudyStatus.Set) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
@@ -190,25 +191,164 @@ export class GeneralMetadataState {
         });
     }
 
+    @Action(Publications.Get)
+    GetPublications(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Get) {
+        const state = ctx.getState();
+        this.generalMetadataService.getPublications(state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new Publications.Set(response.publications as IPublication[]));
+            }
+        )
+    }
+
+    @Action(Publications.Add)
+    AddPublication(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Add) {
+        const state = ctx.getState();
+        this.generalMetadataService.savePublication(action.publication, state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new Publications.Set([response], true))
+            }
+        )
+
+    }
+
+    @Action(Publications.Update)
+    UpdatePublication(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Update) {
+        const state = ctx.getState();
+        this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
+        (response) => {
+            ctx.dispatch(new Publications.Set([response], true))
+            }
+        )
+
+    }
+
+    @Action(Publications.Delete)
+    DeletePublication(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Delete) {
+        const state = ctx.getState();
+        this.generalMetadataService.deletePublication(action.title, state.id).subscribe(
+            (response) => {
+                    ctx.dispatch(new Publications.Get());
+                },
+            (error) => {
+                console.log(`Unable to delete publication ${action.title}`);
+                console.error(error);
+            }
+            )
+    }
+
     @Action(Publications.Set)
     SetPublications(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Set) {
         const state = ctx.getState();
+        // need to do if extend = true
+        const jsonConvert: JsonConvert = new JsonConvert();
+        let temp = [];
+        action.publications.forEach((publication) => {
+            temp.push(jsonConvert.deserialize(publication, MTBLSPublication));
+        });
+        if (action.extend) temp = temp.concat(state.publications);
         ctx.setState({
             ...state,
-            publications: action.publications
+            publications: temp
         });
     }
 
     @Action(People.Set)
     SetPeople(ctx: StateContext<GeneralMetadataStateModel>, action: People.Set) {
         const state = ctx.getState();
+        // need to do if extend = true
+        const jsonConvert: JsonConvert = new JsonConvert();
+        let temp = [];
+        action.people.forEach((person) => {
+            temp.push(jsonConvert.deserialize(person, MTBLSPerson));
+        });
+        if (action.extend) temp = temp.concat(state.people);
         ctx.setState({
             ...state,
-            people: action.people
+            people: temp
         });
     }
 
+    @Action(People.Get)
+    GetPeople(ctx: StateContext<GeneralMetadataStateModel>, action: People.Get) {
+        const state = ctx.getState();
+        this.generalMetadataService.getPeople(state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new People.Set(response.contacts as IPerson[]));
+            },
+            (error) => {
+                console.log("Could not get study people.");
+                console.error(error);
+            }
+        )
+    }
 
+    @Action(People.Add)
+    AddPerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Add) {
+        const state = ctx.getState();
+        this.generalMetadataService.savePerson(action.body, state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new People.Set(response.contacts as IPerson[], false))
+            }, 
+            (error) => {
+                console.log("Could not add new study person.");
+                console.error(error);
+            }
+        )
+    }
+
+    @Action(People.Update)
+    UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
+        const state = ctx.getState();
+        let name = `${action.body.contacts[0].firstname}${action.body.contacts[0].lastName}`
+        this.generalMetadataService.updatePerson(action.body.contacts[0].email, name, action.body.contacts[0].person, state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new People.Set(response.contacts as IPerson[], true))
+            },
+            (error) => {
+                console.log("Could not update study person");
+                console.error(error);
+            }
+        )
+    }
+
+    @Action(People.Delete)
+    DeletePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Delete) {
+        const state = ctx.getState();
+        this.generalMetadataService.deletePerson(action.email, action.fullName, state.id).subscribe(
+            (response) => {
+                ctx.dispatch(new People.Get());
+            },
+            (error) => {
+                console.log(`Unable to delete study person ${action.fullName}`);
+                console.error(error);
+            }
+        )
+    }
+
+    @Action(People.GrantSubmitter)
+    GrantSubmitter(ctx: StateContext<GeneralMetadataStateModel>, action: People.GrantSubmitter) {
+        const state = ctx.getState();
+        this.generalMetadataService.makePersonSubmitter(action.email, state.id).subscribe(
+            (response) => {
+
+            },
+            (error) => {
+                console.log("Unable to make person submitter");
+                console.error(error)
+            }
+            )
+    }
+
+    @Action(StudyStatus.Update)
+    ChangeStudyStatus(ctx: StateContext<GeneralMetadataStateModel>, action: StudyStatus.Update) {
+        const state = ctx.getState();
+        this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
+            (response) => {
+
+            }
+        )
+    }
 
 
     @Selector()

@@ -20,7 +20,6 @@ import { StatusComponent } from "./status/status.component";
 import { ValidationsComponent } from "./validations/validations.component";
 import { ValidationDetailComponent } from "./validations/validation-detail/validation-detail.component";
 import { MatExpansionModule } from "@angular/material/expansion";
-import { NgReduxModule } from "@angular-redux/store";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -91,7 +90,6 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     MatSelectModule,
     MatTableModule,
     MatCommonModule,
-    NgReduxModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,

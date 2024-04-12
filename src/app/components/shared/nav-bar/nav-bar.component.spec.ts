@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store } from "@ngxs/store";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
@@ -19,7 +19,7 @@ describe("NavBarComponent", () => {
       declarations: [NavBarComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         { provide: EditorService, useClass: MockEditorService },
         {
           provide: ConfigurationService,

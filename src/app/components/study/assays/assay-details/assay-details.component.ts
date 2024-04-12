@@ -178,34 +178,19 @@ export class AssayDetailsComponent implements OnInit {
       cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
-        if (environment.useNewState) {
-          this.store.dispatch(new Assay.Delete(name, this.studyId)).subscribe(
-            (completed) => {
-              this.assayDelete.emit(name);
-              //this.store.dispatch(new AssayList.Get(this.studyId));
-              this.store.dispatch(new Protocols.Get());
-              Swal.fire({
-                title: "Assay deleted!",
-                text: "",
-                type: "success",
-                confirmButtonText: "OK",
-              }).then(() => {});
-            }
-          )
-        } else {
-          this.editorService.deleteAssay(name).subscribe((resp) => {
+        this.store.dispatch(new Assay.Delete(name, this.studyId)).subscribe(
+          (completed) => {
             this.assayDelete.emit(name);
-            this.editorService.loadStudyFiles(true);
-            window.location.reload();
+            //this.store.dispatch(new AssayList.Get(this.studyId));
+            this.store.dispatch(new Protocols.Get());
             Swal.fire({
               title: "Assay deleted!",
               text: "",
               type: "success",
               confirmButtonText: "OK",
             }).then(() => {});
-          });
-        }
-
+          }
+        )
       }
     });
   }

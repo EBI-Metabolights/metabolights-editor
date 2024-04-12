@@ -1,5 +1,5 @@
-import { NgRedux } from "@angular-redux/store";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { Store } from "@ngxs/store";
 
 import { HeaderComponent } from "./header.component";
 
@@ -11,7 +11,7 @@ describe("HeaderComponent", () => {
     TestBed.configureTestingModule({
       declarations: [HeaderComponent],
       imports: [],
-      providers: [NgRedux],
+      providers: [Store],
     }).compileComponents();
   }));
 

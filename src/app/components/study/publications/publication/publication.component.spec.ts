@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { async, ComponentFixture, TestBed } from "@angular/core/testing";
@@ -34,7 +34,7 @@ describe("PublicationComponent", () => {
         { provide: DOIService, useClass: MockDOIService },
         { provide: EditorService, useClass: MockEditorService },
         { provide: EuropePMCService, useClass: MockEuropePMCService },
-        NgRedux,
+        Store,
       ],
     }).compileComponents();
   }));

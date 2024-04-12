@@ -29,7 +29,7 @@ export namespace Samples {
 
     export class AddColumns {
         static readonly type = '[samples] Add Table Columns'
-        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>){}
+        constructor(public filename: string, public body: any, public metaInfo?: Record<string, any>){}
     }
 
     export class UpdateCells {

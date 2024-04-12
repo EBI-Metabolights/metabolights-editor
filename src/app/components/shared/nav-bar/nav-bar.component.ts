@@ -1,7 +1,5 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "./../../../store";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
@@ -20,9 +18,6 @@ import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/a
 })
 export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
-  @select((state) => state.study.identifier) studyIdentifier: any;
-  @select((state) => state.status.editorVersion) editorVersionState: Observable<VersionInfo>;
-  @select((state) => state.status.backendVersion) apiVersionState: Observable<ApiVersionInfo>;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(ApplicationState.editorVersion) editorVersion$: Observable<MtblsEditorVersion>;
@@ -50,27 +45,8 @@ export class NavBarComponent implements OnInit {
 
   ngOnInit() {
     this.endpoint = this.configService.config.endpoint;
-    if (!environment.useNewState) {
-      this.editorVersionState.subscribe((value) => {
-        if (value) {
-          this.editorVersion = value.version + "-" + value.releaseName;
-        } else {
-          console.log("Version is not defined " );
-        }
-      });
-      this.apiVersionState.subscribe((value) => {
-        if (value) {
-          this.apiVersion = value.about.api.version;
-        } else {
-          console.log("API Version is not defined " );
-        }
-      });
-      this.studyIdentifier.subscribe((value) => {
-        this.studyid = value;
-      });
-    } else {
-      this.setUpSubscriptionsNgxs();
-    }
+    this.setUpSubscriptionsNgxs();
+    
     
   }
 

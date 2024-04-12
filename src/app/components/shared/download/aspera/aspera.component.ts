@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
@@ -15,8 +14,6 @@ declare let AW4: any;
   styleUrls: ["./aspera.component.css"],
 })
 export class AsperaDownloadComponent implements OnInit {
-  @select((state) => state.study.validations) validations: any;
-  @select((state) => state.study.identifier) studyIdentifier: any;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
@@ -47,20 +44,7 @@ export class AsperaDownloadComponent implements OnInit {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
   ngOnInit() {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
-
-  }
-
-  setUpSubscriptions() {
-    this.validations.subscribe((value) => {
-      this.validation = value[this.validationsId];
-    });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
-    });
+    this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptionsNgxs() {

@@ -12,12 +12,15 @@ import { EuropePMCService } from "../../../services/publications/europePMC.servi
 import * as toastr from "toastr";
 
 import { environment } from "src/environments/environment";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
+import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { AppComponent } from "src/app/app.component";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
   selector: "app-meta",
@@ -35,7 +38,7 @@ export class MetaComponent implements OnInit {
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
   @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
-
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
 
 
   requestedStudy: string = null;
@@ -69,47 +72,32 @@ export class MetaComponent implements OnInit {
   isLoading = false;
   baseHref: string;
 
+  private toastrSettings: Record<string, any> = {};
+
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private router: Router,
     private doiService: DOIService,
-    private europePMCService: EuropePMCService
+    private europePMCService: EuropePMCService,
+    private store: Store
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
   ngOnInit() {}
 
-  setUpSubscriptions() {
-    this.studyIdentifier.subscribe((value) => {
-      if (value !== null) {
-        this.requestedStudy = value;
-      }
-    });
-    this.studyTitle.subscribe((value) => {
-      if (value && value !== "") {
-        this.currentTitle = value;
-      }
-    });
-    this.studyDescription.subscribe((value) => {
-      if (value && value !== "") {
-        this.currentDescription = value;
-      }
-    });
-    this.studyUser.subscribe((value) => {
-      this.user = value;
-      this.user.checked = false;
-    });
-  }
 
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe(
+      (value) => {
+        this.toastrSettings = value;
+        this.toastrSettings.timeOut = "3000"
+      }
+    )
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
@@ -198,84 +186,74 @@ export class MetaComponent implements OnInit {
     this.router.navigate(["/guide/assays", this.requestedStudy]);
   }
   
-  //NEEDS STATE REFACTOR
-  saveMetaData() {
+
+  saveMetadataNgxs() {
     this.isLoading = true;
     if (this.isManuscriptValid()) {
-      // Save title
-      this.editorService.saveTitle({ title: this.manuscript.title }).subscribe(
-        (res) => {
-          // Save Abstract
-          this.editorService
-            .saveAbstract({ description: this.manuscript.abstract })
-            .subscribe(
-              (resp) => {
-                // Save publication
-                if (this.selectedManuscriptOption === 1) {
-                  this.editorService
-                    .savePublication(this.compilePublicationBody())
-                    .subscribe(
-                      (respo) => {
-                        const authorsA = [];
-                        this.manuscript.authorDetails.forEach((author) => {
-                          if (author.checked) {
-                            this.manuscript.title = "";
-                            this.manuscript.abstract = "";
-                            this.isLoading = false;
-                            this.manuscriptIdentifier = "";
-                            this.selectedManuscriptOption = null;
-                            authorsA.push(this.compileAuthor(author));
-                          }
-                        });
-                        if (this.user.checked) {
-                          authorsA.push(this.compileSubmitter(this.user));
-                        }
-                        this.editorService
-                          .savePerson({ contacts: authorsA })
-                          .subscribe(
-                            (respon) => {
-                              this.isLoading = false;
-                              this.manuscript.title = "";
-                              this.manuscript.abstract = "";
-                              this.isLoading = false;
-                              this.manuscriptIdentifier = "";
-                              this.selectedManuscriptOption = null;
-                              this.router.navigate([
-                                "/guide/assays",
-                                this.requestedStudy,
-                              ]);
-                            },
-                            (err) => {
-                              this.isLoading = false;
-                            }
-                          );
-                      },
-                      (err) => {
+      this.store.dispatch(new Title.Update(this.manuscript.title)).subscribe(
+        (completed) => {
+          this.store.dispatch(new StudyAbstract.Update(this.manuscript.abstract)).subscribe(
+            (completed) => {
+              if (this.selectedManuscriptOption === 1) {
+                this.store.dispatch(new Publications.Add(this.compilePublicationBody())).subscribe(
+                  (completed) => {
+                    const authorsA = [];
+                    this.manuscript.authorDetails.forEach((author) => {
+                      if (author.checked) {
+                        this.manuscript.title = "";
+                        this.manuscript.abstract = "";
                         this.isLoading = false;
+                        this.manuscriptIdentifier = "";
+                        this.selectedManuscriptOption = null;
+                        authorsA.push(this.compileAuthor(author));
                       }
-                    );
-                } else {
-                  this.router.navigate(["/guide/assays", this.requestedStudy]);
-                }
-              },
-              (err) => {
-                this.isLoading = false;
+                    });
+                    if (this.user.checked) {
+                      authorsA.push(this.compileSubmitter(this.user));
+                    }
+                    this.store.dispatch(new People.Add({contacts: authorsA})).subscribe(
+                      (completed) => {
+                        this.isLoading = false;
+                        this.manuscript.title = "";
+                        this.manuscript.abstract = "";
+                        this.isLoading = false;
+                        this.manuscriptIdentifier = "";
+                        this.selectedManuscriptOption = null;
+                        this.router.navigate([
+                          "/guide/assays",
+                          this.requestedStudy,
+                        ]);
+                      },
+                      (error) => {
+                        console.log("Unable to save new person");
+                        this.isLoading = false
+                      }
+                    )
+                  },
+                  (error) => {
+                    console.log("Unable to save new publication");
+                    this.isLoading = false;
+
+                  }
+                )
+              } else {
+                this.router.navigate(["/guides/assays", this.requestedStudy]);
               }
-            );
+            },
+            (error) => {
+              console.log("Unable to save abstract of manuscript");
+              this.isLoading = false;
+            }
+          )
         },
-        (err) => {
+        (error) => {
+          console.log("Unable to save title of manuscript.")
           this.isLoading = false;
         }
-      );
-    } else {
+      )
+    } else { // Manuscript is invalid
       this.isLoading = false;
-      toastr.warning("Fields Missing", "Warning", {
-        timeOut: "3000",
-        positionClass: "toast-top-center",
-        preventDuplicates: true,
-        extendedTimeOut: 0,
-        tapToDismiss: false,
-      });
+      toastr.warning("Fields Missing", "Warning", this.toastrSettings)
     }
   }
 

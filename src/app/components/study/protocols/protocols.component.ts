@@ -5,7 +5,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
@@ -23,13 +22,7 @@ import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/appl
   styleUrls: ["./protocols.component.css"],
 })
 export class ProtocolsComponent implements OnInit, OnChanges {
-  @select((state) => state.study.protocols) studyProtocols;
-  @select((state) => state.study.validations) studyValidations;
-  @select((state) => state.study.isProtocolsExpanded) isProtocolsExpanded;
-
   @Input("assay") assay: any;
-
-  @select((state) => state.study.readonly) studyReadonly;
 
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
@@ -53,48 +46,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     this.defaultProtocols = [];
     this.protocols = [];
 
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.studyReadonly.subscribe((value) => {
-      if (value != null) {
-        this.isStudyReadOnly = value;
-      }
-    });
 
-    this.studyValidations.subscribe((value) => {
-      if (value) {
-        this.validations = value;
-        this.validationRulesGetter.default.sort(
-          (a, b) => a["sort-order"] - b["sort-order"]
-        );
-        this.defaultProtocols = this.validationRulesGetter.default.map(
-          (protocol) => protocol.title
-        );
-      }
-    });
-
-    this.studyProtocols.subscribe((value) => {
-      this.initialiseProtocols(value);
-      this.allProtocols = value;
-      this.protocols.forEach((p) => {
-        if (
-          this.defaultProtocols.length > 0 &&
-          this.defaultProtocols.indexOf(p.name) < 0
-        ) {
-          this.customProtocols.push(p.name);
-        }
-      });
-    });
-
-    this.isProtocolsExpanded.subscribe((value) => {
-      this.expand = !value;
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.readonly$.subscribe((value) => {

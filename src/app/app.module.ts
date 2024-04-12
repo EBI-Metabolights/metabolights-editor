@@ -1,13 +1,6 @@
-import { NgReduxRouterModule, NgReduxRouter } from "@angular-redux/router";
-import {
-  NgReduxModule,
-  NgRedux,
-  DevToolsExtension,
-} from "@angular-redux/store";
+
 import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
-
-import { IAppState, rootReducer, INITIAL_STATE } from "./store";
 
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule, isDevMode, APP_INITIALIZER, Injector } from "@angular/core";
@@ -35,7 +28,6 @@ import { NgxWigModule } from "ngx-wig";
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule } from "@angular/material/paginator";
 import { MatSelectModule } from "@angular/material/select";
-import { EditTableDirective } from "./directives/edit-table.directive";
 
 import { QuillModule } from "ngx-quill";
 import { LazyLoadImagesDirective } from "./directives/lazy-load-images.directive";
@@ -97,7 +89,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
     SharedModule,
     GuideModule,
     AppRoutingModule,
-    NgReduxModule,
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
@@ -115,7 +106,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
     MatTableModule,
     AngularStickyThingsModule,
     DragDropModule,
-    NgReduxRouterModule.forRoot(),
     NgxsModule.forRoot([
       UserState, 
       TransitionsState,
@@ -166,12 +156,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
 })
 export class AppModule {
   constructor(
-    ngRedux: NgRedux<IAppState>,
-    devTools: DevToolsExtension,
-    ngReduxRouter: NgReduxRouter
   ) {
-    const enhancers =
-      isDevMode() && devTools.enhancer() != null ? [devTools.enhancer()] : [];
-    ngRedux.configureStore(rootReducer, INITIAL_STATE, [], enhancers);
+    
   }
 }

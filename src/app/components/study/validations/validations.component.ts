@@ -148,20 +148,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
         }
       )
      }
-    this.editorService.refreshValidations().subscribe(
-      (res) => {
-        this.editorService.loadValidations();
-        toastr.success(res.success, "Success", this.defaultToastrOptions);
-      },
-      (err) => {
-        toastr.success(
-          "Validation refresh job is submitted. If your study is large, validations will take some time to refresh." +
-            "If your study validations are not refreshing please contact us.",
-          "Success",
-          this.defaultToastrOptions
-        );
-      }
-    );
+
   }
 
 
@@ -175,68 +162,22 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     const payload = {};
     payload[valSeq] = valDescription;
     data.validations.push(payload);
-    if (environment.useNewState) {
-      this.store.dispatch(new ValidationReport.Override(data)).subscribe(
-        (completed) => {
-          toastr.success("SUCCESS", "Successfully overriden the validation", this.defaultToastrOptions);
-        },
-        (error) => {
-          toastr.error("Validation override failed.", "Error", this.defaultToastrOptions);
-        }
-      )
-    } else {
-      this.editorService.overrideValidations(data).subscribe(
-        (res) => {
-          toastr.success(
-            res.success,
-            "Successfully overriden the validation",
-            this.defaultToastrOptions
-          );
-          // this.refreshValidations();
-        },
-        (err) => {
-          toastr.error(
-            "Validation override failed",
-            "Error",
-            this.defaultToastrOptions
-          );
-        }
-      );
-    }
+    this.store.dispatch(new ValidationReport.Override(data)).subscribe(
+      (completed) => {
+        toastr.success("SUCCESS", "Successfully overriden the validation", this.defaultToastrOptions);
+      },
+      (error) => {
+        toastr.error("Validation override failed.", "Error", this.defaultToastrOptions);
+      }
+    )
+     
 
   }
 
-  /**
-   * Handle a saved comment
-   *
-   * @param $event - The comment emitted from a child component
-   * @param detail - the validation detail that the comment pertains to
-   */
-  handleCommentSaved($event, detail) {
-    console.log($event, detail);
-    const data = {
-      comments: [],
-    };
-    const payload = {};
-    payload[detail.val_sequence] = $event.comment;
-    data.comments.push(payload);
-
-    console.log(data);
-    this.editorService.addComment(data).subscribe((res) => {
-      toastr.success(
-        res.success,
-        "Successfully posted the comment",
-        this.defaultToastrOptions
-      );
-      // this.refreshValidations();
-    });
-  }
 
 
   validationTaskDone($event) {
-    if (environment.useNewState) { this.store.dispatch(new ValidationReport.ContinualRetry(10))}
-    else {
-      this.editorService.getValidationReportRetry(10);
-    }
+    this.store.dispatch(new ValidationReport.ContinualRetry(10))
+
   }
 }

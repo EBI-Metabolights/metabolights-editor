@@ -96,7 +96,7 @@
         <span *ngIf="curator; else submitter">
           <mat-form-field>
             <mat-label>Change study status</mat-label>
-            <mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
+            <mat-select (selectionChange)="changeStatusNgxs()" [(value)]="toStatus">
               <mat-option value="Submitted">Submitted</mat-option>
               <mat-option value="In Curation">In Curation</mat-option>
               <mat-option value="In Review">In Review</mat-option>
@@ -109,7 +109,7 @@
             <mat-form-field>
               <mat-label>Change study status</mat-label>
               <mat-select
-                (selectionChange)="changeStatus()"
+                (selectionChange)="changeStatusNgxs()"
                 [(value)]="toStatus"
               >
                 <mat-option value="Submitted">Submitted</mat-option>

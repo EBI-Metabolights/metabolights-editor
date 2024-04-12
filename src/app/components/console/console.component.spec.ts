@@ -1,6 +1,7 @@
-import { NgRedux } from "@angular-redux/store";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
+import { Store } from "@ngxs/store";
+
 import {
   NgModuleFactoryLoader,
   Compiler,
@@ -35,7 +36,7 @@ describe("ConsoleComponent", () => {
       declarations: [ConsoleComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,

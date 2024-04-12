@@ -7,8 +7,6 @@ import {
 } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { disambiguateUserObj } from "../editor.service";
-import { NgRedux } from "@angular-redux/store";
-import { IAppState } from "src/app/store";
 import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngxs/store";
 import { environment } from "src/environments/environment";
@@ -16,7 +14,6 @@ import { environment } from "src/environments/environment";
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
   constructor(
-    private ngRedux: NgRedux<IAppState>, 
     private configService: ConfigurationService,
     private store: Store) {}
 
@@ -58,11 +55,10 @@ export class HeaderInterceptor implements HttpInterceptor {
       });
     }
     let permissions =  null
-    if (environment.useNewState) permissions = this.store.snapshot().application.studyPermission
-    else permissions = this.ngRedux.getState().status.studyPermission;
+    permissions = this.store.snapshot().application.studyPermission
 
     if (permissions && permissions.obfuscationCode && permissions.studyStatus.toUpperCase() === "INREVIEW"){
-        const user = this.ngRedux.getState().status.user;
+        const user = this.store.snapshot().user.user;
         if (user === null || (user !== null && user.userName === permissions.userName)) {
           request = request.clone({
             setHeaders: {

@@ -2,8 +2,6 @@ import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../store";
 import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
 import { Store } from "@ngxs/store";
@@ -35,7 +33,6 @@ export class CreateComponent implements OnInit {
   constructor(
     private editorService: EditorService,
     private router: Router,
-    private ngRedux: NgRedux<IAppState>,
     private store: Store,
     private platformLocation: PlatformLocation
   ) {
@@ -44,13 +41,8 @@ export class CreateComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (environment.useNewState) {
-      this.store.dispatch(new Loading.Disable())
-    } else {
-      if (!environment.isTesting) {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-      }
-    }
+    this.store.dispatch(new Loading.Disable())
+    
   }
 
   nextSubStep() {

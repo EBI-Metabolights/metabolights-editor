@@ -25,13 +25,16 @@ import {
   distinctUntilChanged,
   startWith,
   concatAll,
+  take,
 } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
+import { Store } from "@ngxs/store";
 
 import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { ConfigurationService } from "src/app/configuration.service";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 /* eslint-disable no-underscore-dangle */
 @Component({
   selector: "mtbls-ontology",
@@ -78,7 +81,8 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   constructor(
     private editorService: EditorService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {
 
   }
@@ -95,7 +99,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   }
 
-  ngOnInit() {
+   async ngOnInit() {
     this.baseHref = this.configService.baseHref;
     this.baseURL = this.configService.config.metabolightsWSURL.baseURL;
     if (this.baseURL.endsWith("/")){
@@ -105,7 +109,7 @@ export class OntologyComponent implements OnInit, OnChanges {
       this.values = [];
     }
     this.url = "/ebi-internal/ontology?term=";
-    this.readonly = this.editorService.ngRedux.getState().study.readonly;
+    this.readonly = await this.getReadonly();
     if (this.readonly === false && "recommended-ontologies" in this.validations) {
       if (this.validations["recommended-ontologies"]) {
         this.isforcedOntology =
@@ -144,6 +148,14 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
 
   }
+
+  async getReadonly() {
+    let result = await this.store.select(state => state.ApplicationState.readonly)
+    .pipe(take(1))
+    .toPromise();
+    return result
+  }
+
   setCurrentOptions(values: Ontology[] = []) {
 
     this.currentOptions = values.filter((value) => {

@@ -8,11 +8,9 @@ import {
   SimpleChanges,
   EventEmitter,
 } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { IAppState } from "../../../../store";
 import * as toastr from "toastr";
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
@@ -35,14 +33,10 @@ export class FactorComponent implements OnInit {
   @Input("value") factor: MTBLSFactor;
   @Input("isDropdown") isDropdown = false;
 
-  // this refers to the validations.json file, NOT the results of the validation pipeline for the study.
-  @select((state) => state.study.validations) studyValidations: any;
 
   @ViewChild(OntologyComponent) factorTypeComponent: OntologyComponent;
 
   @Output() addFactorToSampleSheet = new EventEmitter<any>();
-
-  @select((state) => state.study.readonly) studyReadonly;
 
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
@@ -72,28 +66,14 @@ export class FactorComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>,
     private store: Store
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
     }
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.studyValidations.subscribe((value) => {
-      this.validationRules = value;
-    });
-    this.studyReadonly.subscribe((value) => {
-      if (value !== null) {
-        this.isStudyReadOnly = value;
-      }
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.studyIdentifier$.subscribe(
@@ -172,39 +152,6 @@ export class FactorComponent implements OnInit {
     this.isModalOpen = false;
   }
 
-  save() {
-    if (!this.isStudyReadOnly) {
-      if (this.getFieldValue("factorName") !== "") {
-        this.isFormBusy = true;
-        if (!this.addNewFactor) {
-          this.editorService
-            .updateFactor(this.factor.factorName, this.compileBody())
-            .subscribe(
-              (res) => {
-                this.updateFactors(res, "Factor updated.");
-                this.addFactorToSampleSheet.next(this.factor);
-              },
-              (err) => {
-                this.isFormBusy = false;
-              }
-            );
-        } else {
-          const tempFactor = this.compileBody();
-          this.editorService.saveFactor(tempFactor).subscribe(
-            (res) => {
-              this.updateFactors(res, "Factor saved.");
-              this.isModalOpen = false;
-              this.addFactorToSampleSheet.next(tempFactor.factor);
-            },
-            (err) => {
-              this.isFormBusy = false;
-            }
-          );
-        }
-      }
-    }
-  }
-
   saveNgxs() {
     if(!this.isStudyReadOnly && this.getFieldValue("factorName") !== "") {
       this.isFormBusy = true;
@@ -233,55 +180,19 @@ export class FactorComponent implements OnInit {
   }
 
 
-  // ADJUST POST STATE MIGRATION
   delete() {
     if (!this.isStudyReadOnly) {
-      if(environment.useNewState) {
-        this.store.dispatch(new Factors.Delete(this.studyId, this.factor.factorName)).subscribe(
-          (completed) => {
-            this.refreshFactors(null, "Factor deleted.");
-            this.isDeleteModalOpen = false;
-            this.isModalOpen = false;
-            this.isDeleting = false;
-          },
-          (error) => {
-            this.isFormBusy = false;
-          }
-        )
-      }
-      else {
-        this.isDeleting = true;
-        this.editorService.deleteFactor(this.factor.factorName).subscribe(
-          (res) => {
-            this.updateFactors(res, "Factor deleted.");
-            this.isDeleteModalOpen = false;
-            this.isModalOpen = false;
-            this.isDeleting = false;
-          },
-          (err) => {
-            this.isFormBusy = false;
-          }
-        );
-      }
-
-    }
-  }
-
-  // REMOVE POST STATE MIGRATION
-  updateFactors(data, message) {
-    if (!this.isStudyReadOnly) {
-      this.editorService.getFactors().subscribe((res) => {
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      });
-      this.form.markAsPristine();
-      this.initialiseForm();
-      this.isModalOpen = true;
+      this.store.dispatch(new Factors.Delete(this.studyId, this.factor.factorName)).subscribe(
+        (completed) => {
+          this.refreshFactors(null, "Factor deleted.");
+          this.isDeleteModalOpen = false;
+          this.isModalOpen = false;
+          this.isDeleting = false;
+        },
+        (error) => {
+          this.isFormBusy = false;
+        }
+      )
     }
   }
 

@@ -16,8 +16,6 @@ import { MTBLSPublication } from "./../../../../models/mtbl/mtbls/mtbls-publicat
 import { trigger, style, animate, transition } from "@angular/animations";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./publication.validator";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../../store";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from "toastr";
@@ -28,7 +26,7 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-publication",
@@ -37,11 +35,8 @@ import { StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/
 })
 export class PublicationComponent implements OnInit {
   @Input("value") publication: any;
-  @select((state) => state.study.validations) studyValidations: any;
 
   @ViewChild(OntologyComponent) statusComponent: OntologyComponent;
-
-  @select((state) => state.study.readonly) readonly;
 
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
@@ -81,27 +76,14 @@ export class PublicationComponent implements OnInit {
     private doiService: DOIService,
     private europePMCService: EuropePMCService,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>,
     private store: Store
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
     }
-    if (!environment.isTesting) {
-      this.setUpSubscriptions();
-    }
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.studyValidations.subscribe((value) => {
-      this.validations = value;
-    });
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        this.isReadOnly = value;
-      }
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((settings) => {
@@ -116,17 +98,10 @@ export class PublicationComponent implements OnInit {
       }
     });
     this.title$.subscribe((value) => {
-      if (value !== null && value !== this.title) {
-        toastr.success("Title updated.", "Success", this.toastrSettings);
-        this.closeUpdateTitleModal();
-        this.isFormBusy = false;
-      }
+
     });
     this.description$.subscribe((value) => {
-      if (value !== null && value !== this.description) {
-        toastr.success("Study abstract updated.", "Success", this.toastrSettings);
-        this.closeUpdateAbstractModal();
-      }
+
     })
   }
 
@@ -143,7 +118,7 @@ export class PublicationComponent implements OnInit {
     this.isImportAuthorsModalOpen = false;
   }
 
-  saveAuthors() {
+  saveAuthorsNgxs() {
     if (!this.isReadOnly) {
       const authorsA = [];
       this.manuscriptAuthors.forEach((author) => {
@@ -151,30 +126,15 @@ export class PublicationComponent implements OnInit {
           authorsA.push(this.compileAuthor(author));
         }
       });
-
-      this.editorService.savePerson({ contacts: authorsA }).subscribe(
-        (res) => {
-          toastr.success("Authors imported.", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.manuscriptAuthors.forEach((author) => {
-            author.checked = false;
-          });
+      this.store.dispatch(new People.Add({contacts: authorsA})).subscribe(
+        (completed) => {
+          toastr.success("Authors imported.", "Success", this.toastrSettings);
         },
-        (err) => {
-          toastr.error("Failed to import authors.", "Error", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
+        (error) => {
+          toastr.error("Failed to import authors.", "Error", this.toastrSettings);
         }
-      );
+      )
+
     }
   }
 
@@ -276,27 +236,16 @@ export class PublicationComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-  // REMOVE POST STATE MIGRATION
-  updateStudyTitle() {
-    if (!this.isReadOnly) {
-      this.editorService
-        .saveTitle({ title: this.getFieldValue("title") })
-        .subscribe((res) => {
-          this.ngRedux.dispatch({ type: "SET_STUDY_TITLE", body: res });
-          toastr.success("Title updated.", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.closeUpdateTitleModal();
-        });
-    }
-  }
+
 
   updateStudyTitleNgxs() {
-    this.store.dispatch(new Title.Update(this.getFieldValue("title")));
+    this.store.dispatch(new Title.Update(this.getFieldValue("title"))).subscribe(
+      (completed) => {
+        toastr.success("Title updated.", "Success", this.toastrSettings);
+        this.closeUpdateTitleModal();
+        this.isFormBusy = false;
+      }
+    );
   }
 
   getAbstract() {
@@ -398,105 +347,76 @@ export class PublicationComponent implements OnInit {
     }
   }
 
-  // REMOVE POST STATE MIGRATION
-  updateStudyAbstract() {
-    if (!this.isReadOnly) {
-      this.editorService
-        .saveAbstract({ description: this.publicationAbstract })
-        .subscribe(
-          (res) => {
-            this.ngRedux.dispatch({ type: "SET_STUDY_ABSTRACT", body: res });
-            toastr.success("Study abstract updated.", "Success", {
-              timeOut: "2500",
-              positionClass: "toast-top-center",
-              preventDuplicates: true,
-              extendedTimeOut: 0,
-              tapToDismiss: false,
-            });
-            this.closeUpdateAbstractModal();
-          },
-          (error) => {
-            this.isFormBusy = false;
-          }
-        );
-    }
-  }
 
   updateStudyAbstractNgxs() {
-    if (!this.readonly)  this.store.dispatch(new StudyAbstract.Update(this.publicationAbstract));
+    if (!this.isReadOnly)  {
+      this.store.dispatch(new StudyAbstract.Update(this.publicationAbstract)).subscribe(
+        (completed) => {
+            toastr.success("Study abstract updated.", "Success", this.toastrSettings);
+            this.closeUpdateAbstractModal();
+        }
+      );
+    }
 
   }
 
-  save() {
+
+  saveNgxs() {
     if (!this.isReadOnly) {
-      if (this.statusComponent.values[0] === undefined) {
-        toastr.warning("Publication status cannot be empty", "Warning", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
+      if (this.statusComponent.values[0] === undefined) { 
+        toastr.warning("Publication status cannot be empty", "Warning", this.toastrSettings);
       } else {
         this.isFormBusy = true;
-        if (!this.addNewPublication) {
-          this.editorService
-            .updatePublication(this.publication.title, this.compileBody())
-            .subscribe(
-              (res) => {
-                this.updatePublications(res, "Publication updated.");
-              },
-              (err) => {
-                this.isFormBusy = false;
-              }
-            );
-        } else {
-          this.editorService.savePublication(this.compileBody()).subscribe(
-            (res) => {
-              this.updatePublications(res, "Publication saved.");
-              this.isModalOpen = false;
+        if(!this.addNewPublication) {// if we are updating a publication
+          this.store.dispatch(new Publications.Update(this.publication.title, this.compileBody())).subscribe(
+            (completed) => {
+              this.updatePublicationsNgxs("Publication updated.");
             },
-            (err) => {
+            (error) => {
               this.isFormBusy = false;
             }
           );
+        } else { // if we are adding a new publication
+          this.store.dispatch(new Publications.Add(this.compileBody())).subscribe(
+            (completed) => {
+                this.updatePublicationsNgxs("Publication saved.");
+                this.isModalOpen = false;
+              },
+              (error) => {
+                this.isFormBusy = false;
+              }
+            )
         }
       }
     }
   }
 
-  delete() {
+  deleteNgxs() {
     if (!this.isReadOnly) {
-      this.editorService.deletePublication(this.publication.title).subscribe(
-        (res) => {
-          this.updatePublications(res, "Publication deleted.");
-          this.isDeleteModalOpen = false;
-          this.isModalOpen = false;
-        },
-        (err) => {
-          this.isFormBusy = false;
-        }
-      );
+      this.store.dispatch(new Publications.Delete(this.publication.title)).subscribe(
+        (response) => {
+            this.updatePublicationsNgxs("Publication Deleted");
+            this.isDeleteModalOpen = false;
+            this.isModalOpen = false;
+          },
+          (error) => {
+            this.isFormBusy = false;
+          }
+        )
     }
   }
 
-  updatePublications(data, message) {
-    if (!this.isReadOnly) {
-      this.editorService.getPublications().subscribe((res) => {
-        this.form.markAsPristine();
-        this.initialiseForm();
-        this.isModalOpen = false;
 
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      });
+  updatePublicationsNgxs(message) {
+    if (this.isReadOnly) {
+      this.form.markAsPristine();
+      this.initialiseForm();
+      this.isModalOpen = false;
+      toastr.success(message, "Success", this.toastrSettings);
     }
+
   }
+
 
   compileBody() {
     const mtblPublication = new MTBLSPublication();

@@ -1,11 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../store";
-import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
-import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { MTBLSPublication } from "./../../../models/mtbl/mtbls/mtbls-publication";
+
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import * as toastr from "toastr";
 import { Router } from "@angular/router";
@@ -16,10 +12,11 @@ import { PlatformLocation } from "@angular/common";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { Operations } from "src/app/ngxs-store/study/files/files.actions";
 
 @Component({
   selector: "raw-upload",
@@ -27,9 +24,6 @@ import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.in
   styleUrls: ["./upload.component.css"],
 })
 export class RawUploadComponent implements OnInit {
-  @select((state) => state.status.user) studyUser;
-  @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.study.files) studyFiles;
 
   @Select(UserState.user) user$: Observable<Owner>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
@@ -43,32 +37,17 @@ export class RawUploadComponent implements OnInit {
   isLoading = false;
   baseHref: string;
   constructor(
-    private ngRedux: NgRedux<IAppState>,
     private route: ActivatedRoute,
     private router: Router,
     private editorService: EditorService,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    private store: Store
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+
+    this.setUpSubscriptionsNgxs();
     
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
-  }
-
-  setUpSubscriptions() {
-    this.studyUser.subscribe((value) => {
-      this.user = value;
-      this.user.checked = true;
-    });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
-    });
-    this.studyFiles.subscribe((value) => {
-      this.files = value;
-    });
   }
 
   setUpSubscriptionsNgxs() {
@@ -91,7 +70,7 @@ export class RawUploadComponent implements OnInit {
   }
 
   refreshFiles() {
-    this.editorService.loadStudyFiles(true);
+    this.store.dispatch(new Operations.GetFreshFilesList(true));
   }
 
   copyFilesAndProceed() {

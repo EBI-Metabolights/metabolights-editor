@@ -6,7 +6,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import Swal from "sweetalert2";
 import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
@@ -24,9 +23,6 @@ import { StudyReleaseDate } from "src/app/ngxs-store/study/general-metadata/gene
   styleUrls: ["./release-date.component.css"],
 })
 export class ReleaseDateComponent implements OnInit {
-  @select((state) => state.study.releaseDate) studyReleaseDate;
-  @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.study.readonly) readonly;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.releaseDate) studyReleaseDate$: Observable<Date>;
@@ -44,37 +40,10 @@ export class ReleaseDateComponent implements OnInit {
 
 
   constructor(private editorService: EditorService, private store: Store) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.toastrSettings$.subscribe(settings => {this.toastrSettings = settings})
-    this.studyReleaseDate.subscribe((value) => {
-      if (value !== null) {
-        if (value !== "") {
-          this.releaseDate = value;
-        } else {
-          this.editorService.metaInfo().subscribe((response) => {
-            this.releaseDate = response.data[1].split(":")[1];
-            this.updateReleaseDateSilent(this.releaseDate);
-          });
-        }
-      }
-    });
-    this.studyIdentifier.subscribe((value) => {
-      if (value != null) {
-        this.requestedStudy = value;
-      }
-    });
-    this.readonly.subscribe((value) => {
-      if (value != null) {
-        this.isReadOnly = value;
-      }
-    });
-  }
+
 
   setUpSubscriptionsNgxs() {
     this.studyReleaseDate$.subscribe((value) => {
@@ -103,14 +72,16 @@ export class ReleaseDateComponent implements OnInit {
 
   updateReleaseDateSilent(val) {
     if (!this.isReadOnly) {
-      this.editorService.changeReleasedate(val).subscribe(
-        (data) => {
+      this.store.dispatch(new StudyReleaseDate.Update(val)).subscribe(
+        (completed) => {
+
+        },
+        (error) => {
           console.log(
             "Release date missing in investigation file. Updated release date in investigation"
           );
-        },
-        (err) => {}
-      );
+        }
+      )
     }
   }
 
@@ -135,36 +106,15 @@ export class ReleaseDateComponent implements OnInit {
           cancelButtonText: "Back",
         }).then((willChange) => {
           if (willChange.value) {
-            if (environment.useNewState) {
-              this.store.dispatch(new StudyReleaseDate.Update(dateTo)).subscribe(
-                (completed) => {
-                  this.closeModal();
-                  toastr.success("Study release date updated.", "Success", this.toastrSettings);
+            
+            this.store.dispatch(new StudyReleaseDate.Update(dateTo)).subscribe(
+              (completed) => {
+                this.closeModal();
+                toastr.success("Study release date updated.", "Success", this.toastrSettings);
 
-                }
-              )
-            }
-            else {
-              this.editorService.changeReleasedate(dateTo).subscribe(
-                (data) => {
-                  this.closeModal();
-                  toastr.success("Study release date updated.", "Success", {
-                    timeOut: "2500",
-                    positionClass: "toast-top-center",
-                    preventDuplicates: true,
-                    extendedTimeOut: 0,
-                    tapToDismiss: false,
-                  });
-                  this.editorService.loadStudy(this.requestedStudy, false);
-                },
-                (err) => {
-                  this.closeModal();
-                  Swal.fire({
-                    title: err.json().message,
-                  });
-                }
-              );
-            }
+              }
+            )
+            
 
           }
         });

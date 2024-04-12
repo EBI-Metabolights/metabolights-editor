@@ -1,4 +1,3 @@
-import { NgRedux } from "@angular-redux/store";
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
@@ -28,6 +27,7 @@ import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
+import { Store } from "@ngxs/store";
 
 import { LoginComponent } from "./login.component";
 
@@ -48,7 +48,7 @@ describe("LoginComponent", () => {
         ReactiveFormsModule,
       ],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,

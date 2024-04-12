@@ -62,10 +62,21 @@ export namespace StudyReleaseDate {
     
 }
 
-export class SetStudyStatus {
-    static readonly type = '[general] Set Study Status'
-    constructor(public status: string) {}
+
+export namespace StudyStatus {
+
+    export class Update {
+        static readonly type = '[general] Change Study Status'
+        constructor(public status: string) {}
+    }
+
+    export class Set{
+        static readonly type = '[general] Set Study Status'
+        constructor(public status: string) {}
+    }
+    
 }
+
 
 export class SetStudyReviewerLink {
     static readonly type = '[general] Set Study Reviewer Link'
@@ -75,25 +86,61 @@ export class SetStudyReviewerLink {
 export namespace Publications {
     export class Set {
         static readonly type = '[general] Set Study Publications'
-        constructor(public publications: IPublication[]) {}
+        constructor(public publications: IPublication[], public extend: boolean = false) {}
+    }
+
+    export class Get {
+        static readonly type = '[general] Get Study Publications'
+        constructor() {}
     }
     
     export class Add {
         static readonly type = '[general] Add Study Publication'
-        constructor(public publication: IPublication) {}
+        constructor(public publication: any) {}
+    }
+
+    export class Update {
+        static readonly type = '[general] Update Study Publication'
+        constructor(public title: string, public publication: any) {}
+    }
+
+    export class Delete {
+        static readonly type = '[general] Delete Study Publication'
+        constructor(public title: string) {}
     }
 }
 
 export namespace People {
     export class Set {
         static readonly type = '[general] Set Study People'
-        constructor(public people: IPerson[]) {}
+        constructor(public people: IPerson[], public extend: boolean = false) {}
+    }
+
+    export class Get {
+        static readonly type = '[general] Get Study People'
+        constructor() {}
+    }
+
+    export class Update {
+        static readonly type = '[general] Update Study Person'
+        constructor(public body: Record<string, any>, public existingEmail?: string, public existingFullName?: string) {}
     }
 
     export class Add {
         static readonly type = '[general] Add Study Person'
-        constructor(public person: IPerson) {}
+        constructor(public body: Record<string, any>) {}
+    }
+
+    export class Delete {
+        static readonly type = '[general] Delete Study Person'
+        constructor(public email: string, public fullName: string) {}
+    }
+
+    export class GrantSubmitter {
+        static readonly type = '[general] Grant Submitter Status'
+        constructor(public email: string) {}
     }
 
 }
+
 
