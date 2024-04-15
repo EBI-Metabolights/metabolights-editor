@@ -1,6 +1,6 @@
 import { Component, ViewChild, ViewChildren, QueryList, OnChanges } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
 import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
 import { MTBLSFactorValue } from "./../../../models/mtbl/mtbls/mtbls-factor-value";
@@ -66,12 +66,12 @@ export class SamplesComponent  {
   duplicateNames: any = [];
   rawFileNames: any = [];
 
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   validationsId = "samples";
 
 
-  constructor(private editorService: EditorService, private fb: FormBuilder) {
+  constructor(private editorService: EditorService, private fb: UntypedFormBuilder) {
     if (!this.defaultCharacteristicControlList) {
       this.defaultCharacteristicControlList = {name: "", values: []};
     }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -41,7 +41,7 @@ export class FTPUploadComponent implements OnInit {
 
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService
   ) {
     this.setUpSubscriptionsNgxs();

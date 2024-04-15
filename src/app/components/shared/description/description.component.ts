@@ -7,7 +7,7 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { validateStudyDescription } from "./description.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
@@ -34,7 +34,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
 
   isReadOnly = false;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   description = "";
   validations: any;
@@ -49,7 +49,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
   private toastrSettings: Record<string, any> = {};
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {

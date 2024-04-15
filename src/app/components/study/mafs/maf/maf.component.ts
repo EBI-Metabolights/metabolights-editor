@@ -1,5 +1,5 @@
 import { AfterContentInit, Component, Input, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { map } from "rxjs/operators";
@@ -34,7 +34,7 @@ export class MafComponent implements AfterContentInit {
   isRowEditModalOpen = false;
   isFormBusy = false;
   selectedRow = {};
-  form: FormGroup;
+  form: UntypedFormGroup;
   currentIndex = 0;
 
   rowsToUpdate = [];
@@ -49,7 +49,7 @@ export class MafComponent implements AfterContentInit {
     },
   ];
 
-  constructor(private fb: FormBuilder, private editorService: EditorService) {}
+  constructor(private fb: UntypedFormBuilder, private editorService: EditorService) {}
 
   ngAfterContentInit() {
     this.loadNgxs();

@@ -6,7 +6,7 @@ import {
   ViewChild,
   SimpleChanges,
 } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology, areOntologyListsDifferent, elucidateListComparisonResult } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
@@ -14,7 +14,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
 import { DOIService } from "../../../../services/publications/doi.service";
 import { EuropePMCService } from "../../../../services/publications/europePMC.service";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
@@ -54,7 +54,7 @@ export class DesignDescriptorComponent implements OnInit {
   validations: any = {};
 
   validationsId = "studyDesignDescriptors";
-  selectedPublication = new FormControl("", [Validators.required]);
+  selectedPublication = new UntypedFormControl("", [Validators.required]);
 
   isModalOpen = false;
   isImportModalOpen = false;
@@ -62,7 +62,7 @@ export class DesignDescriptorComponent implements OnInit {
   publications: any = null;
   descriptors: any = null;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   addNewDescriptor = false;
   keywords: any = [];
@@ -73,7 +73,7 @@ export class DesignDescriptorComponent implements OnInit {
   baseHref: string;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
     private doiService: DOIService,

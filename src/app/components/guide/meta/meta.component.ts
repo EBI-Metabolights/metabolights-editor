@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
@@ -62,14 +62,14 @@ export class MetaComponent implements OnInit {
     },
   ];
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   isLoading = false;
   baseHref: string;
 
   private toastrSettings: Record<string, any> = {};
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private router: Router,

@@ -8,7 +8,7 @@ import {
   SimpleChanges,
   EventEmitter,
 } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
@@ -57,14 +57,14 @@ export class FactorComponent implements OnInit {
   isDeleteModalOpen = false;
   isDeleting = false;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   addNewFactor = false;
 
   validationRules: any = null;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {

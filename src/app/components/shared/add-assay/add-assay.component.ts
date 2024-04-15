@@ -12,7 +12,7 @@ import {
   ChangeDetectorRef,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
@@ -46,7 +46,7 @@ export class AddAssayComponent implements OnInit {
   assaySetup: any = null;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private router: Router,

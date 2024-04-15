@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import * as toastr from "toastr";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
@@ -32,7 +32,7 @@ export class DeleteFileComponent implements OnInit {
   forceMetaDataDelete = false;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private editorService: EditorService
   ) {

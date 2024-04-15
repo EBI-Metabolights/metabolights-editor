@@ -14,7 +14,7 @@ import { MTBLSComment } from "./../../../../models/mtbl/mtbls/common/mtbls-comme
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPublication } from "./../../../../models/mtbl/mtbls/mtbls-publication";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./publication.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
@@ -52,7 +52,7 @@ export class PublicationComponent implements OnInit {
 
   isReadOnly = false;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   addNewPublication = false;
 
@@ -72,7 +72,7 @@ export class PublicationComponent implements OnInit {
   publicationAbstract = "";
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private doiService: DOIService,
     private europePMCService: EuropePMCService,
     private editorService: EditorService,

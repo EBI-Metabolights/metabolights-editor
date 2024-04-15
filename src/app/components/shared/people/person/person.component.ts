@@ -12,7 +12,7 @@ import { MTBLSComment } from "../../../../models/mtbl/mtbls/common/mtbls-comment
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import { tassign } from "tassign";
 import * as toastr from "toastr";
@@ -63,7 +63,7 @@ export class PersonComponent implements OnInit {
   defaultControlListName = "Study Person Role";
   requestedStudy: string = null;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   showAdvanced = false;
   isFormBusy = false;
 
@@ -83,7 +83,7 @@ export class PersonComponent implements OnInit {
   private toastrSettings: Record<string, any> = {};
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {

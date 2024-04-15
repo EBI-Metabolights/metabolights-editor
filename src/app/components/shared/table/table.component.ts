@@ -17,7 +17,7 @@ import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
@@ -118,8 +118,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   isEditModalOpen = false;
   isEditColumnModalOpen = false;
   isDeleteModalOpen = false;
-  editCellform: FormGroup;
-  editColumnform: FormGroup;
+  editCellform: UntypedFormGroup;
+  editColumnform: UntypedFormGroup;
   defaultControlList = Object.freeze({name: "", values: Object.freeze([])});
   selectedMissingCol = null;
   selectedMissingKey = null;
@@ -132,7 +132,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   baseHref: string;
   constructor(
     private clipboardService: ClipboardService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private assayService: AssaysService,
     private store: Store

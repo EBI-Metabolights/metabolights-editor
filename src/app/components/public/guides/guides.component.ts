@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { EditorService } from "./../../../services/editor.service";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ActivatedRoute } from "@angular/router";
 import { environment } from "src/environments/environment";
@@ -38,7 +38,7 @@ export class GuidesComponent implements OnInit {
   section: string = null;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private store: Store,
     public router: Router,
     private editorService: EditorService,

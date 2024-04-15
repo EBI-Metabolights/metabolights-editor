@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 
 @Component({
   selector: "mtbls-upload",
@@ -21,7 +21,7 @@ export class UploadComponent implements OnInit {
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
   isUploadModalOpen = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: UntypedFormBuilder) {}
 
   ngOnInit() {}
 

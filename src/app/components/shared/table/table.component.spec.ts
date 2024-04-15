@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
-import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { UntypedFormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule, By } from "@angular/platform-browser";
 import { ClipboardService } from "ngx-clipboard";
 import { EditorService } from "src/app/services/editor.service";
@@ -60,7 +60,7 @@ describe("TableComponent", () => {
         { provide: EditorService, useClass: MockEditorService },
         ClipboardService,
         HttpClient,
-        FormBuilder,
+        UntypedFormBuilder,
       ],
     }).compileComponents();
   }));

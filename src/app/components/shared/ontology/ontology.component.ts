@@ -10,9 +10,9 @@ import {
   EventEmitter,
   ViewChild,
 } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import {
   MatAutocompleteSelectedEvent,
   MatAutocompleteTrigger,
@@ -64,13 +64,13 @@ export class OntologyComponent implements OnInit, OnChanges {
   endPoints: any[] = [];
   addOnBlur = false;
   inputValue = "";
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   visible = true;
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
-  valueCtrl = new FormControl();
+  valueCtrl = new UntypedFormControl();
   filteredValuesObserver: Observable<Ontology[]>;
   currentOptions = [];
   allvalues: Array<Ontology> = [];

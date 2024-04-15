@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FormControl, FormGroup } from "@angular/forms";
+import { UntypedFormControl, UntypedFormGroup } from "@angular/forms";
 
 export type CommentBoxStatus =
   | "Leave a comment"
@@ -21,8 +21,8 @@ export class ValidationDetailCommentComponent implements OnInit {
   disableCuratorCommentBox = false;
   commentBoxStatus: CommentBoxStatus = "Leave a comment";
 
-  monoForm = new FormGroup({
-    commentControl: new FormControl(""),
+  monoForm = new UntypedFormGroup({
+    commentControl: new UntypedFormControl(""),
   });
 
   constructor() {}

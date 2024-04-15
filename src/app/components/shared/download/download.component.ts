@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { environment } from "src/environments/environment";
 import { FilesService } from "src/app/services/decomposed/files.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -21,7 +21,7 @@ export class DownloadComponent implements OnInit {
   code = "";
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService
   ) {
     this.setUpSubscriptionsNgxs();

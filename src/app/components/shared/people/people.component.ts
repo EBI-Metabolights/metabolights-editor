@@ -7,7 +7,7 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { Select } from "@ngxs/store";
@@ -33,7 +33,7 @@ export class PeopleComponent implements OnInit {
   validationsId = "people";
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
   ) {}
   ngOnInit() {

@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { EditorService } from "../../../../services/editor.service";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -51,7 +51,7 @@ export class AsperaUploadComponent implements OnInit {
   videoURL: string;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private editorService: EditorService,
     private configService: ConfigurationService

@@ -7,7 +7,7 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
@@ -37,7 +37,7 @@ export class TitleComponent implements OnInit {
   requestedStudy: string = null;
   title = "";
   validations: any;
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
 
   validationsId = "title";
@@ -45,7 +45,7 @@ export class TitleComponent implements OnInit {
   isModalOpen = false;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {

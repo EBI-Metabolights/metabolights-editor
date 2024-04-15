@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
   MTBLSProtocol,
@@ -66,12 +66,12 @@ export class ProtocolComponent implements OnInit {
 
   expand = true;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   validationsId = "protocols.protocol";
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {

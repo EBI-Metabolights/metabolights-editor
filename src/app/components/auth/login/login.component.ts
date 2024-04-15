@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { AuthService } from "./../../../services/metabolights/auth.service";
 import { EditorService } from "./../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -17,7 +17,7 @@ import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.ac
   styleUrls: ["./login.component.css"],
 })
 export class LoginComponent implements OnInit {
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   invalidCredentials = false;
   domain = "";
@@ -25,7 +25,7 @@ export class LoginComponent implements OnInit {
   baseHref: string;
   environmentName: string;
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private store: Store,
     public router: Router,
     private editorService: EditorService,

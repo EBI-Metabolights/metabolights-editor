@@ -1,6 +1,6 @@
 import { Component, ViewChild, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
 import * as toastr from "toastr";
@@ -54,7 +54,7 @@ export class GuidedAssaysComponent implements OnInit {
   private toastrSettings: Record<string, any> = {};
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private router: Router,
