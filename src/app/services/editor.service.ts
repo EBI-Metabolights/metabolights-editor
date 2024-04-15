@@ -9,7 +9,6 @@ import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermission } from 
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "../configuration.service";
-import { stringify } from "@angular/compiler/src/util";
 import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
