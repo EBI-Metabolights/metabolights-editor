@@ -19,11 +19,9 @@ import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select, Store } from "@ngxs/store";
 import { Observable } from "rxjs";
-import { env } from "process";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
-import { Operations } from "src/app/ngxs-store/study/files/files.actions";
-import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
+import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
+
 
 @Component({
   selector: "add-assay",

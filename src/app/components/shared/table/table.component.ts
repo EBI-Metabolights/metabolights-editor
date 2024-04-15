@@ -24,7 +24,6 @@ import { OntologyComponent } from "../ontology/ontology.component";
 import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
-import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { Select, Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -35,7 +34,6 @@ import { TableColumnAction, TableRowAction, TableType } from "./table-type.type"
 import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
-import { env } from "process";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 
 /* eslint-disable @typescript-eslint/dot-notation */

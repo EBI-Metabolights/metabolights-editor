@@ -9,14 +9,12 @@ import {
 import Swal from "sweetalert2";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
-import { environment } from "src/environments/environment";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";
 import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { env } from "process";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
-import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
+import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 

@@ -1,10 +1,8 @@
 import { Component, OnInit, Input, Inject, SimpleChanges } from "@angular/core";
-import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Select } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { env } from "process";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 

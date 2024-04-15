@@ -1,10 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { EditorService } from "../../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder } from "@angular/forms";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
-import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
-import { uptime } from "process";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";

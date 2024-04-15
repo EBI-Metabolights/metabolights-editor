@@ -6,7 +6,6 @@ import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
-import { env } from "process";
 
 @Component({
   selector: "app-info",

@@ -3,13 +3,9 @@ import { EditorService } from "../../../services/editor.service";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
-import { environment } from "src/environments/environment";
-import { VersionInfo } from "src/environment.interface";
 import { Observable } from "rxjs";
-import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select } from "@ngxs/store";
-import { env } from "process";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 @Component({
   selector: "nav-bar",
