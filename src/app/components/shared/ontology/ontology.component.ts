@@ -433,7 +433,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   add(event: MatChipInputEvent): void {
     if (this.addOnBlur) {
-      const input = event.input;
+      const input = event.chipInput;
       const value = event.value;
       if (event.value.replace(" ", "") !== "") {
         if (this.indexOfObject(this.values, "annotationValue", value) === -1) {
