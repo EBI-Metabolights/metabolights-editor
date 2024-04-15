@@ -178,7 +178,7 @@
               "browserTarget": "metabolights-editor:build:production"
             },
             "development": {
-              "browserTarget": "metabolights-editor:build:development"
+              "browserTarget": "metabolights-editor:build:local"
             },
             "staging": {
               "browserTarget": "metabolights-editor:build:staging"
