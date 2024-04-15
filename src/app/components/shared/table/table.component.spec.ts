@@ -11,17 +11,17 @@ import fileData from "./test-data/mock-files.json";
 import valData from "./test-data/test-validation.json";
 
 import { TableComponent } from "./table.component";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatTableModule } from "@angular/material/table";
-import { MatInputModule } from "@angular/material/input";
+import { MatLegacyFormFieldModule as MatFormFieldModule } from "@angular/material/legacy-form-field";
+import { MatLegacyTableModule as MatTableModule } from "@angular/material/legacy-table";
+import { MatLegacyInputModule as MatInputModule } from "@angular/material/legacy-input";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatPaginatorModule } from "@angular/material/paginator";
+import { MatLegacyPaginatorModule as MatPaginatorModule } from "@angular/material/legacy-paginator";
 import { MockUploadComponent } from "../upload/upload.mock.component";
 import { MockDownloadComponent } from "../download/download.mock.component";
 import { MockOntologyComponent } from "../ontology/ontology.mock.component";
 import { DebugElement } from "@angular/core";
 import { MatSortModule } from "@angular/material/sort";
-import { MatSelectModule } from "@angular/material/select";
+import { MatLegacySelectModule as MatSelectModule } from "@angular/material/legacy-select";
 
 import { MatIconModule } from "@angular/material/icon";
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
