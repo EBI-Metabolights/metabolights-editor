@@ -15,12 +15,12 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from "@angular/material/legacy-progress-spinner";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
-import { MatLegacyChipsModule as MatChipsModule } from "@angular/material/legacy-chips";
+import { MatChipsModule } from "@angular/material/chips";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 
 import { MatTableModule } from "@angular/material/table";

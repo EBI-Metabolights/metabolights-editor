@@ -150,8 +150,8 @@ body {
   border: none !important;
 }
 
-.mat-progress-spinner circle,
-.mat-spinner circle {
+.mat-mdc-progress-spinner circle,
+.mat-mdc-progress-spinner circle {
   stroke: #3fb53f;
 }
 
@@ -569,11 +569,12 @@ element.style {
   font-size: 85%;
 }
 
-.mat-standard-chip {
+.mat-mdc-standard-chip {
   border-radius: 4px !important;
 }
 
-.mat-chip.mat-standard-chip .mat-chip-remove {
+/* TODO(mdc-migration): The following rule targets internal classes of chips that may no longer apply for the MDC version. */
+.mat-mdc-chip.mat-mdc-standard-chip .mat-chip-remove {
   margin-top: 0;
 }
 
@@ -684,8 +685,8 @@ element.style {
   background-color: white;
 }
 
-.mat-progress-spinner circle,
-.mat-spinner circle {
+.mat-mdc-progress-spinner circle,
+.mat-mdc-progress-spinner circle {
   stroke: white;
   margin-right: 5px;
 }

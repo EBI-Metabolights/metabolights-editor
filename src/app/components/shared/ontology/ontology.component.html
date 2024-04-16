@@ -1,9 +1,9 @@
 <span *ngIf="isInline">
   <div>
     <mat-form-field class="full-width">
-      <mat-chip-list #chipList>
+      <mat-chip-grid #chipList>
         <span *ngFor="let value of values">
-          <mat-chip
+          <mat-chip-row
             *ngIf="value && value.annotationValue"
             [selectable]="selectable"
             [removable]="removable"
@@ -11,7 +11,7 @@
           >
             {{ value.annotationValue }}
             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-          </mat-chip>
+          </mat-chip-row>
         </span>
         <input
           [placeholder]="validations.label"
@@ -23,7 +23,7 @@
           [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
           (matChipInputTokenEnd)="add($event)"
         />
-      </mat-chip-list>
+      </mat-chip-grid>
       <mat-autocomplete
         #auto="matAutocomplete"
         (optionSelected)="optionSelected($event)"

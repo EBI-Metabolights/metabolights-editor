@@ -16,7 +16,7 @@ import { MatSort } from "@angular/material/sort";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { MatLegacyChipInputEvent as MatChipInputEvent } from "@angular/material/legacy-chips";
+import { MatChipInputEvent } from "@angular/material/chips";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";

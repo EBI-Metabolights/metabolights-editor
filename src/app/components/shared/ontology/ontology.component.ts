@@ -17,7 +17,7 @@ import {
   MatAutocompleteSelectedEvent,
   MatAutocompleteTrigger,
 } from "@angular/material/autocomplete";
-import { MatLegacyChipInputEvent as MatChipInputEvent } from "@angular/material/legacy-chips";
+import { MatChipInputEvent } from "@angular/material/chips";
 import { Observable } from "rxjs";
 import {
   map,
