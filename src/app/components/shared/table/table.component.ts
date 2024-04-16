@@ -11,11 +11,11 @@ import {
   AfterViewChecked,
   OnChanges,
 } from "@angular/core";
-import { MatLegacyPaginator as MatPaginator } from "@angular/material/legacy-paginator";
+import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
-import { MatLegacyTable as MatTable, MatLegacyTableDataSource as MatTableDataSource } from "@angular/material/legacy-table";
+import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent } from "@angular/material/legacy-autocomplete";
+import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatLegacyChipInputEvent as MatChipInputEvent } from "@angular/material/legacy-chips";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";

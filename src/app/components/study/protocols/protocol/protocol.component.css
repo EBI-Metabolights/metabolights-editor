@@ -25,6 +25,6 @@ label {
   padding: 10px 20px;
 }
 
-.mat-input-element {
+.mat-mdc-input-element {
   width: calc(100% - 30px);
 }

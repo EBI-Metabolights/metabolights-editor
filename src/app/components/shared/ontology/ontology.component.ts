@@ -14,9 +14,9 @@ import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
 import { UntypedFormControl } from "@angular/forms";
 import {
-  MatLegacyAutocompleteSelectedEvent as MatAutocompleteSelectedEvent,
-  MatLegacyAutocompleteTrigger as MatAutocompleteTrigger,
-} from "@angular/material/legacy-autocomplete";
+  MatAutocompleteSelectedEvent,
+  MatAutocompleteTrigger,
+} from "@angular/material/autocomplete";
 import { MatLegacyChipInputEvent as MatChipInputEvent } from "@angular/material/legacy-chips";
 import { Observable } from "rxjs";
 import {

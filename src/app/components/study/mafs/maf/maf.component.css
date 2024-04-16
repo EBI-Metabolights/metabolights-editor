@@ -6,19 +6,19 @@
   align-items: center;
 }
 
-.mat-form-field-appearance-legacy .mat-form-field-prefix .mat-icon-button,
+.mat-form-field-appearance-legacy .mat-form-field-prefix .mat-mdc-icon-button,
 .mat-form-field-appearance-legacy .mat-form-field-suffix .mat-icon-button {
   font: inherit;
   vertical-align: baseline;
 }
 
-.mat-form-field-prefix .mat-icon-button,
+.mat-form-field-prefix .mat-mdc-icon-button,
 .mat-form-field-suffix .mat-icon-button {
   height: 1.5em;
   width: 1.5em;
 }
 
-.mat-icon-button {
+.mat-mdc-icon-button {
   padding: 0;
   min-width: 0;
   width: 40px;
