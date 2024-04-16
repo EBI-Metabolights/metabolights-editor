@@ -171,30 +171,30 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "metabolights-editor:build:local"
+            "buildTarget": "metabolights-editor:build:local"
           },
           "configurations": {
             "production": {
-              "browserTarget": "metabolights-editor:build:production"
+              "buildTarget": "metabolights-editor:build:production"
             },
             "development": {
-              "browserTarget": "metabolights-editor:build:local"
+              "buildTarget": "metabolights-editor:build:local"
             },
             "staging": {
-              "browserTarget": "metabolights-editor:build:staging"
+              "buildTarget": "metabolights-editor:build:staging"
             },
             "test": {
-              "browserTarget": "metabolights-editor:build:test"
+              "buildTarget": "metabolights-editor:build:test"
             },
             "master": {
-              "browserTarget": "metabolights-editor:build:production"
+              "buildTarget": "metabolights-editor:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "metabolights-editor:build"
+            "buildTarget": "metabolights-editor:build"
           }
         },
         "test": {
