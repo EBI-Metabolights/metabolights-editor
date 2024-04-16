@@ -1,13 +1,6 @@
 import { Injectable, OnInit } from "@angular/core";
 import * as toastr from "toastr";
-import {
-  CanActivate,
-  Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  CanActivateChild,
-  ActivatedRoute,
-} from "@angular/router";
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, ActivatedRoute } from "@angular/router";
 import { EditorService } from "./services/editor.service";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
@@ -23,7 +16,7 @@ import { StudyPermissionNS } from "./ngxs-store/non-study/application/applicatio
 @Injectable({
   providedIn: "root",
 })
-export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
+export class AuthGuard  implements OnInit {
 
   constructor(
     private editorService: EditorService,
