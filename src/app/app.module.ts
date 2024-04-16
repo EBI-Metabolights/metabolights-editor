@@ -1,5 +1,4 @@
 
-import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
 
 import { BrowserModule } from "@angular/platform-browser";
@@ -102,7 +101,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
     MatButtonToggleModule,
     MatCheckboxModule,
     MatTableModule,
-    AngularStickyThingsModule,
     DragDropModule,
     NgxsModule.forRoot([
       UserState, 

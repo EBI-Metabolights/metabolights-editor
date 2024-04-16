@@ -41,7 +41,6 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from "@angular/material/legacy-progress-spinner";
 import { AddAssayComponent } from "./add-assay/add-assay.component";
 import { MatTableModule } from "@angular/material/table";
-import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { AuthGuard } from "src/app/auth-guard.service";
@@ -115,7 +114,6 @@ import { TableComponent } from "./table/table.component";
     MatSelectModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    AngularStickyThingsModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatExpansionModule,

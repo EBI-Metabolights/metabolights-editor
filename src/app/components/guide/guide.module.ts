@@ -11,7 +11,6 @@ import { MatInputModule } from "@angular/material/input";
 import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from "@angular/material/legacy-progress-spinner";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { SharedModule } from "../shared/shared.module";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
@@ -45,7 +44,6 @@ import { RawUploadComponent } from "./upload/upload.component";
     MatOptionModule,
     MatFormFieldModule,
     MatInputModule,
-    AngularStickyThingsModule,
   ],
   exports: [
     GuidedAssaysComponent,

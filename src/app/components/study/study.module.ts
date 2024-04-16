@@ -50,7 +50,6 @@ import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.pipe";
-import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { RsyncComponent } from './files/rsync/rsync.component';
 import { ValidationStatusTransformPipe } from "./validations/validation-status-transform.pipe";
 
@@ -106,7 +105,6 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     MatButtonToggleModule,
     QuillModule,
     MatCheckboxModule,
-    AngularStickyThingsModule
   ],
   exports: [
     AssaysComponent,
