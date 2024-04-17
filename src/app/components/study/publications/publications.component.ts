@@ -6,7 +6,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
@@ -23,9 +22,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
   styleUrls: ["./publications.component.css"],
 })
 export class PublicationsComponent implements OnInit {
-  @select((state) => state.study.publications) studyPublications;
   @Input("validations") studyValidations: any;
-  @select((state) => state.study.readonly) readonly;
 
   @Select(GeneralMetadataState.publications) studyPublications$: Observable<IPublication[]>;
   @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
@@ -35,22 +32,9 @@ export class PublicationsComponent implements OnInit {
   publications: any = null;
 
   constructor() {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.studyPublications.subscribe((value) => {
-      this.publications = value;
-    });
-    this.readonly.subscribe((value) => {
-      if (value != null) {
-        this.isReadOnly = value;
-      }
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.studyPublications$.subscribe((value) => {

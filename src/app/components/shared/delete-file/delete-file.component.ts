@@ -1,8 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { NgRedux, select } from "@angular-redux/store";
 import * as toastr from "toastr";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
@@ -24,8 +23,6 @@ export class DeleteFileComponent implements OnInit {
   @Input("parentDirectoryComponent") parentDirectoryComponent: DirectoryComponent;
   @Input("file") studyFile: StudyFile;
 
-  @select((state) => state.study.obfuscationCode) obfuscationCode;
-
   @Select(FilesState.obfuscationCode) obfuscationCode$: Observable<string>;
   
   @Output() fileDeleted = new EventEmitter<{file: StudyFile; parentDirectoryComponent: DirectoryComponent}>();
@@ -35,21 +32,14 @@ export class DeleteFileComponent implements OnInit {
   forceMetaDataDelete = false;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private editorService: EditorService
   ) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.obfuscationCode.subscribe((value) => {
-      this.code = value;
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.obfuscationCode$.subscribe((value) => {

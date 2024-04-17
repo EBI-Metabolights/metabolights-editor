@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { EditorService } from "src/app/services/editor.service";
@@ -13,7 +13,7 @@ describe("DeleteComponent", () => {
   let component: DeleteFileComponent;
   let fixture: ComponentFixture<DeleteFileComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [DeleteFileComponent],
       imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule],

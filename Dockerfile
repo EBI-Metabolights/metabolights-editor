@@ -2,10 +2,9 @@ FROM node:18 as build
 RUN mkdir /app-root
 WORKDIR /app-root
 COPY . .
-RUN npm install --save --legacy-peer-deps
+RUN npm install --save 
 ARG CONFIGURATION=production
 ARG BASE_HREF=/metabolights/editor
-ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build -- --configuration $CONFIGURATION --base-href="$BASE_HREF/"
 
 # Stage 2, use the compiled app, ready for production with Nginx

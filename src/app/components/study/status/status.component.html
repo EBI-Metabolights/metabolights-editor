@@ -57,7 +57,7 @@
           information is required to complete this process. If you would like to
           update you study at this stage please contact
           <a href="mailto:metabolights-curation@ebi.ac.uk"
-            >metabolights-curation@ebi.ac.uk</a
+            >metabolights-curation&#64;ebi.ac.uk</a
           >
           <br /><br />
           <b>Whats next?</b><br />
@@ -96,7 +96,7 @@
         <span *ngIf="curator; else submitter">
           <mat-form-field>
             <mat-label>Change study status</mat-label>
-            <mat-select (selectionChange)="changeStatus()" [(value)]="toStatus">
+            <mat-select (selectionChange)="changeStatusNgxs()" [(value)]="toStatus">
               <mat-option value="Submitted">Submitted</mat-option>
               <mat-option value="In Curation">In Curation</mat-option>
               <mat-option value="In Review">In Review</mat-option>
@@ -109,7 +109,7 @@
             <mat-form-field>
               <mat-label>Change study status</mat-label>
               <mat-select
-                (selectionChange)="changeStatus()"
+                (selectionChange)="changeStatusNgxs()"
                 [(value)]="toStatus"
               >
                 <mat-option value="Submitted">Submitted</mat-option>

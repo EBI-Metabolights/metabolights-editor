@@ -12,7 +12,6 @@ import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { QuickLinkComponent } from "./quick-link/quick-link.component";
 import { UploadComponent } from "./upload/upload.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { NgReduxModule } from "@angular-redux/store";
 import { AsperaDownloadComponent } from "./download/aspera/aspera.component";
 import { FtpDownloadComponent } from "./download/ftp/ftp.component";
 import { HttpDownloadComponent } from "./download/http/http.component";
@@ -23,6 +22,7 @@ import { FTPUploadComponent } from "./upload/ftp/ftp.component";
 import { AsperaUploadComponent } from "./upload/aspera/aspera.component";
 import { MatIconModule } from "@angular/material/icon";
 import { MatFormFieldModule } from "@angular/material/form-field";
+
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatTooltipModule } from "@angular/material/tooltip";
 
@@ -41,7 +41,6 @@ import { MatSelectModule } from "@angular/material/select";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { AddAssayComponent } from "./add-assay/add-assay.component";
 import { MatTableModule } from "@angular/material/table";
-import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { AuthGuard } from "src/app/auth-guard.service";
@@ -104,7 +103,6 @@ import { TableComponent } from "./table/table.component";
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    NgReduxModule,
     RouterModule,
     MatPaginatorModule,
     MatSortModule,
@@ -116,7 +114,6 @@ import { TableComponent } from "./table/table.component";
     MatSelectModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    AngularStickyThingsModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatExpansionModule,

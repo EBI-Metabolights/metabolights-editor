@@ -78,7 +78,6 @@
     padding: 10px;
     border: 1px solid rgba(0, 0, 0, 0.03);
   "
-  stickyThing
   [spacer]="spacer"
   marginTop="50"
 >
@@ -210,7 +209,6 @@
       </ng-container>
       <ng-container
         *ngFor="let column of data.columns"
-        [sticky]="column.sticky"
         [matColumnDef]="column.columnDef"
       >
         <th

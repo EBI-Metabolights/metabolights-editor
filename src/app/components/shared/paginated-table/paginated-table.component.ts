@@ -18,11 +18,10 @@ import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
-import { NgRedux, select } from "@angular-redux/store";
 import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
@@ -33,10 +32,15 @@ import { tap } from "rxjs/operators";
 import { PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
 import { Observable } from "rxjs";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { TableRowAction, TableType } from "../table/table-type.type";
+import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
+import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
+import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
+import { AssaysService } from "src/app/services/decomposed/assays.service";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -54,19 +58,16 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
-  @select((state) => state.study.validations) studyValidations: any;
-  @select((state) => state.study.files) studyFiles: any;
+
 
   @Output() updated = new EventEmitter<any>();
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
 
-  @select((state) => state.study.readonly) readonly;
-
   @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
 
 
 
@@ -126,8 +127,8 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   isEditModalOpen = false;
   isEditColumnModalOpen = false;
   isDeleteModalOpen = false;
-  editCellform: FormGroup;
-  editColumnform: FormGroup;
+  editCellform: UntypedFormGroup;
+  editColumnform: UntypedFormGroup;
   defaultControlList = Object.freeze({name: "", values: Object.freeze([])});
   selectedMissingCol = null;
   selectedMissingKey = null;
@@ -139,11 +140,15 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   hit = false;
   baseHref: string;
 
+  private toastrSettings: Record<string, any> = {}
+
   constructor(
     private clipboardService: ClipboardService,
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private isaTableDataSourceService: IsaTableDataSourceService
+    private isaTableDataSourceService: IsaTableDataSourceService,
+    private store: Store,
+    private assayService: AssaysService
   ) {
     this.baseHref =this.editorService.configService.baseHref;
   }
@@ -154,10 +159,7 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
     this.dataSource.metadata.subscribe((val) => this.currentMetadata = val);
 
     this.dataSource.loadIsaTableRows(this.tableData.data.file, '', 'asc', 0, 50);
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
   ngAfterViewInit() {
 
@@ -178,24 +180,10 @@ loadIsaTablePage() {
         this.paginator.pageSize);
 }
 
-  setUpSubscriptions() {
-    this.studyValidations.subscribe((value) => {
-      this.validations = value;
-    });
-    this.studyFiles.subscribe((value) => {
-      if (value) {
-        this.files = value.study;
-      }
-    });
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        this.isReadOnly = value;
-      }
-    });
-  }
-
-
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe((value) => {
+      this.toastrSettings = value;
+    })
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
@@ -445,30 +433,18 @@ loadIsaTablePage() {
 
     if (cellsToUpdate.length > 0) {
       this.isFormBusy = true;
-      this.editorService
-        .updateCells(
-          this.data.file,
-          { data: cellsToUpdate },
-          this.validationsId,
-          null
-        )
-        .subscribe(
-          (res) => {
-            toastr.success("Cells updated successfully", "Success", {
-              timeOut: "2500",
-              positionClass: "toast-top-center",
-              preventDuplicates: true,
-              extendedTimeOut: 0,
-              tapToDismiss: false,
-            });
-            this.loading = false;
-            this.isFormBusy = false;
-          },
-          (err) => {
-            console.error(err);
-            this.loading = false;
-          }
-        );
+      let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
+      this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+        (completed) => {
+          toastr.success("Cells updated successfully", "Success", this.toastrSettings);
+          this.isEditModalOpen = false;
+          this.isFormBusy = false
+        },
+        (error) => {
+          console.error(error);
+          this.isFormBusy = false;
+        }
+      )
     }
   }
 
@@ -666,28 +642,22 @@ loadIsaTablePage() {
     // }
   }
 
+
   addColumns(columns) {
     this.isFormBusy = true;
-    this.editorService
-      .addColumns(this.data.file, { data: columns }, this.validationsId, null)
-      .subscribe(
-        (res) => {
-          toastr.success("Characteristic/Factor columns are added successfully", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.isFormBusy = false;
-          return true;
-        },
-        (err) => {
-          console.log(err);
-          this.isFormBusy = false;
-          return false;
-        }
-      );
+    this.store.dispatch(new Samples.AddColumns(this.data.file, { data: columns}, null)).subscribe(
+      (completed) => {
+        this.isFormBusy = false;
+        toastr.success("Characteristic/Factor columns added successfully", "Success", this.toastrSettings);
+        this.isFormBusy = false;
+        return true;
+      },
+      (error) => {
+        console.log(error);
+        this.isFormBusy = false;
+        return false;
+      }
+    )
   }
 
   addNRows() {
@@ -716,54 +686,34 @@ loadIsaTablePage() {
 
   updateRows(rows) {
     this.isFormBusy = true;
-    this.editorService
-      .updateRows(this.data.file, { data: rows }, this.validationsId, null)
-      .subscribe(
-        (res) => {
-          toastr.success("Row updated successfully", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.isFormBusy = false;
-        },
-        (err) => {
-          this.isFormBusy = false;
-        }
-      );
+    let actionClass = this.getTableUpdateAction('update', this.getTableType(this.data.file));
+    this.store.dispatch(new actionClass(this.data.file, { data: rows }, null)).subscribe(
+      (completed) => {
+        toastr.success("Row updated successfully", "Success", this.toastrSettings);
+        this.isFormBusy = false;
+      },
+      (error) => {
+        this.isFormBusy = false;
+      }
+    )
+    
+
   }
 
-  addRows(rows, index) {
+  addRows(rows, index, tableType?: TableType) {
     this.isFormBusy = true;
-    this.editorService
-      .addRows(
-        this.data.file,
-        { data: { rows, index: index ? index : 0 } },
-        this.validationsId,
-        null
-      )
-      .subscribe(
-        (res) => {
-          toastr.success(
-            "Rows added successfully to the end of the sheet",
-            "Success",
-            {
-              timeOut: "2500",
-              positionClass: "toast-top-center",
-              preventDuplicates: true,
-              extendedTimeOut: 0,
-              tapToDismiss: false,
-            }
-          );
-          this.rowsUpdated.emit();
-          this.isFormBusy = false;
-        },
-        (err) => {
-          this.isFormBusy = false;
-        }
-      );
+    if (tableType === undefined) { tableType = this.getTableType(this.data.file)}
+    let actionClass = this.getTableUpdateAction('add', tableType)
+      this.store.dispatch(new actionClass(this.data.file, { data: { rows, index: index ? index : 0 } }, null)).subscribe(
+      (completed) => {
+        toastr.success(`Rows added successfully to the end of the ${tableType} sheet`, "Success", this.toastrSettings);
+        this.rowsUpdated.emit();
+        this.isFormBusy = false;
+      },
+      (error) => {
+        this.isFormBusy = false;
+      }
+    )
   }
 
   getEmptyRow() {
@@ -790,32 +740,21 @@ loadIsaTablePage() {
     }
   }
 
+
   deleteSelectedRows() {
     this.isFormBusy = true;
-    this.editorService
-      .deleteRows(
-        this.data.file,
-        this.getUnique(this.selectedRows).join(","),
-        this.validationsId,
-        null
-      )
-      .subscribe(
-        (res) => {
-          this.isDeleteModalOpen = false;
-          toastr.success("Rows delete successfully", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.rowsUpdated.emit();
-          this.isFormBusy = false;
-        },
-        (err) => {
-          this.isFormBusy = false;
-        }
-      );
+    let actionClass = this.getTableUpdateAction('delete', this.getTableType(this.data.file));
+    this.store.dispatch(new actionClass(this.data.file, this.getUnique(this.selectedRows).join(","))).subscribe(
+      (completed) => {
+        this.isDeleteModalOpen = false;
+        toastr.success("Rows delete successfully", "Success", this.toastrSettings);
+        this.rowsUpdated.emit();
+        this.isFormBusy = false;
+      },
+      (error) => {
+        this.isFormBusy = false;
+      }
+    )
   }
 
   closeDelete() {
@@ -971,6 +910,34 @@ loadIsaTablePage() {
     this.lastRowSelection = row;
   }
 
+  getTableType(filename: string): TableType {
+    if (filename.startsWith('a_')) return 'assay'
+    if (filename.startsWith('m_')) return 'maf'
+    if (filename.startsWith('s_')) return 'samples'
+  }
+
+
+  getCellUpdateAction(tableType): any {
+    if (tableType === 'samples') return Samples.UpdateCells
+    if (tableType === 'assay') return Assay.UpdateCells
+    if (tableType === 'maf') return MAF.UpdateCells
+  }
+
+  getTableUpdateAction(action: TableRowAction, tableType: TableType): any {
+    switch(action) {
+      case 'add':
+        if (tableType === 'samples') return Samples.AddRows
+        if (tableType === 'assay') return Assay.AddRows
+        if (tableType === 'maf') return MAF.AddRows
+      case 'update': 
+        if (tableType === 'maf') return MAF.UpdateRows
+      case 'delete':
+        if (tableType === 'samples') return Samples.DeleteRows
+        if (tableType === 'assay') return Assay.DeleteRows
+        if (tableType === 'maf') return MAF.DeleteRows
+    }
+  }
+
   cellClick(row: any, column: any, event) {
     if (event.altKey) {
       this.selectedCells.push([column.columnDef, row.index]);
@@ -1085,30 +1052,18 @@ loadIsaTablePage() {
       ];
     }
     this.isFormBusy = true;
-    this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
-      )
-      .subscribe(
-        (res) => {
-          toastr.success("Cells updated successfully", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.isEditModalOpen = false;
-          this.isFormBusy = false;
-        },
-        (err) => {
-          console.error(err);
-          this.isFormBusy = false;
-        }
-      );
+    let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+      (completed) => {
+        toastr.success("Cells updated successfully", "Success", this.toastrSettings);
+        this.isEditModalOpen = false;
+        this.isFormBusy = false
+      },
+      (error) => {
+        console.error(error);
+        this.isFormBusy = false;
+      }
+    )
   }
 
   saveColumnSelectedMissingRowsValues() {
@@ -1167,22 +1122,10 @@ loadIsaTablePage() {
       }
     });
     this.isFormBusy = true;
-    this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
-      )
-      .subscribe(
-        (res) => {
-          toastr.success("Cells updated successfully", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
+    let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+      (completed) => {
+          toastr.success("Cells updated successfully", "Success", this.toastrSettings);
           this.closeEditMissingColValModal();
           if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
             this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
@@ -1193,7 +1136,8 @@ loadIsaTablePage() {
           console.error(err);
           this.isFormBusy = false;
         }
-      );
+      )
+
   }
 
   saveColumnSelectedRowsValues() {
@@ -1245,30 +1189,19 @@ loadIsaTablePage() {
       });
     }
     this.isFormBusy = true;
-    this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
-      )
-      .subscribe(
-        (res) => {
-          toastr.success("Cells updated successfully", "Success", {
-            timeOut: "4000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.isEditColumnModalOpen = false;
-          this.isFormBusy = false;
-        },
-        (err) => {
-          console.error(err);
-          this.isFormBusy = false;
-        }
-      );
+    let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+      (completed) => {
+        toastr.success("Cells updated successfully.", "Success", this.toastrSettings);
+        this.isEditColumnModalOpen = false;
+        this.isFormBusy = false;
+      },
+      (error) => {
+        console.error(error);
+        this.isFormBusy = false;
+      }
+    )
+
   }
 
   onEditCellChanges(event) {
@@ -1344,7 +1277,7 @@ loadIsaTablePage() {
   getValidationDefinition(header) {
     let selectedColumn = null;
     if (this.tableData?.data?.file && this.tableData.data.file.startsWith("a_") && this.assayTechnique.name === null) {
-      const result = this.editorService.extractAssayDetails(this.tableData);
+      const result = this.assayService.extractAssayDetails(this.tableData);
       this.assayTechnique.name = result.assayTechnique?.name;
       this.assayTechnique.sub = result.assaySubTechnique?.name;
       this.assayTechnique.main = result.assayMainTechnique?.name;
@@ -1497,33 +1430,21 @@ loadIsaTablePage() {
       }
     });
     this.isFormBusy = true;
-    this.editorService
-      .updateCells(
-        this.data.file,
-        { data: cellsToUpdate },
-        this.validationsId,
-        null
-      )
-      .subscribe(
-        (res) => {
-          toastr.success("Cells updated successfully", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.isEditColumnModalOpen = false;
-          this.isFormBusy = false;
-          if(col.missingTerms.has(val)){
-            col.missingTerms.delete(val);
-          }
-        },
-        (err) => {
-          console.error(err);
-          this.isFormBusy = false;
+    let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+      (completed) => {
+        toastr.success("Cells updated successfully.", "Success", this.toastrSettings);
+        this.isEditColumnModalOpen = false;
+        this.isFormBusy = false;
+        if(col.missingTerms.has(val)){
+          col.missingTerms.delete(val);
         }
-      );
+      },
+      (error) => {
+        console.error(error);
+        this.isFormBusy = false;
+      }
+    )
   }
 
   get validation() {

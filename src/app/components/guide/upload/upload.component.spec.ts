@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store } from "@ngxs/store";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
@@ -7,7 +7,7 @@ import {
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import {
   Router,
   UrlSerializer,
@@ -31,12 +31,12 @@ describe("RawUploadComponent", () => {
   let fixture: ComponentFixture<RawUploadComponent>;
   let editorService: EditorService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [RawUploadComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,

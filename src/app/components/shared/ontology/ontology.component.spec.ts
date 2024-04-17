@@ -1,5 +1,5 @@
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import {
@@ -17,7 +17,7 @@ describe("OntologyComponent", () => {
   let editorService: EditorService;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [OntologyComponent],
       imports: [HttpClientTestingModule],

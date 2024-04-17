@@ -1,4 +1,4 @@
-.mat-option {
+.mat-mdc-option {
   white-space: nowrap;
   line-height: inherit;
   min-height: 48px;
@@ -8,6 +8,7 @@
   max-width: 600px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version. */
 .mat-option-text {
   max-width: 570px;
 }
@@ -26,6 +27,7 @@
   max-width: 570px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version. */
 ::ng-deep .mat-option-text {
   display: inline-block;
   flex-grow: 1;

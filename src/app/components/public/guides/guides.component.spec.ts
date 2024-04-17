@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store } from "@ngxs/store";
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
@@ -8,7 +8,7 @@ import {
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import {
@@ -36,7 +36,7 @@ describe("GuidesComponent", () => {
   let fixture: ComponentFixture<GuidesComponent>;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [GuidesComponent],
       imports: [
@@ -48,7 +48,7 @@ describe("GuidesComponent", () => {
         ReactiveFormsModule,
       ],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,

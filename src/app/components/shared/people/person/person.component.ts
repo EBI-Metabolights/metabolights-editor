@@ -12,10 +12,8 @@ import { MTBLSComment } from "../../../../models/mtbl/mtbls/common/mtbls-comment
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "../../../../store";
 import { tassign } from "tassign";
 import * as toastr from "toastr";
 
@@ -25,9 +23,10 @@ import { OntologyComponent } from "../../ontology/ontology.component";
 import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-person",
@@ -48,16 +47,13 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 })
 export class PersonComponent implements OnInit {
   @Input("value") person: MTBLSPerson;
-  @select((state) => state.study.validations) studyValidations;
-  @select((state) => state.study.identifier) studyIdentifier;
 
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
-
-  @select((state) => state.study.readonly) readonly;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
 
 
   isReadOnly = false;
@@ -67,7 +63,7 @@ export class PersonComponent implements OnInit {
   defaultControlListName = "Study Person Role";
   requestedStudy: string = null;
 
-  form: FormGroup;
+  form: UntypedFormGroup;
   showAdvanced = false;
   isFormBusy = false;
 
@@ -84,38 +80,19 @@ export class PersonComponent implements OnInit {
 
   validationsId = "people.person";
 
+  private toastrSettings: Record<string, any> = {};
+
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private ngRedux: NgRedux<IAppState>
+    private store: Store
   ) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.studyValidations.subscribe((value) => {
-      this.validations = value;
-    });
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        if (value) {
-          this.isReadOnly = value;
-        } else {
-          this.isReadOnly = false;
-        }
-      }
-    });
-    this.studyIdentifier.subscribe((value) => {
-      if (value !== null) {
-        this.requestedStudy = value;
-      }
-    });
-  }
 
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe((value) => {this.toastrSettings = value})
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
@@ -133,6 +110,7 @@ export class PersonComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
+
   }
 
   ngOnInit() {
@@ -223,32 +201,20 @@ export class PersonComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-  delete() {
-    if (this.person.email !== "") {
-      this.editorService.deletePerson(this.person.email, null).subscribe(
-        (res) => {
-          this.updateContacts(res, "Person deleted.");
-          this.isDeleteModalOpen = false;
-          this.isModalOpen = false;
-        },
-        (err) => {
-          this.isFormBusy = false;
-        }
-      );
-    } else {
-      this.editorService
-        .deletePerson(null, this.person.firstName + this.person.lastName)
-        .subscribe(
-          (res) => {
-            this.updateContacts(res, "Person deleted.");
-            this.isDeleteModalOpen = false;
-            this.isModalOpen = false;
-          },
-          (err) => {
-            this.isFormBusy = false;
-          }
-        );
-    }
+  deleteNgxs() {
+    const identifier = this.person.email !== "" ? this.person.email : null;
+    const name = this.person.email === "" ? `${this.person.firstName}${this.person.lastName}` : null;
+    
+    this.store.dispatch(new People.Delete(identifier, name)).subscribe(
+      (response) => {
+        this.refreshContacts("Person deleted.");
+        this.isDeleteModalOpen = false;
+        this.isModalOpen = false;
+      },
+      (error) => {
+        this.isFormBusy = false;
+      }
+    );
   }
 
   get validation() {
@@ -276,89 +242,55 @@ export class PersonComponent implements OnInit {
   }
 
   grantSubmitter() {
-    this.editorService
-      .makePersonSubmitter(this.person.email, this.requestedStudy)
-      .subscribe(
-        (res) => {
-          toastr.success("Added user as submitter", "Success", {
-            timeOut: "2500",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-          this.isModalOpen = true;
-          this.isApproveSubmitterModalOpen = false;
+    this.store.dispatch(new People.GrantSubmitter(this.person.email)).subscribe(
+      (completed) => {
+        toastr.success("Added user as a submitter", "Success", this.toastrSettings);
+        this.isModalOpen = true;
+        this.isApproveSubmitterModalOpen = false;
         },
-        (err) => {
+        (error) => {
           this.isFormBusy = false;
         }
-      );
+      )
   }
 
-  save() {
+  saveNgxs() {
     if (!this.isReadOnly) {
       this.isFormBusy = true;
-      if (!this.addNewPerson) {
-        if (
-          this.getFieldValue("email") !== this.person.email &&
-          this.person.email !== ""
-        ) {
-          this.editorService
-            .updatePerson(this.person.email, null, this.compileBody())
-            .subscribe(
-              (res) => {
-                this.updateContacts(res, "Person updated");
-              },
-              (err) => {
-                this.isFormBusy = false;
-              }
-            );
-        } else {
-          this.editorService
-            .updatePerson(
-              null,
-              this.person.firstName + this.person.lastName,
-              this.compileBody()
-            )
-            .subscribe(
-              (res) => {
-                this.updateContacts(res, "Person updated");
-              },
-              (err) => {
-                this.isFormBusy = false;
-              }
-            );
-        }
-      } else {
-        this.editorService.savePerson(this.compileBody()).subscribe(
-          (res) => {
-            this.updateContacts(res, "Person saved");
-            this.closeModal();
+      if (!this.addNewPerson) { // if we are updating an existing person
+        const emailChanged = this.getFieldValue("email") !== this.person.email && this.person.email !== "";
+        const updateIdentifier = emailChanged ? this.person.email : null;
+        const updateName = !emailChanged ? `${this.person.firstName}${this.person.lastName}` : null;
+        
+        this.store.dispatch(new People.Update(this.compileBody(), updateIdentifier, updateName)).subscribe(
+          (completed) => {
+            this.refreshContacts("Person updated.");
           },
-          (err) => {
+          (error) => {
             this.isFormBusy = false;
           }
         );
+      } else { // if we are adding a new person
+        this.store.dispatch(new People.Add(this.compileBody())).subscribe(
+          (completed) => {
+            this.refreshContacts("New person added.");
+            this.closeModal();
+          },
+          (error) => {
+            this.isFormBusy = false;
+          }
+        )
       }
     }
   }
 
-  updateContacts(res, message) {
-    if (!this.isReadOnly) {
-      this.editorService.getPeople().subscribe((data) => {
-        this.form.markAsPristine();
-        this.initialiseForm();
-        toastr.success(message, "Success", {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      });
+  refreshContacts(message) {
+    if (this.isReadOnly) {
+      this.form.markAsPristine();
+      toastr.success(message, "Success", this.toastrSettings);
     }
   }
+
 
   onChanges() {
     this.form.controls.roles.setValue(this.rolesComponent.values);

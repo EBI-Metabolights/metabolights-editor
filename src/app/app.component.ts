@@ -1,7 +1,5 @@
 import { Component, ViewEncapsulation, ElementRef, OnInit } from "@angular/core";
 import { EditorService } from "./services/editor.service";
-import { NgRedux } from "@angular-redux/store";
-import { IAppState } from "./store";
 import { Subscription } from "rxjs";
 import { NavigationStart, Router, RouterEvent } from "@angular/router";
 import jwtDecode from "jwt-decode";
@@ -72,16 +70,10 @@ export class AppComponent implements OnInit {
       localStorage.removeItem("mtblsjwt");
       localStorage.removeItem("mtblsuser");
     }
-    if (environment.useNewState) {
-     // this.store.dispatch( )
      this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
      this.store.dispatch(new BackendVersion.Get());
      this.store.dispatch(new EditorVersion.Get());
-    } else {
-      this.editorService.loadVersionInfo();
-      this.editorService.loadApiVersionInfo();
-      this.editorService.loadGuides();
-    }
+    
 
   }
 

@@ -1,4 +1,3 @@
-import { NgRedux } from "@angular-redux/store";
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
@@ -8,7 +7,7 @@ import {
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import {
@@ -28,6 +27,7 @@ import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
+import { Store } from "@ngxs/store";
 
 import { LoginComponent } from "./login.component";
 
@@ -36,7 +36,7 @@ describe("LoginComponent", () => {
   let fixture: ComponentFixture<LoginComponent>;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [LoginComponent],
       imports: [
@@ -48,7 +48,7 @@ describe("LoginComponent", () => {
         ReactiveFormsModule,
       ],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,

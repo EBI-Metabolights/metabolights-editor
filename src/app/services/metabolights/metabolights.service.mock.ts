@@ -1,4 +1,3 @@
-import { select } from "@angular-redux/store";
 import { HttpClient, HttpHandler } from "@angular/common/http";
 import { of } from "rxjs";
 import { httpOptions } from "../headers";
@@ -8,7 +7,6 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { Select } from "@ngxs/store";
 
 export class MockMetabolightsService {
-  @select((state) => state.study.identifier) studyIdentifier;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
 
   id: string;

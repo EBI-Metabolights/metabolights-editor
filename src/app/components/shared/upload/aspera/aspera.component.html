@@ -93,7 +93,7 @@
         >
           <code>
             $ ascp -QT -P 33001 -L- -l 300M &lt; your_local_data_folder &gt;
-            {{ (validations | async)[this.validationsId]["aspera"]["user"] }}@{{
+            {{ (validations | async)[this.validationsId]["aspera"]["user"] }}&#64;{{
               (validations | async)[this.validationsId]["aspera"]["server"]
             }}:{{ uploadLocation | async }}
           </code>

@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { NgRedux, select } from "@angular-redux/store";
-import { IAppState } from "./../../../../store";
 import { ActivatedRoute, Router } from '@angular/router';
 import { ErrorMessageService } from 'src/app/services/error-message.service';
 import { EditorService } from 'src/app/services/editor.service';
@@ -17,7 +15,7 @@ export class NoStudyPageComponent implements OnInit {
   messageHeader = "Study page not found";
   messageContent = "Error while loading study. Possible reasons: 1) Study accesion number is not valid or it is not public or editable.";
   messageExpanded = true;
-  constructor(private ngRedux: NgRedux<IAppState>,
+  constructor(
     private store: Store,
     private route: ActivatedRoute,
     private router: Router,
@@ -28,13 +26,9 @@ export class NoStudyPageComponent implements OnInit {
     this.messageExpanded = !this.messageExpanded;
   }
   ngOnInit() {
-    if (environment.useNewState) {
-      this.store.dispatch(new Loading.Disable())
-    } else {
-      if (!environment.isTesting) {
-        this.ngRedux.dispatch({ type: "DISABLE_LOADING" });
-      }
-    }
+    
+    this.store.dispatch(new Loading.Disable())
+     
       this.route.queryParams.subscribe((params) => {
         const errorCode = params.code ?? "";
 

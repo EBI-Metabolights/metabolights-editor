@@ -1,11 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import { EditorService } from "../../../../services/editor.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
-import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
-import { uptime } from "process";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
@@ -27,8 +24,6 @@ declare let AW4: any;
   styleUrls: ["./aspera.component.css"],
 })
 export class AsperaUploadComponent implements OnInit {
-  @select((state) => state.study.uploadLocation) uploadLocation;
-  @select((state) => state.study.validations) validations: any;
 
   @Select(FilesState.obfuscationCode) uploadLocation$: Observable<string>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
@@ -56,22 +51,11 @@ export class AsperaUploadComponent implements OnInit {
   videoURL: string;
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private editorService: EditorService,
     private configService: ConfigurationService
   ) {}
-
-  setUpSubscriptions() {
-    this.uploadLocation.subscribe((value) => {
-      this.uploadPath = value;
-    });
-    this.validations.subscribe((value) => {
-      if (value) {
-        this.validation = value[this.validationsId];
-      }
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.uploadLocation$.subscribe((value) => {
@@ -86,10 +70,7 @@ export class AsperaUploadComponent implements OnInit {
 
   ngOnInit() {
     this.videoURL = this.configService.config.videoURL.aspera;
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
   toggleHelp() {

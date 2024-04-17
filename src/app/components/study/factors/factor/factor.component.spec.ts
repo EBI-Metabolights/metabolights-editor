@@ -1,6 +1,6 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import { CommonModule } from "@angular/common";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { EditorService } from "src/app/services/editor.service";
@@ -12,13 +12,13 @@ describe("FactorComponent", () => {
   let component: FactorComponent;
   let fixture: ComponentFixture<FactorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [FactorComponent],
       imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule],
       providers: [
         { provide: EditorService, useClass: MockEditorService },
-        NgRedux,
+        Store,
       ],
     }).compileComponents();
   }));

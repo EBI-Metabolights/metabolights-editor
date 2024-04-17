@@ -1,6 +1,6 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store } from "@ngxs/store";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -14,12 +14,12 @@ describe("NavBarComponent", () => {
   let fixture: ComponentFixture<NavBarComponent>;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [NavBarComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         { provide: EditorService, useClass: MockEditorService },
         {
           provide: ConfigurationService,

@@ -1,7 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
-import { NgRedux, select } from "@angular-redux/store";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -22,8 +21,6 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
   styleUrls: ["./ftp.component.css"],
 })
 export class FTPUploadComponent implements OnInit {
-  @select((state) => state.study.uploadLocation) uploadLocation;
-  @select((state) => state.study.validations) validations: any;
 
   @Select(FilesState.uploadLocation) uploadLocation$: Observable<string>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
@@ -44,23 +41,14 @@ export class FTPUploadComponent implements OnInit {
 
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService
   ) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscription();
-    }
-    if (environment.useNewState) this.setUpSubscriptionNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscription() {
-    this.uploadLocation.subscribe((value) => {
-      this.uploadPath = value;
-    });
-    this.validations.subscribe((rules) => { this.rules = rules})
-  }
 
-  setUpSubscriptionNgxs() {
+  setUpSubscriptionsNgxs() {
     this.uploadLocation$.subscribe((value) => {
       this.uploadPath = value;
     });

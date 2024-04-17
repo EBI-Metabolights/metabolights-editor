@@ -1,7 +1,6 @@
 import { Component, ViewChild, ViewChildren, QueryList, OnChanges } from "@angular/core";
-import { select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
 import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
 import { MTBLSFactorValue } from "./../../../models/mtbl/mtbls/mtbls-factor-value";
@@ -25,12 +24,6 @@ import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descripto
   styleUrls: ["./samples.component.css"],
 })
 export class SamplesComponent  {
-  @select((state) => state.study.samples) studySamples;
-  @select((state) => state.study.validations) studyValidations: any;
-  @select((state) => state.study.factors) studyFactors;
-  @select((state) => state.study.files) studyFiles: any;
-
-  @select((state) => state.study.readonly) readonly;
 
   @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
@@ -73,55 +66,23 @@ export class SamplesComponent  {
   duplicateNames: any = [];
   rawFileNames: any = [];
 
-  form: FormGroup;
+  form: UntypedFormGroup;
 
   validationsId = "samples";
 
 
-  constructor(private editorService: EditorService, private fb: FormBuilder) {
+  constructor(private editorService: EditorService, private fb: UntypedFormBuilder) {
     if (!this.defaultCharacteristicControlList) {
       this.defaultCharacteristicControlList = {name: "", values: []};
     }
     if (!this.defaultUnitControlList) {
       this.defaultUnitControlList = {name: "", values: []};
     }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
-    else this.setUpSubscriptions();
+    this.setUpSubscriptionsNgxs();
   }
 
   onChanges($event) {
 
-  }
-
-  setUpSubscriptions() {
-    this.studyValidations.subscribe((value) => {
-      this.validations = value;
-    });
-    this.studyFactors.subscribe((value) => {
-      this.factors = value;
-    });
-    this.studyFiles.subscribe((f) => {
-      if (f) {
-        f.study.forEach((file) => {
-          if (file.type === "raw") {
-            const name = file.file.split(".")[0];
-            this.rawFileNames.push(name);
-          }
-        });
-      }
-    });
-    this.studySamples.subscribe((value) => {
-      if (value === null) {
-        this.editorService.loadStudySamples();
-      } else {
-        this.samples = value;
-      }
-    });
-    this.readonly.subscribe((value) => {
-      if (value !== null) {
-        this.isReadOnly = value;
-      }
-    });
   }
 
   setUpSubscriptionsNgxs() {
@@ -247,7 +208,6 @@ export class SamplesComponent  {
       const mtblsFactorValue = new MTBLSFactorValue();
       mtblsFactorValue.category = this.selectedFactor;
       const columns = [];
-      console.log(this.sampleTable);
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
         "Factor Value[" + mtblsFactorValue.category.factorName + "]",

@@ -1,7 +1,7 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store } from "@ngxs/store";
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { EditorService } from "src/app/services/editor.service";
@@ -17,7 +17,7 @@ describe("DesignDescriptorComponent", () => {
   let component: DesignDescriptorComponent;
   let fixture: ComponentFixture<DesignDescriptorComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [DesignDescriptorComponent],
       imports: [
@@ -28,7 +28,7 @@ describe("DesignDescriptorComponent", () => {
         ReactiveFormsModule,
       ],
       providers: [
-        NgRedux,
+        Store,
         { provide: EditorService, useClass: MockEditorService },
         { provide: DOIService, useClass: MockDOIService },
         { provide: EuropePMCService, useClass: MockEuropePMCService },

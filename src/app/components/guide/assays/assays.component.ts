@@ -1,8 +1,7 @@
 import { Component, ViewChild, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
-import { select } from "@angular-redux/store";
 import { MTBLSColumn } from "./../../../models/mtbl/mtbls/common/mtbls-column";
 import * as toastr from "toastr";
 import Swal from "sweetalert2";
@@ -11,11 +10,15 @@ import { SamplesComponent } from "./../../study/samples/samples.component";
 import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
+import { Operations } from "src/app/ngxs-store/study/files/files.actions";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
+import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 
 @Component({
   selector: "guide-assays",
@@ -23,16 +26,12 @@ import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
   styleUrls: ["./assays.component.css"],
 })
 export class GuidedAssaysComponent implements OnInit {
-  @select((state) => state.study.identifier) studyIdentifier;
-  @select((state) => state.study.files) studyFiles;
-  @select((state) => state.study.assays) studyAssays;
-  @select((state) => state.study.samples) studySamples;
-
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
   @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
   @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
 
   @ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
@@ -51,53 +50,29 @@ export class GuidedAssaysComponent implements OnInit {
   files: any = [];
   samples: any = {};
   baseHref: string;
+
+  private toastrSettings: Record<string, any> = {};
+
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private store: Store
   ) {
     this.editorService.initialiseStudy(this.route);
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
-  setUpSubscriptions() {
-    this.studyIdentifier.subscribe((value) => {
-      if (value != null) {
-        this.requestedStudy = value;
-      }
-    });
-    this.studyFiles.subscribe((value) => {
-      if (value != null) {
-        this.files = value;
-      } else {
-        this.editorService.loadStudyFiles(false);
-      }
-    });
-    this.studyAssays.subscribe((value) => {
-      this.assays = Object.values(value);
-      if (this.assays.length > 0) {
-        this.assays.sort((a, b) => {
-          if (a.name < b.name) {
-            return -1;
-          }
-          if (a.name > b.name) {
-            return 1;
-          }
-          return 0;
-        });
-      }
-    });
-    this.studySamples.subscribe((value) => {
-      this.samples = value;
-    });
-  }
+
 
   setUpSubscriptionsNgxs() {
+
+    this.toastrSettings$.subscribe((value) => {
+      this.toastrSettings = value
+    });
+
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) this.requestedStudy = value
     });
@@ -105,7 +80,7 @@ export class GuidedAssaysComponent implements OnInit {
       if (value != null) {
         this.files = value;
       } else {
-        this.editorService.loadStudyFiles(false);
+        this.store.dispatch(new Operations.GetFreshFilesList(false));
       }
     });
     this.assays$.subscribe((value) => {
@@ -139,15 +114,18 @@ export class GuidedAssaysComponent implements OnInit {
       cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
-        this.editorService.deleteAssay(name).subscribe((resp) => {
-          this.extractAssayInfo(true);
-          Swal.fire({
-            title: "Assay deleted!",
-            text: "",
-            type: "success",
-            confirmButtonText: "OK",
-          }).then(() => {});
-        });
+        this.store.dispatch(new Assay.Delete(name)).subscribe(
+          (completed) => {
+            this.extractAssayInfo(true);
+            Swal.fire({
+              title: "Assay deleted!",
+              text: "",
+              type: "success",
+              confirmButtonText: "OK",
+            }).then(() => {});
+          }
+        )
+
       }
     });
   }
@@ -202,72 +180,39 @@ export class GuidedAssaysComponent implements OnInit {
             confirmButtonText: "Ignore duplicates, proceed!",
           }).then((result) => {
             if (result.value) {
-              this.editorService
-                .addRows(
-                  this.samples.name,
-                  { data: { rows: sRows, index: 0 } },
-                  "samples",
-                  null
-                )
-                .subscribe(
-                  (res) => {
-                    toastr.success("Samples added successfully", "Success", {
-                      timeOut: "2500",
-                      positionClass: "toast-top-center",
-                      preventDuplicates: true,
-                      extendedTimeOut: 0,
-                      tapToDismiss: false,
-                    });
-                    this.controlsNames = "";
-                    this.samplesNames = "";
-                    this.changeSubStep(4);
-                  },
-                  (err) => {
-                    console.log(err);
-                  }
-                );
+              this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null)).subscribe(
+                (completed) => {
+                  toastr.success("Samples added successfully", "Success", this.toastrSettings);
+                  this.controlsNames = "";
+                  this.samplesNames = "";
+                  this.changeSubStep(4);
+                },
+                (error) => {
+                  console.log(error);
+                }
+              )
             }
           });
         } else if (duplicates.length > 0 && sRows.length === 0) {
           this.changeSubStep(4);
         } else {
-          this.editorService
-            .addRows(
-              this.samples.name,
-              { data: { rows: sRows, index: 0 } },
-              "samples",
-              null
-            )
-            .subscribe(
-              (res) => {
-                toastr.success("Samples added successfully", "Success", {
-                  timeOut: "2500",
-                  positionClass: "toast-top-center",
-                  preventDuplicates: true,
-                  extendedTimeOut: 0,
-                  tapToDismiss: false,
-                });
-                this.controlsNames = "";
-                this.samplesNames = "";
-                this.changeSubStep(4);
-              },
-              (err) => {
-                console.log(err);
-              }
-            );
+          this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null)).subscribe(
+            (completed) => {
+              toastr.success("Samples added successfully", "Success", this.toastrSettings);
+              this.controlsNames = "";
+              this.samplesNames = "";
+              this.changeSubStep(4);
+            },
+            (error) => {
+              console.log(error);
+            }
+          )
         }
       }
     } else {
       toastr.error(
         "Please add experimental controls and sample names",
-        "Error",
-        {
-          timeOut: "2500",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        }
+        "Error",this.toastrSettings
       );
     }
   }
@@ -342,15 +287,15 @@ export class GuidedAssaysComponent implements OnInit {
   }
 
   addColumns(columns) {
-    this.editorService
-      .addColumns(this.samples.name, { data: columns }, "samples", null)
-      .subscribe(
-        (res) => true,
-        (err) => {
-          console.log(err);
-          return false;
-        }
-      );
+    this.store.dispatch(new Samples.AddColumns(this.samples.name, {data: columns})).subscribe(
+      (completed) => {
+        true
+      },
+      (error) => {
+        console.log(error);
+        return false;
+      }
+    )
   }
 
   keys(object) {
@@ -386,9 +331,9 @@ export class GuidedAssaysComponent implements OnInit {
 
   extractAssayInfo(reloadFiles) {
     if (reloadFiles) {
-      this.editorService.loadStudyFiles(true);
+      this.store.dispatch(new Operations.GetFreshFilesList(true));
     } else {
-      this.editorService.loadStudyAssays(this.files);
+      this.store.dispatch(new AssayList.Get(this.requestedStudy));
     }
   }
 }

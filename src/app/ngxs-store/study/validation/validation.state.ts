@@ -111,6 +111,19 @@ export class ValidationState {
         });
     }
 
+    @Action(ValidationReport.Override)
+    OverrideValidationRule(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Override) {
+        const state = ctx.getState();
+        this.validationService.overrideValidations(action.rule).subscribe(
+            (response) => {
+                ctx.dispatch(new ValidationReport.Get());
+            },
+            (error) => {
+                console.log("Could not override validation rule.");
+            }
+        )
+    }
+
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
         return state.rules

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
@@ -10,7 +10,7 @@ describe("FtpUploadComponent", () => {
   let component: FTPUploadComponent;
   let fixture: ComponentFixture<FTPUploadComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [FTPUploadComponent],
       imports: [CommonModule, BrowserModule, FormsModule, ReactiveFormsModule],

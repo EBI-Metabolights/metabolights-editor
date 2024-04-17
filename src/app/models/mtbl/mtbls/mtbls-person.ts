@@ -31,7 +31,7 @@ export class MTBLSPerson {
   @JsonProperty("phone", String)
   phone = "";
 
-  @JsonProperty("roles", Ontology)
+  @JsonProperty("roles", [Ontology])
   roles: Ontology[] = [];
 
   toJSON() {

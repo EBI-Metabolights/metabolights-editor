@@ -51,7 +51,12 @@ export class ValidationService extends BaseConfigDependentService {
         )
         .pipe(catchError(this.handleError));
     }
-
+      /**
+   * Refresh validations file in the study directory. This kicks off a threaded process, so we only get a message as a string in response,
+   * rather than any details of validation.
+   *
+   * @returns message telling the user the update process has started.
+   */
     refreshValidations(): Observable<{ success: string }> {
       return this.http
         .post<{ success: string }>(

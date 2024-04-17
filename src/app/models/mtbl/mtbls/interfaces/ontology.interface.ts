@@ -5,7 +5,7 @@ export interface IOntology {
   comments: IComment[];
   termAccession: string;
   annotationValue: string;
-  annotationDefinition: string;
+  annotationDefinition?: string;
   termSource: IOntologySourceReference;
   name?: string;
   wormsID?: string;

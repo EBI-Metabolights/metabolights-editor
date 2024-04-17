@@ -6,7 +6,6 @@ import {
   OnChanges,
   SimpleChanges,
 } from "@angular/core";
-import { NgRedux, select } from "@angular-redux/store";
 import Swal from "sweetalert2";
 import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
@@ -15,10 +14,11 @@ import { environment } from "src/environments/environment";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { StudyStatus } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-status",
@@ -26,18 +26,13 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
   styleUrls: ["./status.component.css"],
 })
 export class StatusComponent implements OnInit {
-  @select((state) => state.study.status) studyStatus;
-  @select((state) => state.study.validation) studyValidation;
-  @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.study.identifier) studyIdentifier;
-
-  @select((state) => state.study.readonly) readonly;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
+  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
 
 
   isReadOnly = false;
@@ -49,41 +44,20 @@ export class StatusComponent implements OnInit {
   toStatus = "Submitted";
   requestedStudy: string = null;
   validation: IValidationSummary;
+
+  private toastrSettings: Record<string, any> = {}
   constructor(
     private editorService: EditorService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private store: Store
   ) {
-      environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
-  }
-
-  setUpSubscriptions() {
-    this.studyValidation.subscribe((value) => {
-      this.validation = value;
-    });
-    this.studyStatus.subscribe((value) => {
-      if (value != null) {
-        this.status = value;
-        this.toStatus = value;
-      }
-    });
-    this.isCurator.subscribe((value) => {
-      if (value != null) {
-        this.curator = value;
-      }
-    });
-    this.studyIdentifier.subscribe((value) => {
-      if (value != null) {
-        this.requestedStudy = value;
-      }
-    });
-    this.readonly.subscribe((value) => {
-      if (value != null) {
-        this.isReadOnly = value;
-      }
-    });
+      this.setUpSubscriptionsNgxs();
   }
 
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe((value) => {
+      this.toastrSettings = value;
+    })
     this.studyValidation$.subscribe((value) => {
       this.validation = value;
     });
@@ -110,7 +84,7 @@ export class StatusComponent implements OnInit {
     });
   }
 
-  changeStatus(toStatus) {
+  changeStatusNgxs(toStatus) {
     if (!this.isReadOnly) {
       if (toStatus == null) {
         toStatus = this.toStatus;
@@ -123,28 +97,24 @@ export class StatusComponent implements OnInit {
         cancelButtonText: "Back",
       }).then((willChange) => {
         if (willChange.value) {
-          this.editorService.changeStatus(toStatus).subscribe(
-            (data) => {
+          this.store.dispatch(new StudyStatus.Update(toStatus)).subscribe(
+            (completed) => {
               this.closeModal();
-              toastr.success("Study status updated.", "Success", {
-                timeOut: "2500",
-                positionClass: "toast-top-center",
-                preventDuplicates: true,
-                extendedTimeOut: 0,
-                tapToDismiss: false,
-              });
-              this.editorService.loadStudy(this.requestedStudy, false);
-            },
-            (err) => {
+              toastr.success("Study status updated.", "Success", this.toastrSettings);
+              this.editorService.loadStudyNgxs(this.requestedStudy, false);
+
+            }, (error) => {
               this.closeModal();
               this.toStatus = this.status;
+              let message = null;
+              typeof error.json === 'function' ? message = error.json().message : "Could not update study status."
               Swal.fire({
-                title: err.json().message,
-              });
+                title: message
+              })
             }
-          );
+          )
         }
-      });
+      })
     }
   }
 

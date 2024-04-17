@@ -1,4 +1,4 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store } from "@ngxs/store";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
 import {
   NgModuleFactoryLoader,
@@ -15,7 +15,7 @@ import {
   UrlHandlingStrategy,
   RouteReuseStrategy,
 } from "@angular/router";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import {
   RouterTestingModule,
   setupTestingRouter,
@@ -37,12 +37,12 @@ describe("StudyComponent", () => {
   let labsWorkspaceService: LabsWorkspaceService;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PublicStudyComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,

@@ -1,7 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { select } from "@angular-redux/store";
-import { FormBuilder } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { environment } from "src/environments/environment";
 import { FilesService } from "src/app/services/decomposed/files.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -15,7 +14,6 @@ import { Observable } from "rxjs";
 export class DownloadComponent implements OnInit {
   @Input("value") file: string;
   @Input("type") type: string;
-  @select((state) => state.study.obfuscationCode) obfuscationCode;
 
   @Select(FilesState.obfuscationCode) obfuscationCode$: Observable<string>;
 
@@ -23,20 +21,12 @@ export class DownloadComponent implements OnInit {
   code = "";
 
   constructor(
-    private fb: FormBuilder,
+    private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService
   ) {
-    if (!environment.isTesting && !environment.useNewState) {
-      this.setUpSubscriptions();
-    }
-    if (environment.useNewState) this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
-  setUpSubscriptions() {
-    this.obfuscationCode.subscribe((value) => {
-      this.code = value;
-    });
-  }
 
   setUpSubscriptionsNgxs() {
     this.obfuscationCode$.subscribe((value) => {

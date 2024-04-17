@@ -1,26 +1,14 @@
 import { Injectable, OnInit } from "@angular/core";
 import * as toastr from "toastr";
-import {
-  CanActivate,
-  Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  CanActivateChild,
-  ActivatedRoute,
-} from "@angular/router";
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, ActivatedRoute } from "@angular/router";
 import { EditorService } from "./services/editor.service";
-import { NgRedux } from "@angular-redux/store";
-import { IAppState } from "./store";
-import { IsInitialised } from "./components/store";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
-import { HttpResponse } from "@angular/common/http";
-import { browserRefresh } from './app.component';
+
 import jwtDecode from "jwt-decode";
 import { httpOptions, MtblsJwtPayload } from "./services/headers";
 import { HttpClient, HttpClientModule } from "@angular/common/http";
-import { catchError, map } from "rxjs/operators";
-import { throwError } from "rxjs";
+
 import { ErrorMessageService } from "./services/error-message.service";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
@@ -28,7 +16,7 @@ import { StudyPermissionNS } from "./ngxs-store/non-study/application/applicatio
 @Injectable({
   providedIn: "root",
 })
-export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
+export class AuthGuard  implements OnInit {
 
   constructor(
     private editorService: EditorService,
@@ -37,7 +25,6 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private ngRedux: NgRedux<IAppState>,
     private store: Store
   ) { }
 
@@ -229,8 +216,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
           return false;
         }
         const permissions = studyPermission;
-        if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
-        else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });
+        this.store.dispatch(new StudyPermissionNS.Set(permissions))
         return true;
       }
     }
@@ -243,8 +229,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
 
       }
       const permissions = studyPermission;
-      if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
-      else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });      return true;
+      this.store.dispatch(new StudyPermissionNS.Set(permissions))
+      return true;
     }
     return false;
   }
@@ -276,8 +262,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
 
       if (isPublic || studyPermission.submitterOfStudy || (isCurator && isCurator.toLowerCase() === "true")) {
         const permissions = studyPermission;
-        if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
-        else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });        return true;
+        this.store.dispatch(new StudyPermissionNS.Set(permissions))
+        return true;
       }
       const reviewCode = state.root.queryParams.reviewCode;
       if (reviewCode) {
@@ -291,8 +277,8 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
     } else {
       if (studyPermission.edit) {
         const permissions = studyPermission;
-        if (environment.useNewState) this.store.dispatch(new StudyPermissionNS.Set(permissions))
-        else this.ngRedux.dispatch({ type: "SET_STUDY_PERMISSION", body: { studyPermission: permissions } });        return true;
+        this.store.dispatch(new StudyPermissionNS.Set(permissions))
+        return true;
       } else {
         if (studyPermission.submitterOfStudy === true && studyPermission.view === true && url.startsWith("/study/MTBLS")) {
           this.editorService.redirectUrl = url;
@@ -319,7 +305,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, OnInit {
    * @param isInitialisedObj Initialisation object from the state, which contains a timestamp of the session start.
    * @returns A SessionStatus enum value, indicating the status of the session.
    */
-  evaluateSession(isInitialisedObj: IsInitialised): SessionStatus {
+  evaluateSession(isInitialisedObj: any): SessionStatus {
     // in app.component.ts we are subscribing to all router events, and recording when that event is NavigationStart,
     // which will either be arriving at the app for the first time, or refreshing the page.
     // if (

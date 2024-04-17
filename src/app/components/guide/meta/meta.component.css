@@ -1,33 +1,40 @@
+
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-group-vertical {
   flex-direction: column !important;
   width: 100%;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-group,
 .mat-button-toggle-standalone {
   box-shadow: none !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-label-content {
   width: 100% !important;
   text-align: left;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle {
   border: 1px solid rgba(0, 0, 0, 0.38) !important;
   border-radius: 4px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-button {
   width: 100% !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-checked {
   background-color: #5193fb;
   color: white;
 }
 
-/deep/ .mat-checkbox {
+/deep/ .mat-mdc-checkbox {
   display: block;
 }
 
@@ -182,20 +189,21 @@ th div {
   overflow: auto;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-infix {
   border-top: none;
 }
 
-td.mat-cell,
-td.mat-footer-cell,
-th.mat-header-cell {
+td.mat-mdc-cell,
+td.mat-mdc-footer-cell,
+th.mat-mdc-header-cell {
   padding-left: 20px;
   padding-right: 12px;
   -webkit-box-shadow: 0 0 1px #dbdbdb;
   box-shadow: 0 0 1px #dbdbdb;
 }
 
-.mat-table-sticky {
+.mat-mdc-table-sticky {
   background-color: #fdfdfd;
 }
 

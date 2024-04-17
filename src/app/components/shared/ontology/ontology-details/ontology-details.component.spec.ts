@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { on } from "events";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
@@ -11,7 +11,7 @@ describe("OntologyDetailsComponent", () => {
   let component: OntologyDetailsComponent;
   let fixture: ComponentFixture<OntologyDetailsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [OntologyDetailsComponent],
       imports: [],

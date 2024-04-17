@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, OnInit } from "@angular/core";
-import { select } from "@angular-redux/store";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -19,9 +18,6 @@ import { ValidationReport } from "src/app/ngxs-store/study/validation/validation
   styleUrls: ["./validations.component.css"],
 })
 export class ValidationsComponent implements OnInit, AfterViewInit {
-  @select((state) => state.study.validation) validation: any;
-  @select((state) => state.status.isCurator) isCurator;
-  @select((state) => state.study.identifier) studyIdentifier: any;
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
@@ -62,38 +58,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-   environment.useNewState ? this.setUpSubscriptionsNgxs() : this.setUpSubscriptions();
-  }
-
-  setUpSubscriptions() {
-    this.validation.subscribe((value) => {
-      if (value) {
-        this.studyValidation = value;
-        if (this.studyValidation.status === 'error'){
-          this.validationStatusClass = "is-danger";
-        } else if (this.studyValidation.status === 'success'){
-          this.validationStatusClass = "is-success";
-        } else if (this.studyValidation.status === 'warning'){
-            this.validationStatusClass = "is-success";
-        } else if (this.studyValidation.status === 'not ready'){
-          this.validationStatusClass = "is-warning";
-        } else {
-          this.validationStatusClass = "is-warning";
-        }
-      }
-    });
-    this.isCurator.subscribe((value) => {
-      if (value !== null) {
-        this.curator = value;
-      }
-    });
-    this.studyIdentifier.subscribe((value) => {
-      this.requestedStudy = value;
-      this.startValidationTaskUrl = this.configService.config.metabolightsWSURL.baseURL
-        + "/studies/" + this.requestedStudy + "/validation-task";
-      this.getValidationTaskStatusUrl = this.configService.config.metabolightsWSURL.baseURL
-      + "/studies/" + this.requestedStudy + "/validation-task";
-    });
+   this.setUpSubscriptionsNgxs()
   }
 
   setUpSubscriptionsNgxs() {
@@ -148,20 +113,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
         }
       )
      }
-    this.editorService.refreshValidations().subscribe(
-      (res) => {
-        this.editorService.loadValidations();
-        toastr.success(res.success, "Success", this.defaultToastrOptions);
-      },
-      (err) => {
-        toastr.success(
-          "Validation refresh job is submitted. If your study is large, validations will take some time to refresh." +
-            "If your study validations are not refreshing please contact us.",
-          "Success",
-          this.defaultToastrOptions
-        );
-      }
-    );
+
   }
 
 
@@ -175,68 +127,22 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     const payload = {};
     payload[valSeq] = valDescription;
     data.validations.push(payload);
-    if (environment.useNewState) {
-      this.store.dispatch(new ValidationReport.Override(data)).subscribe(
-        (completed) => {
-          toastr.success("SUCCESS", "Successfully overriden the validation", this.defaultToastrOptions);
-        },
-        (error) => {
-          toastr.error("Validation override failed.", "Error", this.defaultToastrOptions);
-        }
-      )
-    } else {
-      this.editorService.overrideValidations(data).subscribe(
-        (res) => {
-          toastr.success(
-            res.success,
-            "Successfully overriden the validation",
-            this.defaultToastrOptions
-          );
-          // this.refreshValidations();
-        },
-        (err) => {
-          toastr.error(
-            "Validation override failed",
-            "Error",
-            this.defaultToastrOptions
-          );
-        }
-      );
-    }
+    this.store.dispatch(new ValidationReport.Override(data)).subscribe(
+      (completed) => {
+        toastr.success("SUCCESS", "Successfully overriden the validation", this.defaultToastrOptions);
+      },
+      (error) => {
+        toastr.error("Validation override failed.", "Error", this.defaultToastrOptions);
+      }
+    )
+     
 
   }
 
-  /**
-   * Handle a saved comment
-   *
-   * @param $event - The comment emitted from a child component
-   * @param detail - the validation detail that the comment pertains to
-   */
-  handleCommentSaved($event, detail) {
-    console.log($event, detail);
-    const data = {
-      comments: [],
-    };
-    const payload = {};
-    payload[detail.val_sequence] = $event.comment;
-    data.comments.push(payload);
-
-    console.log(data);
-    this.editorService.addComment(data).subscribe((res) => {
-      toastr.success(
-        res.success,
-        "Successfully posted the comment",
-        this.defaultToastrOptions
-      );
-      // this.refreshValidations();
-    });
-  }
 
 
   validationTaskDone($event) {
-    if (environment.useNewState) { this.store.dispatch(new ValidationReport.ContinualRetry(10))}
-    else {
-      this.editorService.getValidationReportRetry(10);
-    }
+    this.store.dispatch(new ValidationReport.ContinualRetry(10))
+
   }
 }

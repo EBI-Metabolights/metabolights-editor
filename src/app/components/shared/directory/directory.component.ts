@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { NgRedux, select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
@@ -27,8 +26,6 @@ export class DirectoryComponent implements OnInit {
 
   @Output() fileDeleted = new EventEmitter<any>();
 
-  @select((state) => state.study.readonly) readonly;
-
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
 
   selectedMetaFiles: any[] = [];
@@ -44,19 +41,8 @@ export class DirectoryComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (environment.useNewState) this.setUpSubscriptionNgxs();
-    else this.setUpSubscription();
-    // if (this.collapse){
-    //   this.expandDirectory(this.file);
-    // }
-  }
+    this.setUpSubscriptionNgxs();
 
-  setUpSubscription() {
-    this.readonly.subscribe((value) => {
-      if (value != null) {
-        this.isReadOnly = value;
-      }
-    });
   }
 
   setUpSubscriptionNgxs() {

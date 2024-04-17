@@ -1,7 +1,7 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { EditorService } from "src/app/services/editor.service";
@@ -20,7 +20,7 @@ describe("PublicationComponent", () => {
   let editorService: EditorService;
   let europePMCService: EuropePMCService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PublicationComponent],
       imports: [
@@ -34,7 +34,7 @@ describe("PublicationComponent", () => {
         { provide: DOIService, useClass: MockDOIService },
         { provide: EditorService, useClass: MockEditorService },
         { provide: EuropePMCService, useClass: MockEuropePMCService },
-        NgRedux,
+        Store,
       ],
     }).compileComponents();
   }));

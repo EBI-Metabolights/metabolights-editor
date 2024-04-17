@@ -8,6 +8,9 @@ import { catchError, map } from 'rxjs/operators';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { IReleaseDate } from 'src/app/models/mtbl/mtbls/interfaces/release-date.interface';
 import { IProtocolWrapper } from 'src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface';
+import { IPublication } from 'src/app/models/mtbl/mtbls/interfaces/publication.interface';
+import { IPublicationWrapper } from 'src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface';
+import { IPeopleWrapper } from 'src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -96,6 +99,139 @@ export class GeneralMetadataService extends DataService{
       )
       .pipe(catchError(this.handleError));
   }
+
+  getPublications(id): Observable<any> {
+    return this.http
+      .get<any>(
+        this.url.baseURL + "/studies" + "/" + id + "/publications",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  savePublication(body, id): Observable<IPublication> {
+    return this.http
+      .post<IPublication>(
+        this.url.baseURL + "/studies" + "/" + id + "/publications",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  deletePublication(title, id) {
+    return this.http
+      .delete(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/publications?title=" +
+          title,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  updatePublication(title, body, id): Observable<IPublication> {
+    return this.http
+      .put<IPublication>(
+        this.url.baseURL +
+          "/studies" +
+          "/" +
+          id +
+          "/publications?title=" +
+          title,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  getPeople(id): Observable<IPeopleWrapper> {
+    return this.http
+      .get<IPeopleWrapper>(
+        this.url.baseURL + "/studies" + "/" + id + "/contacts",
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  savePerson(body, id): Observable<IPeopleWrapper> {
+    return this.http
+      .post<IPeopleWrapper>(
+        this.url.baseURL + "/studies" + "/" + id + "/contacts",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  updatePerson(email, name, body, id): Observable<any> {
+    let query = "";
+    if (email && email !== "" && email !== null) {
+      query = "email=" + email;
+    } else if (name && name !== "" && name !== null) {
+      query = "full_name=" + name;
+    }
+    return this.http
+      .put(
+        this.url.baseURL + "/studies" + "/" + id + "/contacts?" + query,
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+  makePersonSubmitter(email, id) {
+    let body = null;
+    if (email && email !== "" && email !== null) {
+      body = {
+        submitters: [
+          {
+            email,
+          },
+        ],
+      };
+    }
+
+    if (body) {
+      return this.http
+        .post(
+          this.url.baseURL + "/studies" + "/" + id + "/submitters",
+          body,
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
+    }
+  }
+
+  deletePerson(email, name, id) {
+    let query = "";
+    if (email && email !== "" && email !== null) {
+      query = "email=" + email;
+    } else if (name && name !== "" && name !== null) {
+      query = "full_name=" + name;
+    }
+    return this.http
+      .delete(
+        this.url.baseURL + "/studies" + "/" + id + "/contacts?" + query,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
+    // Status
+    changeStatus(status, id) {
+      return this.http
+        .put(
+          this.url.baseURL + "/studies" + "/" + id + "/status",
+          { status },
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
+    }
+
 
 }
 

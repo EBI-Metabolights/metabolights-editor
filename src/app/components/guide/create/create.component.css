@@ -1,33 +1,40 @@
+
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-group-vertical {
   flex-direction: column !important;
   width: 100%;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-group,
 .mat-button-toggle-standalone {
   box-shadow: none !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-label-content {
   width: 100% !important;
   text-align: left;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle {
   border: 1px solid rgba(0, 0, 0, 0.38) !important;
   border-radius: 4px;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-button {
   width: 100% !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 /deep/ .mat-button-toggle-checked {
   background-color: #5193fb;
   color: white;
 }
 
-/deep/ .mat-checkbox {
+/deep/ .mat-mdc-checkbox {
   display: block;
 }
 
@@ -35,6 +42,7 @@
   cursor: inherit !important;
 }
 
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
 .mat-button-toggle-checked.mat-button-toggle-appearance-standard {
   color: white;
 }

@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { RouterTestingModule } from "@angular/router/testing";
 
 import { MafsComponent } from "./mafs.component";
@@ -7,7 +7,7 @@ describe("MafsComponent", () => {
   let component: MafsComponent;
   let fixture: ComponentFixture<MafsComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [MafsComponent],
       imports: [RouterTestingModule],

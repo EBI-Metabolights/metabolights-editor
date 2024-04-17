@@ -1,4 +1,3 @@
-import { NgReduxModule } from "@angular-redux/store";
 import { CommonModule } from "@angular/common";
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
@@ -12,7 +11,6 @@ import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { AngularStickyThingsModule } from "@w11k/angular-sticky-things";
 import { SharedModule } from "../shared/shared.module";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
@@ -40,14 +38,12 @@ import { RawUploadComponent } from "./upload/upload.component";
     //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    NgReduxModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatOptionModule,
     MatFormFieldModule,
     MatInputModule,
-    AngularStickyThingsModule,
   ],
   exports: [
     GuidedAssaysComponent,

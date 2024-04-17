@@ -1,11 +1,11 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import {
   NgModuleFactoryLoader,
   Compiler,
   Injector,
   Optional,
 } from "@angular/core";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import {
   Router,
   UrlSerializer,
@@ -34,12 +34,12 @@ describe("StudyComponent", () => {
   let editorService: EditorService;
   let configService: ConfigurationService;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [StudyComponent],
       imports: [RouterTestingModule, HttpClientTestingModule],
       providers: [
-        NgRedux,
+        Store,
         {
           provide: Router,
           useFactory: setupTestingRouter,
@@ -73,7 +73,6 @@ describe("StudyComponent", () => {
     editorService = TestBed.inject(EditorService);
     fixture = TestBed.createComponent(StudyComponent);
     component = fixture.componentInstance;
-    spyOn(component, "setUpSubscriptions").and.stub();
     fixture.detectChanges();
   });
 

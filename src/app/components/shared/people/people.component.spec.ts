@@ -1,7 +1,7 @@
-import { NgRedux } from "@angular-redux/store";
+import { Store} from '@ngxs/store'
 import { CommonModule } from "@angular/common";
 import { HttpClientTestingModule } from "@angular/common/http/testing";
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
 import { MetabolightsService } from "src/app/services/metabolights/metabolights.service";
@@ -13,7 +13,7 @@ describe("PeopleComponent", () => {
   let component: PeopleComponent;
   let fixture: ComponentFixture<PeopleComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
       declarations: [PeopleComponent],
       imports: [
@@ -24,7 +24,7 @@ describe("PeopleComponent", () => {
         ReactiveFormsModule,
       ],
       providers: [
-        NgRedux,
+        Store,
         { provide: MetabolightsService, useClass: MockMetabolightsService },
       ],
     }).compileComponents();

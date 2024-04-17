@@ -10,9 +10,9 @@ import {
   EventEmitter,
   ViewChild,
 } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
-import { FormControl } from "@angular/forms";
+import { UntypedFormControl } from "@angular/forms";
 import {
   MatAutocompleteSelectedEvent,
   MatAutocompleteTrigger,
@@ -25,13 +25,16 @@ import {
   distinctUntilChanged,
   startWith,
   concatAll,
+  take,
 } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
+import { Store } from "@ngxs/store";
 
 import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { ConfigurationService } from "src/app/configuration.service";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 /* eslint-disable no-underscore-dangle */
 @Component({
   selector: "mtbls-ontology",
@@ -61,13 +64,13 @@ export class OntologyComponent implements OnInit, OnChanges {
   endPoints: any[] = [];
   addOnBlur = false;
   inputValue = "";
-  form: FormGroup;
+  form: UntypedFormGroup;
   isFormBusy = false;
   visible = true;
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
-  valueCtrl = new FormControl();
+  valueCtrl = new UntypedFormControl();
   filteredValuesObserver: Observable<Ontology[]>;
   currentOptions = [];
   allvalues: Array<Ontology> = [];
@@ -78,7 +81,8 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   constructor(
     private editorService: EditorService,
-    private configService: ConfigurationService
+    private configService: ConfigurationService,
+    private store: Store
   ) {
 
   }
@@ -95,7 +99,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   }
 
-  ngOnInit() {
+   async ngOnInit() {
     this.baseHref = this.configService.baseHref;
     this.baseURL = this.configService.config.metabolightsWSURL.baseURL;
     if (this.baseURL.endsWith("/")){
@@ -105,7 +109,7 @@ export class OntologyComponent implements OnInit, OnChanges {
       this.values = [];
     }
     this.url = "/ebi-internal/ontology?term=";
-    this.readonly = this.editorService.ngRedux.getState().study.readonly;
+    this.readonly = await this.getReadonly();
     if (this.readonly === false && "recommended-ontologies" in this.validations) {
       if (this.validations["recommended-ontologies"]) {
         this.isforcedOntology =
@@ -144,6 +148,14 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
 
   }
+
+  async getReadonly() {
+    let result = await this.store.select(state => state.ApplicationState.readonly)
+    .pipe(take(1))
+    .toPromise();
+    return result
+  }
+
   setCurrentOptions(values: Ontology[] = []) {
 
     this.currentOptions = values.filter((value) => {
@@ -421,7 +433,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   add(event: MatChipInputEvent): void {
     if (this.addOnBlur) {
-      const input = event.input;
+      const input = event.chipInput;
       const value = event.value;
       if (event.value.replace(" ", "") !== "") {
         if (this.indexOfObject(this.values, "annotationValue", value) === -1) {

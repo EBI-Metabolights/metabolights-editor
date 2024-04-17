@@ -55,7 +55,7 @@
           <button (click)="closeDelete()" class="button is-info">Cancel</button>
         </div>
         <div class="column is-half has-text-right">
-          <button (click)="delete()" class="button is-danger">
+          <button (click)="deleteNgxs()" class="button is-danger">
             OK! Delete Permanently
           </button>
         </div>
@@ -92,7 +92,7 @@
         <div class="column is-half has-text-right">
           <button (click)="closeImportAuthor()" class="button is-default">
             Done</button
-          ><button (click)="saveAuthors()" class="button is-info">
+          ><button (click)="saveAuthorsNgxs()" class="button is-info">
             Import Selected
           </button>
         </div>
@@ -304,7 +304,7 @@
             <button
               *ngIf="!form.pristine"
               [disabled]="!form.valid || isFormBusy"
-              (click)="save()"
+              (click)="saveNgxs()"
               class="button is-info"
             >
               <mat-spinner
