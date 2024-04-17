@@ -357,7 +357,6 @@ export class EditorService {
         await this.loginWithJwt(activeJwt, username);
         return true;
       } else {
-        // console.log('user json ' + user);
         const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
         localStorage.setItem("isCurator", isCurator);
         const apiToken = user.apiToken ?? "";
@@ -437,7 +436,6 @@ export class EditorService {
     if (signInRequest) {
       const userstr = data.content;
       const user: User = JSON.parse(userstr);
-      // console.log('user json ' + user);
       localStorage.setItem("user", JSON.stringify(user.owner));
       const isCurator = user.owner.role === "ROLE_SUPER_USER" ? "true" : "false";
       localStorage.setItem("isCurator", isCurator);
@@ -749,7 +747,6 @@ export class EditorService {
       sourceFile = fileExist ? source[filename] : "";
     }
     if ( result.success && result.updates && result.updates.length > 0) {
-      // console.log("committed values" + result.message);
       const table = sourceFile.data;
       const deepCopiedData = JSON.parse(JSON.stringify(table));
 

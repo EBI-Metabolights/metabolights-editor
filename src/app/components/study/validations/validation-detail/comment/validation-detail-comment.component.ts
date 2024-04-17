@@ -31,10 +31,7 @@ export class ValidationDetailCommentComponent implements OnInit {
     if (this.comment) {
       this.monoForm.setValue({ commentControl: this.comment });
     }
-    // this.commentControl.valueChanges.subscribe(change => {
-    //   console.log('hit');
-    //   this.commentControl.setValue(change)
-    // });
+
   }
 
   saveComment() {

@@ -408,7 +408,6 @@ export class ProtocolComponent implements OnInit {
           .subscribe(
             (protocol) => {
               this.protocol = protocol;
-              console.log(`Opening modal with ${protocol.name}`)
               this.openModal(this.protocol);
             }
           )

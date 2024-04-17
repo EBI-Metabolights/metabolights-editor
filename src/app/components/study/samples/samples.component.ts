@@ -208,7 +208,6 @@ export class SamplesComponent  {
       const mtblsFactorValue = new MTBLSFactorValue();
       mtblsFactorValue.category = this.selectedFactor;
       const columns = [];
-      console.log(this.sampleTable);
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
         "Factor Value[" + mtblsFactorValue.category.factorName + "]",

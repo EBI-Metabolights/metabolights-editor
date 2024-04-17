@@ -78,7 +78,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     }
     this.investigationFailed$.subscribe((value) => {
       this.studyError = value;
-      this.selectCurrentTab(5, "files");
+      if (this.studyError) this.selectCurrentTab(5, "files");
     });
 
     this.studyStatus$.subscribe((value) => {

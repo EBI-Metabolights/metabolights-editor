@@ -95,7 +95,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   initialiseProtocols(value) {
     this.protocols = [];
     this.customProtocols = [];
-    if (this.assay != null) {
+    if (this.assay !== null && this.assay !== undefined) {
       this.assay.protocols.forEach((protocol) => {
         value.forEach((p) => {
           if (p.name === protocol) {
@@ -104,7 +104,9 @@ export class ProtocolsComponent implements OnInit, OnChanges {
         });
       });
     } else {
-      this.protocols = value;
+      if (value !== null) this.protocols = value;
+      else this.protocols = []
+      
     }
   }
 
@@ -116,6 +118,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
   getProtocol(name) {
     let selectedProtocol = null;
+
     this.protocols.forEach((p) => {
       if (p.name === name) {
         selectedProtocol = p;

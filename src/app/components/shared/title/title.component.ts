@@ -122,7 +122,6 @@ export class TitleComponent implements OnInit {
   saveNgxs() {
     if (!this.isReadOnly) {
       this.isFormBusy = true;
-      console.log('about to run action dispatch')
       this.store.dispatch(new Title.Update(this.compileBody(this.form.get("title").value)));
     }
   }

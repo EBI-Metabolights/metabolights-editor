@@ -38,7 +38,6 @@ export class AssayState {
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
         this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
-            console.log(action.id)
             this.generalMetadataService.getStudyGeneralMetadata(action.id).subscribe(
                 (response) => {
                     let assayFiles = response.isaInvestigation.studies[0].assays;

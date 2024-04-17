@@ -33,7 +33,6 @@ export class AssaysComponent {
 
   setUpSubscriptionsNgxs() {
     this.assayFiles$.subscribe((assayfiles) => {
-      //console.log(`number of assay files returned from state select: ${assayfiles.length}`)
       this.studyAssayFiles = assayfiles;
       if (this.studyAssayFiles) {
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
@@ -48,7 +47,6 @@ export class AssaysComponent {
     this.studyAssays$.subscribe((value) => {
       if (this.studyAssayFiles) {
         // @ts-ignore
-        console.log(`Number of sheets returned by state select: ${value.length}`)
         let i = 0;
         this.studyAssayFiles.forEach((assayFileName) => {
           const assayName = assayFileName.filename.trim();
@@ -60,7 +58,6 @@ export class AssaysComponent {
           }
           i++;
         });
-        console.log(`Total number of assay sheets in component: ${this.assays.length}`);
         this.assays = this.assays.filter(obj => Object.keys(obj).length > 0);
 
       }

@@ -47,7 +47,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   ) {
     this.route.queryParams.subscribe((params) => {
       if (params.reload) {
-        console.log('hit console.component constructor if use new state block')
         this.store.dispatch(new User.Studies.Get());
         this.baseHref = this.editorService.configService.baseHref;
       }
@@ -114,9 +113,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   ngAfterContentInit() {
     this.editorService.initialiseStudy(null);
-
-
-    console.log('hit usenewstate in after content init')
     this.setUpSubscriptionsNgxs();
   }
 
