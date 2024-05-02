@@ -57,14 +57,14 @@ export function disambiguateUserObj(user) {
   providedIn: "root",
 })
 export class EditorService {
-  
+
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
   @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
   @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
   @Select(ApplicationState.controlLists) controlLists$: Observable<Record<string, any>>;
 
   // Reconstituting previous state.study selector. state.study was only used in commitUpdatedTableCells
-  // so I am not including ALL study data, only the data that method uses. 
+  // so I am not including ALL study data, only the data that method uses.
   @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
   @Select(SampleState.samples) samples$: Observable<Record<string, any>>;
   @Select(MAFState.mafs) mafs$: Observable<Record<string, any>>;
@@ -101,9 +101,9 @@ export class EditorService {
     private platformLocation: PlatformLocation
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
-    this.setUpSubscriptionsNgxs(); 
+    this.setUpSubscriptionsNgxs();
     this.redirectUrl = this.configService.config.redirectURL;
-   
+
   }
 
   setUpSubscriptionsNgxs() {
@@ -304,7 +304,7 @@ export class EditorService {
   /**
    * Currently this breaks with state pattern and makes service calls, subsequently updating the state. I didn't want to tamper with any session related
    * functionality as this has been a pain point in the past.
-   * @returns 
+   * @returns
    */
   async updateSession(){
     const activeJwt = localStorage.getItem("jwt");
@@ -445,7 +445,7 @@ export class EditorService {
       );
 
       this.store.dispatch(new User.Set(user.owner));
-      
+
       this.store.dispatch(new User.Studies.Set(null))
 
 
@@ -461,7 +461,7 @@ export class EditorService {
       localStorage.setItem("isCurator", isCurator);
 
       this.store.dispatch(new User.Set(user));
-      
+
 
       this.store.dispatch(new User.Studies.Set(null))
 
@@ -473,7 +473,7 @@ export class EditorService {
   /**
    * This method circumvents the state, but it is wired closely to app init and didn't want
    * anything to break.
-   * @returns 
+   * @returns
    */
   loadValidations() {
     if (this.validations) {
@@ -503,7 +503,7 @@ export class EditorService {
       status !== null ? (
         status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
         ) : this.store.dispatch(new Loading.Toggle())
-    
+
   }
 
   initialiseStudy(route) {
@@ -573,7 +573,7 @@ export class EditorService {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
           this.store.dispatch(new SetLoadingInfo("Loading samples data"))
           samplesExist = true;
-          
+
           this.store.dispatch(new Samples.OrganiseAndPersist(file.file));
         }
       });

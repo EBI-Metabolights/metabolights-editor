@@ -1,9 +1,22 @@
 <div class="control">
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
-    <span class="tag is-link clickable" (click)="openModal()">{{
-      status
-    }}</span>
+    <div *ngIf="status == 'Public' && curationRequest == 'NO_CURATION'; else onlyStatus" >
+      <span class="tag clickable not-curated" (click)="openModal()">
+        {{
+          status
+        }} - Not Curated
+      </span>
+    </div>
+    <ng-template #onlyStatus>
+      <span class="tag is-link clickable" (click)="openModal()">
+        {{
+          status
+        }}
+
+      </span>
+    </ng-template>
+
   </div>
 </div>
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">

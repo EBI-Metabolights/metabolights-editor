@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import {  GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
+import {  CurationRequest, GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -23,6 +23,7 @@ export interface GeneralMetadataStateModel {
     submissionDate: Date;
     releaseDate: Date;
     status: string;
+    curationRequest: string;
     reviewerLink: any;
     publications: IPublication[];
     people: IPerson[];
@@ -37,6 +38,7 @@ export interface GeneralMetadataStateModel {
         submissionDate: null,
         releaseDate: null,
         status: null,
+        curationRequest: null,
         reviewerLink: null,
         publications: null,
         people: null
@@ -70,10 +72,11 @@ export class GeneralMetadataState {
                 ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
                 ctx.dispatch(new StudyReleaseDate.Set(new Date(gm_response.isaInvestigation.publicReleaseDate)));
                 ctx.dispatch(new StudyStatus.Set(gm_response.mtblsStudy.studyStatus));
+                ctx.dispatch(new CurationRequest.Set(gm_response.mtblsStudy.curationRequest));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
-                
+
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
 
                 if (action.readonly) {
@@ -83,14 +86,14 @@ export class GeneralMetadataState {
                     this.store.dispatch(new ValidationReport.Get());
                     this.store.dispatch(new SetReadonly(false));
                 }
-            }, 
+            },
             (error) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new Loading.Disable());
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
                 if (!action.readonly) {
                     this.store.dispatch(new ValidationReport.Get())
-                } 
+                }
 
 
             })
@@ -179,6 +182,15 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             status: action.status
+        });
+    }
+
+    @Action(CurationRequest.Set)
+    SetCurationRequest(ctx: StateContext<GeneralMetadataStateModel>, action: CurationRequest.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            curationRequest: action.curationRequest
         });
     }
 
@@ -289,7 +301,7 @@ export class GeneralMetadataState {
         this.generalMetadataService.savePerson(action.body, state.id).subscribe(
             (response) => {
                 ctx.dispatch(new People.Set(response.contacts as IPerson[], false))
-            }, 
+            },
             (error) => {
                 console.log("Could not add new study person.");
                 console.error(error);
@@ -374,6 +386,11 @@ export class GeneralMetadataState {
     @Selector()
     static status(state: GeneralMetadataStateModel): string {
         return state.status
+    }
+
+    @Selector()
+    static curationRequest(state: GeneralMetadataStateModel): string {
+        return state.curationRequest
     }
 
     @Selector()

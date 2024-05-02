@@ -59,7 +59,7 @@ export namespace StudyReleaseDate {
         static readonly type = '[general] Update Study Release Date'
         constructor(public date: string) {}
     }
-    
+
 }
 
 
@@ -74,9 +74,22 @@ export namespace StudyStatus {
         static readonly type = '[general] Set Study Status'
         constructor(public status: string) {}
     }
-    
+
 }
 
+export namespace CurationRequest {
+
+  export class Update {
+      static readonly type = '[general] Change Curation Request'
+      constructor(public curationRequest: string) {}
+  }
+
+  export class Set{
+      static readonly type = '[general] Set Curation Request'
+      constructor(public curationRequest: string) {}
+  }
+
+}
 
 export class SetStudyReviewerLink {
     static readonly type = '[general] Set Study Reviewer Link'
@@ -93,7 +106,7 @@ export namespace Publications {
         static readonly type = '[general] Get Study Publications'
         constructor() {}
     }
-    
+
     export class Add {
         static readonly type = '[general] Add Study Publication'
         constructor(public publication: any) {}

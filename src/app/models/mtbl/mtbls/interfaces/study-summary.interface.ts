@@ -10,6 +10,9 @@ export interface IStudySummary {
 /*Interface to represent the minute study information returned by our IsaInvestigation endpoint*/
 export interface IMtblsStudySummaryInformation {
   studyStatus: string;
+  curationRequest: string;
+  modifiedTime: string;
+  statusUpdateTime: string;
   read_access: boolean;
   is_curator: boolean;
   write_access: boolean;
