@@ -655,6 +655,12 @@ export class EditorService {
           },
         });
         this.ngRedux.dispatch({
+          type: "SET_STUDY_CURATION_REQUEST",
+          body: {
+            study,
+          },
+        });
+        this.ngRedux.dispatch({
           type: "SET_STUDY_REVIEWER_LINK",
           body: {
             study,
