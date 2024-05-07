@@ -27,6 +27,7 @@
     "@babel/polyfill": "^7.4.4",
     "@mdi/font": "^4.7.95",
     "@ngxs/store": "^3.7.2",
+    "@swimlane/ngx-charts": "^20.5.0",
     "bulma": "^0.7.4",
     "bulma-extensions": "^6.2.5",
     "core-js": "^2.5.7",

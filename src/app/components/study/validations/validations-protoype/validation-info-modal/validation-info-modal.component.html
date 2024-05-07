@@ -1,0 +1,22 @@
+<div class="modal is-active ">
+    <div class="modal-background"> </div>
+
+    <div class="modal-card">
+        <section class="modal-card-body">
+            The following files or folders were found to be in violation of {{violation.identifier}}
+            <mat-list>
+                <mat-divider></mat-divider>
+                <div mat-subheader>Items in Violation</div>
+                <mat-list-item *ngFor="let value of violation.values">
+
+                    <mat-icon mat-list-icon>note</mat-icon>
+                    <div mat-line>{{value}}</div>
+                    <div mat-line> some other info </div>
+                </mat-list-item>
+            </mat-list>
+        </section>
+        <button (click)="close()" class="button is-info">
+            Close
+        </button>
+    </div>
+</div>

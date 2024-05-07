@@ -1,0 +1,54 @@
+import { Component, Input, OnInit } from '@angular/core';
+import { Violation } from '../interfaces/validation-report.interface';
+import { Select, Store } from '@ngxs/store';
+import { ApplicationState } from 'src/app/ngxs-store/non-study/application/application.state';
+import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'prototype-detail',
+  templateUrl: './prototype-detail.component.html',
+  styleUrls: ['./prototype-detail.component.css']
+})
+export class PrototypeDetailComponent implements OnInit {
+
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
+
+  @Input() violation: Violation
+  isRawModalOpen: boolean = false;
+  isInfoModalOpen: boolean = false;
+
+  typeIcon: string = "question"
+  protected isCurator: boolean = false;
+
+  constructor(private store: Store) { }
+
+  ngOnInit(): void {
+    this.isCurator$.subscribe((value) => this.isCurator = value);
+    this.typeIcon = this.getViolationTypeIcon();
+  }
+
+  getViolationTypeIcon(): string {
+    if (this.violation.type === 'ERROR') return 'error'
+    if (this.violation.type === 'WARNING') return 'warning'
+    if (this.violation.type === 'INFO') return 'lightbulb_circle'
+    if (this.violation.type === 'SUCCESS') return 'verified'
+  }
+
+  openRawModal() {
+    this.isRawModalOpen = true;
+  }
+
+  closeRawModal() {
+    this.isRawModalOpen = false;
+  }
+
+  openInfoModal() {
+    this.isInfoModalOpen = true;
+  }
+
+  closeInfoModal() {
+    this.isInfoModalOpen = false;
+  }
+
+}

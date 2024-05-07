@@ -1,0 +1,107 @@
+<div *ngIf="ready; else notReadyBlock">
+    <app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>
+    <br>
+    <mat-tab-group *ngIf="report !== null" mat-stretch-tabs="false" mat-align-tabs="center">
+        <mat-tab label="All">
+            <br>
+            <div *ngIf="allViolations.length > 0; else noViolations">
+                <div *ngIf="allViolations !== null">
+                    <div *ngFor="let violation of allViolations; let i = index;">
+                        <prototype-detail [violation]="violation"></prototype-detail>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="General">
+            <br>
+            <div *ngIf="generalViolations.length > 0; else noViolations">
+                <div *ngFor="let violation of generalViolations; let i = index;">
+                    <prototype-detail [violation]="violation"></prototype-detail>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Investigation File">
+            <br>
+            <div *ngIf="investigationViolations.length > 0; else noViolations">
+                <div *ngFor="let violation of investigationViolations; let i = index;">
+                    <prototype-detail [violation]="violation"></prototype-detail>
+                    <br>
+                </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Samples">
+            <br>
+            <div *ngIf="sampleViolations.length > 0; else noViolations">
+                <div *ngFor="let violation of sampleViolations; let i = index;">
+                    <prototype-detail [violation]="violation"></prototype-detail>
+                    <br>
+                </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Assays">
+            <br>
+            <div *ngIf="assayViolations.length > 0; else noViolations">
+                <div *ngFor="let violation of assayViolations; let i = index;">
+                    <prototype-detail [violation]="violation"></prototype-detail>
+                    <br>
+            </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="MAF">
+            <br>
+            <div *ngIf="assignmentViolations.length > 0; else noViolations">
+                <div *ngFor="let violation of assignmentViolations; let i = index;">
+                    <prototype-detail [violation]="violation"></prototype-detail>
+                    <br>
+            </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="Files">
+            <br>
+            <div *ngIf="filesViolations.length > 0; else noViolations">
+                <div *ngFor="let violation of filesViolations; let i = index;">
+                    <prototype-detail [violation]="violation"></prototype-detail>
+                    <br>
+            </div>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+
+</div>
+<!--The below should be made to work with our existing loading component if possible-->
+<ng-template #notReadyBlock>
+    <span>
+        <img src="{{ baseHref }}assets/img/loading.svg" /> <br />
+        <br />
+        <small>
+            <p class="has-text-info">
+                <mat-icon>comment</mat-icon>Loading New Validation Report
+            </p>
+        </small>
+    </span>
+</ng-template>
+
+<!--No violations found template-->
+<ng-template #noViolations>
+    <mat-card class="no-violations-card">
+        <!--<img src="{{ baseHref }}assets/img/MetaboLightsLogo.png" class="ml-logo"/><br />-->
+
+        <div class="no-violations-content">
+            <span class="material-symbols-outlined flask">
+                experiment
+                </span> No Violations
+        </div>
+        <br>
+
+    </mat-card>
+<br>
+</ng-template>

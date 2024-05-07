@@ -29,6 +29,10 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatCommonModule } from "@angular/material/core";
 import { MatOptionModule } from "@angular/material/core";
 import { MatSelectModule } from "@angular/material/select";
+import { MatListModule} from '@angular/material/list';
+import { MatTabsModule } from '@angular/material/tabs';
+import {MatCardModule} from '@angular/material/card';
+
 import { SharedModule } from "../shared/shared.module";
 import { HttpClientModule } from "@angular/common/http";
 import { MatButtonModule } from "@angular/material/button";
@@ -52,6 +56,12 @@ import { MatCheckboxModule } from "@angular/material/checkbox";
 import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.pipe";
 import { RsyncComponent } from './files/rsync/rsync.component';
 import { ValidationStatusTransformPipe } from "./validations/validation-status-transform.pipe";
+import { ValidationsPrototypeComponent } from "./validations/validations-protoype/validations-prototype/validations-prototype.component";
+import { ValidationInfoModalComponent } from "./validations/validations-protoype/validation-info-modal/validation-info-modal.component";
+import { RawViolationModalComponent } from "./validations/validations-protoype/raw-violation-modal/raw-violation-modal.component";
+import { PrototypeDetailComponent } from "./validations/validations-protoype/prototype-detail/prototype-detail.component";
+import { BrowserModule } from "@angular/platform-browser";
+import { ValidationReportSummaryComponent } from "./validations/validations-protoype/validation-report-summary/validation-report-summary.component";
 
 @NgModule({
   declarations: [
@@ -77,7 +87,11 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     ValidationDetailCommentComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
-    RsyncComponent
+    RsyncComponent,
+    ValidationsPrototypeComponent,
+    ValidationInfoModalComponent,
+    RawViolationModalComponent,
+    PrototypeDetailComponent,
   ],
   imports: [
     CommonModule,
@@ -105,6 +119,11 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     MatButtonToggleModule,
     QuillModule,
     MatCheckboxModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatTabsModule,
+    MatCardModule,
+    ValidationReportSummaryComponent
   ],
   exports: [
     AssaysComponent,
@@ -126,7 +145,15 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     StatusComponent,
     ValidationsComponent,
     ValidationDetailComponent,
-    ValidationDetailCommentComponent
+    RsyncComponent,
+    RsyncStatusTransformPipe,
+    ValidationStatusTransformPipe,
+    ValidationDetailCommentComponent,
+    ValidationsPrototypeComponent,
+    ValidationInfoModalComponent,
+    RawViolationModalComponent,
+    PrototypeDetailComponent,
+
   ],
   providers: [
     AuthGuard,

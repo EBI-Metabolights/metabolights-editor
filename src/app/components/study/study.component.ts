@@ -13,6 +13,8 @@ import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
+import { UserService } from "src/app/services/decomposed/user.service";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
   selector: "mtbls-study",
@@ -29,6 +31,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
   @Select(FilesState.obfuscationCode) studyObfuscationCode$: Observable<string>;
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
 
 
   studyError = false;
@@ -43,6 +46,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   baseHref: string;
   banner: string = null;
   underMaintenance = false;
+  isCurator = false;
 
   constructor(
     private store: Store,
@@ -58,6 +62,9 @@ export class StudyComponent implements OnInit, OnDestroy {
   setUpSubscriptionsNgxs() {
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
+    this.isCurator$.subscribe((value) => {
+      this.isCurator = value;
+    });
     this.studyObfuscationCode$.subscribe((value) => {
       this.obfuscationCode = value;
     });

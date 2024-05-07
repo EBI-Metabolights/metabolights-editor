@@ -8,6 +8,7 @@ import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/
 import { httpOptions } from '../headers';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { Select } from '@ngxs/store';
+import { MtblsWs3ResponseWrapper, ValidationReportInterface } from 'src/app/components/study/validations/validations-protoype/interfaces/validation-report.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -83,5 +84,20 @@ export class ValidationService extends BaseConfigDependentService {
         .pipe(catchError(this.handleError));
     }
 
-    
+    getNewValidationReport(): Observable<ValidationReportInterface> {
+      return this.http.get<ValidationReportInterface>("assets/validation-report-v2_copy.json").pipe(
+        map((res) => res),
+        catchError(this.handleError)
+      );
+    }
+
+    getNewValidationReportWs3() {
+      const token = localStorage.getItem('jwt');
+      httpOptions.headers.set('Authorization', `Bearer ${token}`)
+      return this.http.get<MtblsWs3ResponseWrapper>(`https://www-test.ebi.ac.uk/metabolights/staging/ws3/validation/results/${this.id}?message_filter=NONE&summary_messages=true`, httpOptions).pipe(
+        map((res) => res),
+        catchError(this.handleError)
+      );
+    }
+  
 }

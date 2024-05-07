@@ -1,0 +1,30 @@
+
+
+prototype-table .mat-cell, prototype-table .mat-header-cell {
+    padding: 16px;
+}
+
+.no-violations-card {
+    margin-left: 25%;
+    width: 50%;
+}
+
+.no-violations-content {
+    padding-top: 10%;
+    padding-left: 40%;
+}
+
+.ml-logo {
+    height: 55px;
+    width: 55px;
+    position: absolute; 
+    right: 0; 
+    top: 0;
+    transform: translateY(5px);
+}
+
+.flask {
+    color: #4caf50;
+    transform: translateY(4px);
+
+}
