@@ -1,8 +1,10 @@
-import { Action, Selector, State, StateContext } from "@ngxs/store"
-import { StudyPermission } from "../../../services/headers"
-import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, Guides, GuidesMappings, MaintenanceMode, SetProtocolExpand, SetReadonly, SetSelectedLanguage, SetStudyError } from "./application.actions"
-import { Injectable } from "@angular/core"
-import { ApplicationService } from "src/app/services/decomposed/application.service"
+import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { StudyPermission } from "../../../services/headers";
+import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, Guides,
+  GuidesMappings, MaintenanceMode, SetProtocolExpand,
+  SetReadonly, SetSelectedLanguage, SetStudyError } from "./application.actions";
+import { Injectable } from "@angular/core";
+import { ApplicationService } from "src/app/services/decomposed/application.service";
 
 export interface MtblsEditorVersion {
     version: string,
@@ -64,7 +66,7 @@ export interface ApplicationStateModel {
         studyPermission: null,
         bannerMessage: null,
         maintenanceMode: false,
-        controlLists: null, 
+        controlLists: null,
         investigationFailed: null,
         readonly: null,
         isProtocolsExpanded: false,
@@ -122,7 +124,7 @@ export class ApplicationState {
                   ) {
                     ctx.dispatch(new SetSelectedLanguage(language.code));
                     ctx.dispatch(new Guides.Get(language))
-        
+
 
                   }
                 });
@@ -351,7 +353,7 @@ export class ApplicationState {
         return state.controlLists
     }
 
-    @Action(SetProtocolExpand) 
+    @Action(SetProtocolExpand)
     SetProtocolsExpanded(ctx: StateContext<ApplicationStateModel>, action: SetProtocolExpand) {
         const state = ctx.getState();
         ctx.setState({

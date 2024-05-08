@@ -44,7 +44,7 @@ export class PublicationComponent implements OnInit {
   @Select(GeneralMetadataState.id) id$: Observable<string>;
   @Select(GeneralMetadataState.title) title$: Observable<string>;
   @Select(GeneralMetadataState.description) description$: Observable<string>;
-  
+
   private title: string = ""
   private description: string = ""
 
@@ -363,7 +363,7 @@ export class PublicationComponent implements OnInit {
 
   saveNgxs() {
     if (!this.isReadOnly) {
-      if (this.statusComponent.values[0] === undefined) { 
+      if (this.statusComponent.values[0] === undefined) {
         toastr.warning("Publication status cannot be empty", "Warning", this.toastrSettings);
       } else {
         this.isFormBusy = true;

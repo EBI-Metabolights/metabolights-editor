@@ -2,6 +2,11 @@
   border-radius: 4px !important;
 }
 
+.not-curated {
+  background-color: orange;
+  color: white;
+}
+
 .banner {
   font-size: 14px;
   color: red;

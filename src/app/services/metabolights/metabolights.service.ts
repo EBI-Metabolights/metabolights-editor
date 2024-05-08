@@ -45,7 +45,7 @@ interface DeleteFilesResponse {
 export class MetabolightsService extends DataService {
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  
+
 
   study: MTBLSStudy;
   id: string;
@@ -58,7 +58,7 @@ export class MetabolightsService extends DataService {
        // Create a promise to wait for configLoaded to become true
        const configLoadedPromise = new Promise<void>((resolve, reject) => {
         const subscription = this.configService.configLoaded$.subscribe(loaded => {
-            if (loaded == true) {
+            if (loaded===  true) {
                 resolve(); // Resolve the promise when configLoaded becomes true
                 subscription.unsubscribe(); // Unsubscribe to prevent memory leaks
             }
@@ -80,7 +80,7 @@ export class MetabolightsService extends DataService {
             console.log(this.url.guides)
         }
         this.setUpSubscriptionsNgxs();
-      
+
 
     });
 
@@ -88,7 +88,7 @@ export class MetabolightsService extends DataService {
 
   setUpSubscriptionsNgxs() {
     this.studyIdentifier$.subscribe((value) => (this.id = value));
-    
+
   }
 
 
