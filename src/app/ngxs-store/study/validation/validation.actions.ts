@@ -1,4 +1,5 @@
-import { ValidationReportInterface } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.interface"
+import { Ws3ValidationReport } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.interface"
+import { ViolationType } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.types"
 
 export namespace EditorValidationRules {
     export class Get {
@@ -38,6 +39,11 @@ export namespace ValidationReport {
 }
 
 export namespace NewValidationReport {
+    
+    export class InitialiseValidationTask {
+        static readonly type = '[validation] Init New validation Task'
+        constructor() {}
+    }
     export class Get {
         static readonly type = '[validation] Get New Validation Report'
         constructor(public ws3: boolean = false) {}
@@ -45,6 +51,16 @@ export namespace NewValidationReport {
 
     export class Set {
         static readonly type = '[validation] Set New Validation Report'
-        constructor(public report: ValidationReportInterface) {}
+        constructor(public report: Ws3ValidationReport) {}
+    }
+
+    export class SetTaskID {
+        static readonly type = '[validation] Set Validation Task ID'
+        constructor(public id: string) {}
+    }
+
+    export class SetValidationStatus {
+        static readonly type = '[validation] Set Validation Status'
+        constructor(public status: ViolationType) {}
     }
 }

@@ -1,15 +1,19 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChange, SimpleChanges, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
-import { ValidationReportSection } from '../interfaces/validation-report.types';
+import { ValidationReportSection, ViolationType } from '../interfaces/validation-report.types';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { ValidationReportInterface } from '../interfaces/validation-report.interface';
 import { FormControl, FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { Store } from '@ngxs/store';
-import { NewValidationReport } from 'src/app/ngxs-store/study/validation/validation.actions';
+import {MatRadioModule} from '@angular/material/radio';
+import { Select, Store } from '@ngxs/store';
+import { NewValidationReport, ValidationReport } from 'src/app/ngxs-store/study/validation/validation.actions';
+import { PieGridComponent } from '@swimlane/ngx-charts';
+import { ValidationReportContents, Ws3ValidationReport } from '../interfaces/validation-report.interface';
+import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { Observable } from 'rxjs';
 
 
 export interface  GraphItem {
@@ -24,11 +28,11 @@ export interface GraphSeries {
 @Component({
   selector: 'app-validation-report-summary',
   standalone: true,
-  imports: [MatCardModule, MatDividerModule, FormsModule, MatButtonModule, MatButtonToggleModule, NgxChartsModule, BrowserAnimationsModule],
+  imports: [MatCardModule, MatDividerModule, FormsModule, MatButtonModule, MatButtonToggleModule, MatRadioModule, NgxChartsModule, BrowserAnimationsModule],
   templateUrl: './validation-report-summary.component.html',
   styleUrl: './validation-report-summary.component.css'
 })
-export class ValidationReportSummaryComponent implements OnInit{
+export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, OnChanges {
 
   view: any[] = [500, 400];
 
@@ -53,32 +57,85 @@ export class ValidationReportSummaryComponent implements OnInit{
 
   violationsToggle: string = 'errorsGraphItems'
 
-  @Input() report: ValidationReportInterface
+  @Input() report: Ws3ValidationReport
   @Input() accession: string;
+
+  @ViewChild('chart', { static: false }) chart: any;
+
+  @Select(ValidationState.taskId) taskId$: Observable<string>;
+  @Select(ValidationState.validationStatus) validationStatus$: Observable<ViolationType>;
+
 
   private errors: Record<string, number> = {};
   private warnings: Record<string, number> = {};
   private both: Record<string, number> = {};
 
   public dataReady: boolean = false;
+  public taskId: string = "dud";
+  public validationStatus: ViolationType = null;
 
   errorsGraphItems: GraphItem[] = [];
   warningsGraphItems: GraphItem[] = [];
   bothGraphItems: GraphItem[] = [];
   current: GraphItem[] = [];
 
-  constructor(private store: Store) {}
+  constructor(private store: Store, private renderer: Renderer2) {}
 
   ngOnInit(): void {
-      this.breakReportIntoSections();
-      this.convertToSwimlaneFormat();
-      this.dataReady = true;
+      this.taskId$.subscribe(value => {
+        if (value !== null) this.taskId = value;
+      });
+      this.validationStatus$.subscribe(value => {
+        if (value !== null) this.validationStatus = value
+      });
 
-      
+      if (this.report !== null) {
+        this.breakReportIntoSections();
+        this.convertToSwimlaneFormat();
+        this.dataReady = true;
+      }
+
+  }
+
+  ngAfterViewInit(): void {
+    if(this.report !== null) {
+      this.addCustomListeners();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['report']) {
+      if(this.report !== null) {
+        this.breakReportIntoSections();
+        this.convertToSwimlaneFormat();
+        this.dataReady = true;
+        this.addCustomListeners();
+      }
+    }
+  }
+
+
+  addCustomListeners() {
+    // Wait for the microtask queue to be empty so the chart is fully rendered
+    setTimeout(() => {
+      console.log(this.chart);
+      const elements = this.chart.chartElement.nativeElement.querySelectorAll('g.pie-grid-item');
+      elements.forEach(element => {
+        this.renderer.listen(element, 'click', (event) => {
+          console.log('Pie arc clicked', event);
+          // Implement your custom logic here
+          //target.innerHTML
+        });
+      });
+    });
   }
 
   setGraphItems() {
 
+  }
+
+  initNewTask() {
+    this.store.dispatch(new NewValidationReport.InitialiseValidationTask());
   }
 
   getWs3Report() {
@@ -92,7 +149,7 @@ export class ValidationReportSummaryComponent implements OnInit{
       this.both[`${section}`] = 0
     });
 
-    for(let violation of this.report.violations) {
+    for(let violation of this.report.messages.violations) {
       const section = this.findStartingSection(violation.section);
       if (violation.type === 'WARNING') {
         this.warnings[section] += 1;
@@ -111,8 +168,7 @@ export class ValidationReportSummaryComponent implements OnInit{
     this.addItems(this.errors, this.errorsGraphItems);
     this.addItems(this.warnings, this.warningsGraphItems);
     this.addItems(this.both, this.bothGraphItems);
-    console.log(this.errors);
-    console.log(this.errorsGraphItems);
+
   }
 
   addItems(source: any, target: any[]) {

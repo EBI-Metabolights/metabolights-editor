@@ -1,29 +1,29 @@
 import { ViolationPriority, ViolationType } from "./validation-report.types"
 
-export interface MtblsWs3ResponseWrapper {
+export interface Ws3Response<T> {
     status: string
     successMessage: string
     errorMessage: string
     errors: any[]
-    content: any
+    content: T
 }
 
-export interface MtblsWs3ContentWrapper {
+export interface Ws3ValidationTask {
     task_id: string,
     task_status: string,
     message: string,
-    task_result: MtblsWs3ValidationTaskWrapper
+    task_result?: Ws3ValidationReport
 }
 
-export interface MtblsWs3ValidationTaskWrapper {
+export interface Ws3ValidationReport {
     study_id: string
     duration_in_seconds: number
     message?: Record<string, any>;
-    messages?: ValidationReportInterface
+    messages?: ValidationReportContents
 }
 
 
-export interface ValidationReportInterface {
+export interface ValidationReportContents {
     summary: Violation[]
     violations: Violation[]
 }

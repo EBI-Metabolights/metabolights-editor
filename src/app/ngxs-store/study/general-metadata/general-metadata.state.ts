@@ -64,7 +64,9 @@ export class GeneralMetadataState {
                 this.store.dispatch(new Factors.Set(gm_response.isaInvestigation.studies[0].factors))
                 //this.store.dispatch(new SetConfiguration());
                 this.store.dispatch(new EditorValidationRules.Get());
-                this.store.dispatch(new NewValidationReport.Get());
+
+                // TODO fix, commenting this out for demo purpose
+                //this.store.dispatch(new NewValidationReport.Get());
 
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));

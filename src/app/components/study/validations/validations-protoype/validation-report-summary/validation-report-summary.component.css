@@ -4,8 +4,24 @@
     gap: 10px; 
 }
 
-.centered-content {
+.charts-container {
+
 }
+
+.pie-grid-item:hover {
+    cursor: pointer;
+}
+
+.textual-content {
+    display: grid;
+    grid-template-rows: 1fr 1fr; /* Divides the grid into two rows */
+}
+
+.content {
+
+
+}
+
 
 .container {
     position: relative;
@@ -22,5 +38,13 @@
 }
 
 .content > h2 {
-    font-family: Roboto, sans-serif
+    font-family: Roboto, sans-serif;
+
+}
+
+.small-toggle .mat-button-toggle-group {
+    padding: 0 8px; /* Reduce padding */
+    font-size: 12px; /* Smaller font size */
+    line-height: 24px; /* Adjust line height to reduce overall height */
+    min-height: 24px; /* Ensure the button doesn't become too small */
 }

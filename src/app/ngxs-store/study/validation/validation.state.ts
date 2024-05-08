@@ -6,13 +6,16 @@ import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 import { interval } from "rxjs";
-import { ValidationReportInterface, Violation } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.interface";
+import { Violation, Ws3ValidationReport } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.interface";
 import { filter } from "rxjs-compat/operator/filter";
+import { ViolationType } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.types";
 
 export interface ValidationStateModel {
     rules: Record<string, any>;
     report: IValidationSummary;
-    newReport: ValidationReportInterface
+    newReport: Ws3ValidationReport;
+    taskId: string;
+    status: ViolationType
 }
 
 @State<ValidationStateModel>({
@@ -20,7 +23,9 @@ export interface ValidationStateModel {
     defaults: {
         rules: null,
         report: null,
-        newReport: null
+        newReport: null,
+        taskId: null,
+        status: null
     }
 })
 @Injectable()
@@ -81,15 +86,22 @@ export class ValidationState {
         if (action.ws3) {
             this.validationService.getNewValidationReportWs3().subscribe(
                 (response) => {
-                    ctx.dispatch(new NewValidationReport.Set(response.content.task_result.messages));
+                    if (response.status !== 'error') {
+                        ctx.dispatch(new NewValidationReport.Set(response.content.task_result));
+                        ctx.dispatch(new NewValidationReport.SetTaskID(response.content.task_id));
+                        ctx.dispatch(new NewValidationReport.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)))
+                    } else {
+                        console.log("Could not get new ws3 report");
+                        console.log(JSON.stringify(response.errorMessage));
+                    }
                 },
-            (error)=> {
-                console.log("Could not get new ws3 report");
-                console.log(JSON.stringify(error));
-            })
+                (error)=> {
+                    console.log("Could not get new ws3 report");
+                    console.log(JSON.stringify(error));
+                })
         } else {
             this.validationService.getNewValidationReport().subscribe((response) => {
-                ctx.dispatch(new NewValidationReport.Set(response));
+                ctx.dispatch(new NewValidationReport.Set({study_id: "test", duration_in_seconds: 5, messages: response}));
             });
         }
 
@@ -103,6 +115,39 @@ export class ValidationState {
             ...state,
             newReport: action.report
         })
+    }
+
+    @Action(NewValidationReport.InitialiseValidationTask)
+    InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.InitialiseValidationTask) {
+        this.validationService.createStudyValidationTask().subscribe(
+            (response) => {
+                console.log('task submitted successfully');
+                console.log(response);
+                //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
+            },
+            (error) => {
+                console.log('could not submit validation task');
+                console.log(JSON.stringify(error));
+            }
+        )
+    }
+
+    @Action(NewValidationReport.SetTaskID)
+    SetTaskID(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.SetTaskID) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            taskId: action.id
+        });
+    }
+
+    @Action(NewValidationReport.SetValidationStatus)
+    SetValidationStatus(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.SetValidationStatus) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            status: action.status
+        });
     }
 
     @Action(ValidationReport.Refresh)
@@ -169,13 +214,13 @@ export class ValidationState {
     }
 
     @Selector()
-    static newReport(state: ValidationStateModel): ValidationReportInterface {
+    static newReport(state: ValidationStateModel): Ws3ValidationReport {
         return state.newReport
     }
 
     @Selector()
     static newReportViolationsAll(state: ValidationStateModel) {
-        let violations = state.newReport.violations;
+        let violations = state.newReport.messages.violations;
         violations = sortViolations(violations);
         return violations;
     }
@@ -184,7 +229,7 @@ export class ValidationState {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
             return sortViolations(
                 filterViolations(
-                    state.newReport.violations, section
+                    state.newReport.messages.violations, section
                 )
             );
         });
@@ -192,14 +237,24 @@ export class ValidationState {
 
     @Selector()
     static newReportSummariesAll(state: ValidationStateModel) {
-        return state.newReport.summary;
+        return state.newReport.messages.summary;
     }
 
     static newReportSummaries(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            return filterViolations(state.newReport.summary, section)
+            return filterViolations(state.newReport.messages.summary, section)
         });
-    }   
+    }
+
+    @Selector()
+    static taskId(state: ValidationStateModel) {
+        return state.taskId;
+    }
+
+    @Selector()
+    static validationStatus(state: ValidationStateModel) {
+        return state.status
+    }
 }
 
 
@@ -229,3 +284,7 @@ function sortViolations(violations: Violation[]): Violation[] {
     });
 }
 
+function calculateStudyValidationStatus(report: Ws3ValidationReport): ViolationType {
+    if (report.messages.violations.length > 0) return 'ERROR'
+    else return 'SUCCESS'
+}

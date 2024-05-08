@@ -1,7 +1,7 @@
 <div *ngIf="ready; else notReadyBlock">
     <app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>
     <br>
-    <mat-tab-group *ngIf="report !== null" mat-stretch-tabs="false" mat-align-tabs="center">
+    <mat-tab-group *ngIf="report !== null; else noViolations" mat-stretch-tabs="false" mat-align-tabs="center">
         <mat-tab label="All">
             <br>
             <div *ngIf="allViolations.length > 0; else noViolations">
@@ -105,3 +105,4 @@
     </mat-card>
 <br>
 </ng-template>
+

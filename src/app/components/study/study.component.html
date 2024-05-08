@@ -177,6 +177,7 @@
               <ul>
                 <li
                   *ngIf="!studyError"
+                  color="primary"
                   (click)="selectCurrentTab(0, 'descriptors')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }"
                 >
