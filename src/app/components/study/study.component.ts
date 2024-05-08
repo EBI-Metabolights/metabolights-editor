@@ -23,7 +23,8 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
+  @Select(GeneralMetadataState.curationRequest) curationRequest$: Observable<string>;
   @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
   @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
   @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
@@ -35,7 +36,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   requestedTab = 0;
   tab = "descriptors";
   requestedStudy: string = null;
-  status = "submitted";
+  status = "";
+  curationRequest = "";
   validation: any = {};
   obfuscationCode: string = null;
   endpoint: string = null;
@@ -82,7 +84,15 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
 
     this.studyStatus$.subscribe((value) => {
-      this.status = value;
+      if (value) {
+        this.status = value;
+      }
+    });
+
+    this.curationRequest$.subscribe((value) => {
+      if (value) {
+        this.curationRequest = value;
+      }
     });
 
     this.studyValidation$.subscribe((value) => {
