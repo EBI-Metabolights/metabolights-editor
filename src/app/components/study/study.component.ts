@@ -17,6 +17,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.status) studyStatus;
+  @select((state) => state.study.curationRequest) curationRequestState;
+
   @select((state) => state.study.obfuscationCode) studyObfuscationCode;
 
   @select((state) => state.status.bannerMessage) bannerMessage;
@@ -28,6 +30,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   requestedTab = 0;
   tab = "descriptors";
   requestedStudy: string = null;
+  curationRequest = ""
   status = "submitted";
   validation: any = {};
   obfuscationCode: string = null;
@@ -87,6 +90,12 @@ export class StudyComponent implements OnInit, OnDestroy {
 
     this.studyStatus.subscribe((value) => {
       this.status = value;
+    });
+
+    this.curationRequestState.subscribe((value) => {
+      if(value){
+        this.curationRequest = value;
+      }
     });
 
     this.studyValidation.subscribe((value) => {

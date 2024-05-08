@@ -24,6 +24,7 @@ export class StatusComponent implements OnInit {
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.isCurator) isCurator;
   @select((state) => state.study.identifier) studyIdentifier;
+  @select((state) => state.study.curationRequest) curationRequestState;
 
   @select((state) => state.study.readonly) readonly;
   isReadOnly = false;
@@ -33,6 +34,7 @@ export class StatusComponent implements OnInit {
   status: string = null;
   curator = false;
   toStatus = "Submitted";
+  curationRequest: string = null;
   requestedStudy: string = null;
   validation: IValidationSummary;
   constructor(
@@ -43,6 +45,9 @@ export class StatusComponent implements OnInit {
   }
 
   setUpSubscriptions() {
+    this.curationRequestState.subscribe((value) => {
+      this.curationRequest = value;
+    });
     this.studyValidation.subscribe((value) => {
       this.validation = value;
     });

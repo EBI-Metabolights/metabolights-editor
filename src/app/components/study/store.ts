@@ -14,6 +14,7 @@ import {
   SET_STUDY_SUBMISSION_DATE,
   SET_STUDY_RELEASE_DATE,
   SET_STUDY_STATUS,
+  SET_STUDY_CURATION_REQUEST,
   SET_STUDY_REVIEWER_LINK,
   SET_STUDY_ASSAYS,
   SET_STUDY_PUBLICATIONS,
@@ -114,6 +115,10 @@ function setStudyReleaseDate(state, action) {
 
 function setStudyStatus(state, action) {
   return tassign(state, { status: action.body.study.mtblsStudy.studyStatus });
+}
+
+function setCurationRequest(state, action) {
+  return tassign(state, { curationRequest: action.body.study.mtblsStudy.curationRequest });
 }
 
 function setStudyReviewerLink(state, action) {
@@ -349,9 +354,10 @@ export function studyReducer(
       return setStudyTitle(state, action);
     case SET_STUDY_ABSTRACT:
       return setStudyAbstract(state, action);
-
     case SET_STUDY_STATUS:
       return setStudyStatus(state, action);
+    case SET_STUDY_CURATION_REQUEST:
+      return setCurationRequest(state, action);
     case SET_STUDY_REVIEWER_LINK:
       return setStudyReviewerLink(state, action);
 
