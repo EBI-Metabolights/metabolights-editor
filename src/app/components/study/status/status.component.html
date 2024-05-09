@@ -1,13 +1,23 @@
 <div class="control">
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
-    <div *ngIf="status == 'Public' && curationRequest == 'NO_CURATION'; else onlyStatus" >
+    <div *ngIf="status == 'Public'; else onlyStatus" >
+      <span *ngIf="curationRequest == 'MANUAL_CURATION'; else noCuration">
+        <span class="tag is-link clickable" (click)="openModal()">
+          {{
+            status
+          }} - Curated
+        </span>
+      </span>
+    <ng-template #noCuration>
       <span class="tag clickable not-curated" (click)="openModal()">
         {{
           status
         }} - Not Curated
       </span>
-    </div>
+    </ng-template>
+  </div>
+
     <ng-template #onlyStatus>
       <span class="tag is-link clickable" (click)="openModal()">
         {{
