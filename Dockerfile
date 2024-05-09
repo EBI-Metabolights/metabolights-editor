@@ -2,7 +2,8 @@ FROM node:18 as build
 RUN mkdir /app-root
 WORKDIR /app-root
 COPY . .
-RUN npm install --save 
+ENV NODE_OPTIONS=--max-old-space-size=8192
+RUN npm install --save
 ARG CONFIGURATION=production
 ARG BASE_HREF=/metabolights/editor
 RUN npm run build -- --configuration $CONFIGURATION --base-href="$BASE_HREF/"
