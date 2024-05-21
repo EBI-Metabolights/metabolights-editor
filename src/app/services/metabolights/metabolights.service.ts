@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { catchError, map } from "rxjs/operators";
+import { catchError, map, take } from "rxjs/operators";
 import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
 import { Injectable } from "@angular/core";
@@ -55,18 +55,32 @@ export class MetabolightsService extends DataService {
     private configService: ConfigurationService,
   ) {
     super("", http);
+
        // Create a promise to wait for configLoaded to become true
-       const configLoadedPromise = new Promise<void>((resolve, reject) => {
-        const subscription = this.configService.configLoaded$.subscribe(loaded => {
+/*        const configLoadedPromise = new Promise<void>((resolve, reject) => {
+         const subscription = this.configService.configLoaded$.subscribe(loaded => {
             if (loaded===  true) {
                 resolve(); // Resolve the promise when configLoaded becomes true
                 subscription.unsubscribe(); // Unsubscribe to prevent memory leaks
+
             }
         });
-    });
+    }); */
+
+        // Create a promise to wait for configLoaded to become true
+        const configLoadedPromise = new Promise<void>((resolve, reject) => {
+          this.configService.configLoaded$.pipe(
+              take(1) // Automatically complete after the first emission
+          ).subscribe(loaded => {
+              if (loaded === true) {
+                  resolve(); // Resolve the promise when configLoaded becomes true
+              }
+          });
+      });
 
     // Await the promise to wait for configLoaded to become true
     configLoadedPromise.then(() => {
+
         // Initialization logic once configLoaded is true
         this.url = this.configService.config.metabolightsWSURL;
         if (this.url.ontologyDetails.endsWith("/")) {
