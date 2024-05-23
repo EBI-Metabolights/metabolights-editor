@@ -1,9 +1,8 @@
 .mat-mdc-option {
   white-space: nowrap;
-  line-height: inherit;
-  min-height: 48px;
-  height: inherit;
-  display: flex;
+  line-height: 2.5;
+  min-height: 75px;
+  display: block;
   flex-direction: row;
   max-width: 600px;
 }
