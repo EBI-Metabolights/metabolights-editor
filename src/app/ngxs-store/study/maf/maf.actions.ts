@@ -42,7 +42,7 @@ export namespace MAF {
     }
 
     export class UpdateCells {
-        static readonly type = '[maf] Delete Rows'
+        static readonly type = '[maf] Update Cells'
         constructor(public filename: string, public cellsToUpdate: Record<string, any>){}
 
     }

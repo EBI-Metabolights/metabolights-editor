@@ -20,6 +20,7 @@
   </div>
 </ng-template>
 
+<!-- Delete Modal Block Start-->
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -40,6 +41,7 @@
     </footer>
   </div>
 </div>
+<!-- Delete Modal Block End-->
 
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
@@ -125,6 +127,7 @@
   </form>
 </div>
 
+<!--Import descriptor modal block start-->
 <div class="modal" [ngClass]="{ 'is-active': isImportModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
@@ -197,3 +200,4 @@
     </div>
   </form>
 </div>
+<!--Import descriptor modal block end-->
