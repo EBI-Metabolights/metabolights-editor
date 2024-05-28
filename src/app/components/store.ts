@@ -37,6 +37,7 @@ export const SHARED_INITIAL_STATE: Record<string, any> = {
   info: "",
   configuration: "",
   isCurator: false,
+  curationRequest: null,
   user: null,
   error: false,
   message: "",

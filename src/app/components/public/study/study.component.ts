@@ -23,6 +23,7 @@ export class PublicStudyComponent implements OnInit {
   @select((state) => state.study.identifier) studyIdentifier;
   @select((state) => state.status.user) user;
   @select((state) => state.study.status) studyStatus;
+  @select((state) => state.study.curationRequest) curationRequestState;
   @select((state) => state.study.validation) studyValidation;
   @select((state) => state.status.currentTabIndex) currentIndex: number;
   @select((state) => state.study.investigationFailed) investigationFailed;
@@ -35,6 +36,7 @@ export class PublicStudyComponent implements OnInit {
   status = "submitted";
   tab = "descriptors";
   requestedStudy: string = null;
+  curationRequest = ""
   studyError = false;
   validation: any = {};
   files: any = null;
@@ -136,6 +138,12 @@ export class PublicStudyComponent implements OnInit {
       if(value){
         this.status = value;
         this.calculateNotReadyValidationMessage();
+      }
+    });
+
+    this.curationRequestState.subscribe((value) => {
+      if(value){
+        this.curationRequest = value;
       }
     });
 
