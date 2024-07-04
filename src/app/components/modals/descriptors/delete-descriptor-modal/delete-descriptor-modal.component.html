@@ -1,0 +1,22 @@
+<!-- Delete Modal Block Start-->
+<div class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <section class="modal-card-body">
+        <p>Are you sure you want to delete?</p>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button (click)="cancel()" class="button is-info">Cancel</button>
+          </div>
+          <div class="column is-half has-text-right">
+            <button (click)="delete()" class="button is-danger">
+              OK! Delete Permanently
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+  <!-- Delete Modal Block End-->

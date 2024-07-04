@@ -1,3 +1,4 @@
+<!--Earmarked for refactoring into ontology-details-->
 <div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
   <a class="button is-primary is-pulled-right is-small" (click)="openModal()"
     >+ Add</a
@@ -19,6 +20,7 @@
     </div>
   </div>
 </ng-template>
+<!--earmark end -->
 
 <!-- Delete Modal Block Start-->
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
@@ -43,6 +45,7 @@
 </div>
 <!-- Delete Modal Block End-->
 
+<!-- Select ontology term modal-->
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
@@ -126,6 +129,7 @@
     </div>
   </form>
 </div>
+<!--Select ontology term modal block end-->
 
 <!--Import descriptor modal block start-->
 <div class="modal" [ngClass]="{ 'is-active': isImportModalOpen }">

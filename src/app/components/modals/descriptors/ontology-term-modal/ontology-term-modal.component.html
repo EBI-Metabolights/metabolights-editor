@@ -1,0 +1,83 @@
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+    <form *ngIf="form" [formGroup]="form">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <div *ngIf="isFormBusy" class="load-bar">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <section class="modal-card-body">
+          <span *ngIf="descriptor != null; else noDescriptor">
+            <mtbls-ontology
+              #descriptorComponent
+              [validations]="validation"
+              [controlList]="controlList()"
+              (changed)="onChanges($event)"
+              [values]="[descriptor]"
+              [inline]="true"
+            ></mtbls-ontology>
+          </span>
+          <ng-template #noDescriptor>
+            <mtbls-ontology
+              #descriptorComponent
+              [validations]="validation"
+              [controlList]="controlList()"
+              (changed)="onChanges($event)"
+              [values]="[]"
+              [inline]="true"
+            ></mtbls-ontology>
+          </ng-template>
+        </section>
+        <footer class="modal-card-foot">
+          <div class="columns is-gapless full-width">
+            <div class="column is-half">
+              <button
+                *ngIf="!addNewDescriptor"
+                class="button is-danger is-pulled-left"
+                (click)="confirmDelete()"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+              <button
+                *ngIf="addNewDescriptor"
+                class="button is-primary is-pulled-left"
+                (click)="openImportModal()"
+              >
+                <mat-icon>label</mat-icon> Import
+              </button>
+            </div>
+            <div class="column is-half has-text-right">
+              <button
+                *ngIf="!form.pristine"
+                [disabled]="!form.valid || isFormBusy"
+                (click)="saveNgxs()"
+                class="button is-info"
+              >
+                <mat-spinner
+                  [diameter]="20"
+                  [strokeWidth]="3"
+                  *ngIf="isFormBusy"
+                ></mat-spinner>
+                Save
+              </button>
+              <button
+                *ngIf="form.pristine"
+                (click)="closeModal()"
+                class="button is-info"
+              >
+                OK
+              </button>
+              <button
+                class="button"
+                [disabled]="isFormBusy"
+                (click)="closeModal()"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </form>
+  </div>
