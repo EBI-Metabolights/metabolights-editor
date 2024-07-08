@@ -18,6 +18,7 @@ export interface Ws3ValidationTask {
 export interface Ws3ValidationReport {
     study_id: string
     duration_in_seconds: number
+    completion_time: string
     message?: Record<string, any>;
     messages?: ValidationReportContents
 }

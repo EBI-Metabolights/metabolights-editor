@@ -28,3 +28,27 @@ prototype-table .mat-cell, prototype-table .mat-header-cell {
     transform: translateY(4px);
 
 }
+
+section {
+    display: flex;
+    justify-content: center; 
+  }
+  
+  .toggle-group-container {
+    max-width: 700px; 
+    width: 100%; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+  }
+  
+  .toggle-group-container mat-button-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .toggle-group-container mat-button-toggle {
+    flex: 1 1 auto; 
+    margin: 2px;
+  }

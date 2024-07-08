@@ -64,6 +64,7 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
 
   @Select(ValidationState.taskId) taskId$: Observable<string>;
   @Select(ValidationState.validationStatus) validationStatus$: Observable<ViolationType>;
+  @Select(ValidationState.lastValidationRunTime) lastValidationRunTime$: Observable<string>;
 
 
   private errors: Record<string, number> = {};
@@ -73,6 +74,7 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   public dataReady: boolean = false;
   public taskId: string = "dud";
   public validationStatus: ViolationType = null;
+  public lastValidationRunTime: string =  "-";
 
   errorsGraphItems: GraphItem[] = [];
   warningsGraphItems: GraphItem[] = [];
@@ -88,6 +90,9 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
       this.validationStatus$.subscribe(value => {
         if (value !== null) this.validationStatus = value
       });
+      this.lastValidationRunTime$.subscribe(value => {
+        if (value !== null) this.lastValidationRunTime = value
+      })
 
       if (this.report !== null) {
         this.breakReportIntoSections();

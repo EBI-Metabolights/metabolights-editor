@@ -55,13 +55,15 @@ import { EuropePMCService } from "src/app/services/publications/europePMC.servic
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.pipe";
 import { RsyncComponent } from './files/rsync/rsync.component';
-import { ValidationStatusTransformPipe } from "./validations/validation-status-transform.pipe";
+import { ValidationStatusTransformPipe } from "./validations/pipes/validation-status-transform.pipe";
 import { ValidationsPrototypeComponent } from "./validations/validations-protoype/validations-prototype/validations-prototype.component";
 import { ValidationInfoModalComponent } from "./validations/validations-protoype/validation-info-modal/validation-info-modal.component";
 import { RawViolationModalComponent } from "./validations/validations-protoype/raw-violation-modal/raw-violation-modal.component";
 import { PrototypeDetailComponent } from "./validations/validations-protoype/prototype-detail/prototype-detail.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { ValidationReportSummaryComponent } from "./validations/validations-protoype/validation-report-summary/validation-report-summary.component";
+import { AddSpaceBeforeCapitalPipe } from "./validations/pipes/add-space-before-capital.pipe";
+import { ValidationSectionComponent } from "./validations/validation-section/validation-section.component";
 
 @NgModule({
   declarations: [
@@ -92,6 +94,7 @@ import { ValidationReportSummaryComponent } from "./validations/validations-prot
     ValidationInfoModalComponent,
     RawViolationModalComponent,
     PrototypeDetailComponent,
+    ValidationSectionComponent
   ],
   imports: [
     CommonModule,
@@ -123,7 +126,8 @@ import { ValidationReportSummaryComponent } from "./validations/validations-prot
     MatProgressSpinnerModule,
     MatTabsModule,
     MatCardModule,
-    ValidationReportSummaryComponent
+    ValidationReportSummaryComponent,
+    AddSpaceBeforeCapitalPipe
   ],
   exports: [
     AssaysComponent,
@@ -153,6 +157,7 @@ import { ValidationReportSummaryComponent } from "./validations/validations-prot
     ValidationInfoModalComponent,
     RawViolationModalComponent,
     PrototypeDetailComponent,
+    ValidationSectionComponent
 
   ],
   providers: [

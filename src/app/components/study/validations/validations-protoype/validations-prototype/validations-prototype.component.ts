@@ -13,6 +13,7 @@ import {  Violation, Ws3ValidationReport } from '../interfaces/validation-report
 import { Select, Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
+import { validationReportInvestigationSubsectionList } from '../interfaces/validation-report.types';
 
 
 
@@ -51,6 +52,8 @@ export class ValidationsPrototypeComponent implements OnInit {
 
   checked: boolean = false;
   ready: boolean = true;
+
+  investigationSubsections = validationReportInvestigationSubsectionList
 
   ngOnInit(): void {
 

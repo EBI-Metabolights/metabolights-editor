@@ -16,6 +16,7 @@
 
         <mat-tab label="General">
             <br>
+            
             <div *ngIf="generalViolations.length > 0; else noViolations">
                 <div *ngFor="let violation of generalViolations; let i = index;">
                     <prototype-detail [violation]="violation"></prototype-detail>
@@ -26,13 +27,33 @@
         </mat-tab>
 
         <mat-tab label="Investigation File">
-            <br>
+            <!--<br>
+            <section>
+                <h3>Subsections</h3>
+                <div class="toggle-group-container">
+                  <mat-button-toggle-group
+                    name="subsections"
+                    aria-label="Subsections"
+                    [hideMultipleSelectionIndicator]="true"
+
+                    multiple
+                  >
+                    <mat-button-toggle *ngFor="let subsection of subsections" [value]="subsection">
+                      {{ subsection | addSpaceBeforeCapital }}
+                    </mat-button-toggle>
+                  </mat-button-toggle-group>
+                </div>
+              </section>
+              <br>
             <div *ngIf="investigationViolations.length > 0; else noViolations">
                 <div *ngFor="let violation of investigationViolations; let i = index;">
                     <prototype-detail [violation]="violation"></prototype-detail>
                     <br>
                 </div>
-            </div>
+            </div>-->
+            <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
+
+            </app-validation-section>
         </mat-tab>
 
         <mat-tab label="Samples">

@@ -63,4 +63,9 @@ export namespace NewValidationReport {
         static readonly type = '[validation] Set Validation Status'
         constructor(public status: ViolationType) {}
     }
+
+    export class SetLastRunTime {
+        static readonly type = '[validation] Set Last Validation Run Time'
+        constructor(public time: string) {}
+    }
 }

@@ -15,5 +15,25 @@ export type ValidationReportSamplesSubsection = "columns" | "rows" | "filename" 
 export type ValidationReportAssignmentSubsection = "general" | "lcms" | "nmr"
 export type ValidationReportFilesSubsection = "general"
 
+export type ValidationReportSubsection = 
+  | ValidationReportAssaySubsection
+  | ValidationReportInputSubsection
+  | ValidationReportInvestigationSubsection
+  | ValidationReportSamplesSubsection
+  | ValidationReportAssignmentSubsection
+  | ValidationReportFilesSubsection;
+
 export type ViolationType = "WARNING" | "ERROR" | "SUCCESS" | "INFO"
 export type ViolationPriority = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW"
+
+export const validationReportInvestigationSubsectionList: ValidationReportInvestigationSubsection[] = [
+  "ontologySourceReferences", 
+  "investigation", 
+  "studies", 
+  "studyDesignDescriptors", 
+  "studyPublications", 
+  "studyFactors", 
+  "studyAssays", 
+  "studyProtocols", 
+  "studyContacts"
+]
