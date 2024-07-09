@@ -69,10 +69,10 @@
               <div class="content">
                 <h2>Actions</h2> 
                 <mat-card-actions>
-                  <button mat-stroked-button color="primary" (click)="initNewTask()">
+                  <button mat-stroked-button color="primary" class="no-round" (click)="initNewTask()">
                     Start new validation task
                   </button>
-                  <button mat-stroked-button color="primary" (click)="getWs3Report()">
+                  <button mat-stroked-button color="primary" class="no-round" (click)="getWs3Report()">
                       Get new validation report
                   </button>
                   </mat-card-actions>
@@ -83,9 +83,7 @@
        <mat-divider></mat-divider>
     </mat-card-content>
     <mat-card-actions>
-      <!--
-      <button mat-button>LIKE</button>
-      <button mat-button>SHARE</button>-->
+
       Report UUID: <i>{{taskId}}</i>
     </mat-card-actions>
     <mat-card-footer>

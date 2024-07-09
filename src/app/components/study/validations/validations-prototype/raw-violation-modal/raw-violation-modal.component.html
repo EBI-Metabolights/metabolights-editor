@@ -3,9 +3,11 @@
 
         <div class="modal-card">
             <section class="modal-card-body">
-
-            {{ render() }}
+            <div class="json-content">
+                {{ render() | json | removeBackslashes}}
                 <br>
+
+            </div>
             <button (click)="close()" class="button is-info">
                 Close
             </button>

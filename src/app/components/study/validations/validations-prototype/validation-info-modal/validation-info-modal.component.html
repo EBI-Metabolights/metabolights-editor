@@ -3,15 +3,15 @@
 
     <div class="modal-card">
         <section class="modal-card-body">
-            The following files or folders were found to be in violation of {{violation.identifier}}
+            The following items were found to be in violation of {{violation.identifier}}
             <mat-list>
                 <mat-divider></mat-divider>
                 <div mat-subheader>Items in Violation</div>
-                <mat-list-item *ngFor="let value of violation.values">
+                <mat-list-item class="violation-item" *ngFor="let value of violation.values">
 
-                    <mat-icon mat-list-icon>note</mat-icon>
-                    <div mat-line>{{value}}</div>
-                    <div mat-line> some other info </div>
+                    <div mat-line><mat-icon>note</mat-icon>
+                        {{value}}</div>
+                    
                 </mat-list-item>
             </mat-list>
         </section>

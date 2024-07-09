@@ -66,6 +66,7 @@ import { AddSpaceBeforeCapitalPipe } from "./validations/validations-prototype/p
 import { ValidationSectionComponent } from "./validations/validations-prototype/validation-section/validation-section.component";
 import { HandleUnderscoreInReportPipe } from "./validations/validations-prototype/pipes/handle-underscore-in-report.pipe";
 import { NoViolationsComponent } from "./validations/validations-prototype/misc/no-violations/no-violations.component";
+import { RemoveBackslashesPipe } from "./validations/validations-prototype/pipes/remove-backslashes.pipe";
 
 @NgModule({
   declarations: [
@@ -131,7 +132,8 @@ import { NoViolationsComponent } from "./validations/validations-prototype/misc/
     MatCardModule,
     ValidationReportSummaryComponent,
     AddSpaceBeforeCapitalPipe,
-    HandleUnderscoreInReportPipe
+    HandleUnderscoreInReportPipe,
+    RemoveBackslashesPipe
   ],
   exports: [
     AssaysComponent,

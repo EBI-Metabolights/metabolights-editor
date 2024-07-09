@@ -50,7 +50,7 @@
             </span><b>{{ violation.type }}</b> </div>
           <div class="button-container sidebar-bottom"> 
     
-            <button (click)="openInfoModal()" class="button bc-item rounded-top-button is-dark"><mat-icon>info</mat-icon>&nbsp; Details</button>
+            <button *ngIf="violation.values.length > 0 " (click)="openInfoModal()" class="button bc-item rounded-top-button is-dark"><mat-icon>info</mat-icon>&nbsp; Details</button>
             <a   [href]="
             'mailto:metabolights-help@ebi.ac.uk?subject=Regarding validation rule - ' +
             violation.identifier
