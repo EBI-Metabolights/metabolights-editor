@@ -35,3 +35,18 @@ section {
   .selected-button {
     border: 1px dashed rgb(0, 211, 0);
   }
+
+  .no-violations-card {
+    margin-left: 25%;
+    width: 50%;
+}
+
+.no-violations-content {
+    padding-top: 10%;
+    padding-left: 40%;
+}
+
+.flask {
+  color: #4caf50;
+  transform: translateY(4px);
+}

@@ -15,85 +15,35 @@
         </mat-tab>
 
         <mat-tab label="General">
-            <br>
-            
-            <div *ngIf="generalViolations.length > 0; else noViolations">
-                <div *ngFor="let violation of generalViolations; let i = index;">
-                    <prototype-detail [violation]="violation"></prototype-detail>
-                    <br>
-                    <br>
-                </div>
-            </div>
+
+            <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
+            </app-validation-section> 
         </mat-tab>
 
         <mat-tab label="Investigation File">
-            <!--<br>
-            <section>
-                <h3>Subsections</h3>
-                <div class="toggle-group-container">
-                  <mat-button-toggle-group
-                    name="subsections"
-                    aria-label="Subsections"
-                    [hideMultipleSelectionIndicator]="true"
-
-                    multiple
-                  >
-                    <mat-button-toggle *ngFor="let subsection of subsections" [value]="subsection">
-                      {{ subsection | addSpaceBeforeCapital }}
-                    </mat-button-toggle>
-                  </mat-button-toggle-group>
-                </div>
-              </section>
-              <br>
-            <div *ngIf="investigationViolations.length > 0; else noViolations">
-                <div *ngFor="let violation of investigationViolations; let i = index;">
-                    <prototype-detail [violation]="violation"></prototype-detail>
-                    <br>
-                </div>
-            </div>-->
             <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
-
             </app-validation-section>
         </mat-tab>
 
         <mat-tab label="Samples">
-            <br>
-            <div *ngIf="sampleViolations.length > 0; else noViolations">
-                <div *ngFor="let violation of sampleViolations; let i = index;">
-                    <prototype-detail [violation]="violation"></prototype-detail>
-                    <br>
-                </div>
-            </div>
+
+            <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
+            </app-validation-section>
         </mat-tab>
 
         <mat-tab label="Assays">
-            <br>
-            <div *ngIf="assayViolations.length > 0; else noViolations">
-                <div *ngFor="let violation of assayViolations; let i = index;">
-                    <prototype-detail [violation]="violation"></prototype-detail>
-                    <br>
-            </div>
-            </div>
+            <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
+            </app-validation-section>
         </mat-tab>
 
         <mat-tab label="MAF">
-            <br>
-            <div *ngIf="assignmentViolations.length > 0; else noViolations">
-                <div *ngFor="let violation of assignmentViolations; let i = index;">
-                    <prototype-detail [violation]="violation"></prototype-detail>
-                    <br>
-            </div>
-            </div>
+            <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
+            </app-validation-section>
         </mat-tab>
 
         <mat-tab label="Files">
-            <br>
-            <div *ngIf="filesViolations.length > 0; else noViolations">
-                <div *ngFor="let violation of filesViolations; let i = index;">
-                    <prototype-detail [violation]="violation"></prototype-detail>
-                    <br>
-            </div>
-            </div>
+            <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
+            </app-validation-section>
         </mat-tab>
     </mat-tab-group>
 
@@ -113,17 +63,7 @@
 
 <!--No violations found template-->
 <ng-template #noViolations>
-    <mat-card class="no-violations-card">
-        <!--<img src="{{ baseHref }}assets/img/MetaboLightsLogo.png" class="ml-logo"/><br />-->
-
-        <div class="no-violations-content">
-            <span class="material-symbols-outlined flask">
-                experiment
-                </span> No Violations
-        </div>
-        <br>
-
-    </mat-card>
+    <app-no-violations></app-no-violations>
 <br>
 </ng-template>
 

@@ -48,3 +48,7 @@
     line-height: 24px; /* Adjust line height to reduce overall height */
     min-height: 24px; /* Ensure the button doesn't become too small */
 }
+
+.no-round {
+    border-radius: 0 !important;
+  }

@@ -13,7 +13,7 @@ import {  Violation, Ws3ValidationReport } from '../interfaces/validation-report
 import { Select, Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
-import { validationReportInvestigationSubsectionList } from '../interfaces/validation-report.types';
+import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList} from '../interfaces/validation-report.types';
 
 
 
@@ -53,7 +53,12 @@ export class ValidationsPrototypeComponent implements OnInit {
   checked: boolean = false;
   ready: boolean = true;
 
-  investigationSubsections = validationReportInvestigationSubsectionList
+  investigationSubsections = validationReportInvestigationSubsectionList;
+  samplesSubsections = validationReportSamplesSubsectionList;
+  assaySubsections = validationReportAssaySubsectionList;
+  assignmentSubsections = validationReportAssignmentSubsectionList;
+  filesSubsections = validationReportFilesSubsectionList;
+  generalSubsections = validationReportInputSubsectionList;
 
   ngOnInit(): void {
 

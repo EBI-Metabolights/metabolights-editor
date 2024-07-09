@@ -2,7 +2,11 @@
 <section class="container">
     <br>
     <div class="toggle-group-container">
-        <h3><b>Subsections</b></h3>
+        <h3><b>Subsections</b><mat-icon 
+          matTooltip="All sections are enabled by default."
+          [matTooltipPosition]="'right'"
+          matTooltipHideDelay="100000"
+          aria-label="Button that displays a tooltip that hides when scrolled out of the container">help</mat-icon></h3>
         <br>
 
       <mat-button-toggle-group
@@ -17,14 +21,18 @@
         [value]="subsection"
         [class.selected-button]="selectedSubsections.includes(subsection)"
         >
-          {{ subsection | addSpaceBeforeCapital }}
+          {{ subsection | addSpaceBeforeCapital | handleUnderscoreInReport }}
         </mat-button-toggle>
       </mat-button-toggle-group>
 
 
       </div>
       <div class="toggle-group-container">
-        <h3><b>Violation Types</b></h3>
+        <h3><b>Violation Types</b><mat-icon
+          matTooltip="Errors and Warnings both render by default. You do not need to clear warnings in order to pass validation, but it is advised."
+          [matTooltipPosition]="'right'"
+          matTooltipHideDelay="100000"
+          aria-label="Button that displays a tooltip that hides when scrolled out of the container">help</mat-icon></h3>
 
         <mat-button-toggle-group
         name="violation-type"
@@ -61,16 +69,6 @@
 
 <!--No violations found template-->
 <ng-template #noViolations>
-    <mat-card class="no-violations-card">
-        <!--<img src="{{ baseHref }}assets/img/MetaboLightsLogo.png" class="ml-logo"/><br />-->
-
-        <div class="no-violations-content">
-            <span class="material-symbols-outlined flask">
-                experiment
-                </span> No Violations
-        </div>
-        <br>
-
-    </mat-card>
-<br>
+  <app-no-violations></app-no-violations>
+  <br>
 </ng-template>
