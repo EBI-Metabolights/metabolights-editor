@@ -55,17 +55,17 @@ import { EuropePMCService } from "src/app/services/publications/europePMC.servic
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.pipe";
 import { RsyncComponent } from './files/rsync/rsync.component';
-import { ValidationStatusTransformPipe } from "./validations/validations-protoype/pipes/validation-status-transform.pipe";
-import { ValidationsPrototypeComponent } from "./validations/validations-protoype/validations-prototype/validations-prototype.component";
-import { ValidationInfoModalComponent } from "./validations/validations-protoype/validation-info-modal/validation-info-modal.component";
-import { RawViolationModalComponent } from "./validations/validations-protoype/raw-violation-modal/raw-violation-modal.component";
-import { PrototypeDetailComponent } from "./validations/validations-protoype/prototype-detail/prototype-detail.component";
+import { ValidationStatusTransformPipe } from "./validations/validations-prototype/pipes/validation-status-transform.pipe";
+import { ValidationsPrototypeComponent } from "./validations/validations-prototype/validations-prototype/validations-prototype.component";
+import { ValidationInfoModalComponent } from "./validations/validations-prototype/validation-info-modal/validation-info-modal.component";
+import { RawViolationModalComponent } from "./validations/validations-prototype/raw-violation-modal/raw-violation-modal.component";
+import { PrototypeDetailComponent } from "./validations/validations-prototype/prototype-detail/prototype-detail.component";
 import { BrowserModule } from "@angular/platform-browser";
-import { ValidationReportSummaryComponent } from "./validations/validations-protoype/validation-report-summary/validation-report-summary.component";
-import { AddSpaceBeforeCapitalPipe } from "./validations/validations-protoype/pipes/add-space-before-capital.pipe";
-import { ValidationSectionComponent } from "./validations/validations-protoype/validation-section/validation-section.component";
-import { HandleUnderscoreInReportPipe } from "./validations/validations-protoype/pipes/handle-underscore-in-report.pipe";
-import { NoViolationsComponent } from "./validations/validations-protoype/misc/no-violations/no-violations.component";
+import { ValidationReportSummaryComponent } from "./validations/validations-prototype/validation-report-summary/validation-report-summary.component";
+import { AddSpaceBeforeCapitalPipe } from "./validations/validations-prototype/pipes/add-space-before-capital.pipe";
+import { ValidationSectionComponent } from "./validations/validations-prototype/validation-section/validation-section.component";
+import { HandleUnderscoreInReportPipe } from "./validations/validations-prototype/pipes/handle-underscore-in-report.pipe";
+import { NoViolationsComponent } from "./validations/validations-prototype/misc/no-violations/no-violations.component";
 
 @NgModule({
   declarations: [

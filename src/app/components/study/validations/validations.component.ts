@@ -3,7 +3,7 @@ import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { ConfigurationService } from "src/app/configuration.service";
 import { IValidationSummary, IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
-import { ValidationStatusTransformPipe } from "./validations-protoype/pipes/validation-status-transform.pipe";
+import { ValidationStatusTransformPipe } from "./validations-prototype/pipes/validation-status-transform.pipe";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select, Store } from "@ngxs/store";

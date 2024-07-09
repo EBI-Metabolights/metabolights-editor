@@ -1,5 +1,5 @@
-import { Ws3ValidationReport } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.interface"
-import { ViolationType } from "src/app/components/study/validations/validations-protoype/interfaces/validation-report.types"
+import { Ws3ValidationReport } from "src/app/components/study/validations/validations-prototype/interfaces/validation-report.interface"
+import { ViolationType } from "src/app/components/study/validations/validations-prototype/interfaces/validation-report.types"
 
 export namespace EditorValidationRules {
     export class Get {
