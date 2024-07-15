@@ -14,6 +14,7 @@ import { Select, Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList} from '../interfaces/validation-report.types';
+import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 
 
 
@@ -35,6 +36,7 @@ export class ValidationsPrototypeComponent implements OnInit {
   @Select(ValidationState.newReportViolations('files')) filesViolations$: Observable<Violation[]>;
 
   @Select(GeneralMetadataState.id) studyId$: Observable<string>;
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
 
   constructor(private store: Store) { }
 
@@ -50,6 +52,8 @@ export class ValidationsPrototypeComponent implements OnInit {
 
   studyId: string =  null
 
+  isCurator: boolean = false;
+
   checked: boolean = false;
   ready: boolean = true;
 
@@ -61,6 +65,11 @@ export class ValidationsPrototypeComponent implements OnInit {
   generalSubsections = validationReportInputSubsectionList;
 
   ngOnInit(): void {
+
+    this.isCurator$.subscribe(value => {
+      this.isCurator = value;
+      }
+    )
 
     this.newReport$.subscribe(value => {
       console.log(value === null)

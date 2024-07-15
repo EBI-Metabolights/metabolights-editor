@@ -121,7 +121,7 @@
 .violation-footer {
     grid-column: 1 / 3;
     grid-row: 4 / 4;
-    border-top: 1px solid #2f2f2f;
+    border-top: 2px solid #2f2f2f;
     width: 100%;
     padding-left: 1%;
 
@@ -129,8 +129,19 @@
 
 .violation-footer-item {
     height: 100%;
-    border-right: 1px solid #2f2f2f
+    border-right: 2px solid #2f2f2f
 }
+
+.icon-container {
+    display: inline-block; /* Ensure the container takes only as much space as needed */
+    padding: 5px; /* Optional padding for better visuals */
+    cursor: pointer; /* Change cursor to pointer */
+    transition: background-color 0.3s ease; /* Smooth transition for background color change */
+  }
+
+  .icon-container:hover {
+    background-color: #e0e0e0; /* Change to desired hover background color */
+  }
 
 .type {
     font-family: Arial, Helvetica, sans-serif;

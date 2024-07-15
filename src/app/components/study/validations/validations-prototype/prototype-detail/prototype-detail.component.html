@@ -55,7 +55,7 @@
             'mailto:metabolights-help@ebi.ac.uk?subject=Regarding validation rule - ' +
             violation.identifier
           " class="button bc-item is-dark"><mat-icon>mail</mat-icon>&nbsp; Contact</a>
-            <button class="button bc-item rounded-bottom-button is-dark" (click)="openRawModal()"><mat-icon>visibility</mat-icon>&nbsp; View Raw</button>
+            <button *ngIf="isCurator" class="button bc-item rounded-bottom-button is-dark" (click)="openRawModal()"><mat-icon>visibility</mat-icon>&nbsp; View Raw</button>
             <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
                 sword_rose
                 </span> &nbsp; Override</button>
@@ -75,9 +75,17 @@
     </div>
     <div class="violation-footer">
         <div class="footer-container">
-            <div class="violation-footer-item footer-container-1"><small> ID: <i>{{ violation.identifier}}</i> </small></div>
-            <div class="violation-footer-item footer-container-2"><small>Timestamp:<i> December 25th, 9999, 00:00:00 UTC</i></small></div>
-            <div class="footer-container-3">        <small>Report Hash ID: <i>4e9a2bef74a8e-9c1a3b2c34d5f6a7b8c</i></small></div>
+            <div class="violation-footer-item footer-container-1">
+                <small> <b>Rule ID:</b> {{ violation.identifier}} </small>
+                    <div (click)="copyToClipboard(violation.identifier)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
+            </div>
+            <div class="violation-footer-item footer-container-2">
+                <small><b>Section:</b> {{violation.section }}</small>
+                    <div (click)="copyToClipboard(violation.section)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
+            </div>
+            <div class="footer-container-3">        
+                <small><b>Report Hash ID:</b> 4e9a2bef74a8e-9c1a3b2c34d5f6a7b8c</small>
+            </div>
         </div>
     </div>
 </div>
