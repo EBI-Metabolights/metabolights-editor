@@ -264,7 +264,13 @@
         mat-header-row
         *matHeaderRowDef="displayedTableColumns"
       ></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedTableColumns"></tr>
+
+      <tr mat-row 
+      *matRowDef="let row; columns: displayedTableColumns"
+      [ngClass]="{
+        'first-row': isFirstRow(row) && templateRowPresent, 
+        'unclickable': isFirstRow(row) && templateRowPresent
+      }"></tr>
     </table>
   </div>
   <div class="wrapper mat-elevation-z1">

@@ -38,6 +38,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
   @Input("tableData") tableData: any;
+  @Input("templateRowPresent") templateRowPresent: boolean = false;
   @Input("validationsId") validationsId: any;
 
   @ViewChildren(OntologyComponent)
@@ -140,6 +141,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         this.isReadOnly = value;
       }
     });
+  }
+
+  isFirstRow(row: any): boolean {
+    return this.dataSource.data.indexOf(row) === 0;
   }
 
   getFiles(header) {

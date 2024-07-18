@@ -17,6 +17,7 @@
           [fileTypes]="fileTypes"
           (rowsUpdated)="validateAssaySheet()"
           [tableData]="assay"
+          [templateRowPresent]="templateRow !== null"
           validationsId="assays"
         ></mtbls-table>
       </span>

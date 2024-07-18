@@ -230,3 +230,13 @@ a.dropdown-item {
 .button.is-light {
   border-radius: 2px;
 }
+
+.first-row {
+  background-color: rgba(194, 242, 251, 0.481); /* Example formatting */
+  font-weight: bold;
+  font-style: italic;
+}
+
+.unclickable {
+  pointer-events: none;
+}

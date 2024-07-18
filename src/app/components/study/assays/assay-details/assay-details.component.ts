@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { environment } from "src/environments/environment";
+import { RowTemplateService } from "src/app/services/row-template.service";
 
 @Component({
   selector: "assay-details",
@@ -44,7 +45,9 @@ export class AssayDetailsComponent implements OnInit {
   existingSampleNamesInAssay: any = [];
   duplicateSampleNamesInAssay: any = [];
 
-  constructor(private editorService: EditorService) {
+  templateRow = null;
+
+  constructor(private editorService: EditorService, private rowTemplateService: RowTemplateService) {
     if (!environment.isTesting) {
       this.setUpConstructorSubscription();
     }
@@ -54,13 +57,32 @@ export class AssayDetailsComponent implements OnInit {
     this.readonly.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
+
       }
     });
   }
 
+  insertTemplateRow() {
+    this.assay.data.rows.unshift(this.templateRow);
+    for (let i = 1; i < this.assay.data.rows.length; i++) {
+      this.assay.data.rows[i].index += 1;
+    }
+  }
+
   setUpOnInitSubscriptions() {
+
     this.assays.subscribe((value) => {
       this.assay = value[this.assayName];
+      if (!this.isReadOnly) {
+        this.rowTemplateService.getTemplateRow(this.assayName).subscribe((tempObj) => {
+          if (tempObj !== null) {
+            this.templateRow = tempObj;
+            this.insertTemplateRow();
+          }
+          console.log(this.templateRow);
+        });
+      }
+
     });
     this.studySamples.subscribe((value) => {
       if (value.data) {
