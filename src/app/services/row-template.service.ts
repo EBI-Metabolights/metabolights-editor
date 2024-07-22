@@ -27,7 +27,7 @@ export class RowTemplateService {
     }
 
     getTemplateByAssayFilename(filename: string): AssayTemplateRow {
-        //if (filename.indexOf("NMR") > -1) return "NMR"
+        if (filename.indexOf("NMR") > -1) return "NMR"
         if (filename.indexOf("LC-MS") > -1) return "LC-MS"
         if (filename.indexOf("GC-MS") > -1) return "GC-MS"
         if (filename.indexOf("DI-MS") > -1) return "DI-MS"

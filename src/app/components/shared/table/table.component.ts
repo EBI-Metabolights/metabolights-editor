@@ -449,7 +449,15 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
       this.ontologyCols[column].missingValues = false;
       this.ontologyCols[column].values = {};
+
+      let isFirstRow = true
       this.data.rows.forEach((row) => {
+        // We don't want the template rows example values to be flagged up as missing associated ontologies.
+        if (this.templateRowPresent && isFirstRow) {
+          isFirstRow = false;
+          return;
+        }
+
         if (
           !this.isEmpty(row[column]) &&
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||

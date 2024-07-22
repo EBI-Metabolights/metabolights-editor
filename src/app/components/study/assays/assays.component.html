@@ -22,14 +22,21 @@
           </ul>
         </div>
       </div>
-      <span *ngFor="let assay of assays; let i = index">
-        <span *ngIf="currentSubIndex == i">
-          <assay-details
-            (assayDelete)="assayDeleted($event)"
-            [assayName]="assay.name"
-          ></assay-details>
+      <div *ngIf="assaysPrepared; else loadingBlock">
+
+        <span   *ngFor="let assay of assays; let i = index">
+          <span *ngIf="currentSubIndex == i">
+            <assay-details
+              (assayDelete)="assayDeleted($event)"
+              [assayName]="assay.name"
+              [assay]="assay"
+              [rowTemplatePresent]="rowTemplatesPrepared"
+            ></assay-details>
+          </span>
         </span>
-      </span>
+
+      </div>
+
     </div>
     <span>
       <div>&nbsp;</div>
@@ -40,6 +47,16 @@
     <div>&nbsp;</div>
     <div class="has-text-centered">
       <p>No Assays Found</p>
+      <add-assay></add-assay>
+    </div>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+  </ng-template>
+  <ng-template #loadingBlock>
+    <div>&nbsp;</div>
+    <div>&nbsp;</div>
+    <div class="has-text-centered">
+      <p>Loading Assays</p>
       <add-assay></add-assay>
     </div>
     <div>&nbsp;</div>

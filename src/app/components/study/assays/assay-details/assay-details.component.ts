@@ -5,6 +5,7 @@ import {
   Output,
   ViewChild,
   EventEmitter,
+  OnDestroy,
 } from "@angular/core";
 import { select } from "@angular-redux/store";
 import Swal from "sweetalert2";
@@ -12,14 +13,17 @@ import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { environment } from "src/environments/environment";
 import { RowTemplateService } from "src/app/services/row-template.service";
+import { take } from "rxjs/operators";
 
 @Component({
   selector: "assay-details",
   templateUrl: "./assay-details.component.html",
   styleUrls: ["./assay-details.component.css"],
 })
-export class AssayDetailsComponent implements OnInit {
+export class AssayDetailsComponent implements OnInit, OnDestroy {
   @Input("assayName") assayName: any;
+  @Input("rowTemplatePresent") rowTemplatePresent: boolean = false;
+  @Input("assay") inputassay: Record<string, any>;
   @select((state) => state.study.assays) assays;
   @select((state) => state.study.samples) studySamples;
   @ViewChild(TableComponent) assayTable: TableComponent;
@@ -46,6 +50,7 @@ export class AssayDetailsComponent implements OnInit {
   duplicateSampleNamesInAssay: any = [];
 
   templateRow = null;
+  templateRowInserted: boolean = false;
 
   constructor(private editorService: EditorService, private rowTemplateService: RowTemplateService) {
     if (!environment.isTesting) {
@@ -70,17 +75,21 @@ export class AssayDetailsComponent implements OnInit {
   }
 
   setUpOnInitSubscriptions() {
+    console.log(this.inputassay);
 
     this.assays.subscribe((value) => {
       this.assay = value[this.assayName];
       if (!this.isReadOnly) {
-        this.rowTemplateService.getTemplateRow(this.assayName).subscribe((tempObj) => {
+        /** 
+        this.rowTemplateService.getTemplateRow(this.assayName).pipe(
+          take(1)
+        ).subscribe((tempObj) => {
           if (tempObj !== null) {
             this.templateRow = tempObj;
             this.insertTemplateRow();
           }
           console.log(this.templateRow);
-        });
+        });*/
       }
 
     });
@@ -96,6 +105,16 @@ export class AssayDetailsComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpOnInitSubscriptions();
     }
+  }
+
+  ngOnDestroy() {
+    /**if (this.assay) {
+      this.assay.data.rows.shift();
+      for (let i = 0; i < this.assay.data.rows.length; i++) {
+        this.assay.data.rows[i].index -= 1;
+      }
+    }*/
+
   }
 
   onSamplesFilterKeydown(event, filterValue: string) {
