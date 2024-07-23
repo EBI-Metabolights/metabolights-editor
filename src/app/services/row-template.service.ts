@@ -12,6 +12,8 @@ export type AssayTemplateRow = "GC-MS" | "LC-MS" | "NMR" | "DI-MS"
 export class RowTemplateService {
     public baseHref: string;
     public templatePath: string;
+    private insertionCounter: number = 0;
+    private assaySheetsWithTemplateRowsPrepared: Array<string> = [];
 
 
     constructor(private http: HttpClient, private configService: ConfigurationService, private platformLocation: PlatformLocation) {
@@ -32,6 +34,22 @@ export class RowTemplateService {
         if (filename.indexOf("GC-MS") > -1) return "GC-MS"
         if (filename.indexOf("DI-MS") > -1) return "DI-MS"
         return null
+    }
+
+    incrementTemplateInsertionCounter(): void {
+        this.insertionCounter += 1;
+    }
+
+    markAsPrepared(assay: string): void {
+        this.assaySheetsWithTemplateRowsPrepared.push(assay);
+    }
+
+    get templateCounter() {
+        return this.insertionCounter;
+    }
+
+    get preparedAssays() {
+        return this.assaySheetsWithTemplateRowsPrepared;
     }
 
     

@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, platformCore } from "@angular/core";
+import { Component, Output, EventEmitter, platformCore, OnDestroy } from "@angular/core";
 import { select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { RowTemplateService } from "src/app/services/row-template.service";
@@ -52,8 +52,23 @@ export class AssaysComponent {
     }
   }
 
+
   setUpSubscriptions() {
     const assaysLoadedSubject = new Subject();
+    assaysLoadedSubject.subscribe(
+      (value) => {
+        console.debug(`assay subject marked ${value}`)
+      }
+    );
+
+    combineLatest([assaysLoadedSubject, this.readonly]).subscribe(([studyAssaysValue, readonlyValue]) => {
+      console.debug(`in combine latest block`)
+      if (!this.isReadOnly) {
+        this.initializeTemplatePreparation();
+      } else {
+        this.assaysPrepared = true;
+      }
+    });
     
     // Regular subscription to assayFiles
     this.assayFiles.subscribe((assayfiles) => {
@@ -66,12 +81,7 @@ export class AssaysComponent {
     });
   
     this.studyAssays.subscribe((value) => {
-      //console.log(`studyAssays subscription value: ${JSON.stringify(value)}`)
-      console.log(`length of studyAssayFiles: ${this.studyAssayFiles}`);
-      console.log(`type of studyAssayFiles: ${typeof(this.studyAssayFiles)}`)
-      console.log(`keys value: ${Object.keys(value)}`)
       if (this.studyAssayFiles && Object.keys(value).length === Object.keys(this.studyAssayFiles).length) {
-        console.log('we did it papa')
         let i = 0;
         this.studyAssayFiles.forEach((assayFileName) => {
           const assayName = assayFileName.filename.trim();
@@ -88,23 +98,13 @@ export class AssaysComponent {
     this.readonly.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
-        if (!this.isReadOnly) {}
       }
     });
-    assaysLoadedSubject.subscribe((value) => console.log(value));
+
   
     // Combined subscription to execute once both studyAssays and readonly have emitted
     
-    combineLatest([assaysLoadedSubject, this.readonly]).pipe(
-      take(1)
-    ).subscribe(([studyAssaysValue, readonlyValue]) => {
-      if (!this.isReadOnly) {
-        console.log('we should be entering this !isReadonly block')
-        this.initializeTemplatePreparation();
-      } else {
-        this.assaysPrepared = true;
-      }
-    });
+
   }
 
   // Method to get templates
@@ -135,75 +135,42 @@ getTemplates(): Observable<any> {
 
 // Method to prepare template rows in assays
 prepareTemplateRowsInAssays() {
-  //this.assaysPrepared = false;
-  console.log(`here are assayNames ${this.assaysNames}`)
   this.assaysNames.forEach((assayName) => {
-    console.log('in assayNames callback')
-    const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
-    if (Object.keys(this.templateRows[attr]).length !== 0) {
-      const index = this.assays.findIndex(assay => assay.name === assayName);
-      if (index !== -1) {
-        this.assays[index].data.rows.unshift(this.templateRows[attr]);
-        for (let i = 1; i < this.assays[index].data.rows.length; i++) {
-          this.assays[index].data.rows[i].index += 1;
+    if (!this.rowTemplateService.preparedAssays.includes(assayName)) {
+      const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
+      if (Object.keys(this.templateRows[attr]).length !== 0) {
+        const index = this.assays.findIndex(assay => assay.name === assayName);
+        if (index !== -1) {
+          this.assays[index].data.rows.unshift(this.templateRows[attr]);
+          this.rowTemplateService.markAsPrepared(assayName);
+          for (let i = 1; i < this.assays[index].data.rows.length; i++) {
+            this.assays[index].data.rows[i].index += 1;
+          }
         }
+  
+      } else {
+        console.warn(`Expected template row not found for ${attr}`);
       }
-
-
-    } else {
-      console.warn(`Expected template row not found for ${attr}`);
+      // previously flags were set here
     }
-    this.assaysPrepared = true;
-    this.rowTemplatesPrepared = true;
   });
+  this.assaysPrepared = true;
+  this.rowTemplatesPrepared = true;
 }
 
 // Method to initialize and ensure the correct order of operations
 initializeTemplatePreparation() {
   this.getTemplates().subscribe(
     () => {
-      console.log('Templates retrieved.');
+      console.debug('Templates retrieved.');
       this.prepareTemplateRowsInAssays();
-      console.log('Templates prepared and rows are ready.');
-      console.log(this.assays);
+      console.debug('Templates prepared and rows are ready.');
     },
     (error) => {
       console.error('Error during template preparation:', error);
     }
   );
 }
-  /** 
-  getTemplates() {
-    this.assaysNames.forEach((assayName) => {
-      const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
-      if (Object.keys(this.templateRows[attr]).length !== 0) return
-
-      this.rowTemplateService.getTemplateRow(assayName).pipe(
-        take(1)
-      ).subscribe((template) => {
-        if (template !== null) {
-          this.templateRows[attr] = template;
-        }
-      })
-    });
-    console.log(this.templateRows);
-  }
-
-  prepareTemplateRowsInAssays() {
-    this.assaysPrepared = false;
-    this.assaysNames.forEach((assayName) => {
-      const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
-      if (Object.keys(this.templateRows[attr]).length !== 0) {
-        this.assays[assayName].data.rows.unshift(this.templateRows[attr]);
-        for (let i = 1; i < this.assays[assayName].data.rows.length; i++) {
-          this.assays[assayName].data.rows[i].index += 1;
-        }
-      } else {
-        console.warn(`Expected template row not found for ${attr}`);
-      }
-      this.assaysPrepared = true;
-    })
-  }*/
 
   assayDeleted(name) {
     let i = 0;

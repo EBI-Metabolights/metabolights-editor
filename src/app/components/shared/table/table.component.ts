@@ -600,6 +600,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   addNRows() {
     if (this.rowsToAdd > 0) {
       let index = this.data.rows.length;
+      if (this.templateRowPresent) {
+        index -= 1;
+      }
       if (this.selectedRows.length > 0) {
         index = this.selectedRows[0] + 1;
       }
@@ -667,7 +670,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getEmptyRow() {
     if (this.data.rows.length > 0) {
-      const obj = tassign({}, this.data.rows[0]);
+      let index = 0;
+      if (this.templateRowPresent) index = 1
+      const obj = tassign({}, this.data.rows[index]);
       Object.keys(obj).forEach((key) => {
         let isStableColumn = false;
         this.stableColumns.forEach((col) => {
@@ -690,10 +695,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   deleteSelectedRows() {
+    const rowIds = this.getUnique(this.selectedRows).join(",")
     this.editorService
       .deleteRows(
         this.data.file,
-        this.getUnique(this.selectedRows).join(","),
+        rowIds,
         this.validationsId,
         null
       )
@@ -1223,7 +1229,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   getUnique(arr) {
-    return arr.filter((value, index, array) => array.indexOf(value) === index);
+    const uniqueArr = arr.filter((value, index, array) => array.indexOf(value) === index);
+    if (this.templateRowPresent) {
+      return uniqueArr.map(value => value - 1);
+    }
+    return uniqueArr;
   }
 
   getKeys(object) {

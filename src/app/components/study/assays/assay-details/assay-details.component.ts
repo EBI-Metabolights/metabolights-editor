@@ -20,7 +20,7 @@ import { take } from "rxjs/operators";
   templateUrl: "./assay-details.component.html",
   styleUrls: ["./assay-details.component.css"],
 })
-export class AssayDetailsComponent implements OnInit, OnDestroy {
+export class AssayDetailsComponent implements OnInit {
   @Input("assayName") assayName: any;
   @Input("rowTemplatePresent") rowTemplatePresent: boolean = false;
   @Input("assay") inputassay: Record<string, any>;
@@ -79,18 +79,7 @@ export class AssayDetailsComponent implements OnInit, OnDestroy {
 
     this.assays.subscribe((value) => {
       this.assay = value[this.assayName];
-      if (!this.isReadOnly) {
-        /** 
-        this.rowTemplateService.getTemplateRow(this.assayName).pipe(
-          take(1)
-        ).subscribe((tempObj) => {
-          if (tempObj !== null) {
-            this.templateRow = tempObj;
-            this.insertTemplateRow();
-          }
-          console.log(this.templateRow);
-        });*/
-      }
+
 
     });
     this.studySamples.subscribe((value) => {
@@ -107,15 +96,6 @@ export class AssayDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    /**if (this.assay) {
-      this.assay.data.rows.shift();
-      for (let i = 0; i < this.assay.data.rows.length; i++) {
-        this.assay.data.rows[i].index -= 1;
-      }
-    }*/
-
-  }
 
   onSamplesFilterKeydown(event, filterValue: string) {
     if (event.key === "Enter") {
@@ -157,6 +137,7 @@ export class AssayDetailsComponent implements OnInit, OnDestroy {
 
   validateAssaySheet() {
     this.editorService.validateMAF(this.assayName).subscribe((data) => {
+      window.location.reload();
       console.log("MAF updated");
     });
   }

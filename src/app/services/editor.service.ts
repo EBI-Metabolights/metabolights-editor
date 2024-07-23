@@ -1021,7 +1021,9 @@ export class EditorService {
         const assertedRow = row["Metabolite Assignment File"] as string;
         const mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g, "");
         if (mafFile !== "" && mafFiles.indexOf(mafFile) < 0) {
-          mafFiles.push(mafFile);
+          if (!mafFile.startsWith("i.e. 'm_MTBLS1")) { // if it is a template value
+            mafFiles.push(mafFile);
+          }
         }
       });
       mafFiles.forEach((f) => {
