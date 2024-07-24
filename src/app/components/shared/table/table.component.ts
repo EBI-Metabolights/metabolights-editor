@@ -26,6 +26,7 @@ import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { environment } from "src/environments/environment";
+import { RowTemplateService } from "src/app/services/row-template.service";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -116,7 +117,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private rowTemplateService: RowTemplateService
   ) {
     this.baseHref =this.editorService.configService.baseHref;
   }
@@ -601,7 +603,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.rowsToAdd > 0) {
       let index = this.data.rows.length;
       if (this.templateRowPresent) {
-        index -= 1;
+        //index -= 1;
       }
       if (this.selectedRows.length > 0) {
         index = this.selectedRows[0] + 1;
@@ -625,6 +627,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   updateRows(rows) {
+    // if it is an assay
+    if (this.templateRowPresent) {
+      this.rowTemplateService.markAsRecentlyEdited(this.data.file)
+    }
     this.editorService
       .updateRows(this.data.file, { data: rows }, this.validationsId, null)
       .subscribe(
@@ -642,6 +648,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   addRows(rows, index) {
+    if (this.templateRowPresent) {
+      this.rowTemplateService.markAsRecentlyEdited(this.data.file)
+    }
     this.editorService
       .addRows(
         this.data.file,
@@ -959,6 +968,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       ];
     }
 
+    if (this.templateRowPresent) this.rowTemplateService.markAsRecentlyEdited(this.data.file);
     this.editorService
       .updateCells(
         this.data.file,
@@ -1231,7 +1241,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   getUnique(arr) {
     const uniqueArr = arr.filter((value, index, array) => array.indexOf(value) === index);
     if (this.templateRowPresent) {
-      return uniqueArr.map(value => value - 1);
+      //return uniqueArr.map(value => value - 1);
     }
     return uniqueArr;
   }

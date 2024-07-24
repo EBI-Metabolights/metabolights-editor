@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, platformCore, OnDestroy } from "@angular/core";
+import { Component, Output, EventEmitter, platformCore, OnDestroy, ChangeDetectorRef } from "@angular/core";
 import { select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { RowTemplateService } from "src/app/services/row-template.service";
@@ -46,7 +46,7 @@ export class AssaysComponent {
   rowTemplatesPrepared: boolean = false;
 
 
-  constructor(private rowTemplateService: RowTemplateService) {
+  constructor(private rowTemplateService: RowTemplateService, private cdr: ChangeDetectorRef) {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
@@ -82,10 +82,11 @@ export class AssaysComponent {
   
     this.studyAssays.subscribe((value) => {
       if (this.studyAssayFiles && Object.keys(value).length === Object.keys(this.studyAssayFiles).length) {
+        console.log('got both assay files')
         let i = 0;
         this.studyAssayFiles.forEach((assayFileName) => {
           const assayName = assayFileName.filename.trim();
-          if (this.assaysNames.indexOf(assayName) === -1 && value[assayName]) {
+          if (/**this.assaysNames.indexOf(assayName) === -1 &&*/ value[assayName]) {
             this.assays[i] = value[assayName];
             this.assaysNames.push(assayName);
           }
@@ -136,16 +137,22 @@ getTemplates(): Observable<any> {
 // Method to prepare template rows in assays
 prepareTemplateRowsInAssays() {
   this.assaysNames.forEach((assayName) => {
-    if (!this.rowTemplateService.preparedAssays.includes(assayName)) {
+    if (this.rowTemplateShouldBeInserted(assayName)) {
+      this.assaysPrepared = false;
       const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
       if (Object.keys(this.templateRows[attr]).length !== 0) {
         const index = this.assays.findIndex(assay => assay.name === assayName);
         if (index !== -1) {
-          this.assays[index].data.rows.unshift(this.templateRows[attr]);
-          this.rowTemplateService.markAsPrepared(assayName);
-          for (let i = 1; i < this.assays[index].data.rows.length; i++) {
-            this.assays[index].data.rows[i].index += 1;
-          }
+          if (this.assays[index].data.rows[0].index !== -1) {
+            this.assays[index].data.rows.unshift(this.templateRows[attr]);
+            this.rowTemplateService.markAsPrepared(assayName);
+            for (let i = 1; i < this.assays[index].data.rows.length; i++) {
+              this.assays[index].data.rows[i].index += 0;
+            }
+            console.log(`assay ${assayName} looks like ${this.assays[index].data.rows[0].index}`)
+            this.cdr.detectChanges();
+          } else { this.cdr.detectChanges();}
+
         }
   
       } else {
@@ -156,6 +163,18 @@ prepareTemplateRowsInAssays() {
   });
   this.assaysPrepared = true;
   this.rowTemplatesPrepared = true;
+}
+
+rowTemplateShouldBeInserted(assayName: string): boolean {
+  if (this.rowTemplateService.recentlyEdited.includes(assayName)) {
+    console.debug(`we should be in here for ${assayName}`)
+    this.rowTemplateService.removeAsRecentlyEdited(assayName);
+    return true 
+  }
+  if (this.rowTemplateService.preparedAssays.includes(assayName)) {
+    return false
+  }
+  return true;
 }
 
 // Method to initialize and ensure the correct order of operations

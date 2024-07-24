@@ -14,6 +14,7 @@ export class RowTemplateService {
     public templatePath: string;
     private insertionCounter: number = 0;
     private assaySheetsWithTemplateRowsPrepared: Array<string> = [];
+    private assaySheetsRecentlyEdited: Array<string> = [];
 
 
     constructor(private http: HttpClient, private configService: ConfigurationService, private platformLocation: PlatformLocation) {
@@ -44,12 +45,27 @@ export class RowTemplateService {
         this.assaySheetsWithTemplateRowsPrepared.push(assay);
     }
 
+    markAsRecentlyEdited(assay: string): void {
+        this.assaySheetsRecentlyEdited.push(assay)
+    }
+
+    removeAsRecentlyEdited(assay: string): void {
+        let index;
+        while ((index = this.assaySheetsRecentlyEdited.indexOf(assay)) !== -1) {
+            this.assaySheetsRecentlyEdited.splice(index, 1);
+        }
+    }
+
     get templateCounter() {
         return this.insertionCounter;
     }
 
     get preparedAssays() {
         return this.assaySheetsWithTemplateRowsPrepared;
+    }
+
+    get recentlyEdited() {
+        return this.assaySheetsRecentlyEdited;
     }
 
     

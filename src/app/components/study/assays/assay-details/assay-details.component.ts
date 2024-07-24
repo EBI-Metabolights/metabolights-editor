@@ -6,6 +6,8 @@ import {
   ViewChild,
   EventEmitter,
   OnDestroy,
+  OnChanges,
+  SimpleChanges,
 } from "@angular/core";
 import { select } from "@angular-redux/store";
 import Swal from "sweetalert2";
@@ -20,7 +22,7 @@ import { take } from "rxjs/operators";
   templateUrl: "./assay-details.component.html",
   styleUrls: ["./assay-details.component.css"],
 })
-export class AssayDetailsComponent implements OnInit {
+export class AssayDetailsComponent implements OnInit, OnChanges {
   @Input("assayName") assayName: any;
   @Input("rowTemplatePresent") rowTemplatePresent: boolean = false;
   @Input("assay") inputassay: Record<string, any>;
@@ -67,15 +69,8 @@ export class AssayDetailsComponent implements OnInit {
     });
   }
 
-  insertTemplateRow() {
-    this.assay.data.rows.unshift(this.templateRow);
-    for (let i = 1; i < this.assay.data.rows.length; i++) {
-      this.assay.data.rows[i].index += 1;
-    }
-  }
-
   setUpOnInitSubscriptions() {
-    console.log(this.inputassay);
+    console.debug(`number of rows for assay ${this.assayName}: ${this.inputassay.data.rows.length} and row 0 index: ${this.inputassay.data.rows[0].index}`)
 
     this.assays.subscribe((value) => {
       this.assay = value[this.assayName];
@@ -94,6 +89,11 @@ export class AssayDetailsComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpOnInitSubscriptions();
     }
+  }
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+      
   }
 
 
@@ -137,8 +137,9 @@ export class AssayDetailsComponent implements OnInit {
 
   validateAssaySheet() {
     this.editorService.validateMAF(this.assayName).subscribe((data) => {
-      window.location.reload();
-      console.log("MAF updated");
+      
+     //window.location.reload();
+     console.log("MAF updated");
     });
   }
 
