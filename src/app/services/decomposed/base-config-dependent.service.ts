@@ -13,15 +13,15 @@ export class BaseConfigDependentService extends DataService {
   url: MWSURL = null;
 
   constructor(
-    http: HttpClient, 
+    http: HttpClient,
      configService: ConfigurationService
-    ) {    
+    ) {
       super("", http);
       this.configService = configService
     // Create a promise to wait for configLoaded to become true
       const configLoadedPromise = new Promise<void>((resolve, reject) => {
       const subscription = this.configService.configLoaded$.subscribe(loaded => {
-          if (loaded == true) {
+          if (loaded === true) {
               resolve(); // Resolve the promise when configLoaded becomes true
               subscription.unsubscribe(); // Unsubscribe to prevent memory leaks
             }

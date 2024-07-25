@@ -29,6 +29,7 @@ export class StatusComponent implements OnInit {
 
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
+  @Select(GeneralMetadataState.curationRequest) curationRequest$: Observable<string>;
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(UserState.isCurator) isCurator$: Observable<boolean>;
@@ -42,6 +43,7 @@ export class StatusComponent implements OnInit {
   status: string = null;
   curator = false;
   toStatus = "Submitted";
+  curationRequest: string = null;
   requestedStudy: string = null;
   validation: IValidationSummary;
 
@@ -53,6 +55,7 @@ export class StatusComponent implements OnInit {
   ) {
       this.setUpSubscriptionsNgxs();
   }
+
 
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((value) => {
@@ -70,6 +73,11 @@ export class StatusComponent implements OnInit {
     this.isCurator$.subscribe((value) => {
       if (value != null) {
         this.curator = value;
+      }
+    });
+    this.curationRequest$.subscribe((value) => {
+      if (value != null) {
+        this.curationRequest = value;
       }
     });
     this.studyIdentifier$.subscribe((value) => {

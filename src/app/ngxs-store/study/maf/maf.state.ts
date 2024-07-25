@@ -3,9 +3,29 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MAF } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
 
+
+
+// move this
+export type BoolStr = "true" | "false"
+export interface MtblsTableColumn {
+    cell: any,
+    columnDef: string,
+    header: string,
+    sticky: BoolStr,
+    structure?: boolean
+}
+export interface MAF {
+    columns: MtblsTableColumn[],
+    displayedColumns: string[],
+    file: string,
+    header: Record<string, number>
+
+}
 export interface MAFStateModel {
     mafs: Record<string, any>
 }
+
+
 
 @State<MAFStateModel>({
     name: 'mafs',
@@ -21,8 +41,10 @@ export class MAFState {
     @Action(MAF.Set)
     SetStudyMAF(ctx: StateContext<MAFStateModel>, action: MAF.Set) {
         const state = ctx.getState();
-        const tempMAFS = Object.assign({}, state.mafs);
+        let tempMAFS = Object.assign({}, state.mafs);
         tempMAFS[action.maf.data.file] = action.maf;
+        tempMAFS = removeDuplicateMAFs(tempMAFS);
+
         ctx.setState({
             ...state,
             mafs: tempMAFS
@@ -145,4 +167,19 @@ export class MAFState {
         return state.mafs
     }
 
+}
+
+function removeDuplicateMAFs(mafs: { [key: string]: any }): { [key: string]: any } {
+    const uniqueMAFs: { [key: string]: any } = {};
+
+    for (const key in mafs) {
+        if (mafs.hasOwnProperty(key)) {
+            const maf = mafs[key];
+            if (!uniqueMAFs.hasOwnProperty(maf.data.file)) {
+                uniqueMAFs[maf.data.file] = maf;
+            }
+        }
+    }
+
+    return uniqueMAFs;
 }

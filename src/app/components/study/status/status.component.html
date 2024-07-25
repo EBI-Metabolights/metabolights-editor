@@ -1,9 +1,32 @@
 <div class="control">
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
-    <span class="tag is-link clickable" (click)="openModal()">{{
-      status
-    }}</span>
+
+    <div *ngIf="status == 'Public'; else onlyStatus" >
+        <span *ngIf="curationRequest == 'MANUAL_CURATION'; else noCuration">
+          <span class="tag is-link clickable" (click)="openModal()">
+            {{
+              status
+            }} - Curated
+          </span>
+        </span>
+      <ng-template #noCuration>
+        <span class="tag clickable not-curated" (click)="openModal()">
+          {{
+            status
+          }} - Not Curated
+        </span>
+      </ng-template>
+    </div>
+    <ng-template #onlyStatus>
+      <span class="tag is-link clickable" (click)="openModal()">
+        {{
+          status
+        }}
+
+      </span>
+    </ng-template>
+
   </div>
 </div>
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
@@ -81,8 +104,8 @@
           ‘Submission complete’
         </p>
         <br>
-        <div *ngIf="validation !== null">
-          <div *ngIf="validation.status != 'success' && validation.status != 'warning'">
+        <div *ngIf="validation">
+          <div *ngIf="validation.status !== 'success' && validation.status !== 'warning'">
             <p class="error-message">
               Before changing status of your study, please validate your study and fix all errors.
             </p>

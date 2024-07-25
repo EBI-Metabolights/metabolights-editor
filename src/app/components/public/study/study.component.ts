@@ -29,20 +29,22 @@ import { ValidationReport } from "src/app/ngxs-store/study/validation/validation
 })
 export class PublicStudyComponent implements OnInit {
 
-  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>
+  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
   @Select(UserState.user) user$: Observable<Owner>; // potentially unused
-  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]> // Potentially unused
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
+  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>; // Potentially unused
+  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
+  @Select(GeneralMetadataState.curationRequest) curationRequest$: Observable<string>;
   @Select(GeneralMetadataState.reviewerLink) studyReviewerLink$: Observable<string>;
-  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>
+  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
   @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
   @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
 
 
   loading: any = true;
   requestedTab = 0;
-  status = "submitted";
+  status = "";
+  curationRequest = ""
   tab = "descriptors";
   requestedStudy: string = null;
   studyError = false;
@@ -147,6 +149,12 @@ export class PublicStudyComponent implements OnInit {
       if(value){
         this.status = value;
         this.calculateNotReadyValidationMessage();
+      }
+    });
+
+    this.curationRequest$.subscribe((value) => {
+      if(value){
+        this.curationRequest = value;
       }
     });
 

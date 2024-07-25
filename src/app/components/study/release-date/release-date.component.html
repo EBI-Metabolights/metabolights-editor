@@ -2,7 +2,7 @@
   <div class="tags has-addons">
     <span class="tag is-dark">Release Date</span>
     <span (click)="openModal()" class="tag is-success clickable">
-      {{ releaseDate | date: 'MMM d, y'}}
+      {{ releaseDate ? (releaseDate  | date: 'yyyy-MM-dd') : ''}}
     </span>
   </div>
 </div>
