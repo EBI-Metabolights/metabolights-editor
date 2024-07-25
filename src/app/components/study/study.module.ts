@@ -29,6 +29,10 @@ import { MatIconModule } from "@angular/material/icon";
 import { MatCommonModule } from "@angular/material/core";
 import { MatOptionModule } from "@angular/material/core";
 import { MatSelectModule } from "@angular/material/select";
+import { MatListModule} from '@angular/material/list';
+import { MatTabsModule } from '@angular/material/tabs';
+import {MatCardModule} from '@angular/material/card';
+
 import { SharedModule } from "../shared/shared.module";
 import { HttpClientModule } from "@angular/common/http";
 import { MatButtonModule } from "@angular/material/button";
@@ -51,7 +55,18 @@ import { EuropePMCService } from "src/app/services/publications/europePMC.servic
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { RsyncStatusTransformPipe } from "./files/rsync/rsync-status-transform.pipe";
 import { RsyncComponent } from './files/rsync/rsync.component';
-import { ValidationStatusTransformPipe } from "./validations/validation-status-transform.pipe";
+import { ValidationStatusTransformPipe } from "./validations/validations-prototype/pipes/validation-status-transform.pipe";
+import { ValidationsPrototypeComponent } from "./validations/validations-prototype/validations-prototype/validations-prototype.component";
+import { ValidationInfoModalComponent } from "./validations/validations-prototype/validation-info-modal/validation-info-modal.component";
+import { RawViolationModalComponent } from "./validations/validations-prototype/raw-violation-modal/raw-violation-modal.component";
+import { PrototypeDetailComponent } from "./validations/validations-prototype/prototype-detail/prototype-detail.component";
+import { BrowserModule } from "@angular/platform-browser";
+import { ValidationReportSummaryComponent } from "./validations/validations-prototype/validation-report-summary/validation-report-summary.component";
+import { AddSpaceBeforeCapitalPipe } from "./validations/validations-prototype/pipes/add-space-before-capital.pipe";
+import { ValidationSectionComponent } from "./validations/validations-prototype/validation-section/validation-section.component";
+import { HandleUnderscoreInReportPipe } from "./validations/validations-prototype/pipes/handle-underscore-in-report.pipe";
+import { NoViolationsComponent } from "./validations/validations-prototype/misc/no-violations/no-violations.component";
+import { RemoveBackslashesPipe } from "./validations/validations-prototype/pipes/remove-backslashes.pipe";
 
 @NgModule({
   declarations: [
@@ -77,7 +92,13 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     ValidationDetailCommentComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
-    RsyncComponent
+    RsyncComponent,
+    ValidationsPrototypeComponent,
+    ValidationInfoModalComponent,
+    RawViolationModalComponent,
+    PrototypeDetailComponent,
+    ValidationSectionComponent,
+    NoViolationsComponent
   ],
   imports: [
     CommonModule,
@@ -105,6 +126,14 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     MatButtonToggleModule,
     QuillModule,
     MatCheckboxModule,
+    MatListModule,
+    MatProgressSpinnerModule,
+    MatTabsModule,
+    MatCardModule,
+    ValidationReportSummaryComponent,
+    AddSpaceBeforeCapitalPipe,
+    HandleUnderscoreInReportPipe,
+    RemoveBackslashesPipe
   ],
   exports: [
     AssaysComponent,
@@ -126,7 +155,17 @@ import { ValidationStatusTransformPipe } from "./validations/validation-status-t
     StatusComponent,
     ValidationsComponent,
     ValidationDetailComponent,
-    ValidationDetailCommentComponent
+    RsyncComponent,
+    RsyncStatusTransformPipe,
+    ValidationStatusTransformPipe,
+    ValidationDetailCommentComponent,
+    ValidationsPrototypeComponent,
+    ValidationInfoModalComponent,
+    RawViolationModalComponent,
+    PrototypeDetailComponent,
+    ValidationSectionComponent,
+    NoViolationsComponent
+
   ],
   providers: [
     AuthGuard,

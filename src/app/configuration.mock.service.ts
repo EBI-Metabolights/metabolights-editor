@@ -47,6 +47,7 @@ export class MockConfigurationService {
         descriptors: "",
         editor: "",
       },
+      ws3URL: ""
     };
   }
 

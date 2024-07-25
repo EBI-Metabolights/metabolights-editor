@@ -20,7 +20,7 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
   templateUrl: "./files.component.html",
   styleUrls: ["./files.component.css"],
 })
-export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
+export class FilesComponent implements OnInit,  OnChanges {
   
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
   @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
@@ -96,12 +96,6 @@ export class FilesComponent implements OnInit, OnDestroy,  OnChanges {
 
 
 
-  ngOnDestroy(): void {
-    // this.readonly.unsubscribe();
-    // this.studyStatus.unsubscribe();
-    // this.studyIdentifier.unsubscribe();
-    // this.isCurator.unsubscribe();
-  }
 
 
 

@@ -157,7 +157,7 @@ export class ApplicationState {
                 ctx.dispatch(new EditorVersion.Set(versionInfo));
             },
             (error) => {
-                console.error(`Could not get Editor version info: ${error}`)
+                console.error(`Could not get Editor version info: ${JSON.stringify(error)}`)
                 const missingno = {
                     version: "",
                     releaseName: ""

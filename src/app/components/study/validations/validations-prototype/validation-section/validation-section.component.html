@@ -1,0 +1,74 @@
+<br>
+<section class="container">
+    <br>
+    <div class="toggle-group-container">
+        <h3><b>Subsections</b><mat-icon 
+          matTooltip="All sections are enabled by default."
+          [matTooltipPosition]="'right'"
+          matTooltipHideDelay="100000"
+          aria-label="Button that displays a tooltip that hides when scrolled out of the container">help</mat-icon></h3>
+        <br>
+
+      <mat-button-toggle-group
+        name="subsections"
+        aria-label="Subsections"
+        [hideMultipleSelectionIndicator]="true"
+        [(ngModel)]="selectedSubsections"
+        multiple
+      >
+        <mat-button-toggle 
+        *ngFor="let subsection of subsections" 
+        [value]="subsection"
+        [class.selected-button]="selectedSubsections.includes(subsection)"
+        >
+          {{ subsection | addSpaceBeforeCapital | handleUnderscoreInReport }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+
+      </div>
+      <div class="toggle-group-container">
+        <h3><b>Violation Types</b><mat-icon
+          matTooltip="Errors and Warnings both render by default. You do not need to clear warnings in order to pass validation, but it is advised."
+          [matTooltipPosition]="'right'"
+          matTooltipHideDelay="100000"
+          aria-label="Button that displays a tooltip that hides when scrolled out of the container">help</mat-icon></h3>
+
+        <mat-button-toggle-group
+        name="violation-type"
+        aria-label="ViolationType"
+        [hideMultipleSelectionIndicator]="true"
+        [(ngModel)]="selectedViolationTypes"
+        class="w-100"
+        multiple
+      >
+        <mat-button-toggle
+        *ngFor="let type of violationTypes"
+        [value]="type"
+        [class.selected-button]="selectedViolationTypes.includes(type)"
+  
+  
+        >
+        {{type}}
+        </mat-button-toggle>
+  
+      </mat-button-toggle-group>
+      </div>
+
+
+
+
+  </section>
+  <br>
+<div *ngIf="violations.length > 0; else noViolations">
+    <div *ngFor="let violation of violations; let i = index;">
+        <prototype-detail *ngIf="subsectionSelected(violation.section) && selectedViolationTypes.includes(violation.type)" [violation]="violation"></prototype-detail>
+        <br>
+    </div>
+</div>
+
+<!--No violations found template-->
+<ng-template #noViolations>
+  <app-no-violations></app-no-violations>
+  <br>
+</ng-template>

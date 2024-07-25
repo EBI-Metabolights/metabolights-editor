@@ -12,7 +12,7 @@ import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
-import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
+import { EditorValidationRules, NewValidationReport, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 
 
@@ -65,7 +65,10 @@ export class GeneralMetadataState {
                 this.store.dispatch(new Descriptors.Set(gm_response.isaInvestigation.studies[0].studyDesignDescriptors));
                 this.store.dispatch(new Factors.Set(gm_response.isaInvestigation.studies[0].factors))
                 //this.store.dispatch(new SetConfiguration());
-                this.store.dispatch(EditorValidationRules.Get);
+                this.store.dispatch(new EditorValidationRules.Get());
+
+                // TODO fix, commenting this out for demo purpose
+                //this.store.dispatch(new NewValidationReport.Get());
 
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));

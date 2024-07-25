@@ -1,0 +1,69 @@
+<div *ngIf="ready; else notReadyBlock">
+    <app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>
+    <br>
+    <mat-tab-group *ngIf="report !== null; else noViolations" mat-stretch-tabs="false" mat-align-tabs="center">
+        <mat-tab label="All">
+            <br>
+            <div *ngIf="allViolations.length > 0; else noViolations">
+                <div *ngIf="allViolations !== null">
+                    <div *ngFor="let violation of allViolations; let i = index;">
+                        <prototype-detail [violation]="violation"></prototype-detail>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </mat-tab>
+
+        <mat-tab label="General">
+
+            <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
+            </app-validation-section> 
+        </mat-tab>
+
+        <mat-tab label="Investigation File">
+            <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
+            </app-validation-section>
+        </mat-tab>
+
+        <mat-tab label="Samples">
+
+            <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
+            </app-validation-section>
+        </mat-tab>
+
+        <mat-tab label="Assays">
+            <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
+            </app-validation-section>
+        </mat-tab>
+
+        <mat-tab label="MAF">
+            <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
+            </app-validation-section>
+        </mat-tab>
+
+        <mat-tab label="Files">
+            <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
+            </app-validation-section>
+        </mat-tab>
+    </mat-tab-group>
+
+</div>
+<!--The below should be made to work with our existing loading component if possible-->
+<ng-template #notReadyBlock>
+    <span>
+        <img src="{{ baseHref }}assets/img/loading.svg" /> <br />
+        <br />
+        <small>
+            <p class="has-text-info">
+                <mat-icon>comment</mat-icon>Loading New Validation Report
+            </p>
+        </small>
+    </span>
+</ng-template>
+
+<!--No violations found template-->
+<ng-template #noViolations>
+    <app-no-violations></app-no-violations>
+<br>
+</ng-template>
+

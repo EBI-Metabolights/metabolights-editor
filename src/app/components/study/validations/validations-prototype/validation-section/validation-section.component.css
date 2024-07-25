@@ -1,0 +1,52 @@
+
+section {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: center;
+}
+  
+  .toggle-group-container {
+    max-width: 700px; 
+    width: 100%; 
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  
+  .toggle-group-container h3 {
+    margin-bottom: 10px;
+    text-align: center; /* Center align the h3 text */
+  }
+
+  .toggle-group-container mat-button-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%; 
+  }
+  
+  .toggle-group-container mat-button-toggle {
+    flex: 1 1 auto; 
+    margin: 2px;
+  }
+
+  .selected-button {
+    border: 1px dashed rgb(0, 211, 0);
+  }
+
+  .no-violations-card {
+    margin-left: 25%;
+    width: 50%;
+}
+
+.no-violations-content {
+    padding-top: 10%;
+    padding-left: 40%;
+}
+
+.flask {
+  color: #4caf50;
+  transform: translateY(4px);
+}

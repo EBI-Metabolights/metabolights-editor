@@ -1,0 +1,11 @@
+.json-content {
+    white-space: pre-wrap; /* Wrap lines as needed */
+    word-wrap: break-word; /* Break long words */
+    max-height: 80vh; /* Adjust max height as needed */
+    overflow-y: auto; /* Add vertical scrollbar if needed */
+    font-family: monospace; /* Use monospace font for JSON */
+    background-color: #f5f5f5; /* Light background for readability */
+    padding: 1rem; /* Padding for better readability */
+    border: 1px solid #ddd; /* Optional border */
+    border-radius: 4px; /* Rounded corners */
+  }

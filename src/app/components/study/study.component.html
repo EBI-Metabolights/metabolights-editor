@@ -196,6 +196,7 @@
               <ul>
                 <li
                   *ngIf="!studyError"
+                  color="primary"
                   (click)="selectCurrentTab(0, 'descriptors')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }"
                 >
@@ -240,6 +241,13 @@
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
                 >
                   <a>Study Validations</a>
+                </li>
+                <li 
+                *ngIf="isCurator"
+                (click)="selectCurrentTab(7, 'prototype')"
+                [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}">
+                  Validation Prototype
+
                 </li>
               </ul>
             </div>
@@ -294,6 +302,13 @@
                   *ngIf="(currentTabIndex$ | async) === 6"
                 >
                   <study-validations></study-validations>
+                </div>
+                <div
+                  class="tab-content fadeIn animated"
+                  *ngIf="(currentTabIndex$ | async) === 7">
+                  <validations-prototype></validations-prototype>
+
+
                 </div>
               </div>
             </div>

@@ -1,0 +1,16 @@
+<div class="modal is-active ">
+    <div class="modal-background">    </div>
+
+        <div class="modal-card">
+            <section class="modal-card-body">
+            <div class="json-content">
+                {{ render() | json | removeBackslashes}}
+                <br>
+
+            </div>
+            <button (click)="close()" class="button is-info">
+                Close
+            </button>
+            </section>
+        </div>
+</div>
