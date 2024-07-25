@@ -30,7 +30,7 @@
               (assayDelete)="assayDeleted($event)"
               [assayName]="assay.name"
               [assay]="assay"
-              [rowTemplatePresent]="rowTemplatesPrepared"
+              [rowTemplatePresent]="rowTemplateService.preparedAssays.includes(assay.name)"
             ></assay-details>
           </span>
         </span>

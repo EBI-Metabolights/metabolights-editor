@@ -86,7 +86,7 @@ export class AssaysComponent {
           const assayName = assayFileName.filename.trim();
           if (value[assayName]) {
             this.assays[i] = value[assayName];
-            this.assaysNames.push(assayName);
+            if (assayName != null) this.assaysNames.push(assayName);
           }
           i++;
         });
@@ -114,7 +114,10 @@ export class AssaysComponent {
  */
 getTemplates(): Observable<any> {
   const observables = this.assaysNames.map((assayName) => {
-    const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
+    const templ = this.rowTemplateService.getTemplateByAssayFilename(assayName);
+    if (templ === null) return templ
+
+    const attr = stripHyphensAndLowercase(templ);
     
     // If template row already exists, return an observable that emits null
     if (Object.keys(this.templateRows[attr]).length !== 0) {
@@ -131,7 +134,7 @@ getTemplates(): Observable<any> {
         return this.templateRows;
       })
     );
-  });
+  }).filter(observable => observable !== null)
 
   // Use forkJoin to wait for all HTTP calls to complete
   return forkJoin(observables);
@@ -146,24 +149,29 @@ prepareTemplateRowsInAssays(): void {
   this.assaysNames.forEach((assayName) => {
     if (this.rowTemplateShouldBeInserted(assayName)) {
       this.assaysPrepared = false;
-      const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
-      if (Object.keys(this.templateRows[attr]).length !== 0) { // if the template is not empty
-        const index = this.assays.findIndex(assay => assay.name === assayName);
-        if (index !== -1) { // if we have an assay in component matching the current assay name
-
-          if (this.assays[index].data.rows[0].index !== -1) { // if a template row is not present (all template rows have -1 index)
-
-            this.assays[index].data.rows.unshift(this.templateRows[attr]); // insert the template row at the start of the Array.
-            this.rowTemplateService.markAsPrepared(assayName); // Mark as 'prepared' to prevent another template row being inserted.
-
-            this.cdr.detectChanges(); // Manually trigger change detection to make sure nested child components receive changes
-          } else { this.cdr.detectChanges();} // failsafe to make sure nested child components receive changes
-
-        }
+      const templ = this.rowTemplateService.getTemplateByAssayFilename(assayName)
+      if (templ !== null) {
+        const attr = stripHyphensAndLowercase(templ);
+        if (Object.keys(this.templateRows[attr]).length !== 0) { // if the template is not empty
+          const index = this.assays.findIndex(assay => assay.name === assayName);
+          if (index !== -1) { // if we have an assay in component matching the current assay name
   
-      } else {
-        console.warn(`Expected template row not found for ${attr}`);
+            if (this.assays[index].data.rows[0].index !== -1) { // if a template row is not present (all template rows have -1 index)
+  
+              this.assays[index].data.rows.unshift(this.templateRows[attr]); // insert the template row at the start of the Array.
+              this.rowTemplateService.markAsPrepared(assayName); // Mark as 'prepared' to prevent another template row being inserted.
+  
+              this.cdr.detectChanges(); // Manually trigger change detection to make sure nested child components receive changes
+            } else { this.cdr.detectChanges();} // failsafe to make sure nested child components receive changes
+  
+          }
+    
+        } else {
+          console.warn(`Expected template row not found for ${attr}`);
+        }
+
       }
+
       // previously flags were set here
     }
   });
