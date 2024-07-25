@@ -1,8 +1,8 @@
-import { Component, Output, EventEmitter, platformCore, OnDestroy, ChangeDetectorRef } from "@angular/core";
+import { Component, ChangeDetectorRef } from "@angular/core";
 import { select } from "@angular-redux/store";
 import { environment } from "src/environments/environment";
 import { RowTemplateService } from "src/app/services/row-template.service";
-import { concatMap, map, take, toArray } from "rxjs/operators";
+import { map, take} from "rxjs/operators";
 import { Observable, Subject, combineLatest, forkJoin, from, of } from "rxjs";
 
 
@@ -62,7 +62,6 @@ export class AssaysComponent {
     );
 
     combineLatest([assaysLoadedSubject, this.readonly]).subscribe(([studyAssaysValue, readonlyValue]) => {
-      console.debug(`in combine latest block`)
       if (!this.isReadOnly) {
         this.initializeTemplatePreparation();
       } else {
@@ -82,11 +81,10 @@ export class AssaysComponent {
   
     this.studyAssays.subscribe((value) => {
       if (this.studyAssayFiles && Object.keys(value).length === Object.keys(this.studyAssayFiles).length) {
-        console.log('got both assay files')
         let i = 0;
         this.studyAssayFiles.forEach((assayFileName) => {
           const assayName = assayFileName.filename.trim();
-          if (/**this.assaysNames.indexOf(assayName) === -1 &&*/ value[assayName]) {
+          if (value[assayName]) {
             this.assays[i] = value[assayName];
             this.assaysNames.push(assayName);
           }
@@ -108,7 +106,12 @@ export class AssaysComponent {
 
   }
 
-  // Method to get templates
+/**
+ * Get the template rows for each of this studies current assays, if a template for that assay type exists.
+ * Uses RxJs's forkjoin operator to await the collection of all template rows, and return them as a single observable.
+ * @returns Observable<any> containing all template rows that pertain to assays in the current study.
+ * 
+ */
 getTemplates(): Observable<any> {
   const observables = this.assaysNames.map((assayName) => {
     const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
@@ -134,24 +137,27 @@ getTemplates(): Observable<any> {
   return forkJoin(observables);
 }
 
-// Method to prepare template rows in assays
-prepareTemplateRowsInAssays() {
+/**
+ * Iterate over assay names, check whether a row template needs inserting, and if it does, retrieve it, check that it is 
+ * populated, failsafe check that there isn't already a template row inserted, and pending success of that failsafe check, insert it.
+ * Manually trigger change detection, and set assaysPrepared and rowTemplatesPrepared flags (table rendering conditional on these flag values)
+ */
+prepareTemplateRowsInAssays(): void {
   this.assaysNames.forEach((assayName) => {
     if (this.rowTemplateShouldBeInserted(assayName)) {
       this.assaysPrepared = false;
       const attr = stripHyphensAndLowercase(this.rowTemplateService.getTemplateByAssayFilename(assayName));
-      if (Object.keys(this.templateRows[attr]).length !== 0) {
+      if (Object.keys(this.templateRows[attr]).length !== 0) { // if the template is not empty
         const index = this.assays.findIndex(assay => assay.name === assayName);
-        if (index !== -1) {
-          if (this.assays[index].data.rows[0].index !== -1) {
-            this.assays[index].data.rows.unshift(this.templateRows[attr]);
-            this.rowTemplateService.markAsPrepared(assayName);
-            for (let i = 1; i < this.assays[index].data.rows.length; i++) {
-              this.assays[index].data.rows[i].index += 0;
-            }
-            console.log(`assay ${assayName} looks like ${this.assays[index].data.rows[0].index}`)
-            this.cdr.detectChanges();
-          } else { this.cdr.detectChanges();}
+        if (index !== -1) { // if we have an assay in component matching the current assay name
+
+          if (this.assays[index].data.rows[0].index !== -1) { // if a template row is not present (all template rows have -1 index)
+
+            this.assays[index].data.rows.unshift(this.templateRows[attr]); // insert the template row at the start of the Array.
+            this.rowTemplateService.markAsPrepared(assayName); // Mark as 'prepared' to prevent another template row being inserted.
+
+            this.cdr.detectChanges(); // Manually trigger change detection to make sure nested child components receive changes
+          } else { this.cdr.detectChanges();} // failsafe to make sure nested child components receive changes
 
         }
   
@@ -165,6 +171,12 @@ prepareTemplateRowsInAssays() {
   this.rowTemplatesPrepared = true;
 }
 
+/**
+ * Decide whether a row template row needs to be inserted. 'false' if we already have one, 'true' if one has never been inserted, or there has
+ * been a recent edit to the assay sheet and the template row needs to be re-inserted.
+ * @param assayName Name of the assay sheet IE. a_MTBLS_DI-MS...txt, used to xref with the RowTemplateService to make insertion decision.
+ * @returns bool
+ */
 rowTemplateShouldBeInserted(assayName: string): boolean {
   if (this.rowTemplateService.recentlyEdited.includes(assayName)) {
     console.debug(`we should be in here for ${assayName}`)
@@ -177,7 +189,9 @@ rowTemplateShouldBeInserted(assayName: string): boolean {
   return true;
 }
 
-// Method to initialize and ensure the correct order of operations
+/**
+ * Retrieve the assay templates, and then call the inserting method.
+ */
 initializeTemplatePreparation() {
   this.getTemplates().subscribe(
     () => {

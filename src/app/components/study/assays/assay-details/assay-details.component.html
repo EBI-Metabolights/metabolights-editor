@@ -13,6 +13,9 @@
             ><mat-icon>delete</mat-icon> Delete Assay</a
           >
         </span>
+        <div *ngIf="true" class="notification is-warning">
+          <small><mat-icon>info</mat-icon> The first row visible is a template, to give examples of actual values. It is not included in your assay sheet.</small>
+        </div>
         <mtbls-table
           [fileTypes]="fileTypes"
           (rowsUpdated)="validateAssaySheet()"

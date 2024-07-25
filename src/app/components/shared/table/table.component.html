@@ -269,7 +269,8 @@
       *matRowDef="let row; columns: displayedTableColumns"
       [ngClass]="{
         'first-row': isFirstRow(row) && templateRowPresent, 
-        'unclickable': isFirstRow(row) && templateRowPresent
+        'unclickable': isFirstRow(row) && templateRowPresent,
+        'watermark': isFirstRow(row) && templateRowPresent
       }"></tr>
     </table>
   </div>

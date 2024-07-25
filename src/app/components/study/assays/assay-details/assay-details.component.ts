@@ -5,7 +5,6 @@ import {
   Output,
   ViewChild,
   EventEmitter,
-  OnDestroy,
   OnChanges,
   SimpleChanges,
 } from "@angular/core";
@@ -15,7 +14,6 @@ import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { environment } from "src/environments/environment";
 import { RowTemplateService } from "src/app/services/row-template.service";
-import { take } from "rxjs/operators";
 
 @Component({
   selector: "assay-details",

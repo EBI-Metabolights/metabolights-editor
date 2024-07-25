@@ -232,8 +232,7 @@ a.dropdown-item {
 }
 
 .first-row {
-  background-color: rgba(194, 242, 251, 0.481); /* Example formatting */
-  font-weight: bold;
+  background-color: rgba(220, 245, 249, 0.481); 
   font-style: italic;
 }
 
