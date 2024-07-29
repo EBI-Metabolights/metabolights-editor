@@ -9,8 +9,8 @@
     "Term Source REF": "MTBLS",
     "Term Accession Number": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000389",
     "Parameter Value[Solvent]": "Solvent used in the NMR sample, i.e. '0.075 M phosphate buffered D2O/H2O'.",
-    "Term Source REF.1": "MTBLS",
-    "Term Accession Number.1": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
+    "Term Source REF.1": "",
+    "Term Accession Number.1": "",
     "Parameter Value[Sample pH]": "Sample pH value, i.e. '7.4'.",
     "Parameter Value[Temperature]": "Sample Temperature value, i.e. '298'.",
     "Unit": "Relevant Temperature unit, i.e. 'kelvin'.",
@@ -25,7 +25,7 @@
     "Term Source REF.4": "MTBLS",
     "Term Accession Number.4": "http://www.ebi.ac.uk/metabolights/ontology/placeholder",
     "Parameter Value[NMR Probe]": "Full description, including the name and type of probe used, i.e. '5 mm CPQCI 1H/19F/31P/13C/15N/D Z-GRD'. This information can be found in the 'Acquisition Parameter Data File', 'acqus.txt' within the Bruker raw data file structure, in the field marked ' $PROBHD= '.",
-    "Parameter Value[Number of transients]": "Number of scans acquired, i.e. '64'. This information can be found in the 'Acquisition Parameter Data File', 'acqus.txt' within the Bruker raw data file structure, in the field marked '$NS='.",
+    "Parameter Value[Number of transients]": "Number of scans acquired, i.e. '64'. This information can be found in the 'Acquisition Parameter Data File', 'acqus.txt' within the Bruker raw data file structure, in the field marked '$NS='. ",
     "Parameter Value[Pulse sequence name]": "Sequence program used with a short description, i.e. '1D 1H perfect echo with water suppression using excitation sculpting with perfect echo (zgespe)'. This information can be found in the 'Acquisition Parameter Data File', 'acqus.txt' within the Bruker raw data file structure, in the field marked ' $PULPROG= ' and in the file 'pulseprogram.txt'.",
     "Parameter Value[Magnetic field strength]": "Magnetic field strength value in Tesla (T), i.e. '14.1'",
     "Unit.1": "tesla",
@@ -36,10 +36,9 @@
     "NMR Assay Name": "Example_1",
     "Free Induction Decay Data File": "i.e. 'FILES/myfilename.zip' OR if in folder structure, 'FILES/RAW_FILES/Subfolder/myfilename.zip'.",
     "Protocol REF.4": "Data transformation",
-    "Normalization Name": "Normalization data files, if available",
+    "Normalization Name": "Normalization data files (if available), preferably as an Excel file.",
     "Derived Spectral Data File": "i.e. 'FILES/myfilename.nmrML' OR if in folder structure, 'FILES/DERIVED_FILES/Subfolder/myfilename.nmrML'.",
     "Protocol REF.5": "Metabolite identification",
-    "Data Transformation Name": "Transformation data files, if available",
-    "Metabolite Assignment File": "i.e. 'm_MTBLS1_NMR___metabolite_profiling_v2_maf.tsv'."
+    "Data Transformation Name": "Data transformation files (if available)",
+    "Metabolite Assignment File": "i.e. 'm_MTBLS1_NMR___metabolite_profiling_v2_maf.tsv'"
   }
-  
