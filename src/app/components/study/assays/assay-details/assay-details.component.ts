@@ -5,20 +5,25 @@ import {
   Output,
   ViewChild,
   EventEmitter,
+  OnChanges,
+  SimpleChanges,
 } from "@angular/core";
 import { select } from "@angular-redux/store";
 import Swal from "sweetalert2";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { environment } from "src/environments/environment";
+import { RowTemplateService } from "src/app/services/row-template.service";
 
 @Component({
   selector: "assay-details",
   templateUrl: "./assay-details.component.html",
   styleUrls: ["./assay-details.component.css"],
 })
-export class AssayDetailsComponent implements OnInit {
+export class AssayDetailsComponent implements OnInit, OnChanges {
   @Input("assayName") assayName: any;
+  @Input("rowTemplatePresent") rowTemplatePresent: boolean = false;
+  @Input("assay") inputassay: Record<string, any>;
   @select((state) => state.study.assays) assays;
   @select((state) => state.study.samples) studySamples;
   @ViewChild(TableComponent) assayTable: TableComponent;
@@ -44,7 +49,10 @@ export class AssayDetailsComponent implements OnInit {
   existingSampleNamesInAssay: any = [];
   duplicateSampleNamesInAssay: any = [];
 
-  constructor(private editorService: EditorService) {
+  templateRow = null;
+  templateRowInserted: boolean = false;
+
+  constructor(private editorService: EditorService, private rowTemplateService: RowTemplateService) {
     if (!environment.isTesting) {
       this.setUpConstructorSubscription();
     }
@@ -54,13 +62,18 @@ export class AssayDetailsComponent implements OnInit {
     this.readonly.subscribe((value) => {
       if (value != null) {
         this.isReadOnly = value;
+
       }
     });
   }
 
   setUpOnInitSubscriptions() {
+    console.debug(`number of rows for assay ${this.assayName}: ${this.inputassay.data.rows.length} and row 0 index: ${this.inputassay.data.rows[0].index}`)
+
     this.assays.subscribe((value) => {
       this.assay = value[this.assayName];
+
+
     });
     this.studySamples.subscribe((value) => {
       if (value.data) {
@@ -75,6 +88,12 @@ export class AssayDetailsComponent implements OnInit {
       this.setUpOnInitSubscriptions();
     }
   }
+
+
+  ngOnChanges(changes: SimpleChanges): void {
+      
+  }
+
 
   onSamplesFilterKeydown(event, filterValue: string) {
     if (event.key === "Enter") {
@@ -116,7 +135,9 @@ export class AssayDetailsComponent implements OnInit {
 
   validateAssaySheet() {
     this.editorService.validateMAF(this.assayName).subscribe((data) => {
-      console.log("MAF updated");
+      
+     //window.location.reload();
+     console.log("MAF updated");
     });
   }
 

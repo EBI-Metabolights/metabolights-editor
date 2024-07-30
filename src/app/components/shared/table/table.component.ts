@@ -26,6 +26,7 @@ import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { environment } from "src/environments/environment";
+import { RowTemplateService } from "src/app/services/row-template.service";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -38,6 +39,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
   @Input("tableData") tableData: any;
+  @Input("templateRowPresent") templateRowPresent: boolean = false;
   @Input("validationsId") validationsId: any;
 
   @ViewChildren(OntologyComponent)
@@ -115,7 +117,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   constructor(
     private clipboardService: ClipboardService,
     private fb: FormBuilder,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private rowTemplateService: RowTemplateService
   ) {
     this.baseHref =this.editorService.configService.baseHref;
   }
@@ -140,6 +143,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         this.isReadOnly = value;
       }
     });
+  }
+
+  isFirstRow(row: any): boolean {
+    return this.dataSource.data.indexOf(row) === 0;
   }
 
   getFiles(header) {
@@ -444,7 +451,15 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
       this.ontologyCols[column].missingValues = false;
       this.ontologyCols[column].values = {};
+
+      let isFirstRow = true
       this.data.rows.forEach((row) => {
+        // We don't want the template rows example values to be flagged up as missing associated ontologies.
+        if (this.templateRowPresent && isFirstRow) {
+          isFirstRow = false;
+          return;
+        }
+
         if (
           !this.isEmpty(row[column]) &&
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||
@@ -587,6 +602,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   addNRows() {
     if (this.rowsToAdd > 0) {
       let index = this.data.rows.length;
+      if (this.templateRowPresent) {
+        //index -= 1;
+      }
       if (this.selectedRows.length > 0) {
         index = this.selectedRows[0] + 1;
       }
@@ -609,6 +627,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   updateRows(rows) {
+    // if it is an assay
+    if (this.templateRowPresent) {
+      this.rowTemplateService.markAsRecentlyEdited(this.data.file)
+    }
     this.editorService
       .updateRows(this.data.file, { data: rows }, this.validationsId, null)
       .subscribe(
@@ -626,6 +648,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   addRows(rows, index) {
+    if (this.templateRowPresent) {
+      this.rowTemplateService.markAsRecentlyEdited(this.data.file)
+    }
     this.editorService
       .addRows(
         this.data.file,
@@ -654,7 +679,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getEmptyRow() {
     if (this.data.rows.length > 0) {
-      const obj = tassign({}, this.data.rows[0]);
+      let index = 0;
+      if (this.templateRowPresent) index = 1
+      const obj = tassign({}, this.data.rows[index]);
       Object.keys(obj).forEach((key) => {
         let isStableColumn = false;
         this.stableColumns.forEach((col) => {
@@ -677,10 +704,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   deleteSelectedRows() {
+    const rowIds = this.getUnique(this.selectedRows).join(",")
     this.editorService
       .deleteRows(
         this.data.file,
-        this.getUnique(this.selectedRows).join(","),
+        rowIds,
         this.validationsId,
         null
       )
@@ -940,6 +968,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       ];
     }
 
+    if (this.templateRowPresent) this.rowTemplateService.markAsRecentlyEdited(this.data.file);
     this.editorService
       .updateCells(
         this.data.file,
@@ -1210,7 +1239,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   getUnique(arr) {
-    return arr.filter((value, index, array) => array.indexOf(value) === index);
+    const uniqueArr = arr.filter((value, index, array) => array.indexOf(value) === index);
+    if (this.templateRowPresent) {
+      //return uniqueArr.map(value => value - 1);
+    }
+    return uniqueArr;
   }
 
   getKeys(object) {

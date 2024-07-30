@@ -19,6 +19,7 @@ import { HttpHeaders } from "@angular/common/http";
 import { Observable, interval } from "rxjs";
 import { VersionInfo } from "src/environment.interface";
 import { PlatformLocation } from "@angular/common";
+import { RowTemplateService } from "./row-template.service";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -68,7 +69,8 @@ export class EditorService {
     private authService: AuthService,
     private dataService: MetabolightsService,
     public configService: ConfigurationService,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    public rowTemplateService: RowTemplateService
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.redirectUrl = this.configService.config.redirectURL;
@@ -1021,7 +1023,9 @@ export class EditorService {
         const assertedRow = row["Metabolite Assignment File"] as string;
         const mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g, "");
         if (mafFile !== "" && mafFiles.indexOf(mafFile) < 0) {
-          mafFiles.push(mafFile);
+          if (!mafFile.startsWith("i.e. 'm_MTBLS1")) { // if it is a template value
+            mafFiles.push(mafFile);
+          }
         }
       });
       mafFiles.forEach((f) => {
@@ -1394,6 +1398,8 @@ export class EditorService {
   deleteRows(filename, rowIds, tableType, metaInfo) {
     return this.dataService.deleteRows(filename, rowIds).pipe(
       map((data) => {
+        this.rowTemplateService.markAsRecentlyEdited(filename)
+        console.log(filename)
         this.updateTableState(filename, tableType, metaInfo);
         return data;
       })
