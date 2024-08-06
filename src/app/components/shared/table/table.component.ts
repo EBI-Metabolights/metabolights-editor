@@ -268,18 +268,26 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.selectedCells.length > 0 || this.selectedColumns.length > 0) {
       if (this.selectedCells.length > 0) {
         let i = 0;
+        let additionalIndex = 0;
+        if (this.templateRowPresent) additionalIndex = 1
         this.selectedCells.forEach((cell) => {
           i = i + 1;
           if (i < this.selectedCells.length) {
-            content = content + this.data.rows[cell[1]][cell[0]] + "\n";
+            content = content + this.data.rows[cell[1] + additionalIndex][cell[0]] + "\n";
           } else {
-            content = content + this.data.rows[cell[1]][cell[0]];
+            content = content + this.data.rows[cell[1] + additionalIndex][cell[0]];
           }
         });
       } else if (this.selectedColumns.length > 0) {
         if (this.selectedColumns.length === 1) {
           let i = 0;
+          let skipFirstIteration = null;
+          this.templateRowPresent ? skipFirstIteration = true : skipFirstIteration = false
           this.data.rows.forEach((row) => {
+            if (this.templateRowPresent) {
+              skipFirstIteration = false;
+              return
+            }
             i = i + 1;
             if (i < this.data.rows.length) {
               content = content + row[this.selectedColumns[0]] + "\n";
@@ -351,9 +359,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
             .getData("Text")
             .split(/\r\n|\n|\r/);
           if (pastedValues.length === 1) {
+
             let currentRow = 0;
+            let skipFirstIteration = null;
+            this.templateRowPresent ? skipFirstIteration = true : skipFirstIteration = false
+
             this.data.rows.forEach((value) => {
               if (currentRow < this.data.rows.length) {
+                if(skipFirstIteration) {
+                  skipFirstIteration = false;
+                  return
+                }
                 cellsToUpdate.push({
                   row: currentRow,
                   column: this.getHeaderIndex(
@@ -733,7 +749,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   getEmptyRow() {
     if (this.data.rows.length > 0) {
-      const obj = tassign({}, this.data.rows[0]);
+      let index = 0;
+      if (this.templateRowPresent) index = 1
+      const obj = tassign({}, this.data.rows[index]);
       Object.keys(obj).forEach((key) => {
         let isStableColumn = false;
         this.stableColumns.forEach((col) => {

@@ -360,38 +360,11 @@ export class AssayState {
         return state.assays
     }
 
-    static getAssay(name: string, templateInserted: boolean = false) {
-        return createSelector([AssayState], (state: AssayStateModel) => {
-            let assay = state.assays[name]
-            // modify assay here by inserting a given template row into its data.rows Array
-            // Ensure the object is cloned to avoid direct mutation of the state
-            let modifiedAssay = { ...assay, data: { ...assay.data, rows: [...assay.data.rows] } };
-
-            // If templateInserted is true, modify the rows array by inserting a template row
-            if (templateInserted) {
-                const templ = getTemplateByAssayFilename(name)
-                const attr = stripHyphensAndLowercase(templ)
-
-                const templateRow = state.templateRows[attr]
-                modifiedAssay.data.rows.unshift(templateRow); // Insert the template row at the beginning
-            }
-
-            return modifiedAssay;
-        });
-    }
 }
 
 function stripHyphensAndLowercase(input: string): string {
     return input.replace(/-/g, '').toLowerCase();
   }
-
-function getTemplateByAssayFilename(filename: string): AssayTemplateRow {
-    if (filename.indexOf("NMR") > -1) return "NMR"
-    if (filename.indexOf("LC-MS") > -1) return "LC-MS"
-    if (filename.indexOf("GC-MS") > -1) return "GC-MS"
-    if (filename.indexOf("DI-MS") > -1) return "DI-MS"
-    return null
-}
 
 
 function isStudyFile(file: IAssay | StudyFile): file is StudyFile {
