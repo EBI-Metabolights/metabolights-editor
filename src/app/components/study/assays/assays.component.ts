@@ -63,7 +63,14 @@ export class AssaysComponent {
 
     combineLatest([assaysLoadedSubject, this.readonly]).subscribe(([studyAssaysValue, readonlyValue]) => {
       if (!this.isReadOnly) {
-        this.initializeTemplatePreparation();
+        let anyAssayHasTemplate = false;
+        this.assaysNames.forEach((assayName) => {
+          let result = this.rowTemplateService.getTemplateByAssayFilename(assayName);
+          if (result !== null) anyAssayHasTemplate = true
+        });
+
+        if (anyAssayHasTemplate) this.initializeTemplatePreparation();
+        else this.assaysPrepared = true;
       } else {
         this.assaysPrepared = true;
       }
