@@ -49,6 +49,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Input("tableData") tableData: any;
   @Input("validationsId") validationsId: any;
   @Input("enableControlList") enableControlList = true;
+  @Input("templateRowPresent") templateRowPresent: boolean = false;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -162,6 +163,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
     });
   }
+
+  isFirstRow(row: any): boolean {
+    return this.dataSource.data.indexOf(row) === 0;
+  }
+
 
   getFiles(header) {
     // if(this.fileColumns.indexOf(header) > -1){
@@ -488,7 +494,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
       this.ontologyCols[column].values = new Map<string, [string, string, string][]>();
       this.ontologyCols[column].missingTerms = new Set<string>();
+
+
+      let isFirstRow = true
       this.data.rows.forEach((row) => {
+        // We don't want the template rows example values to be flagged up as missing associated ontologies.
+        if (this.templateRowPresent && isFirstRow) {
+          isFirstRow = false;
+          return;
+        }
+
         if (
           !this.isEmpty(row[column]) &&
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||

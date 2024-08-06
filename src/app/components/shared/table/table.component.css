@@ -243,3 +243,12 @@ a.dropdown-item {
   margin-top: 0px;
   vertical-align: top;
 }
+
+.first-row {
+  background-color: rgba(220, 245, 249, 0.481); 
+  font-style: italic;
+}
+
+.unclickable {
+  pointer-events: none;
+}
