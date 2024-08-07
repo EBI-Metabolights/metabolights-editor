@@ -1,5 +1,5 @@
 <span>
-  <span *ngIf="assays && assays.length > 0; else noAssays">
+  <span *ngIf="studyAssayFiles && studyAssayFiles.length > 0; else noAssays">
     <div *ngIf="!isReadOnly">
       <add-assay></add-assay>
     </div>

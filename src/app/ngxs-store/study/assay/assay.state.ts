@@ -3,17 +3,17 @@ import { Action, Select, Selector, State, StateContext, Store, createSelector } 
 import { Assay, AssayList, TemplateRow } from "./assay.actions";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { FilesState } from "../files/files.state";
-import { Observable, Subject, forkJoin, of, pipe } from "rxjs";
+import { Observable, Subject, forkJoin, of } from "rxjs";
 import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { MAF } from "../maf/maf.actions";
-import { FilesLists, Operations } from "../files/files.actions";
+import { Operations } from "../files/files.actions";
 import { ApplicationState } from "../../non-study/application/application.state";
 import { Protocols } from "../protocols/protocols.actions";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { TemplateRowCollection } from "src/app/models/row-template-collection";
-import { AssayTemplateRow, RowTemplateService } from "src/app/services/row-template/row-template.service";
+import { RowTemplateService } from "src/app/services/row-template/row-template.service";
 import { filter, map, take } from "rxjs/operators";
 
 export interface AssayStateModel {
@@ -41,8 +41,8 @@ export class AssayState {
     private readonly: boolean = null;
 
     constructor(
-        private store: Store, 
-        private assaysService: AssaysService, 
+        private store: Store,
+        private assaysService: AssaysService,
         private generalMetadataService: GeneralMetadataService,
         private rowTemplateService: RowTemplateService) { }
 
@@ -55,62 +55,50 @@ export class AssayState {
                     let assayFiles = response.isaInvestigation.studies[0].assays;
                     ctx.dispatch(new AssayList.Set(assayFiles));
                     this.readonly$.pipe(take(1)).subscribe((readonly) => {
-                        console.log(`readonly within assaylist.get interior subscription block: ${readonly}`)
                         this.readonly = readonly;
-
                         this.templatesLoadedSubject.subscribe((val) => {
                             assayFiles.forEach((sheet) => {
                                 ctx.dispatch(new Assay.OrganiseAndPersist(sheet.filename));
                             });
                         });
 
+                        /**  want to load the templates first so they get interpolated
+                         could later change to use some RxJs stuff to wait for Assays.OrganiseAndPersist
+                        and the RowTemplate.GetTemplateRows actions to complete*/
                         if (!readonly) {
                             ctx.dispatch(new TemplateRow.GetTemplateRows(assayFiles));
                         } else {
                             this.templatesLoadedSubject.next('readonly');
                         }
                     })
-
-                    /**  want to load the templates first so they get interpolated
-                     could later change to use some RxJs stuff to wait for Assays.OrganiseAndPersist
-                     and the RowTemplate.GetTemplateRows actions to complete*/
-
-
-                }    
+                }
             )
-
         } else {
-            console.log('hitting that  alternate path on AssayList.Get')
-         this.files$.subscribe(
-            (files) => {
-                // the data type of assay files is different in this block than the one above - some strict typing needed to avoid confusion
-                let assayFiles = files.study.filter(file => file.file.startsWith('a_'));
-                this.readonly$.pipe(take(1)).subscribe((readonly) => {
-                    console.log(`readonly within files.subscrine interior subscription block: ${readonly}`)
-                    this.readonly = readonly;
+            this.files$.subscribe(
+                (files) => {
+                    // the data type of assay files is different in this block than the one above - some strict typing needed to avoid confusion
+                    let assayFiles = files.study.filter(file => file.file.startsWith('a_'));
+                    this.readonly$.pipe(take(1)).subscribe((readonly) => {
+                        this.readonly = readonly;
 
-                    this.templatesLoadedSubject.subscribe((val) => {
-                        assayFiles.forEach((sheet) => {
-                            ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
+                        this.templatesLoadedSubject.subscribe((val) => {
+                            assayFiles.forEach((sheet) => {
+                                ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
+                            });
                         });
-                    });
 
-                    if (!readonly) {
-                        let filenames = [];
-                        assayFiles.forEach((assayFile) => {
-                            filenames.push(assayFile.file)
-                        })
-                        ctx.dispatch(new TemplateRow.GetTemplateRows(assayFiles));
-                    } else {
-                        this.templatesLoadedSubject.next('readonly');
-                    }
-                });
-                /**assayFiles.forEach((sheet) => {
-                    ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
-                });*/
-                //ctx.dispatch(new AssayList.Set(assayfiles))
-            }
-        ); 
+                        if (!readonly) {
+                            let filenames = [];
+                            assayFiles.forEach((assayFile) => {
+                                filenames.push(assayFile.file)
+                            })
+                            ctx.dispatch(new TemplateRow.GetTemplateRows(assayFiles));
+                        } else {
+                            this.templatesLoadedSubject.next('readonly');
+                        }
+                    });
+                }
+            );
         }
     }
 
@@ -122,15 +110,14 @@ export class AssayState {
                     (response) => {
                         this.store.dispatch(new Operations.GetFreshFilesList(false, readonly, action.id));
                         this.store.dispatch(new Protocols.Get());
-                        //ctx.dispatch(new AssayList.Get());
                     },
                     (error) => {
                         console.log("Unable to add new assay to study.")
                         console.log(error)
                     }
                 );
-                }
-            )
+            }
+        )
     }
 
     @Action(Assay.OrganiseAndPersist)
@@ -182,7 +169,7 @@ export class AssayState {
                     if (mafFile !== "" && mafFiles.indexOf(mafFile) < 0) {
                         if (!mafFile.startsWith("i.e. 'm_MTBLS1")) { // if it is a template value
                             mafFiles.push(mafFile);
-                          }
+                        }
                     }
                 });
                 mafFiles.forEach((f) => {
@@ -190,18 +177,22 @@ export class AssayState {
                 });
                 assay["mafs"] = mafFiles;
                 //insert template Row here
-                console.log(`readonly at point of template insertion: ${this.readonly}`)
                 if (!this.readonly) {
                     const state = ctx.getState();
-                    console.log(state)
                     const templates = state.templateRows
                     assay = this.prepareTemplateRow(templates, assay)
                 }
                 ctx.dispatch(new Assay.Set(assay))
-            
-        })
+
+            })
     }
 
+    /**
+     * Insert a template row in an assay table, should a template row exist for this assay type.
+     * @param templateRows - Collection of template rows, from the state 
+     * @param assay - The assay object, we modify its data['rows'] attribute to insert the template
+     * @returns assay object.
+     */
     prepareTemplateRow(templateRows: TemplateRowCollection, assay: any) {
         const templ = this.rowTemplateService.getTemplateByAssayFilename(assay["name"]);
         if (templ === null) return assay
@@ -307,27 +298,26 @@ export class AssayState {
         const observables = action.assayFiles.map((assayFile) => {
             const templ = this.rowTemplateService.getTemplateByAssayFilename(getFilename(assayFile));
             if (templ === null) return of(null); // return an observable that emits null
-    
+
             const attr = stripHyphensAndLowercase(templ);
-    
+
             // If template row already exists, skip (assuming the commented logic is re-enabled)
             if (state.templateRows[attr] && Object.keys(state.templateRows[attr]).length !== 0) {
                 return of(null); // return an observable that emits null
             }
-    
+
             return this.rowTemplateService.getTemplateRow(getFilename(assayFile)).pipe(
                 filter((template) => template !== null),
                 take(1),
                 map((template) => {
                     if (template !== null) {
-                        console.log(`hit pre template setting action dispatch with ${template}`);
                         ctx.dispatch(new TemplateRow.SetTemplateRow(template, attr));
                     }
                     return template;
                 })
             );
         });
-    
+
         // Wait for all observables to complete before proceeding
         forkJoin(observables).subscribe(() => {
             this.templatesLoadedSubject.next('ready');
@@ -338,7 +328,6 @@ export class AssayState {
     @Action(TemplateRow.SetTemplateRow)
     SetTemplateRow(ctx: StateContext<AssayStateModel>, action: TemplateRow.SetTemplateRow) {
         const state = ctx.getState();
-        console.log("hitting template row set action impl")
         let newTemplateRows = null;
         newTemplateRows = state.templateRows;
         if (newTemplateRows === null) newTemplateRows = {}
@@ -364,17 +353,17 @@ export class AssayState {
 
 function stripHyphensAndLowercase(input: string): string {
     return input.replace(/-/g, '').toLowerCase();
-  }
+}
 
 
 function isStudyFile(file: IAssay | StudyFile): file is StudyFile {
     return 'file' in file;
-  }
-  
-  function getFilename(file: IAssay | StudyFile) {
+}
+
+function getFilename(file: IAssay | StudyFile) {
     if (isStudyFile(file)) {
-      return file.file;
+        return file.file;
     } else {
         return file.filename
     }
-  }
+}

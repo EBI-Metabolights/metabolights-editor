@@ -1,5 +1,4 @@
-import { Component, Output, EventEmitter } from "@angular/core";
-import { environment } from "src/environments/environment";
+import { Component } from "@angular/core";
 import { Select } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";

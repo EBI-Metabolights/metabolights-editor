@@ -73,10 +73,7 @@ export class AssayDetailsComponent implements OnInit {
 
 
   setUpOnInitSubscriptionsNgxs() {
-    /**this.assay$ = this.store.select(AssayState.getAssay(this.assayName, true));
-    this.assay$.subscribe((value) => {
-      console.log(value)
-    })*/
+
     this.assays$.subscribe((value) => {
       if (Object.keys(value).length > 0 && this.assayName !== undefined) {
         this.assay = value[this.assayName];
