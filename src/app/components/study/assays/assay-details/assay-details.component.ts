@@ -80,7 +80,9 @@ export class AssayDetailsComponent implements OnInit {
     this.assays$.subscribe((value) => {
       if (Object.keys(value).length > 0 && this.assayName !== undefined) {
         this.assay = value[this.assayName];
-        this.assay.data.rows[0].index === -1 ? this.templateRowPresent = true : null
+        if(this.assay !== undefined){
+          this.assay.data.rows[0].index === -1 ? this.templateRowPresent = true : null
+        }
       }
 
     });

@@ -43,27 +43,6 @@ export class AssaysComponent {
       }
     });
 
-    // eslint-disable-next-line @typescript-eslint/indent
-    this.studyAssays$.subscribe((value) => {
-      if (this.studyAssayFiles) {
-        // @ts-ignore
-        let i = 0;
-        this.studyAssayFiles.forEach((assayFileName) => {
-          const assayName = assayFileName.filename.trim();
-          if (this.assaysNames.indexOf(assayName) === -1 && value[assayName]) {
-
-            this.assays = [...this.assays];
-            this.assays[i] = value[assayName];
-            this.assaysNames = [...this.assaysNames, assayName];
-          }
-          i++;
-        });
-        this.assays = this.assays.filter(obj => Object.keys(obj).length > 0);
-
-      }
-      // eslint-disable-next-line @typescript-eslint/indent
-    });
-
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;

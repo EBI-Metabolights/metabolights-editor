@@ -11,7 +11,7 @@
           style="margin-bottom: 0; padding-bottom: 0"
         >
           <ul>
-            <span *ngFor="let assay of assays; let i = index">
+            <span *ngFor="let assay of studyAssayFiles; let i = index">
               <li
                 (click)="selectCurrentSubTab(i)"
                 [ngClass]="{ 'is-active': currentSubIndex == i }"
@@ -22,11 +22,11 @@
           </ul>
         </div>
       </div>
-      <span *ngFor="let assay of assays; let i = index">
+      <span *ngFor="let assay of studyAssayFiles; let i = index">
         <span *ngIf="currentSubIndex == i">
           <assay-details
             (assayDelete)="assayDeleted($event)"
-            [assayName]="assay.name"
+            [assayName]="assay.filename"
           ></assay-details>
         </span>
       </span>
