@@ -18,6 +18,7 @@ import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { MTBLSFactor } from "./../../../../models/mtbl/mtbls/mtbls-factor";
 import { environment } from "src/environments/environment";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "mtbls-factor",
@@ -58,6 +59,12 @@ export class FactorComponent implements OnInit {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+  }
+
+  
+  navigateToSamples() {
+    let samplesLoc = window.location.href.replace('descriptors', 'samples')
+    window.location.href = samplesLoc;
   }
 
   setUpSubscriptions() {
