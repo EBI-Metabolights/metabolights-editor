@@ -74,6 +74,12 @@ export class FactorComponent implements OnInit {
     this.setUpSubscriptionsNgxs();
   }
 
+  navigateToSamples() {
+    let samplesLoc = window.location.href.replace('descriptors', 'samples')
+    window.location.href = samplesLoc;
+  }
+
+
 
   setUpSubscriptionsNgxs() {
     this.studyIdentifier$.subscribe(
