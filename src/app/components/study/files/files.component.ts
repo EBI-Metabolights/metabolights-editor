@@ -546,6 +546,14 @@ export class FilesComponent implements OnInit,  OnChanges {
   }
 
   deletionEnabled(file: StudyFile): boolean {
+    if (file.type === "audit" && this.curator == false) return false
+    return !this.MANAGED_FOLDERS.includes(file.file);
+  }
+
+  deletionEnabledDebug(file: StudyFile): boolean {
+    console.log(file.type);
+    console.log(file);
+    if (file.type === "audit" && this.curator == false) return false
     return !this.MANAGED_FOLDERS.includes(file.file);
   }
 
