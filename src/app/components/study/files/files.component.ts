@@ -357,7 +357,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     }
   }
 
-  decompresssFiles(files) {
+  decompressFiles(files) {
     const body = { files: [] };
     files.forEach((file) => {
       if (file.type === "compressed") {
