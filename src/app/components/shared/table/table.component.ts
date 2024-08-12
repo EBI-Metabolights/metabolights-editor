@@ -284,8 +284,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           let skipFirstIteration = null;
           this.templateRowPresent ? skipFirstIteration = true : skipFirstIteration = false
           this.data.rows.forEach((row) => {
-            if (this.templateRowPresent) {
+            if (skipFirstIteration) {
               skipFirstIteration = false;
+              i = i + 1;
               return
             }
             i = i + 1;
