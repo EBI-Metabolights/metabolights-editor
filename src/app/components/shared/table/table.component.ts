@@ -127,6 +127,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (!environment.isTesting) {
       this.setUpSubscriptions();
     }
+    let tempView = localStorage.getItem('tableView')
+    if (tempView !== null) this.view = tempView
   }
 
   setUpSubscriptions() {
@@ -258,8 +260,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.templateRowPresent ? skipFirstIteration = true : skipFirstIteration = false
 
           this.data.rows.forEach((row) => {
-            if (this.templateRowPresent) {
+            if (skipFirstIteration) {
               skipFirstIteration = false;
+              i = i + 1;
               return
             }
             i = i + 1;
@@ -303,7 +306,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.loading = true;
     const cellsToUpdate = [];
     if (!this.isEditModalOpen) {
-      if (this.selectedCells.length === 1) {
+      if (this.selectedCells.length === 1) { // if we are pasting into a single cell
         const clipboardData = e.clipboardData
           ? e.clipboardData
           : (window as any).clipboardData;
@@ -326,14 +329,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.selectedCells.length === 0 &&
           this.selectedColumns.length > 0 &&
           this.selectedRows.length === 0
-        ) {
+        ) { // if we are pasting into a whole column
           const clipboardData = e.clipboardData
             ? e.clipboardData
             : (window as any).clipboardData;
           const pastedValues = clipboardData
             .getData("Text")
             .split(/\r\n|\n|\r/);
-          if (pastedValues.length === 1) {
+          if (pastedValues.length === 1) { // if we are pasting one value into every cell in the column
 
             let currentRow = 0;
             let skipFirstIteration = null;
@@ -355,7 +358,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
                 currentRow = currentRow + 1;
               }
             });
-          } else {
+          } else { // if we are pasting a whole columns worth of values into a column
             let currentRow = 0;
             pastedValues.forEach((value) => {
               if (currentRow < this.data.rows.length) {
