@@ -1164,10 +1164,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
     }
     if (this.isCellTypeOntology) {
+      let skipFirstIteration = false;
+      if (this.templateRowPresent) skipFirstIteration = true
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyColumn").values[0];
 
       sRows.forEach((row) => {
+        if (skipFirstIteration) {
+          skipFirstIteration = false;
+          return
+        }
         cellsToUpdate.push(
           {
             row: row.index,
@@ -1187,7 +1193,13 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         );
       });
     } else {
+      let skipFirstIteration = false;
+      if (this.templateRowPresent) skipFirstIteration = true
       sRows.forEach((row) => {
+        if (skipFirstIteration) {
+          skipFirstIteration = false;
+          return
+        }
         cellsToUpdate.push({
           row: row.index,
           column: columnIndex,
