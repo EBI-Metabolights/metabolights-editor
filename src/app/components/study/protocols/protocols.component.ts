@@ -6,13 +6,11 @@ import {
   SimpleChanges,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
-import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
 import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/application.actions";
 
@@ -86,7 +84,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     });
 
     this.isProtocolsExpanded$.subscribe((value) => {
-      this.expand = !value;
+      this.expand = value;
     });
   }
 
@@ -110,10 +108,8 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     }
   }
 
-  // ADJUST POST STATE MIGRATION
   toggleExpand() {
-    if (environment.useNewState) this.store.dispatch(new SetProtocolExpand(!this.expand))
-    else this.editorService.toggleProtocolsExpand(!this.expand);
+    this.store.dispatch(new SetProtocolExpand(!this.expand))
   }
 
   getProtocol(name) {

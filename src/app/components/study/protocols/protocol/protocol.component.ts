@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
   MTBLSProtocol,
@@ -10,9 +10,6 @@ import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology"
 import { ValidateRules } from "./protocol.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import * as toastr from "toastr";
-import { JsonConvert } from "json2typescript";
-import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable, Subscription } from "rxjs";
@@ -20,7 +17,6 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
-import { take } from "rxjs/operators";
 
 @Component({
   selector: "mtbls-protocol",
@@ -39,8 +35,6 @@ export class ProtocolComponent implements OnInit {
   @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
   @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
   @Select(GeneralMetadataState.id) studyId$: Observable<string>;
-
-  //@Select(ProtocolsState.specificProtocol()) updatedProtocol$: Observable<MTBLSProtocol>;
 
 
 
