@@ -12,6 +12,7 @@ export type AssayTemplateRow = "GC-MS" | "LC-MS" | "NMR" | "DI-MS"
 export class RowTemplateService {
     public baseHref: string;
     public templatePath: string;
+    public protocolGuidePath: string;
     private insertionCounter: number = 0;
     private assaySheetsWithTemplateRowsPrepared: Array<string> = [];
     private assaySheetsRecentlyEdited: Array<string> = [];
@@ -20,6 +21,7 @@ export class RowTemplateService {
     constructor(private http: HttpClient, private configService: ConfigurationService, private platformLocation: PlatformLocation) {
      this.baseHref = this.platformLocation.getBaseHrefFromDOM();
       this.templatePath = this.baseHref + "assets/templateRows/";
+      this.protocolGuidePath = `${this.baseHref}assets/protocolGuides/protocolGuides.json`
     }
 
     getTemplateRow(assayFilename: string): Observable<Record<string, any>> {
@@ -35,6 +37,10 @@ export class RowTemplateService {
         if (filename.indexOf("GC-MS") > -1) return "GC-MS"
         if (filename.indexOf("DI-MS") > -1) return "DI-MS"
         return null
+    }
+
+    getProtocolGuides(): Observable<Record<string,any>> {
+      return this.http.get(this.protocolGuidePath)
     }
 
     incrementTemplateInsertionCounter(): void {

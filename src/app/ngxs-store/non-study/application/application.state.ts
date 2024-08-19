@@ -69,7 +69,7 @@ export interface ApplicationStateModel {
         controlLists: null,
         investigationFailed: null,
         readonly: null,
-        isProtocolsExpanded: false,
+        isProtocolsExpanded: true,
         toastrSettings: {
             timeOut: "2500",
             positionClass: "toast-top-center",
@@ -356,6 +356,7 @@ export class ApplicationState {
     @Action(SetProtocolExpand)
     SetProtocolsExpanded(ctx: StateContext<ApplicationStateModel>, action: SetProtocolExpand) {
         const state = ctx.getState();
+        console.log(action.expand)
         ctx.setState({
             ...state,
             isProtocolsExpanded: action.expand

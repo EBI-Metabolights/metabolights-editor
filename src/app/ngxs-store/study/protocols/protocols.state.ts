@@ -1,6 +1,6 @@
 import { Action, Select, Selector, State, StateContext, createSelector } from "@ngxs/store";
 import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
-import { Protocols } from "./protocols.actions";
+import { ProtocolGuides, Protocols } from "./protocols.actions";
 import { JsonConvert } from "json2typescript";
 import { Injectable } from "@angular/core";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
@@ -8,15 +8,25 @@ import { ProtocolsService } from "src/app/services/decomposed/protocols.service"
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
+import { RowTemplateService } from "src/app/services/row-template/row-template.service";
 
 export interface ProtocolsStateModel {
     protocols: MTBLSProtocol[]
+    guides: Record<string, string>
 }
 
 @State<ProtocolsStateModel>({
     name: 'protocols',
     defaults: {
-        protocols: null
+        protocols: null,
+        guides: {
+            "Sample collection": "",
+            "Extraction": "",
+            "Chromatography": "",
+            "Mass spectrometry": "",
+            "Data transformation": "",
+            "Metabolite identification": ""
+        }
     }
 })
 @Injectable()
@@ -25,13 +35,15 @@ export class ProtocolsState {
     @Select(GeneralMetadataState.id) studyId$: Observable<string>;
     private id: string = null;
 
-    constructor(private protocolsService: ProtocolsService) {
+    constructor(private protocolsService: ProtocolsService, private rowTemplateService: RowTemplateService) {
         this.studyId$.subscribe(id => this.id = id)
     }
 
     @Action(Protocols.Set)
     SetProtocols(ctx: StateContext<ProtocolsStateModel>, action: Protocols.Set) {
         const state = ctx.getState();
+        ctx.dispatch(new ProtocolGuides.Get);
+
         let temp = []
         const jsonConvert: JsonConvert = new JsonConvert();
         action.rawProtocols.forEach((protocol) => {
@@ -86,15 +98,43 @@ export class ProtocolsState {
         )
     }
 
+    @Action(ProtocolGuides.Set)
+    SetProtocolGuides(ctx: StateContext<ProtocolsStateModel>, action: ProtocolGuides.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            guides: action.guides
+        })
+    }
+
+    @Action(ProtocolGuides.Get)
+    GetProtocolGuides(ctx: StateContext<ProtocolsStateModel>, action: ProtocolGuides.Get) {
+        this.rowTemplateService.getProtocolGuides().subscribe((guides) => {
+            ctx.dispatch(new ProtocolGuides.Set(guides));
+        })
+    }
+
     @Selector()
     static protocols(state: ProtocolsStateModel): MTBLSProtocol[] {
         return state.protocols
+    }
+
+    @Selector()
+    static protocolGuides(state: ProtocolsStateModel): Record<string, string> {
+        return state.guides
     }
 
     static specificProtocol(protocolName: string) {
         return createSelector([ProtocolsState], (state: ProtocolsStateModel) => {
             // returning static ref [0] as there will never be duplicate names
             return state.protocols.filter(prot => prot.name === protocolName)[0]
+        })
+    }
+
+    static specificGuide(guideName: string) {
+        return createSelector([ProtocolsState], (state: ProtocolsStateModel) => {
+            if (Object.keys(state.guides).includes(guideName)) return state.guides[guideName]
+            else return ""
         })
     }
 }

@@ -26,6 +26,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
   @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
   @Select(ProtocolsState.protocols) studyProtocols$: Observable<MTBLSProtocol[]>;
+  @Select(ProtocolsState.protocolGuides) protocolGuides$: Observable<Record<string, any>>
 
   isStudyReadOnly = false;
 
@@ -35,6 +36,8 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   allProtocols: any[] = [];
   customProtocols: string[] = [];
   defaultProtocols: string[] = [];
+
+  protocolGuides = {}
 
   validationsId = "protocols";
   expand = true;
@@ -86,6 +89,11 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     this.isProtocolsExpanded$.subscribe((value) => {
       this.expand = value;
     });
+
+    this.protocolGuides$.subscribe((value) => {
+      this.protocolGuides = value;
+      console.debug(value);
+    })
   }
 
   ngOnInit() {}

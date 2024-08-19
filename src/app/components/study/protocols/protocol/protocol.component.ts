@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
@@ -23,10 +23,11 @@ import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.sta
   templateUrl: "./protocol.component.html",
   styleUrls: ["./protocol.component.css"],
 })
-export class ProtocolComponent implements OnInit {
+export class ProtocolComponent implements OnInit, OnChanges {
   @Input("value") protocol: any;
   @Input("required") required = false;
   @Input("validations") validations: any;
+  @Input("guides") guides: Record<string, any> = {};
 
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
@@ -36,6 +37,7 @@ export class ProtocolComponent implements OnInit {
   @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
   @Select(GeneralMetadataState.id) studyId$: Observable<string>;
 
+  @Select(ProtocolsState.protocolGuides) protocolGuides$: Observable<Record<string, any>>;
 
 
   private studyId: string =  null;
@@ -64,12 +66,30 @@ export class ProtocolComponent implements OnInit {
 
   validationsId = "protocols.protocol";
 
+  protocolInGuides: boolean = false;
+  guideText: string = "";
+
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {
+   // this.setUpSubscriptionsNgxs();
+  }
+
+  ngOnInit() {
     this.setUpSubscriptionsNgxs();
+
+    if (this.protocol == null) {
+      this.addNewProtocol = true;
+    } else {
+     this.isProtocolInGuides();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    //this.isProtocolInGuides();
+    
   }
 
   setUpSubscriptionsNgxs() {
@@ -77,12 +97,19 @@ export class ProtocolComponent implements OnInit {
       this.studyId = id;
     })
     this.isProtocolsExpanded$.subscribe((value) => {
-      this.expand = !value;
+      this.expand = value;
     });
 
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isStudyReadOnly = value;
+        if(!this.isStudyReadOnly) {
+          this.protocolGuides$.subscribe((value) => {
+            if (Object.keys(value).includes(this.protocol.name)) {
+              this.guideText = value[this.protocol.name];
+            }
+          })
+        }
       }
     });
     this.toastrSettings$.subscribe((settings) => {
@@ -90,8 +117,18 @@ export class ProtocolComponent implements OnInit {
     })
   }
 
+
   toggleExpand() {
     this.expand = !this.expand;
+  }
+
+  isProtocolInGuides(): void {
+    let duds = [undefined, null]
+    console.log(`guides in protocol component: ${Object.keys(this.guides)}`);
+    if (duds.includes(this.guides)) this.protocolInGuides = false // this may now be redundant
+    let result = Object.keys(this.guides).includes(this.protocol.name)
+    console.log(`result of .includes ${result}`)
+    this.protocolInGuides = result
   }
 
   saveColumnValue(col, assay) {
@@ -215,11 +252,6 @@ export class ProtocolComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    if (this.protocol == null) {
-      this.addNewProtocol = true;
-    }
-  }
 
   clearFormatting(target) {
     this.setFieldValue(target, this.strip(this.getFieldValue(target)));

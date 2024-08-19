@@ -13,7 +13,7 @@
           style="margin-right: 10px; margin-left: 10px"
           class="button is-default is-pulled-right is-small"
         >
-          <div *ngIf="expand; else expandSections">
+          <div *ngIf="!expand; else expandSections">
             <i class="material-icons"> list </i> Expand all
           </div>
           <ng-template #expandSections>
@@ -36,6 +36,7 @@
         [value]="getProtocol(protocol)"
         [required]="true"
         [validations]="validations"
+        [guides]="protocolGuides"
       ></mtbls-protocol>
     </span>
   </div>
