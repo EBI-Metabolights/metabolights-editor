@@ -224,7 +224,7 @@ export class EditorService {
         .pipe(catchError(this.dataService.handleError));
     }
 
-  checkMaintenaceMode(): Observable<any> {
+  checkMaintenanceMode(): Observable<any> {
     return this.dataService.http
       .get<any>(
         this.dataService.url.baseURL + "/ebi-internal/ws-status",
@@ -336,7 +336,7 @@ export class EditorService {
             this.store.dispatch(new BannerMessage.Set(null))
           }
       );
-      this.checkMaintenaceMode().subscribe(
+      this.checkMaintenanceMode().subscribe(
         (response) => {
           const result = response.content;
           this.store.dispatch(new MaintenanceMode.Set(result));
