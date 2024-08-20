@@ -8,10 +8,12 @@ import { FtpManagementService } from "src/app/services/ftp-management.service";
 import { CommonModule, PlatformLocation } from '@angular/common';
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { GetGeneralMetadata } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { SyncEvent } from "./rsync/rsync.component";
 
 
 
@@ -79,7 +81,8 @@ export class FilesComponent implements OnInit,  OnChanges {
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    private store: Store
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
@@ -436,13 +439,13 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.loadFiles();
   }
 
-  loadFiles(sync: boolean = false) {
+  loadFiles(sync: boolean = false, syncEvent: SyncEvent = null) {
     this.resetData();
     sync ? this.filesLoading = false : this.filesLoading = true;
     this.rawFilesLoading = true;
     this.refreshingData = true;
 
-    this.passiveUpdate();
+    this.passiveUpdate(syncEvent);
   }
 
   loadAccess() {
@@ -467,7 +470,10 @@ export class FilesComponent implements OnInit,  OnChanges {
     );
   }
 
-  passiveUpdate() {
+  passiveUpdate(syncEvent) {
+    if (syncEvent === SyncEvent.metadata) {
+      this.store.dispatch(new GetGeneralMetadata(this.requestedStudy, this.isReadOnly))
+    }
     this.dataService.getStudyFilesFetch(true, this.isReadOnly).subscribe(
       (data) => {
         this.sortFiles(data);
@@ -604,7 +610,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     return this.validations[this.validationsId];
   }
 
-  onFilesSynchronized($event): void {
-    this.loadFiles(true);
+  onFilesSynchronized($event: SyncEvent): void {
+    this.loadFiles(true, $event);
   }
 }
