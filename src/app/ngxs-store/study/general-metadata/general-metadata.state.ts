@@ -372,7 +372,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
             (response) => {
-
+                ctx.dispatch(new StudyStatus.Set(action.status));
             }
         )
     }
