@@ -232,7 +232,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            ctx.dispatch(new Publications.Set([response], true))
+            ctx.dispatch(new Publications.Set([response], false, true))
             }
         )
 
@@ -262,6 +262,18 @@ export class GeneralMetadataState {
             temp.push(jsonConvert.deserialize(publication, MTBLSPublication));
         });
         if (action.extend) temp = temp.concat(state.publications);
+        if (action.update){
+            let existingPublications = []
+            existingPublications = existingPublications.concat(state.publications);
+            console.log(existingPublications);
+            existingPublications = existingPublications.filter(pub => pub.title !== temp[0].title);
+            console.log(existingPublications);
+            temp = temp.concat(existingPublications);
+            temp.sort((a, b) => {
+                return a.title[0].localeCompare(b.title[0]);
+              });
+
+        }
         ctx.setState({
             ...state,
             publications: temp
