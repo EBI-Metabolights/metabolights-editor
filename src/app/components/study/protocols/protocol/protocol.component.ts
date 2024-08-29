@@ -124,10 +124,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   isProtocolInGuides(): void {
     let duds = [undefined, null]
-    console.log(`guides in protocol component: ${Object.keys(this.guides)}`);
     if (duds.includes(this.guides)) this.protocolInGuides = false // this may now be redundant
     let result = Object.keys(this.guides).includes(this.protocol.name)
-    console.log(`result of .includes ${result}`)
     this.protocolInGuides = result
   }
 
