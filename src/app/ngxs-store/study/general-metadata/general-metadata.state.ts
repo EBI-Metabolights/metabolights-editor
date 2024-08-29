@@ -286,6 +286,7 @@ export class GeneralMetadataState {
         // need to do if extend = true
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
+
         action.people.forEach((person) => {
             temp.push(jsonConvert.deserialize(person, MTBLSPerson));
         });
@@ -328,9 +329,16 @@ export class GeneralMetadataState {
     UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
         const state = ctx.getState();
         let name = `${action.body.contacts[0].firstname}${action.body.contacts[0].lastName}`
-        this.generalMetadataService.updatePerson(action.body.contacts[0].email, name, action.body.contacts[0].person, state.id).subscribe(
+        let email = "";
+        action.existingEmail !== null ? email = action.existingEmail : email = action[0].body.contacts[0].email
+        this.generalMetadataService.updatePerson(email, name, action.body, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new People.Set(response.contacts as IPerson[], true))
+                let body = null
+                if (!Object.keys(response).includes('contacts')) body = [response]
+                else body = response.contacts
+
+                //ctx.dispatch(new People.Set(body, true, true))
+                ctx.dispatch(new People.Get());
             },
             (error) => {
                 console.log("Could not update study person");

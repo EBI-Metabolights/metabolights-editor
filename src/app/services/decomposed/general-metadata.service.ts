@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { IStudySummary } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
 import { DataService } from '../data.service';
 import { httpOptions } from '../headers';
@@ -15,8 +15,8 @@ import { IPeopleWrapper } from 'src/app/models/mtbl/mtbls/interfaces/people-wrap
 @Injectable({
   providedIn: 'root'
 })
-export class GeneralMetadataService extends DataService{
-
+export class GeneralMetadataService extends DataService {
+  
   constructor(
     http: HttpClient,
     private configService: ConfigurationService

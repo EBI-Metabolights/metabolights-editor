@@ -126,7 +126,7 @@ export namespace Publications {
 export namespace People {
     export class Set {
         static readonly type = '[general] Set Study People'
-        constructor(public people: IPerson[], public extend: boolean = false) {}
+        constructor(public people: IPerson[], public extend: boolean = false, public updated: boolean = false) {}
     }
 
     export class Get {
