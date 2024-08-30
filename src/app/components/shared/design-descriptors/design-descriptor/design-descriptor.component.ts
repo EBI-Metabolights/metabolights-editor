@@ -301,7 +301,6 @@ export class DesignDescriptorComponent implements OnInit {
             this.compileBody(), this.studyId
           )
         )
-        // After this point, the change will be fed through to the selector - we must do any callback stuff in there
 
       }
     }
