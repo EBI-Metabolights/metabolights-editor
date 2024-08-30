@@ -1,11 +1,14 @@
 import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, Select, Selector, State, StateContext } from "@ngxs/store";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
 import { Descriptors, Factors } from "./descriptors.action";
 import { JsonConvert } from "json2typescript";
 import { DescriptorsService } from "src/app/services/decomposed/descriptors.service";
 import { IStudyDesignDescriptor } from "src/app/models/mtbl/mtbls/interfaces/study-design-descriptor.interface";
+import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
+import { Observable } from "rxjs";
+import { take } from "rxjs/operators";
 
 
 export interface DescriptorsStateModel {
@@ -22,6 +25,8 @@ export interface DescriptorsStateModel {
 })
 @Injectable()
 export class DescriptorsState {
+
+    @Select(GeneralMetadataState.id) studyId$:  Observable<string>
 
     constructor(private descriptorsService: DescriptorsService) {
 
@@ -56,7 +61,17 @@ export class DescriptorsState {
     UpdateDesignDescriptor(ctx: StateContext<DescriptorsStateModel>, action: Descriptors.Update) {
         this.descriptorsService.updateDesignDescriptor(action.annotationValue, action.descriptor, action.id).subscribe(
             (response) => {
-                ctx.dispatch(new Descriptors.Set([response], true));
+                //ctx.dispatch(new Descriptors.Set([response], true));
+                this.studyId$.pipe(take(1)).subscribe((value) => {
+                    ctx.dispatch(new Descriptors.Get(value))
+                });
+                /**
+                 * It may be hard to figure out which descriptor is new. Easy option for this is to just get 
+                 * the entire list of descriptors again - OR change the API response for this request (and for all requests)
+                 * where you're updating an item that exists as within a list of items, to return _all_ items even if youre only updating one
+                 * (perhaps enabled by a query param). That involves API changes, so for now, might just make the extra http request / obtain 
+                 * the study ID via a subcription from this state container.
+                 */
             },
             (error) => {
                 console.error(`Could not update descriptor ${action.annotationValue}`)
@@ -86,6 +101,10 @@ export class DescriptorsState {
         });
 
         if (action.extend) temp = temp.concat(state.designDescriptors)
+        /**
+         * If i want to do this properly
+         * have an if (update) block
+         */
         ctx.setState({
             ...state,
             designDescriptors: temp

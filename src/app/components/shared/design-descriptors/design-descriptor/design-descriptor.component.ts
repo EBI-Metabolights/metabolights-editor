@@ -2,21 +2,18 @@ import {
   Component,
   OnInit,
   Input,
-  Inject,
   ViewChild,
-  SimpleChanges,
 } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology, areOntologyListsDifferent, elucidateListComparisonResult } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
 import { DOIService } from "../../../../services/publications/doi.service";
 import { EuropePMCService } from "../../../../services/publications/europePMC.service";
 import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
@@ -76,7 +73,6 @@ export class DesignDescriptorComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
-    private doiService: DOIService,
     private europePMCService: EuropePMCService
   ) {
 
@@ -312,18 +308,17 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
 
-
-  // changed the name from the above method as the wording is confusing, we arent updating anything
   refreshDesignDescriptors(message) {
     this.isFormBusy = true;
 
     // MAY NEED REVISITING
     this.isFormBusy = false;
-    this.form.markAsPristine();
-    this.initialiseForm();
-    this.isModalOpen = true;
-
-    this.descriptorComponent.reset();
+    if (message !== "Design descriptor updated.") this.form.markAsPristine();
+    if (!["Design descriptor updated.", "Design descriptor deleted."].includes(message)) {
+      this.initialiseForm();
+      this.descriptorComponent.reset();
+      this.isModalOpen = true;
+    }
     toastr.success(message, "Success", this.toastrSettings);
 
   }
