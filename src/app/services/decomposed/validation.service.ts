@@ -137,5 +137,12 @@ export class ValidationService extends BaseConfigDependentService {
         catchError(this.handleError)
       );
     }
+
+    getFakeValidationReportApiResponse(): Observable<Ws3Response<Ws3ValidationTask>> {
+      return this.http.get<Ws3Response<Ws3ValidationTask>>(`assets/validation-api-response.json`).pipe(
+        map((res) => res),
+        catchError(this.handleError)
+      );
+    }
   
 }

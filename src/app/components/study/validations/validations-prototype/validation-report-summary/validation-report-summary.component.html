@@ -4,6 +4,11 @@
 <button mat-stroked-button color="primary" class="no-round" (click)="getWs3Report()">
     Get new validation report
 </button>
+<button mat-stroked-button color="primary" class="no-round" (click)="getFakeWs3Report()">
+  Get fake validation report
+<button>
+
+</button>
 <mat-card *ngIf="report !== null; else noReportBlock" class="report-card no-round">
     <mat-card-header>
       <mat-card-subtitle>{{accession}}</mat-card-subtitle>

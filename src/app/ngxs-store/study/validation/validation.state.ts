@@ -85,7 +85,7 @@ export class ValidationState {
 
     @Action(NewValidationReport.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.Get) {
-        if (action.ws3) {
+        if (!action.test) {
             this.validationService.getNewValidationReportWs3().subscribe(
                 (response) => {
                     if (response.status !== 'error') {
@@ -93,7 +93,6 @@ export class ValidationState {
                         ctx.dispatch(new NewValidationReport.SetTaskID(response.content.task_id));
                         ctx.dispatch(new NewValidationReport.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
                         ctx.dispatch(new NewValidationReport.SetLastRunTime(response.content.task_result.completion_time))
-
                     } else {
                         console.log("Could not get new ws3 report");
                         console.log(JSON.stringify(response.errorMessage));
@@ -104,9 +103,16 @@ export class ValidationState {
                     console.log(JSON.stringify(error));
                 })
         } else {
-            this.validationService.getNewValidationReport().subscribe((response) => {
+            /**this.validationService.getNewValidationReport().subscribe((response) => {
                 ctx.dispatch(new NewValidationReport.Set({study_id: "test", duration_in_seconds: 5,completion_time: "0.00", messages: response}));
-            });
+            });*/
+
+            this.validationService.getFakeValidationReportApiResponse().subscribe((response) => {
+                ctx.dispatch(new NewValidationReport.Set(response.content.task_result));
+                ctx.dispatch(new NewValidationReport.SetTaskID(response.content.task_id));
+                ctx.dispatch(new NewValidationReport.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
+                ctx.dispatch(new NewValidationReport.SetLastRunTime(response.content.task_result.completion_time))
+            })
         }
 
 

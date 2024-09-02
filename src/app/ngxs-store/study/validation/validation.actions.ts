@@ -46,8 +46,9 @@ export namespace NewValidationReport {
     }
     export class Get {
         static readonly type = '[validation] Get New Validation Report'
-        constructor(public ws3: boolean = false) {}
+        constructor(public test: boolean = false) {}
     }
+
 
     export class Set {
         static readonly type = '[validation] Set New Validation Report'
