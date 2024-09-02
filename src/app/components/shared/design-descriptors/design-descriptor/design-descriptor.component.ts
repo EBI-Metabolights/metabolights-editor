@@ -16,7 +16,7 @@ import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { Select, Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Observable } from "rxjs";
+import { Observable, timer } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
@@ -94,42 +94,7 @@ export class DesignDescriptorComponent implements OnInit {
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
     });
-    this.descriptors$.subscribe((stateDescriptors) => {
-      // As a new 'pattern' this is complicated
-      if (stateDescriptors !== null) {
-        if (this.descriptors === null) this.descriptors = stateDescriptors
-        else { 
-          const descriptorComparisonResult = elucidateListComparisonResult(areOntologyListsDifferent(this.descriptors, stateDescriptors));
-          switch(descriptorComparisonResult) {
-            case 'Positive':
-              this.descriptors = stateDescriptors
-              // pull out to method
-              this.refreshDesignDescriptors("Design descriptor deleted.");
-              this.isDeleteModalOpen = false;
-              this.isModalOpen = false;
-              this.isFormBusy = false;
-            case 'Negative':
-              this.descriptors = stateDescriptors
-              // pull out to method
-              this.refreshDesignDescriptors("Design descriptor saved.");
-              this.descriptorComponent.values = [];
-              this.isModalOpen = false;
-              this.loading = false;
-              this.isFormBusy = false;
-            case 'Null':
-              this.descriptors = stateDescriptors
-              console.log('No change');
-            case 'Zero':
-              this.descriptors = stateDescriptors
-              // pull out to method
-              this.refreshDesignDescriptors("Design descriptor updated.");
-              this.isFormBusy = false;
-              this.closeImportModal();
-          }
-        }
-      }
-      
-    });
+
     this.studyReadonly$.subscribe((value) => {
       if (value != null) {
         this.isStudyReadOnly = value;
@@ -301,6 +266,11 @@ export class DesignDescriptorComponent implements OnInit {
             this.compileBody(), this.studyId
           )
         )
+        // this is a quick fix - a large scale refactor to move away from inline modals is required.
+        const oneSecondTimer = timer(1000);
+        oneSecondTimer.subscribe(() => {
+          this.closeModal();
+        });
 
       }
     }
