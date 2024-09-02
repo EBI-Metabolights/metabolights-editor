@@ -312,13 +312,17 @@ export class DesignDescriptorComponent implements OnInit {
 
     // MAY NEED REVISITING
     this.isFormBusy = false;
-    if (message !== "Design descriptor updated.") this.form.markAsPristine();
+    if (message !== "Design descriptor updated.") {
+      if (this.form !== undefined) {
+        this.form.markAsPristine();
+      }
+    }
     if (!["Design descriptor updated.", "Design descriptor deleted."].includes(message)) {
       this.initialiseForm();
       this.descriptorComponent.reset();
       this.isModalOpen = true;
     }
-    toastr.success(message, "Success", this.toastrSettings);
+    //toastr.success(message, "Success", this.toastrSettings);
 
   }
 
