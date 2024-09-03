@@ -4,16 +4,17 @@
     <div class="modal-card">
         <section class="modal-card-body">
             The following items were found to be in violation of {{violation.identifier}}
-            <mat-list>
-                <mat-divider></mat-divider>
-                <div mat-subheader>Items in Violation</div>
-                <mat-list-item class="violation-item" *ngFor="let value of violation.values">
+            <mat-divider></mat-divider>
+            <br>
 
-                    <div mat-line><mat-icon>note</mat-icon>
+            <div class="violation-container">
+                <div class="violation-item long-violation-height wrap-text" *ngFor="let value of violation.values">
+
+                    <div mat-line class="wrap-text"><mat-icon>note</mat-icon>
                         {{value}}</div>
                     
-                </mat-list-item>
-            </mat-list>
+                    </div>
+            </div>
         </section>
         <button (click)="close()" class="button is-info">
             Close
