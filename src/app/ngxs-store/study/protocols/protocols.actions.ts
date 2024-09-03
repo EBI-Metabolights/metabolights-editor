@@ -27,3 +27,15 @@ export namespace Protocols {
 
     }
 }
+
+export namespace ProtocolGuides {
+    export class Get {
+        static readonly type = '[protocols] Get Protocol Guides'
+        constructor() {}
+    }
+
+    export class Set {
+        static readonly type = '[protocols] Set Protocol Guides'
+        constructor(public guides: Record<string, any>) {}
+    }
+}

@@ -232,7 +232,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            ctx.dispatch(new Publications.Set([response], true))
+            ctx.dispatch(new Publications.Set([response], false, true))
             }
         )
 
@@ -262,6 +262,18 @@ export class GeneralMetadataState {
             temp.push(jsonConvert.deserialize(publication, MTBLSPublication));
         });
         if (action.extend) temp = temp.concat(state.publications);
+        if (action.update){
+            let existingPublications = []
+            existingPublications = existingPublications.concat(state.publications);
+            console.log(existingPublications);
+            existingPublications = existingPublications.filter(pub => pub.title !== temp[0].title);
+            console.log(existingPublications);
+            temp = temp.concat(existingPublications);
+            temp.sort((a, b) => {
+                return a.title[0].localeCompare(b.title[0]);
+              });
+
+        }
         ctx.setState({
             ...state,
             publications: temp
@@ -274,6 +286,7 @@ export class GeneralMetadataState {
         // need to do if extend = true
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
+
         action.people.forEach((person) => {
             temp.push(jsonConvert.deserialize(person, MTBLSPerson));
         });
@@ -316,9 +329,16 @@ export class GeneralMetadataState {
     UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
         const state = ctx.getState();
         let name = `${action.body.contacts[0].firstname}${action.body.contacts[0].lastName}`
-        this.generalMetadataService.updatePerson(action.body.contacts[0].email, name, action.body.contacts[0].person, state.id).subscribe(
+        let email = "";
+        action.existingEmail !== null ? email = action.existingEmail : email = action[0].body.contacts[0].email
+        this.generalMetadataService.updatePerson(email, name, action.body, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new People.Set(response.contacts as IPerson[], true))
+                let body = null
+                if (!Object.keys(response).includes('contacts')) body = [response]
+                else body = response.contacts
+
+                //ctx.dispatch(new People.Set(body, true, true))
+                ctx.dispatch(new People.Get());
             },
             (error) => {
                 console.log("Could not update study person");
@@ -360,7 +380,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
             (response) => {
-
+                ctx.dispatch(new StudyStatus.Set(action.status));
             }
         )
     }

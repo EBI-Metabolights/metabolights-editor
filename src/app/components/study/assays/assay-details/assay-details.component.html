@@ -13,10 +13,14 @@
             ><mat-icon>delete</mat-icon> Delete Assay</a
           >
         </span>
+        <div *ngIf="templateRowPresent" class="notification is-primary">
+          <small><mat-icon>info</mat-icon> The first row in light blue (below) is an example row. It is not included in the ASSAY or ‘ISA METADATA’. Please see the <a href="https://www.ebi.ac.uk/metabolights/editor/guides/Quick_start_Guide/Quick_start_overview">Quick Start Guide</a> for more information.</small>
+        </div>
         <mtbls-table
           [fileTypes]="fileTypes"
           (rowsUpdated)="validateAssaySheet()"
           [tableData]="assay"
+          [templateRowPresent]="templateRowPresent"
           validationsId="assays"
         ></mtbls-table>
       </span>

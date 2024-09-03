@@ -27,6 +27,7 @@ import { Select, Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 
 @Component({
   selector: "mtbls-person",
@@ -85,6 +86,7 @@ export class PersonComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
+    private generalMetadataService: GeneralMetadataService,
     private store: Store
   ) {
     this.setUpSubscriptionsNgxs();
@@ -258,11 +260,9 @@ export class PersonComponent implements OnInit {
     if (!this.isReadOnly) {
       this.isFormBusy = true;
       if (!this.addNewPerson) { // if we are updating an existing person
-        const emailChanged = this.getFieldValue("email") !== this.person.email && this.person.email !== "";
-        const updateIdentifier = emailChanged ? this.person.email : null;
-        const updateName = !emailChanged ? `${this.person.firstName}${this.person.lastName}` : null;
-        
-        this.store.dispatch(new People.Update(this.compileBody(), updateIdentifier, updateName)).subscribe(
+        const name = `${this.person.firstName}${this.person.lastName}`
+
+        this.store.dispatch(new People.Update(this.compileBody(), this.person.email, name)).subscribe(
           (completed) => {
             this.refreshContacts("Person updated.");
           },
@@ -285,7 +285,7 @@ export class PersonComponent implements OnInit {
   }
 
   refreshContacts(message) {
-    if (this.isReadOnly) {
+    if (!this.isReadOnly) {
       this.form.markAsPristine();
       toastr.success(message, "Success", this.toastrSettings);
     }

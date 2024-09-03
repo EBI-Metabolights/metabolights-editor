@@ -18,7 +18,7 @@
           class="is-pulled-left"
           style="user-select: none"
         >
-          {{ protocol.name }}
+          {{ protocol.name }} 
         </p>
         <span
           *ngIf="getAssaysWithProtocol().length > 0 && !hasAllSectionsEmpty()"
@@ -45,6 +45,11 @@
           class="button is-light is-pulled-right is-small"
           ><mat-icon>edit</mat-icon> Edit Description</a
         >
+        
+        <div *ngIf="protocolInGuides">
+          <br>
+          <small class="guide-text"> <i> {{ guideText}} </i></small>
+        </div>
       </span>
     </header>
     <div *ngIf="expand" class="card-content">

@@ -203,7 +203,7 @@ export class SamplesComponent  {
     this.form.get("samples").setValue(this.rawFileNames.join("\n"));
   }
 
-  addColumn(type) {
+  addColumn(type, selectedFactor?: MTBLSFactor) {
     if (type === "factor") {
       const mtblsFactorValue = new MTBLSFactorValue();
       mtblsFactorValue.category = this.selectedFactor;
@@ -233,11 +233,13 @@ export class SamplesComponent  {
           "",
           newFactorIndex + 2
         );
+        factorSourceColumn.value = factorUnitValue.termSource.name
         factorAccessionColumn = new MTBLSColumn(
           "Term Accession Number",
           "",
           newFactorIndex + 3
         );
+        factorAccessionColumn.value = factorUnitValue.termAccession
       } else {
         factorSourceColumn = new MTBLSColumn(
           "Term Source REF",

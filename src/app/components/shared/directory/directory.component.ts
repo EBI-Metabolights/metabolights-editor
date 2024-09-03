@@ -5,6 +5,7 @@ import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.inte
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
 import { Select } from "@ngxs/store";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 @Component({
   selector: "mtbls-directory",
   templateUrl: "./directory.component.html",
@@ -27,6 +28,7 @@ export class DirectoryComponent implements OnInit {
   @Output() fileDeleted = new EventEmitter<any>();
 
   @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
 
   selectedMetaFiles: any[] = [];
   selectedRawFiles: any[] = [];
@@ -35,6 +37,8 @@ export class DirectoryComponent implements OnInit {
   selectedUploadFiles: any[] = [];
 
   isReadOnly = false;
+  curator = false;
+
   baseHref: string;
   constructor(private editorService: EditorService) {
     this.baseHref =this.editorService.configService.baseHref;
@@ -50,7 +54,14 @@ export class DirectoryComponent implements OnInit {
       if (value != null) {
         this.isReadOnly = value;
       }
-    });  }
+    });
+    this.isCurator$.subscribe((value) => {
+      if (value != null) {
+        this.curator = value;
+      }
+    })
+  
+  }
 
   isFolder(file) {
     return file.directory;
@@ -81,6 +92,11 @@ export class DirectoryComponent implements OnInit {
           });
       }
     }
+  }
+
+  childDirectoryDeletionEnabled(file): boolean {
+    if (!this.curator && this.file.type === 'audit') return false
+    return !this.readonlyFolder
   }
 
   isManagedFolder(path){

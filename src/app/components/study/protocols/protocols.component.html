@@ -13,9 +13,9 @@
           style="margin-right: 10px; margin-left: 10px"
           class="button is-default is-pulled-right is-small"
         >
-          <span *ngIf="!expand; else expandSections">
-            <i class="material-icons"> calendar_view_day </i> Expand all
-          </span>
+          <div *ngIf="!expand; else expandSections">
+            <i class="material-icons"> list </i> Expand all
+          </div>
           <ng-template #expandSections>
             <i class="material-icons"> list </i> Collapse all
           </ng-template>
@@ -36,6 +36,7 @@
         [value]="getProtocol(protocol)"
         [required]="true"
         [validations]="validations"
+        [guides]="protocolGuides"
       ></mtbls-protocol>
     </span>
   </div>

@@ -1,0 +1,8 @@
+{
+    "Sample collection": "Describe the origin of samples, any relevant treatment, time points etc. and the collection and storage procedure.",
+    "Extraction": "Describe any extraction or preparation methods applied to the sample before analysis. Please also include any control samples prepared for the assay eg. pooled samples, standards, quality control, solvent blank etc",
+    "Chromatography": "Provide details of the instrument and column used (make & manufacturer), mobile phase and gradient, and settings such as temperatures, flow rate, injection volume.",
+    "Mass spectrometry": "Provide details of the instrument used (make & manufacturer), ion source, ionisation mode (positive / negative), m/z range, and specific parameters such as temperatures, voltages, flow rates, scan rates.",
+    "Data transformation": "Provide details of methods / pipelines and software used to transform the raw data.",
+    "Metabolite identification": "Provide details of methods / pipelines, reference databases and software used to identify features and/or annotate metabolites."
+}

@@ -31,6 +31,7 @@ export class PeopleComponent implements OnInit {
 
   isReadOnly = false;
   validationsId = "people";
+  people = []
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -48,6 +49,10 @@ export class PeopleComponent implements OnInit {
         this.isReadOnly = value;
       }
     });
+    this.people$.subscribe((value) => {
+      this.people = value;
+      
+    })
   }
 
 

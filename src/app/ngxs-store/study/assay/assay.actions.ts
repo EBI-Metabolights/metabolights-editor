@@ -1,4 +1,6 @@
+import { D } from "@angular/cdk/keycodes";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
+import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 
 export namespace AssayList {
 
@@ -52,5 +54,21 @@ export namespace Assay {
         static readonly type = '[assay] Update Cells'
         constructor(public filename: string, public cellsToUpdate: Record<string, any>){}
     }
+
+}
+
+export namespace TemplateRow {
+
+    export class GetTemplateRows {
+        static readonly type = '[assay] Get Template Rows'
+        constructor(public assayFiles: IAssay[] | StudyFile[]){}
+    }
+
+    export class SetTemplateRow {
+        static readonly type = '[assay] Set Template Row'
+        constructor(public templateRow: any, public attr: string) {}
+    }
+
+    //export class 
 
 }
