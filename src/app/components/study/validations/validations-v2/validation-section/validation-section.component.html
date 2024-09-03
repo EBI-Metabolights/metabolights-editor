@@ -62,7 +62,7 @@
   <br>
 <div *ngIf="violations.length > 0; else noViolations">
     <div *ngFor="let violation of violations; let i = index;">
-        <prototype-detail *ngIf="subsectionSelected(violation.section) && selectedViolationTypes.includes(violation.type)" [violation]="violation"></prototype-detail>
+        <validation-v2-detail *ngIf="subsectionSelected(violation.section) && selectedViolationTypes.includes(violation.type)" [violation]="violation"></validation-v2-detail>
         <br>
     </div>
 </div>

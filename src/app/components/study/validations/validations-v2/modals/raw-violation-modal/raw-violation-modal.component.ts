@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Violation } from '../interfaces/validation-report.interface';
+import { Violation } from '../../interfaces/validation-report.interface';
 
 @Component({
   selector: 'raw-violation-modal',

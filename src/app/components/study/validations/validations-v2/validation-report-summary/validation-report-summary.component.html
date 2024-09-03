@@ -6,13 +6,12 @@
 </button>
 <button mat-stroked-button color="primary" class="no-round" (click)="getFakeWs3Report()">
   Get fake validation report
-<button>
-
 </button>
+
 <mat-card *ngIf="report !== null; else noReportBlock" class="report-card no-round">
     <mat-card-header>
       <mat-card-subtitle>{{accession}}</mat-card-subtitle>
-      <mat-card-title>Validation Report #1 Breakdown</mat-card-title>
+      <mat-card-title>Validation Report Summary</mat-card-title>
       <div class="container">
         <img src="assets/img/MetaboLightsLogo.png" alt="metabolights logo" class="right-aligned-image">
     </div>
@@ -99,12 +98,27 @@
     <mat-card class="empty-card no-round">
       <mat-card-header>
         <mat-card-subtitle>{{accession}}</mat-card-subtitle>
-        <mat-card-title>Study Not Validated (Ever!)</mat-card-title>
+        <mat-card-title>No Report to Display.</mat-card-title>
         <div class="container">
           <img src="assets/img/MetaboLightsLogo.png" alt="metabolights logo" class="right-aligned-image">
       </div>
       </mat-card-header>
       <mat-divider></mat-divider>
+      <mat-card-content>
+        <div class="empty-summary-content content">
+          <h2>Actions</h2> 
+          <br>
+
+          <mat-card-actions>
+            <button mat-stroked-button color="primary" class="no-round" (click)="initNewTask()">
+              Start new validation task
+            </button>
+            <button mat-stroked-button color="primary" class="no-round" (click)="getWs3Report()">
+                Get new validation report
+            </button>
+            </mat-card-actions>
+        </div>
+      </mat-card-content>
       </mat-card>
 
   </ng-template>

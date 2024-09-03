@@ -126,7 +126,11 @@ export class StudyComponent implements OnInit, OnDestroy {
       } else if (params.tab === "validations") {
         this.requestedTab = 6;
         this.tab = "validations";
-      } else {
+      } else if (params.tab === "validationsv2") {
+        this.requestedTab = 7;
+        this.tab = "validationsv2"
+      }
+      else {
         this.requestedTab = 0;
         this.tab = "descriptors";
       }

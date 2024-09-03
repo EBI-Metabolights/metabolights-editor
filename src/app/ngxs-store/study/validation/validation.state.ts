@@ -6,9 +6,9 @@ import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 import { interval } from "rxjs";
-import { Violation, Ws3ValidationReport } from "src/app/components/study/validations/validations-prototype/interfaces/validation-report.interface";
+import { Violation, Ws3ValidationReport } from "src/app/components/study/validations/validations-v2/interfaces/validation-report.interface";
 import { filter } from "rxjs-compat/operator/filter";
-import { ViolationType } from "src/app/components/study/validations/validations-prototype/interfaces/validation-report.types";
+import { ViolationType } from "src/app/components/study/validations/validations-v2/interfaces/validation-report.types";
 
 export interface ValidationStateModel {
     rules: Record<string, any>;

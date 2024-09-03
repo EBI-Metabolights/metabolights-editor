@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ValidationsPrototypeComponent } from './validations-prototype.component';
+import { ValidationsV2ParentComponent } from './validations-v2-parent.component';
 
 describe('ValidationsPrototypeComponent', () => {
-  let component: ValidationsPrototypeComponent;
-  let fixture: ComponentFixture<ValidationsPrototypeComponent>;
+  let component: ValidationsV2ParentComponent;
+  let fixture: ComponentFixture<ValidationsV2ParentComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ValidationsPrototypeComponent ]
+      declarations: [ ValidationsV2ParentComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ValidationsPrototypeComponent);
+    fixture = TestBed.createComponent(ValidationsV2ParentComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

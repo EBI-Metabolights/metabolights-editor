@@ -1,14 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { AppError } from 'src/app/services/error/app-error';
-import { BadInput } from 'src/app/services/error/bad-input';
-import { ForbiddenError } from 'src/app/services/error/forbidden-error';
-import { InternalServerError } from 'src/app/services/error/internal-server-error';
-import { MaintenanceError } from 'src/app/services/error/maintenance-error';
-import { NotFoundError } from 'src/app/services/error/not-found-error';
-import { PermissionError } from 'src/app/services/error/permission-error';
+import { Observable } from 'rxjs';
 import {  Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { Select, Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
@@ -19,11 +10,11 @@ import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 
 
 @Component({
-  selector: 'validations-prototype',
-  templateUrl: './validations-prototype.component.html',
-  styleUrls: ['./validations-prototype.component.css']
+  selector: 'validations-v2-parent',
+  templateUrl: './validations-v2-parent.component.html',
+  styleUrls: ['./validations-v2-parent.component.css']
 })
-export class ValidationsPrototypeComponent implements OnInit {
+export class ValidationsV2ParentComponent implements OnInit {
 
   @Select(ValidationState.newReport) newReport$: Observable<Ws3ValidationReport>;
   @Select(ValidationState.newReportViolationsAll) allViolations$: Observable<Violation[]>;

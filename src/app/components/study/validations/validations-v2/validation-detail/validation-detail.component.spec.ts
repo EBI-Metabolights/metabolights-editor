@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PrototypeDetailComponent } from './prototype-detail.component';
+import { PrototypeDetailComponent } from './validation-detail.component';
 
 describe('PrototypeDetailComponent', () => {
   let component: PrototypeDetailComponent;

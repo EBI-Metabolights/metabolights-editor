@@ -8,7 +8,7 @@ import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/
 import { httpOptions } from '../headers';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { Select } from '@ngxs/store';
-import { ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations/validations-prototype/interfaces/validation-report.interface';
+import { ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations/validations-v2/interfaces/validation-report.interface';
 
 @Injectable({
   providedIn: 'root'

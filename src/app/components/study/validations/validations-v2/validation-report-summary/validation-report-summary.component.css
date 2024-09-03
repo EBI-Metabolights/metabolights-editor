@@ -4,9 +4,6 @@
     gap: 10px; 
 }
 
-.charts-container {
-
-}
 
 .pie-grid-item:hover {
     cursor: pointer;
@@ -16,12 +13,6 @@
     display: grid;
     grid-template-rows: 1fr 1fr; /* Divides the grid into two rows */
 }
-
-.content {
-
-
-}
-
 
 .container {
     position: relative;
@@ -35,6 +26,10 @@
     position: absolute; 
     right: 0; 
     top: 0; 
+}
+
+.content {
+
 }
 
 .content > h2 {
@@ -51,4 +46,9 @@
 
 .no-round {
     border-radius: 0 !important;
+  }
+
+  .empty-summary-content {
+    display: flex;
+    justify-content: center;
   }

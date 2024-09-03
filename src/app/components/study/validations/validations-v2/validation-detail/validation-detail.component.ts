@@ -7,11 +7,11 @@ import { Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
 
 @Component({
-  selector: 'prototype-detail',
-  templateUrl: './prototype-detail.component.html',
-  styleUrls: ['./prototype-detail.component.css']
+  selector: 'validation-v2-detail',
+  templateUrl: './validation-detail.component.html',
+  styleUrls: ['./validation-detail.component.css']
 })
-export class PrototypeDetailComponent implements OnInit {
+export class ValidationV2DetailComponent implements OnInit {
 
   @Select(UserState.isCurator) isCurator$: Observable<boolean>;
 

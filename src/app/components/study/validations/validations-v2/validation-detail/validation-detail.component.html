@@ -13,7 +13,6 @@
                     <span class="material-symbols-outlined">
                         breaking_news
                         </span>
-                    <!--<b>TITLE</b>--> 
                 </div> 
                     <div class="row-content"> <h2>{{ violation.title }}</h2> </div>
             </div>
@@ -24,7 +23,6 @@
                     <span class="material-symbols-outlined">
                         description
                         </span>
-                    <!--<b>DESCRIPTION</b>--> 
                 </div> 
                 <div class="row-content"> {{ violation.description }} <br> {{violation.violation}}</div> 
             </div>
@@ -62,12 +60,7 @@
     
           </div>
           <div class="spinner-container">
-            <!--a spinner here perhaps     <mat-progress-spinner
-            class="example-margin spinner"
-            [color]="'success'"
-            [diameter]="30"
-            [value]="75">
-        </mat-progress-spinner>-->
+
           </div>
     
         </div>
@@ -83,8 +76,8 @@
                 <small><b>Section:</b> {{violation.section }}</small>
                     <div (click)="copyToClipboard(violation.section)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
             </div>
-            <div class="footer-container-3">        
-                <small><b>Report Hash ID:</b> 4e9a2bef74a8e-9c1a3b2c34d5f6a7b8c</small>
+            <div class="violation-footer-end-item footer-container-3">        
+                <small><b>Report UUID:</b> 4e9a2bef74a8e-9c1a3b2c34d5f6a7b8c</small>
             </div>
         </div>
     </div>
