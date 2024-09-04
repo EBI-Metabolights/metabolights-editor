@@ -99,7 +99,7 @@ export class SetStudyReviewerLink {
 export namespace Publications {
     export class Set {
         static readonly type = '[general] Set Study Publications'
-        constructor(public publications: IPublication[], public extend: boolean = false, public update: boolean = false) {}
+        constructor(public publications: IPublication[], public extend: boolean = false, public update: boolean = false, public oldTitle: string = null) {}
     }
 
     export class Get {

@@ -1,15 +1,9 @@
 import {
   Component,
   OnInit,
-  Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
+  Input
 } from "@angular/core";
-import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
+
 import { Select } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";

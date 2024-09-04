@@ -232,7 +232,8 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            ctx.dispatch(new Publications.Set([response], false, true))
+            console.log(action.title);
+            ctx.dispatch(new Publications.Set([response], false, true, action.title))
             }
         )
 
@@ -265,9 +266,7 @@ export class GeneralMetadataState {
         if (action.update){
             let existingPublications = []
             existingPublications = existingPublications.concat(state.publications);
-            console.log(existingPublications);
-            existingPublications = existingPublications.filter(pub => pub.title !== temp[0].title);
-            console.log(existingPublications);
+            existingPublications = existingPublications.filter(pub => pub.title !== action.oldTitle);
             temp = temp.concat(existingPublications);
             temp.sort((a, b) => {
                 return a.title[0].localeCompare(b.title[0]);
@@ -328,9 +327,10 @@ export class GeneralMetadataState {
     @Action(People.Update)
     UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
         const state = ctx.getState();
-        let name = `${action.body.contacts[0].firstname}${action.body.contacts[0].lastName}`
+        let name = `${action.body.contacts[0].firstName}${action.body.contacts[0].lastName}`
         let email = "";
-        action.existingEmail !== null ? email = action.existingEmail : email = action[0].body.contacts[0].email
+        let duds = [null, undefined, ''];
+        duds.includes(action.existingEmail) ? email = action.existingEmail : email = action[0].body.contacts[0].email
         this.generalMetadataService.updatePerson(email, name, action.body, state.id).subscribe(
             (response) => {
                 let body = null
