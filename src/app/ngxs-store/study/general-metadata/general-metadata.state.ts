@@ -256,7 +256,6 @@ export class GeneralMetadataState {
     @Action(Publications.Set)
     SetPublications(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Set) {
         const state = ctx.getState();
-        // need to do if extend = true
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
         action.publications.forEach((publication) => {
@@ -271,7 +270,6 @@ export class GeneralMetadataState {
             temp.sort((a, b) => {
                 return a.title[0].localeCompare(b.title[0]);
               });
-
         }
         ctx.setState({
             ...state,
@@ -282,7 +280,6 @@ export class GeneralMetadataState {
     @Action(People.Set)
     SetPeople(ctx: StateContext<GeneralMetadataStateModel>, action: People.Set) {
         const state = ctx.getState();
-        // need to do if extend = true
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
 
@@ -336,8 +333,6 @@ export class GeneralMetadataState {
                 let body = null
                 if (!Object.keys(response).includes('contacts')) body = [response]
                 else body = response.contacts
-
-                //ctx.dispatch(new People.Set(body, true, true))
                 ctx.dispatch(new People.Get());
             },
             (error) => {
