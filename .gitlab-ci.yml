@@ -4,5 +4,5 @@ deploy:
     entrypoint: ['']
   script:
     - kubectl config get-contexts
-    - kubectl config use-context mtbls/sd/metabolights-editor:famaladoss --namespace prod
-    - kubectl config get-contexts
+    - kubectl config set-context --current --namespace=prod
+    - kubectl get pods
