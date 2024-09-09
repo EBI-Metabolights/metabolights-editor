@@ -11,6 +11,6 @@ deploy:
     - kubectl create secret docker-registry gitlab-registry-container-auth --docker-server=dockerhub.ebi.ac.uk --docker-username=$DOC_USER_NAME --docker-password=$DOCKER_PASSWORD --dry-run=client -o json | kubectl apply -f -
     - echo "Checking out Apps project"
     - cd $GITLAB_ROOT_PATH
-    - git clone https://gitlab.ebi.ac.uk/mtbls/operations/Metabolights-Apps.git
+    - git clone https://$GIT_USERNAME:$GIT_PASSWORD@gitlab.ebi.ac.uk/mtbls/operations/Metabolights-Apps.git
     - cd Metabolights-Apps/k8s
     - helm upgrade --install metabolights-editor $GITLAB_ROOT_PATH/Metabolights-Apps/metabolights-editor/k8s -f $GITLAB_ROOT_PATH/Metabolights-Apps/metabolights-editor/k8s/values-prod-ingre.yaml
