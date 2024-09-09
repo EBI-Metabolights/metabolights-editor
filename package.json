@@ -26,6 +26,7 @@
     "@angular/router": "^17.3.4",
     "@babel/polyfill": "^7.4.4",
     "@mdi/font": "^4.7.95",
+    "@ngxs/devtools-plugin": "^3.8.2",
     "@ngxs/store": "^3.7.2",
     "@swimlane/ngx-charts": "^20.5.0",
     "bulma": "^0.7.4",
