@@ -234,7 +234,8 @@ export class PublicationComponent implements OnInit {
 
 
   updateStudyTitleNgxs() {
-    this.store.dispatch(new Title.Update(this.getFieldValue("title"))).subscribe(
+    const title = this.getFieldValue("title");
+    this.store.dispatch(new Title.Update({title})).subscribe(
       (completed) => {
         toastr.success("Title updated.", "Success", this.toastrSettings);
         this.closeUpdateTitleModal();
