@@ -325,9 +325,12 @@ export class GeneralMetadataState {
     UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
         const state = ctx.getState();
         let name = `${action.body.contacts[0].firstName}${action.body.contacts[0].lastName}`
-        let email = "";
+        let email = "a";
         let duds = [null, undefined, ''];
-        duds.includes(action.existingEmail) ? email = action.existingEmail : email = action[0].body.contacts[0].email
+        let result = duds.includes(action.existingEmail);
+        if (result) email = action.existingEmail;
+        else email = action.body.contacts[0].email;
+
         this.generalMetadataService.updatePerson(email, name, action.body, state.id).subscribe(
             (response) => {
                 let body = null
