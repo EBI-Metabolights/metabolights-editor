@@ -1,16 +1,34 @@
 variables:
-  GITLAB_ROOT_PATH: "/home/gitlab-runner/ci_cd/"
-deploy:
-  image:
-    name: bitnami/kubectl:latest
-    entrypoint: ['']
+  VERSION: "2.1.0"
+  BUILD_SCRIPTS_ROOT_PATH: "/home/gitlab-runner/ci_cd/k8s"
+workflow:
+  rules:
+  - if: $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "migration"
+stages:
+- build
+- push
+- deploy
+
+checkout_configs:
+  stage: build
   script:
-    - kubectl config get-contexts
-    - kubectl config use-context mtbls/sd/metabolights-editor:famaladoss
-    - kubectl config set-context --current --namespace=prod
-    - kubectl create secret docker-registry gitlab-registry-container-auth --docker-server=dockerhub.ebi.ac.uk --docker-username=$DOC_USER_NAME --docker-password=$DOCKER_PASSWORD --dry-run=client -o json | kubectl apply -f -
-    - echo "Checking out Apps project"
-    - cd $GITLAB_ROOT_PATH
-    - git clone https://$GIT_USERNAME:$GIT_PASSWORD@gitlab.ebi.ac.uk/mtbls/operations/Metabolights-Apps.git
-    - cd Metabolights-Apps/k8s
-    - helm upgrade --install metabolights-editor $GITLAB_ROOT_PATH/Metabolights-Apps/metabolights-editor/k8s -f $GITLAB_ROOT_PATH/Metabolights-Apps/metabolights-editor/k8s/values-prod-ingre.yaml
+  - bash "$BUILD_SCRIPTS_ROOT_PATH/checkout_configs.sh"
+
+build_container:
+  stage: build
+  script:
+  - bash "$BUILD_SCRIPTS_ROOT_PATH/metabolights-editor/build_container.sh"
+
+push_container:
+  stage: push
+  script:
+  - bash "$BUILD_SCRIPTS_ROOT_PATH/push_container.sh"
+
+deploy:
+  stage: deploy
+  only:
+  - test
+  - staging
+  - master
+  script:
+  - bash "$BUILD_SCRIPTS_ROOT_PATH/metabolights-editor/deploy.sh"
