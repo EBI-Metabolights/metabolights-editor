@@ -136,7 +136,7 @@ export namespace People {
 
     export class Update {
         static readonly type = '[general] Update Study Person'
-        constructor(public body: Record<string, any>, public existingEmail?: string, public existingFullName?: string) {}
+        constructor(public body: Record<string, any>, public email: string, public fullName: string) {}
     }
 
     export class Add {

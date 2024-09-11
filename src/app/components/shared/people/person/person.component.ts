@@ -261,15 +261,34 @@ export class PersonComponent implements OnInit {
       this.isFormBusy = true;
       if (!this.addNewPerson) { // if we are updating an existing person
         const name = `${this.person.firstName}${this.person.lastName}`
+        if ( this.getFieldValue("email") !== this.person.email && this.person.email !== "") {
+          this.store.dispatch(new People.Update(this.compileBody(), this.person.email, null)).subscribe(
+            (completed) => {
+              this.refreshContacts("Person updated.");
+            },
+            (error) => {
+              this.isFormBusy = false;
+            }
+          );
+        } else {
+          this.store.dispatch(new People.Update(this.compileBody(), null, name)).subscribe(
+            (completed) => {
+              this.refreshContacts("Person updated.");
+            },
+            (error) => {
+              this.isFormBusy = false;
+            }
+          );
+        }
 
-        this.store.dispatch(new People.Update(this.compileBody(), this.person.email, name)).subscribe(
+       /**  this.store.dispatch(new People.Update(this.compileBody(), this.person.email, name)).subscribe(
           (completed) => {
             this.refreshContacts("Person updated.");
           },
           (error) => {
             this.isFormBusy = false;
           }
-        );
+        );*/
       } else { // if we are adding a new person
         this.store.dispatch(new People.Add(this.compileBody())).subscribe(
           (completed) => {
