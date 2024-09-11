@@ -13,8 +13,8 @@
             ><mat-icon>delete</mat-icon> Delete Assay</a
           >
         </span>
-        <div *ngIf="rowTemplatePresent" class="notification is-primary">
-          <small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. The first row in light blue is an example row. It is not included in the assay or ‘ISA METADATA’.  Please see the <a href="https://www.ebi.ac.uk/metabolights/editor/guides/Quick_start_Guide/Quick_start_overview">Quick Start Guide</a> for more information.</small>
+        <div *ngIf="!isReadOnly" class="notification is-primary">
+          <small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. <div *ngIf="rowTemplatePresent">The first row in light blue is an example row. It is not included in the assay or ‘ISA METADATA’.</div> <b> <br>Please see the <a href="https://www.ebi.ac.uk/metabolights/guides/Assay/Assay_overview">Guides</a> for more information on how to complete your Assays section.</b></small>
         </div>
         <mtbls-table
           [fileTypes]="fileTypes"
