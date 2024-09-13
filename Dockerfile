@@ -5,8 +5,8 @@ COPY . .
 ENV NODE_OPTIONS=--max-old-space-size=8192
 RUN npm install --save
 ARG CONFIGURATION=production
-ARG BASE_HREF=/metabolights/editor
-RUN npm run build -- --configuration $CONFIGURATION --base-href="$BASE_HREF/"
+ARG BASE_HREF=/
+RUN npm run build -- --configuration $CONFIGURATION --base-href="$BASE_HREF"
 
 # Stage 2, use the compiled app, ready for production with Nginx
 FROM nginx:stable

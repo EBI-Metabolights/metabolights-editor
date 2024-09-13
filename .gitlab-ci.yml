@@ -1,5 +1,5 @@
 variables:
-  VERSION: "2.1.0"
+  VERSION: "2.2.0"
   BUILD_SCRIPTS_ROOT_PATH: "/home/gitlab-runner/ci_cd/k8s"
 workflow:
   rules:
@@ -23,12 +23,3 @@ push_container:
   stage: push
   script:
   - bash "$BUILD_SCRIPTS_ROOT_PATH/push_container.sh"
-
-deploy:
-  stage: deploy
-  only:
-  - test
-  - staging
-  - master
-  script:
-  - bash "$BUILD_SCRIPTS_ROOT_PATH/metabolights-editor/deploy.sh"
