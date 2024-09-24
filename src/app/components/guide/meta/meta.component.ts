@@ -179,12 +179,12 @@ export class MetaComponent implements OnInit {
   skipMetaData() {
     this.router.navigate(["/guide/assays", this.requestedStudy]);
   }
-  
+
 
   saveMetadataNgxs() {
     this.isLoading = true;
     if (this.isManuscriptValid()) {
-      this.store.dispatch(new Title.Update(this.manuscript.title)).subscribe(
+      this.store.dispatch(new Title.Update({"title": this.manuscript.title})).subscribe(
         (completed) => {
           this.store.dispatch(new StudyAbstract.Update(this.manuscript.abstract)).subscribe(
             (completed) => {
@@ -231,7 +231,7 @@ export class MetaComponent implements OnInit {
                   }
                 )
               } else {
-                this.router.navigate(["/guides/assays", this.requestedStudy]);
+                this.router.navigate(["/guide/assays", this.requestedStudy]);
               }
             },
             (error) => {
