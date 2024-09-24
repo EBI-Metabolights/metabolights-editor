@@ -162,7 +162,7 @@ export class OntologyComponent implements OnInit, OnChanges {
       if (values) {
         let match = false;
         this.values.forEach((ontology) => {
-          if (!match && ontology.annotationValue  && ontology.annotationValue === value.annotationValue
+          if (!match && ontology && ontology.annotationValue  && ontology.annotationValue === value.annotationValue
             && ontology.termAccession && ontology.termAccession === value.termAccession
             && ontology.termSource && ontology.termSource === value.termSource
             ) {
