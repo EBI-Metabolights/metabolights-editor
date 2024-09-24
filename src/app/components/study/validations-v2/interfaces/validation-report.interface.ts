@@ -44,5 +44,10 @@ export interface Violation {
     violation: string
 }
 
+export interface ValidationPhase {
+    validationTime: string,
+    taskId: string
+}
+
 
 

@@ -1,6 +1,13 @@
 <div *ngIf="ready; else notReadyBlock">
-    <app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>
+    <!--Mothballed for now until it is fully featured-->
+    <!--<app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>-->
     <br>
+    <div class="validation-panel">
+        <app-validation-task-box></app-validation-task-box>
+      </div>
+      
+    
+    <!--Violation components start-->
     <mat-tab-group *ngIf="report !== null; else noViolations" mat-stretch-tabs="false" mat-align-tabs="center">
         <mat-tab label="All">
             <br>
@@ -46,6 +53,7 @@
             </app-validation-section>
         </mat-tab>
     </mat-tab-group>
+    <!--Violations components end-->
 
 </div>
 <!--The below should be made to work with our existing loading component if possible-->

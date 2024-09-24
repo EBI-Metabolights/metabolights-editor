@@ -1,0 +1,48 @@
+<div class="parent-flex">
+
+    <!--Validation v2 information start-->
+<div  class="notification is-primary">
+    <p>
+        As of October 2024  version 2 of the Metabolights Study Validation System is now available for submitters. In order for your study to be eligible for the status of 'PUBLIC - UNREVIEWED' it must pass the rules of this new system.
+        Version 2 has a stricter and more structured ruleset for validation than Version 1. You can find a summary and the rules themselves <a href="http://rulles.org">here.</a>
+    </p><p>
+        If you have any problems or queries that cannot be resolved by our <a href="https://www.ebi.ac.uk/metabolights/editor/guides/Quick_start_Guide/Quick_start_overview">guides</a>, please contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
+    </p>
+
+   </div>
+<!--Validation v2 information end-->
+
+
+<article class="message article-box" #trackHeight>
+    <!--message header start-->
+    <div class="message-header">
+      <p>Validate Study</p>
+      <span><mat-icon [matTooltip]="'helpMessage'" >help</mat-icon></span>
+    </div>
+    <!--message header end-->
+    <div class="message-body padding">
+      <div class=" container ">
+  
+        <div class="interior-container right" #trackStatusHeight>
+          <a
+          class="button is-info init-button"
+          [ngClass]="startButtonClass"
+          (click)="startValidationTask()" >
+            <span *ngIf="serverReady"><mat-icon> schedule </mat-icon></span>
+            <div *ngIf="isInitiated" ><mat-spinner [diameter]="18" strokeWidth="2"></mat-spinner></div>
+            {{ buttonText }}  </a>
+            <div class="status-container"> 
+              <div class="response"><b>LAST UPDATE:</b> -</div>
+              <div class="response"><b>STATUS:</b><i> </i></div>
+              <div class="response top" *ngIf="showTaskId" ><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
+              <div class="response bottom"><b>DESCRIPTION:</b><br>
+              </div>
+            </div>
+        </div>
+      </div>
+      </div>
+  </article>
+  
+
+</div>
+

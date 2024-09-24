@@ -3,7 +3,6 @@ import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { ConfigurationService } from "src/app/configuration.service";
 import { IValidationSummary, IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
-import { ValidationStatusTransformPipe } from "./validations-v2/pipes/validation-status-transform.pipe";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select, Store } from "@ngxs/store";
@@ -11,6 +10,7 @@ import { environment } from "src/environments/environment";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
+import { ValidationStatusTransformPipe } from "../validations-v2/pipes/validation-status-transform.pipe";
 
 @Component({
   selector: "study-validations",

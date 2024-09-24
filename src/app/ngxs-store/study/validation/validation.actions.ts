@@ -1,5 +1,7 @@
-import { Ws3ValidationReport } from "src/app/components/study/validations/validations-v2/interfaces/validation-report.interface"
-import { ViolationType } from "src/app/components/study/validations/validations-v2/interfaces/validation-report.types"
+import { ValidationPhase, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface"
+import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types"
+import { ValidationTask } from "./validation.state"
+
 
 export namespace EditorValidationRules {
     export class Get {
@@ -38,15 +40,15 @@ export namespace ValidationReport {
     }
 }
 
-export namespace NewValidationReport {
+export namespace ValidationReportV2 {
     
     export class InitialiseValidationTask {
         static readonly type = '[validation] Init New validation Task'
-        constructor() {}
+        constructor(public proxy: boolean = false) {}
     }
     export class Get {
         static readonly type = '[validation] Get New Validation Report'
-        constructor(public test: boolean = false) {}
+        constructor(public test: boolean = false, public proxy: boolean = false) {}
     }
 
 
@@ -69,4 +71,26 @@ export namespace NewValidationReport {
         static readonly type = '[validation] Set Last Validation Run Time'
         constructor(public time: string) {}
     }
+
+    export class SetCurrentTask {
+        static readonly type = '[validation] Set Current Task'
+        constructor(public task: ValidationTask) {}
+    }
+
+    export namespace History {
+        export class Get {
+            static readonly type = '[validation] Get Validation History'
+            constructor() {}
+        }
+
+        export class Set {
+            static readonly type = '[validation] Set Validation History'
+            constructor(public history: Array<ValidationPhase>) {}
+        }
+    }
+}
+
+export class SetInitialLoad {
+    static readonly type = '[validation] Set Initial Load'
+    constructor(public set: boolean) {}
 }

@@ -5,13 +5,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ValidationReportSection, ViolationType } from '../interfaces/validation-report.types';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
-import { FormControl, FormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatRadioModule} from '@angular/material/radio';
 import { Select, Store } from '@ngxs/store';
-import { NewValidationReport, ValidationReport } from 'src/app/ngxs-store/study/validation/validation.actions';
-import { PieGridComponent } from '@swimlane/ngx-charts';
-import { ValidationReportContents, Ws3ValidationReport } from '../interfaces/validation-report.interface';
+import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
+import { Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { Observable } from 'rxjs';
 
@@ -140,15 +139,15 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   }
 
   initNewTask() {
-    this.store.dispatch(new NewValidationReport.InitialiseValidationTask());
+    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask());
   }
 
   getWs3Report() {
-    this.store.dispatch(new NewValidationReport.Get(false));
+    this.store.dispatch(new ValidationReportV2.Get(false));
   }
 
   getFakeWs3Report() {
-    this.store.dispatch(new NewValidationReport.Get(true));
+    this.store.dispatch(new ValidationReportV2.Get(true));
   }
 
   breakReportIntoSections() {

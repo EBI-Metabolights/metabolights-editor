@@ -6,6 +6,7 @@ import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList} from '../interfaces/validation-report.types';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
+import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
 
 
 
@@ -29,7 +30,10 @@ export class ValidationsV2ParentComponent implements OnInit {
   @Select(GeneralMetadataState.id) studyId$: Observable<string>;
   @Select(UserState.isCurator) isCurator$: Observable<boolean>;
 
-  constructor(private store: Store) { }
+  constructor(private store: Store) {
+    this.store.dispatch(new ValidationReportV2.Get());
+    this.store.dispatch(new ValidationReportV2.History.Get())
+   }
 
   report: Ws3ValidationReport = null;
   // report subsections
@@ -56,6 +60,8 @@ export class ValidationsV2ParentComponent implements OnInit {
   generalSubsections = validationReportInputSubsectionList;
 
   ngOnInit(): void {
+
+
 
     this.isCurator$.subscribe(value => {
       this.isCurator = value;

@@ -12,7 +12,7 @@ import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
-import { EditorValidationRules, NewValidationReport, ValidationReport } from "../validation/validation.actions";
+import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 
 

@@ -39,3 +39,10 @@ section {
     flex: 1 1 auto; 
     margin: 2px;
   }
+
+  .validation-panel {
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
