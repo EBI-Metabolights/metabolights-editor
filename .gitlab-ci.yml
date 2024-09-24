@@ -1,5 +1,5 @@
 variables:
-  APP_VERSION: "2.1.0"
+  APP_VERSION: "2.2.0"
 workflow:
   rules:
   - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "migration"
