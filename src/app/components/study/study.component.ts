@@ -154,7 +154,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       .split("/")
       .filter((n) => n);
     if (urlSplit.length >= 3) {
-      if (urlSplit[urlSplit.length - 1].indexOf("MTBLS") < 0) {
+      if (urlSplit[urlSplit.length - 1].indexOf("MTBLS") < 0 && urlSplit[urlSplit.length - 1].indexOf("REQ") < 0) {
         urlSplit.pop();
       }
     }
