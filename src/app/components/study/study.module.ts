@@ -131,6 +131,7 @@ import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box
     MatProgressSpinnerModule,
     MatTabsModule,
     MatCardModule,
+    MatSelectModule,
     ValidationReportSummaryComponent,
     AddSpaceBeforeCapitalPipe,
     HandleUnderscoreInReportPipe,

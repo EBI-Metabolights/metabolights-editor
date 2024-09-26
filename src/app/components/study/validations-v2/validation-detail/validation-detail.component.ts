@@ -5,6 +5,7 @@ import { ApplicationState } from 'src/app/ngxs-store/non-study/application/appli
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
+import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 
 @Component({
   selector: 'validation-v2-detail',
@@ -15,9 +16,13 @@ export class ValidationV2DetailComponent implements OnInit {
 
   @Select(UserState.isCurator) isCurator$: Observable<boolean>;
 
+  @Select(ValidationState.taskId) taskId$: Observable<string>;
+
   @Input() violation: Violation
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
+
+  currentTaskId = "";
 
   typeIcon: string = "question"
   protected isCurator: boolean = false;
@@ -26,6 +31,7 @@ export class ValidationV2DetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.isCurator$.subscribe((value) => this.isCurator = value);
+    this.taskId$.subscribe((id) => {if(id !== null) this.currentTaskId = id})
     this.typeIcon = this.getViolationTypeIcon();
   }
 

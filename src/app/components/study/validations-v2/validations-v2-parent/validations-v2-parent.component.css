@@ -46,3 +46,33 @@ section {
     justify-content: center;
     align-items: center;
   }
+
+  .history-container {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .history-dropdown {
+    border-top: 2px solid #4caf50;
+    border-left: 2px solid #4caf50;
+    border-right: 2px solid #4caf50;
+
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .history-dropdown-box {
+    border-top: 2px solid #4caf50;
+    border-left: 2px solid #4caf50;
+    border-right: 2px solid #4caf50;
+    padding-bottom: 0% !important;
+    display: inline-block;
+  }
+
+  ::ng-deep .mat-form-field {
+    min-width: 1000px; /* Controls the dropdown width */
+  }
+
+  .select-box {
+    width: 450px !important;
+  }

@@ -32,10 +32,10 @@
             <div *ngIf="isInitiated" ><mat-spinner [diameter]="18" strokeWidth="2"></mat-spinner></div>
             {{ buttonText }}  </a>
             <div class="status-container"> 
-              <div class="response"><b>LAST UPDATE:</b> -</div>
-              <div class="response"><b>STATUS:</b><i> </i></div>
+              <div class="response"><b>LAST UPDATE:</b> {{lastRunTime}}</div>
+              <div class="response"><b>STATUS:</b><i> {{status}} </i></div>
               <div class="response top" *ngIf="showTaskId" ><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
-              <div class="response bottom"><b>DESCRIPTION:</b><br>
+              <div class="response bottom"><b>DESCRIPTION: </b><br>
               </div>
             </div>
         </div>

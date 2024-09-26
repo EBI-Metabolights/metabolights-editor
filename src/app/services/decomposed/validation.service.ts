@@ -121,16 +121,20 @@ export class ValidationService extends BaseConfigDependentService {
       // remove once new auth service implemented
       const token = localStorage.getItem('jwt');
       let headers = null;
-      // write new headers impl this is annoying me
-      headers = new HttpHeaders({
+      let headersObj = {
         //'Content-Type':  'application/json',
         Accept: "application/json",
         Authorization: `Bearer ${token}`
-      });
+      }
+      // write new headers impl this is annoying me
       let params = new HttpParams();
       for (const key in this.dnvtParams) {
         params.set(key, this.dnvtParams[key]);
       }
+      if (taskId !== null) {
+        headersObj['task_id'] = taskId
+      }
+      headers = new HttpHeaders(headersObj);
       let valUrl = this.configService.config.ws3URL;
       if (proxy) valUrl = valUrl.replace('https://www-test.ebi.ac.uk', '')
 

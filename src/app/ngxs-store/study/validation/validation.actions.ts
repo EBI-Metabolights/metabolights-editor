@@ -48,7 +48,7 @@ export namespace ValidationReportV2 {
     }
     export class Get {
         static readonly type = '[validation] Get New Validation Report'
-        constructor(public test: boolean = false, public proxy: boolean = false) {}
+        constructor(public id?: string, public test: boolean = false, public proxy: boolean = false) {}
     }
 
 

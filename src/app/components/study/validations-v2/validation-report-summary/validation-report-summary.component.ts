@@ -143,11 +143,11 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   }
 
   getWs3Report() {
-    this.store.dispatch(new ValidationReportV2.Get(false));
+    this.store.dispatch(new ValidationReportV2.Get());
   }
 
   getFakeWs3Report() {
-    this.store.dispatch(new ValidationReportV2.Get(true));
+    this.store.dispatch(new ValidationReportV2.Get(null, true));
   }
 
   breakReportIntoSections() {

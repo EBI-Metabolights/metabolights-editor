@@ -5,55 +5,76 @@
     <div class="validation-panel">
         <app-validation-task-box></app-validation-task-box>
       </div>
+      <br>
       
-    
-    <!--Violation components start-->
-    <mat-tab-group *ngIf="report !== null; else noViolations" mat-stretch-tabs="false" mat-align-tabs="center">
-        <mat-tab label="All">
-            <br>
-            <div *ngIf="allViolations.length > 0; else noViolations">
-                <div *ngIf="allViolations !== null">
-                    <div *ngFor="let violation of allViolations; let i = index;">
-                        <validation-v2-detail [violation]="violation"></validation-v2-detail>
-                        <br>
+    <!--History dropdown wrapper start-->
+    <div class="history-dropdown-box">
+        <mat-form-field class="select-box">
+            <mat-label>Select a Report</mat-label>
+            <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
+            <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
+                {{ phase.taskId }} 
+                <span *ngIf="isFirst"><b>(most recent)</b></span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+    </div>
+
+
+        <div class="history-dropdown">
+            <!--Violation components start-->
+            <mat-tab-group *ngIf="report !== null; else noViolations" mat-stretch-tabs="false" mat-align-tabs="center">
+            <mat-tab label="All">
+                <br>
+                <div *ngIf="allViolations.length > 0; else noViolations">
+                    <div *ngIf="allViolations !== null">
+                        <div *ngFor="let violation of allViolations; let i = index;">
+                            <validation-v2-detail [violation]="violation"></validation-v2-detail>
+                            <br>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </mat-tab>
+            </mat-tab>
+    
+            <mat-tab label="General">
+    
+                <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
+                </app-validation-section> 
+            </mat-tab>
+    
+            <mat-tab label="Investigation File">
+                <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="Samples">
+    
+                <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="Assays">
+                <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="MAF">
+                <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="Files">
+                <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
+                </app-validation-section>
+            </mat-tab>
+            </mat-tab-group>
+            <!--Violations components end-->
+        </div>
 
-        <mat-tab label="General">
+   
 
-            <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
-            </app-validation-section> 
-        </mat-tab>
+    <!--History dropdown wrapper end-->
 
-        <mat-tab label="Investigation File">
-            <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
-            </app-validation-section>
-        </mat-tab>
-
-        <mat-tab label="Samples">
-
-            <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
-            </app-validation-section>
-        </mat-tab>
-
-        <mat-tab label="Assays">
-            <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
-            </app-validation-section>
-        </mat-tab>
-
-        <mat-tab label="MAF">
-            <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
-            </app-validation-section>
-        </mat-tab>
-
-        <mat-tab label="Files">
-            <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
-            </app-validation-section>
-        </mat-tab>
-    </mat-tab-group>
-    <!--Violations components end-->
 
 </div>
 <!--The below should be made to work with our existing loading component if possible-->

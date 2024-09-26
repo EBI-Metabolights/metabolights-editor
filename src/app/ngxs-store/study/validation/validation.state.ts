@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { EditorValidationRules, ValidationReport, ValidationReportV2 } from "./validation.actions";
+import { EditorValidationRules, SetInitialLoad, ValidationReport, ValidationReportV2 } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
@@ -20,7 +20,7 @@ export interface ValidationTask {
 export interface ValidationStateModel {
     rules: Record<string, any>;
     report: IValidationSummary;
-    newReport: Ws3ValidationReport;
+    reportV2: Ws3ValidationReport;
     taskId: string;
     status: ViolationType;
     lastRunTime: string;
@@ -34,12 +34,12 @@ export interface ValidationStateModel {
     defaults: {
         rules: null,
         report: null,
-        newReport: null,
+        reportV2: null,
         taskId: null,
         status: null,
         lastRunTime: null,
         currentValidationTask: null,
-        history: [],
+        history: null,
         initialLoadMade: false
     }
 })
@@ -99,7 +99,7 @@ export class ValidationState {
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
         if (!action.test) {
-            this.validationService.getValidationV2Report(action.proxy).subscribe( 
+            this.validationService.getValidationV2Report(action.proxy, action.id).subscribe( 
                 (response) => {
                     if (response.status !== 'error') {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
@@ -144,9 +144,12 @@ export class ValidationState {
     @Action(ValidationReportV2.Set)
     SetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Set) {
         const state = ctx.getState();
+        if (!state.initialLoadMade) {
+            ctx.dispatch(new SetInitialLoad(true));
+        }
         ctx.setState({
             ...state,
-            newReport: action.report
+            reportV2: action.report
         })
     }
 
@@ -156,6 +159,7 @@ export class ValidationState {
             (response) => {
                 console.log('task submitted successfully');
                 console.log(response);
+                ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
                 //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
             },
             (error) => {
@@ -203,8 +207,12 @@ export class ValidationState {
 
     @Action(ValidationReportV2.History.Get)
     GetHistory(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.History.Get) {
+        const state = ctx.getState();
         this.validationService.getValidationHistory().subscribe((historyResponse) => {
             ctx.dispatch(new ValidationReportV2.History.Set(historyResponse.content));
+            if (!state.initialLoadMade) {
+                ctx.dispatch(new ValidationReportV2.Get(historyResponse.content[0].taskId))
+            }
         },
         (error) => {
             console.error(`Could not get history for current study: ${error}`);
@@ -284,36 +292,46 @@ export class ValidationState {
     }
 
     @Selector()
-    static newReport(state: ValidationStateModel): Ws3ValidationReport {
-        return state.newReport
+    static reportV2(state: ValidationStateModel): Ws3ValidationReport {
+        return state.reportV2
     }
 
     @Selector()
-    static newReportViolationsAll(state: ValidationStateModel) {
-        let violations = state.newReport.messages.violations;
+    static reportV2ViolationsAll(state: ValidationStateModel) {
+        let violations = state.reportV2.messages.violations;
         violations = sortViolations(violations);
         return violations;
     }
 
-    static newReportViolations(section: string) {
+    static reportV2Violations(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
             return sortViolations(
                 filterViolations(
-                    state.newReport.messages.violations, section
+                    state.reportV2.messages.violations, section
                 )
             );
         });
     }
 
     @Selector()
-    static newReportSummariesAll(state: ValidationStateModel) {
-        return state.newReport.messages.summary;
+    static reportV2SummariesAll(state: ValidationStateModel) {
+        return state.reportV2.messages.summary;
     }
 
-    static newReportSummaries(section: string) {
+    static reportV2Summaries(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            return filterViolations(state.newReport.messages.summary, section)
+            return filterViolations(state.reportV2.messages.summary, section)
         });
+    }
+
+    @Selector()
+    static history(state: ValidationStateModel) {
+        return state.history;
+    }
+
+    @Selector()
+    static initialLoadMade(state: ValidationStateModel) {
+        return state.initialLoadMade
     }
 
     @Selector()
