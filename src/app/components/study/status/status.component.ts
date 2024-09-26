@@ -73,7 +73,7 @@ export class StatusComponent implements OnInit {
         const prevStatus = this.status
         this.status = value;
         this.toStatus = value;
-        if (prevStatus !== null && this.isReadOnly !== null && this.requestedStudy) {
+        if (prevStatus !== null && this.requestedStudy && this.status !== prevStatus) {
           toastr.success("Study status updated.", "Success", this.toastrSettings);
           this.router.navigate(["/study", this.requestedStudy]);
         }
