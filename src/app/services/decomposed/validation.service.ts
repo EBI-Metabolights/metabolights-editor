@@ -97,18 +97,18 @@ export class ValidationService extends BaseConfigDependentService {
 
     createStudyValidationTask(): Observable<Ws3Response<Ws3ValidationTask>> {
       // remove once new auth service implemented
-      const token = localStorage.getItem('jwt');
-      console.log(token)
+      // const token = localStorage.getItem('jwt');
+      // console.log(token)
       let headers = null;
       // write new headers impl this is annoying me
       headers = new HttpHeaders({
         //'Content-Type':  'application/json',
         accept: "application/json",
-        Authorization: `Bearer ${token}`
+        // Authorization: `Bearer ${token}`
       });
       console.log(`headers: ${JSON.stringify(headers)}`);
 
-      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validation/${this.id}`,"", {headers}).pipe(
+      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validations/${this.id}`,"", {headers}).pipe(
         map((res) => res),
         catchError(this.handleError)
       );
@@ -116,26 +116,25 @@ export class ValidationService extends BaseConfigDependentService {
 
     getNewValidationReportWs3(): Observable<Ws3Response<Ws3ValidationTask>> {
 
-      // remove once new auth service implemented
-      const token = localStorage.getItem('jwt');
-      let headers = null;
-      // write new headers impl this is annoying me
-      headers = new HttpHeaders({
+      // // remove once new auth service implemented
+      // const token = localStorage.getItem('jwt');
+      // let headers = null;
+      // // write new headers impl this is annoying me
+      const headers = new HttpHeaders({
         //'Content-Type':  'application/json',
         Accept: "application/json",
-        Authorization: `Bearer ${token}`
+        // Authorization: `Bearer ${token}`
       });
-      console.log(`headers: ${headers}`);
+      // console.log(`headers: ${headers}`);
       let params = new HttpParams();
       for (const key in this.dnvtParams) {
         params.set(key, this.dnvtParams[key]);
       }
 
-
-      return this.http.get<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validation/results/${this.id}`, {headers, params}).pipe(
+      return this.http.get<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validations/${this.id}/result`, {headers, params}).pipe(
         map((res) => res),
         catchError(this.handleError)
       );
     }
-  
+
 }
