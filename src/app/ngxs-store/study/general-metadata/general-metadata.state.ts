@@ -380,7 +380,21 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new StudyStatus.Set(action.status));
+                const state = ctx.getState();
+                let updated_study_id = state.id;
+                if (response.hasOwnProperty("assigned_study_id")){
+                  updated_study_id = response["assigned_study_id"]
+                  if (state.id !== updated_study_id) {
+                    ctx.dispatch(new Identifier.Set(updated_study_id));
+                  }
+                }
+                let assigned_status = action.status;
+                if (response.hasOwnProperty("assigned_status")){
+                  assigned_status = response["assigned_status"]
+                }
+                if (assigned_status !== state.status) {
+                  ctx.dispatch(new StudyStatus.Set(assigned_status));
+                }
             }
         )
     }

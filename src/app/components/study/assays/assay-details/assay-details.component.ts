@@ -84,7 +84,7 @@ export class AssayDetailsComponent implements OnInit {
 
     });
     this.studySamples$.subscribe((value) => {
-      if (value.data) {
+      if (value && value.data) {
         this.sampleNames = value.data.rows.map((r) => r["Sample Name"]);
         this.filteredSampleNames = this.sampleNames;
       }

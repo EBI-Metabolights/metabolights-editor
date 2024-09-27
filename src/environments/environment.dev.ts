@@ -4,4 +4,5 @@ export const environment = {
   production: false,
   context: "development",
   isTesting: false,
+  useNewState: true
 };
