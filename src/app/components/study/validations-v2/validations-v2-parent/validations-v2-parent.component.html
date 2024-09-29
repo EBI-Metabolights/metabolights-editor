@@ -8,22 +8,27 @@
       <br>
       
     <!--History dropdown wrapper start-->
-    <div class="history-dropdown-box">
-        <mat-form-field class="select-box">
-            <mat-label>Select a Report</mat-label>
-            <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
-            <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
-                {{ phase.taskId }} 
-                <span *ngIf="isFirst"><b>(most recent)</b></span>
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+    <div class="history-wrapper-top-menu">
+        <div *ngIf="report !== null" class="history-dropdown-box">
+            <mat-form-field class="select-box">
+                <mat-label>Select a Report</mat-label>
+                <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
+                <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
+                    {{ phase.taskId }} 
+                    <span *ngIf="isFirst"><b>(most recent)</b></span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+        </div>
+        <div class="download-report-button">
+            <a (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
+        </div>
     </div>
 
 
-        <div class="history-dropdown">
+        <div *ngIf="report !== null; else noViolations" [ngClass]="{'blurred': loadingDiffReport}"  class="history-dropdown">
             <!--Violation components start-->
-            <mat-tab-group *ngIf="report !== null; else noViolations" mat-stretch-tabs="false" mat-align-tabs="center">
+            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
             <mat-tab label="All">
                 <br>
                 <div *ngIf="allViolations.length > 0; else noViolations">
@@ -70,10 +75,12 @@
             </mat-tab-group>
             <!--Violations components end-->
         </div>
-
-   
-
     <!--History dropdown wrapper end-->
+<!-- Overlay text (only appears when blurred) -->
+  <div class="overlay-text" *ngIf="loadingDiffReport">
+    <p>Overlay Text: Action Required</p>
+  </div>
+<!--End of overlay text-->
 
 
 </div>
@@ -92,7 +99,7 @@
 
 <!--No violations found template-->
 <ng-template #noViolations>
-    <app-no-violations></app-no-violations>
+    <app-no-violations [studyId]="studyId"></app-no-violations>
 <br>
 </ng-template>
 

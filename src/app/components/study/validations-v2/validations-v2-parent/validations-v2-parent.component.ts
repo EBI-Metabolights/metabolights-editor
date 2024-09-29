@@ -38,7 +38,8 @@ export class ValidationsV2ParentComponent implements OnInit {
     this.store.dispatch(new ValidationReportV2.Get());
     this.store.dispatch(new ValidationReportV2.History.Get())
    }
-
+  
+  //report variables
   report: Ws3ValidationReport = null;
   history: Array<ValidationPhase> = [];
   selectedPhase: ValidationPhase = null;
@@ -52,14 +53,16 @@ export class ValidationsV2ParentComponent implements OnInit {
   assayViolations: Violation[] = null;
   assignmentViolations: Violation[] = null;
   filesViolations: Violation[] = null;
-
+  
+  // core state variables
   studyId: string =  null
-
   isCurator: boolean = false;
 
   checked: boolean = false;
   ready: boolean = true;
+  loadingDiffReport = false;
 
+  // Subsection buckets
   investigationSubsections = validationReportInvestigationSubsectionList;
   samplesSubsections = validationReportSamplesSubsectionList;
   assaySubsections = validationReportAssaySubsectionList;
@@ -80,6 +83,7 @@ export class ValidationsV2ParentComponent implements OnInit {
       console.log(value === null)
       this.report = value;
       if (this.report !== null) {
+        if(this.loadingDiffReport) this.loadingDiffReport = false;
         this.ready = true;
       }
     });
@@ -132,8 +136,22 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   onPhaseSelection($event) {
     console.log($event)
-    this.store.dispatch(new ValidationReportV2.Get($event.taskId))
+    this.store.dispatch(new ValidationReportV2.Get($event.taskId));
+    this.loadingDiffReport = true;
     // TODO set up some kind of loading state
+  }
+
+  downloadReport() {
+    const jsonStr = JSON.stringify(this.report, null, 2); // Pretty print with 2-space indentation
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${this.studyId}-report-${this.selectedPhase.taskId}.json`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    a.remove();
   }
 
 

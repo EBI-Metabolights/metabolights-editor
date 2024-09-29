@@ -76,3 +76,29 @@ section {
   .select-box {
     width: 450px !important;
   }
+
+  .blurred {
+    filter: blur(5px); 
+    pointer-events: none; 
+  }
+
+.overlay-text {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: 10; 
+  background-color: rgba(255, 255, 255, 0.8); 
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.download-report-button {
+  margin-left: auto;
+}
+
+.history-wrapper-top-menu {
+  display: flex; 
+
+}

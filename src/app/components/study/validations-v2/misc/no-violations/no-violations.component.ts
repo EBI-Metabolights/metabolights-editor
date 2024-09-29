@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input  } from '@angular/core';
 
 @Component({
   selector: 'app-no-violations',
@@ -7,5 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './no-violations.component.css'
 })
 export class NoViolationsComponent {
+
+  @Input() studyId: string;
+  @Input() section: boolean = false;
 
 }

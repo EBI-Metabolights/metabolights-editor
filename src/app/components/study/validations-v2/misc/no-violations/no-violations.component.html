@@ -1,11 +1,22 @@
-<mat-card class="no-violations-card no-round">
+<div class="no-violations-card">
     <!--<img src="{{ baseHref }}assets/img/MetaboLightsLogo.png" class="ml-logo"/><br />-->
-
-    <div class="no-violations-content">
-        <span class="material-symbols-outlined flask">
-            experiment
-            </span> <b>No Violations</b>
+    <br><h2><b *ngIf="section == false; else emptySectionHeader">There is no available validation report for {{studyId}}</b></h2>
+    <mat-divider></mat-divider>
+    <div *ngIf="section === false" class="no-violations-content">
+       Use the box above to queue a new validation task with our Validation server. 
+        This should typically only take a few seconds. If you are unable to queue a validation task despite repeated attempts please contact <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>
     </div>
-    <br>
+    <br *ngIf="section === false">
 
-</mat-card>
+</div>
+
+<ng-template #emptySectionHeader>
+    
+    <mat-icon class="good-job-icon mat-icon-large">check_circle</mat-icon> &nbsp;
+    <b>
+    There are no violations for this section.
+</b>
+</ng-template>
+<ng-template #emptySectionContent>
+
+</ng-template>

@@ -16,7 +16,7 @@
 <article class="message article-box" #trackHeight>
     <!--message header start-->
     <div class="message-header">
-      <p>Validate Study</p>
+      <p>Validate {{studyId}}</p>
       <span><mat-icon [matTooltip]="'helpMessage'" >help</mat-icon></span>
     </div>
     <!--message header end-->
@@ -24,18 +24,28 @@
       <div class=" container ">
   
         <div class="interior-container right" #trackStatusHeight>
-          <a
+          <button
           class="button is-info init-button"
+          [disabled]="isInitiated || taskStarted"
           [ngClass]="startButtonClass"
           (click)="startValidationTask()" >
-            <span *ngIf="serverReady"><mat-icon> schedule </mat-icon></span>
+            <span *ngIf="isInitiated === false && taskStarted === false"><mat-icon> schedule </mat-icon></span>&nbsp;
             <div *ngIf="isInitiated" ><mat-spinner [diameter]="18" strokeWidth="2"></mat-spinner></div>
-            {{ buttonText }}  </a>
+            {{ buttonText }}  </button>
             <div class="status-container"> 
-              <div class="response"><b>LAST UPDATE:</b> {{lastRunTime}}</div>
-              <div class="response"><b>STATUS:</b><i> {{status}} </i></div>
-              <div class="response top" *ngIf="showTaskId" ><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
-              <div class="response bottom"><b>DESCRIPTION: </b><br>
+              <div class="response text-padding"><b>LAST UPDATE:</b> {{lastRunTime}}</div>
+              <div class="response text-padding"><b>STATUS:</b><i> {{status}} </i></div>
+              <div class="response text-padding" *ngIf="showTaskId" ><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
+              <div class="response text-padding bottom"><b>DESCRIPTION: </b>
+
+                <div *ngIf="currentTaskState.ws3TaskStatus == 'SUCCESS'; else otherStatusesBlock">
+                  {{dm.SUCCESS[status]}}
+                </div>
+                <ng-template #otherStatusesBlock>
+                  {{dm[currentTaskState.ws3TaskStatus]}}
+  
+                </ng-template>
+              <br>
               </div>
             </div>
         </div>

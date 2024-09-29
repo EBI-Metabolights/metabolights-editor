@@ -6,6 +6,23 @@ import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validati
 import { ValidationState, ValidationTask } from 'src/app/ngxs-store/study/validation/validation.state';
 import { ViolationType } from '../interfaces/validation-report.types';
 import { ValidationPhase } from '../interfaces/validation-report.interface';
+import { GeneralMetadataService } from 'src/app/services/decomposed/general-metadata.service';
+import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
+
+
+export const DescriptionMessages = {
+  SUCCESS: {
+    ERROR: "Study has failed validation pipeline.",
+    WARNING: "Study has passed validation pipeline, with warnings. Please consult report.",
+    SUCCESS: "Study has passed validation pipeline."
+  },
+  FAILED: "Unable to complete validation task. Please contact metabolights-help if the problem persists.",
+  PENDING: "Validation task is awaiting execution in a queue.",
+  INITIATED: "Task is executing.",
+  REVOKED: "Validation task was revoked. If this was unexpected contact metabolights-help.",
+  NONE: "-"
+}
+
 
 @Component({
   selector: 'app-validation-task-box',
@@ -18,6 +35,8 @@ export class ValidationTaskBoxComponent implements OnInit {
   @Select(ValidationState.currentValidationTask) currentTask$: Observable<ValidationTask>;
   @Select(ValidationState.validationStatus) validationStatus$: Observable<ViolationType>;
   @Select(ValidationState.lastValidationRunTime) lastValidationTime$: Observable<string>;
+  @Select(GeneralMetadataState.id) studyId$: Observable<string>;
+
   buttonTexts = "Initiate Validation Task"
   startButtonClass = "";
 
@@ -32,7 +51,11 @@ export class ValidationTaskBoxComponent implements OnInit {
   taskStarted = false;
 
   taskStates =  ['INITIATED', 'STARTED', 'SUCCESS', 'FAILURE', 'REVOKED', 'PENDING']
+  dm = DescriptionMessages;
+  dynamicStatus: keyof typeof DescriptionMessages.SUCCESS
   currentTaskState: ValidationTask = {id: "", ws3TaskStatus: "NONE"};
+
+  studyId: string = "";
 
   constructor(private store: Store) {
 
@@ -43,13 +66,13 @@ export class ValidationTaskBoxComponent implements OnInit {
     this.currentTask$.subscribe((task) => {
       if (task !== null) {
         this.currentTaskState = task;
-        console.log(`taskState: ${this.currentTaskState}`)
+        console.log(`taskState: ${JSON.stringify(this.currentTaskState)}`)
       }
     })
 
     this.validationStatus$.subscribe((status) => {
       if (status !== null) {
-
+        console.log(`status: ${status}`)
         this.status = status
       }
     });
@@ -58,7 +81,13 @@ export class ValidationTaskBoxComponent implements OnInit {
       if (time !== null) {
         this.lastRunTime = time;
       }
-    }) 
+    });
+
+    this.studyId$.subscribe((id) => {
+      if (id !== null) {
+        this.studyId = id;
+      }
+    })
       
   }
 
