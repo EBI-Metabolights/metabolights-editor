@@ -14,6 +14,7 @@
         aria-label="Subsections"
         [hideMultipleSelectionIndicator]="true"
         [(ngModel)]="selectedSubsections"
+        (change)="filterViolations()"
         multiple
       >
         <mat-button-toggle 
@@ -39,6 +40,7 @@
         aria-label="ViolationType"
         [hideMultipleSelectionIndicator]="true"
         [(ngModel)]="selectedViolationTypes"
+        (change)="filterViolations()"
         class="w-100"
         multiple
       >
@@ -61,10 +63,14 @@
   </section>
   <br>
 <div *ngIf="violations.length > 0; else noViolations">
-    <div *ngFor="let violation of violations; let i = index;">
-        <validation-v2-detail *ngIf="subsectionSelected(violation.section) && selectedViolationTypes.includes(violation.type)" [violation]="violation"></validation-v2-detail>
-        <br>
-    </div>
+  <div *ngIf="filteredViolations.length > 0; else noViolationsForFilterSelection">
+    <div *ngFor="let violation of filteredViolations; let i = index;">
+      <validation-v2-detail  [violation]="violation"></validation-v2-detail>
+      <br>
+  </div>
+
+  </div>
+
 </div>
 
 <!--No violations found template-->
@@ -72,3 +78,11 @@
   <app-no-violations [section]="true"></app-no-violations>
   <br>
 </ng-template>
+<!--End of no violations template-->
+
+<!--No violations found for selected subsection and violation type filters-->
+<ng-template #noViolationsForFilterSelection>
+  <app-no-violations [section]="true" [filter]="true"></app-no-violations>
+  <br>
+</ng-template>
+<!--End of no violation found for selected filters-->

@@ -24,3 +24,15 @@ h2 {
 .no-round {
     border-radius: 0 !important;
   }
+
+  .text-align {
+    text-align: left;
+  }
+
+  .header-container {
+    display: flex;
+  }
+
+  .icon-subcontainer {
+    padding-top: 0.5%;
+  }

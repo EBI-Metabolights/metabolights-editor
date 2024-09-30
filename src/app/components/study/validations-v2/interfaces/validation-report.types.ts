@@ -29,9 +29,9 @@ export type ViolationType = "WARNING" | "ERROR" | "SUCCESS" | "INFO"
 export type ViolationPriority = "CRITICAL" | "HIGH" | "MEDIUM" | "LOW"
 
 export const validationReportAssaySubsectionList: ValidationReportAssaySubsection[] = [
+  "general",
   "columns",
   "rows",
-  "general",
   "metabolite_identification",
   "mass_spectrometry",
   "nmr_assay",
@@ -55,10 +55,10 @@ export const validationReportInvestigationSubsectionList: ValidationReportInvest
 ];
 
 export const validationReportSamplesSubsectionList: ValidationReportSamplesSubsection[] = [
+  "general",
   "columns",
   "rows",
   "filename",
-  "general",
   "source",
   "sampleCollection"
 ];

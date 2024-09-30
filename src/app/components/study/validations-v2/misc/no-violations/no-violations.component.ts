@@ -10,5 +10,6 @@ export class NoViolationsComponent {
 
   @Input() studyId: string;
   @Input() section: boolean = false;
+  @Input() filter: boolean = false;
 
 }

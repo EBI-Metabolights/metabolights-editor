@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ValidationReportSubsection } from '../interfaces/validation-report.types';
 import { Violation } from '../interfaces/validation-report.interface';
 
@@ -8,18 +8,34 @@ import { Violation } from '../interfaces/validation-report.interface';
   templateUrl: './validation-section.component.html',
   styleUrl: './validation-section.component.css'
 })
-export class ValidationSectionComponent implements OnInit {
+export class ValidationSectionComponent implements OnInit, OnChanges {
 
   @Input() violations: Violation[];
   @Input() subsections: ValidationReportSubsection[];
+
   selectedSubsections: ValidationReportSubsection[] = [];
+  filteredViolations: Violation[] = [];
 
   violationTypes = ["ERROR", "WARNING"];
   selectedViolationTypes = ["ERROR", "WARNING"];
 
   ngOnInit(): void {
     this.selectedSubsections = JSON.parse(JSON.stringify(this.subsections));
+    this.filteredViolations = this.violations;
   }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.selectedSubsections || changes.selectedViolationTypes) {
+      this.filterViolations();
+    }
+  }
+
+  filterViolations() {
+    this.filteredViolations = this.violations.filter(
+      violation => this.subsectionSelected(violation.section) && this.selectedViolationTypes.includes(violation.type)
+    )
+  }
+
 
   getSelectedValues() {
     console.log(this.selectedSubsections);

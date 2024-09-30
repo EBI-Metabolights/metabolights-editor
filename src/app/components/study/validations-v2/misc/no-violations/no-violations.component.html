@@ -11,11 +11,19 @@
 </div>
 
 <ng-template #emptySectionHeader>
-    
-    <mat-icon class="good-job-icon mat-icon-large">check_circle</mat-icon> &nbsp;
-    <b>
-    There are no violations for this section.
-</b>
+    <div class="header-container">
+        <div class="icon-subcontainer">
+            <mat-icon *ngIf="section && filter == false" class="good-job-icon mat-icon-large">check_circle</mat-icon>
+            <mat-icon *ngIf="filter" class="mat-icon-large">info</mat-icon> &nbsp;
+        </div>
+        <div class="text-align">
+            <b>
+                {{ filter ? "There are no violations for your selected subsection and violation type filters." :  "There are no violations for this section."}}
+                
+            </b>
+        </div>
+    </div>
+
 </ng-template>
 <ng-template #emptySectionContent>
 
