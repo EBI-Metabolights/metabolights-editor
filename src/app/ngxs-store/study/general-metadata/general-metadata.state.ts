@@ -14,6 +14,10 @@ import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
 import { EditorValidationRules, NewValidationReport, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
+import { ApplicationState } from "../../non-study/application/application.state";
+import { take } from "rxjs/operators";
+import { UserState } from "../../non-study/user/user.state";
+import { User } from "../../non-study/user/user.actions";
 
 
 export interface GeneralMetadataStateModel {
@@ -395,6 +399,12 @@ export class GeneralMetadataState {
                 if (assigned_status !== state.status) {
                   ctx.dispatch(new StudyStatus.Set(assigned_status));
                 }
+                const readOnlySub = this.store.select(state => state.ApplicationState.readonly).pipe(take(1))
+                readOnlySub.subscribe((ro) => {
+                    this.store.dispatch(new User.Studies.Get())
+                    ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
+                })
+                
             }
         )
     }
