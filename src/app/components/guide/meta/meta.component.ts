@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { AbstractControl, FormBuilder, UntypedFormBuilder, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
@@ -40,10 +40,12 @@ export class MetaComponent implements OnInit {
 
   currentTitle: string = null;
   currentDescription: string = null;
+
   manuscript: any = null;
   manuscriptIdentifier = "";
   selectedManuscriptOption: number = null;
   isManuscriptLoading = false;
+  manuscriptIdentifierValidSyntax = true;
   manuscriptOptions: any[] = [
     {
       text: "Yes, Published",
@@ -62,14 +64,14 @@ export class MetaComponent implements OnInit {
     },
   ];
 
-  form: UntypedFormGroup;
+  manuscriptForm: UntypedFormGroup;
   isLoading = false;
   baseHref: string;
 
   private toastrSettings: Record<string, any> = {};
 
   constructor(
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private router: Router,
@@ -80,6 +82,10 @@ export class MetaComponent implements OnInit {
     this.editorService.initialiseStudy(this.route);
     this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
+
+    this.manuscriptForm = this.fb.group({
+      manuscriptID: ['', [manuscriptIDValidator()]]
+    })
   }
 
   ngOnInit() {}
@@ -125,10 +131,17 @@ export class MetaComponent implements OnInit {
   fetchManuscriptInformation() {
     this.isManuscriptLoading = true;
     let manuscript = null;
-    if (this.manuscriptIdentifier.indexOf(".") > 0) {
+    //if (this.manuscriptIdentifier.indexOf(".") > 0) {
+    if (isValidDOI(this.manuscriptIdentifier)) {
+      this.manuscriptIdentifierValidSyntax = true;
       manuscript = this.getArticleFromDOI();
-    } else {
+    } else if (isValidPubMedID(this.manuscriptIdentifier)) {
+      this.manuscriptIdentifierValidSyntax = true;
       manuscript = this.getArticleFromPubMedID();
+    } else {
+      this.manuscriptIdentifierValidSyntax = false;
+      this.isManuscriptLoading = false;
+
     }
   }
 
@@ -144,7 +157,8 @@ export class MetaComponent implements OnInit {
           .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
           .subscribe((art) => {
             if (art.doi === doi) {
-              this.manuscript = article;
+              //this.manuscript = article;
+              this.manuscript = art;
               this.isManuscriptLoading = false;
               this.includeAllAuthors();
             }
@@ -167,14 +181,13 @@ export class MetaComponent implements OnInit {
   }
 
   includeAllAuthors() {
+    console.log(JSON.stringify(this.manuscript));
     this.manuscript.authorDetails.forEach((author) => {
       author.checked = true;
     });
   }
 
-  getFieldValue(name) {
-    return this.form.get(name).value;
-  }
+
 
   skipMetaData() {
     this.router.navigate(["/guide/assays", this.requestedStudy]);
@@ -317,14 +330,38 @@ export class MetaComponent implements OnInit {
     return mtblPerson.toJSON();
   }
 
-  setFieldValue(name, value) {
-    return this.form.get(name).setValue(value);
-  }
-
   isManuscriptValid() {
     if (this.manuscript.title !== "" && this.manuscript.abstract !== "") {
       return true;
     }
     return false;
   }
+}
+
+export function manuscriptIDValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (!value) {
+      return null; 
+    }
+
+    if (isValidPubMedID(value) || isValidDOI(value)) {
+      return null; 
+    }
+
+    return { invalidManuscriptID: true };
+  };
+}
+
+function isValidDOI(doi: string): boolean {
+  const doiRegex = /^10.\d{4,9}\/[-._;()\/:A-Za-z0-9]+$/;
+
+  return doiRegex.test(doi);
+}
+
+function isValidPubMedID(pmid: string | number): boolean {
+  const pmidStr = pmid.toString();
+  const pmidRegex = /^[1-9]\d*$/;
+  return pmidRegex.test(pmidStr);
 }
