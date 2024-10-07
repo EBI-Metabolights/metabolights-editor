@@ -81,6 +81,7 @@ export class TitleComponent implements OnInit {
       this.validations = value;
     });
     this.studyIdentifier$.subscribe((value) => {
+      console.log(`title component id subscription ${value}`)
       if (value != null) {
         this.requestedStudy = value;
         if (document.title.indexOf("|") > -1) {

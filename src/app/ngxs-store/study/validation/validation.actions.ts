@@ -69,3 +69,8 @@ export namespace NewValidationReport {
         constructor(public time: string) {}
     }
 }
+
+export class ResetValidationState {
+    static readonly type = '[validation] Reset Validation State'
+    constructor() {}
+}

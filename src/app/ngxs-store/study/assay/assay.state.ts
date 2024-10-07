@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Action, Select, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { Assay, AssayList, TemplateRow } from "./assay.actions";
+import { Assay, AssayList, ResetAssayState, TemplateRow } from "./assay.actions";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { FilesState } from "../files/files.state";
 import { Observable, Subject, forkJoin, of } from "rxjs";
@@ -21,14 +21,14 @@ export interface AssayStateModel {
     assays: Record<string, any>;
     templateRows: TemplateRowCollection;
 }
-
+const defaultState: AssayStateModel = {
+    assayList: null,
+    assays: {},
+    templateRows: new TemplateRowCollection()
+}
 @State<AssayStateModel>({
     name: 'assay',
-    defaults: {
-        assayList: null,
-        assays: {},
-        templateRows: new TemplateRowCollection()
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class AssayState {
@@ -74,14 +74,14 @@ export class AssayState {
                 }
             )
         } else {
-            this.files$.subscribe(
+            this.files$.pipe(take(1)).subscribe(
                 (files) => {
                     // the data type of assay files is different in this block than the one above - some strict typing needed to avoid confusion
                     let assayFiles = files.study.filter(file => file.file.startsWith('a_'));
                     this.readonly$.pipe(take(1)).subscribe((readonly) => {
                         this.readonly = readonly;
 
-                        this.templatesLoadedSubject.subscribe((val) => {
+                        this.templatesLoadedSubject.pipe(take(1)).subscribe((val) => {
                             assayFiles.forEach((sheet) => {
                                 ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
                             });
@@ -104,7 +104,7 @@ export class AssayState {
 
     @Action(Assay.Add)
     AddNewAssay(ctx: StateContext<AssayStateModel>, action: Assay.Add) {
-        this.readonly$.subscribe(
+        this.readonly$.pipe(take(1)).subscribe(
             (readonly) => {
                 this.assaysService.addAssay(action.assay).subscribe(
                     (response) => {
@@ -337,6 +337,11 @@ export class AssayState {
             ...state,
             templateRows: newTemplateRows
         });
+    }
+
+    @Action(ResetAssayState)
+    Reset(ctx: StateContext<AssayStateModel>, action: ResetAssayState) {
+        ctx.setState(defaultState)
     }
 
     @Selector()

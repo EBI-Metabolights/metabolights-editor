@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
-import { FilesLists, ObfuscationCode, Operations, UploadLocation } from "./files.actions";
+import { FilesLists, ObfuscationCode, Operations, ResetFilesState, UploadLocation } from "./files.actions";
 import { FilesService } from "src/app/services/decomposed/files.service";
 import { sample } from "rxjs-compat/operator/sample";
 import { Samples } from "../samples/samples.actions";
@@ -14,14 +14,16 @@ export interface FilesStateModel {
     selectedFiles: IStudyFiles[];
 }
 
+const defaultState: FilesStateModel = {
+    obfuscationCode: null,
+    uploadLocation: null,
+    files: null,
+    selectedFiles: null
+}
+
 @State<FilesStateModel>({
     name: 'files',
-    defaults: {
-        obfuscationCode: null,
-        uploadLocation: null,
-        files: null,
-        selectedFiles: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class FilesState {
@@ -32,7 +34,6 @@ export class FilesState {
     @Action(Operations.GetFreshFilesList)
     GetStudyFiles(ctx: StateContext<FilesStateModel>, action: Operations.GetFreshFilesList) {
         const state = ctx.getState();
-        console.log(action);
         this.filesService.getStudyFilesFetch(action.force, action.readonly).subscribe(
             (data) => {
                 ctx.dispatch(new UploadLocation.Set(data.uploadPath));
@@ -91,6 +92,12 @@ export class FilesState {
             files: action.files
         })
     }
+
+    @Action(ResetFilesState)
+    Reset(ctx: StateContext<FilesStateModel>, action: ResetFilesState) {
+        ctx.setState(defaultState);
+    }
+
 
     @Selector()
     static getSampleSheet(state: FilesStateModel) {

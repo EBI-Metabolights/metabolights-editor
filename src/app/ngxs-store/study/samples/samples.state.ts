@@ -1,25 +1,27 @@
 import { Injectable } from "@angular/core";
 import { Action, Select, Selector, State, StateContext, Store } from "@ngxs/store";
-import { Organisms, Samples } from "./samples.actions";
+import { Organisms, ResetSamplesState, Samples } from "./samples.actions";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import Swal from "sweetalert2";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";
+import { take } from "rxjs/operators";
 
 // we should type the below properly once we get a better handle on what the data looks like
 export interface SamplesStateModel {
     samples: Record<string, any>;
     organisms: Record<string, any>;
 }
+const defaultState: SamplesStateModel = {
+  samples: null,
+  organisms: null
+}
 
 @State<SamplesStateModel>({
     name: 'samples',
-    defaults: {
-        samples: null,
-        organisms: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class SampleState {
@@ -34,7 +36,7 @@ export class SampleState {
 
     @Action(Samples.Get)
     GetStudySamples(ctx: StateContext<SamplesStateModel>, action: Samples.Get) {
-        this.sampleSheet$.subscribe(
+        this.sampleSheet$.pipe(take(1)).subscribe(
             (sampleSheet) => {
                 if (sampleSheet) {
                     this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
@@ -223,6 +225,11 @@ export class SampleState {
             ...state,
             organisms: action.organisms
         })
+    }
+
+    @Action(ResetSamplesState)
+    Reset(ctx: StateContext<SamplesStateModel>, action: ResetSamplesState) {
+      ctx.setState(defaultState);
     }
 
     @Selector()

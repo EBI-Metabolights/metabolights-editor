@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
-import { MAF } from "./maf.actions";
+import { MAF, ResetMAFState } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
 
 
@@ -24,14 +24,14 @@ export interface MAF {
 export interface MAFStateModel {
     mafs: Record<string, any>
 }
-
+ const defaultState: MAFStateModel = {
+    mafs: {}
+ }
 
 
 @State<MAFStateModel>({
     name: 'mafs',
-    defaults: {
-        mafs: {}
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class MAFState {
@@ -160,6 +160,11 @@ export class MAFState {
                 console.log(error);
             }
         )
+    }
+
+    @Action(ResetMAFState)
+    Reset(ctx: StateContext<MAFStateModel>, action: ResetMAFState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { EditorValidationRules, NewValidationReport, ValidationReport } from "./validation.actions";
+import { EditorValidationRules, NewValidationReport, ResetValidationState, ValidationReport } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
@@ -18,17 +18,17 @@ export interface ValidationStateModel {
     status: ViolationType;
     lastRunTime: string;
 }
-
+const defaultState: ValidationStateModel = {
+    rules: null,
+    report: null,
+    newReport: null,
+    taskId: null,
+    status: null,
+    lastRunTime: null
+}
 @State<ValidationStateModel>({
     name: 'validation',
-    defaults: {
-        rules: null,
-        report: null,
-        newReport: null,
-        taskId: null,
-        status: null,
-        lastRunTime: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class ValidationState {
@@ -214,6 +214,11 @@ export class ValidationState {
                 console.log("Could not override validation rule.");
             }
         )
+    }
+
+    @Action(ResetValidationState)
+    Reset(ctx: StateContext<ValidationStateModel>, action: ResetValidationState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

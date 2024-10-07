@@ -48,3 +48,8 @@ export namespace MAF {
     }
 
 }
+
+export class ResetMAFState {
+    static readonly type = '[maf] Reset MAF State'
+    constructor() {}
+}
