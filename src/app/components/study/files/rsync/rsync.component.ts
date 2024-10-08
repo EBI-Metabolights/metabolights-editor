@@ -11,6 +11,11 @@ export enum RsyncMode {
   sync
 }
 
+export enum SyncEvent {
+  metadata,
+  files,
+  internal,
+}
 
 @Component({
   selector: 'app-rsync',
@@ -161,7 +166,9 @@ export class RsyncComponent implements OnInit {
         && this.lastResponse.status === "COMPLETED_SUCCESS"
         && this.lastEmittedTaskId !== this.lastResponse.task_id){
         this.lastEmittedTaskId = this.lastResponse.task_id;
-        this.filesSynchronized.emit();
+
+        // want to have this emit something to indicate what sort of sync has taken place.
+        this.filesSynchronized.emit(SyncEvent[this.syncType as keyof typeof SyncEvent]);
       }
 
       this.updateButtons();

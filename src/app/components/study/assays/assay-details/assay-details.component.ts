@@ -33,11 +33,14 @@ export class AssayDetailsComponent implements OnInit {
   @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
   @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
 
+  assay$: Observable<any>;
+
   @Output() assayDelete = new EventEmitter<any>();
 
   private studyId: string = null
 
   isReadOnly = false;
+  templateRowPresent: boolean = false;
 
   fileTypes: any = [
     {
@@ -70,11 +73,18 @@ export class AssayDetailsComponent implements OnInit {
 
 
   setUpOnInitSubscriptionsNgxs() {
+
     this.assays$.subscribe((value) => {
-      this.assay = value[this.assayName];
+      if (Object.keys(value).length > 0 && this.assayName !== undefined) {
+        this.assay = value[this.assayName];
+        if(this.assay !== undefined){
+          this.assay.data.rows[0].index === -1 ? this.templateRowPresent = true : null
+        }
+      }
+
     });
     this.studySamples$.subscribe((value) => {
-      if (value.data) {
+      if (value && value.data) {
         this.sampleNames = value.data.rows.map((r) => r["Sample Name"]);
         this.filteredSampleNames = this.sampleNames;
       }

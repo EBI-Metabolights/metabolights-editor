@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import {  CurationRequest, GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
+import { CurationRequest, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -14,6 +14,7 @@ import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
+import { take } from "rxjs/operators";
 
 
 export interface GeneralMetadataStateModel {
@@ -28,22 +29,22 @@ export interface GeneralMetadataStateModel {
     publications: IPublication[];
     people: IPerson[];
 }
+const defaultState: GeneralMetadataStateModel = {
+    id: null,
+    title: null,
+    description: null,
+    submissionDate: null,
+    releaseDate: null,
+    status: null,
+    curationRequest: null,
+    reviewerLink: null,
+    publications: null,
+    people: null
+}
 
 @State<GeneralMetadataStateModel>({
     name: 'general',
-    defaults: {
-        id: null,
-        title: null,
-        description: null,
-        submissionDate: null,
-        releaseDate: null,
-        status: null,
-        curationRequest: null,
-        reviewerLink: null,
-        publications: null,
-        people: null
-
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class GeneralMetadataState {
@@ -55,7 +56,7 @@ export class GeneralMetadataState {
 
     @Action(GetGeneralMetadata)
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
-        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).subscribe(
+        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
             (gm_response) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new SetLoadingInfo("Loading investigation details"));
@@ -105,6 +106,7 @@ export class GeneralMetadataState {
     @Action(Identifier.Set)
     SetStudyIdentifier(ctx: StateContext<GeneralMetadataStateModel>, action: Identifier.Set) {
         const state = ctx.getState();
+        console.log(`hit Identifier.Set action handler with ${action.id}`)
         ctx.setState({
             ...state,
             id: action.id
@@ -232,7 +234,8 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            ctx.dispatch(new Publications.Set([response], true))
+            console.log(action.title);
+            ctx.dispatch(new Publications.Set([response], false, true, action.title))
             }
         )
 
@@ -255,13 +258,21 @@ export class GeneralMetadataState {
     @Action(Publications.Set)
     SetPublications(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Set) {
         const state = ctx.getState();
-        // need to do if extend = true
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
         action.publications.forEach((publication) => {
             temp.push(jsonConvert.deserialize(publication, MTBLSPublication));
         });
         if (action.extend) temp = temp.concat(state.publications);
+        if (action.update){
+            let existingPublications = []
+            existingPublications = existingPublications.concat(state.publications);
+            existingPublications = existingPublications.filter(pub => pub.title !== action.oldTitle);
+            temp = temp.concat(existingPublications);
+            temp.sort((a, b) => {
+                return a.title[0].localeCompare(b.title[0]);
+              });
+        }
         ctx.setState({
             ...state,
             publications: temp
@@ -271,9 +282,9 @@ export class GeneralMetadataState {
     @Action(People.Set)
     SetPeople(ctx: StateContext<GeneralMetadataStateModel>, action: People.Set) {
         const state = ctx.getState();
-        // need to do if extend = true
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
+
         action.people.forEach((person) => {
             temp.push(jsonConvert.deserialize(person, MTBLSPerson));
         });
@@ -315,10 +326,19 @@ export class GeneralMetadataState {
     @Action(People.Update)
     UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
         const state = ctx.getState();
-        let name = `${action.body.contacts[0].firstname}${action.body.contacts[0].lastName}`
-        this.generalMetadataService.updatePerson(action.body.contacts[0].email, name, action.body.contacts[0].person, state.id).subscribe(
+        let name = `${action.body.contacts[0].firstName}${action.body.contacts[0].lastName}`
+        let email = "a";
+        let duds = [null, undefined, ''];
+        let result = duds.includes(action.existingEmail);
+        if (result) email = action.existingEmail;
+        else email = action.body.contacts[0].email;
+
+        this.generalMetadataService.updatePerson(email, name, action.body, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new People.Set(response.contacts as IPerson[], true))
+                let body = null
+                if (!Object.keys(response).includes('contacts')) body = [response]
+                else body = response.contacts
+                ctx.dispatch(new People.Get());
             },
             (error) => {
                 console.log("Could not update study person");
@@ -360,9 +380,14 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
             (response) => {
-
+                ctx.dispatch(new StudyStatus.Set(action.status));
             }
         )
+    }
+
+    @Action(ResetGeneralMetadataState)
+    Reset(ctx: StateContext<GeneralMetadataStateModel>, action: ResetGeneralMetadataState) {
+        ctx.setState(defaultState);
     }
 
 

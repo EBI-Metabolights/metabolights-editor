@@ -1,27 +1,41 @@
 import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { Action, Select, Selector, State, StateContext } from "@ngxs/store";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
-import { Descriptors, Factors } from "./descriptors.action";
+import { Descriptors, Factors, ResetDescriptorsState } from "./descriptors.action";
 import { JsonConvert } from "json2typescript";
 import { DescriptorsService } from "src/app/services/decomposed/descriptors.service";
-import { IStudyDesignDescriptor } from "src/app/models/mtbl/mtbls/interfaces/study-design-descriptor.interface";
+import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
+import { Observable } from "rxjs";
+import { take } from "rxjs/operators";
+import * as toastr from "toastr";
+
 
 
 export interface DescriptorsStateModel {
     designDescriptors: Ontology[]
     factors: MTBLSFactor[]
 }
-
+const defaultState: DescriptorsStateModel = {
+    designDescriptors: null,
+    factors: null
+}
 @State<DescriptorsStateModel> ({
     name: 'descriptors',
-    defaults: {
-        designDescriptors: null,
-        factors: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class DescriptorsState {
+
+    descriptorToastrSettings: Record<string, any> = {
+        timeOut: "2500",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+      }
+
+    @Select(GeneralMetadataState.id) studyId$:  Observable<string>
 
     constructor(private descriptorsService: DescriptorsService) {
 
@@ -45,6 +59,14 @@ export class DescriptorsState {
         this.descriptorsService.saveDesignDescriptor(action.descriptor, action.id).subscribe(
             (response) => {
                 ctx.dispatch(new Descriptors.Set([response], true));
+                let toastrSettingsTemp = {
+                    timeOut: "2500",
+                    positionClass: "toast-top-center",
+                    preventDuplicates: true,
+                    extendedTimeOut: 0,
+                    tapToDismiss: false,
+                  }
+                toastr.success('Design descriptor saved.', "Success", toastrSettingsTemp);
             },
             (error) => {
                 console.error(`Could not add descriptor`)
@@ -56,7 +78,20 @@ export class DescriptorsState {
     UpdateDesignDescriptor(ctx: StateContext<DescriptorsStateModel>, action: Descriptors.Update) {
         this.descriptorsService.updateDesignDescriptor(action.annotationValue, action.descriptor, action.id).subscribe(
             (response) => {
-                ctx.dispatch(new Descriptors.Set([response], true));
+                /**
+                 * It may be hard to figure out which descriptor is new. Easy option for this is to just get 
+                 * the entire list of descriptors again - OR change the API response for this request (and for all requests)
+                 * where you're updating an item that exists as within a list of items, to return _all_ items even if youre only updating one
+                 * (perhaps enabled by a query param). That involves API changes, so for now, might just make the extra http request / obtain 
+                 * the study ID via a subcription from this state container.
+                 */
+                //ctx.dispatch(new Descriptors.Set([response], true));
+                this.studyId$.pipe(take(1)).subscribe((value) => {
+                    ctx.dispatch(new Descriptors.Get(value))
+                    toastr.success('Design descriptor updated.', "Success", this.descriptorToastrSettings);
+
+                });
+
             },
             (error) => {
                 console.error(`Could not update descriptor ${action.annotationValue}`)
@@ -69,6 +104,8 @@ export class DescriptorsState {
         this.descriptorsService.deleteDesignDescriptor(action.annotationValue, action.id).subscribe(
             (response) => {
                 ctx.dispatch( new Descriptors.Get(action.id));
+                toastr.success('Design descriptor deleted.', "Success", this.descriptorToastrSettings);
+
             },
             (error) => {
                 console.error(`Could not delete descriptor ${action.annotationValue}`)
@@ -158,6 +195,11 @@ export class DescriptorsState {
                 console.error(`Could not delete factor ${action.factorName}`);
             }
             )
+    }
+
+    @Action(ResetDescriptorsState)
+    Reset(ctx: StateContext<DescriptorsStateModel>, action: ResetDescriptorsState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

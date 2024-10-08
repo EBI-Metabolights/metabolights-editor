@@ -2,24 +2,21 @@ import {
   Component,
   OnInit,
   Input,
-  Inject,
   ViewChild,
-  SimpleChanges,
 } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology, areOntologyListsDifferent, elucidateListComparisonResult } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
 import { DOIService } from "../../../../services/publications/doi.service";
 import { EuropePMCService } from "../../../../services/publications/europePMC.service";
 import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Observable } from "rxjs";
+import { Observable, timer } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
@@ -76,7 +73,6 @@ export class DesignDescriptorComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
-    private doiService: DOIService,
     private europePMCService: EuropePMCService
   ) {
 
@@ -98,42 +94,7 @@ export class DesignDescriptorComponent implements OnInit {
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
     });
-    this.descriptors$.subscribe((stateDescriptors) => {
-      // As a new 'pattern' this is complicated
-      if (stateDescriptors !== null) {
-        if (this.descriptors === null) this.descriptors = stateDescriptors
-        else { 
-          const descriptorComparisonResult = elucidateListComparisonResult(areOntologyListsDifferent(this.descriptors, stateDescriptors));
-          switch(descriptorComparisonResult) {
-            case 'Positive':
-              this.descriptors = stateDescriptors
-              // pull out to method
-              this.refreshDesignDescriptors("Design descriptor deleted.");
-              this.isDeleteModalOpen = false;
-              this.isModalOpen = false;
-              this.isFormBusy = false;
-            case 'Negative':
-              this.descriptors = stateDescriptors
-              // pull out to method
-              this.refreshDesignDescriptors("Design descriptor saved.");
-              this.descriptorComponent.values = [];
-              this.isModalOpen = false;
-              this.loading = false;
-              this.isFormBusy = false;
-            case 'Null':
-              this.descriptors = stateDescriptors
-              console.log('No change');
-            case 'Zero':
-              this.descriptors = stateDescriptors
-              // pull out to method
-              this.refreshDesignDescriptors("Design descriptor updated.");
-              this.isFormBusy = false;
-              this.closeImportModal();
-          }
-        }
-      }
-      
-    });
+
     this.studyReadonly$.subscribe((value) => {
       if (value != null) {
         this.isStudyReadOnly = value;
@@ -305,26 +266,33 @@ export class DesignDescriptorComponent implements OnInit {
             this.compileBody(), this.studyId
           )
         )
-        // After this point, the change will be fed through to the selector - we must do any callback stuff in there
+        // this is a quick fix - a large scale refactor to move away from inline modals is required.
+        const oneSecondTimer = timer(1000);
+        oneSecondTimer.subscribe(() => {
+          this.closeModal();
+        });
 
       }
     }
   }
 
 
-
-  // changed the name from the above method as the wording is confusing, we arent updating anything
   refreshDesignDescriptors(message) {
     this.isFormBusy = true;
 
     // MAY NEED REVISITING
     this.isFormBusy = false;
-    this.form.markAsPristine();
-    this.initialiseForm();
-    this.isModalOpen = true;
-
-    this.descriptorComponent.reset();
-    toastr.success(message, "Success", this.toastrSettings);
+    if (message !== "Design descriptor updated.") {
+      if (this.form !== undefined) {
+        this.form.markAsPristine();
+      }
+    }
+    if (!["Design descriptor updated.", "Design descriptor deleted."].includes(message)) {
+      this.initialiseForm();
+      this.descriptorComponent.reset();
+      this.isModalOpen = true;
+    }
+    //toastr.success(message, "Success", this.toastrSettings);
 
   }
 

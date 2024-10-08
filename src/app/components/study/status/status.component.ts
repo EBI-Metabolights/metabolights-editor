@@ -109,6 +109,9 @@ export class StatusComponent implements OnInit {
             (completed) => {
               this.closeModal();
               toastr.success("Study status updated.", "Success", this.toastrSettings);
+              let readonly = true;
+              if (this.curator) readonly = false;
+              if (toStatus === 'Submitted') readonly = false;
               this.editorService.loadStudyNgxs(this.requestedStudy, false);
 
             }, (error) => {

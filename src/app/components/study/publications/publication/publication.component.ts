@@ -5,22 +5,17 @@ import {
   Component,
   OnInit,
   Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
   ViewChild,
 } from "@angular/core";
-import { MTBLSComment } from "./../../../../models/mtbl/mtbls/common/mtbls-comment";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPublication } from "./../../../../models/mtbl/mtbls/mtbls-publication";
 import { trigger, style, animate, transition } from "@angular/animations";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./publication.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { JsonConvert } from "json2typescript";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
@@ -239,7 +234,8 @@ export class PublicationComponent implements OnInit {
 
 
   updateStudyTitleNgxs() {
-    this.store.dispatch(new Title.Update(this.getFieldValue("title"))).subscribe(
+    const title = this.getFieldValue("title");
+    this.store.dispatch(new Title.Update({title})).subscribe(
       (completed) => {
         toastr.success("Title updated.", "Success", this.toastrSettings);
         this.closeUpdateTitleModal();
@@ -408,7 +404,7 @@ export class PublicationComponent implements OnInit {
 
 
   updatePublicationsNgxs(message) {
-    if (this.isReadOnly) {
+    if (!this.isReadOnly) {
       this.form.markAsPristine();
       this.initialiseForm();
       this.isModalOpen = false;

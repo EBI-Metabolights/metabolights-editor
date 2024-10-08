@@ -94,3 +94,8 @@ export class SetInitialLoad {
     static readonly type = '[validation] Set Initial Load'
     constructor(public set: boolean) {}
 }
+
+export class ResetValidationState {
+    static readonly type = '[validation] Reset Validation State'
+    constructor() {}
+}

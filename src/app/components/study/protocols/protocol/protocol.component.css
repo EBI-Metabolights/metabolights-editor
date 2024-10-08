@@ -28,3 +28,8 @@ label {
 .mat-mdc-input-element {
   width: calc(100% - 30px);
 }
+
+.guide-text {
+  color: #666666;
+
+}

@@ -66,7 +66,7 @@
     [parent]="parent + file.file + '/'"
     [file]="sfile"
     [parentDirectoryComponent]="this"
-    [deletionEnabled]="!readonlyFolder"
+    [deletionEnabled]="childDirectoryDeletionEnabled(file)"
     [downloadContents]="downloadContents"
     [downloadEnabled]="!sfile.directory && downloadContents"
     [readonlyFolder]="readonlyFolder"

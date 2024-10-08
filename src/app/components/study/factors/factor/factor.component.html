@@ -1,9 +1,10 @@
 <div *ngIf="addNewFactor || factor == null; else showFactorDetails">
   <span *ngIf="!isDropdown; else showDropdownOption">
     <a
-      class="button is-primary is-pulled-right is-small"
-      (click)="openModal()"
-      >+ Add factor</a
+      class="button is-light is-pulled-right is-small"
+      (click)="navigateToSamples()"
+            >    <mat-icon>info</mat-icon>
+       Add factor in the sample sheet</a
     >
   </span>
   <ng-template #showDropdownOption>
@@ -52,7 +53,7 @@
         </div>
         <div class="timeline-item">
           <div class="timeline-marker is-image is-32x32">
-            <img src="https://bulma.io/images/placeholders/32x32.png" />
+            <img src="{{ baseHref }}assets/img/file.png" />
           </div>
           <div class="timeline-content">
             <p class="heading">February 2016</p>

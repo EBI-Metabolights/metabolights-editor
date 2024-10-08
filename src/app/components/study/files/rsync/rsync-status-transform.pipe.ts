@@ -14,7 +14,7 @@ export class RsyncStatusTransformPipe implements PipeTransform {
         CALCULATION_FAILURE: 'Check failure',
         NOT_FOUND: "No Task Found",
         PENDING: 'Task is in Queue ...',
-        RUNNING: 'TAsk is running ...',
+        RUNNING: 'Task is running ...',
         COMPLETED_SUCCESS: "Task completed. Sync Completed",
         SYNC_FAILURE: "Sync failure",
         START_FAILURE: "Start failure",

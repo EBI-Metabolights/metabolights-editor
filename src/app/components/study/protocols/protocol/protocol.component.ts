@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, ViewChild } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
   MTBLSProtocol,
@@ -10,9 +10,6 @@ import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology"
 import { ValidateRules } from "./protocol.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import * as toastr from "toastr";
-import { JsonConvert } from "json2typescript";
-import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
-import { environment } from "src/environments/environment";
 import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable, Subscription } from "rxjs";
@@ -20,17 +17,17 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
-import { take } from "rxjs/operators";
 
 @Component({
   selector: "mtbls-protocol",
   templateUrl: "./protocol.component.html",
   styleUrls: ["./protocol.component.css"],
 })
-export class ProtocolComponent implements OnInit {
+export class ProtocolComponent implements OnInit, OnChanges {
   @Input("value") protocol: any;
   @Input("required") required = false;
   @Input("validations") validations: any;
+  @Input("guides") guides: Record<string, any> = {};
 
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
@@ -40,8 +37,7 @@ export class ProtocolComponent implements OnInit {
   @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
   @Select(GeneralMetadataState.id) studyId$: Observable<string>;
 
-  //@Select(ProtocolsState.specificProtocol()) updatedProtocol$: Observable<MTBLSProtocol>;
-
+  @Select(ProtocolsState.protocolGuides) protocolGuides$: Observable<Record<string, any>>;
 
 
   private studyId: string =  null;
@@ -70,12 +66,30 @@ export class ProtocolComponent implements OnInit {
 
   validationsId = "protocols.protocol";
 
+  protocolInGuides: boolean = false;
+  guideText: string = "";
+
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store
   ) {
+   // this.setUpSubscriptionsNgxs();
+  }
+
+  ngOnInit() {
     this.setUpSubscriptionsNgxs();
+
+    if (this.protocol == null) {
+      this.addNewProtocol = true;
+    } else {
+     this.isProtocolInGuides();
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    //this.isProtocolInGuides();
+    
   }
 
   setUpSubscriptionsNgxs() {
@@ -83,12 +97,19 @@ export class ProtocolComponent implements OnInit {
       this.studyId = id;
     })
     this.isProtocolsExpanded$.subscribe((value) => {
-      this.expand = !value;
+      this.expand = value;
     });
 
     this.readonly$.subscribe((value) => {
-      if (value !== null) {
+      if (value !== null && this.protocol) {
         this.isStudyReadOnly = value;
+        if(!this.isStudyReadOnly) {
+          this.protocolGuides$.subscribe((value) => {
+            if (Object.keys(value).includes(this.protocol.name)) {
+              this.guideText = value[this.protocol.name];
+            }
+          })
+        }
       }
     });
     this.toastrSettings$.subscribe((settings) => {
@@ -96,8 +117,16 @@ export class ProtocolComponent implements OnInit {
     })
   }
 
+
   toggleExpand() {
     this.expand = !this.expand;
+  }
+
+  isProtocolInGuides(): void {
+    let duds = [undefined, null]
+    if (duds.includes(this.guides)) this.protocolInGuides = false // this may now be redundant
+    let result = Object.keys(this.guides).includes(this.protocol.name)
+    this.protocolInGuides = result
   }
 
   saveColumnValue(col, assay) {
@@ -221,11 +250,6 @@ export class ProtocolComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
-    if (this.protocol == null) {
-      this.addNewProtocol = true;
-    }
-  }
 
   clearFormatting(target) {
     this.setFieldValue(target, this.strip(this.getFieldValue(target)));
@@ -402,7 +426,7 @@ export class ProtocolComponent implements OnInit {
           /**
            * This is an extraordinary antipattern but don't have much of a choice,
            * we can't change the components current protocol via the state without destroying
-           * the component that has the modal rendered. 
+           * the component that has the modal rendered.
            */
           this.protocolSubscription = this.store.select(ProtocolsState.specificProtocol(name))
           .subscribe(
@@ -411,7 +435,7 @@ export class ProtocolComponent implements OnInit {
               this.openModal(this.protocol);
             }
           )
-        
+
         }
         toastr.success(message, "Success", this.toastrSettings)
 

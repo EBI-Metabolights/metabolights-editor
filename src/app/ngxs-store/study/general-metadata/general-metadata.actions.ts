@@ -99,7 +99,7 @@ export class SetStudyReviewerLink {
 export namespace Publications {
     export class Set {
         static readonly type = '[general] Set Study Publications'
-        constructor(public publications: IPublication[], public extend: boolean = false) {}
+        constructor(public publications: IPublication[], public extend: boolean = false, public update: boolean = false, public oldTitle: string = null) {}
     }
 
     export class Get {
@@ -126,7 +126,7 @@ export namespace Publications {
 export namespace People {
     export class Set {
         static readonly type = '[general] Set Study People'
-        constructor(public people: IPerson[], public extend: boolean = false) {}
+        constructor(public people: IPerson[], public extend: boolean = false, public updated: boolean = false) {}
     }
 
     export class Get {
@@ -156,4 +156,8 @@ export namespace People {
 
 }
 
+export class ResetGeneralMetadataState {
+    static readonly type = '[general] Reset General Metadata State'
+    constructor() {}
+}
 

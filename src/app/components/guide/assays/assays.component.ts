@@ -79,7 +79,7 @@ export class GuidedAssaysComponent implements OnInit {
     this.studyFiles$.subscribe((value) => {
       if (value != null) {
         this.files = value;
-      } else {
+      } else if (value === null && this.files.length === 0) {
         this.store.dispatch(new Operations.GetFreshFilesList(false));
       }
     });

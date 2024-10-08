@@ -1,21 +1,11 @@
 import {
   Component,
-  ViewChild,
   OnInit,
-  Input,
-  Inject,
-  ViewChildren,
-  AfterContentInit,
-  QueryList,
-  OnChanges,
-  SimpleChanges,
-  ChangeDetectorRef,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import Swal from "sweetalert2";
-import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Select, Store } from "@ngxs/store";
 import { Observable } from "rxjs";
@@ -169,8 +159,6 @@ export class AddAssayComponent implements OnInit {
             type: "success",
           });
           
-          //this.store.dispatch(new AssayList.Get(this.requestedStudy));
-          //this.store.dispatch(new Protocols.Get());
         }
       )
     

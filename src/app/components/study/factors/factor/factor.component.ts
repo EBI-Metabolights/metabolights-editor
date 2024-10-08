@@ -60,7 +60,7 @@ export class FactorComponent implements OnInit {
   form: UntypedFormGroup;
   isFormBusy = false;
   addNewFactor = false;
-
+  baseHref: string;
   validationRules: any = null;
 
   constructor(
@@ -72,7 +72,14 @@ export class FactorComponent implements OnInit {
       this.defaultControlList = {name: "", values: []};
     }
     this.setUpSubscriptionsNgxs();
+    this.baseHref = editorService.baseHref
   }
+
+  navigateToSamples() {
+    let samplesLoc = window.location.href.replace('descriptors', 'samples')
+    window.location.href = samplesLoc;
+  }
+
 
 
   setUpSubscriptionsNgxs() {
