@@ -20,7 +20,7 @@ import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
 import { Select, Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/non-study/transitions/transitions.actions";
 import { User } from "../ngxs-store/non-study/user/user.actions";
-import { GetGeneralMetadata, Identifier } from "../ngxs-store/study/general-metadata/general-metadata.actions";
+import { GetGeneralMetadata, Identifier, ResetGeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.actions";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
 import { AssayState } from "../ngxs-store/study/assay/assay.state";
 import { FilesState } from "../ngxs-store/study/files/files.state";
@@ -30,11 +30,14 @@ import {  BannerMessage, DefaultControlLists, GuidesMappings, MaintenanceMode, S
 import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
 import { SampleState } from "../ngxs-store/study/samples/samples.state";
 import { MAFState } from "../ngxs-store/study/maf/maf.state";
-import { EditorValidationRules } from "../ngxs-store/study/validation/validation.actions";
-import { FilesLists, Operations } from "../ngxs-store/study/files/files.actions";
-import { Assay } from "../ngxs-store/study/assay/assay.actions";
-import { Samples } from "../ngxs-store/study/samples/samples.actions";
+import { EditorValidationRules, ResetValidationState } from "../ngxs-store/study/validation/validation.actions";
+import { FilesLists, Operations, ResetFilesState } from "../ngxs-store/study/files/files.actions";
+import { Assay, ResetAssayState } from "../ngxs-store/study/assay/assay.actions";
+import { ResetSamplesState, Samples } from "../ngxs-store/study/samples/samples.actions";
 import { ValidationService } from "./decomposed/validation.service";
+import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
+import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
+import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -158,7 +161,21 @@ export class EditorService {
       window.location.href = this.configService.config.javaLogoutURL;
     } else {
       this.router.navigate([this.configService.config.loginURL]);
+      this.resetStudyStates();
     }
+  }
+
+  resetStudyStates() {
+    this.store.dispatch([
+      new ResetGeneralMetadataState(),
+      new ResetAssayState(),
+      new ResetSamplesState(),
+      new ResetMAFState(),
+      new ResetProtocolsState(),
+      new ResetDescriptorsState(),
+      new ResetValidationState(),
+      new ResetFilesState()
+     ])
   }
 
   authenticateAPIToken(body) {
@@ -492,7 +509,11 @@ export class EditorService {
   }
 
   loadStudyId(id) {
-   this.store.dispatch(new Identifier.Set(id))
+    console.log(`hit loadStudyId with ${id}`)
+    if (id === null) {
+      console.trace();
+    }
+    this.store.dispatch(new Identifier.Set(id))
   }
 
   createStudy() {
@@ -513,6 +534,7 @@ export class EditorService {
       route.params.subscribe((params) => {
         const studyID = params.id;
         if (this.currentStudyIdentifier !== studyID) {
+          console.log(`hit initStudy if block with ${studyID}`)
           this.loadStudyNgxs(studyID, false);
         }
       });

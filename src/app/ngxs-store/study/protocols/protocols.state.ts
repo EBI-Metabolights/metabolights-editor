@@ -1,6 +1,6 @@
 import { Action, Select, Selector, State, StateContext, createSelector } from "@ngxs/store";
 import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
-import { ProtocolGuides, Protocols } from "./protocols.actions";
+import { ProtocolGuides, Protocols, ResetProtocolsState } from "./protocols.actions";
 import { JsonConvert } from "json2typescript";
 import { Injectable } from "@angular/core";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
@@ -14,20 +14,21 @@ export interface ProtocolsStateModel {
     protocols: MTBLSProtocol[]
     guides: Record<string, string>
 }
+const defaultState: ProtocolsStateModel = {
+    protocols: null,
+    guides: {
+        "Sample collection": "",
+        "Extraction": "",
+        "Chromatography": "",
+        "Mass spectrometry": "",
+        "Data transformation": "",
+        "Metabolite identification": ""
+    }
+}
 
 @State<ProtocolsStateModel>({
     name: 'protocols',
-    defaults: {
-        protocols: null,
-        guides: {
-            "Sample collection": "",
-            "Extraction": "",
-            "Chromatography": "",
-            "Mass spectrometry": "",
-            "Data transformation": "",
-            "Metabolite identification": ""
-        }
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class ProtocolsState {
@@ -112,6 +113,11 @@ export class ProtocolsState {
         this.rowTemplateService.getProtocolGuides().subscribe((guides) => {
             ctx.dispatch(new ProtocolGuides.Set(guides));
         })
+    }
+
+    @Action(ResetProtocolsState)
+    Reset(ctx: StateContext<ProtocolsStateModel>, action: ResetProtocolsState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

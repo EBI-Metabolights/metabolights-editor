@@ -1,0 +1,22 @@
+.violation-container {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: stretch; /* Ensure children take full width of the parent */
+  }
+  
+
+.violation-item {
+    margin-bottom: 10px;
+}
+
+.wrap-text {
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+.long-violation-height {
+    min-height: auto !important; /* Remove the fixed minimum height */
+    height: auto; /* Allow height to adjust based on content */
+    align-items: flex-start; /* Align content at the start, rather than centered */
+}

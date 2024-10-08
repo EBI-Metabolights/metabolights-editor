@@ -8,7 +8,8 @@ import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/
 import { httpOptions } from '../headers';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { Select } from '@ngxs/store';
-import { ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations/validations-prototype/interfaces/validation-report.interface';
+import { ValidationPhase, ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations-v2/interfaces/validation-report.interface';
+import { visitLexicalEnvironment } from 'typescript';
 
 @Injectable({
   providedIn: 'root'
@@ -95,10 +96,9 @@ export class ValidationService extends BaseConfigDependentService {
       );
     }
 
-    createStudyValidationTask(): Observable<Ws3Response<Ws3ValidationTask>> {
+    createStudyValidationTask(proxy: boolean = false): Observable<Ws3Response<Ws3ValidationTask>> {
       // remove once new auth service implemented
       const token = localStorage.getItem('jwt');
-      console.log(token)
       let headers = null;
       // write new headers impl this is annoying me
       headers = new HttpHeaders({
@@ -106,33 +106,59 @@ export class ValidationService extends BaseConfigDependentService {
         accept: "application/json",
         Authorization: `Bearer ${token}`
       });
-      console.log(`headers: ${JSON.stringify(headers)}`);
 
-      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validation/${this.id}`,"", {headers}).pipe(
+      let valUrl = this.configService.config.ws3URL;
+      if (proxy) valUrl = valUrl.replace('https://www-test.ebi.ac.uk', '')
+
+      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${valUrl}/validations/${this.id}`,"", {headers}).pipe(
         map((res) => res),
         catchError(this.handleError)
       );
     }
 
-    getNewValidationReportWs3(): Observable<Ws3Response<Ws3ValidationTask>> {
+    getValidationV2Report(proxy: boolean = false, taskId: string = null): Observable<Ws3Response<Ws3ValidationTask>> {
 
       // remove once new auth service implemented
       const token = localStorage.getItem('jwt');
       let headers = null;
+      let headersObj = {
+        //'Content-Type':  'application/json',
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`
+      }
+      // write new headers impl this is annoying me
+      let params = new HttpParams();
+      for (const key in this.dnvtParams) {
+        params.set(key, this.dnvtParams[key]);
+      }
+      if (taskId !== null) {
+        headersObj['task_id'] = taskId
+      }
+      headers = new HttpHeaders(headersObj);
+      let valUrl = this.configService.config.ws3URL;
+      if (proxy) valUrl = valUrl.replace('https://www-test.ebi.ac.uk', '')
+
+      return this.http.get<Ws3Response<Ws3ValidationTask>>(`${valUrl}/validations/${this.id}/result`, {headers, params}).pipe(
+        map((res) => res),
+        catchError(this.handleError)
+      );
+    }
+
+    getValidationHistory(): Observable<Ws3Response<Array<ValidationPhase>>> {
+      let headers = null;
+      const token = localStorage.getItem('jwt');
       // write new headers impl this is annoying me
       headers = new HttpHeaders({
         //'Content-Type':  'application/json',
         Accept: "application/json",
         Authorization: `Bearer ${token}`
       });
-      console.log(`headers: ${headers}`);
-      let params = new HttpParams();
-      for (const key in this.dnvtParams) {
-        params.set(key, this.dnvtParams[key]);
-      }
+      const valUrl = this.configService.config.ws3URL;
+      return this.http.get<Ws3Response<Array<ValidationPhase>>>(`${valUrl}/validations/${this.id}/history`, {headers})
+    }
 
-
-      return this.http.get<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validation/results/${this.id}`, {headers, params}).pipe(
+    getFakeValidationReportApiResponse(): Observable<Ws3Response<Ws3ValidationTask>> {
+      return this.http.get<Ws3Response<Ws3ValidationTask>>(`assets/validation-api-response.json`).pipe(
         map((res) => res),
         catchError(this.handleError)
       );

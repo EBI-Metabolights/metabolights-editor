@@ -63,6 +63,7 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   setUpSubscriptionsNgxs() {
     this.baseHref = this.configService.baseHref;
+    console.log(this.route);
     this.editorService.initialiseStudy(this.route);
     this.isCurator$.subscribe((value) => {
       this.isCurator = value;
@@ -126,7 +127,11 @@ export class StudyComponent implements OnInit, OnDestroy {
       } else if (params.tab === "validations") {
         this.requestedTab = 6;
         this.tab = "validations";
-      } else {
+      } else if (params.tab === "validationsv2") {
+        this.requestedTab = 7;
+        this.tab = "validationsv2"
+      }
+      else {
         this.requestedTab = 0;
         this.tab = "descriptors";
       }

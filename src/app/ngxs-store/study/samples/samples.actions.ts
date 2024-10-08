@@ -44,3 +44,8 @@ export namespace Organisms {
         constructor(public organisms: any) {}
     }
 }
+
+export class ResetSamplesState {
+    static readonly type = '[samples] Reset Samples State'
+    constructor() {}
+}

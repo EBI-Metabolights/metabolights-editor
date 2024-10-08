@@ -69,6 +69,9 @@ export namespace TemplateRow {
         constructor(public templateRow: any, public attr: string) {}
     }
 
-    //export class 
+}
 
+export class ResetAssayState {
+    static readonly type = '[assay] Reset Assay State'
+    constructor(){}
 }

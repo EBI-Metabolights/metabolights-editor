@@ -1,0 +1,104 @@
+
+
+prototype-table .mat-cell, prototype-table .mat-header-cell {
+    padding: 16px;
+}
+
+
+.ml-logo {
+    height: 55px;
+    width: 55px;
+    position: absolute; 
+    right: 0; 
+    top: 0;
+    transform: translateY(5px);
+}
+
+
+
+section {
+    display: flex;
+    justify-content: center; 
+  }
+  
+  .toggle-group-container {
+    max-width: 700px; 
+    width: 100%; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; 
+  }
+  
+  .toggle-group-container mat-button-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .toggle-group-container mat-button-toggle {
+    flex: 1 1 auto; 
+    margin: 2px;
+  }
+
+  .validation-panel {
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .history-container {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .history-dropdown {
+    border-top: 2px solid #4caf50;
+    border-left: 2px solid #4caf50;
+    border-right: 2px solid #4caf50;
+
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .history-dropdown-box {
+    border-top: 2px solid #4caf50;
+    border-left: 2px solid #4caf50;
+    border-right: 2px solid #4caf50;
+    padding-bottom: 0% !important;
+    display: inline-block;
+  }
+
+  ::ng-deep .mat-form-field {
+    min-width: 1000px; /* Controls the dropdown width */
+  }
+
+  .select-box {
+    width: 450px !important;
+  }
+
+  .blurred {
+    filter: blur(5px); 
+    pointer-events: none; 
+  }
+
+.overlay-text {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%);
+  z-index: 10; 
+  background-color: rgba(255, 255, 255, 0.8); 
+  padding: 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.download-report-button {
+  margin-left: auto;
+}
+
+.history-wrapper-top-menu {
+  display: flex; 
+
+}
