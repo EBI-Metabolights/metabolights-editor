@@ -172,7 +172,6 @@ export class AssayState {
                         }
                     }
                 });
-                console.log(`${mafFiles.length}`)
                 mafFiles.forEach((f) => {
                     this.store.dispatch(new MAF.Organise(f))
                 });

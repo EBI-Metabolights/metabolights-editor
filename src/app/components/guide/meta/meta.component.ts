@@ -181,7 +181,6 @@ export class MetaComponent implements OnInit {
   }
 
   includeAllAuthors() {
-    console.log(JSON.stringify(this.manuscript));
     this.manuscript.authorDetails.forEach((author) => {
       author.checked = true;
     });
