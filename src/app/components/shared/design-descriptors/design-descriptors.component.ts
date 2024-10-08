@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, Inject, SimpleChanges } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
@@ -13,9 +13,9 @@ import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 })
 export class DesignDescriptorsComponent implements OnInit {
 
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(DescriptorsState.studyDesignDescriptors) descriptors$: Observable<Ontology[]>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  descriptors$: Observable<Ontology[]> = inject(Store).select(DescriptorsState.studyDesignDescriptors);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   
   @Input("inline") inline: boolean;
   @Input("readOnly") readOnly: boolean;

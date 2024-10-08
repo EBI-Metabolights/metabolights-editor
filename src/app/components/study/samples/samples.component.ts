@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, OnChanges } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList, inject } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
@@ -8,9 +8,8 @@ import { OntologyComponent } from "../../shared/ontology/ontology.component";
 import { TableComponent } from "./../../shared/table/table.component";
 import { MTBLSCharacteristic } from "./../../../models/mtbl/mtbls/mtbls-characteristic";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { environment } from "src/environments/environment";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Observable } from "rxjs";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
@@ -25,11 +24,11 @@ import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descripto
 })
 export class SamplesComponent  {
 
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(DescriptorsState.studyFactors) studyFactors$: Observable<MTBLSFactor>;
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
 
   @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;

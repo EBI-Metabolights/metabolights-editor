@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
-import { DataService } from '../data.service';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { catchError } from 'rxjs/operators';
 import { httpOptions } from '../headers';
 import { ConfigurationService } from 'src/app/configuration.service';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 
 @Injectable({
@@ -15,7 +14,7 @@ import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/
 })
 export class FilesService extends BaseConfigDependentService {
 
-  @Select(GeneralMetadataState.id) private studyIdentifier$: Observable<string>
+  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   id: string;
 

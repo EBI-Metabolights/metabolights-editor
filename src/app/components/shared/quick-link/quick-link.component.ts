@@ -1,8 +1,7 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { Router } from "@angular/router";
-import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 
 @Component({
@@ -11,7 +10,7 @@ import { Observable } from "rxjs";
   styleUrls: ["./quick-link.component.css"],
 })
 export class QuickLinkComponent implements OnInit {
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   @Input("path") path: string;
   @Input("icon") icon: string;

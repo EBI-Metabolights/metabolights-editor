@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { inject, Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
@@ -17,8 +17,8 @@ import { IAssay } from 'src/app/models/mtbl/mtbls/interfaces/assay.interface';
 })
 export class AssaysService extends BaseConfigDependentService {
 
-  @Select(GeneralMetadataState.id) private studyIdentifier$: Observable<string>;
-  @Select(ValidationState.rules) private validationRules$: Observable<Record<string, any>>;
+  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  private validationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
 
   private id: string;
   private rules: Record<string, any>;
@@ -26,7 +26,7 @@ export class AssaysService extends BaseConfigDependentService {
   public loadingMessage: string = "Loading assays information."
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private store: Store, private tableService: TableService) {  
+    http: HttpClient, configService: ConfigurationService, private tableService: TableService) {  
       super(http, configService);
       this.studyIdentifier$.subscribe((id) => {
         if (id !== null) this.id = id;

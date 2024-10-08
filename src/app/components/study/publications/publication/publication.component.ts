@@ -6,17 +6,17 @@ import {
   OnInit,
   Input,
   ViewChild,
+  inject,
 } from "@angular/core";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPublication } from "./../../../../models/mtbl/mtbls/mtbls-publication";
-import { trigger, style, animate, transition } from "@angular/animations";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ValidateRules } from "./publication.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { JsonConvert } from "json2typescript";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
@@ -33,12 +33,12 @@ export class PublicationComponent implements OnInit {
 
   @ViewChild(OntologyComponent) statusComponent: OntologyComponent;
 
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-  @Select(GeneralMetadataState.id) id$: Observable<string>;
-  @Select(GeneralMetadataState.title) title$: Observable<string>;
-  @Select(GeneralMetadataState.description) description$: Observable<string>;
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
+  id$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  title$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
+  description$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
 
   private title: string = ""
   private description: string = ""

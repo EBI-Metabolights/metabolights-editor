@@ -1,13 +1,14 @@
-import { HttpClient, HttpHandler } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { of } from "rxjs";
 import { httpOptions } from "../headers";
 import { Observable } from "rxjs-compat";
-import { IStudyDetail, IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
+import { IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { inject } from "@angular/core";
+import { Store } from "@ngxs/store";
 
 export class MockMetabolightsService {
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   id: string;
   http: HttpClient;

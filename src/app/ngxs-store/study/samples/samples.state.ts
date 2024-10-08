@@ -1,9 +1,9 @@
-import { Injectable } from "@angular/core";
-import { Action, Select, Selector, State, StateContext, Store } from "@ngxs/store";
+import { inject, Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Organisms, ResetSamplesState, Samples } from "./samples.actions";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
-import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
+import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import Swal from "sweetalert2";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";
@@ -28,7 +28,7 @@ export class SampleState {
 
 
     // subscribing to other state containers isnt forbidden but feels wrong, so try and limit doing so
-    @Select(FilesState.getSampleSheet) sampleSheet$: Observable<StudyFile>;
+    sampleSheet$: Observable<StudyFile> = inject(Store).select(FilesState.getSampleSheet);
 
     constructor(private store: Store, private samplesService: SamplesService) {
 
@@ -241,6 +241,5 @@ export class SampleState {
     static organisms(state: SamplesStateModel): Record<string, any> {
         return state.organisms
     }
-
 
 }

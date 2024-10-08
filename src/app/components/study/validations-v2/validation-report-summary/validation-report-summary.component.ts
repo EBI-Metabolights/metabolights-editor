@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChange, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -8,7 +8,7 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatRadioModule} from '@angular/material/radio';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
 import { Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
@@ -61,9 +61,9 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
 
   @ViewChild('chart', { static: false }) chart: any;
 
-  @Select(ValidationState.taskId) taskId$: Observable<string>;
-  @Select(ValidationState.validationStatus) validationStatus$: Observable<ViolationType>;
-  @Select(ValidationState.lastValidationRunTime) lastValidationRunTime$: Observable<string>;
+  taskId$: Observable<string> = inject(Store).select(ValidationState.taskId);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  lastValidationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
 
 
   private errors: Record<string, number> = {};

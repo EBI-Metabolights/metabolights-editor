@@ -1,5 +1,5 @@
-import { Injectable } from "@angular/core";
-import { Action, Select, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
+import { inject, Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Assay, AssayList, ResetAssayState, TemplateRow } from "./assay.actions";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { FilesState } from "../files/files.state";
@@ -33,9 +33,9 @@ const defaultState: AssayStateModel = {
 @Injectable()
 export class AssayState {
 
-    @Select(FilesState.getAssaySheets) assaySheets$: Observable<StudyFile[]>
-    @Select(FilesState.files) files$: Observable<IStudyFiles>
-    @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+    assaySheets$: Observable<StudyFile[]> = inject(Store).select(FilesState.getAssaySheets);
+    files$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+    readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
 
     private templatesLoadedSubject = new Subject<string>();
     private readonly: boolean = null;

@@ -1,13 +1,12 @@
-import { Injectable } from '@angular/core';
-import { TableComponent } from 'src/app/components/shared/table/table.component';
+import { inject, Injectable } from '@angular/core';
 import { TableService } from './table.service';
 import { HttpClient } from '@angular/common/http';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
-import { Select, Store } from '@ngxs/store';
+import {  Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { BaseConfigDependentService } from './base-config-dependent.service';
-import { ITableHeader, ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
+import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +16,7 @@ export class MafService extends BaseConfigDependentService {
   private id: string;
   public loadingMessage: string = "Loading MAF information."
 
-  @Select(GeneralMetadataState.id) private studyIdentifier$: Observable<string>
+  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
   constructor(

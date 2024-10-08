@@ -1,20 +1,16 @@
 import {
   Component,
-  OnInit,
-  Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
+  inject,
+  OnInit
 } from "@angular/core";
 import Swal from "sweetalert2";
 import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
@@ -27,13 +23,13 @@ import { StudyStatus } from "src/app/ngxs-store/study/general-metadata/general-m
 })
 export class StatusComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
-  @Select(GeneralMetadataState.curationRequest) curationRequest$: Observable<string>;
-  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
+  curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
+  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
 
   isReadOnly = false;

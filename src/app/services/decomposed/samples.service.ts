@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
+import { inject, Injectable } from '@angular/core';
+import { Store } from '@ngxs/store';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
 import { httpOptions } from '../headers';
@@ -15,7 +15,7 @@ import { TableService } from './table.service';
 })
 export class SamplesService extends BaseConfigDependentService {
 
-  @Select(GeneralMetadataState.id) private studyIdentifier$: Observable<string>
+  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   private id: string;
   public samplesColumnOrder: Record<string, any> = {

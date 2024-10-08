@@ -11,28 +11,26 @@ import {
   AfterViewChecked,
   OnChanges,
   AfterViewInit,
+  inject,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
-import { MatTable, MatTableDataSource } from "@angular/material/table";
+import { MatTable } from "@angular/material/table";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { MatChipInputEvent } from "@angular/material/chips";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
 import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
-import { environment } from "src/environments/environment";
 import { ServerDataSource } from "./paginated-table.datasource";
 import { IsaTableDataSourceService } from "src/app/services/remote.datasource.service";
 import { tap } from "rxjs/operators";
 import { PaginatedTableMetadata } from "src/app/models/mtbl/mtbls/paginated-table";
 import { Observable } from "rxjs";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
@@ -64,10 +62,10 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
 
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
 
 

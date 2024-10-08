@@ -1,10 +1,11 @@
 import {
   Component,
   OnInit,
-  Input
+  Input,
+  inject
 } from "@angular/core";
 
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
@@ -18,8 +19,8 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 export class PublicationsComponent implements OnInit {
   @Input("validations") studyValidations: any;
 
-  @Select(GeneralMetadataState.publications) studyPublications$: Observable<IPublication[]>;
-  @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
+  studyPublications$: Observable<IPublication[]> = inject(Store).select(GeneralMetadataState.publications);
+  studyReadonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
 
 
   isReadOnly = false;

@@ -66,6 +66,7 @@ import { ValidationReportSummaryComponent } from "./validations-v2/validation-re
 import { ValidationSectionComponent } from "./validations-v2/validation-section/validation-section.component";
 import { ValidationsV2ParentComponent } from "./validations-v2/validations-v2-parent/validations-v2-parent.component";
 import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box/validation-task-box.component";
+import { HttpClientModule } from "@angular/common/http";
 
 @NgModule({
   declarations: [

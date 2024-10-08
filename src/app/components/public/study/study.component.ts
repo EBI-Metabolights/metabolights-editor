@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { Router } from "@angular/router";
 import { ActivatedRoute } from "@angular/router";
@@ -7,19 +7,18 @@ import { ConfigurationService } from "src/app/configuration.service";
 import {AuthGuard} from '../../../auth-guard.service';
 import { StudyPermission } from "src/app/services/headers";
 import { PlatformLocation } from "@angular/common";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { SetTabIndex } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { Observable } from "rxjs";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
-import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
+import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
 
 @Component({
@@ -29,16 +28,16 @@ import { ValidationReport } from "src/app/ngxs-store/study/validation/validation
 })
 export class PublicStudyComponent implements OnInit {
 
-  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
-  @Select(UserState.user) user$: Observable<Owner>; // potentially unused
-  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>; // Potentially unused
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
-  @Select(GeneralMetadataState.curationRequest) curationRequest$: Observable<string>;
-  @Select(GeneralMetadataState.reviewerLink) studyReviewerLink$: Observable<string>;
-  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
+  currentTabIndex$: Observable<string> = inject(Store).select(TransitionsState.currentTabIndex);
+  user$: Observable<Owner> = inject(Store).select(UserState.user); // potentially unused
+  userStudies$: Observable<IStudyDetail[]> = inject(Store).select(UserState.userStudies); // Potentially unused
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
+  curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
+  studyReviewerLink$: Observable<string> = inject(Store).select(GeneralMetadataState.reviewerLink);
+  investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
 
 
   loading: any = true;
@@ -63,9 +62,7 @@ export class PublicStudyComponent implements OnInit {
     private store: Store,
     private editorService: EditorService,
     private authGuardService: AuthGuard,
-    private router: Router,
     private route: ActivatedRoute,
-    private labsWorkspaceService: LabsWorkspaceService,
     private configService: ConfigurationService,
     private platformLocation: PlatformLocation
   ) {

@@ -1,11 +1,11 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 @Component({
   selector: "nav-bar",
@@ -15,9 +15,9 @@ import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/a
 export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(ApplicationState.editorVersion) editorVersion$: Observable<MtblsEditorVersion>;
-  @Select(ApplicationState.backendVersion) apiVersion$: Observable<MtblsBackendVersion>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  editorVersion$: Observable<MtblsEditorVersion> = inject(Store).select(ApplicationState.editorVersion);
+  apiVersion$: Observable<MtblsBackendVersion> = inject(Store).select(ApplicationState.backendVersion);
 
 
   editorVersion: string;

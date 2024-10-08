@@ -10,14 +10,13 @@ import {
   EventEmitter,
   AfterViewChecked,
   OnChanges,
+  inject,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { MatChipInputEvent } from "@angular/material/chips";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
@@ -25,7 +24,7 @@ import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { Observable } from "rxjs";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
@@ -58,10 +57,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
 
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
 
   @Input("fileTypes") fileTypes: any = [

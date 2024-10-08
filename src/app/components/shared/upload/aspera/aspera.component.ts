@@ -1,11 +1,11 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter, inject } from "@angular/core";
 import { EditorService } from "../../../../services/editor.service";
 import { UntypedFormBuilder } from "@angular/forms";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 declare let AW4: any;
 
@@ -25,8 +25,8 @@ declare let AW4: any;
 })
 export class AsperaUploadComponent implements OnInit {
 
-  @Select(FilesState.obfuscationCode) uploadLocation$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  uploadLocation$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
 
 
   @Input("type") type = "file";

@@ -1,12 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { EditorService } from "./../../../services/editor.service";
 import { UntypedFormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
 import { ActivatedRoute } from "@angular/router";
-import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { Guides } from "src/app/ngxs-store/non-study/application/application.actions";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
@@ -18,9 +17,9 @@ import { Observable } from "rxjs";
 })
 export class GuidesComponent implements OnInit {
 
-  @Select(ApplicationState.selectedLanguage) selectedLanguage$: Observable<string>;
-  @Select(ApplicationState.mappings) mappings$: Observable<Record<string, any>>;
-  @Select(ApplicationState.guides) guides$: Observable<any>;
+  selectedLanguage$: Observable<string> = inject(Store).select(ApplicationState.selectedLanguage);
+  mappings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.mappings);
+  guides$: Observable<any> = inject(Store).select(ApplicationState.guides);
 
   domain = "";
   repo = "";

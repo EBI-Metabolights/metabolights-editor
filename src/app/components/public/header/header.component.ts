@@ -1,11 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { PlatformLocation } from "@angular/common";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
@@ -14,9 +14,9 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
   styleUrls: ["./header.component.css"],
 })
 export class HeaderComponent {
- @Select(UserState.user) user$: Observable<Owner>;
- @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
- @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
+  user$: Observable<Owner> = inject(Store).select(UserState.user);
+  bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
+  maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
 
   authUser: any = null;
   query = "";

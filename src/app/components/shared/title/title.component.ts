@@ -5,6 +5,7 @@ import {
   Inject,
   OnChanges,
   SimpleChanges,
+  inject,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
@@ -25,11 +26,11 @@ import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadat
 })
 export class TitleComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   private toastrSettings: Record<string, any> = {};
 

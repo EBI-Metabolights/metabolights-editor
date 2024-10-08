@@ -1,7 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Violation } from '../interfaces/validation-report.interface';
-import { Select, Store } from '@ngxs/store';
-import { ApplicationState } from 'src/app/ngxs-store/non-study/application/application.state';
+import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -14,9 +13,8 @@ import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.
 })
 export class ValidationV2DetailComponent implements OnInit {
 
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
-
-  @Select(ValidationState.taskId) taskId$: Observable<string>;
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  taskId$: Observable<string> = inject(Store).select(ValidationState.taskId);
 
   @Input() violation: Violation
   isRawModalOpen: boolean = false;
@@ -27,7 +25,7 @@ export class ValidationV2DetailComponent implements OnInit {
   typeIcon: string = "question"
   protected isCurator: boolean = false;
 
-  constructor(private store: Store, private clipboard: Clipboard) { }
+  constructor(private clipboard: Clipboard) { }
 
   ngOnInit(): void {
     this.isCurator$.subscribe((value) => this.isCurator = value);

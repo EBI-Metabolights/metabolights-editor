@@ -2,28 +2,17 @@
 import { catchError, map, take } from "rxjs/operators";
 import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
-import { Injectable } from "@angular/core";
-import { Observable, of } from "rxjs";
-import { Router } from "@angular/router";
+import { inject, Injectable } from "@angular/core";
+import { Observable } from "rxjs";
 import { HttpClient } from "@angular/common/http";
 import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
-import { IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
-import { IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
-import { IProtocolWrapper } from "src/app/models/mtbl/mtbls/interfaces/protocol-wrapper.interface";
-import { ITableWrapper } from "src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface";
-import { IPeopleWrapper } from "src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface";
-import { IFactorsWrapper } from "src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface";
-import { IPublicationWrapper } from "src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface";
-import { IStudyDesignDescriptorWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface";
 import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
-import { environment } from "src/environments/environment";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MTBLSStudy } from "src/app/models/mtbl/mtbls/mtbls-study";
 import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
-
+import { Store } from "@ngxs/store";
 
 
 interface DeleteFileDetail {
@@ -44,7 +33,7 @@ interface DeleteFilesResponse {
 })
 export class MetabolightsService extends DataService {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
   study: MTBLSStudy;

@@ -1,6 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { AbstractControl, FormBuilder, UntypedFormBuilder, UntypedFormGroup, ValidationErrors, ValidatorFn, Validators } from "@angular/forms";
+import { AbstractControl, FormBuilder, UntypedFormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
@@ -10,15 +10,12 @@ import { DOIService } from "../../../services/publications/doi.service";
 import { EuropePMCService } from "../../../services/publications/europePMC.service";
 import * as toastr from "toastr";
 
-import { environment } from "src/environments/environment";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
-import { AppComponent } from "src/app/app.component";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
@@ -28,12 +25,11 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 })
 export class MetaComponent implements OnInit {
 
-  @Select(UserState.user) user$: Observable<Owner>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
-  @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-
+  user$: Observable<Owner> = inject(Store).select(UserState.user);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
+  studyDescription$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   requestedStudy: string = null;
   user: any = null;

@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from "@angular/core";
+import { Component, ViewChild, OnInit, inject } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
@@ -27,12 +27,11 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 })
 export class GuidedAssaysComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   @ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
   requestedStudy: string = null;

@@ -1,12 +1,10 @@
-import { AfterContentInit, Component, Input, ViewChild } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { AfterContentInit, Component, inject, Input, ViewChild } from "@angular/core";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
-import { map } from "rxjs/operators";
-import { environment } from "src/environments/environment";
 import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { deepCopy } from "src/app/ngxs-store/utils";
 
@@ -20,8 +18,8 @@ export class MafComponent implements AfterContentInit {
 
   @ViewChild(TableComponent) mafTable: TableComponent;
 
-  @Select(MAFState.mafs) studyMAFs$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  studyMAFs$: Observable<Record<string, any>> = inject(Store).select(MAFState.mafs);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   
 
   isReadOnly = false;

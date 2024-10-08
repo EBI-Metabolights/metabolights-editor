@@ -1,7 +1,6 @@
-import { Component, OnInit } from "@angular/core";
-import { environment } from "src/environments/environment";
+import { Component, inject, OnInit } from "@angular/core";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 
 @Component({
@@ -10,7 +9,7 @@ import { Observable } from "rxjs";
   styleUrls: ["./ftp.component.css"],
 })
 export class FtpDownloadComponent implements OnInit {  
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   requestedStudy: any = null;
 
