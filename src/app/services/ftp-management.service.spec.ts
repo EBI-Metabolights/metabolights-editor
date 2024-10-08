@@ -1,9 +1,10 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MockConfigurationService } from '../configuration.mock.service';
 import { ConfigurationService } from '../configuration.service';
 
 import { FtpManagementService } from './ftp-management.service';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('FtpManagementService', () => {
   let service: FtpManagementService;
@@ -12,9 +13,9 @@ describe('FtpManagementService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [FtpManagementService, {provide: ConfigurationService, useClass: MockConfigurationService}]
-    });
+    imports: [],
+    providers: [FtpManagementService, { provide: ConfigurationService, useClass: MockConfigurationService }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+});
     service = TestBed.inject(FtpManagementService);
     configServiceSpy = TestBed.inject(ConfigurationService) as jasmine.SpyObj<ConfigurationService>;
     httpMock = TestBed.inject(HttpTestingController);

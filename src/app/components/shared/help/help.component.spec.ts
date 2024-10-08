@@ -1,10 +1,11 @@
 import { ConfigurableFocusTrap } from "@angular/cdk/a11y";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
 
 import { HelpComponent } from "./help.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("HelpComponent", () => {
   let component: HelpComponent;
@@ -13,15 +14,17 @@ describe("HelpComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [HelpComponent],
-      imports: [HttpClientTestingModule],
-      providers: [
+    declarations: [HelpComponent],
+    imports: [],
+    providers: [
         {
-          provide: ConfigurationService,
-          useClass: MockConfigurationService,
+            provide: ConfigurationService,
+            useClass: MockConfigurationService,
         },
-      ],
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
     TestBed.compileComponents();

@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
@@ -19,39 +19,33 @@ import { MetaComponent } from "./meta/meta.component";
 import { ProgressComponent } from "./progress/progress.component";
 import { RawUploadComponent } from "./upload/upload.component";
 
-@NgModule({
-  declarations: [
-    GuidedAssaysComponent,
-    CreateComponent,
-    InfoComponent,
-    MetaComponent,
-    ProgressComponent,
-    RawUploadComponent,
-  ],
-  imports: [
-    CommonModule,
-    BrowserModule,
-    HttpClientModule,
-    MatIconModule,
-    FormsModule,
-    SharedModule,
-    //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    MatProgressSpinnerModule,
-    MatButtonModule,
-    MatButtonToggleModule,
-    MatOptionModule,
-    MatFormFieldModule,
-    MatInputModule,
-  ],
-  exports: [
-    GuidedAssaysComponent,
-    CreateComponent,
-    InfoComponent,
-    MetaComponent,
-    ProgressComponent,
-    RawUploadComponent,
-  ],
-})
+@NgModule({ declarations: [
+        GuidedAssaysComponent,
+        CreateComponent,
+        InfoComponent,
+        MetaComponent,
+        ProgressComponent,
+        RawUploadComponent,
+    ],
+    exports: [
+        GuidedAssaysComponent,
+        CreateComponent,
+        InfoComponent,
+        MetaComponent,
+        ProgressComponent,
+        RawUploadComponent,
+    ], imports: [CommonModule,
+        BrowserModule,
+        MatIconModule,
+        FormsModule,
+        SharedModule,
+        //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatProgressSpinnerModule,
+        MatButtonModule,
+        MatButtonToggleModule,
+        MatOptionModule,
+        MatFormFieldModule,
+        MatInputModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class GuideModule {}

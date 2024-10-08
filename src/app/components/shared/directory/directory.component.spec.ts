@@ -1,10 +1,11 @@
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 
 import { DirectoryComponent } from "./directory.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("DirectoryComponent", () => {
   let component: DirectoryComponent;
@@ -13,10 +14,10 @@ describe("DirectoryComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DirectoryComponent],
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: EditorService, useClass: MockEditorService }],
-    }).compileComponents();
+    declarations: [DirectoryComponent],
+    imports: [],
+    providers: [{ provide: EditorService, useClass: MockEditorService }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
   }));
 
   beforeEach(() => {

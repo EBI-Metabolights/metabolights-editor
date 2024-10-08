@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BaseConfigDependentService } from './base-config-dependent.service';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { Observable } from 'rxjs';
 import { IStudyDesignDescriptorWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface';

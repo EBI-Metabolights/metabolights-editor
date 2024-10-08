@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Store} from '@ngxs/store'
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
@@ -10,6 +10,7 @@ import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { TitleComponent } from "./title.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("TitleComponent", () => {
   let component: TitleComponent;
@@ -18,20 +19,19 @@ describe("TitleComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [TitleComponent],
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
+    declarations: [TitleComponent],
+    imports: [RouterTestingModule,
         BrowserModule,
         CommonModule,
         FormsModule,
-        ReactiveFormsModule,
-      ],
-      providers: [
+        ReactiveFormsModule],
+    providers: [
         { provide: EditorService, useClass: MockEditorService },
         Store,
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

@@ -1,9 +1,10 @@
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { ReleaseDateComponent } from "./release-date.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("ReleaseDateComponent", () => {
   let component: ReleaseDateComponent;
@@ -12,10 +13,10 @@ describe("ReleaseDateComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ReleaseDateComponent],
-      imports: [HttpClientTestingModule],
-      providers: [{ provide: EditorService, useClass: MockEditorService }],
-    }).compileComponents();
+    declarations: [ReleaseDateComponent],
+    imports: [],
+    providers: [{ provide: EditorService, useClass: MockEditorService }, provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
   }));
 
   beforeEach(() => {

@@ -34,7 +34,7 @@ import { HeaderComponent } from "./components/public/header/header.component";
 import { FooterComponent } from "./components/public/footer/footer.component";
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { StudyModule } from "./components/study/study.module";
-import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { SharedModule } from "./components/shared/shared.module";
 import { GuideModule } from "./components/guide/guide.module";
 import { ConfigurationService } from "./configuration.service";
@@ -67,91 +67,84 @@ export function configLoader(injector: Injector): () => Promise<any> {
   return () => injector.get(ConfigurationService).loadConfiguration();
 }
 
-@NgModule({
-  declarations: [
-    AppComponent,
-    StudyComponent,
-    PublicStudyComponent,
-    LoginComponent,
-    ConsoleComponent,
-    PublicStudyComponent,
-    LazyLoadImagesDirective,
-    HeaderComponent,
-    FooterComponent,
-    GuidesComponent,
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    StudyModule,
-    SharedModule,
-    GuideModule,
-    AppRoutingModule,
-    FormsModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    MatProgressSpinnerModule,
-    MatInputModule,
-    MatAutocompleteModule,
-    MatPaginatorModule,
-    MatSelectModule,
-    MatIconModule,
-    MatChipsModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatButtonToggleModule,
-    MatCheckboxModule,
-    MatTableModule,
-    DragDropModule,
-    NgxsModule.forRoot([
-      UserState, 
-      TransitionsState,
-      ApplicationState,
-      GeneralMetadataState,
-      FilesState,
-      AssayState,
-      MAFState,
-      SampleState,
-      ProtocolsState,
-      DescriptorsState,
-      ValidationState
-    ], 
-    { developmentMode: true }),
-    NgxsReduxDevtoolsPluginModule.forRoot(),
-    QuillModule.forRoot({
-      modules: {
-        clipboard: {
-          matchVisual: false,
+@NgModule({ declarations: [
+        AppComponent,
+        StudyComponent,
+        PublicStudyComponent,
+        LoginComponent,
+        ConsoleComponent,
+        PublicStudyComponent,
+        LazyLoadImagesDirective,
+        HeaderComponent,
+        FooterComponent,
+        GuidesComponent,
+    ],
+    exports: [],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        StudyModule,
+        SharedModule,
+        GuideModule,
+        AppRoutingModule,
+        FormsModule,
+        ReactiveFormsModule,
+        BrowserAnimationsModule,
+        MatProgressSpinnerModule,
+        MatInputModule,
+        MatAutocompleteModule,
+        MatPaginatorModule,
+        MatSelectModule,
+        MatIconModule,
+        MatChipsModule,
+        MatDatepickerModule,
+        MatNativeDateModule,
+        MatButtonToggleModule,
+        MatCheckboxModule,
+        MatTableModule,
+        DragDropModule,
+        NgxsModule.forRoot([
+            UserState,
+            TransitionsState,
+            ApplicationState,
+            GeneralMetadataState,
+            FilesState,
+            AssayState,
+            MAFState,
+            SampleState,
+            ProtocolsState,
+            DescriptorsState,
+            ValidationState
+        ], { developmentMode: true }),
+        NgxsReduxDevtoolsPluginModule.forRoot(),
+        QuillModule.forRoot({
+            modules: {
+                clipboard: {
+                    matchVisual: false,
+                },
+            },
+        })], providers: [
+        AuthGuard,
+        {
+            provide: APP_INITIALIZER,
+            useFactory: configLoader,
+            deps: [Injector],
+            multi: true,
         },
-      },
-    }),
-  ],
-  exports: [],
-  providers: [
-    AuthGuard,
-    {
-      provide: APP_INITIALIZER,
-      useFactory: configLoader,
-      deps: [Injector],
-      multi: true,
-    },
-    EditorService,
-    MetabolightsService,
-    EuropePMCService,
-    DOIService,
-    AuthService,
-    LabsWorkspaceService,
-    { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true},
-    { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true},
-    {
-      provide: APP_BASE_HREF,
-      useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
-      deps: [PlatformLocation]
-    }
-  ],
-  bootstrap: [AppComponent],
-})
+        EditorService,
+        MetabolightsService,
+        EuropePMCService,
+        DOIService,
+        AuthService,
+        LabsWorkspaceService,
+        { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
+        {
+            provide: APP_BASE_HREF,
+            useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
+            deps: [PlatformLocation]
+        },
+        provideHttpClient(withInterceptorsFromDi())
+    ] })
 export class AppModule {
   constructor(
   ) {
