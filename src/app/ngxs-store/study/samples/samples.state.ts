@@ -53,7 +53,7 @@ export class SampleState {
     OrganiseAndPersist(ctx: StateContext<SamplesStateModel>, action: Samples.OrganiseAndPersist) {
         const samples = {};
         samples["name"] = action.sampleSheetFilename
-        this.samplesService.getTable(action.sampleSheetFilename).subscribe(
+        this.samplesService.getTable(action.sampleSheetFilename).pipe(take(1)).subscribe(
             (data) => {
                 /**
                  * Sample sheet processing

@@ -14,6 +14,7 @@ import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
+import { take } from "rxjs/operators";
 
 
 export interface GeneralMetadataStateModel {
@@ -55,7 +56,7 @@ export class GeneralMetadataState {
 
     @Action(GetGeneralMetadata)
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
-        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).subscribe(
+        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
             (gm_response) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new SetLoadingInfo("Loading investigation details"));

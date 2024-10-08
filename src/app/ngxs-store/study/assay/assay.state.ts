@@ -50,7 +50,7 @@ export class AssayState {
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
         this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
-            this.generalMetadataService.getStudyGeneralMetadata(action.id).subscribe(
+            this.generalMetadataService.getStudyGeneralMetadata(action.id).pipe(take(1)).subscribe(
                 (response) => {
                     let assayFiles = response.isaInvestigation.studies[0].assays;
                     ctx.dispatch(new AssayList.Set(assayFiles));
@@ -122,7 +122,7 @@ export class AssayState {
 
     @Action(Assay.OrganiseAndPersist)
     OrganiseAndPersist(ctx: StateContext<AssayStateModel>, action: Assay.OrganiseAndPersist) {
-        this.assaysService.getAssaySheet(action.assaySheetFilename).subscribe(
+        this.assaysService.getAssaySheet(action.assaySheetFilename).pipe(take(1)).subscribe(
             (data) => {
                 let assay = {};
                 assay["name"] = action.assaySheetFilename;

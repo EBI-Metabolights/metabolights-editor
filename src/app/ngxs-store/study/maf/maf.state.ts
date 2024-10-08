@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MAF, ResetMAFState } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
+import { take } from "rxjs/operators";
 
 
 
@@ -54,7 +55,7 @@ export class MAFState {
 
     @Action(MAF.Organise)
     OrganiseMAF(ctx: StateContext<MAFStateModel>, action: MAF.Organise) {
-        this.mafService.getMAFSheet(action.filename).subscribe(
+        this.mafService.getMAFSheet(action.filename).pipe(take(1)).subscribe(
             (mdata) => {
                 const mcolumns = [];
                 const maf = {};
