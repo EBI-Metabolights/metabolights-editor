@@ -1,0 +1,105 @@
+<div *ngIf="ready; else notReadyBlock">
+    <!--Mothballed for now until it is fully featured-->
+    <!--<app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>-->
+    <br>
+    <div class="validation-panel">
+        <app-validation-task-box></app-validation-task-box>
+      </div>
+      <br>
+      
+    <!--History dropdown wrapper start-->
+    <div class="history-wrapper-top-menu">
+        <div *ngIf="report !== null" class="history-dropdown-box">
+            <mat-form-field class="select-box">
+                <mat-label>Select a Report</mat-label>
+                <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
+                <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
+                    {{ phase.taskId }} 
+                    <span *ngIf="isFirst"><b>(most recent)</b></span>
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+        </div>
+        <div class="download-report-button">
+            <a (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
+        </div>
+    </div>
+
+
+        <div *ngIf="report !== null; else noViolations" [ngClass]="{'blurred': loadingDiffReport}"  class="history-dropdown">
+            <!--Violation components start-->
+            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
+            <mat-tab label="All">
+                <br>
+                <div *ngIf="allViolations.length > 0; else noViolations">
+                    <div *ngIf="allViolations !== null">
+                        <div *ngFor="let violation of allViolations; let i = index;">
+                            <validation-v2-detail [violation]="violation"></validation-v2-detail>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </mat-tab>
+    
+            <mat-tab label="General">
+    
+                <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
+                </app-validation-section> 
+            </mat-tab>
+    
+            <mat-tab label="Investigation File">
+                <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="Samples">
+    
+                <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="Assays">
+                <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="MAF">
+                <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
+                </app-validation-section>
+            </mat-tab>
+    
+            <mat-tab label="Files">
+                <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
+                </app-validation-section>
+            </mat-tab>
+            </mat-tab-group>
+            <!--Violations components end-->
+        </div>
+    <!--History dropdown wrapper end-->
+<!-- Overlay text (only appears when blurred) -->
+  <div class="overlay-text" *ngIf="loadingDiffReport">
+    <p>Overlay Text: Action Required</p>
+  </div>
+<!--End of overlay text-->
+
+
+</div>
+<!--The below should be made to work with our existing loading component if possible-->
+<ng-template #notReadyBlock>
+    <span>
+        <img src="{{ baseHref }}assets/img/loading.svg" /> <br />
+        <br />
+        <small>
+            <p class="has-text-info">
+                <mat-icon>comment</mat-icon>Loading New Validation Report
+            </p>
+        </small>
+    </span>
+</ng-template>
+
+<!--No violations found template-->
+<ng-template #noViolations>
+    <app-no-violations [studyId]="studyId"></app-no-violations>
+<br>
+</ng-template>
+

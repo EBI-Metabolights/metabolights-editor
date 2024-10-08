@@ -1,0 +1,23 @@
+<div class="modal is-active ">
+    <div class="modal-background"> </div>
+
+    <div class="modal-card">
+        <section class="modal-card-body">
+            The following items were found to be in violation of {{violation.identifier}}
+            <mat-divider></mat-divider>
+            <br>
+
+            <div class="violation-container">
+                <div class="violation-item long-violation-height wrap-text" *ngFor="let value of violation.values">
+
+                    <div mat-line class="wrap-text"><mat-icon>note</mat-icon>
+                        {{value}}</div>
+                    
+                    </div>
+            </div>
+        </section>
+        <button (click)="close()" class="button is-info">
+            Close
+        </button>
+    </div>
+</div>

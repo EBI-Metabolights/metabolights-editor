@@ -1,30 +1,43 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { EditorValidationRules, NewValidationReport, ResetValidationState, ValidationReport } from "./validation.actions";
+import { EditorValidationRules, ResetValidationState, SetInitialLoad, ValidationReport, ValidationReportV2 } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
 import { interval } from "rxjs";
-import { Violation, Ws3ValidationReport } from "src/app/components/study/validations/validations-prototype/interfaces/validation-report.interface";
-import { filter } from "rxjs-compat/operator/filter";
-import { ViolationType } from "src/app/components/study/validations/validations-prototype/interfaces/validation-report.types";
+import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
+import { ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
+
+
+export interface ValidationTask {
+    id: string;
+    ws3TaskStatus: string;
+}
+
+
 
 export interface ValidationStateModel {
     rules: Record<string, any>;
     report: IValidationSummary;
-    newReport: Ws3ValidationReport;
+    reportV2: Ws3ValidationReport;
     taskId: string;
     status: ViolationType;
     lastRunTime: string;
+    currentValidationTask: ValidationTask;
+    history: Array<ValidationPhase>;
+    initialLoadMade: boolean;
 }
 const defaultState: ValidationStateModel = {
     rules: null,
     report: null,
-    newReport: null,
+    reportV2: null,
     taskId: null,
     status: null,
-    lastRunTime: null
+    lastRunTime: null,
+    currentValidationTask: null,
+    history: [],
+    initialLoadMade: false
 }
 @State<ValidationStateModel>({
     name: 'validation',
@@ -83,18 +96,27 @@ export class ValidationState {
         });
     }
 
-    @Action(NewValidationReport.Get)
-    GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.Get) {
-        if (action.ws3) {
-            this.validationService.getNewValidationReportWs3().subscribe(
+    @Action(ValidationReportV2.Get)
+    GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
+        if (!action.test) {
+            this.validationService.getValidationV2Report(action.proxy, action.id).subscribe( 
                 (response) => {
                     if (response.status !== 'error') {
-                        ctx.dispatch(new NewValidationReport.Set(response.content.task_result));
-                        ctx.dispatch(new NewValidationReport.SetTaskID(response.content.task_id));
-                        ctx.dispatch(new NewValidationReport.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
-                        ctx.dispatch(new NewValidationReport.SetLastRunTime(response.content.task_result.completion_time))
+                        const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
+                        ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
+                        if (response.content.task_status === "SUCCESS") {
+                            ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
+                            ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
+                            ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
+                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time))
+                        } else {
+                            // some other task status handling here "INITIATED, STARTED, PENDING, FAILURE" etc
+                        }
+
 
                     } else {
+                        const currentTask = {id: null, ws3TaskStatus: "ERROR"}
+                        ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
                         console.log("Could not get new ws3 report");
                         console.log(JSON.stringify(response.errorMessage));
                     }
@@ -104,29 +126,40 @@ export class ValidationState {
                     console.log(JSON.stringify(error));
                 })
         } else {
-            this.validationService.getNewValidationReport().subscribe((response) => {
+            /**this.validationService.getNewValidationReport().subscribe((response) => {
                 ctx.dispatch(new NewValidationReport.Set({study_id: "test", duration_in_seconds: 5,completion_time: "0.00", messages: response}));
-            });
+            });*/
+
+            this.validationService.getFakeValidationReportApiResponse().subscribe((response) => {
+                ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
+                ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
+                ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
+                ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time))
+            })
         }
 
 
     }
 
-    @Action(NewValidationReport.Set)
-    SetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.Set) {
+    @Action(ValidationReportV2.Set)
+    SetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Set) {
         const state = ctx.getState();
+        if (!state.initialLoadMade) {
+            ctx.dispatch(new SetInitialLoad(true));
+        }
         ctx.setState({
             ...state,
-            newReport: action.report
+            reportV2: action.report
         })
     }
 
-    @Action(NewValidationReport.InitialiseValidationTask)
-    InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.InitialiseValidationTask) {
-        this.validationService.createStudyValidationTask().subscribe(
+    @Action(ValidationReportV2.InitialiseValidationTask)
+    InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.InitialiseValidationTask) {
+        this.validationService.createStudyValidationTask(action.proxy).subscribe(
             (response) => {
                 console.log('task submitted successfully');
                 console.log(response);
+                ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
                 //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
             },
             (error) => {
@@ -136,8 +169,8 @@ export class ValidationState {
         )
     }
 
-    @Action(NewValidationReport.SetTaskID)
-    SetTaskID(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.SetTaskID) {
+    @Action(ValidationReportV2.SetTaskID)
+    SetTaskID(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetTaskID) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
@@ -145,8 +178,8 @@ export class ValidationState {
         });
     }
 
-    @Action(NewValidationReport.SetValidationStatus)
-    SetValidationStatus(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.SetValidationStatus) {
+    @Action(ValidationReportV2.SetValidationStatus)
+    SetValidationStatus(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetValidationStatus) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
@@ -154,12 +187,44 @@ export class ValidationState {
         });
     }
 
-    @Action(NewValidationReport.SetLastRunTime)
-    SetLastRunTime(ctx: StateContext<ValidationStateModel>, action: NewValidationReport.SetLastRunTime) {
+    @Action(ValidationReportV2.SetLastRunTime)
+    SetLastRunTime(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetLastRunTime) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
             lastRunTime: action.time
+        });
+    }
+
+    @Action(ValidationReportV2.SetCurrentTask)
+    SetCurrentTask(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetCurrentTask) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            currentValidationTask: action.task
+        });
+    }
+
+    @Action(ValidationReportV2.History.Get)
+    GetHistory(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.History.Get) {
+        const state = ctx.getState();
+        this.validationService.getValidationHistory().subscribe((historyResponse) => {
+            ctx.dispatch(new ValidationReportV2.History.Set(historyResponse.content));
+            if (!state.initialLoadMade) {
+                ctx.dispatch(new ValidationReportV2.Get(historyResponse.content[0].taskId))
+            }
+        },
+        (error) => {
+            console.error(`Could not get history for current study: ${error}`);
+        })
+    }
+
+    @Action(ValidationReportV2.History.Set)
+    SetHistory(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.History.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            history: action.history
         });
     }
 
@@ -232,36 +297,46 @@ export class ValidationState {
     }
 
     @Selector()
-    static newReport(state: ValidationStateModel): Ws3ValidationReport {
-        return state.newReport
+    static reportV2(state: ValidationStateModel): Ws3ValidationReport {
+        return state.reportV2
     }
 
     @Selector()
-    static newReportViolationsAll(state: ValidationStateModel) {
-        let violations = state.newReport.messages.violations;
+    static reportV2ViolationsAll(state: ValidationStateModel) {
+        let violations = state.reportV2.messages.violations;
         violations = sortViolations(violations);
         return violations;
     }
 
-    static newReportViolations(section: string) {
+    static reportV2Violations(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
             return sortViolations(
                 filterViolations(
-                    state.newReport.messages.violations, section
+                    state.reportV2.messages.violations, section
                 )
             );
         });
     }
 
     @Selector()
-    static newReportSummariesAll(state: ValidationStateModel) {
-        return state.newReport.messages.summary;
+    static reportV2SummariesAll(state: ValidationStateModel) {
+        return state.reportV2.messages.summary;
     }
 
-    static newReportSummaries(section: string) {
+    static reportV2Summaries(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            return filterViolations(state.newReport.messages.summary, section)
+            return filterViolations(state.reportV2.messages.summary, section)
         });
+    }
+
+    @Selector()
+    static history(state: ValidationStateModel) {
+        return state.history;
+    }
+
+    @Selector()
+    static initialLoadMade(state: ValidationStateModel) {
+        return state.initialLoadMade
     }
 
     @Selector()
@@ -277,6 +352,11 @@ export class ValidationState {
     @Selector()
     static lastValidationRunTime(state: ValidationStateModel) {
         return state.lastRunTime
+    }
+
+    @Selector()
+    static currentValidationTask(state: ValidationStateModel) {
+        return state.currentValidationTask;
     }
 }
 
