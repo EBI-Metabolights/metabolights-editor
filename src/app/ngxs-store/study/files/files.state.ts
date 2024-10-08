@@ -32,7 +32,6 @@ export class FilesState {
     @Action(Operations.GetFreshFilesList)
     GetStudyFiles(ctx: StateContext<FilesStateModel>, action: Operations.GetFreshFilesList) {
         const state = ctx.getState();
-        console.log(action);
         this.filesService.getStudyFilesFetch(action.force, action.readonly).subscribe(
             (data) => {
                 ctx.dispatch(new UploadLocation.Set(data.uploadPath));

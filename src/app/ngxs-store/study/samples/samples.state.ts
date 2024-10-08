@@ -7,6 +7,7 @@ import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions
 import Swal from "sweetalert2";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";
+import { take } from "rxjs/operators";
 
 // we should type the below properly once we get a better handle on what the data looks like
 export interface SamplesStateModel {
@@ -34,7 +35,7 @@ export class SampleState {
 
     @Action(Samples.Get)
     GetStudySamples(ctx: StateContext<SamplesStateModel>, action: Samples.Get) {
-        this.sampleSheet$.subscribe(
+        this.sampleSheet$.pipe(take(1)).subscribe(
             (sampleSheet) => {
                 if (sampleSheet) {
                     this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
@@ -51,7 +52,7 @@ export class SampleState {
     OrganiseAndPersist(ctx: StateContext<SamplesStateModel>, action: Samples.OrganiseAndPersist) {
         const samples = {};
         samples["name"] = action.sampleSheetFilename
-        this.samplesService.getTable(action.sampleSheetFilename).subscribe(
+        this.samplesService.getTable(action.sampleSheetFilename).pipe(take(1)).subscribe(
             (data) => {
                 /**
                  * Sample sheet processing
