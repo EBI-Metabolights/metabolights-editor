@@ -53,3 +53,8 @@ export namespace Operations {
         constructor(public force: boolean, public readonly: boolean = false, public id: string = null) {}
     }
 }
+
+export class ResetFilesState {
+    static readonly type = '[files] Reset Files State'
+    constructor() {}
+}

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Action, Select, Selector, State, StateContext, Store } from "@ngxs/store";
-import { Organisms, Samples } from "./samples.actions";
+import { Organisms, ResetSamplesState, Samples } from "./samples.actions";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -14,13 +14,14 @@ export interface SamplesStateModel {
     samples: Record<string, any>;
     organisms: Record<string, any>;
 }
+const defaultState: SamplesStateModel = {
+  samples: null,
+  organisms: null
+}
 
 @State<SamplesStateModel>({
     name: 'samples',
-    defaults: {
-        samples: null,
-        organisms: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class SampleState {
@@ -224,6 +225,11 @@ export class SampleState {
             ...state,
             organisms: action.organisms
         })
+    }
+
+    @Action(ResetSamplesState)
+    Reset(ctx: StateContext<SamplesStateModel>, action: ResetSamplesState) {
+      ctx.setState(defaultState);
     }
 
     @Selector()

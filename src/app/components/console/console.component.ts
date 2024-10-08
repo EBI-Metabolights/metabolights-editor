@@ -1,4 +1,4 @@
-import { Router, ActivatedRoute } from "@angular/router";
+import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
 import { AfterContentInit, Component, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
@@ -9,6 +9,15 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { filter } from "rxjs/operators";
+import { ResetAssayState } from "src/app/ngxs-store/study/assay/assay.actions";
+import { ResetDescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.action";
+import { ResetFilesState } from "src/app/ngxs-store/study/files/files.actions";
+import { ResetGeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { ResetMAFState } from "src/app/ngxs-store/study/maf/maf.actions";
+import { ResetProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.actions";
+import { ResetSamplesState } from "src/app/ngxs-store/study/samples/samples.actions";
+import { ResetValidationState } from "src/app/ngxs-store/study/validation/validation.actions";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -51,6 +60,14 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
         this.baseHref = this.editorService.configService.baseHref;
       }
     });
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      filter((event: NavigationEnd) => event.url === '/console')
+    )
+      .subscribe(() => {
+        this.resetStudyStates();
+      })
   }
 
   ngOnInit() {
@@ -69,6 +86,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
     
 
+  }
+
+  resetStudyStates() {
+    this.editorService.resetStudyStates();
   }
 
   toggleMessage() {

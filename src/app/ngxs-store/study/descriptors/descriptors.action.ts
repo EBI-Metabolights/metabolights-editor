@@ -55,3 +55,8 @@ export namespace Factors {
     }
 
 }
+
+export class ResetDescriptorsState {
+    static readonly type = '[descriptors] Reset Descriptors State'
+    constructor() {}
+}

@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Action, Select, Selector, State, StateContext } from "@ngxs/store";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
-import { Descriptors, Factors } from "./descriptors.action";
+import { Descriptors, Factors, ResetDescriptorsState } from "./descriptors.action";
 import { JsonConvert } from "json2typescript";
 import { DescriptorsService } from "src/app/services/decomposed/descriptors.service";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
@@ -16,13 +16,13 @@ export interface DescriptorsStateModel {
     designDescriptors: Ontology[]
     factors: MTBLSFactor[]
 }
-
+const defaultState: DescriptorsStateModel = {
+    designDescriptors: null,
+    factors: null
+}
 @State<DescriptorsStateModel> ({
     name: 'descriptors',
-    defaults: {
-        designDescriptors: null,
-        factors: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class DescriptorsState {
@@ -195,6 +195,11 @@ export class DescriptorsState {
                 console.error(`Could not delete factor ${action.factorName}`);
             }
             )
+    }
+
+    @Action(ResetDescriptorsState)
+    Reset(ctx: StateContext<DescriptorsStateModel>, action: ResetDescriptorsState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

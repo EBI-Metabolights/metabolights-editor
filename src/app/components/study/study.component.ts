@@ -63,6 +63,7 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   setUpSubscriptionsNgxs() {
     this.baseHref = this.configService.baseHref;
+    console.log(this.route);
     this.editorService.initialiseStudy(this.route);
     this.isCurator$.subscribe((value) => {
       this.isCurator = value;

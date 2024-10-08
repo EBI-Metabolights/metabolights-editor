@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import {  CurationRequest, GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
+import { CurationRequest, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -12,7 +12,7 @@ import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
-import { EditorValidationRules, NewValidationReport, ValidationReport } from "../validation/validation.actions";
+import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
 
@@ -29,22 +29,22 @@ export interface GeneralMetadataStateModel {
     publications: IPublication[];
     people: IPerson[];
 }
+const defaultState: GeneralMetadataStateModel = {
+    id: null,
+    title: null,
+    description: null,
+    submissionDate: null,
+    releaseDate: null,
+    status: null,
+    curationRequest: null,
+    reviewerLink: null,
+    publications: null,
+    people: null
+}
 
 @State<GeneralMetadataStateModel>({
     name: 'general',
-    defaults: {
-        id: null,
-        title: null,
-        description: null,
-        submissionDate: null,
-        releaseDate: null,
-        status: null,
-        curationRequest: null,
-        reviewerLink: null,
-        publications: null,
-        people: null
-
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class GeneralMetadataState {
@@ -106,6 +106,7 @@ export class GeneralMetadataState {
     @Action(Identifier.Set)
     SetStudyIdentifier(ctx: StateContext<GeneralMetadataStateModel>, action: Identifier.Set) {
         const state = ctx.getState();
+        console.log(`hit Identifier.Set action handler with ${action.id}`)
         ctx.setState({
             ...state,
             id: action.id
@@ -382,6 +383,11 @@ export class GeneralMetadataState {
                 ctx.dispatch(new StudyStatus.Set(action.status));
             }
         )
+    }
+
+    @Action(ResetGeneralMetadataState)
+    Reset(ctx: StateContext<GeneralMetadataStateModel>, action: ResetGeneralMetadataState) {
+        ctx.setState(defaultState);
     }
 
 
