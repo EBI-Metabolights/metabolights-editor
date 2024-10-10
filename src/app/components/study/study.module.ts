@@ -34,7 +34,6 @@ import { MatTabsModule } from '@angular/material/tabs';
 import {MatCardModule} from '@angular/material/card';
 
 import { SharedModule } from "../shared/shared.module";
-import { HttpClientModule } from "@angular/common/http";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
 import { ValidationDetailCommentComponent } from "./validations/validation-detail/comment/validation-detail-comment.component";
@@ -103,7 +102,6 @@ import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box
   ],
   imports: [
     CommonModule,
-    HttpClientModule,
     MatExpansionModule,
     MatDatepickerModule,
     MatFormFieldModule,

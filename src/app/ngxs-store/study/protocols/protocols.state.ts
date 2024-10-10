@@ -1,13 +1,12 @@
-import { Action, Select, Selector, State, StateContext, createSelector } from "@ngxs/store";
+import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
 import { IProtocol } from "src/app/models/mtbl/mtbls/interfaces/protocol.interface";
 import { ProtocolGuides, Protocols, ResetProtocolsState } from "./protocols.actions";
 import { JsonConvert } from "json2typescript";
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
 import { ProtocolsService } from "src/app/services/decomposed/protocols.service";
-import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
-import { Observable } from "rxjs";
+import { filter, firstValueFrom, Observable } from "rxjs";
 import { RowTemplateService } from "src/app/services/row-template/row-template.service";
 
 export interface ProtocolsStateModel {
@@ -33,11 +32,19 @@ const defaultState: ProtocolsStateModel = {
 @Injectable()
 export class ProtocolsState {
 
-    @Select(GeneralMetadataState.id) studyId$: Observable<string>;
+    studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
     private id: string = null;
 
     constructor(private protocolsService: ProtocolsService, private rowTemplateService: RowTemplateService) {
-        this.studyId$.subscribe(id => this.id = id)
+        this.getId();
+    }
+
+
+    async getId() {
+        const id = await firstValueFrom(this.studyId$.pipe(
+        filter((val) => val !== null && val !== undefined)
+        ));
+        this.id = id;
     }
 
     @Action(Protocols.Set)

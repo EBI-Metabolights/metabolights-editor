@@ -3,18 +3,18 @@ import {
   OnInit,
   Input,
   ViewChild,
+  inject,
 } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
-import { Ontology, areOntologyListsDifferent, elucidateListComparisonResult } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
+import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
 import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
-import { DOIService } from "../../../../services/publications/doi.service";
 import { EuropePMCService } from "../../../../services/publications/europePMC.service";
 import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable, timer } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
@@ -29,14 +29,14 @@ import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.ac
 })
 export class DesignDescriptorComponent implements OnInit {
 
-  @Select(ApplicationState.readonly) studyReadonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyReadonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
-  @Select(GeneralMetadataState.publications) studyPublications$: Observable<IPublication[]>;
-  @Select(GeneralMetadataState.id) identifier$: Observable<string>;
+  studyPublications$: Observable<IPublication[]> = inject(Store).select(GeneralMetadataState.publications);
+  identifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(DescriptorsState.studyDesignDescriptors) descriptors$: Observable<Ontology[]>;
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  descriptors$: Observable<Ontology[]> = inject(Store).select(DescriptorsState.studyDesignDescriptors);
 
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;

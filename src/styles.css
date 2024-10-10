@@ -1,15 +1,15 @@
-@import "~bulma/css/bulma.css";
+@import "bulma/css/bulma.css";
 @import "https://ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.3/fonts.css";
-@import "~bulma-extensions/bulma-steps/dist/css/bulma-steps.min.css";
+@import "bulma-extensions/bulma-steps/dist/css/bulma-steps.min.css";
 
 /*@import "@angular/material/prebuilt-themes/deeppurple-amber.css";*/
 
-@import "~toastr/build/toastr.css";
+@import "toastr/build/toastr.css";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import "https://cdn.materialdesignicons.com/2.1.19/css/materialdesignicons.min.css";
-@import "~quill/dist/quill.core.css";
-@import "~quill/dist/quill.bubble.css";
-@import "~quill/dist/quill.snow.css";
+@import "quill/dist/quill.core.css";
+@import "quill/dist/quill.bubble.css";
+@import "quill/dist/quill.snow.css";
 
 @font-face {
   font-family: "Material Icons";

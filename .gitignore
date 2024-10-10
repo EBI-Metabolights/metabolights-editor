@@ -57,3 +57,8 @@ package-lock.json
 yarn.lock
 
 /.angular
+
+.nx/
+proxy.conf.json
+src/assets/configs/version.json
+src/assets/validation-*.json

@@ -1,9 +1,9 @@
-import { Injectable } from "@angular/core";
-import { Action, Select, Selector, State, StateContext, Store } from "@ngxs/store";
+import { inject, Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Organisms, ResetSamplesState, Samples } from "./samples.actions";
 import { FilesState } from "../files/files.state";
 import { Observable } from "rxjs";
-import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
+import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import Swal from "sweetalert2";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";
@@ -28,7 +28,7 @@ export class SampleState {
 
 
     // subscribing to other state containers isnt forbidden but feels wrong, so try and limit doing so
-    @Select(FilesState.getSampleSheet) sampleSheet$: Observable<StudyFile>;
+    sampleSheet$: Observable<StudyFile> = inject(Store).select(FilesState.getSampleSheet);
 
     constructor(private store: Store, private samplesService: SamplesService) {
 
@@ -40,7 +40,7 @@ export class SampleState {
             (sampleSheet) => {
                 if (sampleSheet) {
                     this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
-                    ctx.dispatch(new Samples.OrganiseAndPersist(sampleSheet.file));
+                    ctx.dispatch(new Samples.OrganiseAndPersist(sampleSheet.file, action.studyId));
                 } else {
                     Swal.fire({title: 'Error', text: this.samplesService.sampleSheetMissingPopupMessage, showCancelButton: false, 
                     confirmButtonColor: "#DD6B55", confirmButtonText: "OK"});
@@ -53,7 +53,7 @@ export class SampleState {
     OrganiseAndPersist(ctx: StateContext<SamplesStateModel>, action: Samples.OrganiseAndPersist) {
         const samples = {};
         samples["name"] = action.sampleSheetFilename
-        this.samplesService.getTable(action.sampleSheetFilename).pipe(take(1)).subscribe(
+        this.samplesService.getTable(action.sampleSheetFilename, action.studyId).pipe(take(1)).subscribe(
             (data) => {
                 /**
                  * Sample sheet processing
@@ -168,9 +168,9 @@ export class SampleState {
 
     @Action(Samples.AddRows)
     AddRows(ctx: StateContext<SamplesStateModel>, action: Samples.AddRows) {
-      this.samplesService.addRows(action.filename, action.body).subscribe(
+      this.samplesService.addRows(action.filename, action.body, action.studyId).subscribe(
         (response) => {
-          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename));
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename, action.studyId));
         },
         (error) => {
           console.log(`Unable to add new row to sample sheet ${error.toString()}} `)
@@ -180,9 +180,9 @@ export class SampleState {
 
     @Action(Samples.DeleteRows)
     DeleteRows(ctx: StateContext<SamplesStateModel>, action: Samples.DeleteRows) {
-      this.samplesService.deleteRows(action.filename, action.rowIds).subscribe(
+      this.samplesService.deleteRows(action.filename, action.rowIds, action.studyId).subscribe(
         (response) => {
-          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename))
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename, action.studyId))
         },
         (error) => {
           console.log('Unable to delete rows from sample sheet.')
@@ -193,9 +193,9 @@ export class SampleState {
 
     @Action(Samples.AddColumns)
     AddColumns(ctx: StateContext<SamplesStateModel>, action: Samples.AddColumns) {
-      this.samplesService.addColumns(action.filename, action.body).subscribe(
+      this.samplesService.addColumns(action.filename, action.body, action.studyId).subscribe(
         (response) => {
-          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename));
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename, action.studyId));
         },
         (error) => {
           console.log(`Unable to add new column to sample sheet ${error.toString()}`);
@@ -205,11 +205,11 @@ export class SampleState {
 
     @Action(Samples.UpdateCells)
     UpdateCells(ctx: StateContext<SamplesStateModel>, action: Samples.UpdateCells) {
-      this.samplesService.updateCells(action.filename, action.cellsToUpdate).subscribe(
+      this.samplesService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
         (response) => {
           // maybe do some processing and setting here akin to commitUpdatedTableCells
           //or
-          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename));
+          ctx.dispatch(new Samples.OrganiseAndPersist(action.filename, action.studyId));
         },
         (error) => {
           console.log('Unable to edit cells in sample sheet.');
@@ -241,6 +241,5 @@ export class SampleState {
     static organisms(state: SamplesStateModel): Record<string, any> {
         return state.organisms
     }
-
 
 }

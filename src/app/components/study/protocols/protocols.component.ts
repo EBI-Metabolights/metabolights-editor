@@ -4,9 +4,10 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
+  inject,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
@@ -22,11 +23,11 @@ import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/appl
 export class ProtocolsComponent implements OnInit, OnChanges {
   @Input("assay") assay: any;
 
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
-  @Select(ProtocolsState.protocols) studyProtocols$: Observable<MTBLSProtocol[]>;
-  @Select(ProtocolsState.protocolGuides) protocolGuides$: Observable<Record<string, any>>
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
+  studyProtocols$: Observable<MTBLSProtocol[]> = inject(Store).select(ProtocolsState.protocols);
+  protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
 
   isStudyReadOnly = false;
 

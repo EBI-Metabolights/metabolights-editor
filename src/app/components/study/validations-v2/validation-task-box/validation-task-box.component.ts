@@ -1,12 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { Select, Store } from '@ngxs/store';
-import { interval, Observable, Subscription, timer } from 'rxjs';
+import { Component, inject, OnInit } from '@angular/core';
+import {Store } from '@ngxs/store';
+import { interval, Observable } from 'rxjs';
 import { takeWhile, tap } from 'rxjs/operators';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
 import { ValidationState, ValidationTask } from 'src/app/ngxs-store/study/validation/validation.state';
 import { ViolationType } from '../interfaces/validation-report.types';
-import { ValidationPhase } from '../interfaces/validation-report.interface';
-import { GeneralMetadataService } from 'src/app/services/decomposed/general-metadata.service';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 
 
@@ -32,10 +30,10 @@ export const DescriptionMessages = {
 })
 export class ValidationTaskBoxComponent implements OnInit {
 
-  @Select(ValidationState.currentValidationTask) currentTask$: Observable<ValidationTask>;
-  @Select(ValidationState.validationStatus) validationStatus$: Observable<ViolationType>;
-  @Select(ValidationState.lastValidationRunTime) lastValidationTime$: Observable<string>;
-  @Select(GeneralMetadataState.id) studyId$: Observable<string>;
+  currentTask$: Observable<ValidationTask> = inject(Store).select(ValidationState.currentValidationTask);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  lastValidationTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
+  studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   buttonTexts = "Initiate Validation Task"
   startButtonClass = "";
@@ -66,13 +64,11 @@ export class ValidationTaskBoxComponent implements OnInit {
     this.currentTask$.subscribe((task) => {
       if (task !== null) {
         this.currentTaskState = task;
-        console.log(`taskState: ${JSON.stringify(this.currentTaskState)}`)
       }
     })
 
     this.validationStatus$.subscribe((status) => {
       if (status !== null) {
-        console.log(`status: ${status}`)
         this.status = status
       }
     });
@@ -95,14 +91,13 @@ export class ValidationTaskBoxComponent implements OnInit {
   startValidationTask() {
     const deposedTaskId = this.currentTaskState.id;
 
-    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false)).pipe( // currently proxying, this will not work outside of dev
+    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).pipe( // currently proxying, this will not work outside of dev
       tap(() => {
-        console.log('side effect hit')
         this.isInitiated = true
         
       })
-    ).subscribe(
-      (next) => {
+    ).subscribe({
+      next: (next) => {
         const taskSub = this.store.selectOnce(ValidationState.currentValidationTask)
         let newTask: ValidationTask | null = null
 
@@ -121,23 +116,21 @@ export class ValidationTaskBoxComponent implements OnInit {
           })
         )
 
-        responseSubscription.subscribe(
-          () => {
+        responseSubscription.subscribe({
+          next: () => {
             this.taskStarted = true;
-            this.store.dispatch(new ValidationReportV2.Get(newTask.id))},
-          error => console.log('Unexpected error in Validation task component'),
-          () => {
+            this.store.dispatch(new ValidationReportV2.Get(this.studyId, newTask.id))},
+          error: () => console.log('Unexpected error in Validation task component'),
+          complete: () => {
             this.isInitiated = false;
             this.taskStarted = false;
-            this.store.dispatch(new ValidationReportV2.History.Get());
+            this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
             console.debug('finished & subscription closed.') }
-          )
+      })
        
       },
-      (error) => {},
-      () => {//completed action callback
-        }
-    )
+      error: (error) => {},
+    })
   }
 
   get buttonText(): string {

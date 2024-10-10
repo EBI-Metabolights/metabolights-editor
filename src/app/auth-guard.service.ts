@@ -7,7 +7,7 @@ import { ConfigurationService } from "./configuration.service";
 
 import jwtDecode from "jwt-decode";
 import { httpOptions, MtblsJwtPayload } from "./services/headers";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 
 import { ErrorMessageService } from "./services/error-message.service";
 import { environment } from "src/environments/environment";

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Renderer2, SimpleChange, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
@@ -8,11 +8,12 @@ import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { FormsModule } from '@angular/forms';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import {MatRadioModule} from '@angular/material/radio';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
 import { Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
-import { Observable } from 'rxjs';
+import { filter, Observable } from 'rxjs';
+import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 
 
 export interface  GraphItem {
@@ -61,10 +62,12 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
 
   @ViewChild('chart', { static: false }) chart: any;
 
-  @Select(ValidationState.taskId) taskId$: Observable<string>;
-  @Select(ValidationState.validationStatus) validationStatus$: Observable<ViolationType>;
-  @Select(ValidationState.lastValidationRunTime) lastValidationRunTime$: Observable<string>;
+  taskId$: Observable<string> = inject(Store).select(ValidationState.taskId);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  lastValidationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
+  private studyId: string = null;
 
   private errors: Record<string, number> = {};
   private warnings: Record<string, number> = {};
@@ -91,6 +94,9 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
       });
       this.lastValidationRunTime$.subscribe(value => {
         if (value !== null) this.lastValidationRunTime = value
+      });
+      this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+        this.studyId = value;
       })
 
       if (this.report !== null) {
@@ -139,15 +145,15 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   }
 
   initNewTask() {
-    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask());
+    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId));
   }
 
   getWs3Report() {
-    this.store.dispatch(new ValidationReportV2.Get());
+    this.store.dispatch(new ValidationReportV2.Get(this.studyId));
   }
 
   getFakeWs3Report() {
-    this.store.dispatch(new ValidationReportV2.Get(null, true));
+    this.store.dispatch(new ValidationReportV2.Get(this.studyId, "", true));
   }
 
   breakReportIntoSections() {
@@ -195,7 +201,6 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   }
 
   onSelect($event) {
-    console.log($event);
   }
 }
 

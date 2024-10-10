@@ -1,11 +1,11 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { AfterViewInit, Component, inject, OnInit } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { ConfigurationService } from "src/app/configuration.service";
-import { IValidationSummary, IValidationSummaryWrapper } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { environment } from "src/environments/environment";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
@@ -19,9 +19,9 @@ import { ValidationStatusTransformPipe } from "../validations-v2/pipes/validatio
 })
 export class ValidationsComponent implements OnInit, AfterViewInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
   validationMessageTransform = new ValidationStatusTransformPipe();
@@ -99,7 +99,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   // ADJUST POST STATE MIGRATION
   refreshValidations() {
     if (environment.useNewState) {
-      this.store.dispatch(new ValidationReport.Refresh()).subscribe(
+      this.store.dispatch(new ValidationReport.Refresh(this.requestedStudy)).subscribe(
         (completed) => {
           toastr.success("Validation run submitted.", "Success", this.defaultToastrOptions);
         }, 
@@ -127,7 +127,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     const payload = {};
     payload[valSeq] = valDescription;
     data.validations.push(payload);
-    this.store.dispatch(new ValidationReport.Override(data)).subscribe(
+    this.store.dispatch(new ValidationReport.Override(data, this.requestedStudy)).subscribe(
       (completed) => {
         toastr.success("SUCCESS", "Successfully overriden the validation", this.defaultToastrOptions);
       },
@@ -142,7 +142,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
 
 
   validationTaskDone($event) {
-    this.store.dispatch(new ValidationReport.ContinualRetry(10))
+    this.store.dispatch(new ValidationReport.ContinualRetry(this.requestedStudy, 10))
 
   }
 }

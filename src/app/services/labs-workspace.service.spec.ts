@@ -1,8 +1,5 @@
-import { HttpClient } from "@angular/common/http";
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from "@angular/common/http/testing";
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import { TestBed, waitForAsync } from "@angular/core/testing";
 import { MockConfigurationService } from "../configuration.mock.service";
 import { ConfigurationService } from "../configuration.service";
@@ -18,15 +15,17 @@ describe("LabsWorkspaceService", () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
+    imports: [],
+    providers: [
         LabsWorkspaceService,
         {
-          provide: ConfigurationService,
-          useClass: MockConfigurationService,
+            provide: ConfigurationService,
+            useClass: MockConfigurationService,
         },
-      ],
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
     httpClientSpy = jasmine.createSpyObj("HttpClient", ["post"]);

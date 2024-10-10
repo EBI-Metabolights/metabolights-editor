@@ -1,5 +1,5 @@
 import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
-import { AfterContentInit, Component, OnInit } from "@angular/core";
+import { AfterContentInit, Component, inject, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
 import { Select, Store } from "@ngxs/store";
@@ -10,14 +10,8 @@ import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { filter } from "rxjs/operators";
-import { ResetAssayState } from "src/app/ngxs-store/study/assay/assay.actions";
-import { ResetDescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.action";
-import { ResetFilesState } from "src/app/ngxs-store/study/files/files.actions";
-import { ResetGeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
-import { ResetMAFState } from "src/app/ngxs-store/study/maf/maf.actions";
-import { ResetProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.actions";
-import { ResetSamplesState } from "src/app/ngxs-store/study/samples/samples.actions";
-import { ResetValidationState } from "src/app/ngxs-store/study/validation/validation.actions";
+import { Identifier } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -27,11 +21,11 @@ import { ResetValidationState } from "src/app/ngxs-store/study/validation/valida
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
 
-  @Select(UserState.user) user$: Observable<Owner>
-  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
-  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
-  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
+  user$: Observable<Owner> = inject(Store).select(UserState.user);
+  userStudies$: Observable<IStudyDetail[]> = inject(Store).select(UserState.userStudies);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
+  maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
 
   studies: IStudyDetail[] = [];
   filteredStudies: IStudyDetail[] = [];
@@ -168,5 +162,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   getString(s) {
     return s.accession + " " + s.title + " " + s.description;
+  }
+
+  studyClick(study: IStudyDetail, view: string) {
+    //this.store.dispatch(new Identifier.Set(study.accession));
+    //this.router.navigate([`${view}`, study.accession]);
   }
 }

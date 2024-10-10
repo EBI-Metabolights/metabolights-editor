@@ -1,13 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import {  ValidationPhase, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
-import { Select, Store } from '@ngxs/store';
+import { Component, inject, OnInit } from '@angular/core';
+import { combineLatest, filter, Observable, withLatestFrom } from 'rxjs';
+import { ValidationPhase, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
+import { Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList} from '../interfaces/validation-report.types';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
-import { filter } from 'rxjs-compat/operator/filter';
 
 
 
@@ -18,25 +17,23 @@ import { filter } from 'rxjs-compat/operator/filter';
 })
 export class ValidationsV2ParentComponent implements OnInit {
 
-  @Select(ValidationState.reportV2) reportV2$: Observable<Ws3ValidationReport>;
-  @Select(ValidationState.reportV2ViolationsAll) allViolations$: Observable<Violation[]>;
+  reportV2$: Observable<Ws3ValidationReport> = inject(Store).select(ValidationState.reportV2);
+  allViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2ViolationsAll);
 
-  @Select(ValidationState.history) history$: Observable<Array<ValidationPhase>>
-  @Select(ValidationState.initialLoadMade) initialLoadMade$: Observable<boolean>;
+  history$: Observable<Array<ValidationPhase>> = inject(Store).select(ValidationState.history);
+  initialLoadMade$: Observable<boolean> = inject(Store).select(ValidationState.initialLoadMade);
 
-  @Select(ValidationState.reportV2Violations('input')) generalViolations$: Observable<Violation[]>;
-  @Select(ValidationState.reportV2Violations('investigation')) investigationViolations$: Observable<Violation[]>;
-  @Select(ValidationState.reportV2Violations('sample')) sampleViolations$: Observable<Violation[]>;
-  @Select(ValidationState.reportV2Violations('assay')) assayViolations$: Observable<Violation[]>;
-  @Select(ValidationState.reportV2Violations('assignment')) assignmentViolations$: Observable<Violation[]>;
-  @Select(ValidationState.reportV2Violations('files')) filesViolations$: Observable<Violation[]>;
+  generalViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('input'));
+  investigationViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('investigation'));
+  sampleViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('sample'));
+  assayViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('assay'));
+  assignmentViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('assignment'));
+  filesViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('files'));
 
-  @Select(GeneralMetadataState.id) studyId$: Observable<string>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
+  studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
   constructor(private store: Store) {
-    this.store.dispatch(new ValidationReportV2.Get());
-    this.store.dispatch(new ValidationReportV2.History.Get())
    }
   
   //report variables
@@ -46,13 +43,13 @@ export class ValidationsV2ParentComponent implements OnInit {
   lastRunTime: string = ""
 
   // report subsections
-  allViolations: Violation[] = null;
-  generalViolations: Violation[] = null;
-  investigationViolations: Violation[] = null;
-  sampleViolations: Violation[] =  null;
-  assayViolations: Violation[] = null;
-  assignmentViolations: Violation[] = null;
-  filesViolations: Violation[] = null;
+  allViolations: Violation[] = [];
+  generalViolations: Violation[] = [];
+  investigationViolations: Violation[] = [];
+  sampleViolations: Violation[] =  [];
+  assayViolations: Violation[] = [];
+  assignmentViolations: Violation[] = [];
+  filesViolations: Violation[] = [];
   
   // core state variables
   studyId: string =  null
@@ -79,8 +76,7 @@ export class ValidationsV2ParentComponent implements OnInit {
       }
     )
 
-    this.reportV2$.subscribe(value => {
-      console.log(value === null)
+    this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
       this.report = value;
       if (this.report !== null) {
         if(this.loadingDiffReport) this.loadingDiffReport = false;
@@ -129,14 +125,17 @@ export class ValidationsV2ParentComponent implements OnInit {
       this.filesViolations = value;
     });
 
-    this.studyId$.subscribe(value => {
+
+    this.studyId$.pipe(filter(value => value !== null)).subscribe(value => {
       this.studyId = value;
+      this.store.dispatch(new ValidationReportV2.Get(this.studyId));
+      this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
     });
   }
 
   onPhaseSelection($event) {
     console.log($event)
-    this.store.dispatch(new ValidationReportV2.Get($event.taskId));
+    this.store.dispatch(new ValidationReportV2.Get(this.studyId, $event.taskId));
     this.loadingDiffReport = true;
     // TODO set up some kind of loading state
   }

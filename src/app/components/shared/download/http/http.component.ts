@@ -1,8 +1,7 @@
-import { Component, OnInit } from "@angular/core";
-import { environment } from "src/environments/environment";
+import { Component, inject, OnInit } from "@angular/core";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-download-http",
@@ -10,7 +9,7 @@ import { Select } from "@ngxs/store";
   styleUrls: ["./http.component.css"],
 })
 export class HttpDownloadComponent implements OnInit {
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
   requestedStudy: any = null;

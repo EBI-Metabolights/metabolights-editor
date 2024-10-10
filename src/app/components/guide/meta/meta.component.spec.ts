@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
@@ -14,6 +14,7 @@ import { EuropePMCService } from "src/app/services/publications/europePMC.servic
 import { MockEuropePMCService } from "src/app/services/publications/europePMC.service.mock";
 
 import { MetaComponent } from "./meta.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("MetaComponent", () => {
   let component: MetaComponent;
@@ -21,22 +22,21 @@ describe("MetaComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [MetaComponent],
-      imports: [
-        CommonModule,
+    declarations: [MetaComponent],
+    imports: [CommonModule,
         BrowserModule,
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        HttpClientTestingModule,
-        MatButtonToggleModule,
-      ],
-      providers: [
+        MatButtonToggleModule],
+    providers: [
         { provide: EditorService, useClass: MockEditorService },
         { provide: DOIService, useClass: MockDOIService },
         { provide: EuropePMCService, useClass: MockEuropePMCService },
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

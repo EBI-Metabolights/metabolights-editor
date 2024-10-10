@@ -1,11 +1,8 @@
 import {  Store } from "@ngxs/store";
 
 import { ConfigurableFocusTrap } from "@angular/cdk/a11y";
-import { HttpClient, HTTP_INTERCEPTORS } from "@angular/common/http";
-import {
-  HttpClientTestingModule,
-  HttpTestingController,
-} from "@angular/common/http/testing";
+import { HttpClient, HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { HttpTestingController, provideHttpClientTesting } from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -24,21 +21,23 @@ describe("HeaderInterceptor", () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [
+    imports: [],
+    providers: [
         MetabolightsService,
         {
-          provide: ConfigurationService,
-          useClass: MockConfigurationService,
+            provide: ConfigurationService,
+            useClass: MockConfigurationService,
         },
         {
-          provide: HTTP_INTERCEPTORS,
-          useClass: HeaderInterceptor,
-          multi: true,
+            provide: HTTP_INTERCEPTORS,
+            useClass: HeaderInterceptor,
+            multi: true,
         },
-        Store
-      ],
-    });
+        Store,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+});
     httpMock = TestBed.inject(HttpTestingController);
     http = TestBed.inject(HttpClient);
     configurationService = TestBed.inject(ConfigurationService);

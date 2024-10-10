@@ -5,9 +5,10 @@ import { ValidationService } from "src/app/services/decomposed/validation.servic
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
-import { interval } from "rxjs";
+import { interval, withLatestFrom } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
 import { ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
+import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
 
 
 export interface ValidationTask {
@@ -51,15 +52,15 @@ export class ValidationState {
 
     @Action(EditorValidationRules.Get)
     GetValidationRules(ctx: StateContext<ValidationStateModel>) {
-        this.validationService.getValidationRules().subscribe(
-            (rules) => {
+        this.validationService.getValidationRules().subscribe({
+            next: (rules) => {
                 this.store.dispatch(new SetLoadingInfo(this.validationService.loadingRulesMessage));
                 ctx.dispatch(new EditorValidationRules.Set(rules));
             },
-            (error) => {
+            error: (error) => {
                 console.error(`Unable to retrieve the validations.json rules file for the editor: ${error}`)
             }
-        )
+        })
     }
 
     @Action(EditorValidationRules.Set)
@@ -73,17 +74,18 @@ export class ValidationState {
     }
 
     @Action(ValidationReport.Get)
-    GetValidationReport(ctx: StateContext<ValidationStateModel>) {
-        this.validationService.getValidationReport().subscribe(
-            (report) => {
+    GetValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Get) {
+        this.validationService.getValidationReport(action.studyId).subscribe({
+            next: (report) => {
                 this.store.dispatch(new Loading.Disable());
                 ctx.dispatch(new ValidationReport.Set(report));
             },
-            (error) => {
+            error: (error) => {
                 console.error(`Could not get validation report: ${error}`)
                 this.store.dispatch(new Loading.Disable());
             }
-        );
+        }
+    );
 
     }
 
@@ -99,7 +101,7 @@ export class ValidationState {
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
         if (!action.test) {
-            this.validationService.getValidationV2Report(action.proxy, action.id).subscribe( 
+            this.validationService.getValidationV2Report(action.proxy, action.taskId, action.studyId).subscribe( 
                 (response) => {
                     if (response.status !== 'error') {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
@@ -108,7 +110,8 @@ export class ValidationState {
                             ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                             ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
                             ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
-                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time))
+                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time));
+                            ctx.dispatch(new SetInitialLoad(true));
                         } else {
                             // some other task status handling here "INITIATED, STARTED, PENDING, FAILURE" etc
                         }
@@ -155,10 +158,8 @@ export class ValidationState {
 
     @Action(ValidationReportV2.InitialiseValidationTask)
     InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.InitialiseValidationTask) {
-        this.validationService.createStudyValidationTask(action.proxy).subscribe(
+        this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe(
             (response) => {
-                console.log('task submitted successfully');
-                console.log(response);
                 ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
                 //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
             },
@@ -208,10 +209,12 @@ export class ValidationState {
     @Action(ValidationReportV2.History.Get)
     GetHistory(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.History.Get) {
         const state = ctx.getState();
-        this.validationService.getValidationHistory().subscribe((historyResponse) => {
-            ctx.dispatch(new ValidationReportV2.History.Set(historyResponse.content));
+        this.validationService.getValidationHistory(action.studyId).subscribe((historyResponse) => {
+            const sortedPhases = sortPhasesByTime(historyResponse.content);
+            console.log(sortedPhases);
+            ctx.dispatch(new ValidationReportV2.History.Set(sortedPhases));
             if (!state.initialLoadMade) {
-                ctx.dispatch(new ValidationReportV2.Get(historyResponse.content[0].taskId))
+                ctx.dispatch(new ValidationReportV2.Get(action.studyId, sortedPhases[0].taskId))
             }
         },
         (error) => {
@@ -231,7 +234,7 @@ export class ValidationState {
     @Action(ValidationReport.Refresh)
     RefreshValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Refresh) {
         const state = ctx.getState();
-        this.validationService.refreshValidations().subscribe(
+        this.validationService.refreshValidations(action.studyId).subscribe(
             (response) => {
                 this.store.dispatch(new SetLoadingInfo("Loading study validations"));
                 ctx.dispatch(new EditorValidationRules.Get());
@@ -246,11 +249,11 @@ export class ValidationState {
     @Action(ValidationReport.ContinualRetry)
     ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry){
         let repeat = 0;
-        this.validationService.getValidationReport().subscribe(reportResponse => {
+        this.validationService.getValidationReport(action.studyId).subscribe(reportResponse => {
           if (reportResponse.validation.status === "not ready"){
             const validationReportPollInvertal = interval(action.interval);
             const validationReportLoadSubscription = validationReportPollInvertal.subscribe(x => {
-              this.validationService.getValidationReport().subscribe(nextReportResponse => {
+              this.validationService.getValidationReport(action.studyId).subscribe(nextReportResponse => {
                 repeat = repeat + 1;
               if (nextReportResponse.validation.status !== "not ready"){
                 validationReportLoadSubscription.unsubscribe();
@@ -271,9 +274,9 @@ export class ValidationState {
     @Action(ValidationReport.Override)
     OverrideValidationRule(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Override) {
         const state = ctx.getState();
-        this.validationService.overrideValidations(action.rule).subscribe(
+        this.validationService.overrideValidations(action.rule, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new ValidationReport.Get());
+                ctx.dispatch(new ValidationReport.Get(action.studyId));
             },
             (error) => {
                 console.log("Could not override validation rule.");
@@ -281,13 +284,26 @@ export class ValidationState {
         )
     }
 
+    @Action(SetInitialLoad)
+    SetInitialLoad(ctx: StateContext<ValidationStateModel>, action: SetInitialLoad) {
+        const state = ctx.getState();
+        ctx.setState(({
+            ...state,
+            initialLoadMade: action.set
+        }));
+
+    }
+
     @Action(ResetValidationState)
     Reset(ctx: StateContext<ValidationStateModel>, action: ResetValidationState) {
         ctx.setState(defaultState);
     }
 
+    
+
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
+        if (state === undefined) { return null }
         return state.rules
     }
 
@@ -303,6 +319,7 @@ export class ValidationState {
 
     @Selector()
     static reportV2ViolationsAll(state: ValidationStateModel) {
+        if (state.reportV2 === null) { return [] }
         let violations = state.reportV2.messages.violations;
         violations = sortViolations(violations);
         return violations;
@@ -310,6 +327,7 @@ export class ValidationState {
 
     static reportV2Violations(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
+            if (state.reportV2 === null) { return [] }
             return sortViolations(
                 filterViolations(
                     state.reportV2.messages.violations, section
@@ -391,3 +409,21 @@ function calculateStudyValidationStatus(report: Ws3ValidationReport): ViolationT
     if (report.messages.violations.length > 0) return 'ERROR'
     else return 'SUCCESS'
 }
+
+
+function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
+    return phases.sort((a, b) => {
+        const dateA = parseValidationTime(a.validationTime);
+        const dateB = parseValidationTime(b.validationTime);
+        return dateB.getTime() - dateA.getTime(); // Sort by most recent first
+    });
+  }
+
+  function parseValidationTime(validationTime: string): Date {
+    const [datePart, timePart] = validationTime.split('_');
+    const [year, day, month] = datePart.split('-').map(Number);
+    const [hours, minutes, seconds] = timePart.split('-').map(Number);
+    // Note: JavaScript Date uses 0-based months, so we subtract 1 from `month`
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  }
+  

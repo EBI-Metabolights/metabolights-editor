@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { HttpClient, HttpClientModule } from "@angular/common/http";
+import { HttpClient, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { UntypedFormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule, By } from "@angular/platform-browser";
@@ -33,19 +33,17 @@ describe("TableComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
+    declarations: [
         TableComponent,
         MockUploadComponent,
         MockDownloadComponent,
         MockOntologyComponent,
-      ],
-      imports: [
-        CommonModule,
+    ],
+    imports: [CommonModule,
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
-        HttpClientModule,
         MatInputModule,
         MatFormFieldModule,
         FormsModule,
@@ -54,15 +52,15 @@ describe("TableComponent", () => {
         MatPaginatorModule,
         MatSortModule,
         MatSelectModule,
-        MatIconModule,
-      ],
-      providers: [
+        MatIconModule],
+    providers: [
         { provide: EditorService, useClass: MockEditorService },
         ClipboardService,
         HttpClient,
         UntypedFormBuilder,
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

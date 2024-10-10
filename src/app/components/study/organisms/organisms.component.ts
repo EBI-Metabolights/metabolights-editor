@@ -1,8 +1,7 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { environment } from "src/environments/environment";
+import { Component, inject, OnInit } from "@angular/core";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-organisms",
@@ -11,7 +10,7 @@ import { Select } from "@ngxs/store";
 })
 export class OrganismsComponent implements OnInit {
 
-  @Select(SampleState.organisms) studyOrganisms$: Observable<Record<string, any>>;
+  studyOrganisms$: Observable<Record<string, any>> = inject(Store).select(SampleState.organisms);
   
   organisms: any[] = [];
 

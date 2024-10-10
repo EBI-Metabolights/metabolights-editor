@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
@@ -22,6 +22,7 @@ import {
 } from "@angular/router/testing";
 
 import { ProgressComponent } from "./progress.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("ProgressComponent", () => {
   let component: ProgressComponent;
@@ -29,28 +30,30 @@ describe("ProgressComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ProgressComponent],
-      imports: [RouterTestingModule, HttpClientTestingModule],
-      providers: [
+    declarations: [ProgressComponent],
+    imports: [RouterTestingModule],
+    providers: [
         {
-          provide: Router,
-          useFactory: setupTestingRouter,
-          deps: [
-            UrlSerializer,
-            ChildrenOutletContexts,
-            Location,
-            NgModuleFactoryLoader,
-            Compiler,
-            Injector,
-            ROUTES,
-            ROUTER_CONFIGURATION,
-            [UrlHandlingStrategy, new Optional()],
-            [RouteReuseStrategy, new Optional()],
-          ],
+            provide: Router,
+            useFactory: setupTestingRouter,
+            deps: [
+                UrlSerializer,
+                ChildrenOutletContexts,
+                Location,
+                NgModuleFactoryLoader,
+                Compiler,
+                Injector,
+                ROUTES,
+                ROUTER_CONFIGURATION,
+                [UrlHandlingStrategy, new Optional()],
+                [RouteReuseStrategy, new Optional()],
+            ],
         },
         { provide: Location, useClass: SpyLocation },
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

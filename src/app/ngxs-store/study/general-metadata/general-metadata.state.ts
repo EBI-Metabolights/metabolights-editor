@@ -58,6 +58,8 @@ export class GeneralMetadataState {
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
         this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
             (gm_response) => {
+                const state = ctx.getState();
+                if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new SetLoadingInfo("Loading investigation details"));
                 this.store.dispatch(new SetReadonly(action.readonly));
@@ -81,22 +83,22 @@ export class GeneralMetadataState {
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
 
-                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
 
                 if (action.readonly) {
                     this.store.dispatch(new SetReadonly(true));
                     this.store.dispatch(new Loading.Disable());
                 } else {
-                    this.store.dispatch(new ValidationReport.Get());
+                    this.store.dispatch(new ValidationReport.Get(action.studyId));
                     this.store.dispatch(new SetReadonly(false));
                 }
             },
             (error) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new Loading.Disable());
-                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
                 if (!action.readonly) {
-                    this.store.dispatch(new ValidationReport.Get())
+                    this.store.dispatch(new ValidationReport.Get(action.studyId))
                 }
 
 
@@ -106,7 +108,6 @@ export class GeneralMetadataState {
     @Action(Identifier.Set)
     SetStudyIdentifier(ctx: StateContext<GeneralMetadataStateModel>, action: Identifier.Set) {
         const state = ctx.getState();
-        console.log(`hit Identifier.Set action handler with ${action.id}`)
         ctx.setState({
             ...state,
             id: action.id
@@ -234,7 +235,6 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            console.log(action.title);
             ctx.dispatch(new Publications.Set([response], false, true, action.title))
             }
         )
@@ -393,6 +393,7 @@ export class GeneralMetadataState {
 
     @Selector()
     static id(state: GeneralMetadataStateModel): string {
+        if (state === undefined) return null
         return state.id
     }
 

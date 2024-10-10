@@ -6,14 +6,15 @@ import { Observable } from 'rxjs';
 import { IStudyDetailWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-detail.interface';
 import { httpOptions } from '../headers';
 import { catchError } from 'rxjs/operators';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService extends BaseConfigDependentService{
 
-  constructor(http: HttpClient, configService: ConfigurationService) { 
-    super(http, configService)
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) { 
+    super(http, configService, store)
   }
 
   getAllStudies(): Observable<IStudyDetailWrapper> {

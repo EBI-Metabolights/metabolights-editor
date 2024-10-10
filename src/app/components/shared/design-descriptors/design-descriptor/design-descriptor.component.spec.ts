@@ -1,6 +1,6 @@
 import { Store } from "@ngxs/store";
 import { CommonModule } from "@angular/common";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
@@ -12,6 +12,7 @@ import { EuropePMCService } from "src/app/services/publications/europePMC.servic
 import { MockEuropePMCService } from "src/app/services/publications/europePMC.service.mock";
 
 import { DesignDescriptorComponent } from "./design-descriptor.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("DesignDescriptorComponent", () => {
   let component: DesignDescriptorComponent;
@@ -19,21 +20,20 @@ describe("DesignDescriptorComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [DesignDescriptorComponent],
-      imports: [
-        HttpClientTestingModule,
-        CommonModule,
+    declarations: [DesignDescriptorComponent],
+    imports: [CommonModule,
         BrowserModule,
         FormsModule,
-        ReactiveFormsModule,
-      ],
-      providers: [
+        ReactiveFormsModule],
+    providers: [
         Store,
         { provide: EditorService, useClass: MockEditorService },
         { provide: DOIService, useClass: MockDOIService },
         { provide: EuropePMCService, useClass: MockEuropePMCService },
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

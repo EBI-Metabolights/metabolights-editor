@@ -1,5 +1,5 @@
-import { Injectable } from "@angular/core";
-import { Action, Select, Selector, State, StateContext } from "@ngxs/store";
+import { inject, Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
 import { Descriptors, Factors, ResetDescriptorsState } from "./descriptors.action";
@@ -35,7 +35,7 @@ export class DescriptorsState {
         tapToDismiss: false,
       }
 
-    @Select(GeneralMetadataState.id) studyId$:  Observable<string>
+      studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
     constructor(private descriptorsService: DescriptorsService) {
 

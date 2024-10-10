@@ -1,10 +1,8 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { MetabolightsService } from "./../services/metabolights/metabolights.service";
 import { AuthService } from "./../services/metabolights/auth.service";
 import { ActivatedRouteSnapshot, Router } from "@angular/router";
-
 import { catchError, map, observeOn } from "rxjs/operators";
-
 import { httpOptions, MtblsJwtPayload, MetabolightsUser, StudyPermission } from "./../services/headers";
 import Swal from "sweetalert2";
 import { environment } from "src/environments/environment";
@@ -13,11 +11,10 @@ import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
 import { HttpHeaders } from "@angular/common/http";
-import { Observable, of, interval, asapScheduler, asyncScheduler } from "rxjs";
-import { VersionInfo } from "src/environment.interface";
+import { Observable, of, asapScheduler } from "rxjs";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/non-study/transitions/transitions.actions";
 import { User } from "../ngxs-store/non-study/user/user.actions";
 import { GetGeneralMetadata, Identifier, ResetGeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.actions";
@@ -26,13 +23,13 @@ import { AssayState } from "../ngxs-store/study/assay/assay.state";
 import { FilesState } from "../ngxs-store/study/files/files.state";
 import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
 import { ValidationState } from "../ngxs-store/study/validation/validation.state";
-import {  BannerMessage, DefaultControlLists, GuidesMappings, MaintenanceMode, SetProtocolExpand, SetSelectedLanguage } from "../ngxs-store/non-study/application/application.actions";
+import { BannerMessage, DefaultControlLists, MaintenanceMode, SetProtocolExpand } from "../ngxs-store/non-study/application/application.actions";
 import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
 import { SampleState } from "../ngxs-store/study/samples/samples.state";
 import { MAFState } from "../ngxs-store/study/maf/maf.state";
 import { EditorValidationRules, ResetValidationState } from "../ngxs-store/study/validation/validation.actions";
-import { FilesLists, Operations, ResetFilesState } from "../ngxs-store/study/files/files.actions";
-import { Assay, ResetAssayState } from "../ngxs-store/study/assay/assay.actions";
+import { Operations, ResetFilesState } from "../ngxs-store/study/files/files.actions";
+import { ResetAssayState } from "../ngxs-store/study/assay/assay.actions";
 import { ResetSamplesState, Samples } from "../ngxs-store/study/samples/samples.actions";
 import { ValidationService } from "./decomposed/validation.service";
 import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
@@ -61,16 +58,14 @@ export function disambiguateUserObj(user) {
 })
 export class EditorService {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.controlLists) controlLists$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  controlLists$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.controlLists);
 
-  // Reconstituting previous state.study selector. state.study was only used in commitUpdatedTableCells
-  // so I am not including ALL study data, only the data that method uses.
-  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
-  @Select(SampleState.samples) samples$: Observable<Record<string, any>>;
-  @Select(MAFState.mafs) mafs$: Observable<Record<string, any>>;
+  assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
+  samples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
+  mafs$: Observable<Record<string, any>> = inject(Store).select(MAFState.mafs);
 
   private assays: Record<string, any>;
   private samples: Record<string, any>;
@@ -509,7 +504,6 @@ export class EditorService {
   }
 
   loadStudyId(id) {
-    console.log(`hit loadStudyId with ${id}`)
     if (id === null) {
       console.trace();
     }
@@ -534,7 +528,6 @@ export class EditorService {
       route.params.subscribe((params) => {
         const studyID = params.id;
         if (this.currentStudyIdentifier !== studyID) {
-          console.log(`hit initStudy if block with ${studyID}`)
           this.loadStudyNgxs(studyID, false);
         }
       });
@@ -586,9 +579,9 @@ export class EditorService {
   }
 
 
-  loadStudySamples() {
+  loadStudySamples(studyId: string) {
     if (this.files === null) {
-      this.store.dispatch(new Operations.GetFreshFilesList(false))
+      //this.store.dispatch(new Operations.GetFreshFilesList(false)) // causing issues currently
     } else {
       let samplesExist = false;
       this.files.study.forEach((file) => {
@@ -596,7 +589,7 @@ export class EditorService {
           this.store.dispatch(new SetLoadingInfo("Loading samples data"))
           samplesExist = true;
 
-          this.store.dispatch(new Samples.OrganiseAndPersist(file.file));
+          this.store.dispatch(new Samples.OrganiseAndPersist(file.file, studyId));
         }
       });
       if (!samplesExist) {

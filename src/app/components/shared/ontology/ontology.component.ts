@@ -18,7 +18,7 @@ import {
   MatAutocompleteTrigger,
 } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
-import { Observable } from "rxjs";
+import { firstValueFrom, Observable } from "rxjs";
 import {
   map,
   debounceTime,
@@ -150,9 +150,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   async getReadonly() {
-    let result = await this.store.select(state => state.ApplicationState.readonly)
-    .pipe(take(1))
-    .toPromise();
+    let result = await firstValueFrom(this.store.select(ApplicationState.readonly))
     return result
   }
 
