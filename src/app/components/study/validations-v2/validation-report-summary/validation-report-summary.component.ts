@@ -201,7 +201,6 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   }
 
   onSelect($event) {
-    console.log($event);
   }
 }
 

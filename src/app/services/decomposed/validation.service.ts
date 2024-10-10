@@ -114,8 +114,6 @@ export class ValidationService extends BaseConfigDependentService {
 
       // remove once new auth service implemented
       const token = localStorage.getItem('jwt');
-      console.log(`taskid: ${taskId}`);
-      console.log(`study id: ${studyId}`)
       let headers = null;
       let headersObj = {
         //'Content-Type':  'application/json',

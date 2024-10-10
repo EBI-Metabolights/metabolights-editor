@@ -504,7 +504,6 @@ export class EditorService {
   }
 
   loadStudyId(id) {
-    console.log(`hit loadStudyId with ${id}`)
     if (id === null) {
       console.trace();
     }
@@ -528,9 +527,7 @@ export class EditorService {
     } else {
       route.params.subscribe((params) => {
         const studyID = params.id;
-        console.log(`init study retrived study accession ${studyID} from params`)
         if (this.currentStudyIdentifier !== studyID) {
-          console.log(`hit initStudy if block with ${studyID}`)
           this.loadStudyNgxs(studyID, false);
         }
       });

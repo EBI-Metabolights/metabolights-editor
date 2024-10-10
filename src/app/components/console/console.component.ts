@@ -61,7 +61,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     )
       .subscribe(() => {
         this.resetStudyStates();
-        console.log('study states reset')
       })
   }
 

@@ -38,7 +38,6 @@ export class ValidationSectionComponent implements OnInit, OnChanges {
 
 
   getSelectedValues() {
-    console.log(this.selectedSubsections);
   }
 
   subsectionSelected(section): boolean {

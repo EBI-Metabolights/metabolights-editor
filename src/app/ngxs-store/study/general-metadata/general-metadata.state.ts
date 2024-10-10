@@ -58,7 +58,6 @@ export class GeneralMetadataState {
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
         this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
             (gm_response) => {
-                console.log(action.studyId);
                 const state = ctx.getState();
                 if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
                 this.store.dispatch(new SetStudyError(false));
@@ -109,7 +108,6 @@ export class GeneralMetadataState {
     @Action(Identifier.Set)
     SetStudyIdentifier(ctx: StateContext<GeneralMetadataStateModel>, action: Identifier.Set) {
         const state = ctx.getState();
-        console.log(`hit Identifier.Set action handler with ${action.id}`)
         ctx.setState({
             ...state,
             id: action.id
@@ -237,7 +235,6 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            console.log(action.title);
             ctx.dispatch(new Publications.Set([response], false, true, action.title))
             }
         )

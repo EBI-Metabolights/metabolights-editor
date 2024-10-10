@@ -77,7 +77,6 @@ export class ValidationsV2ParentComponent implements OnInit {
     )
 
     this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
-      console.log(value === null)
       this.report = value;
       if (this.report !== null) {
         if(this.loadingDiffReport) this.loadingDiffReport = false;
@@ -136,7 +135,7 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   onPhaseSelection($event) {
     console.log($event)
-    this.store.dispatch(new ValidationReportV2.Get($event.taskId));
+    this.store.dispatch(new ValidationReportV2.Get(this.studyId, $event.taskId));
     this.loadingDiffReport = true;
     // TODO set up some kind of loading state
   }

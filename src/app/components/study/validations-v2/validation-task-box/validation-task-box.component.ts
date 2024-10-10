@@ -64,13 +64,11 @@ export class ValidationTaskBoxComponent implements OnInit {
     this.currentTask$.subscribe((task) => {
       if (task !== null) {
         this.currentTaskState = task;
-        console.log(`taskState: ${JSON.stringify(this.currentTaskState)}`)
       }
     })
 
     this.validationStatus$.subscribe((status) => {
       if (status !== null) {
-        console.log(`status: ${status}`)
         this.status = status
       }
     });
@@ -95,12 +93,11 @@ export class ValidationTaskBoxComponent implements OnInit {
 
     this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).pipe( // currently proxying, this will not work outside of dev
       tap(() => {
-        console.log('side effect hit')
         this.isInitiated = true
         
       })
-    ).subscribe(
-      (next) => {
+    ).subscribe({
+      next: (next) => {
         const taskSub = this.store.selectOnce(ValidationState.currentValidationTask)
         let newTask: ValidationTask | null = null
 
@@ -119,23 +116,21 @@ export class ValidationTaskBoxComponent implements OnInit {
           })
         )
 
-        responseSubscription.subscribe(
-          () => {
+        responseSubscription.subscribe({
+          next: () => {
             this.taskStarted = true;
             this.store.dispatch(new ValidationReportV2.Get(this.studyId, newTask.id))},
-          error => console.log('Unexpected error in Validation task component'),
-          () => {
+          error: () => console.log('Unexpected error in Validation task component'),
+          complete: () => {
             this.isInitiated = false;
             this.taskStarted = false;
             this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
             console.debug('finished & subscription closed.') }
-          )
+      })
        
       },
-      (error) => {},
-      () => {//completed action callback
-        }
-    )
+      error: (error) => {},
+    })
   }
 
   get buttonText(): string {

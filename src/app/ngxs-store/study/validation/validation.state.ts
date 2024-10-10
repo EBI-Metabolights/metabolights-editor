@@ -110,7 +110,8 @@ export class ValidationState {
                             ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                             ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
                             ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
-                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time))
+                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time));
+                            ctx.dispatch(new SetInitialLoad(true));
                         } else {
                             // some other task status handling here "INITIATED, STARTED, PENDING, FAILURE" etc
                         }
@@ -146,7 +147,6 @@ export class ValidationState {
     @Action(ValidationReportV2.Set)
     SetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Set) {
         const state = ctx.getState();
-        console.log('saving report: ')
         if (!state.initialLoadMade) {
             ctx.dispatch(new SetInitialLoad(true));
         }
@@ -160,8 +160,6 @@ export class ValidationState {
     InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.InitialiseValidationTask) {
         this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe(
             (response) => {
-                console.log('task submitted successfully');
-                console.log(response);
                 ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
                 //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
             },
@@ -212,10 +210,11 @@ export class ValidationState {
     GetHistory(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.History.Get) {
         const state = ctx.getState();
         this.validationService.getValidationHistory(action.studyId).subscribe((historyResponse) => {
-            ctx.dispatch(new ValidationReportV2.History.Set(historyResponse.content));
+            const sortedPhases = sortPhasesByTime(historyResponse.content);
+            console.log(sortedPhases);
+            ctx.dispatch(new ValidationReportV2.History.Set(sortedPhases));
             if (!state.initialLoadMade) {
-                console.log('hit initial load not made block')
-                ctx.dispatch(new ValidationReportV2.Get(action.studyId, historyResponse.content[0].taskId))
+                ctx.dispatch(new ValidationReportV2.Get(action.studyId, sortedPhases[0].taskId))
             }
         },
         (error) => {
@@ -285,6 +284,16 @@ export class ValidationState {
         )
     }
 
+    @Action(SetInitialLoad)
+    SetInitialLoad(ctx: StateContext<ValidationStateModel>, action: SetInitialLoad) {
+        const state = ctx.getState();
+        ctx.setState(({
+            ...state,
+            initialLoadMade: action.set
+        }));
+
+    }
+
     @Action(ResetValidationState)
     Reset(ctx: StateContext<ValidationStateModel>, action: ResetValidationState) {
         ctx.setState(defaultState);
@@ -294,6 +303,7 @@ export class ValidationState {
 
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
+        if (state === undefined) { return null }
         return state.rules
     }
 
@@ -399,3 +409,21 @@ function calculateStudyValidationStatus(report: Ws3ValidationReport): ViolationT
     if (report.messages.violations.length > 0) return 'ERROR'
     else return 'SUCCESS'
 }
+
+
+function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
+    return phases.sort((a, b) => {
+        const dateA = parseValidationTime(a.validationTime);
+        const dateB = parseValidationTime(b.validationTime);
+        return dateB.getTime() - dateA.getTime(); // Sort by most recent first
+    });
+  }
+
+  function parseValidationTime(validationTime: string): Date {
+    const [datePart, timePart] = validationTime.split('_');
+    const [year, day, month] = datePart.split('-').map(Number);
+    const [hours, minutes, seconds] = timePart.split('-').map(Number);
+    // Note: JavaScript Date uses 0-based months, so we subtract 1 from `month`
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  }
+  
