@@ -426,7 +426,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (cellsToUpdate.length > 0) {
       this.isFormBusy = true;
       let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-      this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+      this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate}, this.studyId)).subscribe(
         (completed) => {
           toastr.success("Cells updated successfully", "Success", this.toastrSettings);
           this.isEditModalOpen = false;
@@ -645,19 +645,19 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   addColumns(columns) {
     this.isFormBusy = true;
-    this.store.dispatch(new Samples.AddColumns(this.data.file, { data: columns}, null)).subscribe(
-      (completed) => {
+    this.store.dispatch(new Samples.AddColumns(this.data.file, { data: columns}, this.studyId)).subscribe({
+      next: (completed) => {
         this.isFormBusy = false;
         toastr.success("Characteristic/Factor columns added successfully", "Success", this.toastrSettings);
         this.isFormBusy = false;
         return true;
       },
-      (error) => {
+      error: (error) => {
         console.log(error);
         this.isFormBusy = false;
         return false;
       }
-    )
+    })
   }
 
   addNRows() {
@@ -687,15 +687,18 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   updateRows(rows) {
     this.isFormBusy = true;
     let actionClass = this.getTableUpdateAction('update', this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, { data: rows }, null)).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, { data: rows }, null, this.studyId)).subscribe({
+      next: () => {
+
+      },
+      error: (error) => {
+        this.isFormBusy = false;
+      },
+      complete: () => {
         toastr.success("Row updated successfully", "Success", this.toastrSettings);
         this.isFormBusy = false;
       },
-      (error) => {
-        this.isFormBusy = false;
-      }
-    )
+  })
     
 
   }
@@ -704,14 +707,15 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.isFormBusy = true;
     if (tableType === undefined) { tableType = this.getTableType(this.data.file)}
     let actionClass = this.getTableUpdateAction('add', tableType)
-      this.store.dispatch(new actionClass(this.data.file, { data: { rows, index: index ? index : 0 } }, null)).subscribe(
-      (completed) => {
+      this.store.dispatch(new actionClass(this.data.file, { data: { rows, index: index ? index : 0 } }, null, this.studyId)).subscribe({
+      next: (completed) => {
         toastr.success(`Rows added successfully to the end of the ${tableType} sheet`, "Success", this.toastrSettings);
         this.rowsUpdated.emit();
         this.isFormBusy = false;
       },
-      (error) => {
+      error: (error) => {
         this.isFormBusy = false;
+        }
       }
     )
   }
@@ -783,15 +787,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   deleteSelectedRows() {
     this.isFormBusy = true;
     let actionClass = this.getTableUpdateAction('delete', this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, this.getUnique(this.selectedRows).join(","))).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, this.getUnique(this.selectedRows).join(","), this.studyId)).subscribe({
+      next: (completed) => {
         this.isDeleteModalOpen = false;
-        toastr.success("Rows delete successfully", "Success", this.toastrSettings);
+        toastr.success("Rows deleted successfully", "Success", this.toastrSettings);
         this.rowsUpdated.emit();
         this.isFormBusy = false;
-      },
-      (error) => {
+        },
+      error: (error) => {
         this.isFormBusy = false;
+        }
       }
     )
   }
@@ -1066,17 +1071,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
     this.isFormBusy = true;
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate}, this.studyId)).subscribe({
+      next: (completed) => {
         toastr.success("Cells updated successfully", "Success", this.toastrSettings);
         this.isEditModalOpen = false;
         this.isFormBusy = false
       },
-      (error) => {
+      error: (error) => {
         console.error(error);
         this.isFormBusy = false;
       }
-    )
+   })
   }
 
   saveColumnSelectedMissingRowsValues() {
@@ -1136,8 +1141,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
     this.isFormBusy = true;
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate}, this.studyId)).subscribe({
+      next: (completed) => {
           toastr.success("Cells updated successfully", "Success", this.toastrSettings);
           this.closeEditMissingColValModal();
           if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
@@ -1145,11 +1150,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           }
           this.isFormBusy = false;
         },
-        (err) => {
+       error: (err) => {
           console.error(err);
           this.isFormBusy = false;
         }
-      )
+    })
 
   }
 
@@ -1216,7 +1221,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.isFormBusy = true;
 
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate}, this.studyId)).subscribe(
       (completed) => {
         toastr.success("Cells updated successfully.", "Success", this.toastrSettings);
         this.isEditColumnModalOpen = false;
