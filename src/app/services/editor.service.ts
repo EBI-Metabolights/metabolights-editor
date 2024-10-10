@@ -58,7 +58,7 @@ export function disambiguateUserObj(user) {
 })
 export class EditorService {
 
-  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   controlLists$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.controlLists);
@@ -528,6 +528,7 @@ export class EditorService {
     } else {
       route.params.subscribe((params) => {
         const studyID = params.id;
+        console.log(`init study retrived study accession ${studyID} from params`)
         if (this.currentStudyIdentifier !== studyID) {
           console.log(`hit initStudy if block with ${studyID}`)
           this.loadStudyNgxs(studyID, false);
@@ -581,9 +582,9 @@ export class EditorService {
   }
 
 
-  loadStudySamples() {
+  loadStudySamples(studyId: string) {
     if (this.files === null) {
-      this.store.dispatch(new Operations.GetFreshFilesList(false))
+      //this.store.dispatch(new Operations.GetFreshFilesList(false)) // causing issues currently
     } else {
       let samplesExist = false;
       this.files.study.forEach((file) => {
@@ -591,7 +592,7 @@ export class EditorService {
           this.store.dispatch(new SetLoadingInfo("Loading samples data"))
           samplesExist = true;
 
-          this.store.dispatch(new Samples.OrganiseAndPersist(file.file));
+          this.store.dispatch(new Samples.OrganiseAndPersist(file.file, studyId));
         }
       });
       if (!samplesExist) {

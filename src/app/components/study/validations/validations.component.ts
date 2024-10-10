@@ -99,7 +99,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
   // ADJUST POST STATE MIGRATION
   refreshValidations() {
     if (environment.useNewState) {
-      this.store.dispatch(new ValidationReport.Refresh()).subscribe(
+      this.store.dispatch(new ValidationReport.Refresh(this.requestedStudy)).subscribe(
         (completed) => {
           toastr.success("Validation run submitted.", "Success", this.defaultToastrOptions);
         }, 
@@ -127,7 +127,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
     const payload = {};
     payload[valSeq] = valDescription;
     data.validations.push(payload);
-    this.store.dispatch(new ValidationReport.Override(data)).subscribe(
+    this.store.dispatch(new ValidationReport.Override(data, this.requestedStudy)).subscribe(
       (completed) => {
         toastr.success("SUCCESS", "Successfully overriden the validation", this.defaultToastrOptions);
       },
@@ -142,7 +142,7 @@ export class ValidationsComponent implements OnInit, AfterViewInit {
 
 
   validationTaskDone($event) {
-    this.store.dispatch(new ValidationReport.ContinualRetry(10))
+    this.store.dispatch(new ValidationReport.ContinualRetry(this.requestedStudy, 10))
 
   }
 }

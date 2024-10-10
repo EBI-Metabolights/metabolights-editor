@@ -10,6 +10,7 @@ import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { filter } from "rxjs/operators";
+import { Identifier } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 
 /* eslint-disable @typescript-eslint/dot-notation */
@@ -60,6 +61,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     )
       .subscribe(() => {
         this.resetStudyStates();
+        console.log('study states reset')
       })
   }
 
@@ -161,5 +163,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   getString(s) {
     return s.accession + " " + s.title + " " + s.description;
+  }
+
+  studyClick(study: IStudyDetail, view: string) {
+    //this.store.dispatch(new Identifier.Set(study.accession));
+    //this.router.navigate([`${view}`, study.accession]);
   }
 }

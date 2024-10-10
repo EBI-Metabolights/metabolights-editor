@@ -15,9 +15,9 @@ import { TableService } from './table.service';
 })
 export class SamplesService extends BaseConfigDependentService {
 
-  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  //private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
-  private id: string;
+  //private id: string;
   public samplesColumnOrder: Record<string, any> = {
     "Sample Name": 1,
     "Characteristics[Organism]": 2,
@@ -32,36 +32,33 @@ export class SamplesService extends BaseConfigDependentService {
   
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private tableService: TableService, private store: Store) {  
-      super(http, configService);
-      this.studyIdentifier$.subscribe((id) => {
-        if (id !== null) this.id = id
-      });
+    http: HttpClient, configService: ConfigurationService, private tableService: TableService, store: Store) {  
+      super(http, configService, store);
   }
 
-  getTable(filename): Observable<ITableWrapper> {
+  getTable(filename, suppliedId): Observable<ITableWrapper> {
     return this.http
       .get<ITableWrapper>(
-        this.url.baseURL + "/studies" + "/" + this.id + "/" + filename,
+        this.url.baseURL + "/studies" + "/" + suppliedId + "/" + filename,
         httpOptions
       )
       .pipe(catchError(this.handleError));
   }
 
-  addRows(filename, body): Observable<any> {
-    return this.tableService.addRows(filename, body, this.id);
+  addRows(filename, body, suppliedId): Observable<any> {
+    return this.tableService.addRows(filename, body, suppliedId);
   }
 
-  deleteRows(filename: string, rowIds: any): Observable<any> {
-    return this.tableService.deleteRows(filename, rowIds, this.id);
+  deleteRows(filename: string, rowIds: any, suppliedId): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, suppliedId);
   }
 
-  addColumns(filename, body): Observable<any> {
-    return this.tableService.addColumns(filename, body, this.id);
+  addColumns(filename, body, suppliedId): Observable<any> {
+    return this.tableService.addColumns(filename, body, suppliedId);
   }
 
-  updateCells(filename, body): Observable<any> {
-    return this.tableService.updateCells(filename, body, this.id);
+  updateCells(filename, body, suppliedId): Observable<any> {
+    return this.tableService.updateCells(filename, body, suppliedId);
 
   }
 

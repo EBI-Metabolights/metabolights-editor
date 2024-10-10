@@ -8,13 +8,14 @@ import { httpOptions } from '../headers';
 import { catchError } from 'rxjs/operators';
 import { IFactorsWrapper } from 'src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface';
 import { IfStmt } from '@angular/compiler';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DescriptorsService extends BaseConfigDependentService{
 
-  constructor(http: HttpClient, configService: ConfigurationService) {super(http, configService)}
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) {super(http, configService, store)}
 
     /**
    * Get the study design descriptors for a study.

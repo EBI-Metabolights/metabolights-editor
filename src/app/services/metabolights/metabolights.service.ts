@@ -33,7 +33,7 @@ interface DeleteFilesResponse {
 })
 export class MetabolightsService extends DataService {
 
-  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  private studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
 
 
   study: MTBLSStudy;
@@ -42,6 +42,7 @@ export class MetabolightsService extends DataService {
   constructor(
     http: HttpClient,
     private configService: ConfigurationService,
+    private store: Store
   ) {
     super("", http);
 

@@ -169,7 +169,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       window.location.origin + "/" + urlSplit.join("/") + "/" + tab
     );
     if (index === 6) {
-      this.store.dispatch(new ValidationReport.Get())
+      this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
       if (document.getElementById("tab-content-wrapper")) {
         document.getElementById("tab-content-wrapper").scrollIntoView();
       }

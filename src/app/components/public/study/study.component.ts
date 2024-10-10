@@ -31,7 +31,7 @@ export class PublicStudyComponent implements OnInit {
   currentTabIndex$: Observable<string> = inject(Store).select(TransitionsState.currentTabIndex);
   user$: Observable<Owner> = inject(Store).select(UserState.user); // potentially unused
   userStudies$: Observable<IStudyDetail[]> = inject(Store).select(UserState.userStudies); // Potentially unused
-  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
   studyReviewerLink$: Observable<string> = inject(Store).select(GeneralMetadataState.reviewerLink);
@@ -134,7 +134,7 @@ export class PublicStudyComponent implements OnInit {
         }
 
         if (this.isCurator || this.isOwner) {
-          this.store.dispatch(new ValidationReport.Get())
+          this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
         }
     });
 
@@ -222,7 +222,7 @@ export class PublicStudyComponent implements OnInit {
     );
     if (index === 6) {
       if ((this.isCurator || this.isOwner) && (this.status && this.status.toLowerCase() !== 'public' )) {
-        this.store.dispatch(new ValidationReport.Get())
+        this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
       }
       document.getElementById("tab-content-wrapper").scrollIntoView();
     }

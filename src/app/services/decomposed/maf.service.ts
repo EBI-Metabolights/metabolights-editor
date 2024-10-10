@@ -13,38 +13,35 @@ import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrappe
 })
 export class MafService extends BaseConfigDependentService {
 
-  private id: string;
+  //private id: string;
   public loadingMessage: string = "Loading MAF information."
 
-  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  //private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private store: Store, private tableService: TableService) {  
-      super(http, configService);
-      this.studyIdentifier$.subscribe((id) => {
-        if (id !== null) this.id = id
-      });
+    http: HttpClient, configService: ConfigurationService, store: Store, private tableService: TableService) {  
+      super(http, configService, store);
   }
   
-  getMAFSheet(filename): Observable<ITableWrapper> {
-    return this.tableService.getTable(filename, this.id);
+  getMAFSheet(filename, suppliedId): Observable<ITableWrapper> {
+    return this.tableService.getTable(filename, suppliedId);
   }
 
-  addRows(filename, body): Observable<any> {
-    return this.tableService.addRows(filename, body, this.id)
+  addRows(filename, body, suppliedId): Observable<any> {
+    return this.tableService.addRows(filename, body, suppliedId)
   }
 
-  updateRow(filename, body): Observable<any> {
-    return this.tableService.updateRows(filename, body, this.id)
+  updateRow(filename, body, suppliedId): Observable<any> {
+    return this.tableService.updateRows(filename, body, suppliedId)
   }
 
-  deleteRows(filename: string, rowIds: any): Observable<any> {
-    return this.tableService.deleteRows(filename, rowIds, this.id);
+  deleteRows(filename: string, rowIds: any, suppliedId): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, suppliedId);
   }
 
 
-  updateCells(filename, body): Observable<any> {
-    return this.tableService.updateCells(filename, body, this.id);
+  updateCells(filename, body, suppliedId): Observable<any> {
+    return this.tableService.updateCells(filename, body, suppliedId);
 
   }}

@@ -6,7 +6,7 @@ import { inject, Injectable } from "@angular/core";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
 import { ProtocolsService } from "src/app/services/decomposed/protocols.service";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
-import { Observable } from "rxjs";
+import { filter, firstValueFrom, Observable } from "rxjs";
 import { RowTemplateService } from "src/app/services/row-template/row-template.service";
 
 export interface ProtocolsStateModel {
@@ -36,7 +36,15 @@ export class ProtocolsState {
     private id: string = null;
 
     constructor(private protocolsService: ProtocolsService, private rowTemplateService: RowTemplateService) {
-        this.studyId$.subscribe(id => this.id = id)
+        this.getId();
+    }
+
+
+    async getId() {
+        const id = await firstValueFrom(this.studyId$.pipe(
+        filter((val) => val !== null && val !== undefined)
+        ));
+        this.id = id;
     }
 
     @Action(Protocols.Set)

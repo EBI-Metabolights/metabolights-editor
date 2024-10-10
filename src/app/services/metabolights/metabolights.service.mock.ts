@@ -1,7 +1,6 @@
 import { HttpClient } from "@angular/common/http";
-import { of } from "rxjs";
+import { Observable, of } from "rxjs";
 import { httpOptions } from "../headers";
-import { Observable } from "rxjs-compat";
 import { IStudyDetailWrapper } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { inject } from "@angular/core";

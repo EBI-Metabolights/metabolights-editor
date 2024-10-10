@@ -23,7 +23,7 @@ import { OntologyComponent } from "../ontology/ontology.component";
 import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
@@ -34,6 +34,7 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -61,7 +62,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
-
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -71,6 +72,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ];
 
   private toastrSettings: Record<string, any> = null;
+
+  private studyId: string;
 
   rowsToAdd: any = 1;
   isReadOnly = true;
@@ -145,7 +148,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   setUpSubscriptionsNgxs() {
-    this.toastrSettings$.subscribe(value => this.toastrSettings = value)
+    this.toastrSettings$.subscribe(value => this.toastrSettings = value);
+
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+      this.studyId = value;
+    })
 
 
     this.editorValidationRules$.subscribe((value) => {
@@ -1296,7 +1303,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   getValidationDefinition(header) {
     let selectedColumn = null;
     if (this.tableData?.data?.file && this.tableData.data.file.startsWith("a_") && this.assayTechnique.name === null) {
-      const result = this.assayService.extractAssayDetails(this.tableData);
+      const result = this.assayService.extractAssayDetails(this.tableData, this.studyId);
       this.assayTechnique.name = result.assayTechnique?.name;
       this.assayTechnique.sub = result.assaySubTechnique?.name;
       this.assayTechnique.main = result.assayMainTechnique?.name;
@@ -1453,7 +1460,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
     this.isFormBusy = true;
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate}, this.studyId)).subscribe(
       (completed) => {
         toastr.success("Cells updated successfully.", "Success", this.toastrSettings);
         this.isEditColumnModalOpen = false;

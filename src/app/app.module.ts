@@ -59,7 +59,6 @@ import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.sta
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
-import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -79,7 +78,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         FooterComponent,
         GuidesComponent,
     ],
-    exports: [],
+    exports: [FooterComponent],
     bootstrap: [AppComponent], imports: [BrowserModule,
         StudyModule,
         SharedModule,
@@ -102,10 +101,10 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatTableModule,
         DragDropModule,
         NgxsModule.forRoot([
+            GeneralMetadataState,
             UserState,
             TransitionsState,
             ApplicationState,
-            GeneralMetadataState,
             FilesState,
             AssayState,
             MAFState,
@@ -114,7 +113,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
             DescriptorsState,
             ValidationState
         ], { developmentMode: true }),
-        NgxsReduxDevtoolsPluginModule.forRoot(),
         QuillModule.forRoot({
             modules: {
                 clipboard: {

@@ -14,29 +14,30 @@ import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/
 })
 export class FilesService extends BaseConfigDependentService {
 
-  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
+  //private studyIdentifier$: Observable<string> = this.store.selectOnce(GeneralMetadataState.id)
   id: string;
 
   constructor(
     public http: HttpClient, 
     configService: ConfigurationService,
     public store: Store) {
-    super(http, configService);
-    this.studyIdentifier$.subscribe((id) => {
-      if (id !== null) this.id = id
-    });
+    super(http, configService, store);
+    //this.getId();
    }
 
-  getStudyFilesFetch(force, readonly: boolean = true): Observable<IStudyFiles> {
-    const studyId = this.id;
+  getStudyFilesFetch(force, readonly: boolean = true, suppliedId: string): Observable<IStudyFiles> {
+    
+    if (suppliedId === undefined) {
+      console.trace();
+      
+    }
     if (force) {
       return this.http
         .get<IStudyFiles>(
           this.url.baseURL +
             "/studies" +
             "/" +
-            studyId +
+            suppliedId +
             "/files-fetch?force=true&readonlyMode=" + readonly,
           httpOptions
         )
@@ -44,7 +45,7 @@ export class FilesService extends BaseConfigDependentService {
     } else {
       return this.http
         .get<IStudyFiles>(
-          this.url.baseURL + "/studies" + "/" + studyId + "/files-fetch",
+          this.url.baseURL + "/studies" + "/" + suppliedId + "/files-fetch",
           httpOptions
         )
         .pipe(catchError(this.handleError));
@@ -61,7 +62,7 @@ export class FilesService extends BaseConfigDependentService {
    * @returns observable of a wrapper containing the studies file information.
    */
     getStudyFilesListFromLocation(id, include_sub_dir, dir, parent, location: 'study'): Observable<IStudyFiles> {
-      const studyId = id ? id : this.id;
+      const studyId = id 
       const includeSubDir = include_sub_dir ? include_sub_dir : null;
       const directory = dir ? dir : null;
       let query = this.url.baseURL + "/studies" + "/" + studyId + "/files/tree?";

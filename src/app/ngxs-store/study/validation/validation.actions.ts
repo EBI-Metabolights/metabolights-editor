@@ -18,11 +18,11 @@ export namespace ValidationReport {
 
     export class Refresh {
         static readonly type = '[validation] Refresh Validation Report'
-        constructor(){}
+        constructor(public studyId: string){}
     }
     export class Get {
         static readonly type = '[validation] Get Validation Report'
-        constructor() {}
+        constructor(public studyId: string) {}
     }
     export class Set {
         static readonly type = '[validation] Set Validation Report'
@@ -31,12 +31,12 @@ export namespace ValidationReport {
 
     export class Override {
         static readonly type = '[validation] Override Validation Rule'
-        constructor(public rule: any) {}
+        constructor(public rule: any, public studyId: string) {}
     }
 
     export class ContinualRetry {
         static readonly type = '[validation] Continually Poll Validation Service'
-        constructor(public retries: number = 5, public interval: number = 3000 ) {}
+        constructor(public studyId: string, public retries: number = 5, public interval: number = 3000,  ) {}
     }
 }
 
@@ -44,11 +44,11 @@ export namespace ValidationReportV2 {
     
     export class InitialiseValidationTask {
         static readonly type = '[validation] Init New validation Task'
-        constructor(public proxy: boolean = false) {}
+        constructor(public proxy: boolean = false, public studyId: string) {}
     }
     export class Get {
         static readonly type = '[validation] Get New Validation Report'
-        constructor(public id?: string, public test: boolean = false, public proxy: boolean = false) {}
+        constructor(public studyId: string, public taskId?: string, public test: boolean = false, public proxy: boolean = false) {}
     }
 
 
@@ -80,7 +80,7 @@ export namespace ValidationReportV2 {
     export namespace History {
         export class Get {
             static readonly type = '[validation] Get Validation History'
-            constructor() {}
+            constructor(public studyId: string) {}
         }
 
         export class Set {

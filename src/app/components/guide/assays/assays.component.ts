@@ -27,7 +27,7 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 })
 export class GuidedAssaysComponent implements OnInit {
 
-  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
   assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
@@ -113,7 +113,7 @@ export class GuidedAssaysComponent implements OnInit {
       cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
-        this.store.dispatch(new Assay.Delete(name)).subscribe(
+        this.store.dispatch(new Assay.Delete(name, this.requestedStudy)).subscribe(
           (completed) => {
             this.extractAssayInfo(true);
             Swal.fire({
@@ -179,7 +179,7 @@ export class GuidedAssaysComponent implements OnInit {
             confirmButtonText: "Ignore duplicates, proceed!",
           }).then((result) => {
             if (result.value) {
-              this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null)).subscribe(
+              this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null, this.requestedStudy)).subscribe(
                 (completed) => {
                   toastr.success("Samples added successfully", "Success", this.toastrSettings);
                   this.controlsNames = "";
@@ -195,7 +195,7 @@ export class GuidedAssaysComponent implements OnInit {
         } else if (duplicates.length > 0 && sRows.length === 0) {
           this.changeSubStep(4);
         } else {
-          this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null)).subscribe(
+          this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null, this.requestedStudy)).subscribe(
             (completed) => {
               toastr.success("Samples added successfully", "Success", this.toastrSettings);
               this.controlsNames = "";
@@ -286,7 +286,7 @@ export class GuidedAssaysComponent implements OnInit {
   }
 
   addColumns(columns) {
-    this.store.dispatch(new Samples.AddColumns(this.samples.name, {data: columns})).subscribe(
+    this.store.dispatch(new Samples.AddColumns(this.samples.name, {data: columns}, this.requestedStudy)).subscribe(
       (completed) => {
         true
       },

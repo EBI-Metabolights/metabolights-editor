@@ -3,9 +3,8 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { FilesLists, ObfuscationCode, Operations, ResetFilesState, UploadLocation } from "./files.actions";
 import { FilesService } from "src/app/services/decomposed/files.service";
-import { sample } from "rxjs-compat/operator/sample";
 import { Samples } from "../samples/samples.actions";
-import { Assay, AssayList } from "../assay/assay.actions";
+import { AssayList } from "../assay/assay.actions";
 
 export interface FilesStateModel {
     obfuscationCode: string,
@@ -34,21 +33,21 @@ export class FilesState {
     @Action(Operations.GetFreshFilesList)
     GetStudyFiles(ctx: StateContext<FilesStateModel>, action: Operations.GetFreshFilesList) {
         const state = ctx.getState();
-        this.filesService.getStudyFilesFetch(action.force, action.readonly).subscribe(
-            (data) => {
+        this.filesService.getStudyFilesFetch(action.force, action.readonly, action.id).subscribe({
+            next: (data) => {
                 ctx.dispatch(new UploadLocation.Set(data.uploadPath));
                 ctx.dispatch(new ObfuscationCode.Set(data.obfuscationCode));
                 data = this.filesService.deleteProperties(data);
                 ctx.dispatch(new FilesLists.SetStudyFiles(data))
                 // todo: LOAD STUDY SAMPLES
-                this.store.dispatch(new Samples.Get());
+                this.store.dispatch(new Samples.Get(action.id));
                 // todo: LOAD STUDY ASSAYS\
                 this.store.dispatch(new AssayList.Get(action.id))
             },
-            (error) => {
+            error: (error) => {
                 ctx.dispatch(new Operations.GetFilesTree(null, null, null, null, null))
             }
-        );
+        });
         
     }
 

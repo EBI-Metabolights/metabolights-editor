@@ -23,7 +23,7 @@ export namespace Assay {
     }
     export class OrganiseAndPersist {
         static readonly type = '[assay] Organise and Persist Assay Sheet'
-        constructor(public assaySheetFilename: string) {}
+        constructor(public assaySheetFilename: string, public studyId: string) {}
     }
     export class Set {
         static readonly type = '[assay] Set Study Assay'
@@ -32,27 +32,27 @@ export namespace Assay {
 
     export class Delete {
         static readonly type = '[assay] Delete Study Assay'
-        constructor(public assay: string, public id: string = null) {}
+        constructor(public assay: string, public studyId: string) {}
     }
 
     export class AddColumn {
         static readonly type = '[assay] Add Columns to Assay Sheet'
-        constructor(public assay: string, public body: Record<string, any>, public tableType: string, public id: string, public metaInfo: any = null ){}
+        constructor(public assay: string, public body: Record<string, any>, public tableType: string, public studyId: string, public metaInfo: any = null ){}
     }
     export class AddRows {
         static readonly type ='[assay] Add Rows'
-        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>) {}
+        constructor(public filename: string, public body: any, public metaInfo: Record<string, any>, public studyId: string) {}
 
     }
 
     export class DeleteRows {
         static readonly type = '[assay] Delete Rows'
-        constructor(public filename: string, public rowIds: any) {}
+        constructor(public filename: string, public rowIds: any, public studyId: string) {}
     }
 
     export class UpdateCells {
         static readonly type = '[assay] Update Cells'
-        constructor(public filename: string, public cellsToUpdate: Record<string, any>){}
+        constructor(public filename: string, public cellsToUpdate: Record<string, any>, public studyId: string){}
     }
 
 }

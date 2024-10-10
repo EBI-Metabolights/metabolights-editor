@@ -3,7 +3,6 @@ import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { ConfigurationService } from 'src/app/configuration.service';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { TableService } from './table.service';
 import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrapper.interface';
@@ -17,42 +16,39 @@ import { IAssay } from 'src/app/models/mtbl/mtbls/interfaces/assay.interface';
 })
 export class AssaysService extends BaseConfigDependentService {
 
-  private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  //private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   private validationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
 
-  private id: string;
+  //private id: string;
   private rules: Record<string, any>;
 
   public loadingMessage: string = "Loading assays information."
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private tableService: TableService) {  
-      super(http, configService);
-      this.studyIdentifier$.subscribe((id) => {
-        if (id !== null) this.id = id;
-      });
+    http: HttpClient, configService: ConfigurationService, store: Store, private tableService: TableService) {  
+      super(http, configService, store);
       this.validationRules$.subscribe((rules) => {
         if (rules !== null) this.rules = rules;
       });
   }
 
-  getAssaySheet(filename): Observable<ITableWrapper> {
-    return this.tableService.getTable(filename, this.id);
+  getAssaySheet(filename, suppliedId: string): Observable<ITableWrapper> {
+    return this.tableService.getTable(filename, suppliedId);
   }
 
-  deleteAssay(name): Observable<Object> {
+  deleteAssay(name, suppliedId: string): Observable<Object> {
     return this.http
       .delete(
-        this.url.baseURL + "/studies" + "/" + this.id + "/assays/" + name,
+        this.url.baseURL + "/studies" + "/" + suppliedId + "/assays/" + name,
         httpOptions
       )
       .pipe(catchError(this.handleError));
   }
 
-  extractAssayDetails(assay): Record<string, any> {
-    if (assay.name.split(this.id)[1]) {
+  extractAssayDetails(assay, suppliedId: string): Record<string, any> {
+    if (assay.name.split(suppliedId)[1]) {
       const assayInfo = assay.name
-        .split(this.id)[1]
+        .split(suppliedId)[1]
         .split("_");
       let assaySubTechnique = null;
       let assayTechnique = null;
@@ -85,10 +81,10 @@ export class AssaysService extends BaseConfigDependentService {
     };
   }
 
-  addAssay(body: any): Observable<IAssay> {
+  addAssay(body: any, suppliedId: string): Observable<IAssay> {
     return this.http
     .post<IAssay>(
-      this.url.baseURL + "/studies" + "/" + this.id + "/assays",
+      this.url.baseURL + "/studies" + "/" + suppliedId + "/assays",
       body,
       httpOptions
     )
@@ -99,16 +95,16 @@ export class AssaysService extends BaseConfigDependentService {
     return this.tableService.addColumns(filename, body, id);
   }
 
-  addRows(filename: string, body: Record<string, any>): Observable<any> {
-    return this.tableService.addRows(filename, body, this.id);
+  addRows(filename: string, body: Record<string, any>, suppliedId: string): Observable<any> {
+    return this.tableService.addRows(filename, body, suppliedId);
   }
 
-  deleteRows(filename: string, rowIds: any): Observable<any> {
-    return this.tableService.deleteRows(filename, rowIds, this.id);
+  deleteRows(filename: string, rowIds: any, suppliedId: string): Observable<any> {
+    return this.tableService.deleteRows(filename, rowIds, suppliedId);
   }
 
-  updateCells(filename, body): Observable<any> {
-    return this.tableService.updateCells(filename, body, this.id);
+  updateCells(filename, body, suppliedId): Observable<any> {
+    return this.tableService.updateCells(filename, body, suppliedId);
 
   }
   

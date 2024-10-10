@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { combineLatest, filter, Observable, withLatestFrom } from 'rxjs';
 import { ValidationPhase, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
@@ -34,8 +34,6 @@ export class ValidationsV2ParentComponent implements OnInit {
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
   constructor(private store: Store) {
-    this.store.dispatch(new ValidationReportV2.Get());
-    this.store.dispatch(new ValidationReportV2.History.Get())
    }
   
   //report variables
@@ -45,13 +43,13 @@ export class ValidationsV2ParentComponent implements OnInit {
   lastRunTime: string = ""
 
   // report subsections
-  allViolations: Violation[] = null;
-  generalViolations: Violation[] = null;
-  investigationViolations: Violation[] = null;
-  sampleViolations: Violation[] =  null;
-  assayViolations: Violation[] = null;
-  assignmentViolations: Violation[] = null;
-  filesViolations: Violation[] = null;
+  allViolations: Violation[] = [];
+  generalViolations: Violation[] = [];
+  investigationViolations: Violation[] = [];
+  sampleViolations: Violation[] =  [];
+  assayViolations: Violation[] = [];
+  assignmentViolations: Violation[] = [];
+  filesViolations: Violation[] = [];
   
   // core state variables
   studyId: string =  null
@@ -78,7 +76,7 @@ export class ValidationsV2ParentComponent implements OnInit {
       }
     )
 
-    this.reportV2$.subscribe(value => {
+    this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
       console.log(value === null)
       this.report = value;
       if (this.report !== null) {
@@ -128,8 +126,11 @@ export class ValidationsV2ParentComponent implements OnInit {
       this.filesViolations = value;
     });
 
-    this.studyId$.subscribe(value => {
+
+    this.studyId$.pipe(filter(value => value !== null)).subscribe(value => {
       this.studyId = value;
+      this.store.dispatch(new ValidationReportV2.Get(this.studyId));
+      this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
     });
   }
 

@@ -93,7 +93,7 @@ export class ValidationTaskBoxComponent implements OnInit {
   startValidationTask() {
     const deposedTaskId = this.currentTaskState.id;
 
-    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false)).pipe( // currently proxying, this will not work outside of dev
+    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).pipe( // currently proxying, this will not work outside of dev
       tap(() => {
         console.log('side effect hit')
         this.isInitiated = true
@@ -122,12 +122,12 @@ export class ValidationTaskBoxComponent implements OnInit {
         responseSubscription.subscribe(
           () => {
             this.taskStarted = true;
-            this.store.dispatch(new ValidationReportV2.Get(newTask.id))},
+            this.store.dispatch(new ValidationReportV2.Get(this.studyId, newTask.id))},
           error => console.log('Unexpected error in Validation task component'),
           () => {
             this.isInitiated = false;
             this.taskStarted = false;
-            this.store.dispatch(new ValidationReportV2.History.Get());
+            this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
             console.debug('finished & subscription closed.') }
           )
        
