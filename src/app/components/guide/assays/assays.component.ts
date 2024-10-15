@@ -9,7 +9,7 @@ import { tassign } from "tassign";
 import { SamplesComponent } from "./../../study/samples/samples.component";
 import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Observable } from "rxjs";
+import { Observable, withLatestFrom } from "rxjs";
 import { Select, Store } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -75,14 +75,15 @@ export class GuidedAssaysComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) this.requestedStudy = value
     });
-    this.studyFiles$.subscribe((value) => {
+    this.studyFiles$.pipe(withLatestFrom(this.studyIdentifier$)).subscribe(([value, studyIdentifierValue]) => {
       if (value != null) {
         this.files = value;
       } else if (value === null && this.files.length === 0) {
-        this.store.dispatch(new Operations.GetFreshFilesList(false));
+        this.store.dispatch(new Operations.GetFreshFilesList(false, false, studyIdentifierValue));
       }
     });
     this.assays$.subscribe((value) => {
+      if (this.assays.length > 0) console.debug('assays updated via observable')
       this.assays = Object.values(value);
       if (this.assays.length > 0) {
         this.assays.sort((a, b) => {
@@ -330,7 +331,7 @@ export class GuidedAssaysComponent implements OnInit {
 
   extractAssayInfo(reloadFiles) {
     if (reloadFiles) {
-      this.store.dispatch(new Operations.GetFreshFilesList(true));
+      this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
     } else {
       this.store.dispatch(new AssayList.Get(this.requestedStudy));
     }

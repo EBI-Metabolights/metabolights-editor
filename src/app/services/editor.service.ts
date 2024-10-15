@@ -1,4 +1,4 @@
-import { inject, Injectable } from "@angular/core";
+import { inject, Injectable, isDevMode } from "@angular/core";
 import { MetabolightsService } from "./../services/metabolights/metabolights.service";
 import { AuthService } from "./../services/metabolights/auth.service";
 import { ActivatedRouteSnapshot, Router } from "@angular/router";
@@ -505,7 +505,7 @@ export class EditorService {
 
   loadStudyId(id) {
     if (id === null) {
-      console.trace();
+      if (isDevMode()) console.trace();
     }
     this.store.dispatch(new Identifier.Set(id))
   }
@@ -616,13 +616,13 @@ export class EditorService {
   copyStudyFiles() {
     return this.dataService
       .copyFiles()
-      .pipe(map(() => this.store.dispatch(new Operations.GetFreshFilesList(true))));
+      .pipe(map(() => this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.currentStudyIdentifier))));
   }
 
   syncStudyFiles(data) {
     return this.dataService
       .syncFiles(data)
-      .pipe(map(() => this.store.dispatch(new Operations.GetFreshFilesList(true))));
+      .pipe(map(() => this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.currentStudyIdentifier))));
   }
 
   deleteProperties(data) {

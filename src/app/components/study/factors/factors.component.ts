@@ -30,6 +30,7 @@ export class FactorsComponent implements OnInit {
 
   setUpConstructorSubscriptionNgxs() {
     this.studyFactors$.subscribe((value) => {
+      console.debug('hit factor subscription in factors component.')
       this.factors = value;
     });
   }

@@ -145,6 +145,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   ngOnInit() {
     this.setUpSubscriptionsNgxs();
+    if (localStorage.getItem(this.data.file) !== null) {
+      this.view = localStorage.getItem(this.data.file);
+    } else {
+      localStorage.setItem(this.data.file, 'compact')
+    }
   }
 
   setUpSubscriptionsNgxs() {
@@ -197,6 +202,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   initialise() {
     this.deSelect();
     this.data = this.tableData.data;
+    console.log(`tableData.data.displayedColumns: ${JSON.stringify(this.tableData.data.displayedColumns)}`)
+    console.log(`tableData.data.headers: ${JSON.stringify(Object.keys(this.tableData.data.header))}`)
     if (this.data) {
       this.hit = true;
       this.displayedTableColumns = this.data.displayedColumns;
@@ -480,10 +487,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   toggleView() {
     if (this.view === "compact") {
       this.displayedTableColumns = Object.keys(this.data.header);
+      this.displayedTableColumns.unshift("Select")
       this.view = "expanded";
+      localStorage.setItem(this.data.file, 'expanded')
     } else {
       this.displayedTableColumns = this.data.displayedColumns;
       this.view = "compact";
+      localStorage.setItem(this.data.file, 'compact')
+
     }
   }
 
@@ -1180,6 +1191,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyColumn").values[0];
 
+      const value = selectedOntology ? selectedOntology.annotationValue : "";
+      const termSource = selectedOntology ? selectedOntology.termSource.name : "";
+      const termAccession = selectedOntology ? selectedOntology.termAccession : "";
+
       sRows.forEach((row) => {
         if (skipFirstIteration) {
           skipFirstIteration = false;
@@ -1189,17 +1204,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           {
             row: row.index,
             column: columnIndex,
-            value: selectedOntology.annotationValue,
+            value: value,
           },
           {
             row: row.index,
             column: columnIndex + 1,
-            value: selectedOntology.termSource.name,
+            value: termSource,
           },
           {
             row: row.index,
             column: columnIndex + 2,
-            value: selectedOntology.termAccession,
+            value: termAccession,
           }
         );
       });
