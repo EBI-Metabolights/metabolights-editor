@@ -202,8 +202,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   initialise() {
     this.deSelect();
     this.data = this.tableData.data;
-    console.log(`tableData.data.displayedColumns: ${JSON.stringify(this.tableData.data.displayedColumns)}`)
-    console.log(`tableData.data.headers: ${JSON.stringify(Object.keys(this.tableData.data.header))}`)
     if (this.data) {
       this.hit = true;
       this.displayedTableColumns = this.data.displayedColumns;

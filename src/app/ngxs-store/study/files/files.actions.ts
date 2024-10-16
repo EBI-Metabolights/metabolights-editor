@@ -1,4 +1,4 @@
-import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface"
+import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface"
 
 export namespace UploadLocation {
     export class Set {
@@ -18,6 +18,16 @@ export namespace FilesLists {
     export class SetStudyFiles {
         static readonly type = '[files] Set Study Files'
         constructor(public files: IStudyFiles) {}
+    }
+
+    export class GetRawFiles {
+        static readonly type = '[files] Get Raw Data Files'
+        constructor(/*public dir: StudyFile,*/ public studyId: string) {}
+    }
+
+    export class SetRawFiles {
+        static readonly type = '[files] Set Raw Data Files'
+        constructor(public files: StudyFile[]) {}
     }
 }
 
