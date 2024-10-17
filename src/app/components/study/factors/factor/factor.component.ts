@@ -20,6 +20,7 @@ import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Factors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "mtbls-factor",
@@ -63,7 +64,8 @@ export class FactorComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private store: Store
+    private store: Store,
+    private router: Router
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};

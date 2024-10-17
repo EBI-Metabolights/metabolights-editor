@@ -33,3 +33,7 @@ label {
   color: #666666;
 
 }
+
+.bold-text {
+  font-weight: bold;
+}
