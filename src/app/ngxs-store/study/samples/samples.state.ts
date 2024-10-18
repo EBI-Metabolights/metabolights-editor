@@ -53,6 +53,10 @@ export class SampleState {
     OrganiseAndPersist(ctx: StateContext<SamplesStateModel>, action: Samples.OrganiseAndPersist) {
         const samples = {};
         samples["name"] = action.sampleSheetFilename
+        if (action.studyId === null) {
+          console.debug('Unexpected absence of study id in Samples.OrganiseAndPersist action. Aborting action handler method execution.')
+          return
+        }
         this.samplesService.getTable(action.sampleSheetFilename, action.studyId).pipe(take(1)).subscribe(
             (data) => {
                 /**

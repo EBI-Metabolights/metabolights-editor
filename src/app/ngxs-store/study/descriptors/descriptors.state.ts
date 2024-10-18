@@ -7,8 +7,9 @@ import { JsonConvert } from "json2typescript";
 import { DescriptorsService } from "src/app/services/decomposed/descriptors.service";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
-import { take } from "rxjs/operators";
+import { filter, take } from "rxjs/operators";
 import * as toastr from "toastr";
+import { Samples } from "../samples/samples.actions";
 
 
 
@@ -37,7 +38,7 @@ export class DescriptorsState {
 
       studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
-    constructor(private descriptorsService: DescriptorsService) {
+    constructor(private descriptorsService: DescriptorsService, private store: Store) {
 
     }
 
@@ -187,14 +188,19 @@ export class DescriptorsState {
 
     @Action(Factors.Delete)
     DeleteFactor(ctx: StateContext<DescriptorsStateModel>, action: Factors.Delete) {
-        this.descriptorsService.deleteFactor(action.id, action.factorName).subscribe(
-            (response) => {
+        this.descriptorsService.deleteFactor(action.id, action.factorName).subscribe({
+            next: (response) => {
                 ctx.dispatch(new Factors.Get(action.id));
+                this.studyId$.pipe(filter(val => val !== null),take(1)).subscribe({
+                    next: (id) => this.store.dispatch(new Samples.Get(id)),
+                    error: () => console.error('Unable to retrieve study id')
+                })
+                
             },
-            (error) => {
+            error: (error) => {
                 console.error(`Could not delete factor ${action.factorName}`);
             }
-            )
+        })
     }
 
     @Action(ResetDescriptorsState)

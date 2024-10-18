@@ -2,7 +2,7 @@
   <span *ngIf="!isDropdown; else showDropdownOption">
     <a
       class="button is-light is-pulled-right is-small"
-      (click)="navigateToSamples()"
+      [routerLink]="['/study', studyId, 'samples' ]"
             >    <mat-icon>info</mat-icon>
        Add factor in the sample sheet</a
     >

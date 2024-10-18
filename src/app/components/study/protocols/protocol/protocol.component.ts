@@ -68,6 +68,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   protocolInGuides: boolean = false;
   guideText: string = "";
+  coreProtocols: string[] = ['sample collection', 'extraction', 'chromatography', 'mass spectrometry', 'data transformation', 'metabolite identification']
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -480,5 +481,9 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   setFieldValue(name, value) {
     return this.form.get(name).setValue(value);
+  }
+
+  isCoreProtocol(name: string): boolean {
+    return this.coreProtocols.includes(name.toLowerCase())
   }
 }

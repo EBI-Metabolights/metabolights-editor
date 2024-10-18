@@ -18,6 +18,7 @@ import { InfoComponent } from "./info/info.component";
 import { MetaComponent } from "./meta/meta.component";
 import { ProgressComponent } from "./progress/progress.component";
 import { RawUploadComponent } from "./upload/upload.component";
+import { StudyModule } from "../study/study.module";
 
 @NgModule({ declarations: [
         GuidedAssaysComponent,
@@ -39,7 +40,7 @@ import { RawUploadComponent } from "./upload/upload.component";
         MatIconModule,
         FormsModule,
         SharedModule,
-        //StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
+        StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
         ReactiveFormsModule,
         BrowserAnimationsModule,
         MatProgressSpinnerModule,
