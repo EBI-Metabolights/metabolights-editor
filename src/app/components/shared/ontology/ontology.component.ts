@@ -3,10 +3,8 @@ import {
   OnInit,
   Input,
   Output,
-  Inject,
   OnChanges,
   SimpleChanges,
-  ElementRef,
   EventEmitter,
   ViewChild,
 } from "@angular/core";
@@ -20,26 +18,31 @@ import {
 import { MatChipInputEvent } from "@angular/material/chips";
 import { firstValueFrom, Observable } from "rxjs";
 import {
-  map,
   debounceTime,
   distinctUntilChanged,
-  startWith,
-  concatAll,
-  take,
 } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
 
 import { Ontology } from "../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { JsonConvert } from "json2typescript";
 import { ConfigurationService } from "src/app/configuration.service";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { animate, state, style, transition, trigger } from "@angular/animations";
 /* eslint-disable no-underscore-dangle */
 @Component({
   selector: "mtbls-ontology",
   templateUrl: "./ontology.component.html",
   styleUrls: ["./ontology.component.css"],
+  animations: [
+    trigger('fadeInOut', [
+      state('in', style({ opacity: 1 })),
+      state('out', style({ opacity: 0 })),
+      transition('in => out', [animate('500ms ease-in-out')]),
+      transition('out => in', [animate('500ms ease-in-out')]),
+    ]),
+  ]
 })
 export class OntologyComponent implements OnInit, OnChanges {
   @Input("validations") validations: any;
@@ -77,6 +80,8 @@ export class OntologyComponent implements OnInit, OnChanges {
   ontologyDetails: any = {};
   readonly = false;
   baseHref: string;
+
+  fadeState: 'in' | 'out' = 'out';
 
 
   constructor(
@@ -266,7 +271,6 @@ export class OntologyComponent implements OnInit, OnChanges {
       inputElement.value = "";
       this.triggerChanges();
     } else {
-      // this.retrieveMore();
       this.searchTerm(this.inputValue, true);
       setTimeout(() => {
         this.valueInput.openPanel();
@@ -404,15 +408,27 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   reset() {
-    // this.inputValue = "";
-    // this.allvalues = [];
+
     this.values = [];
     this.valueCtrl.setValue(null);
-    // this.retrieveMore();
   }
 
   triggerChanges() {
     this.changed.emit(this.values);
+  }
+
+  copyText(ontologyTerm) {
+    navigator.clipboard.writeText(ontologyTerm.annotationValue).then(() => {
+      this.fadeInThenOut();
+    })
+  }
+
+  fadeInThenOut() {
+    this.fadeState = 'in';
+
+    setTimeout(() => {
+      this.fadeState = 'out';
+    }, 2000);
   }
 
   private _filter(value: Ontology): Ontology[] {

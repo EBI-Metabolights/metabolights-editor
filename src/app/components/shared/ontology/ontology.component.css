@@ -41,3 +41,7 @@
 ::ng-deep .tiny {
   font-size: 0.7em !important;
 }
+
+.selectable-chip-content {
+  user-select: text !important;
+}
