@@ -101,7 +101,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
     });
 
     this.readonly$.subscribe((value) => {
-      if (value !== null) {
+      if (value !== null && this.protocol) {
         this.isStudyReadOnly = value;
         if(!this.isStudyReadOnly) {
           this.protocolGuides$.subscribe((value) => {
@@ -426,7 +426,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
           /**
            * This is an extraordinary antipattern but don't have much of a choice,
            * we can't change the components current protocol via the state without destroying
-           * the component that has the modal rendered. 
+           * the component that has the modal rendered.
            */
           this.protocolSubscription = this.store.select(ProtocolsState.specificProtocol(name))
           .subscribe(
@@ -435,7 +435,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
               this.openModal(this.protocol);
             }
           )
-        
+
         }
         toastr.success(message, "Success", this.toastrSettings)
 
