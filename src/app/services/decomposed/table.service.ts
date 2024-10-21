@@ -6,14 +6,15 @@ import { ITableWrapper } from 'src/app/models/mtbl/mtbls/interfaces/table-wrappe
 import { httpOptions } from '../headers';
 import { catchError } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TableService extends BaseConfigDependentService{
 
-  constructor(http: HttpClient, configService: ConfigurationService) { 
-    super(http, configService)
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) { 
+    super(http, configService, store)
   }
 
   getTable(fileName, id): Observable<ITableWrapper> {

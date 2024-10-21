@@ -3,26 +3,24 @@ import {
   OnInit,
   Input,
   Output,
-  Inject,
   ViewChild,
-  SimpleChanges,
   EventEmitter,
+  inject,
 } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
+import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { MTBLSFactor } from "./../../../../models/mtbl/mtbls/mtbls-factor";
-import { environment } from "src/environments/environment";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Factors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
-import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "mtbls-factor",
@@ -38,10 +36,10 @@ export class FactorComponent implements OnInit {
 
   @Output() addFactorToSampleSheet = new EventEmitter<any>();
 
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
   private toastrSettings: Record<string, any> = {};
@@ -60,18 +58,20 @@ export class FactorComponent implements OnInit {
   form: UntypedFormGroup;
   isFormBusy = false;
   addNewFactor = false;
-
+  baseHref: string;
   validationRules: any = null;
 
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private store: Store
+    private store: Store,
+    private router: Router
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
     }
     this.setUpSubscriptionsNgxs();
+    this.baseHref = editorService.baseHref
   }
 
   navigateToSamples() {

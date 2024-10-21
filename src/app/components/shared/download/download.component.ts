@@ -1,10 +1,8 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import { UntypedFormBuilder } from "@angular/forms";
-import { environment } from "src/environments/environment";
-import { FilesService } from "src/app/services/decomposed/files.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 @Component({
   selector: "mtbls-download",
@@ -15,7 +13,7 @@ export class DownloadComponent implements OnInit {
   @Input("value") file: string;
   @Input("type") type: string;
 
-  @Select(FilesState.obfuscationCode) obfuscationCode$: Observable<string>;
+  obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
 
   domain = "";
   code = "";

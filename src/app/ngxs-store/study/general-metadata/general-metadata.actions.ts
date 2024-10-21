@@ -156,4 +156,8 @@ export namespace People {
 
 }
 
+export class ResetGeneralMetadataState {
+    static readonly type = '[general] Reset General Metadata State'
+    constructor() {}
+}
 

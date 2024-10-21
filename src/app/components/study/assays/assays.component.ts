@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { Select } from "@ngxs/store";
+import { Component, inject } from "@angular/core";
+import { Store } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
@@ -12,10 +12,9 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 })
 export class AssaysComponent {
 
-  @Select(AssayState.assayList) assayFiles$: Observable<IAssay[]>;
-  @Select(AssayState.assays) studyAssays$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-
+  assayFiles$: Observable<IAssay[]> = inject(Store).select(AssayState.assayList);
+  studyAssays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isReadOnly = false;
 
   assays: any = [];

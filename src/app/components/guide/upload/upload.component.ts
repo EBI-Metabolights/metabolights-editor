@@ -1,18 +1,12 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-import * as toastr from "toastr";
 import { Router } from "@angular/router";
-
 import { EditorService } from "./../../../services/editor.service";
-import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
@@ -25,9 +19,9 @@ import { Operations } from "src/app/ngxs-store/study/files/files.actions";
 })
 export class RawUploadComponent implements OnInit {
 
-  @Select(UserState.user) user$: Observable<Owner>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
+  user$: Observable<Owner> = inject(Store).select(UserState.user);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
 
 
 
@@ -70,7 +64,7 @@ export class RawUploadComponent implements OnInit {
   }
 
   refreshFiles() {
-    this.store.dispatch(new Operations.GetFreshFilesList(true));
+    this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
   }
 
   copyFilesAndProceed() {

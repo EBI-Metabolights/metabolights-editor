@@ -1,14 +1,13 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter, inject } from "@angular/core";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
 import * as toastr from "toastr";
-import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
-import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { DirectoryComponent } from "../directory/directory.component";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 
 @Component({
   selector: "mtbls-file-delete",
@@ -23,7 +22,7 @@ export class DeleteFileComponent implements OnInit {
   @Input("parentDirectoryComponent") parentDirectoryComponent: DirectoryComponent;
   @Input("file") studyFile: StudyFile;
 
-  @Select(FilesState.obfuscationCode) obfuscationCode$: Observable<string>;
+  obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
   
   @Output() fileDeleted = new EventEmitter<{file: StudyFile; parentDirectoryComponent: DirectoryComponent}>();
   inProgress = false;
@@ -32,8 +31,6 @@ export class DeleteFileComponent implements OnInit {
   forceMetaDataDelete = false;
 
   constructor(
-    private fb: UntypedFormBuilder,
-    private metabolightsService: MetabolightsService,
     private editorService: EditorService
   ) {
 

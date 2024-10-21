@@ -99,19 +99,23 @@
       <div class="panel-block has-background-white br4 p-4">
         <span style="flex: 0 0 100%">
           <span>
-            <mat-form-field floatLabel="always" class="full-width">
-              <mat-label>Enter DOI or PMID<mat-icon>edit</mat-icon> </mat-label>
-              <input
-                autocomplete="off"
-                placeholder="eg. 10.1111/111111"
-                [(ngModel)]="manuscriptIdentifier"
-                class="no-scroll"
-                matInput
-              />
-              <mat-error> </mat-error>
-            </mat-form-field>
+            <form [formGroup]="manuscriptForm">
+              <mat-form-field floatLabel="always" class="full-width">
+                <mat-label>Enter DOI or PMID<mat-icon>edit</mat-icon> </mat-label>
+                <input
+                  autocomplete="off"
+                  placeholder="eg. 10.1111/111111"
+                  [(ngModel)]="manuscriptIdentifier"
+                  formControlName="manuscriptID"
+                  class="no-scroll"
+                  matInput
+                />
+                  <mat-error>Manuscript identifier not valid.</mat-error>
+              </mat-form-field>
+            </form>
+
             <button
-              [disabled]="manuscriptIdentifier == ''"
+              [disabled]="manuscriptForm.invalid || manuscriptIdentifier === ''"
               (click)="fetchManuscriptInformation()"
               class="button is-link"
             >

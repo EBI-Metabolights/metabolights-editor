@@ -1,6 +1,6 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { AbstractControl, FormBuilder, UntypedFormGroup, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import { MTBLSPerson } from "./../../../models/mtbl/mtbls/mtbls-person";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
@@ -10,15 +10,12 @@ import { DOIService } from "../../../services/publications/doi.service";
 import { EuropePMCService } from "../../../services/publications/europePMC.service";
 import * as toastr from "toastr";
 
-import { environment } from "src/environments/environment";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
-import { AppComponent } from "src/app/app.component";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
@@ -28,22 +25,23 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 })
 export class MetaComponent implements OnInit {
 
-  @Select(UserState.user) user$: Observable<Owner>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
-  @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-
+  user$: Observable<Owner> = inject(Store).select(UserState.user);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
+  studyDescription$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   requestedStudy: string = null;
   user: any = null;
 
   currentTitle: string = null;
   currentDescription: string = null;
+
   manuscript: any = null;
   manuscriptIdentifier = "";
   selectedManuscriptOption: number = null;
   isManuscriptLoading = false;
+  manuscriptIdentifierValidSyntax = true;
   manuscriptOptions: any[] = [
     {
       text: "Yes, Published",
@@ -62,14 +60,14 @@ export class MetaComponent implements OnInit {
     },
   ];
 
-  form: UntypedFormGroup;
+  manuscriptForm: UntypedFormGroup;
   isLoading = false;
   baseHref: string;
 
   private toastrSettings: Record<string, any> = {};
 
   constructor(
-    private fb: UntypedFormBuilder,
+    private fb: FormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private router: Router,
@@ -80,6 +78,10 @@ export class MetaComponent implements OnInit {
     this.editorService.initialiseStudy(this.route);
     this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
+
+    this.manuscriptForm = this.fb.group({
+      manuscriptID: ['', [manuscriptIDValidator()]]
+    })
   }
 
   ngOnInit() {}
@@ -125,10 +127,17 @@ export class MetaComponent implements OnInit {
   fetchManuscriptInformation() {
     this.isManuscriptLoading = true;
     let manuscript = null;
-    if (this.manuscriptIdentifier.indexOf(".") > 0) {
+    //if (this.manuscriptIdentifier.indexOf(".") > 0) {
+    if (isValidDOI(this.manuscriptIdentifier)) {
+      this.manuscriptIdentifierValidSyntax = true;
       manuscript = this.getArticleFromDOI();
-    } else {
+    } else if (isValidPubMedID(this.manuscriptIdentifier)) {
+      this.manuscriptIdentifierValidSyntax = true;
       manuscript = this.getArticleFromPubMedID();
+    } else {
+      this.manuscriptIdentifierValidSyntax = false;
+      this.isManuscriptLoading = false;
+
     }
   }
 
@@ -144,7 +153,8 @@ export class MetaComponent implements OnInit {
           .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
           .subscribe((art) => {
             if (art.doi === doi) {
-              this.manuscript = article;
+              //this.manuscript = article;
+              this.manuscript = art;
               this.isManuscriptLoading = false;
               this.includeAllAuthors();
             }
@@ -172,9 +182,7 @@ export class MetaComponent implements OnInit {
     });
   }
 
-  getFieldValue(name) {
-    return this.form.get(name).value;
-  }
+
 
   skipMetaData() {
     this.router.navigate(["/guide/assays", this.requestedStudy]);
@@ -317,14 +325,38 @@ export class MetaComponent implements OnInit {
     return mtblPerson.toJSON();
   }
 
-  setFieldValue(name, value) {
-    return this.form.get(name).setValue(value);
-  }
-
   isManuscriptValid() {
     if (this.manuscript.title !== "" && this.manuscript.abstract !== "") {
       return true;
     }
     return false;
   }
+}
+
+export function manuscriptIDValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (!value) {
+      return null; 
+    }
+
+    if (isValidPubMedID(value) || isValidDOI(value)) {
+      return null; 
+    }
+
+    return { invalidManuscriptID: true };
+  };
+}
+
+function isValidDOI(doi: string): boolean {
+  const doiRegex = /^10.\d{4,9}\/[-._;()\/:A-Za-z0-9]+$/;
+
+  return doiRegex.test(doi);
+}
+
+function isValidPubMedID(pmid: string | number): boolean {
+  const pmidStr = pmid.toString();
+  const pmidRegex = /^[1-9]\d*$/;
+  return pmidRegex.test(pmidStr);
 }

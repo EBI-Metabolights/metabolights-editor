@@ -1,22 +1,19 @@
 import {
   Component,
   OnInit,
-  Input,
-  Inject,
   OnChanges,
   SimpleChanges,
+  inject,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { validateStudyDescription } from "./description.validator";
 import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
-import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
+
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { StudyAbstract } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
@@ -27,10 +24,10 @@ import { StudyAbstract } from "src/app/ngxs-store/study/general-metadata/general
 })
 export class DescriptionComponent implements OnChanges, OnInit {
 
-  @Select(GeneralMetadataState.description) studyDescription$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyDescription$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   isReadOnly = false;
 

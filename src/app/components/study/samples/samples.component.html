@@ -1,13 +1,12 @@
 <div *ngIf="!isReadOnly" class="notification is-primary">
-  Please complete the table below to include organism & organism part. You may also add further information that may help to describe samples, such as gender or drug treatment.
-  <button class="button border is-light is-small">
+  <small><mat-icon>info</mat-icon>Please complete the table below to include organism & organism part. You may also add further information that may
+    help to describe samples, such as gender or drug treatment.
+  <button class="button is-light is-small add-factor-button">
     <span><mat-icon>add</mat-icon>Factor</span>
-  </button><br>
-  Please see our <a href="https://www.ebi.ac.uk/metabolights/editor/guides/Sample/Sample">Guides</a> for information on how to complete your Samples section.
-
-  <br /><span style="font-size: 0.8em"
-    ><mtbls-help target="samples"></mtbls-help
-  ></span>
+  </button>
+    <br /><span style="font-size: 0.8em"
+      ><mtbls-help target="samples"></mtbls-help
+    ></span></small>
 </div>
 <div
   *ngIf="duplicateSamples.length > 0 && !isReadOnly"

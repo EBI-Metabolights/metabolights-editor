@@ -1,10 +1,9 @@
-import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter, inject } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { environment } from "src/environments/environment";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 @Component({
   selector: "mtbls-directory",
@@ -27,8 +26,8 @@ export class DirectoryComponent implements OnInit {
 
   @Output() fileDeleted = new EventEmitter<any>();
 
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
   selectedMetaFiles: any[] = [];
   selectedRawFiles: any[] = [];

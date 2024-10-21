@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
@@ -30,6 +30,7 @@ import { MockEditorService } from "src/app/services/editor.service.mock";
 import { Store } from "@ngxs/store";
 
 import { LoginComponent } from "./login.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("LoginComponent", () => {
   let component: LoginComponent;
@@ -38,38 +39,37 @@ describe("LoginComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [LoginComponent],
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
+    declarations: [LoginComponent],
+    imports: [RouterTestingModule,
         CommonModule,
         BrowserModule,
         FormsModule,
-        ReactiveFormsModule,
-      ],
-      providers: [
+        ReactiveFormsModule],
+    providers: [
         Store,
         {
-          provide: Router,
-          useFactory: setupTestingRouter,
-          deps: [
-            UrlSerializer,
-            ChildrenOutletContexts,
-            Location,
-            NgModuleFactoryLoader,
-            Compiler,
-            Injector,
-            ROUTES,
-            ROUTER_CONFIGURATION,
-            [UrlHandlingStrategy, new Optional()],
-            [RouteReuseStrategy, new Optional()],
-          ],
+            provide: Router,
+            useFactory: setupTestingRouter,
+            deps: [
+                UrlSerializer,
+                ChildrenOutletContexts,
+                Location,
+                NgModuleFactoryLoader,
+                Compiler,
+                Injector,
+                ROUTES,
+                ROUTER_CONFIGURATION,
+                [UrlHandlingStrategy, new Optional()],
+                [RouteReuseStrategy, new Optional()],
+            ],
         },
         { provide: Location, useClass: SpyLocation },
         { provide: EditorService, useClass: MockEditorService },
         { provide: ConfigurationService, useClass: MockConfigurationService },
-      ],
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
     TestBed.compileComponents();

@@ -2488,24 +2488,6 @@
                 ]
               }
             ]
-          },
-          {
-            "name": "Company/Institutional partner template",
-            "value": "template",
-            "color": "is-danger",
-            "disabled": false,
-            "techniques": [
-              {
-                "name": "Metabolon study",
-                "value": "metabolon",
-                "disabled": true
-              },
-              {
-                "name": "Imperial Phenome Center",
-                "value": "imperial",
-                "disabled": true
-              }
-            ]
           }
         ]
       }

@@ -1,11 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
-import { map } from "rxjs/operators";
-import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
@@ -15,9 +13,9 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 })
 export class DeleteComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
 

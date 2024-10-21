@@ -5,7 +5,8 @@ import {  Store } from "@ngxs/store";
 import { MetabolightsService } from "./metabolights.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("MetabolightsService", () => {
   let httpClientSpy: { get: jasmine.Spy };
@@ -14,16 +15,18 @@ describe("MetabolightsService", () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [
+    imports: [],
+    providers: [
         MetabolightsService,
         {
-          provide: ConfigurationService,
-          useClass: MockConfigurationService,
+            provide: ConfigurationService,
+            useClass: MockConfigurationService,
         },
-        Store
-      ],
-      imports: [HttpClientTestingModule],
-    });
+        Store,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+});
     httpClientSpy = jasmine.createSpyObj("HttpClient", ["post"]);
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();

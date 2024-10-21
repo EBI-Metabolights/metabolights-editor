@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
@@ -27,6 +27,7 @@ import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { GuidedAssaysComponent } from "./assays.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("AssaysComponent", () => {
   let component: GuidedAssaysComponent;
@@ -34,36 +35,35 @@ describe("AssaysComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [GuidedAssaysComponent],
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
+    declarations: [GuidedAssaysComponent],
+    imports: [RouterTestingModule,
         CommonModule,
         BrowserModule,
         FormsModule,
-        ReactiveFormsModule,
-      ],
-      providers: [
+        ReactiveFormsModule],
+    providers: [
         {
-          provide: Router,
-          useFactory: setupTestingRouter,
-          deps: [
-            UrlSerializer,
-            ChildrenOutletContexts,
-            Location,
-            NgModuleFactoryLoader,
-            Compiler,
-            Injector,
-            ROUTES,
-            ROUTER_CONFIGURATION,
-            [UrlHandlingStrategy, new Optional()],
-            [RouteReuseStrategy, new Optional()],
-          ],
+            provide: Router,
+            useFactory: setupTestingRouter,
+            deps: [
+                UrlSerializer,
+                ChildrenOutletContexts,
+                Location,
+                NgModuleFactoryLoader,
+                Compiler,
+                Injector,
+                ROUTES,
+                ROUTER_CONFIGURATION,
+                [UrlHandlingStrategy, new Optional()],
+                [RouteReuseStrategy, new Optional()],
+            ],
         },
         { provide: Location, useClass: SpyLocation },
         { provide: EditorService, useClass: MockEditorService },
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

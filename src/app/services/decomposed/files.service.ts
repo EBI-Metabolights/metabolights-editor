@@ -1,13 +1,12 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
-import { DataService } from '../data.service';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { catchError } from 'rxjs/operators';
 import { httpOptions } from '../headers';
 import { ConfigurationService } from 'src/app/configuration.service';
-import { Select, Store } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 
 @Injectable({
@@ -15,29 +14,30 @@ import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/
 })
 export class FilesService extends BaseConfigDependentService {
 
-  @Select(GeneralMetadataState.id) private studyIdentifier$: Observable<string>
-
+  //private studyIdentifier$: Observable<string> = this.store.selectOnce(GeneralMetadataState.id)
   id: string;
 
   constructor(
     public http: HttpClient, 
     configService: ConfigurationService,
     public store: Store) {
-    super(http, configService);
-    this.studyIdentifier$.subscribe((id) => {
-      if (id !== null) this.id = id
-    });
+    super(http, configService, store);
+    //this.getId();
    }
 
-  getStudyFilesFetch(force, readonly: boolean = true): Observable<IStudyFiles> {
-    const studyId = this.id;
+  getStudyFilesFetch(force, readonly: boolean = true, suppliedId: string): Observable<IStudyFiles> {
+    
+    if (suppliedId === undefined) {
+      console.trace();
+      
+    }
     if (force) {
       return this.http
         .get<IStudyFiles>(
           this.url.baseURL +
             "/studies" +
             "/" +
-            studyId +
+            suppliedId +
             "/files-fetch?force=true&readonlyMode=" + readonly,
           httpOptions
         )
@@ -45,7 +45,7 @@ export class FilesService extends BaseConfigDependentService {
     } else {
       return this.http
         .get<IStudyFiles>(
-          this.url.baseURL + "/studies" + "/" + studyId + "/files-fetch",
+          this.url.baseURL + "/studies" + "/" + suppliedId + "/files-fetch",
           httpOptions
         )
         .pipe(catchError(this.handleError));
@@ -62,7 +62,7 @@ export class FilesService extends BaseConfigDependentService {
    * @returns observable of a wrapper containing the studies file information.
    */
     getStudyFilesListFromLocation(id, include_sub_dir, dir, parent, location: 'study'): Observable<IStudyFiles> {
-      const studyId = id ? id : this.id;
+      const studyId = id 
       const includeSubDir = include_sub_dir ? include_sub_dir : null;
       const directory = dir ? dir : null;
       let query = this.url.baseURL + "/studies" + "/" + studyId + "/files/tree?";

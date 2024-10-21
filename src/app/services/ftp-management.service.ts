@@ -1,13 +1,10 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { ConfigurationService } from '../configuration.service';
 import { FTPResponse } from '../models/mtbl/mtbls/interfaces/generics/ftp-response.interface';
-import { GenericHttpResponse } from '../models/mtbl/mtbls/interfaces/generics/generic-http-response.interface';
-import { httpOptions } from './headers';
 import { GeneralMetadataState } from '../ngxs-store/study/general-metadata/general-metadata.state';
-import { Select } from '@ngxs/store';
+import { Store } from '@ngxs/store';
 
 
 @Injectable({
@@ -20,7 +17,7 @@ import { Select } from '@ngxs/store';
  *  - check on the status of sync operations
  */
 export class FtpManagementService {
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   id: string;
 

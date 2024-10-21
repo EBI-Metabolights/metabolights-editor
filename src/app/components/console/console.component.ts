@@ -1,5 +1,5 @@
-import { Router, ActivatedRoute } from "@angular/router";
-import { AfterContentInit, Component, OnInit } from "@angular/core";
+import { Router, ActivatedRoute, NavigationEnd } from "@angular/router";
+import { AfterContentInit, Component, inject, OnInit } from "@angular/core";
 import { EditorService } from "../../services/editor.service";
 import { HttpClient } from "@angular/common/http";
 import { Select, Store } from "@ngxs/store";
@@ -9,6 +9,9 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { IStudyDetail } from "src/app/models/mtbl/mtbls/interfaces/study-detail.interface";
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { filter } from "rxjs/operators";
+import { Identifier } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -18,11 +21,11 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
 
-  @Select(UserState.user) user$: Observable<Owner>
-  @Select(UserState.userStudies) userStudies$: Observable<IStudyDetail[]>
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
-  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
-  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
+  user$: Observable<Owner> = inject(Store).select(UserState.user);
+  userStudies$: Observable<IStudyDetail[]> = inject(Store).select(UserState.userStudies);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
+  maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
 
   studies: IStudyDetail[] = [];
   filteredStudies: IStudyDetail[] = [];
@@ -51,6 +54,14 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
         this.baseHref = this.editorService.configService.baseHref;
       }
     });
+
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      filter((event: NavigationEnd) => event.url === '/console')
+    )
+      .subscribe(() => {
+        this.resetStudyStates();
+      })
   }
 
   ngOnInit() {
@@ -69,6 +80,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
     
 
+  }
+
+  resetStudyStates() {
+    this.editorService.resetStudyStates();
   }
 
   toggleMessage() {
@@ -147,5 +162,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   getString(s) {
     return s.accession + " " + s.title + " " + s.description;
+  }
+
+  studyClick(study: IStudyDetail, view: string) {
+    //this.store.dispatch(new Identifier.Set(study.accession));
+    //this.router.navigate([`${view}`, study.accession]);
   }
 }

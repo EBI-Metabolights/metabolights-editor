@@ -1,6 +1,5 @@
-import { Component, OnInit } from "@angular/core";
-import { environment } from "src/environments/environment";
-import { Select } from "@ngxs/store";
+import { Component, inject, OnInit } from "@angular/core";
+import { Store } from "@ngxs/store";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
 import { Observable } from "rxjs";
@@ -13,8 +12,8 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 })
 export class FactorsComponent implements OnInit {
 
-  @Select(DescriptorsState.studyFactors) studyFactors$: Observable<MTBLSFactor>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+  studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   
 
   isReadOnly = false;
@@ -27,7 +26,6 @@ export class FactorsComponent implements OnInit {
   ngOnInit() {
     this.setUpInitSubscriptionNgxs();
   }
-
 
   setUpConstructorSubscriptionNgxs() {
     this.studyFactors$.subscribe((value) => {

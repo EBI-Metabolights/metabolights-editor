@@ -1,5 +1,5 @@
 import { Store } from "@ngxs/store";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
@@ -25,6 +25,7 @@ import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { InfoComponent } from "./info.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("InfoComponent", () => {
   let component: InfoComponent;
@@ -32,30 +33,32 @@ describe("InfoComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [InfoComponent],
-      imports: [RouterTestingModule, HttpClientTestingModule],
-      providers: [
+    declarations: [InfoComponent],
+    imports: [RouterTestingModule],
+    providers: [
         Store,
         {
-          provide: Router,
-          useFactory: setupTestingRouter,
-          deps: [
-            UrlSerializer,
-            ChildrenOutletContexts,
-            Location,
-            NgModuleFactoryLoader,
-            Compiler,
-            Injector,
-            ROUTES,
-            ROUTER_CONFIGURATION,
-            [UrlHandlingStrategy, new Optional()],
-            [RouteReuseStrategy, new Optional()],
-          ],
+            provide: Router,
+            useFactory: setupTestingRouter,
+            deps: [
+                UrlSerializer,
+                ChildrenOutletContexts,
+                Location,
+                NgModuleFactoryLoader,
+                Compiler,
+                Injector,
+                ROUTES,
+                ROUTER_CONFIGURATION,
+                [UrlHandlingStrategy, new Optional()],
+                [RouteReuseStrategy, new Optional()],
+            ],
         },
         { provide: Location, useClass: SpyLocation },
         { provide: EditorService, useClass: MockEditorService },
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {
