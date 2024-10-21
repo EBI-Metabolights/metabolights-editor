@@ -1,23 +1,26 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
-import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { FilesLists, ObfuscationCode, Operations, ResetFilesState, UploadLocation } from "./files.actions";
 import { FilesService } from "src/app/services/decomposed/files.service";
 import { Samples } from "../samples/samples.actions";
 import { AssayList } from "../assay/assay.actions";
+import { take } from "rxjs";
 
 export interface FilesStateModel {
     obfuscationCode: string,
     uploadLocation: string,
     files: IStudyFiles,
-    selectedFiles: IStudyFiles[];
+    selectedFiles: IStudyFiles,
+    rawFiles: StudyFile[]
 }
 
 const defaultState: FilesStateModel = {
     obfuscationCode: null,
     uploadLocation: null,
     files: null,
-    selectedFiles: null
+    selectedFiles: null,
+    rawFiles: null
 }
 
 @State<FilesStateModel>({
@@ -33,7 +36,7 @@ export class FilesState {
     @Action(Operations.GetFreshFilesList)
     GetStudyFiles(ctx: StateContext<FilesStateModel>, action: Operations.GetFreshFilesList) {
         const state = ctx.getState();
-        this.filesService.getStudyFilesFetch(action.force, action.readonly, action.id).subscribe({
+        this.filesService.getStudyFilesFetch(action.force, action.readonly, action.id).pipe(take(1)).subscribe({
             next: (data) => {
                 ctx.dispatch(new UploadLocation.Set(data.uploadPath));
                 ctx.dispatch(new ObfuscationCode.Set(data.obfuscationCode));
@@ -92,6 +95,36 @@ export class FilesState {
         })
     }
 
+    @Action(FilesLists.GetRawFiles)
+    GetRawFiles(ctx: StateContext<FilesStateModel>, action: FilesLists.GetRawFiles) {
+        const rawFilesObj = {
+            file: "FILES/RAW_FILES/",
+            createdAt: "",
+            timestamp: "",
+            type: "",
+            status: "",
+            directory: true
+
+        }
+        this.filesService.getStudyFilesListFromLocation(action.studyId, true, rawFilesObj, null, "study").subscribe({
+            next: (files) => {
+                //console.log(files);
+                ctx.dispatch(new FilesLists.SetRawFiles(files.study))
+            },
+            error: () => {}
+
+        })
+    }
+
+    @Action(FilesLists.SetRawFiles)
+    SetRawFiles(ctx: StateContext<FilesStateModel>, action: FilesLists.SetRawFiles) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            rawFiles: action.files
+        });
+    }
+
     @Action(ResetFilesState)
     Reset(ctx: StateContext<FilesStateModel>, action: ResetFilesState) {
         ctx.setState(defaultState);
@@ -123,5 +156,10 @@ export class FilesState {
     @Selector()
     static files(state: FilesStateModel) {
         return state.files;
+    }
+
+    @Selector()
+    static rawFiles(state: FilesStateModel) {
+        return state.rawFiles
     }
 }

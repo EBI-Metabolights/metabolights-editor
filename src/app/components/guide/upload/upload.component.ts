@@ -64,7 +64,7 @@ export class RawUploadComponent implements OnInit {
   }
 
   refreshFiles() {
-    this.store.dispatch(new Operations.GetFreshFilesList(true));
+    this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
   }
 
   copyFilesAndProceed() {

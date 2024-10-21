@@ -27,7 +27,6 @@ export class FactorsComponent implements OnInit {
     this.setUpInitSubscriptionNgxs();
   }
 
-
   setUpConstructorSubscriptionNgxs() {
     this.studyFactors$.subscribe((value) => {
       this.factors = value;
