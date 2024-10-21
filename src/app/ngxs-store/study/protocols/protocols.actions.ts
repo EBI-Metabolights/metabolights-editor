@@ -39,3 +39,8 @@ export namespace ProtocolGuides {
         constructor(public guides: Record<string, any>) {}
     }
 }
+
+export class ResetProtocolsState {
+    static readonly type = '[protocols] Reset Protocols State'
+    constructor() {}
+}

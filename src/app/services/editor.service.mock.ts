@@ -1,16 +1,17 @@
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { FilesState } from "../ngxs-store/study/files/files.state";
 import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
 import { ValidationState } from "../ngxs-store/study/validation/validation.state";
+import { inject } from "@angular/core";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 export class MockEditorService {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
 
 
 

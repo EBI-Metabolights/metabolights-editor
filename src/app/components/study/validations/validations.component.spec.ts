@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, Input, Output } from "@angular/core";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { RouterTestingModule } from "@angular/router/testing";
@@ -11,6 +11,7 @@ import {  Store } from "@ngxs/store";
 import { ValidationsComponent } from "./validations.component";
 import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 /* eslint-disable @typescript-eslint/naming-convention */
 /* eslint-disable @angular-eslint/directive-selector */
 /* eslint-disable @angular-eslint/directive-class-suffix */
@@ -33,13 +34,15 @@ describe("ValidationsComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ValidationsComponent, MockValidationDetailComponent],
-      imports: [RouterTestingModule, HttpClientTestingModule],
-      providers: [
+    declarations: [ValidationsComponent, MockValidationDetailComponent],
+    imports: [RouterTestingModule],
+    providers: [
         { provide: EditorService, useClass: MockEditorService },
         Store,
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

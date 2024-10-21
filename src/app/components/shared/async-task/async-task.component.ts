@@ -19,6 +19,7 @@ export class AsyncTaskComponent implements OnInit {
   @Input('startTaskUrl') startTaskUrl: string;
   @Input('pollTaskStatusUrl') pollTaskStatusUrl: string;
   @Input('pollingInterval') pollingInterval = 10000;
+  @Input('taskAction') taskAction: any = null;
 
   @Output() taskDone = new EventEmitter<any>();
 

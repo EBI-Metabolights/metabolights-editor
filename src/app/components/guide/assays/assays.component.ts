@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from "@angular/core";
+import { Component, ViewChild, OnInit, inject } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
@@ -9,7 +9,7 @@ import { tassign } from "tassign";
 import { SamplesComponent } from "./../../study/samples/samples.component";
 import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Observable } from "rxjs";
+import { Observable, withLatestFrom } from "rxjs";
 import { Select, Store } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -27,12 +27,11 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 })
 export class GuidedAssaysComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-
+  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
+  assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   @ViewChild(SamplesComponent) sampleTable: SamplesComponent;
 
   requestedStudy: string = null;
@@ -76,14 +75,15 @@ export class GuidedAssaysComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) this.requestedStudy = value
     });
-    this.studyFiles$.subscribe((value) => {
+    this.studyFiles$.pipe(withLatestFrom(this.studyIdentifier$)).subscribe(([value, studyIdentifierValue]) => {
       if (value != null) {
         this.files = value;
-      } else {
-        this.store.dispatch(new Operations.GetFreshFilesList(false));
+      } else if (value === null && this.files.length === 0) {
+        this.store.dispatch(new Operations.GetFreshFilesList(false, false, studyIdentifierValue));
       }
     });
     this.assays$.subscribe((value) => {
+      if (this.assays.length > 0) console.debug('assays updated via observable')
       this.assays = Object.values(value);
       if (this.assays.length > 0) {
         this.assays.sort((a, b) => {
@@ -114,7 +114,7 @@ export class GuidedAssaysComponent implements OnInit {
       cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
-        this.store.dispatch(new Assay.Delete(name)).subscribe(
+        this.store.dispatch(new Assay.Delete(name, this.requestedStudy)).subscribe(
           (completed) => {
             this.extractAssayInfo(true);
             Swal.fire({
@@ -180,7 +180,7 @@ export class GuidedAssaysComponent implements OnInit {
             confirmButtonText: "Ignore duplicates, proceed!",
           }).then((result) => {
             if (result.value) {
-              this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null)).subscribe(
+              this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null, this.requestedStudy)).subscribe(
                 (completed) => {
                   toastr.success("Samples added successfully", "Success", this.toastrSettings);
                   this.controlsNames = "";
@@ -196,7 +196,7 @@ export class GuidedAssaysComponent implements OnInit {
         } else if (duplicates.length > 0 && sRows.length === 0) {
           this.changeSubStep(4);
         } else {
-          this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null)).subscribe(
+          this.store.dispatch(new Samples.AddRows(this.samples.name, { data: { rows: sRows, index: 0} }, null, this.requestedStudy)).subscribe(
             (completed) => {
               toastr.success("Samples added successfully", "Success", this.toastrSettings);
               this.controlsNames = "";
@@ -287,7 +287,7 @@ export class GuidedAssaysComponent implements OnInit {
   }
 
   addColumns(columns) {
-    this.store.dispatch(new Samples.AddColumns(this.samples.name, {data: columns})).subscribe(
+    this.store.dispatch(new Samples.AddColumns(this.samples.name, {data: columns}, this.requestedStudy)).subscribe(
       (completed) => {
         true
       },
@@ -331,7 +331,7 @@ export class GuidedAssaysComponent implements OnInit {
 
   extractAssayInfo(reloadFiles) {
     if (reloadFiles) {
-      this.store.dispatch(new Operations.GetFreshFilesList(true));
+      this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
     } else {
       this.store.dispatch(new AssayList.Get(this.requestedStudy));
     }

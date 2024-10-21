@@ -1,4 +1,4 @@
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
 import { MockConfigurationService } from "src/app/configuration.mock.service";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -10,6 +10,7 @@ import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { OntologyComponent } from "./ontology.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("OntologyComponent", () => {
   let component: OntologyComponent;
@@ -19,16 +20,18 @@ describe("OntologyComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [OntologyComponent],
-      imports: [HttpClientTestingModule],
-      providers: [
+    declarations: [OntologyComponent],
+    imports: [],
+    providers: [
         { provide: EditorService, useClass: MockEditorService },
         {
-          provide: ConfigurationService,
-          useClass: MockConfigurationService,
+            provide: ConfigurationService,
+            useClass: MockConfigurationService,
         },
-      ],
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
     TestBed.compileComponents();

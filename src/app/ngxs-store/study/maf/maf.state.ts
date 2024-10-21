@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
-import { MAF } from "./maf.actions";
+import { MAF, ResetMAFState } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
+import { take } from "rxjs/operators";
 
 
 
@@ -24,14 +25,14 @@ export interface MAF {
 export interface MAFStateModel {
     mafs: Record<string, any>
 }
-
+ const defaultState: MAFStateModel = {
+    mafs: {}
+ }
 
 
 @State<MAFStateModel>({
     name: 'mafs',
-    defaults: {
-        mafs: {}
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class MAFState {
@@ -54,7 +55,7 @@ export class MAFState {
 
     @Action(MAF.Organise)
     OrganiseMAF(ctx: StateContext<MAFStateModel>, action: MAF.Organise) {
-        this.mafService.getMAFSheet(action.filename).subscribe(
+        this.mafService.getMAFSheet(action.filename, action.studyId).pipe(take(1)).subscribe(
             (mdata) => {
                 const mcolumns = [];
                 const maf = {};
@@ -110,9 +111,9 @@ export class MAFState {
 
     @Action(MAF.AddRows)
     AddRows(ctx: StateContext<MAFStateModel>, action: MAF.AddRows) {
-        this.mafService.addRows(action.filename, action.body).subscribe(
+        this.mafService.addRows(action.filename, action.body, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new MAF.Organise(action.filename));
+                ctx.dispatch(new MAF.Organise(action.filename, action.studyId));
             },
             (error) => {
                 console.log("Unable to add rows to MAF sheet.")
@@ -123,9 +124,9 @@ export class MAFState {
 
     @Action(MAF.UpdateRows)
     UpdateRows(ctx: StateContext<MAFStateModel>, action: MAF.UpdateRows) {
-        this.mafService.updateRow(action.filename, action.body).subscribe(
+        this.mafService.updateRow(action.filename, action.body, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new MAF.Organise(action.filename));
+                ctx.dispatch(new MAF.Organise(action.filename, action.studyId));
             },
             (error) => {
                 console.log("Unable to update rows in MAF sheet.")
@@ -136,9 +137,9 @@ export class MAFState {
 
     @Action(MAF.DeleteRows)
     DeleteRows(ctx: StateContext<MAFStateModel>, action: MAF.DeleteRows) {
-        this.mafService.deleteRows(action.filename, action.rowIds).subscribe(
+        this.mafService.deleteRows(action.filename, action.rowIds, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new MAF.Organise(action.filename));
+                ctx.dispatch(new MAF.Organise(action.filename, action.studyId));
             },
             (error) => {
                 console.log('Unable to delete rows from MAF sheet.')
@@ -149,17 +150,22 @@ export class MAFState {
 
     @Action(MAF.UpdateCells)
     UpdateCells(ctx: StateContext<MAFStateModel>, action: MAF.UpdateCells) {
-        this.mafService.updateCells(action.filename, action.cellsToUpdate).subscribe(
+        this.mafService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
             (response) => {
                 // do some commitUpdatedTableCellsNgxs type processing
                 // or
-                ctx.dispatch(new MAF.Organise(action.filename));
+                ctx.dispatch(new MAF.Organise(action.filename, action.studyId));
             },
             (error) => {
                 console.log("Unable to edit cells in MAF sheet");
                 console.log(error);
             }
         )
+    }
+
+    @Action(ResetMAFState)
+    Reset(ctx: StateContext<MAFStateModel>, action: ResetMAFState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

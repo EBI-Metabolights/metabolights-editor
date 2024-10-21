@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
@@ -10,7 +10,7 @@ import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology"
 import { ValidateRules } from "./protocol.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import * as toastr from "toastr";
-import { Select, Store } from "@ngxs/store";
+import {  Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable, Subscription } from "rxjs";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
@@ -32,12 +32,12 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
 
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.isProtocolsExpanded) isProtocolsExpanded$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-  @Select(GeneralMetadataState.id) studyId$: Observable<string>;
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
+  studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
-  @Select(ProtocolsState.protocolGuides) protocolGuides$: Observable<Record<string, any>>;
+  protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
 
 
   private studyId: string =  null;
@@ -68,6 +68,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   protocolInGuides: boolean = false;
   guideText: string = "";
+  coreProtocols: string[] = ['sample collection', 'extraction', 'chromatography', 'mass spectrometry', 'data transformation', 'metabolite identification']
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -480,5 +481,9 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   setFieldValue(name, value) {
     return this.form.get(name).setValue(value);
+  }
+
+  isCoreProtocol(name: string): boolean {
+    return this.coreProtocols.includes(name.toLowerCase())
   }
 }

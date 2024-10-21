@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, OnChanges } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList, inject } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
@@ -8,15 +8,16 @@ import { OntologyComponent } from "../../shared/ontology/ontology.component";
 import { TableComponent } from "./../../shared/table/table.component";
 import { MTBLSCharacteristic } from "./../../../models/mtbl/mtbls/mtbls-characteristic";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
-import { environment } from "src/environments/environment";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
-import { Observable } from "rxjs";
-import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
+import { filter, Observable, withLatestFrom } from "rxjs";
+import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { FilesLists } from "src/app/ngxs-store/study/files/files.actions";
 
 @Component({
   selector: "mtbls-samples",
@@ -25,12 +26,14 @@ import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descripto
 })
 export class SamplesComponent  {
 
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(DescriptorsState.studyFactors) studyFactors$: Observable<MTBLSFactor>;
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  rawFiles$: Observable<StudyFile[]> = inject(Store).select(FilesState.rawFiles);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
   @ViewChildren(OntologyComponent)
@@ -71,7 +74,7 @@ export class SamplesComponent  {
   validationsId = "samples";
 
 
-  constructor(private editorService: EditorService, private fb: UntypedFormBuilder) {
+  constructor(private editorService: EditorService, private fb: UntypedFormBuilder, private store: Store) {
     if (!this.defaultCharacteristicControlList) {
       this.defaultCharacteristicControlList = {name: "", values: []};
     }
@@ -92,28 +95,35 @@ export class SamplesComponent  {
     this.studyFactors$.subscribe((value) => {
       this.factors = value;
     });
-    this.studyFiles$.subscribe((f) => {
+    this.studyIdentifier$.pipe(filter(val => val !== null)).subscribe(val => {
+      //
+    });
+    this.studyFiles$.pipe(withLatestFrom(this.studyIdentifier$)).subscribe(([f, studyIdentifierValue]) => {
       if (f) {
-        f.study.forEach((file) => {
-          if (file.type === "raw") {
-            const name = file.file.split(".")[0];
-            this.rawFileNames.push(name);
-          }
-        });
+        this.store.dispatch(new FilesLists.GetRawFiles(studyIdentifierValue));
       }
     });
-    this.studySamples$.subscribe((value) => {
-      if (value === null) {
-        this.editorService.loadStudySamples();
-      } else {
-        this.samples = value;
-      }
+    this.studySamples$.pipe(withLatestFrom(this.studyIdentifier$))
+      .subscribe(([value, studyIdentifierValue]) => {
+        if (value === null) {
+          this.editorService.loadStudySamples(studyIdentifierValue); // currently causing an issue
+        } else {
+          this.samples = value;
+        }
     });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
       }
     });
+    this.rawFiles$.pipe(filter(val => val !== null)).subscribe((val) => {
+      this.rawFileNames = val.filter(file => file.type == 'raw').map(file => file.file.split(".")[0]);
+    });
+  }
+
+  getParticularFileObject(listOfFiles: StudyFile[], name: string): StudyFile {
+    const result = listOfFiles.find(file => file.file === name)
+    return result
   }
 
   refresh() {

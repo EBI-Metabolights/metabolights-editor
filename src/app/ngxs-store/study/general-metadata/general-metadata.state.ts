@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import {  CurationRequest, GetGeneralMetadata, Identifier, People, Publications, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
+import { CurationRequest, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -12,8 +12,9 @@ import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { Operations } from "../files/files.actions";
-import { EditorValidationRules, NewValidationReport, ValidationReport } from "../validation/validation.actions";
+import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
+import { take } from "rxjs/operators";
 
 
 export interface GeneralMetadataStateModel {
@@ -28,22 +29,22 @@ export interface GeneralMetadataStateModel {
     publications: IPublication[];
     people: IPerson[];
 }
+const defaultState: GeneralMetadataStateModel = {
+    id: null,
+    title: null,
+    description: null,
+    submissionDate: null,
+    releaseDate: null,
+    status: null,
+    curationRequest: null,
+    reviewerLink: null,
+    publications: null,
+    people: null
+}
 
 @State<GeneralMetadataStateModel>({
     name: 'general',
-    defaults: {
-        id: null,
-        title: null,
-        description: null,
-        submissionDate: null,
-        releaseDate: null,
-        status: null,
-        curationRequest: null,
-        reviewerLink: null,
-        publications: null,
-        people: null
-
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class GeneralMetadataState {
@@ -55,8 +56,10 @@ export class GeneralMetadataState {
 
     @Action(GetGeneralMetadata)
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
-        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).subscribe(
+        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
             (gm_response) => {
+                const state = ctx.getState();
+                if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new SetLoadingInfo("Loading investigation details"));
                 this.store.dispatch(new SetReadonly(action.readonly));
@@ -80,22 +83,22 @@ export class GeneralMetadataState {
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
 
-                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
 
                 if (action.readonly) {
                     this.store.dispatch(new SetReadonly(true));
                     this.store.dispatch(new Loading.Disable());
                 } else {
-                    this.store.dispatch(new ValidationReport.Get());
+                    this.store.dispatch(new ValidationReport.Get(action.studyId));
                     this.store.dispatch(new SetReadonly(false));
                 }
             },
             (error) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new Loading.Disable());
-                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly));
+                this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
                 if (!action.readonly) {
-                    this.store.dispatch(new ValidationReport.Get())
+                    this.store.dispatch(new ValidationReport.Get(action.studyId))
                 }
 
 
@@ -232,7 +235,6 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
         (response) => {
-            console.log(action.title);
             ctx.dispatch(new Publications.Set([response], false, true, action.title))
             }
         )
@@ -385,9 +387,15 @@ export class GeneralMetadataState {
         )
     }
 
+    @Action(ResetGeneralMetadataState)
+    Reset(ctx: StateContext<GeneralMetadataStateModel>, action: ResetGeneralMetadataState) {
+        ctx.setState(defaultState);
+    }
+
 
     @Selector()
     static id(state: GeneralMetadataStateModel): string {
+        if (state === undefined) return null
         return state.id
     }
 

@@ -5,13 +5,14 @@ import {
   Output,
   ViewChild,
   EventEmitter,
+  inject,
 } from "@angular/core";
 import Swal from "sweetalert2";
 import { EditorService } from "../../../../services/editor.service";
 import { TableComponent } from "./../../../shared/table/table.component";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { Observable } from "rxjs";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
@@ -28,10 +29,10 @@ export class AssayDetailsComponent implements OnInit {
   @ViewChild(TableComponent) assayTable: TableComponent;
 
 
-  @Select(AssayState.assays) assays$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(SampleState.samples) studySamples$: Observable<Record<string, any>>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
+  assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   assay$: Observable<any>;
 
@@ -84,7 +85,7 @@ export class AssayDetailsComponent implements OnInit {
 
     });
     this.studySamples$.subscribe((value) => {
-      if (value.data) {
+      if (value && value.data) {
         this.sampleNames = value.data.rows.map((r) => r["Sample Name"]);
         this.filteredSampleNames = this.sampleNames;
       }

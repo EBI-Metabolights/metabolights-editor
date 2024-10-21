@@ -1,0 +1,124 @@
+<button mat-stroked-button color="primary" class="no-round" (click)="initNewTask()">
+  Start new validation task
+</button>
+<button mat-stroked-button color="primary" class="no-round" (click)="getWs3Report()">
+    Get new validation report
+</button>
+<button mat-stroked-button color="primary" class="no-round" (click)="getFakeWs3Report()">
+  Get fake validation report
+</button>
+
+<mat-card *ngIf="report !== null; else noReportBlock" class="report-card no-round">
+    <mat-card-header>
+      <mat-card-subtitle>{{accession}}</mat-card-subtitle>
+      <mat-card-title>Validation Report Summary</mat-card-title>
+      <div class="container">
+        <img src="assets/img/MetaboLightsLogo.png" alt="metabolights logo" class="right-aligned-image">
+    </div>
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+    <mat-radio-group aria-label="Select an option" [(ngModel)]="violationsToggle" color="primary">
+      <mat-radio-button value="errorsGraphItems">Errors</mat-radio-button>
+      <mat-radio-button value="warningsGraphItems">Warnings</mat-radio-button>
+      <mat-radio-button value="bothGraphItems">Both</mat-radio-button>
+    </mat-radio-group>
+        <div class="grid-container">
+            <div class="charts-container">
+                <ngx-charts-pie-grid #chart *ngIf="dataReady && violationsToggle === 'errorsGraphItems'"
+                [view]="view"
+                [scheme]="colorScheme"
+                [results]="errorsGraphItems"
+                (select)="onSelect($event)">
+              </ngx-charts-pie-grid>
+              <ngx-charts-pie-grid #chart *ngIf="dataReady && violationsToggle === 'warningsGraphItems'"
+              [view]="view"
+              [scheme]="colorScheme"
+              [results]="warningsGraphItems"
+              (select)="onSelect($event)">
+            </ngx-charts-pie-grid>
+            <ngx-charts-pie-grid #chart *ngIf="dataReady && violationsToggle === 'bothGraphItems'"
+            [view]="view"
+            [scheme]="colorScheme"
+            [results]="bothGraphItems"
+            (select)="onSelect($event)">
+          </ngx-charts-pie-grid>
+            
+            </div>
+            <div class="textual-content">
+              <div class="content">
+                <h2> Status </h2>
+                <div class="is-pulled-left">
+                  <div class="tags has-addons">
+                    <span class="tag is-dark">Validation</span>
+                    <span class="tag" [ngClass]="{
+                      'is-danger': validationStatus === 'ERROR',
+                      'is-success': validationStatus === 'SUCCESS',
+                      'is-warning': validationStatus === 'WARNING',
+                    }" > {{validationStatus}} </span>
+                  </div>
+              </div>
+              
+                <div class="is-pulled-left">
+                  <span>
+                    <div class="tags has-addons">
+                      <span class="tag is-dark">Last Validation Time</span>
+                      <span class="tag is-danger" > <small> {{lastValidationRunTime == "-" ? "-" : lastValidationRunTime | date:'long'}} </small> </span>
+                    </div>
+                  </span>
+              
+                </div>
+                
+              </div>
+              <div class="content">
+                <h2>Actions</h2> 
+                <mat-card-actions>
+                  <button mat-stroked-button color="primary" class="no-round" (click)="initNewTask()">
+                    Start new validation task
+                  </button>
+                  <button mat-stroked-button color="primary" class="no-round" (click)="getWs3Report()">
+                      Get new validation report
+                  </button>
+                  </mat-card-actions>
+              </div>
+            </div>
+        </div>
+
+       <mat-divider></mat-divider>
+    </mat-card-content>
+    <mat-card-actions>
+
+      Report UUID: &nbsp;<i> {{taskId}}</i>
+    </mat-card-actions>
+    <mat-card-footer>
+    </mat-card-footer>
+  </mat-card>
+
+  <ng-template #noReportBlock>
+    <mat-card class="empty-card no-round">
+      <mat-card-header>
+        <mat-card-subtitle>{{accession}}</mat-card-subtitle>
+        <mat-card-title>No Report to Display.</mat-card-title>
+        <div class="container">
+          <img src="assets/img/MetaboLightsLogo.png" alt="metabolights logo" class="right-aligned-image">
+      </div>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        <div class="empty-summary-content content">
+          <h2>Actions</h2> 
+          <br>
+
+          <mat-card-actions>
+            <button mat-stroked-button color="primary" class="no-round" (click)="initNewTask()">
+              Start new validation task
+            </button>
+            <button mat-stroked-button color="primary" class="no-round" (click)="getWs3Report()">
+                Get new validation report
+            </button>
+            </mat-card-actions>
+        </div>
+      </mat-card-content>
+      </mat-card>
+
+  </ng-template>

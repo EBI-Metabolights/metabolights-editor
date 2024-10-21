@@ -6,14 +6,15 @@ import { IProtocolWrapper } from 'src/app/models/mtbl/mtbls/interfaces/protocol-
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { httpOptions } from '../headers';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProtocolsService extends BaseConfigDependentService {
 
-  constructor(http: HttpClient, configService: ConfigurationService) {
-    super(http, configService)
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) {
+    super(http, configService, store);
    }
 
   getProtocols(id): Observable<IProtocolWrapper> {

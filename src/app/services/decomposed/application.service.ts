@@ -10,6 +10,7 @@ import { VersionInfo } from 'src/environment.interface';
 import { ApiVersionInfo } from 'src/app/models/mtbl/mtbls/interfaces/common';
 import { httpOptions } from '../headers';
 import { MaintenanceStatus } from 'src/app/models/mtbl/mtbls/interfaces/maintenance-status.interface';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,9 @@ export class ApplicationService extends BaseConfigDependentService {
   private baseHref: string;
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private platformLocation: PlatformLocation
+    http: HttpClient, configService: ConfigurationService, private platformLocation: PlatformLocation, store: Store
   ) { 
-    super(http, configService);
+    super(http, configService, store);
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
 

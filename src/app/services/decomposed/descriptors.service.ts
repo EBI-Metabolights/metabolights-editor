@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BaseConfigDependentService } from './base-config-dependent.service';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { Observable } from 'rxjs';
 import { IStudyDesignDescriptorWrapper } from 'src/app/models/mtbl/mtbls/interfaces/study-design-descriptor-wrapper.interface';
@@ -8,13 +8,14 @@ import { httpOptions } from '../headers';
 import { catchError } from 'rxjs/operators';
 import { IFactorsWrapper } from 'src/app/models/mtbl/mtbls/interfaces/factor-wrapper.interface';
 import { IfStmt } from '@angular/compiler';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DescriptorsService extends BaseConfigDependentService{
 
-  constructor(http: HttpClient, configService: ConfigurationService) {super(http, configService)}
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) {super(http, configService, store)}
 
     /**
    * Get the study design descriptors for a study.

@@ -1,18 +1,13 @@
 import {
   Component,
-  OnInit,
-  Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
+  inject,
+  OnInit
 } from "@angular/core";
 import Swal from "sweetalert2";
-import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { StudyReleaseDate } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
@@ -24,10 +19,10 @@ import { StudyReleaseDate } from "src/app/ngxs-store/study/general-metadata/gene
 })
 export class ReleaseDateComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.releaseDate) studyReleaseDate$: Observable<Date>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyReleaseDate$: Observable<Date> = inject(Store).select(GeneralMetadataState.releaseDate);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   private toastrSettings: Record<string, any> = {};
 

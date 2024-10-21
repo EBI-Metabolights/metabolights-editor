@@ -1,11 +1,11 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
 import { Router } from "@angular/router";
 import { environment } from "src/environments/environment";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Select, Store } from "@ngxs/store";
 
 @Component({
   selector: "app-info",
@@ -14,8 +14,8 @@ import { Select } from "@ngxs/store";
 })
 export class InfoComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  
   user: any = null;
   requestedStudy: string = null;
   uploadFiles: any[] = [];

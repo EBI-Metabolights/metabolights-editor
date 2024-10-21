@@ -1,8 +1,7 @@
-import { Component, OnInit, Input } from "@angular/core";
-import { environment } from "src/environments/environment";
+import { Component, OnInit, Input, inject } from "@angular/core";
 import { Router } from "@angular/router";
 import { Observable } from "rxjs";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
@@ -16,10 +15,10 @@ import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
 export class MafsComponent implements OnInit {
   @Input("assayName") assayName: any;
 
-  @Select(AssayState.assayList) assayFiles$: Observable<IAssay[]>;
-  @Select(AssayState.assays) studyAssays$: Observable<Record<string, any>>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(MAFState.mafs) studyMAFs$: Observable<Record<string, any>>;
+  assayFiles$: Observable<IAssay[]> = inject(Store).select(AssayState.assayList);
+  studyAssays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyMAFs$: Observable<Record<string, any>> = inject(Store).select(MAFState.mafs);
 
 
   assays: any = [];

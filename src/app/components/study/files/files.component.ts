@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Component, OnInit, Input, OnDestroy, OnChanges } from "@angular/core";
+import { Component, OnInit, Input, OnChanges, inject } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { environment } from "src/environments/environment";
-import { FtpManagementService } from "src/app/services/ftp-management.service";
-import { CommonModule, PlatformLocation } from '@angular/common';
+import { PlatformLocation } from '@angular/common';
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
@@ -24,10 +22,10 @@ import { SyncEvent } from "./rsync/rsync.component";
 })
 export class FilesComponent implements OnInit,  OnChanges {
   
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
 
