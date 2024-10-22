@@ -11,7 +11,7 @@ RUN npm run build -- --configuration $CONFIGURATION --base-href="$BASE_HREF/"
 # Stage 2, use the compiled app, ready for production with Nginx
 FROM nginx:stable
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
-COPY --from=build /app-root/dist/metabolights-editor /editor
+COPY --from=build /app-root/dist/metabolights-editor/browser /editor
 
 ARG EXPOSED_PORT=8008
 EXPOSE $EXPOSED_PORT
