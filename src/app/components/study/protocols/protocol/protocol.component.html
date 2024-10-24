@@ -214,10 +214,15 @@
                       form.get('name').errors.name
                     "
                   >
-                    {{ form.get("name").errors.name.error }}
+                    {{ form.get("name").errors.name.error }}lol
                   </mat-error>
                 </mat-form-field>
-                <div>&nbsp;</div>
+                <div *ngIf="guideText !== ''">
+                  <div>&nbsp;</div>
+                  <span><i>{{guideText}}</i></span>
+                  <div>&nbsp;</div>
+                </div>
+
                 <span *ngIf="form.get('description')">
                   <!-- <div *ngIf="form.get('description').value != ''" class="is-clearfix">
                     </div>  -->
