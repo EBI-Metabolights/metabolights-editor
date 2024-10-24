@@ -107,6 +107,7 @@ export class ValidationState {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
                         ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
                         if (response.content.task_status === "SUCCESS") {
+                            console.dir(response);
                             ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                             ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
                             ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
@@ -211,7 +212,6 @@ export class ValidationState {
         const state = ctx.getState();
         this.validationService.getValidationHistory(action.studyId).subscribe((historyResponse) => {
             const sortedPhases = sortPhasesByTime(historyResponse.content);
-            console.log(sortedPhases);
             ctx.dispatch(new ValidationReportV2.History.Set(sortedPhases));
             if (!state.initialLoadMade) {
                 ctx.dispatch(new ValidationReportV2.Get(action.studyId, sortedPhases[0].taskId))
@@ -406,7 +406,8 @@ function sortViolations(violations: Violation[]): Violation[] {
 }
 
 function calculateStudyValidationStatus(report: Ws3ValidationReport): ViolationType {
-    if (report.messages.violations.length > 0) return 'ERROR'
+    const warningsFilteredOut = report.messages.violations.filter(vio => vio.type !== 'WARNING')
+    if (warningsFilteredOut.length > 0) return 'ERROR'
     else return 'SUCCESS'
 }
 
