@@ -1,10 +1,12 @@
 .mat-mdc-option {
   white-space: nowrap;
-  line-height: 2.5;
+  line-height: 1.25;
   min-height: 75px;
   display: block;
   flex-direction: row;
   max-width: 600px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 }
 
 /* TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version. */
