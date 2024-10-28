@@ -148,6 +148,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.setUpSubscriptionsNgxs();
     if (localStorage.getItem(this.data.file) !== null) {
       this.view = localStorage.getItem(this.data.file);
+      if (this.view === "expanded") {
+        this.displayedTableColumns = Object.keys(this.data.header);
+      }
     } else {
       localStorage.setItem(this.data.file, 'compact')
     }
@@ -876,6 +879,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   headerClick(column: any, event) {
+    console.dir(column);
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;
