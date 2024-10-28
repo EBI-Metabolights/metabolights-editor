@@ -77,7 +77,7 @@
                     <div (click)="copyToClipboard(violation.section)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
             </div>
             <div class="violation-footer-end-item footer-container-3">        
-                <small><b>Report UUID:</b> {{currentTaskId}}</small>
+                <small><b>Report Timestamp:</b> {{ runTime === "" ? "-" : runTime | date: 'MMM d, y, H:mm:ss z'}}</small>
             </div>
         </div>
     </div>

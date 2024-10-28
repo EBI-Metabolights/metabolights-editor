@@ -2,7 +2,7 @@ import { Component, inject, Input, OnInit } from '@angular/core';
 import { Violation } from '../interfaces/validation-report.interface';
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
-import { Observable } from 'rxjs';
+import { filter, Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 
@@ -14,13 +14,14 @@ import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.
 export class ValidationV2DetailComponent implements OnInit {
 
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
-  taskId$: Observable<string> = inject(Store).select(ValidationState.taskId);
+  runTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
 
   @Input() violation: Violation
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
 
   currentTaskId = "";
+  runTime = "";
 
   typeIcon: string = "question"
   protected isCurator: boolean = false;
@@ -29,7 +30,7 @@ export class ValidationV2DetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.isCurator$.subscribe((value) => this.isCurator = value);
-    this.taskId$.subscribe((id) => {if(id !== null) this.currentTaskId = id})
+    this.runTime$.pipe(filter(val => val !== null)).subscribe((time) => { this.runTime = time})
     this.typeIcon = this.getViolationTypeIcon();
   }
 
