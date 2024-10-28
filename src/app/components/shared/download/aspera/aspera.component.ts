@@ -85,6 +85,8 @@ export class AsperaDownloadComponent implements OnInit {
       sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
     });
     this.asperaWeb.initSession();
+    console.log(this.asperaWeb.getStatus());
+
     this.downloadFile();
   }
 

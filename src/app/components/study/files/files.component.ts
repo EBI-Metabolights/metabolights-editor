@@ -7,11 +7,13 @@ import { PlatformLocation } from '@angular/common';
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
-import { Observable } from "rxjs";
+import { Observable, timer } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { GetGeneralMetadata } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { SyncEvent } from "./rsync/rsync.component";
+declare let AW4: any;
+
 
 
 
@@ -76,6 +78,11 @@ export class FilesComponent implements OnInit,  OnChanges {
   MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES', 'ARCHIVED_AUDIT_FILES'];
   MANAGED_SUB_FOLDERS=['AUDIT_FILES/ARCHIVED_AUDIT_FILES', "INTERNAL_FILES/logs"];
 
+  MIN_CONNECT_VERSION = "3.6.0.0";
+  CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
+  asperaWeb: any = null;
+  asperaStatus: any = "-";
+
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
@@ -89,15 +96,37 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.loadFiles();
 
     this.setUpSubscriptionsNgxs();
+    this.checkAspera();
 
   }
 
   ngOnChanges(changes) {
   }
 
+  checkAspera() {
+    this.asperaWeb = new AW4.Connect({
+      sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
+      minVersion: this.MIN_CONNECT_VERSION,
+    });
+    const t = new AW4.ConnectInstaller({
+      sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
+    });
+    this.asperaWeb.initSession();
 
-
-
+    const initAsperaStatus = this.asperaWeb.getStatus();
+    const timerSub = timer(5000);
+    if (initAsperaStatus === "INITIALIZING") {
+      timerSub.subscribe((n) => {
+        this.asperaStatus = this.asperaWeb.getStatus();
+        }
+      )
+    } else if (initAsperaStatus === "RUNNING") {
+      this.asperaStatus = initAsperaStatus
+    } else {
+      this.asperaStatus = initAsperaStatus
+    }
+    
+  }
 
 
   setUpSubscriptionsNgxs() {
