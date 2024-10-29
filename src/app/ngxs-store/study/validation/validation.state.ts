@@ -107,7 +107,6 @@ export class ValidationState {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
                         ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
                         if (response.content.task_status === "SUCCESS") {
-                            console.dir(response);
                             ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                             ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
                             ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));

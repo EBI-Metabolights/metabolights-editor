@@ -1597,7 +1597,4 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
   }
 
-  syncScroll(scrolledContainer: HTMLElement, otherContainer: HTMLElement) {
-    otherContainer.scrollLeft = scrolledContainer.scrollLeft;
-  }
 }
