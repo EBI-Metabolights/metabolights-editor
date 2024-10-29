@@ -211,7 +211,6 @@ export class ValidationState {
         const state = ctx.getState();
         this.validationService.getValidationHistory(action.studyId).subscribe((historyResponse) => {
             const sortedPhases = sortPhasesByTime(historyResponse.content);
-            console.log(sortedPhases);
             ctx.dispatch(new ValidationReportV2.History.Set(sortedPhases));
             if (!state.initialLoadMade) {
                 ctx.dispatch(new ValidationReportV2.Get(action.studyId, sortedPhases[0].taskId))
@@ -406,7 +405,8 @@ function sortViolations(violations: Violation[]): Violation[] {
 }
 
 function calculateStudyValidationStatus(report: Ws3ValidationReport): ViolationType {
-    if (report.messages.violations.length > 0) return 'ERROR'
+    const warningsFilteredOut = report.messages.violations.filter(vio => vio.type !== 'WARNING')
+    if (warningsFilteredOut.length > 0) return 'ERROR'
     else return 'SUCCESS'
 }
 
