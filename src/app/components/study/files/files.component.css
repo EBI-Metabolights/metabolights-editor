@@ -181,3 +181,17 @@ img {
   margin-left: 10px;
   margin-right: 0px;
 }
+
+.buttons-container {
+  display: flex;
+  flex-direction: row; /* Arrange items in a single row */
+  flex-wrap: nowrap;   /* Prevent items from wrapping to the next line */
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.status-badge {
+  margin-top: 5px;
+}

@@ -190,6 +190,8 @@
 </div>
 <span *ngIf="tableData && data">
   <div class="wrapper mat-elevation-z1 prevent-deselect">
+
+        <!--table start-->
     <table
       editTable
       (copy)="onCopy($event)"
@@ -284,7 +286,9 @@
         'watermark': isFirstRow(row) && templateRowPresent
       }"></tr>
     </table>
-  </div>
+        <!--table end-->
+      </div>
+  <!--empty table message end-->
   <div class="wrapper mat-elevation-z1">
     <span *ngIf="dataSource && dataSource.data.length === 0">
       <div>&nbsp;</div>
@@ -298,8 +302,10 @@
       <div>&nbsp;</div>
     </span>
   </div>
+  <!--empty table message end-->
 </span>
 
+<!--Edit column modal start-->
 <div
   class="modal prevent-deselect"
   [ngClass]="{ 'is-active': isEditColumnModalOpen }"
@@ -372,7 +378,9 @@
     </div>
   </form>
 </div>
+<!--edit column modal end-->
 
+<!--edit cell modal start-->
 <div
   class="modal editModal prevent-deselect"
   *ngIf="isEditModalOpen"
@@ -489,6 +497,9 @@
     </div>
   </form>
 </div>
+<!--edit cell modal end-->
+
+<!--Delete modal start-->
 <div
   class="modal prevent-deselect"
   [ngClass]="{ 'is-active': isDeleteModalOpen }"
@@ -512,6 +523,9 @@
     </footer>
   </div>
 </div>
+<!--Delete modal end-->
+
+<!--edit column missing modal start-->
 <div class="modal" [ngClass]="{ 'is-active': isEditColumnMissingModalOpen }">
   <div class="modal-background"></div>
   <div
@@ -554,3 +568,4 @@
     </footer>
   </div>
 </div>
+<!--edit column missing modal end-->
