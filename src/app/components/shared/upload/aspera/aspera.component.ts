@@ -67,7 +67,6 @@ export class AsperaUploadComponent implements OnInit {
     this.editorValidationRules$.subscribe((value) => {
       if (value) {
         this.validation = value[this.validationsId];
-        console.dir(this.validation.aspera)
       }
     });
     this.studyId$.pipe(filter(val => val !== null)).subscribe((value) => {
@@ -224,7 +223,6 @@ export class AsperaUploadComponent implements OnInit {
     ];
 
     const i = this.validation.aspera;
-    console.dir(i)
 
     const l = {};
     l["remote_user"] = i.user;
