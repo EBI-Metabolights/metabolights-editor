@@ -4,9 +4,10 @@ import { UntypedFormBuilder } from "@angular/forms";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 declare let AW4: any;
 
 /* the aspera code here is such a mystery that I'm afraid to tinker with it, so I'm disabling basically
@@ -25,8 +26,9 @@ declare let AW4: any;
 })
 export class AsperaUploadComponent implements OnInit {
 
-  uploadLocation$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
+  uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
   @Input("type") type = "file";
@@ -49,6 +51,7 @@ export class AsperaUploadComponent implements OnInit {
   asperaWeb: any = null;
   validation: any = null;
   videoURL: string;
+  studyId: string = null;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -65,6 +68,9 @@ export class AsperaUploadComponent implements OnInit {
       if (value) {
         this.validation = value[this.validationsId];
       }
+    });
+    this.studyId$.pipe(filter(val => val !== null)).subscribe((value) => {
+      this.studyId = value;
     });
   }
 
