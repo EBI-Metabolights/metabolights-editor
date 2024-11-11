@@ -1,19 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { NotFoundError, Observable, throwError } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { catchError } from 'rxjs/operators';
 import { httpOptions } from '../headers';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { Store } from '@ngxs/store';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
-import { AppError } from '../error/app-error';
-import { BadInput } from '../error/bad-input';
-import { ForbiddenError } from '../error/forbidden-error';
-import { InternalServerError } from '../error/internal-server-error';
-import { MaintenanceError } from '../error/maintenance-error';
-import { PermissionError } from '../error/permission-error';
+
 
 @Injectable({
   providedIn: 'root'
