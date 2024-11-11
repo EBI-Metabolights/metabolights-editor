@@ -14,7 +14,6 @@ import { Store } from '@ngxs/store';
 })
 export class FilesService extends BaseConfigDependentService {
 
-  //private studyIdentifier$: Observable<string> = this.store.selectOnce(GeneralMetadataState.id)
   id: string;
 
   constructor(
@@ -22,14 +21,12 @@ export class FilesService extends BaseConfigDependentService {
     configService: ConfigurationService,
     public store: Store) {
     super(http, configService, store);
-    //this.getId();
    }
 
   getStudyFilesFetch(force, readonly: boolean = true, suppliedId: string): Observable<IStudyFiles> {
     
     if (suppliedId === undefined) {
       console.trace();
-      
     }
     if (force) {
       return this.http
