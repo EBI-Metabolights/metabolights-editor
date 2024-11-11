@@ -181,8 +181,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   @HostListener('window:keydown', ['$event'])
   handleDeleteKeydown(event: KeyboardEvent) {
-    console.log(`event key: ${event.key}`)
-    if (['Delete', 'Backspace'].includes(event.key)) {
+    //console.log(`event key: ${event.key}`)
+    if (['Delete', 'Backspace'].includes(event.key) && !this.isEditModalOpen) {
      
       console.log(`cell: ${console.dir(this.selectedCells)}`);
       // reusing an existing method to delete cell content by instead pasting empty strings
@@ -1038,6 +1038,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.enableControlList && this.isCellTypeControlList) {
       const selectedOntology =
         this.getOntologyComponentValue("editControlListCell").values[0];
+      const debugOntology = this.getOntologyComponentValue("editOntologyCell").values[0];
+      console.dir(debugOntology)
       const value = selectedOntology ? selectedOntology.annotationValue : "";
       cellsToUpdate = [
         {
@@ -1049,7 +1051,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     } else if (this.enableControlList && this.isCellTypeOntology) {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyCell").values[0];
-
       const value = selectedOntology ? selectedOntology.annotationValue : "";
       const termSource = selectedOntology ? selectedOntology.termSource.name : "";
       const termAccession = selectedOntology ? selectedOntology.termAccession : "";

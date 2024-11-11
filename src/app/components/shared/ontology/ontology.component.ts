@@ -345,13 +345,14 @@ export class OntologyComponent implements OnInit, OnChanges {
         if (this.indexOfObject(this.values, "annotationValue", value) === -1) {
           const newOntology = new Ontology();
           newOntology.annotationValue = value.trim();
-          newOntology.termAccession = "";
+          newOntology.termAccession =
+            "http://www.ebi.ac.uk/metabolights/ontology/placeholder";
           newOntology.termSource = new OntologySourceReference();
-          newOntology.termSource.description = "";
-          newOntology.termSource.file = "";
-          newOntology.termSource.name = "";
-          newOntology.termSource.provenance_name = "";
-          newOntology.termSource.version = "";
+          newOntology.termSource.description = "User defined terms";
+          newOntology.termSource.file = "https://www.ebi.ac.uk/metabolights/";
+          newOntology.termSource.name = "MTBLS";
+          newOntology.termSource.provenance_name = "metabolights";
+          newOntology.termSource.version = "1.0";
           this.setValue(newOntology);
         }
         const inputElement = document.getElementById(

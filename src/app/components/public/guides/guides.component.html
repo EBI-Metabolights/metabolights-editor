@@ -6,7 +6,7 @@
         *ngFor="let language of languageMappings['languages']"
         [ngClass]="{ 'is-active': language['code'] == languageSelected }"
       >
-        <a (click)="setSelectedLanguage(language['code'])">{{
+        <a (click)="setSelectedLanguage(language)">{{
           language["name"]
         }}</a>
       </li>

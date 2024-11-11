@@ -97,6 +97,11 @@ export class FilesState {
 
     @Action(FilesLists.GetRawFiles)
     GetRawFiles(ctx: StateContext<FilesStateModel>, action: FilesLists.GetRawFiles) {
+        const state = ctx.getState();
+        const rfe = rawFilesDirExists(state.files)
+        if (!rfe) {
+            return
+        }
         const rawFilesObj = {
             file: "FILES/RAW_FILES/",
             createdAt: "",
@@ -104,11 +109,10 @@ export class FilesState {
             type: "",
             status: "",
             directory: true
-
         }
         this.filesService.getStudyFilesListFromLocation(action.studyId, true, rawFilesObj, null, "study").subscribe({
             next: (files) => {
-                //console.log(files);
+                console.debug('expected result');
                 ctx.dispatch(new FilesLists.SetRawFiles(files.study))
             },
             error: () => {}
@@ -162,4 +166,14 @@ export class FilesState {
     static rawFiles(state: FilesStateModel) {
         return state.rawFiles
     }
+
+
+}
+
+function rawFilesDirExists(files: IStudyFiles): boolean {
+    let exists = null;
+    const dirs = files.study.filter(obj => obj.directory === true)
+    const rawFilesObj = dirs.find(dir => dir.file === 'RAW_FILES');
+    rawFilesObj === undefined ? exists = false : exists = true;
+    return exists
 }
