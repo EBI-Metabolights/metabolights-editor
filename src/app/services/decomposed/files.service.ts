@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
 import { BaseConfigDependentService } from './base-config-dependent.service';
@@ -7,14 +7,13 @@ import { catchError } from 'rxjs/operators';
 import { httpOptions } from '../headers';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { Store } from '@ngxs/store';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class FilesService extends BaseConfigDependentService {
 
-  //private studyIdentifier$: Observable<string> = this.store.selectOnce(GeneralMetadataState.id)
   id: string;
 
   constructor(
@@ -22,14 +21,12 @@ export class FilesService extends BaseConfigDependentService {
     configService: ConfigurationService,
     public store: Store) {
     super(http, configService, store);
-    //this.getId();
    }
 
   getStudyFilesFetch(force, readonly: boolean = true, suppliedId: string): Observable<IStudyFiles> {
     
     if (suppliedId === undefined) {
       console.trace();
-      
     }
     if (force) {
       return this.http

@@ -13,28 +13,28 @@ export class DataService {
 
   public handleError(error: Response) {
     if (error.status === 400 || error.status === 417 || error.status === 412) {
-      return throwError(new BadInput(error));
+      return throwError(() => new BadInput(error));
     }
     if (error.status === 401) {
-      return throwError(new PermissionError(error));
+      return throwError(() => new PermissionError(error));
     }
     if (error.status === 403) {
-      return throwError(new ForbiddenError(error));
+      return throwError(() => new ForbiddenError(error));
     }
 
     if (error.status === 404 || error.status === 0) {
-      return throwError(new NotFoundError(error));
+      return throwError(() => new NotFoundError(error));
     }
 
     if (error.status === 500) {
-      return throwError(new InternalServerError(error));
+      return throwError(() => new InternalServerError(error));
     }
 
     if (error.status === 503) {
-      return throwError(new MaintenanceError(error));
+      return throwError(() => new MaintenanceError(error));
     }
 
-    return throwError(new AppError(error));
+    return throwError(() => new AppError(error));
   }
 
   public convertSnakeCaseToCamelCase(data: any): any {
