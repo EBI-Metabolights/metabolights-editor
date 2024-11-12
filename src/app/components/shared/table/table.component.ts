@@ -1038,8 +1038,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.enableControlList && this.isCellTypeControlList) {
       const selectedOntology =
         this.getOntologyComponentValue("editControlListCell").values[0];
-      const debugOntology = this.getOntologyComponentValue("editOntologyCell").values[0];
-      console.dir(debugOntology)
       const value = selectedOntology ? selectedOntology.annotationValue : "";
       cellsToUpdate = [
         {
