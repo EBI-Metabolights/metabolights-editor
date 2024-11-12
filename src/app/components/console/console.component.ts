@@ -83,6 +83,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   resetStudyStates() {
+    document.title = "Metabolights Editor"
     this.editorService.resetStudyStates();
   }
 

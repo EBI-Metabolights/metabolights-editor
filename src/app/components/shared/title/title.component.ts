@@ -1,20 +1,15 @@
 import {
   Component,
   OnInit,
-  Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
   inject,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
@@ -58,7 +53,7 @@ export class TitleComponent implements OnInit {
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((settings) => {this.toastrSettings = settings});
 
-    this.studyTitle$.subscribe((value) => {
+    this.studyTitle$.pipe(filter(val => val !== null)).subscribe((value) => {
       if (value === "") {
         this.title = "Please add your study title here";
       } else {
