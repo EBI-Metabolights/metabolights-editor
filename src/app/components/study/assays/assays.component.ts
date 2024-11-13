@@ -1,14 +1,16 @@
 import { Component, inject } from "@angular/core";
 import { Store } from "@ngxs/store";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { AnalyticalMethodPipe } from "./assay-analytical-method-pipe";
 
 @Component({
   selector: "mtbls-assays",
   templateUrl: "./assays.component.html",
   styleUrls: ["./assays.component.css"],
+  providers: [AnalyticalMethodPipe]
 })
 export class AssaysComponent {
 
@@ -22,15 +24,19 @@ export class AssaysComponent {
   currentSubIndex = 0;
   assaysNames: any = [];
 
-  constructor() {
+  constructor(private analyticalMethodPipe: AnalyticalMethodPipe) {
 
     this.setUpSubscriptionsNgxs();
     
   }
 
+  getLabel(val) {
+    return this.analyticalMethodPipe.transform(val);
+  }
+
 
   setUpSubscriptionsNgxs() {
-    this.assayFiles$.subscribe((assayfiles) => {
+    this.assayFiles$.pipe(filter(val => val !== null)).subscribe((assayfiles) => {
       this.studyAssayFiles = assayfiles;
       if (this.studyAssayFiles) {
         // eslint-disable-next-line @typescript-eslint/prefer-for-of

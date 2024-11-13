@@ -44,7 +44,10 @@ export class StudyComponent implements OnInit, OnDestroy {
   validation: any = {};
   obfuscationCode: string = null;
   endpoint: string = null;
-  messageExpanded = false;
+
+  reviewTimeMessageExpanded = false;
+  validationMessageExpanded = false;
+  
   baseHref: string;
   banner: string = null;
   underMaintenance = false;
@@ -145,10 +148,6 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     window.addEventListener("scroll", this.scrollFunction, true);
-  }
-
-  toggleMessage() {
-    this.messageExpanded = !this.messageExpanded;
   }
 
   selectCurrentTab(index, tab) {

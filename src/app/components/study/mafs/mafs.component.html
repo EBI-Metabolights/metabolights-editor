@@ -15,7 +15,7 @@
               (click)="selectCurrentSubTab(i)"
               [ngClass]="{ 'is-active': currentSubIndex == i }"
             >
-              <a>MAF Sheet {{ i + 1 }}</a>
+              <a>{{maf.data.file | amPipe}}</a>
             </li>
           </span>
         </ul>

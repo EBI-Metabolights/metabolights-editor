@@ -10,26 +10,52 @@
           class="column is-full tabs npt"
           style="margin-bottom: 0; padding-bottom: 0"
         >
-          <ul>
+        <mat-tab-group [(selectedIndex)]="currentSubIndex">
+          <mat-tab *ngFor="let assay of studyAssayFiles; let i = index" [label]="getLabel(assay.filename)">
+            <!-- No content here, just labels for switching tabs -->
+          </mat-tab>
+        </mat-tab-group>
+        
+        <!-- Render the assay-details components separately -->
+         <ng-container *ngIf="false">
+
+         
+        <div *ngFor="let assay of studyAssayFiles; let i = index">
+          <div *ngIf="currentSubIndex === i">
+            <span>
+            <span>
+              <assay-details
+              (assayDelete)="assayDeleted($event)"
+              [assayName]="assay.filename"
+            ></assay-details>
+            </span>
+            </span>
+          </div>
+        </div>
+      </ng-container>
+          <ul *ngIf="false">
             <span *ngFor="let assay of studyAssayFiles; let i = index">
               <li
                 (click)="selectCurrentSubTab(i)"
                 [ngClass]="{ 'is-active': currentSubIndex == i }"
               >
-                <a>Assay Sheet {{ i + 1 }}</a>
+                <a>{{ assay.filename | amPipe }}</a>
               </li>
             </span>
           </ul>
         </div>
       </div>
-      <span *ngFor="let assay of studyAssayFiles; let i = index">
-        <span *ngIf="currentSubIndex == i">
-          <assay-details
-            (assayDelete)="assayDeleted($event)"
-            [assayName]="assay.filename"
-          ></assay-details>
+      <ng-container *ngIf="true">
+        <span *ngFor="let assay of studyAssayFiles; let i = index">
+          <span *ngIf="currentSubIndex == i">
+            <assay-details
+              (assayDelete)="assayDeleted($event)"
+              [assayName]="assay.filename"
+            ></assay-details>
+          </span>
         </span>
-      </span>
+      </ng-container>
+
     </div>
     <span>
       <div>&nbsp;</div>

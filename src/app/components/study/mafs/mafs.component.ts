@@ -108,6 +108,7 @@ export class MafsComponent implements OnInit {
         this.mafNames.forEach((mafFile) => {
           this.mafs.push(value[mafFile]);
         });
+        console.dir(this.mafs);
       }
       if (value && this.mafNames.length === 0) {
         if (this.router.url.indexOf("metabolites") > -1) {
