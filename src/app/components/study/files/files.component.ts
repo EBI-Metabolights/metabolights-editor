@@ -96,7 +96,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.loadFiles();
 
     this.setUpSubscriptionsNgxs();
-    this.checkAspera();
+    //this.checkAspera();
 
   }
 
@@ -107,9 +107,6 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.asperaWeb = new AW4.Connect({
       sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
       minVersion: this.MIN_CONNECT_VERSION,
-    });
-    const t = new AW4.ConnectInstaller({
-      sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
     });
     this.asperaWeb.initSession();
 

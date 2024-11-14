@@ -35,12 +35,12 @@
         </span>
       </span>
     </span>
-    <span>
+    <!--<span>
       <div class="tags has-addons refresh-button status-badge">
         <span class="tag is-dark">Aspera Status</span><span class="tag"
         [ngClass]="{ 'is-danger': ['RETRYING', 'OUTDATED', 'FAILED', 'EXTENSION_INSTALL'].includes(asperaStatus), 'is-success': asperaStatus === 'RUNNING', 'is-grey': asperaStatus === '-' }">{{asperaStatus}}</span>
       </div>
-    </span>
+    </span>-->
 
 
     <span *ngIf="!isReadOnly && curator" class="is-pulled-rightn ml-auto">
