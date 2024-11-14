@@ -15,25 +15,9 @@
             <!-- No content here, just labels for switching tabs -->
           </mat-tab>
         </mat-tab-group>
-        
-        <!-- Render the assay-details components separately -->
-         <ng-container *ngIf="false">
 
-         
-        <div *ngFor="let assay of studyAssayFiles; let i = index">
-          <div *ngIf="currentSubIndex === i">
-            <span>
-            <span>
-              <assay-details
-              (assayDelete)="assayDeleted($event)"
-              [assayName]="assay.filename"
-            ></assay-details>
-            </span>
-            </span>
-          </div>
-        </div>
-      </ng-container>
-          <ul *ngIf="false">
+        <!--Old assay selection remove if assent given to make change-->
+          <!--<ul *ngIf="false">
             <span *ngFor="let assay of studyAssayFiles; let i = index">
               <li
                 (click)="selectCurrentSubTab(i)"
@@ -42,7 +26,8 @@
                 <a>{{ assay.filename | amPipe }}</a>
               </li>
             </span>
-          </ul>
+          </ul>-->
+          
         </div>
       </div>
       <ng-container *ngIf="true">

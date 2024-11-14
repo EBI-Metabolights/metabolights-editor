@@ -9,6 +9,12 @@
         class="column is-full tabs npt"
         style="margin-bottom: 0; padding-bottom: 0"
       >
+      <mat-tab-group [(selectedIndex)]="currentSubIndex">
+        <mat-tab *ngFor="let maf of renderedMafNames; let i = index" [label]="maf">
+          <!-- No content here, just labels for switching tabs -->
+        </mat-tab>
+      </mat-tab-group>
+      <!--old nav 
         <ul>
           <span *ngFor="let maf of mafs; let i = index">
             <li
@@ -18,7 +24,7 @@
               <a>{{maf.data.file | amPipe}}</a>
             </li>
           </span>
-        </ul>
+        </ul>-->
       </div>
     </div>
     <span *ngFor="let maf of mafs; let i = index">

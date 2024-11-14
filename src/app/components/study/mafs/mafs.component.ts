@@ -6,11 +6,14 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
+import { NumberDuplicatesPipe } from "../assays/number-duplicate-methods-pipe";
+import { AnalyticalMethodPipe } from "../assays/assay-analytical-method-pipe";
 
 @Component({
   selector: "mtbls-mafs",
   templateUrl: "./mafs.component.html",
   styleUrls: ["./mafs.component.css"],
+  providers: [AnalyticalMethodPipe, NumberDuplicatesPipe]
 })
 export class MafsComponent implements OnInit {
   @Input("assayName") assayName: any;
@@ -22,14 +25,16 @@ export class MafsComponent implements OnInit {
 
 
   assays: any = [];
-  mafs: any = [];
-  mafNames: any = [];
+  
+  mafs: Record<string, any> = [];
+  mafNames: string[] = [];
+  renderedMafNames: string[] = [];
   studyAssayFiles: any = [];
   currentSubIndex = 0;
   loading = false;
   requestedStudy: string = null;
 
-  constructor(public router: Router) {}
+  constructor(public router: Router, private analyticalMethodPipe: AnalyticalMethodPipe, private numberDuplicatesPipe: NumberDuplicatesPipe) {}
 
   ngOnInit() {
     this.mafs = [];
@@ -95,11 +100,19 @@ export class MafsComponent implements OnInit {
                 mafFile.indexOf("m_") === 0
               ) {
                 this.mafNames.push(mafFile);
+                
               }
             });
           }
         }
       });
+      if (this.mafNames.length > 0) {
+
+        this.renderedMafNames = this.numberDuplicatesPipe.transform(
+          this.mafNames.map(val => this.analyticalMethodPipe.transform(val))
+        )
+        console.log(this.mafNames)
+      }
     }
 
     this.studyMAFs$.subscribe((value) => {
@@ -108,7 +121,6 @@ export class MafsComponent implements OnInit {
         this.mafNames.forEach((mafFile) => {
           this.mafs.push(value[mafFile]);
         });
-        console.dir(this.mafs);
       }
       if (value && this.mafNames.length === 0) {
         if (this.router.url.indexOf("metabolites") > -1) {

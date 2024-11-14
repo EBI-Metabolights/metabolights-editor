@@ -43,7 +43,6 @@ export class AssaysComponent {
         this.assaysNames = this.numberDuplicatesPipe.transform(
           this.studyAssayFiles.map(val => this.analyticalMethodPipe.transform(val.filename))
         );
-        console.log(this.assaysNames);
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.studyAssayFiles.length; i++) {
           if (this.studyAssayFiles.length !== this.assays.length) this.assays.push({});
