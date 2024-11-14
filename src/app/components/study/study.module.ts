@@ -67,6 +67,7 @@ import { ValidationSectionComponent } from "./validations-v2/validation-section/
 import { ValidationsV2ParentComponent } from "./validations-v2/validations-v2-parent/validations-v2-parent.component";
 import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box/validation-task-box.component";
 import { AnalyticalMethodPipe } from "./assays/assay-analytical-method-pipe";
+import { NumberDuplicatesPipe } from "./assays/number-duplicate-methods-pipe";
 
 @NgModule({
   declarations: [
@@ -100,7 +101,8 @@ import { AnalyticalMethodPipe } from "./assays/assay-analytical-method-pipe";
     ValidationSectionComponent,
     NoViolationsComponent,
     ValidationTaskBoxComponent,
-    AnalyticalMethodPipe
+    AnalyticalMethodPipe,
+    NumberDuplicatesPipe
   ],
   imports: [
     CommonModule,
@@ -168,7 +170,8 @@ import { AnalyticalMethodPipe } from "./assays/assay-analytical-method-pipe";
     ValidationSectionComponent,
     NoViolationsComponent,
     ValidationTaskBoxComponent,
-    AnalyticalMethodPipe
+    AnalyticalMethodPipe,
+    NumberDuplicatesPipe
 
   ],
   providers: [

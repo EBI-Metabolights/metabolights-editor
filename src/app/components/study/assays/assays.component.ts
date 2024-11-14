@@ -5,12 +5,13 @@ import { filter, Observable } from "rxjs";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { AnalyticalMethodPipe } from "./assay-analytical-method-pipe";
+import { NumberDuplicatesPipe } from "./number-duplicate-methods-pipe";
 
 @Component({
   selector: "mtbls-assays",
   templateUrl: "./assays.component.html",
   styleUrls: ["./assays.component.css"],
-  providers: [AnalyticalMethodPipe]
+  providers: [AnalyticalMethodPipe, NumberDuplicatesPipe]
 })
 export class AssaysComponent {
 
@@ -24,14 +25,14 @@ export class AssaysComponent {
   currentSubIndex = 0;
   assaysNames: any = [];
 
-  constructor(private analyticalMethodPipe: AnalyticalMethodPipe) {
+  constructor(private analyticalMethodPipe: AnalyticalMethodPipe, private numberDuplicatesPipe: NumberDuplicatesPipe) {
 
     this.setUpSubscriptionsNgxs();
     
   }
 
   getLabel(val) {
-    return this.analyticalMethodPipe.transform(val);
+    return this.numberDuplicatesPipe.transform(val);
   }
 
 
@@ -39,6 +40,10 @@ export class AssaysComponent {
     this.assayFiles$.pipe(filter(val => val !== null)).subscribe((assayfiles) => {
       this.studyAssayFiles = assayfiles;
       if (this.studyAssayFiles) {
+        this.assaysNames = this.numberDuplicatesPipe.transform(
+          this.studyAssayFiles.map(val => this.analyticalMethodPipe.transform(val.filename))
+        );
+        console.log(this.assaysNames);
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
         for (let i = 0; i < this.studyAssayFiles.length; i++) {
           if (this.studyAssayFiles.length !== this.assays.length) this.assays.push({});

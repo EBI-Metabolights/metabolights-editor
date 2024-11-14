@@ -11,7 +11,7 @@
           style="margin-bottom: 0; padding-bottom: 0"
         >
         <mat-tab-group [(selectedIndex)]="currentSubIndex">
-          <mat-tab *ngFor="let assay of studyAssayFiles; let i = index" [label]="getLabel(assay.filename)">
+          <mat-tab *ngFor="let assay of assaysNames; let i = index" [label]="assay">
             <!-- No content here, just labels for switching tabs -->
           </mat-tab>
         </mat-tab-group>

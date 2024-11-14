@@ -7,7 +7,11 @@ export class AnalyticalMethodPipe implements PipeTransform {
   transform(value: string): string {
     // Add transformation logic here
     let modifiedValue = null;
-    modifiedValue = value.split('_').slice(2).join('_').replace("_metabolite_profiling.txt", "").replace("_", " ").replace("_", " ");
+    modifiedValue = value.split('_').slice(2).join('_')
+      .replace("_metabolite_profiling.txt", "")
+      .replace(/_metabolite_profiling-\d+\.txt/, "")
+      .replace("_", " ")
+      .replace("_", " ").trimRight();
 
     return modifiedValue;
   }
