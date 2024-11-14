@@ -28,7 +28,7 @@
       </div>
     </div>
     <span *ngFor="let maf of mafs; let i = index">
-      <span *ngIf="currentSubIndex == i">
+      <span class="fadeIn animated" *ngIf="currentSubIndex == i">
         <mtbls-maf [value]="maf"></mtbls-maf>
       </span>
     </span>

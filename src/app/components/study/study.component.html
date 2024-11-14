@@ -127,25 +127,28 @@
           please contact us if you have any specific requirements.
         </div>
       </article>
-      <article class="message is-small has-shadow">
-        <div (click)="validationMessageExpanded = !validationMessageExpanded" class="message-header">
-          <p>
-            <span class="material-icons">warning</span>&nbsp;Your study has passed validation and should be moved to 'In Curation'
-          </p>
-          <button
-          style="background-color: transparent; border: 0"
-          (click)="validationMessageExpanded = !validationMessageExpanded"
-        >
-          <span class="material-icons">
-            {{validationMessageExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
-          </span>
-        </button>
-        </div>
-        <div *ngIf="validationMessageExpanded" class="message-body">
-          Your study can not be made public nor receive manual curation until the status has been changed to 'In Curation'. 
-          This status change is not an automatic result of passing the validation pipeline. Click the status label below to change the status of your study.
-        </div>
-      </article>
+      <ng-container *ngIf="validation !== null">
+        <article *ngIf="status == 'Submitted' && validation.status !== 'error'" class="message is-small has-shadow">
+          <div (click)="validationMessageExpanded = !validationMessageExpanded" class="message-header">
+            <p>
+              <span class="material-icons">warning</span>&nbsp;Your study has passed validation and should be moved to 'In Curation'
+            </p>
+            <button
+            style="background-color: transparent; border: 0"
+            (click)="validationMessageExpanded = !validationMessageExpanded"
+          >
+            <span class="material-icons">
+              {{validationMessageExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}
+            </span>
+          </button>
+          </div>
+          <div *ngIf="validationMessageExpanded" class="message-body">
+            Your study can not be made public nor receive manual curation until the status has been changed to 'In Curation'. 
+            This status change is not an automatic result of passing the validation pipeline. Click the status label below to change the status of your study.
+          </div>
+        </article>
+      </ng-container>
+
       <div *ngIf="banner" style="margin: 0 0 5px 0">
         <div class="col-md-12 ">
           <div class="banner"[innerHTML]="banner"></div>
