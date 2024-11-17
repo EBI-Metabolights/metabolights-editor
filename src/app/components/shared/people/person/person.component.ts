@@ -3,31 +3,23 @@ import {
   Component,
   OnInit,
   Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
   ViewChild,
+  inject,
 } from "@angular/core";
-import { MTBLSComment } from "../../../../models/mtbl/mtbls/common/mtbls-comment";
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
-import { tassign } from "tassign";
 import * as toastr from "toastr";
-
-import { JsonConvert, OperationMode, ValueCheckingMode } from "json2typescript";
-
+import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
-import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
-import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 
 @Component({
   selector: "mtbls-person",
@@ -50,11 +42,11 @@ export class PersonComponent implements OnInit {
   @Input("value") person: MTBLSPerson;
 
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
-
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
 
   isReadOnly = false;
@@ -86,7 +78,6 @@ export class PersonComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private generalMetadataService: GeneralMetadataService,
     private store: Store
   ) {
     this.setUpSubscriptionsNgxs();

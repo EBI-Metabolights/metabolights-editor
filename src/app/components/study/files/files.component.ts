@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Component, OnInit, Input, OnDestroy, OnChanges } from "@angular/core";
+import { Component, OnInit, Input, OnChanges, inject } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
-import { environment } from "src/environments/environment";
-import { FtpManagementService } from "src/app/services/ftp-management.service";
-import { CommonModule, PlatformLocation } from '@angular/common';
+import { PlatformLocation } from '@angular/common';
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
-import { Observable } from "rxjs";
+import { Store } from "@ngxs/store";
+import { Observable, timer } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { GetGeneralMetadata } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { SyncEvent } from "./rsync/rsync.component";
+declare let AW4: any;
+
 
 
 
@@ -24,10 +24,10 @@ import { SyncEvent } from "./rsync/rsync.component";
 })
 export class FilesComponent implements OnInit,  OnChanges {
   
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
 
@@ -78,6 +78,11 @@ export class FilesComponent implements OnInit,  OnChanges {
   MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES', 'ARCHIVED_AUDIT_FILES'];
   MANAGED_SUB_FOLDERS=['AUDIT_FILES/ARCHIVED_AUDIT_FILES', "INTERNAL_FILES/logs"];
 
+  MIN_CONNECT_VERSION = "3.6.0.0";
+  CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
+  asperaWeb: any = null;
+  asperaStatus: any = "-";
+
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
@@ -91,15 +96,34 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.loadFiles();
 
     this.setUpSubscriptionsNgxs();
+    //this.checkAspera();
 
   }
 
   ngOnChanges(changes) {
   }
 
+  checkAspera() {
+    this.asperaWeb = new AW4.Connect({
+      sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
+      minVersion: this.MIN_CONNECT_VERSION,
+    });
+    this.asperaWeb.initSession();
 
-
-
+    const initAsperaStatus = this.asperaWeb.getStatus();
+    const timerSub = timer(5000);
+    if (initAsperaStatus === "INITIALIZING") {
+      timerSub.subscribe((n) => {
+        this.asperaStatus = this.asperaWeb.getStatus();
+        }
+      )
+    } else if (initAsperaStatus === "RUNNING") {
+      this.asperaStatus = initAsperaStatus
+    } else {
+      this.asperaStatus = initAsperaStatus
+    }
+    
+  }
 
 
   setUpSubscriptionsNgxs() {

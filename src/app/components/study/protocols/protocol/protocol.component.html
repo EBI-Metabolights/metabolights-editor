@@ -17,6 +17,7 @@
           (dblclick)="toggleExpand()"
           class="is-pulled-left"
           style="user-select: none"
+          [ngClass]="{'bold-text': isCoreProtocol(protocol.name)}"
         >
           {{ protocol.name }} 
         </p>
@@ -216,7 +217,12 @@
                     {{ form.get("name").errors.name.error }}
                   </mat-error>
                 </mat-form-field>
-                <div>&nbsp;</div>
+                <div *ngIf="guideText !== ''">
+                  <div>&nbsp;</div>
+                  <span><i>{{guideText}}</i></span>
+                  <div>&nbsp;</div>
+                </div>
+
                 <span *ngIf="form.get('description')">
                   <!-- <div *ngIf="form.get('description').value != ''" class="is-clearfix">
                     </div>  -->

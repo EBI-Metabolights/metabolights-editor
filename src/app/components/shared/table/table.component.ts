@@ -10,22 +10,22 @@ import {
   EventEmitter,
   AfterViewChecked,
   OnChanges,
+  inject,
+  HostListener,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTable, MatTableDataSource } from "@angular/material/table";
 import { OntologySourceReference } from "./../../../models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
-import { MatChipInputEvent } from "@angular/material/chips";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
 import { ClipboardService } from "ngx-clipboard";
 import * as toastr from "toastr";
 import { tassign } from "tassign";
-import { Observable } from "rxjs";
-import { Select, Store } from "@ngxs/store";
+import { filter, Observable } from "rxjs";
+import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
@@ -35,6 +35,7 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -58,11 +59,11 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
 
-  @Select(FilesState.files) studyFiles$: Observable<IStudyFiles>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
-
+  studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -72,6 +73,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ];
 
   private toastrSettings: Record<string, any> = null;
+
+  private studyId: string;
 
   rowsToAdd: any = 1;
   isReadOnly = true;
@@ -100,7 +103,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   fileColumns: any = [];
   controlListColumns: Map<string, any> = new Map<string, any>();
   controlListNames: Map<string, string> = new Map<string, string>();
-  controlLists: Map<string, {name: string; values: Ontology[]}> = new Map<string, {name: string; values: Ontology[]}>();
+  controlLists: Map<string, { name: string; values: Ontology[] }> = new Map<string, { name: string; values: Ontology[] }>();
   ontologyColumns: any = [];
   isFormBusy = false;
   isCellTypeFile = false;
@@ -121,12 +124,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   isDeleteModalOpen = false;
   editCellform: UntypedFormGroup;
   editColumnform: UntypedFormGroup;
-  defaultControlList = Object.freeze({name: "", values: Object.freeze([])});
+  defaultControlList = Object.freeze({ name: "", values: Object.freeze([]) });
   selectedMissingCol = null;
   selectedMissingKey = null;
   selectedMissingVal = null;
   isEditColumnMissingModalOpen = false;
-  assayTechnique: {name: string; sub: string; main: string} = {name: null, sub:null, main:null};
+  assayTechnique: { name: string; sub: string; main: string } = { name: null, sub: null, main: null };
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
   ontologies = [];
   hit = false;
@@ -138,15 +141,27 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     private assayService: AssaysService,
     private store: Store
   ) {
-    this.baseHref =this.editorService.configService.baseHref;
+    this.baseHref = this.editorService.configService.baseHref;
   }
 
   ngOnInit() {
     this.setUpSubscriptionsNgxs();
+    if (localStorage.getItem(this.data.file) !== null) {
+      this.view = localStorage.getItem(this.data.file);
+      if (this.view === "expanded") {
+        this.displayedTableColumns = Object.keys(this.data.header);
+      }
+    } else {
+      localStorage.setItem(this.data.file, 'compact')
+    }
   }
 
   setUpSubscriptionsNgxs() {
-    this.toastrSettings$.subscribe(value => this.toastrSettings = value)
+    this.toastrSettings$.subscribe(value => this.toastrSettings = value);
+
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+      this.studyId = value;
+    })
 
 
     this.editorValidationRules$.subscribe((value) => {
@@ -164,25 +179,28 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
   }
 
+  @HostListener('window:keydown', ['$event'])
+  handleDeleteKeydown(event: KeyboardEvent) {
+    //console.log(`event key: ${event.key}`)
+    if (['Delete', 'Backspace'].includes(event.key) && !this.isEditModalOpen) {
+     
+      console.log(`cell: ${console.dir(this.selectedCells)}`);
+      // reusing an existing method to delete cell content by instead pasting empty strings
+      if (this.selectedCells.length > 0) this.savePastedCellContent(new ClipboardEvent('paste'), null, true)
+    }
+  }
+
   isFirstRow(row: any): boolean {
     return this.dataSource.data.indexOf(row) === 0;
   }
 
 
   getFiles(header) {
-    // if(this.fileColumns.indexOf(header) > -1){
-    // 	if(this.data.header[header]){
-    // 		let type = this.data.header[header]['file-type']
-    // 		return this.files.filter(file => {
-    // 			return file.type === type
-    // 		})
-    // 	}
-    // }
     return this.files;
   }
 
   getControlList(header) {
-    if(this.controlListColumns.has(header)){
+    if (this.controlListColumns.has(header)) {
 
     }
     return [];
@@ -300,7 +318,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
       const navigator = window.navigator;
       navigator.clipboard.writeText(content).then(
-        () => {},
+        () => { },
         (err) => {
           console.error("Async: Could not copy text: ", err);
         }
@@ -326,14 +344,15 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     return false;
   }
 
-  savePastedCellContent(e, pvalue) {
+  savePastedCellContent(e, pvalue, deleting: boolean = false) {
     const cellsToUpdate = [];
     if (!this.isEditModalOpen) {
       if (this.selectedCells.length === 1) {
         const clipboardData = e.clipboardData
           ? e.clipboardData
           : (window as any).clipboardData;
-        const pastedValues = clipboardData.getData("Text").split(/\r\n|\n|\r/);
+        let pastedValues = null
+        deleting ? pastedValues = [""] : pastedValues = clipboardData.getData("Text").split(/\r\n|\n|\r/);
         let currentRow = this.selectedCells[0][1];
         pastedValues.forEach((value) => {
           if (currentRow < this.data.rows.length) {
@@ -367,7 +386,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
             this.data.rows.forEach((value) => {
               if (currentRow < this.data.rows.length) {
-                if(skipFirstIteration) {
+                if (skipFirstIteration) {
                   skipFirstIteration = false;
                   return
                 }
@@ -420,7 +439,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (cellsToUpdate.length > 0) {
       this.isFormBusy = true;
       let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-      this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+      this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe(
         (completed) => {
           toastr.success("Cells updated successfully", "Success", this.toastrSettings);
           this.isEditModalOpen = false;
@@ -456,16 +475,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           && "ontology-details" in definition
           && "recommended-ontologies" in definition["ontology-details"]
           && definition["ontology-details"]["recommended-ontologies"]) {
-            const prefix = definition["ontology-details"]["recommended-ontologies"].ontology?.url;
-            let branch = "";
-            const branchParam = prefix.split("branch=");
-            if (branchParam.length > 1) {
-              branch = decodeURI(branchParam[1].split("&")[0]);
-            }
-            if (branch.length > 0) {
-              this.controlListNames.set(col, branch);
-              this.controlListColumns.set(col, Object.freeze(definition));
-            }
+          const prefix = definition["ontology-details"]["recommended-ontologies"].ontology?.url;
+          let branch = "";
+          const branchParam = prefix.split("branch=");
+          if (branchParam.length > 1) {
+            branch = decodeURI(branchParam[1].split("&")[0]);
+          }
+          if (branch.length > 0) {
+            this.controlListNames.set(col, branch);
+            this.controlListColumns.set(col, Object.freeze(definition));
+          }
         }
       }
     });
@@ -474,10 +493,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   toggleView() {
     if (this.view === "compact") {
       this.displayedTableColumns = Object.keys(this.data.header);
+      this.displayedTableColumns.unshift("Select")
       this.view = "expanded";
+      localStorage.setItem(this.data.file, 'expanded')
     } else {
       this.displayedTableColumns = this.data.displayedColumns;
       this.view = "compact";
+      localStorage.setItem(this.data.file, 'compact')
+
     }
   }
 
@@ -526,7 +549,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           (this.isEmpty(row[this.ontologyCols[column].ref]) ||
             this.isEmpty(row[this.ontologyCols[column].accession]))
         ) {
-          if (!this.ontologyCols[column].missingTerms.has(row[column])){
+          if (!this.ontologyCols[column].missingTerms.has(row[column])) {
             this.ontologyCols[column].missingTerms.add(row[column]);
           }
         }
@@ -537,16 +560,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         const lowerCaseValue = row[column].trim().toLowerCase();
         if (term.length > 0 && ref.length > 0 && accession.length > 0) {
 
-            const key = term +":"+ ref +":" + accession;
-            if (!(possibleValueKeys.has(lowerCaseValue))){
-              possibleValueKeys.set(lowerCaseValue, new Set<string>());
-              possibleValues.set(lowerCaseValue, []);
-            }
-            if (!possibleValueKeys.get(lowerCaseValue).has(key)) {
-              possibleValues.get(lowerCaseValue).push([ref, accession, term]);
-              possibleValueKeys.get(lowerCaseValue).add(key);
-            }
-            this.ontologyCols[column].values.set(row[column], possibleValues.get(lowerCaseValue));
+          const key = term + ":" + ref + ":" + accession;
+          if (!(possibleValueKeys.has(lowerCaseValue))) {
+            possibleValueKeys.set(lowerCaseValue, new Set<string>());
+            possibleValues.set(lowerCaseValue, []);
+          }
+          if (!possibleValueKeys.get(lowerCaseValue).has(key)) {
+            possibleValues.get(lowerCaseValue).push([ref, accession, term]);
+            possibleValueKeys.get(lowerCaseValue).add(key);
+          }
+          this.ontologyCols[column].values.set(row[column], possibleValues.get(lowerCaseValue));
 
         }
       });
@@ -554,7 +577,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   hasAnyMissingValues() {
-    if(this.enableControlList) {
+    if (this.enableControlList) {
       let hasMV = false;
       Object.keys(this.ontologyCols).forEach((key) => {
         if (this.ontologyCols[key].missingTerms.size > 0) {
@@ -639,19 +662,19 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   addColumns(columns) {
     this.isFormBusy = true;
-    this.store.dispatch(new Samples.AddColumns(this.data.file, { data: columns}, null)).subscribe(
-      (completed) => {
+    this.store.dispatch(new Samples.AddColumns(this.data.file, { data: columns }, this.studyId)).subscribe({
+      next: (completed) => {
         this.isFormBusy = false;
         toastr.success("Characteristic/Factor columns added successfully", "Success", this.toastrSettings);
         this.isFormBusy = false;
         return true;
       },
-      (error) => {
+      error: (error) => {
         console.log(error);
         this.isFormBusy = false;
         return false;
       }
-    )
+    })
   }
 
   addNRows() {
@@ -681,32 +704,36 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   updateRows(rows) {
     this.isFormBusy = true;
     let actionClass = this.getTableUpdateAction('update', this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, { data: rows }, null)).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, { data: rows }, null, this.studyId)).subscribe({
+      next: () => {
+
+      },
+      error: (error) => {
+        this.isFormBusy = false;
+      },
+      complete: () => {
         toastr.success("Row updated successfully", "Success", this.toastrSettings);
         this.isFormBusy = false;
       },
-      (error) => {
-        this.isFormBusy = false;
-      }
-    )
-    
+    })
+
 
   }
 
   addRows(rows, index, tableType?: TableType) {
     this.isFormBusy = true;
-    if (tableType === undefined) { tableType = this.getTableType(this.data.file)}
+    if (tableType === undefined) { tableType = this.getTableType(this.data.file) }
     let actionClass = this.getTableUpdateAction('add', tableType)
-      this.store.dispatch(new actionClass(this.data.file, { data: { rows, index: index ? index : 0 } }, null)).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, { data: { rows, index: index ? index : 0 } }, null, this.studyId)).subscribe({
+      next: (completed) => {
         toastr.success(`Rows added successfully to the end of the ${tableType} sheet`, "Success", this.toastrSettings);
         this.rowsUpdated.emit();
         this.isFormBusy = false;
       },
-      (error) => {
+      error: (error) => {
         this.isFormBusy = false;
       }
+    }
     )
   }
 
@@ -717,12 +744,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   getTableUpdateAction(action: TableRowAction, tableType: TableType): any {
-    switch(action) {
+    switch (action) {
       case 'add':
         if (tableType === 'samples') return Samples.AddRows
         if (tableType === 'assay') return Assay.AddRows
         if (tableType === 'maf') return MAF.AddRows
-      case 'update': 
+      case 'update':
         if (tableType === 'maf') return MAF.UpdateRows
       case 'delete':
         if (tableType === 'samples') return Samples.DeleteRows
@@ -732,13 +759,13 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   getTableColumnUpdateAction(action: TableColumnAction, tableType: TableType) {
-    switch(action) {
+    switch (action) {
       case 'add':
         if (tableType === 'samples') return Samples.AddColumns
         if (tableType === 'assay') return Assay.AddColumn
       case 'delete':
-        //if (tableType === 'samples') return Samples
-        //if (tableType === 'assay') return Assay
+      //if (tableType === 'samples') return Samples
+      //if (tableType === 'assay') return Assay
     }
   }
 
@@ -777,16 +804,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   deleteSelectedRows() {
     this.isFormBusy = true;
     let actionClass = this.getTableUpdateAction('delete', this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, this.getUnique(this.selectedRows).join(","))).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, this.getUnique(this.selectedRows).join(","), this.studyId)).subscribe({
+      next: (completed) => {
         this.isDeleteModalOpen = false;
-        toastr.success("Rows delete successfully", "Success", this.toastrSettings);
+        toastr.success("Rows deleted successfully", "Success", this.toastrSettings);
         this.rowsUpdated.emit();
         this.isFormBusy = false;
       },
-      (error) => {
+      error: (error) => {
         this.isFormBusy = false;
       }
+    }
     )
   }
 
@@ -851,6 +879,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   headerClick(column: any, event) {
+    console.dir(column);
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;
@@ -965,12 +994,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
       // }
-      if(this.enableControlList) {
+      if (this.enableControlList) {
         if (this.controlListColumns.size === 0
           && this.validations && this.validation && this.data && this.data.header) {
           this.detectControlListColumns();
         }
-        if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string" ) {
+        if (this.controlListColumns.has(column.header) && this.controlListColumns.get(column.header)["data-type"] === "string") {
           this.isCellTypeControlList = true;
           this.cellControlListValue();
         } else if (this.ontologyColumns.indexOf(column.header) > -1) {
@@ -1020,7 +1049,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     } else if (this.enableControlList && this.isCellTypeOntology) {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyCell").values[0];
-
       const value = selectedOntology ? selectedOntology.annotationValue : "";
       const termSource = selectedOntology ? selectedOntology.termSource.name : "";
       const termAccession = selectedOntology ? selectedOntology.termAccession : "";
@@ -1060,17 +1088,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
     this.isFormBusy = true;
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
-      (completed) => {
+    this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe({
+      next: (completed) => {
         toastr.success("Cells updated successfully", "Success", this.toastrSettings);
         this.isEditModalOpen = false;
         this.isFormBusy = false
       },
-      (error) => {
+      error: (error) => {
         console.error(error);
         this.isFormBusy = false;
       }
-    )
+    })
   }
 
   saveColumnSelectedMissingRowsValues() {
@@ -1078,7 +1106,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       "editMissingOntology"
     ).values[0];
     const validOntology = selectedMissingOntology?.termSource?.name?.length > 0;
-    if (!validOntology){
+    if (!validOntology) {
       return;
     }
 
@@ -1130,20 +1158,20 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
     this.isFormBusy = true;
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
-      (completed) => {
-          toastr.success("Cells updated successfully", "Success", this.toastrSettings);
-          this.closeEditMissingColValModal();
-          if(this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)){
-            this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
-          }
-          this.isFormBusy = false;
-        },
-        (err) => {
-          console.error(err);
-          this.isFormBusy = false;
+    this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe({
+      next: (completed) => {
+        toastr.success("Cells updated successfully", "Success", this.toastrSettings);
+        this.closeEditMissingColValModal();
+        if (this.selectedMissingCol.missingTerms.has(selectedMissingOntology.annotationValue)) {
+          this.selectedMissingCol.missingTerms.delete(selectedMissingOntology.annotationValue);
         }
-      )
+        this.isFormBusy = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isFormBusy = false;
+      }
+    })
 
   }
 
@@ -1169,6 +1197,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       const selectedOntology =
         this.getOntologyComponentValue("editOntologyColumn").values[0];
 
+      const value = selectedOntology ? selectedOntology.annotationValue : "";
+      const termSource = selectedOntology ? selectedOntology.termSource.name : "";
+      const termAccession = selectedOntology ? selectedOntology.termAccession : "";
+
       sRows.forEach((row) => {
         if (skipFirstIteration) {
           skipFirstIteration = false;
@@ -1178,17 +1210,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           {
             row: row.index,
             column: columnIndex,
-            value: selectedOntology.annotationValue,
+            value: value,
           },
           {
             row: row.index,
             column: columnIndex + 1,
-            value: selectedOntology.termSource.name,
+            value: termSource,
           },
           {
             row: row.index,
             column: columnIndex + 2,
-            value: selectedOntology.termAccession,
+            value: termAccession,
           }
         );
       });
@@ -1210,7 +1242,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.isFormBusy = true;
 
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+    this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe(
       (completed) => {
         toastr.success("Cells updated successfully.", "Success", this.toastrSettings);
         this.isEditColumnModalOpen = false;
@@ -1237,9 +1269,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       newOntology.termSource = new OntologySourceReference();
       const value = this.selectedCell["row"][this.selectedCell["column"].header];
       newOntology.annotationValue = value;
-      if (this.controlListNames.has(selectedCellColumn)){
+      if (this.controlListNames.has(selectedCellColumn)) {
         const controlListName = this.controlListNames.get(selectedCellColumn);
-        if (controlListName in this.editorService.defaultControlLists){
+        if (controlListName in this.editorService.defaultControlLists) {
           const defaultControlList = this.editorService.defaultControlLists[controlListName].OntologyTerm;
           const values = defaultControlList.filter((val) => val.annotationValue === value);
           if (values.length > 0) {
@@ -1297,7 +1329,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   getValidationDefinition(header) {
     let selectedColumn = null;
     if (this.tableData?.data?.file && this.tableData.data.file.startsWith("a_") && this.assayTechnique.name === null) {
-      const result = this.assayService.extractAssayDetails(this.tableData);
+      const result = this.assayService.extractAssayDetails(this.tableData, this.studyId);
       this.assayTechnique.name = result.assayTechnique?.name;
       this.assayTechnique.sub = result.assaySubTechnique?.name;
       this.assayTechnique.main = result.assayMainTechnique?.name;
@@ -1307,9 +1339,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     this.validation.default_order.forEach((col) => {
       if (col.header === header) {
         if (this.assayTechnique.name !== null && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
-          if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1 ){
+          if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1) {
             selectedColumn = col;
-            if (techniqueSpecificColumn === null ) {
+            if (techniqueSpecificColumn === null) {
               techniqueSpecificColumn = col;
             }
           }
@@ -1321,14 +1353,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
   columnControlList(header) {
-    if (this.enableControlList && header && this.controlListNames.has(header)){
+    if (this.enableControlList && header && this.controlListNames.has(header)) {
       if (this.controlLists.has(header)) {
         return this.controlLists.get(header);
       } else {
         const controlListName = this.controlListNames.get(header);
         if (controlListName in this.editorService.defaultControlLists) {
           const ontologies = this.editorService.defaultControlLists[controlListName].OntologyTerm;
-          this.controlLists.set(header, {name: header, values: ontologies});
+          this.controlLists.set(header, { name: header, values: ontologies });
           return this.controlLists.get(header);
         }
       }
@@ -1340,10 +1372,10 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   columnValidations(header) {
-    if (this.enableControlList && header && this.controlListColumns.size > 0 && this.controlListColumns.has(header)){
+    if (this.enableControlList && header && this.controlListColumns.size > 0 && this.controlListColumns.has(header)) {
       return this.controlListColumns.get(header)["ontology-details"];
     }
-    if (this.enableControlList){
+    if (this.enableControlList) {
       return this.validations.default_ontology_validation["ontology-details"];
     }
     return {};
@@ -1454,12 +1486,12 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     });
     this.isFormBusy = true;
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
-    this.store.dispatch(new actionClass(this.data.file, {data: cellsToUpdate})).subscribe(
+    this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe(
       (completed) => {
         toastr.success("Cells updated successfully.", "Success", this.toastrSettings);
         this.isEditColumnModalOpen = false;
         this.isFormBusy = false;
-        if(col.missingTerms.has(val)){
+        if (col.missingTerms.has(val)) {
           col.missingTerms.delete(val);
         }
       },
@@ -1476,7 +1508,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])) { }
       return tempValidations;
     }
     return this.validations[this.validationsId];
@@ -1545,7 +1577,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     );
   }
 
-  onChanges() {}
+  onChanges() { }
 
   triggerChanges() {
     this.updated.emit();
@@ -1563,4 +1595,5 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       }
     }
   }
+
 }

@@ -1,6 +1,6 @@
 import { Store } from "@ngxs/store";
 import { CommonModule } from "@angular/common";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
@@ -30,6 +30,7 @@ import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { GuidesComponent } from "./guides.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("GuidesComponent", () => {
   let component: GuidesComponent;
@@ -38,41 +39,40 @@ describe("GuidesComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [GuidesComponent],
-      imports: [
-        RouterTestingModule,
-        HttpClientTestingModule,
+    declarations: [GuidesComponent],
+    imports: [RouterTestingModule,
         CommonModule,
         BrowserModule,
         FormsModule,
-        ReactiveFormsModule,
-      ],
-      providers: [
+        ReactiveFormsModule],
+    providers: [
         Store,
         {
-          provide: Router,
-          useFactory: setupTestingRouter,
-          deps: [
-            UrlSerializer,
-            ChildrenOutletContexts,
-            Location,
-            NgModuleFactoryLoader,
-            Compiler,
-            Injector,
-            ROUTES,
-            ROUTER_CONFIGURATION,
-            [UrlHandlingStrategy, new Optional()],
-            [RouteReuseStrategy, new Optional()],
-          ],
+            provide: Router,
+            useFactory: setupTestingRouter,
+            deps: [
+                UrlSerializer,
+                ChildrenOutletContexts,
+                Location,
+                NgModuleFactoryLoader,
+                Compiler,
+                Injector,
+                ROUTES,
+                ROUTER_CONFIGURATION,
+                [UrlHandlingStrategy, new Optional()],
+                [RouteReuseStrategy, new Optional()],
+            ],
         },
         { provide: EditorService, useClass: MockEditorService },
         { provide: Location, useClass: SpyLocation },
         {
-          provide: ConfigurationService,
-          useClass: MockConfigurationService,
+            provide: ConfigurationService,
+            useClass: MockConfigurationService,
         },
-      ],
-    });
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+});
     configService = TestBed.inject(ConfigurationService);
     configService.loadConfiguration();
     TestBed.compileComponents();

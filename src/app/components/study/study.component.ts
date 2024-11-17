@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, inject, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { EditorService } from "./../../services/editor.service";
 import { Router } from "@angular/router";
@@ -23,16 +23,16 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 })
 export class StudyComponent implements OnInit, OnDestroy {
 
-  @Select(TransitionsState.currentTabIndex) currentTabIndex$: Observable<string>;
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.status) studyStatus$: Observable<string>;
-  @Select(GeneralMetadataState.curationRequest) curationRequest$: Observable<string>;
-  @Select(ApplicationState.investigationFailed) investigationFailed$: Observable<boolean>;
-  @Select(ApplicationState.bannerMessage) bannerMessage$: Observable<string>;
-  @Select(ApplicationState.maintenanceMode) maintenanceMode$: Observable<boolean>;
-  @Select(FilesState.obfuscationCode) studyObfuscationCode$: Observable<string>;
-  @Select(ValidationState.report) studyValidation$: Observable<IValidationSummary>;
-  @Select(UserState.isCurator) isCurator$: Observable<boolean>;
+  currentTabIndex$: Observable<string> = inject(Store).select(TransitionsState.currentTabIndex);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
+  curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
+  investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
+  bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
+  maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
+  studyObfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
+  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
   studyError = false;
@@ -126,7 +126,11 @@ export class StudyComponent implements OnInit, OnDestroy {
       } else if (params.tab === "validations") {
         this.requestedTab = 6;
         this.tab = "validations";
-      } else {
+      } else if (params.tab === "validationsv2") {
+        this.requestedTab = 7;
+        this.tab = "validationsv2"
+      }
+      else {
         this.requestedTab = 0;
         this.tab = "descriptors";
       }
@@ -164,7 +168,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       window.location.origin + "/" + urlSplit.join("/") + "/" + tab
     );
     if (index === 6) {
-      this.store.dispatch(new ValidationReport.Get())
+      this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
       if (document.getElementById("tab-content-wrapper")) {
         document.getElementById("tab-content-wrapper").scrollIntoView();
       }

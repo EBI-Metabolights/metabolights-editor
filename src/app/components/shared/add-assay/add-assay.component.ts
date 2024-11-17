@@ -1,5 +1,6 @@
 import {
   Component,
+  inject,
   OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -7,7 +8,7 @@ import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import Swal from "sweetalert2";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
@@ -19,8 +20,8 @@ import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
   styleUrls: ["./add-assay.component.css"],
 })
 export class AddAssayComponent implements OnInit {
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
 
   requestedStudy: string = null;
   validations: any = null;

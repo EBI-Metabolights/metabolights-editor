@@ -8,7 +8,8 @@
   </div>
 </span>
 <ng-template #showContent>
-  <div>
+
+  <div class="buttons-container">
 
     <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
     <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
@@ -20,6 +21,7 @@
       (complete)="loadFilesPassively()"
       [size]="'is'"
     ></mtbls-upload>
+
     <span *ngIf="!isReadOnly" class="refresh-button" >
       <a (click)="loadFilesPassively()" class="button is-light">
         <mat-icon>refresh</mat-icon> Refresh
@@ -33,8 +35,15 @@
         </span>
       </span>
     </span>
+    <!--<span>
+      <div class="tags has-addons refresh-button status-badge">
+        <span class="tag is-dark">Aspera Status</span><span class="tag"
+        [ngClass]="{ 'is-danger': ['RETRYING', 'OUTDATED', 'FAILED', 'EXTENSION_INSTALL'].includes(asperaStatus), 'is-success': asperaStatus === 'RUNNING', 'is-grey': asperaStatus === '-' }">{{asperaStatus}}</span>
+      </div>
+    </span>-->
 
-    <span *ngIf="!isReadOnly && curator" class="is-pulled-right">
+
+    <span *ngIf="!isReadOnly && curator" class="is-pulled-rightn ml-auto">
       <a *ngIf="access == null"
         (click)="getFolderStatus()"
         class="button is-light"

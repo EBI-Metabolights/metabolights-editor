@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  inject,
   Input,
   OnChanges,
   OnInit,
@@ -11,6 +12,8 @@ import * as toastr from "toastr";
 import { EditorService } from "../../../../services/editor.service";
 import { Select, Store } from "@ngxs/store";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
+import { filter, Observable } from "rxjs";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 
 /* eslint-disable @typescript-eslint/naming-convention */
 // linter keeps falsely identifying ternary operatorss as being pure expressions
@@ -39,6 +42,10 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
   @Input() validationDetail: ValidationDetail;
   @Output() commentSaved: EventEmitter<{ comment: string }> =
     new EventEmitter();
+  
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+
+  studyId: string = null;
 
   /**Validation detail rendering flags */
   panelOpenState = true;
@@ -65,6 +72,9 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
     this.isNotNaN(this.validationDetail.description)
       ? (this.hasDescription = true)
       : (this.hasDescription = false);
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+      this.studyId = null;
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -135,7 +145,7 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
     const payload = {};
     payload[val_seq] = val_description;
     data.validations.push(payload);
-    this.store.dispatch(new ValidationReport.Override(data)).subscribe(
+    this.store.dispatch(new ValidationReport.Override(data, this.studyId)).subscribe(
       (completed) => {
         toastr.success(
           "Success",
@@ -156,7 +166,7 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
 
 
   refreshValidations() {
-    this.store.dispatch(new ValidationReport.Refresh()).subscribe((completed) => {
+    this.store.dispatch(new ValidationReport.Refresh(this.studyId)).subscribe((completed) => {
       toastr.success("Success", "Refreshed.", this.defaultToastrOptions);
 
       },

@@ -1,10 +1,8 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
-import { UntypedFormBuilder, FormGroup, Validators } from "@angular/forms";
-import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
+import { UntypedFormBuilder } from "@angular/forms";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
@@ -22,8 +20,8 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 })
 export class FTPUploadComponent implements OnInit {
 
-  @Select(FilesState.uploadLocation) uploadLocation$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
+  uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
 
   rules: Record<string, any> = null;
   details: FtpDetails = {

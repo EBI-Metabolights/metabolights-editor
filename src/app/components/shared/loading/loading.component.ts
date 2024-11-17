@@ -1,7 +1,7 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { PlatformLocation } from "@angular/common";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
-import { Select } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 
 @Component({
@@ -11,8 +11,8 @@ import { Observable } from "rxjs";
 })
 export class LoadingComponent implements OnInit {
 
-  @Select(TransitionsState.loading) loading$: Observable<boolean>
-  @Select(TransitionsState.loadingInformation) loadingInformation$: Observable<string>;
+  loading$: Observable<boolean> = inject(Store).select(TransitionsState.loading);
+  loadingInformation$: Observable<string> = inject(Store).select(TransitionsState.loadingInformation);
   baseHref: string;
 
   constructor(private platformLocation: PlatformLocation) {

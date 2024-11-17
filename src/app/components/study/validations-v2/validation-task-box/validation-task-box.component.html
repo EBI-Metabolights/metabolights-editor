@@ -1,0 +1,58 @@
+<div class="parent-flex">
+
+    <!--Validation v2 information start-->
+<div  class="notification is-primary">
+    <p>
+        As of October 2024  version 2 of the Metabolights Study Validation System is now available for submitters. In order for your study to be eligible for the status of 'PUBLIC - UNREVIEWED' it must pass the rules of this new system.
+        Version 2 has a stricter and more structured ruleset for validation than Version 1. You can find a summary and the rules themselves <a href="http://rulles.org">here.</a>
+    </p><p>
+        If you have any problems or queries that cannot be resolved by our <a href="https://www.ebi.ac.uk/metabolights/editor/guides/Quick_start_Guide/Quick_start_overview">guides</a>, please contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
+    </p>
+
+   </div>
+<!--Validation v2 information end-->
+
+
+<article class="message article-box" #trackHeight>
+    <!--message header start-->
+    <div class="message-header">
+      <p>Validate {{studyId}}</p>
+      <span><mat-icon [matTooltip]="'Passing validation is necessary for your study to be made public. Please consult the guides for more information.'" >help</mat-icon></span>
+    </div>
+    <!--message header end-->
+    <div class="message-body padding">
+      <div class=" container ">
+  
+        <div class="interior-container right" #trackStatusHeight>
+          <button
+          class="button is-info init-button"
+          [disabled]="isInitiated || taskStarted"
+          [ngClass]="startButtonClass"
+          (click)="startValidationTask()" >
+            <span *ngIf="isInitiated === false && taskStarted === false"><mat-icon> schedule </mat-icon></span>&nbsp;
+            <div *ngIf="isInitiated" ><mat-spinner [diameter]="18" strokeWidth="2"></mat-spinner></div>
+            {{ buttonText }}  </button>
+            <div class="status-container"> 
+              <div class="response text-padding"><b>LAST UPDATE:</b> {{lastRunTime}}</div>
+              <div class="response text-padding"><b>STATUS:</b><i> {{status}} </i></div>
+              <div class="response text-padding" *ngIf="showTaskId" ><b>TASK ID:</b> <small> {{lastResponse.task.task_id}} </small> </div>
+              <div class="response text-padding bottom"><b>DESCRIPTION: </b>
+
+                <div *ngIf="currentTaskState.ws3TaskStatus == 'SUCCESS'; else otherStatusesBlock">
+                  {{dm.SUCCESS[status]}}
+                </div>
+                <ng-template #otherStatusesBlock>
+                  {{dm[currentTaskState.ws3TaskStatus]}}
+  
+                </ng-template>
+              <br>
+              </div>
+            </div>
+        </div>
+      </div>
+      </div>
+  </article>
+  
+
+</div>
+

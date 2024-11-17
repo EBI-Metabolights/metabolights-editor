@@ -93,9 +93,9 @@
         >
           <code>
             $ ascp -QT -P 33001 -L- -l 300M &lt; your_local_data_folder &gt;
-            {{ (validations | async)[this.validationsId]["aspera"]["user"] }}&#64;{{
-              (validations | async)[this.validationsId]["aspera"]["server"]
-            }}:{{ uploadLocation | async }}
+            {{ validation.aspera.user }}&#64;{{
+              validation.aspera.server
+            }}:{{ uploadPath }}
           </code>
           <div
             class="panel-block notification is-primary"
@@ -104,7 +104,7 @@
             <small class="is-tiny">
               Aspera Password:
               <b>{{
-                (validations | async)[this.validationsId]["aspera"]["secret"]
+                validation.aspera.secret
               }}</b></small
             >
           </div>

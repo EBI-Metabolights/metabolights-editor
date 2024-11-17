@@ -1,5 +1,5 @@
 
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import {  Store } from "@ngxs/store";
 
 import { Directive, EventEmitter, Input, Output } from "@angular/core";
@@ -20,6 +20,7 @@ import { MockEditorService } from "src/app/services/editor.service.mock";
 import { ValidationDetailCommentComponent } from "./comment/validation-detail-comment.component";
 
 import { ValidationDetailComponent } from "./validation-detail.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 // disabling this rather than refactor our entire validation pipeline to be camelcase
 /* eslint-disable @typescript-eslint/naming-convention*/
@@ -31,28 +32,26 @@ describe("ValidationDetailComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [
+    declarations: [
         ValidationDetailComponent,
         ValidationDetailCommentComponent,
-      ],
-      imports: [
-        BrowserAnimationsModule,
+    ],
+    imports: [BrowserAnimationsModule,
         MatIconModule,
         MatInputModule,
         MatExpansionModule,
         MatDividerModule,
         FormsModule,
         ReactiveFormsModule,
-        MatFormFieldModule,
-        HttpClientTestingModule,
-      ],
-      providers: [
+        MatFormFieldModule],
+    providers: [
         { provide: ConfigurationService, useClass: MockConfigurationService },
         { provide: EditorService, useClass: MockEditorService },
-        Store
-        
-      ],
-    }).compileComponents();
+        Store,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+}).compileComponents();
   }));
 
   beforeEach(() => {

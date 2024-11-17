@@ -1,6 +1,6 @@
-import { Injectable } from "@angular/core";
-import { Action, Select, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { Assay, AssayList, TemplateRow } from "./assay.actions";
+import { inject, Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
+import { Assay, AssayList, ResetAssayState, TemplateRow } from "./assay.actions";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { FilesState } from "../files/files.state";
 import { Observable, Subject, forkJoin, of } from "rxjs";
@@ -21,21 +21,21 @@ export interface AssayStateModel {
     assays: Record<string, any>;
     templateRows: TemplateRowCollection;
 }
-
+const defaultState: AssayStateModel = {
+    assayList: null,
+    assays: {},
+    templateRows: new TemplateRowCollection()
+}
 @State<AssayStateModel>({
     name: 'assay',
-    defaults: {
-        assayList: null,
-        assays: {},
-        templateRows: new TemplateRowCollection()
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class AssayState {
 
-    @Select(FilesState.getAssaySheets) assaySheets$: Observable<StudyFile[]>
-    @Select(FilesState.files) files$: Observable<IStudyFiles>
-    @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
+    assaySheets$: Observable<StudyFile[]> = inject(Store).select(FilesState.getAssaySheets);
+    files$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
+    readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
 
     private templatesLoadedSubject = new Subject<string>();
     private readonly: boolean = null;
@@ -50,7 +50,7 @@ export class AssayState {
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
         this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
-            this.generalMetadataService.getStudyGeneralMetadata(action.id).subscribe(
+            this.generalMetadataService.getStudyGeneralMetadata(action.id).pipe(take(1)).subscribe(
                 (response) => {
                     let assayFiles = response.isaInvestigation.studies[0].assays;
                     ctx.dispatch(new AssayList.Set(assayFiles));
@@ -58,7 +58,7 @@ export class AssayState {
                         this.readonly = readonly;
                         this.templatesLoadedSubject.subscribe((val) => {
                             assayFiles.forEach((sheet) => {
-                                ctx.dispatch(new Assay.OrganiseAndPersist(sheet.filename));
+                                ctx.dispatch(new Assay.OrganiseAndPersist(sheet.filename, action.id));
                             });
                         });
 
@@ -74,16 +74,16 @@ export class AssayState {
                 }
             )
         } else {
-            this.files$.subscribe(
+            this.files$.pipe(take(1)).subscribe(
                 (files) => {
                     // the data type of assay files is different in this block than the one above - some strict typing needed to avoid confusion
                     let assayFiles = files.study.filter(file => file.file.startsWith('a_'));
                     this.readonly$.pipe(take(1)).subscribe((readonly) => {
                         this.readonly = readonly;
 
-                        this.templatesLoadedSubject.subscribe((val) => {
+                        this.templatesLoadedSubject.pipe(take(1)).subscribe((val) => {
                             assayFiles.forEach((sheet) => {
-                                ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file));
+                                ctx.dispatch(new Assay.OrganiseAndPersist(sheet.file, action.id));
                             });
                         });
 
@@ -104,9 +104,9 @@ export class AssayState {
 
     @Action(Assay.Add)
     AddNewAssay(ctx: StateContext<AssayStateModel>, action: Assay.Add) {
-        this.readonly$.subscribe(
+        this.readonly$.pipe(take(1)).subscribe(
             (readonly) => {
-                this.assaysService.addAssay(action.assay).subscribe(
+                this.assaysService.addAssay(action.assay, action.id).subscribe(
                     (response) => {
                         this.store.dispatch(new Operations.GetFreshFilesList(false, readonly, action.id));
                         this.store.dispatch(new Protocols.Get());
@@ -122,11 +122,11 @@ export class AssayState {
 
     @Action(Assay.OrganiseAndPersist)
     OrganiseAndPersist(ctx: StateContext<AssayStateModel>, action: Assay.OrganiseAndPersist) {
-        this.assaysService.getAssaySheet(action.assaySheetFilename).subscribe(
+        this.assaysService.getAssaySheet(action.assaySheetFilename, action.studyId).pipe(take(1)).subscribe(
             (data) => {
                 let assay = {};
                 assay["name"] = action.assaySheetFilename;
-                assay["meta"] = this.assaysService.extractAssayDetails(assay);
+                assay["meta"] = this.assaysService.extractAssayDetails(assay, action.studyId);
                 const columns = [];
                 Object.keys(data.header).forEach((key) => {
                     const fn = "element['" + key + "']";
@@ -173,7 +173,7 @@ export class AssayState {
                     }
                 });
                 mafFiles.forEach((f) => {
-                    this.store.dispatch(new MAF.Organise(f))
+                    this.store.dispatch(new MAF.Organise(f, action.studyId))
                 });
                 assay["mafs"] = mafFiles;
                 //insert template Row here
@@ -221,9 +221,9 @@ export class AssayState {
     @Action(Assay.Delete)
     DeleteStudyAssay(ctx: StateContext<AssayStateModel>, action: Assay.Delete) {
         const state = ctx.getState();
-        this.assaysService.deleteAssay(action.assay).subscribe(
+        this.assaysService.deleteAssay(action.assay, action.studyId).subscribe(
             (deleted) => {
-                ctx.dispatch(new AssayList.Get(action.id))
+                ctx.dispatch(new AssayList.Get(action.studyId))
             }
         )
     }
@@ -231,9 +231,9 @@ export class AssayState {
     @Action(Assay.AddColumn)
     AddColumnsToAssaySheet(ctx: StateContext<AssayStateModel>, action: Assay.AddColumn) {
         const state = ctx.getState();
-        this.assaysService.addColumnToAssaySheet(action.assay, action.body, action.id).subscribe(
+        this.assaysService.addColumnToAssaySheet(action.assay, action.body, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new Assay.OrganiseAndPersist(action.assay));
+                ctx.dispatch(new Assay.OrganiseAndPersist(action.assay, action.studyId));
             },
             (error) => {
                 console.log("Unable to add column to assay sheet.")
@@ -244,9 +244,9 @@ export class AssayState {
 
     @Action(Assay.AddRows)
     AddRows(ctx: StateContext<AssayStateModel>, action: Assay.AddRows) {
-        this.assaysService.addRows(action.filename, action.body).subscribe(
+        this.assaysService.addRows(action.filename, action.body, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new Assay.OrganiseAndPersist(action.filename));
+                ctx.dispatch(new Assay.OrganiseAndPersist(action.filename, action.studyId));
             },
             (error) => {
                 console.log("Unable to add rows to assay sheet")
@@ -257,9 +257,9 @@ export class AssayState {
 
     @Action(Assay.DeleteRows)
     DeleteRows(ctx: StateContext<AssayStateModel>, action: Assay.DeleteRows) {
-        this.assaysService.deleteRows(action.filename, action.rowIds).subscribe(
+        this.assaysService.deleteRows(action.filename, action.rowIds, action.studyId).subscribe(
             (response) => {
-                ctx.dispatch(new Assay.OrganiseAndPersist(action.filename));
+                ctx.dispatch(new Assay.OrganiseAndPersist(action.filename, action.studyId));
             },
             (error) => {
                 console.log('Unable to delete rows from assay sheet')
@@ -270,11 +270,11 @@ export class AssayState {
 
     @Action(Assay.UpdateCells)
     UpdateCells(ctx: StateContext<AssayStateModel>, action: Assay.UpdateCells) {
-        this.assaysService.updateCells(action.filename, action.cellsToUpdate).subscribe(
+        this.assaysService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
             (response) => {
                 // do some commitCellsToNgxs Processing
                 // or
-                ctx.dispatch(new Assay.OrganiseAndPersist(action.filename));
+                ctx.dispatch(new Assay.OrganiseAndPersist(action.filename, action.studyId));
             },
             (error) => {
                 console.log('Unable to update cells in assay sheet.')
@@ -337,6 +337,11 @@ export class AssayState {
             ...state,
             templateRows: newTemplateRows
         });
+    }
+
+    @Action(ResetAssayState)
+    Reset(ctx: StateContext<AssayStateModel>, action: ResetAssayState) {
+        ctx.setState(defaultState)
     }
 
     @Selector()

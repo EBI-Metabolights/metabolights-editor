@@ -1,14 +1,15 @@
-import { Injectable } from "@angular/core";
-import { Action, Select, Selector, State, StateContext } from "@ngxs/store";
+import { inject, Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
-import { Descriptors, Factors } from "./descriptors.action";
+import { Descriptors, Factors, ResetDescriptorsState } from "./descriptors.action";
 import { JsonConvert } from "json2typescript";
 import { DescriptorsService } from "src/app/services/decomposed/descriptors.service";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
-import { take } from "rxjs/operators";
+import { filter, take } from "rxjs/operators";
 import * as toastr from "toastr";
+import { Samples } from "../samples/samples.actions";
 
 
 
@@ -16,13 +17,13 @@ export interface DescriptorsStateModel {
     designDescriptors: Ontology[]
     factors: MTBLSFactor[]
 }
-
+const defaultState: DescriptorsStateModel = {
+    designDescriptors: null,
+    factors: null
+}
 @State<DescriptorsStateModel> ({
     name: 'descriptors',
-    defaults: {
-        designDescriptors: null,
-        factors: null
-    }
+    defaults: defaultState
 })
 @Injectable()
 export class DescriptorsState {
@@ -35,9 +36,9 @@ export class DescriptorsState {
         tapToDismiss: false,
       }
 
-    @Select(GeneralMetadataState.id) studyId$:  Observable<string>
+      studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
-    constructor(private descriptorsService: DescriptorsService) {
+    constructor(private descriptorsService: DescriptorsService, private store: Store) {
 
     }
 
@@ -187,14 +188,24 @@ export class DescriptorsState {
 
     @Action(Factors.Delete)
     DeleteFactor(ctx: StateContext<DescriptorsStateModel>, action: Factors.Delete) {
-        this.descriptorsService.deleteFactor(action.id, action.factorName).subscribe(
-            (response) => {
+        this.descriptorsService.deleteFactor(action.id, action.factorName).subscribe({
+            next: (response) => {
                 ctx.dispatch(new Factors.Get(action.id));
+                this.studyId$.pipe(filter(val => val !== null),take(1)).subscribe({
+                    next: (id) => this.store.dispatch(new Samples.Get(id)),
+                    error: () => console.error('Unable to retrieve study id')
+                })
+                
             },
-            (error) => {
+            error: (error) => {
                 console.error(`Could not delete factor ${action.factorName}`);
             }
-            )
+        })
+    }
+
+    @Action(ResetDescriptorsState)
+    Reset(ctx: StateContext<DescriptorsStateModel>, action: ResetDescriptorsState) {
+        ctx.setState(defaultState);
     }
 
     @Selector()

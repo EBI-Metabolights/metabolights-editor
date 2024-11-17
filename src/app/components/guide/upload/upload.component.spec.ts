@@ -1,5 +1,5 @@
 import { Store } from "@ngxs/store";
-import { HttpClientTestingModule } from "@angular/common/http/testing";
+import { provideHttpClientTesting } from "@angular/common/http/testing";
 import { SpyLocation } from "@angular/common/testing";
 import {
   NgModuleFactoryLoader,
@@ -25,6 +25,7 @@ import { EditorService } from "src/app/services/editor.service";
 import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { RawUploadComponent } from "./upload.component";
+import { provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
 
 describe("RawUploadComponent", () => {
   let component: RawUploadComponent;
@@ -33,30 +34,32 @@ describe("RawUploadComponent", () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [RawUploadComponent],
-      imports: [RouterTestingModule, HttpClientTestingModule],
-      providers: [
+    declarations: [RawUploadComponent],
+    imports: [RouterTestingModule],
+    providers: [
         Store,
         {
-          provide: Router,
-          useFactory: setupTestingRouter,
-          deps: [
-            UrlSerializer,
-            ChildrenOutletContexts,
-            Location,
-            NgModuleFactoryLoader,
-            Compiler,
-            Injector,
-            ROUTES,
-            ROUTER_CONFIGURATION,
-            [UrlHandlingStrategy, new Optional()],
-            [RouteReuseStrategy, new Optional()],
-          ],
+            provide: Router,
+            useFactory: setupTestingRouter,
+            deps: [
+                UrlSerializer,
+                ChildrenOutletContexts,
+                Location,
+                NgModuleFactoryLoader,
+                Compiler,
+                Injector,
+                ROUTES,
+                ROUTER_CONFIGURATION,
+                [UrlHandlingStrategy, new Optional()],
+                [RouteReuseStrategy, new Optional()],
+            ],
         },
         { provide: EditorService, useClass: MockEditorService },
         { provide: Location, useClass: SpyLocation },
-      ],
-    }).compileComponents();
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting(),
+    ]
+}).compileComponents();
     editorService = TestBed.inject(EditorService);
   }));
 

@@ -1,19 +1,15 @@
 import {
   Component,
   OnInit,
-  Input,
-  Inject,
-  OnChanges,
-  SimpleChanges,
+  inject,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ValidateStudyTitle } from "./title.validator";
 import * as toastr from "toastr";
-import { environment } from "src/environments/environment";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
@@ -25,11 +21,11 @@ import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadat
 })
 export class TitleComponent implements OnInit {
 
-  @Select(GeneralMetadataState.id) studyIdentifier$: Observable<string>;
-  @Select(GeneralMetadataState.title) studyTitle$: Observable<string>;
-  @Select(ValidationState.rules) editorValidationRules$: Observable<Record<string, any>>;
-  @Select(ApplicationState.readonly) readonly$: Observable<boolean>;
-  @Select(ApplicationState.toastrSettings) toastrSettings$: Observable<Record<string, any>>;
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   private toastrSettings: Record<string, any> = {};
 
@@ -57,7 +53,7 @@ export class TitleComponent implements OnInit {
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((settings) => {this.toastrSettings = settings});
 
-    this.studyTitle$.subscribe((value) => {
+    this.studyTitle$.pipe(filter(val => val !== null)).subscribe((value) => {
       if (value === "") {
         this.title = "Please add your study title here";
       } else {

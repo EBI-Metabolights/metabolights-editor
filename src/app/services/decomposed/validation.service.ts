@@ -1,37 +1,32 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ConfigurationService } from 'src/app/configuration.service';
-import { catchError, map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { catchError, filter, map } from 'rxjs/operators';
+import { firstValueFrom, Observable } from 'rxjs';
 import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/validation-summary.interface';
 import { httpOptions } from '../headers';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
-import { Select } from '@ngxs/store';
-import { ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations/validations-prototype/interfaces/validation-report.interface';
+import { ValidationPhase, ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations-v2/interfaces/validation-report.interface';
+import { Store } from '@ngxs/store';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ValidationService extends BaseConfigDependentService {
 
-  @Select(GeneralMetadataState.id) private studyIdentifier$: Observable<string>;
-
-  private id: string;
   private dnvtParams = {
     message_filter: 'NONE',
     summary_messages: true
   } // default new validation task params
   public loadingRulesMessage: string = "Loading study validation rules."
 
-  constructor(http: HttpClient, configService: ConfigurationService) {
-      super(http, configService);
-      this.studyIdentifier$.subscribe(
-        (id) => {
-          if(id !== null) this.id = id
-        }
-      )
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) {
+      super(http, configService, store);
+
     }
+
+
 
     /**
    * Get our validation config file.
@@ -45,12 +40,12 @@ export class ValidationService extends BaseConfigDependentService {
       );
     }
 
-    getValidationReport(): Observable<IValidationSummaryWrapper> {
+    getValidationReport(studyId: string): Observable<IValidationSummaryWrapper> {
       return this.http
         .get<IValidationSummaryWrapper>(
           this.url.baseURL +
             "/studies/" +
-            this.id +
+            studyId +
             "/validation-report",
           httpOptions
         )
@@ -62,12 +57,12 @@ export class ValidationService extends BaseConfigDependentService {
    *
    * @returns message telling the user the update process has started.
    */
-    refreshValidations(): Observable<{ success: string }> {
+    refreshValidations(studyId: string): Observable<{ success: string }> {
       return this.http
         .post<{ success: string }>(
           this.url.baseURL +
             "/ebi-internal/" +
-            this.id +
+            studyId +
             "/validate-study/update-file",
           {},
           httpOptions
@@ -75,12 +70,12 @@ export class ValidationService extends BaseConfigDependentService {
         .pipe(catchError(this.handleError));
     }
 
-    overrideValidations(data): Observable<{ success: string }> {
+    overrideValidations(data, studyId): Observable<{ success: string }> {
       return this.http
         .post<{ success: string }>(
           this.url.baseURL +
             "/ebi-internal/" +
-            this.id +
+            studyId +
             "/validate-study/override",
           data,
           httpOptions
@@ -95,7 +90,7 @@ export class ValidationService extends BaseConfigDependentService {
       );
     }
 
-    createStudyValidationTask(): Observable<Ws3Response<Ws3ValidationTask>> {
+    createStudyValidationTask(proxy: boolean = false, studyId: string): Observable<Ws3Response<Ws3ValidationTask>> {
       // remove once new auth service implemented
       // const token = localStorage.getItem('jwt');
       // console.log(token)
@@ -106,32 +101,59 @@ export class ValidationService extends BaseConfigDependentService {
         accept: "application/json",
         // Authorization: `Bearer ${token}`
       });
-      console.log(`headers: ${JSON.stringify(headers)}`);
 
-      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validations/${this.id}`,"", {headers}).pipe(
+      let valUrl = this.configService.config.ws3URL;
+      if (proxy) valUrl = valUrl.replace('https://www-test.ebi.ac.uk', '')
+
+      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${valUrl}/validations/${studyId}`,"", {headers}).pipe(
         map((res) => res),
         catchError(this.handleError)
       );
     }
 
-    getNewValidationReportWs3(): Observable<Ws3Response<Ws3ValidationTask>> {
+    getValidationV2Report(proxy: boolean = false, taskId: string = null, studyId: string): Observable<Ws3Response<Ws3ValidationTask>> {
 
-      // // remove once new auth service implemented
-      // const token = localStorage.getItem('jwt');
-      // let headers = null;
-      // // write new headers impl this is annoying me
-      const headers = new HttpHeaders({
+      // remove once new auth service implemented
+      const token = localStorage.getItem('jwt');
+      let headers = null;
+      let headersObj = {
         //'Content-Type':  'application/json',
         Accept: "application/json",
-        // Authorization: `Bearer ${token}`
-      });
-      // console.log(`headers: ${headers}`);
+        Authorization: `Bearer ${token}`
+      }
+      // write new headers impl this is annoying me
       let params = new HttpParams();
       for (const key in this.dnvtParams) {
         params.set(key, this.dnvtParams[key]);
       }
+      if (taskId !== null) {
+        headersObj['task_id'] = taskId
+      }
+      headers = new HttpHeaders(headersObj);
+      let valUrl = this.configService.config.ws3URL;
+      if (proxy) valUrl = valUrl.replace('https://www-test.ebi.ac.uk', '')
 
-      return this.http.get<Ws3Response<Ws3ValidationTask>>(`${this.configService.config.ws3URL}/validations/${this.id}/result`, {headers, params}).pipe(
+      return this.http.get<Ws3Response<Ws3ValidationTask>>(`${valUrl}/validations/${studyId}/result`, {headers, params}).pipe(
+        map((res) => res),
+        catchError(this.handleError)
+      );
+    }
+
+    getValidationHistory(studyId: string): Observable<Ws3Response<Array<ValidationPhase>>> {
+      let headers = null;
+      const token = localStorage.getItem('jwt');
+      // write new headers impl this is annoying me
+      headers = new HttpHeaders({
+        //'Content-Type':  'application/json',
+        Accept: "application/json",
+        // Authorization: `Bearer ${token}`
+      });
+      const valUrl = this.configService.config.ws3URL;
+      return this.http.get<Ws3Response<Array<ValidationPhase>>>(`${valUrl}/validations/${studyId}/history`, {headers})
+    }
+
+    getFakeValidationReportApiResponse(): Observable<Ws3Response<Ws3ValidationTask>> {
+      return this.http.get<Ws3Response<Ws3ValidationTask>>(`assets/validation-api-response.json`).pipe(
         map((res) => res),
         catchError(this.handleError)
       );
