@@ -167,7 +167,7 @@
               <div *ngIf="!underMaintenance">
                 <a
                   [routerLink]="['/guide/info', study.accession]"
-                  class="button is-rounded"
+                  class="guided-submission-button button is-rounded"
                 >
                   <small>
                     <mat-icon>view_carousel</mat-icon> Guided submission
@@ -176,7 +176,7 @@
                 <a
                 (click)="studyClick(study)"
                   [routerLink]="['/study', study.accession]"
-                  class="button is-rounded"
+                  class="study-overview-button button is-rounded"
                 >
                   <small>
                     <mat-icon>chrome_reader_mode</mat-icon> Study overview

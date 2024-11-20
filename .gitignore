@@ -9,6 +9,7 @@ nginx.conf
 
 # Don't expose configs
 /src/assets/configs/*config.json
+cypress.env.json
 
 # Only exists if Bazel was run
 /bazel-out
