@@ -200,6 +200,7 @@
                   color="primary"
                   (click)="selectCurrentTab(0, 'descriptors')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }"
+                  data-id="1"
                 >
                   <a>Descriptors</a>
                 </li>
@@ -207,6 +208,7 @@
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(1, 'protocols')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }"
+                  data-id="2"
                 >
                   <a>Protocols</a>
                 </li>
@@ -214,6 +216,7 @@
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(2, 'samples')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }"
+                  data-id="3"
                 >
                   <a>Samples</a>
                 </li>
@@ -221,6 +224,7 @@
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(3, 'assays')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }"
+                  data-id="4"
                 >
                   <a>Assays</a>
                 </li>
@@ -228,25 +232,30 @@
                   *ngIf="!studyError"
                   (click)="selectCurrentTab(4, 'metabolites')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }"
+                  data-id="5"
                 >
                   <a>Metabolites</a>
                 </li>
                 <li
                   (click)="selectCurrentTab(5, 'files')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }"
+                  data-id="6"
                 >
                   <a>Files</a>
                 </li>
                 <li
                   (click)="selectCurrentTab(6, 'validations')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
+                  data-id="7"
                 >
                   <a>Study Validations</a>
                 </li>
                 <li 
                 *ngIf="isCurator"
                 (click)="selectCurrentTab(7, 'validationsv2')"
-                [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}">
+                [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}"
+                data-id="8"
+                >
                   <a>Validation Framework V2</a>
 
                 </li>
@@ -260,6 +269,7 @@
                   <div
                     class="tab-content fadeIn animated"
                     *ngIf="(currentTabIndex$ | async) === 0"
+                    data-id="1"
                   >
                     <mtbls-design-descriptors></mtbls-design-descriptors>
                     <br />
@@ -270,6 +280,7 @@
                   <div
                     class="tab-content fadeIn animated"
                     *ngIf="(currentTabIndex$ | async) === 1"
+                    data-id="2"
                   >
                     <mtbls-protocols></mtbls-protocols>
                   </div>
@@ -277,36 +288,42 @@
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 2"
+                  data-id="3"
                 >
                   <mtbls-samples></mtbls-samples>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 3"
+                  data-id="4"
                 >
                   <mtbls-assays></mtbls-assays>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 4"
+                  data-id="5"
                 >
                   <mtbls-mafs></mtbls-mafs>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 5"
+                  data-id="6"
                 >
                   <mtbls-files class="files-tab"></mtbls-files>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 6"
+                  data-id="7"
                 >
                   <study-validations></study-validations>
                 </div>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 7">
+                  *ngIf="(currentTabIndex$ | async) === 7"
+                  data-id="8">
                   <validations-v2-parent></validations-v2-parent>
 
 

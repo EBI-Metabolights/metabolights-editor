@@ -324,6 +324,7 @@ export class GuidedAssaysComponent implements OnInit {
       cancelButtonText: "Back",
     }).then((willDelete) => {
       if (willDelete.value) {
+        console.log(`/study/${this.requestedStudy}`)
         this.router.navigate(["/study", this.requestedStudy]);
       }
     });
