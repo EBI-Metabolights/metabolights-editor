@@ -1,3 +1,4 @@
+
 context('navigation', () => {
     beforeEach(() => {
         cy.visit(Cypress.env('editorLoc'));
@@ -8,7 +9,7 @@ context('navigation', () => {
         cy.get('.login-button').click();
     });
     it('should navigate guided, with all components loaded successfully', () => {
-        cy.get('.guided-submission-button').eq(1).click(); // statically clicking the second study, for demo purposes
+        cy.get('.guided-submission-button', { timeout: 10000 }).eq(0).click(); // statically clicking the second study, for demo purposes
         
         cy.contains('Your MetaboLights study').should('be.visible');
         cy.get('.next-button').click();
@@ -25,7 +26,22 @@ context('navigation', () => {
 
     });
     it('should hit full study view', () => {
-        cy.get('.study-overview-button').eq(1).click(); // statically clicking the second study, for demo purposes
+        cy.get('.study-overview-button').eq(0).click(); // statically clicking the second study, for demo purposes
+        cy.get('.column.is-full.tabs.npt')
+        .find('li')
+        .each(($el, index) => {
+          cy.wrap($el)
+            .click()
+            .invoke('text')
+            .then((text) => {
+                if(!text.toLowerCase().includes('validation')) {
+                    cy.url().should('include', `/${text.toLowerCase()}`);
+                }
+            });
 
+            const dataId = $el.attr('data-id');
+            cy.get(`.tab-content[data-id="${dataId}"]`)
+                .should('be.visible');
+        });
     })
 })
