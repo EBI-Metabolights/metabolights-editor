@@ -10,26 +10,35 @@
           class="column is-full tabs npt"
           style="margin-bottom: 0; padding-bottom: 0"
         >
-          <ul>
+        <mat-tab-group [(selectedIndex)]="currentSubIndex">
+          <mat-tab *ngFor="let assay of assaysNames; let i = index" [label]="assay">
+            <!-- No content here, just labels for switching tabs -->
+          </mat-tab>
+        </mat-tab-group>
+
+        <!--Old assay selection remove if assent given to make change-->
+          <!--<ul *ngIf="false">
             <span *ngFor="let assay of studyAssayFiles; let i = index">
               <li
                 (click)="selectCurrentSubTab(i)"
                 [ngClass]="{ 'is-active': currentSubIndex == i }"
               >
-                <a>Assay Sheet {{ i + 1 }}</a>
+                <a>{{ assay.filename | amPipe }}</a>
               </li>
             </span>
-          </ul>
+          </ul>-->
+
         </div>
       </div>
-      <span *ngFor="let assay of studyAssayFiles; let i = index">
-        <span *ngIf="currentSubIndex == i">
-          <assay-details
-            (assayDelete)="assayDeleted($event)"
-            [assayName]="assay.filename"
-          ></assay-details>
+        <span *ngFor="let assay of studyAssayFiles; let i = index">
+          <span class="fadeIn animated" *ngIf="currentSubIndex == i">
+            <assay-details
+              (assayDelete)="assayDeleted($event)"
+              [assayName]="assay.filename"
+            ></assay-details>
+          </span>
         </span>
-      </span>
+
     </div>
     <span>
       <div>&nbsp;</div>
