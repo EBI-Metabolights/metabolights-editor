@@ -30,8 +30,9 @@ export interface ValidationReportContents {
 }
 
 export interface Violation {
-    description: string
+    description: string // violation definition
     hasMoreViolations: boolean
+    totalViolations: number
     identifier: string
     priority: ViolationPriority // will be an enum or custom type
     section: string // will be an enum or custom type
@@ -41,7 +42,10 @@ export interface Violation {
     title: string
     type: ViolationType // will be an enum or custom type
     values: string[]
-    violation: string
+    violation: string // description but as it relates to this study
+    technique: string // this refers to analytical technique IE LCMS
+    overrided: boolean 
+    overrideComment: string
 }
 
 export interface ValidationPhase {

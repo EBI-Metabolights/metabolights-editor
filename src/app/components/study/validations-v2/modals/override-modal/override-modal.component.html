@@ -1,0 +1,36 @@
+<div class="modal is-active ">
+    <div class="modal-background"> </div>
+
+    <div class="modal-card">
+        <section class="modal-card-body">
+            <h2> <b>Override {{violation.identifier}}</b> </h2>
+            <mat-divider></mat-divider>
+            &nbsp;
+            <div class="">
+                <form [formGroup]="options">
+                    <div class="form-container">
+                      <mat-form-field  [floatLabel]="'auto'" >
+                        <input matInput placeholder="Simple placeholder" required />
+                      </mat-form-field>
+                
+                      <mat-form-field >
+                        <mat-label>Both a label and a placeholder</mat-label>
+                        <input matInput placeholder="Simple placeholder" />
+                      </mat-form-field>
+                
+                      <mat-form-field  [floatLabel]="'auto'">
+                        <mat-select >
+                          <mat-option>-- None --</mat-option>
+                          <mat-option value="option">Option</mat-option>
+                        </mat-select>
+                        <mat-label><mat-icon>favorite</mat-icon> <strong> Fancy</strong> <em> label</em></mat-label>
+                      </mat-form-field>
+                    </div>
+                  </form>
+            </div>
+        </section>
+        <button (click)="close()" class="button is-info">
+            Close
+        </button>
+    </div>
+</div>

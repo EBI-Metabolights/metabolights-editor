@@ -66,6 +66,7 @@ import { ValidationReportSummaryComponent } from "./validations-v2/validation-re
 import { ValidationSectionComponent } from "./validations-v2/validation-section/validation-section.component";
 import { ValidationsV2ParentComponent } from "./validations-v2/validations-v2-parent/validations-v2-parent.component";
 import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box/validation-task-box.component";
+import { OverrideModalComponent } from "./validations-v2/modals/override-modal/override-modal.component";
 
 @NgModule({
   declarations: [
@@ -95,6 +96,7 @@ import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box
     ValidationsV2ParentComponent,
     ValidationInfoModalComponent,
     RawViolationModalComponent,
+    OverrideModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,
     NoViolationsComponent,
@@ -161,6 +163,7 @@ import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box
     ValidationDetailCommentComponent,
     ValidationsV2ParentComponent,
     ValidationInfoModalComponent,
+    OverrideModalComponent,
     RawViolationModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,

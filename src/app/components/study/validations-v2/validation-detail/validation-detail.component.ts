@@ -5,11 +5,12 @@ import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { filter, Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { OverrideModalComponent } from '../modals/override-modal/override-modal.component';
 
 @Component({
   selector: 'validation-v2-detail',
   templateUrl: './validation-detail.component.html',
-  styleUrls: ['./validation-detail.component.css']
+  styleUrls: ['./validation-detail.component.css'],
 })
 export class ValidationV2DetailComponent implements OnInit {
 
@@ -19,6 +20,7 @@ export class ValidationV2DetailComponent implements OnInit {
   @Input() violation: Violation
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
+  isOverrideModalOpen: boolean = false;
 
   currentTaskId = "";
   runTime = "";
@@ -59,6 +61,14 @@ export class ValidationV2DetailComponent implements OnInit {
 
   closeInfoModal() {
     this.isInfoModalOpen = false;
+  }
+
+  handleOverride(violation: Violation) {
+    this.isOverrideModalOpen = true;
+  }
+
+  closeOverrideModal() {
+    this.isOverrideModalOpen = false;
   }
 
 }
