@@ -53,5 +53,9 @@ export interface ValidationPhase {
     taskId: string
 }
 
+export interface OverrideResponse {
+    studyId: string,
+    validationVersion: string
+}
 
 

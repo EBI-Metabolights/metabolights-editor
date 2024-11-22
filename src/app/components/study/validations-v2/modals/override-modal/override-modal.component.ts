@@ -15,14 +15,19 @@ export class OverrideModalComponent implements OnInit {
 
   constructor() { }
 
-  options: FormGroup; 
+  options: FormGroup;
+  types = [
+    { value: 'info', viewValue: 'INFO' },
+    { value: 'warning', viewValue: 'WARNING' },
+    { value: 'error', viewValue: 'ERROR' },
+  ];
 
 
   ngOnInit(): void {
     this.options = inject(FormBuilder).group({
       type: [this.violation.type],
       curator: [""],
-      enabled: [false],
+      enabled: [this.violation.overrided],
       comments: [""]
     })
   }

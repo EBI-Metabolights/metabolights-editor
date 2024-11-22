@@ -18,6 +18,7 @@ export class ValidationV2DetailComponent implements OnInit {
   runTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
 
   @Input() violation: Violation
+  @Input() overrides: 
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
   isOverrideModalOpen: boolean = false;
