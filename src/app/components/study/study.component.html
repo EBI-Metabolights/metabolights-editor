@@ -238,13 +238,13 @@
                   <a>Files</a>
                 </li>
                 <li
+                  *ngIf="isCurator"
                   (click)="selectCurrentTab(6, 'validations')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
                 >
                   <a>Study Validations</a>
                 </li>
                 <li 
-                *ngIf="isCurator"
                 (click)="selectCurrentTab(7, 'validationsv2')"
                 [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}">
                   <a>Validation Framework V2</a>
