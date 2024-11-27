@@ -107,8 +107,8 @@
         <mtbls-status></mtbls-status>
         <mtbls-release-date></mtbls-release-date>&emsp;
         <div *ngIf="isOwner || isCurator">
-          <span class="clickable" *ngIf="validation.status == 'error'">
-            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+          <span class="clickable" *ngIf="validationStatus == 'ERROR'">
+            <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Validation</span>
                 <span class="tag is-danger"> Failed ( {{ validation !== undefined && validation.last_update_timestamp > 0 ? (validation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} )</span>
@@ -116,8 +116,8 @@
             </div>
           </span>
 
-          <span class="clickable" *ngIf="validation.status == 'not ready' && notReadyValidationMessage != null">
-            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+          <span class="clickable" *ngIf="validationStatus == null && notReadyValidationMessage != null">
+            <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Validation</span>
                 <span class="tag is-warning"> {{ notReadyValidationMessage }} </span>

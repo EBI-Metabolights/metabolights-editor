@@ -8,7 +8,7 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
@@ -16,6 +16,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { StudyStatus } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { Loading, SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { ViolationType } from "../validations-v2/interfaces/validation-report.types";
 
 @Component({
   selector: "mtbls-status",
@@ -32,6 +33,9 @@ export class StatusComponent implements OnInit {
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+
+
 
   isReadOnly = false;
 
@@ -43,6 +47,8 @@ export class StatusComponent implements OnInit {
   curationRequest: string = null;
   requestedStudy: string = null;
   validation: IValidationSummary;
+
+  validationStatus: ViolationType = null;
 
   private toastrSettings: Record<string, any> = {}
   constructor(
@@ -94,6 +100,9 @@ export class StatusComponent implements OnInit {
       if (value != null) {
         this.isReadOnly = value;
       }
+    });
+    this.validationStatus$.pipe(filter(val => val !== null)).subscribe((val) => {
+      this.validationStatus = val;
     });
   }
 

@@ -50,6 +50,9 @@ export class ValidationsV2ParentComponent implements OnInit {
   assayViolations: Violation[] = [];
   assignmentViolations: Violation[] = [];
   filesViolations: Violation[] = [];
+
+  totalErrors: number;
+  totalWarnings: number;
   
   // core state variables
   studyId: string =  null
@@ -68,8 +71,6 @@ export class ValidationsV2ParentComponent implements OnInit {
   generalSubsections = validationReportInputSubsectionList;
 
   ngOnInit(): void {
-
-
 
     this.isCurator$.subscribe(value => {
       this.isCurator = value;
@@ -90,6 +91,7 @@ export class ValidationsV2ParentComponent implements OnInit {
         if (history !== null) {
           this.history = history;
           this.selectedPhase = this.history[0]
+          console.log(history);
 
           if (this.history.length === 0) {
             // TODO: this means a study has never been validated - we should account for this in the UI
@@ -99,6 +101,9 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.allViolations$.subscribe((value) => {
       this.allViolations = value;
+      this.allViolations.map((violation) => 
+        violation.type === 'WARNING' ? this.totalWarnings += 1 : this.totalErrors += 1
+      );
     });
 
     this.generalViolations$.subscribe((value) => {
@@ -134,10 +139,8 @@ export class ValidationsV2ParentComponent implements OnInit {
   }
 
   onPhaseSelection($event) {
-    console.log($event)
     this.store.dispatch(new ValidationReportV2.Get(this.studyId, $event.taskId));
     this.loadingDiffReport = true;
-    // TODO set up some kind of loading state
   }
 
   downloadReport() {

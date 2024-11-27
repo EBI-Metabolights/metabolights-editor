@@ -20,6 +20,7 @@ import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.in
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
+import { ViolationType } from "../../study/validations-v2/interfaces/validation-report.types";
 
 @Component({
   selector: "study",
@@ -38,6 +39,7 @@ export class PublicStudyComponent implements OnInit {
   investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
 
 
   loading: any = true;
@@ -57,6 +59,7 @@ export class PublicStudyComponent implements OnInit {
   reviewerLink: string = null;
   permissions: StudyPermission = null;
   notReadyValidationMessage: string = null;
+  validationStatus: ViolationType = null;
 
   constructor(
     private store: Store,
@@ -148,6 +151,12 @@ export class PublicStudyComponent implements OnInit {
         this.calculateNotReadyValidationMessage();
       }
     });
+
+
+    this.validationStatus$.subscribe((value) => {
+      this.validationStatus = value;
+    })
+
 
     this.curationRequest$.subscribe((value) => {
       if(value){

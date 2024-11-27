@@ -16,7 +16,10 @@ export class ValidationV2DetailComponent implements OnInit {
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   runTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
 
-  @Input() violation: Violation
+  @Input() violation: Violation;
+  @Input() totalErrors: number;
+  @Input() totalWarnings: number;
+  
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
 

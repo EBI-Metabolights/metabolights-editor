@@ -15,6 +15,7 @@ import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validat
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
 import { UserService } from "src/app/services/decomposed/user.service";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
 
 @Component({
   selector: "mtbls-study",
@@ -32,6 +33,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
   studyObfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  validationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
@@ -49,6 +52,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   banner: string = null;
   underMaintenance = false;
   isCurator = false;
+  validationStatus: ViolationType = null;
+  validationRunTime: string =  null;
 
   constructor(
     private store: Store,
@@ -105,6 +110,14 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.studyValidation$.subscribe((value) => {
       this.validation = value;
     });
+
+    this.validationStatus$.subscribe((value) => {
+      this.validationStatus = value;
+    });
+
+    this.validationRunTime$.subscribe((value) => {
+      this.validationRunTime = value;
+    })
 
     this.route.params.subscribe((params) => {
       this.requestedStudy = params.id;

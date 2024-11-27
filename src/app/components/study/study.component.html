@@ -146,19 +146,19 @@
         <mtbls-status></mtbls-status>
         <mtbls-release-date></mtbls-release-date>&emsp;
         <!--Start of validation label-->
-        <div *ngIf="validation !== null">
+        <div *ngIf="validationStatus !== null">
 
         <div class="is-pulled-right">
-          <span class="clickable" *ngIf="validation.status == 'error'">
-            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+          <span class="clickable" *ngIf="validationStatus == 'ERROR'">
+            <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Validation</span>
                 <span class="tag is-danger"> Failed </span>
               </div>
             </div>
           </span>
-          <span class="clickable" *ngIf="validation.status == 'not ready'">
-            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+          <span class="clickable" *ngIf="validationStatus == null">
+            <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Validation</span>
                 <span class="tag is-warning"> Required </span>
@@ -167,11 +167,11 @@
           </span>
         </div>
         <div class="is-pulled-right">
-          <span class="clickable" *ngIf="validation.status == 'error'">
-            <div (click)="selectCurrentTab(6, 'validations')" class="control">
+          <span class="clickable" *ngIf="validationStatus == 'error'">
+            <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
                 <span class="tag is-dark">Last Validation Time</span>
-                <span class="tag is-danger"> <small> {{ validation !== undefined && validation.last_update_timestamp > 0 ? (validation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
+                <span class="tag is-danger"> <small> {{ validationStatus !== null && validationRunTime !== null ? (validationRunTime | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
               </div>
             </div>
           </span>
@@ -237,17 +237,17 @@
                 >
                   <a>Files</a>
                 </li>
-                <li
+                <!--<li
                   *ngIf="isCurator"
                   (click)="selectCurrentTab(6, 'validations')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
                 >
                   <a>Study Validations</a>
-                </li>
+                </li>-->
                 <li 
                 (click)="selectCurrentTab(7, 'validationsv2')"
                 [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}">
-                  <a>Validation Framework V2</a>
+                  <a>Study Validations</a>
 
                 </li>
               </ul>
@@ -298,12 +298,12 @@
                 >
                   <mtbls-files class="files-tab"></mtbls-files>
                 </div>
-                <div
+                <!--<div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 6"
                 >
                   <study-validations></study-validations>
-                </div>
+                </div>-->
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 7">
