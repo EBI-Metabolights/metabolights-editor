@@ -50,9 +50,6 @@ export class ValidationsV2ParentComponent implements OnInit {
   assayViolations: Violation[] = [];
   assignmentViolations: Violation[] = [];
   filesViolations: Violation[] = [];
-
-  totalErrors: number;
-  totalWarnings: number;
   
   // core state variables
   studyId: string =  null
@@ -101,9 +98,6 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.allViolations$.subscribe((value) => {
       this.allViolations = value;
-      this.allViolations.map((violation) => 
-        violation.type === 'WARNING' ? this.totalWarnings += 1 : this.totalErrors += 1
-      );
     });
 
     this.generalViolations$.subscribe((value) => {

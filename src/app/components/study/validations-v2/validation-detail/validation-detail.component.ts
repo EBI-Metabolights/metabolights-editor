@@ -4,7 +4,7 @@ import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { filter, Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { Breakdown, ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 
 @Component({
   selector: 'validation-v2-detail',
@@ -15,16 +15,16 @@ export class ValidationV2DetailComponent implements OnInit {
 
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   runTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
+  breakdown$: Observable<Breakdown> = inject(Store).select(ValidationState.breakdown);
 
   @Input() violation: Violation;
-  @Input() totalErrors: number;
-  @Input() totalWarnings: number;
   
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
 
   currentTaskId = "";
   runTime = "";
+  breakdown: Breakdown = null;
 
   typeIcon: string = "question"
   protected isCurator: boolean = false;
@@ -33,7 +33,9 @@ export class ValidationV2DetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.isCurator$.subscribe((value) => this.isCurator = value);
-    this.runTime$.pipe(filter(val => val !== null)).subscribe((time) => { this.runTime = time})
+    this.runTime$.pipe(filter(val => val !== null)).subscribe((time) => { this.runTime = time});
+    this.breakdown$.pipe(filter(val => ![undefined, null].includes(val.errors) && ![undefined, null].includes(val.warnings)))
+      .subscribe(val => this.breakdown = val);
     this.typeIcon = this.getViolationTypeIcon();
   }
 

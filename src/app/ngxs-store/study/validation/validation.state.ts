@@ -16,6 +16,11 @@ export interface ValidationTask {
     ws3TaskStatus: string;
 }
 
+export interface Breakdown {
+    warnings: number;
+    errors: number;
+}
+
 
 
 export interface ValidationStateModel {
@@ -374,6 +379,13 @@ export class ValidationState {
     @Selector()
     static currentValidationTask(state: ValidationStateModel) {
         return state.currentValidationTask;
+    }
+
+    @Selector()
+    static breakdown(state: ValidationStateModel): Breakdown {
+        return {
+            warnings: state.reportV2.messages.violations.filter(val => val.type === 'ERROR').length,
+            errors: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length}
     }
 }
 

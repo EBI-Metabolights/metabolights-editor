@@ -76,8 +76,24 @@
                 <small><b>Section:</b> {{violation.section }}</small>
                     <div (click)="copyToClipboard(violation.section)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
             </div>
-            <div class="violation-footer-end-item footer-container-3">        
-                <small><b>Total Violations:</b>Errors: {{totalErrors}} Warnings: {{totalWarnings}}</small>
+            <div class="violation-footer-end-item footer-container-3">   
+                <small>
+     
+                <div class="breakdown-tags">
+                    <b>Total Violations </b>
+                    &nbsp;&nbsp;&nbsp;
+                    <div class=" has-addons">
+                        <span class="tag is-dark">Errors</span>
+                        <span class="tag is-danger"> {{breakdown.errors}} </span>
+                      </div>
+                      &nbsp;&nbsp;&nbsp;
+                      <div class="tags has-addons">
+                        <span class="tag is-dark">Warnings</span>
+                        <span class="tag is-warning"> {{breakdown.warnings}} </span>
+                      </div>
+                </div>
+            </small>
+
             </div>
         </div>
     </div>

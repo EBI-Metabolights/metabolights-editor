@@ -135,6 +135,10 @@
 .violation-footer-end-item {
     padding: 5px;
 }
+.breakdown-tags {
+    display: flex;
+    flex-direction: row;
+}
 
 .icon-container {
     display: inline-block; /* Ensure the container takes only as much space as needed */
