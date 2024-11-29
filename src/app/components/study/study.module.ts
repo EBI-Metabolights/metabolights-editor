@@ -67,6 +67,7 @@ import { ValidationSectionComponent } from "./validations-v2/validation-section/
 import { ValidationsV2ParentComponent } from "./validations-v2/validations-v2-parent/validations-v2-parent.component";
 import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box/validation-task-box.component";
 import { ValidationDateFormatPipe } from "./validations-v2/pipes/validation-date.pipe";
+import { OverrideModalComponent } from "./validations-v2/modals/override-modal/override-modal.component";
 
 @NgModule({
   declarations: [
@@ -96,6 +97,7 @@ import { ValidationDateFormatPipe } from "./validations-v2/pipes/validation-date
     ValidationsV2ParentComponent,
     ValidationInfoModalComponent,
     RawViolationModalComponent,
+    OverrideModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,
     NoViolationsComponent,
@@ -164,6 +166,7 @@ import { ValidationDateFormatPipe } from "./validations-v2/pipes/validation-date
     ValidationDetailCommentComponent,
     ValidationsV2ParentComponent,
     ValidationInfoModalComponent,
+    OverrideModalComponent,
     RawViolationModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,

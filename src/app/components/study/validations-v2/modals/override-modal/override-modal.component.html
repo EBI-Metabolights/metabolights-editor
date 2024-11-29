@@ -1,0 +1,52 @@
+<div class="modal is-active ">
+    <div class="modal-background"> </div>
+
+    <div class="modal-card">
+        <section class="modal-card-body">
+            <h2> <b>Override {{violation.identifier}}</b> </h2>
+            <mat-divider></mat-divider>
+            &nbsp;
+            <div class="">
+                <form [formGroup]="options">
+                    <div class="form-container">
+                        <!--type field start-->
+                        <mat-form-field  [floatLabel]="'auto'">
+                            <mat-select formControlName="type">
+                                <mat-option *ngFor="let type of types" [value]="type.value">
+                                    {{ type.viewValue }}
+                                  </mat-option>
+                            </mat-select>
+                            <mat-label>Violation type</mat-label>
+                          </mat-form-field>
+                        <!--type field end-->
+                    <!--curator field start-->
+                      <mat-form-field  [floatLabel]="'auto'" >
+                        <input matInput 
+                            placeholder="Actioning Curator"
+                            formControlName="curator"  />
+                      </mat-form-field>
+                      <!--curator field end-->
+
+                      <!--enabled field start-->
+                      <mat-form-field appearance="fill">
+                        <mat-label>Enabled</mat-label>
+                        <mat-radio-group formControlName="enabled">
+                          <mat-radio-button [value]="true">True</mat-radio-button>
+                          <mat-radio-button [value]="false">False</mat-radio-button>
+                        </mat-radio-group>
+                      </mat-form-field>
+                      <!--Enable field end-->
+
+                        <mat-form-field>
+                        <mat-label>Comments</mat-label>
+                        <textarea matInput formcontrolName="comments"></textarea>
+                        </mat-form-field>
+                    </div>
+                  </form>
+            </div>
+        </section>
+        <button (click)="close()" class="button is-info">
+            Close
+        </button>
+    </div>
+</div>

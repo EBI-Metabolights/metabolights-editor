@@ -54,7 +54,7 @@
             violation.identifier
           " class="button bc-item is-dark"><mat-icon>mail</mat-icon>&nbsp; Contact</a>
             <button *ngIf="isCurator" class="button bc-item rounded-bottom-button is-dark" (click)="openRawModal()"><mat-icon>visibility</mat-icon>&nbsp; View Raw</button>
-            <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
+            <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" (click)="handleOverride(violation)" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
                 sword_rose
                 </span> &nbsp; Override</button>
     
@@ -104,4 +104,7 @@
 </div>
 <div *ngIf="isInfoModalOpen === true">
     <violation-info-modal [violation]="violation" (closeEvent)="closeInfoModal()"></violation-info-modal>
+</div>
+<div *ngIf="isOverrideModalOpen === true">
+    <override-modal [violation]="violation" (closeEvent)="closeOverrideModal()"></override-modal>
 </div>
