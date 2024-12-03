@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { combineLatest, filter, Observable, withLatestFrom } from 'rxjs';
-import { ValidationPhase, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
+import { FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
@@ -29,6 +29,8 @@ export class ValidationsV2ParentComponent implements OnInit {
   assayViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('assay'));
   assignmentViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('assignment'));
   filesViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('files'));
+
+  overrides$: Observable<FullOverride[]> = inject(Store).select(ValidationState.overrides);
 
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
@@ -67,6 +69,10 @@ export class ValidationsV2ParentComponent implements OnInit {
   filesSubsections = validationReportFilesSubsectionList;
   generalSubsections = validationReportInputSubsectionList;
 
+  //override variables
+  overrides: FullOverride[] = [];
+  overrideListModalOpen = false;
+
   ngOnInit(): void {
 
     this.isCurator$.subscribe(value => {
@@ -88,7 +94,6 @@ export class ValidationsV2ParentComponent implements OnInit {
         if (history !== null) {
           this.history = history;
           this.selectedPhase = this.history[0]
-          console.log(history);
 
           if (this.history.length === 0) {
             // TODO: this means a study has never been validated - we should account for this in the UI
@@ -130,6 +135,11 @@ export class ValidationsV2ParentComponent implements OnInit {
       this.store.dispatch(new ValidationReportV2.Get(this.studyId));
       this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
     });
+
+    this.overrides$.pipe(filter(val => val !== null)).subscribe(value => {
+      console.log(value);
+      this.overrides = value;
+    })
   }
 
   onPhaseSelection($event) {
@@ -148,6 +158,14 @@ export class ValidationsV2ParentComponent implements OnInit {
     a.click();
     window.URL.revokeObjectURL(url);
     a.remove();
+  }
+
+  openOverrideListModal() {
+    this.overrideListModalOpen = true;
+  }
+
+  overrideListModalClosed($event) {
+    this.overrideListModalOpen = false;
   }
 
 

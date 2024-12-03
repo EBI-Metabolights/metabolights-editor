@@ -57,6 +57,32 @@ export interface ValidationPhase {
 export interface OverrideResponse {
     studyId: string,
     validationVersion: string
+    validationOverrides: FullOverride[]
 }
 
 
+export interface Breakdown {
+    warnings: number;
+    errors: number;
+}
+
+// we should eventually do some proper schemas WS3 side in order to stop using snake case here
+export interface BaseOverride {
+    enabled: boolean,
+    rule_id: string,
+    new_type: ViolationType,
+    curator: string,
+    comment: string,
+    source_file: string,
+    source_column_header: string,
+    source_column_index: string
+}
+
+export interface FullOverride extends BaseOverride {
+    override_id: string,
+    title: string,
+    description: string,
+    old_type: ViolationType,
+    created_at: string,
+    modified_at: string
+}

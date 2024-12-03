@@ -7,20 +7,13 @@ import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validat
 
 import { interval, withLatestFrom } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
-import { ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
-import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
-
+import { Breakdown, FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
+import * as toastr from "toastr";
 
 export interface ValidationTask {
     id: string;
     ws3TaskStatus: string;
 }
-
-export interface Breakdown {
-    warnings: number;
-    errors: number;
-}
-
 
 
 export interface ValidationStateModel {
@@ -31,6 +24,7 @@ export interface ValidationStateModel {
     status: ViolationType;
     lastRunTime: string;
     currentValidationTask: ValidationTask;
+    overrides: Array<FullOverride>;
     history: Array<ValidationPhase>;
     initialLoadMade: boolean;
 }
@@ -42,6 +36,7 @@ const defaultState: ValidationStateModel = {
     status: null,
     lastRunTime: null,
     currentValidationTask: null,
+    overrides: [],
     history: [],
     initialLoadMade: false
 }
@@ -110,7 +105,8 @@ export class ValidationState {
                 (response) => {
                     if (response.status !== 'error') {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
-                        ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
+                        ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask));
+                        ctx.dispatch( new ValidationReportV2.Override.GetAll(action.studyId));
                         if (response.content.task_status === "SUCCESS") {
                             ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                             ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
@@ -235,6 +231,56 @@ export class ValidationState {
         });
     }
 
+    @Action(ValidationReportV2.Override.GetAll) 
+    GetOverrides(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.GetAll) {
+        const state = ctx.getState();
+        this.validationService.getAllOverrides(action.studyId).subscribe({
+            next: (response) => {
+                ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+            },
+            error: (error) => {
+                console.error(`${error}`)
+            }
+        })
+    }
+
+    @Action([ValidationReportV2.Override.Create, ValidationReportV2.Override.Update])
+    PatchOverride(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.Create | ValidationReportV2.Override.Update) {
+        const state = ctx.getState();
+        this.validationService.overrideRule(action.studyId, action.override).subscribe({
+            next: (response) => {
+                ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+                console.log(response);
+            },
+            error: (e) => {
+                console.log('unexpected error when creating override');
+                console.error(e);
+            }
+        })
+    }
+
+    @Action(ValidationReportV2.Override.Set)
+    SetOverride(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            overrides: action.overrides
+        });
+    }
+
+    @Action(ValidationReportV2.Override.Delete)
+    DeleteOverride(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.Delete) {
+        this.validationService.deleteOverride(action.studyId, action.overrideId).subscribe({
+            next: (response) => {
+                ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+            },
+            error: (error) => {
+                console.error(`${error}`);
+            }
+        })
+    }
+    
+
     @Action(ValidationReport.Refresh)
     RefreshValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Refresh) {
         const state = ctx.getState();
@@ -244,14 +290,14 @@ export class ValidationState {
                 ctx.dispatch(new EditorValidationRules.Get());
             },
             (error) => {
-                console.log("Unable to start new validation run.")
-                console.log(error)
+                console.log("Unable to start new validation run.");
+                console.log(error);
             }
         )
     }
 
     @Action(ValidationReport.ContinualRetry)
-    ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry){
+    ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry) {
         let repeat = 0;
         this.validationService.getValidationReport(action.studyId).subscribe(reportResponse => {
           if (reportResponse.validation.status === "not ready"){
@@ -261,16 +307,16 @@ export class ValidationState {
                 repeat = repeat + 1;
               if (nextReportResponse.validation.status !== "not ready"){
                 validationReportLoadSubscription.unsubscribe();
-                ctx.dispatch(new ValidationReport.Set(nextReportResponse))
+                ctx.dispatch(new ValidationReport.Set(nextReportResponse));
               }
               if (repeat > action.retries) {
                 validationReportLoadSubscription.unsubscribe();
-                ctx.dispatch(new ValidationReport.Set(nextReportResponse))
+                ctx.dispatch(new ValidationReport.Set(nextReportResponse));
               }
               });
             });
           } else {
-                ctx.dispatch(new ValidationReport.Set(reportResponse))
+                ctx.dispatch(new ValidationReport.Set(reportResponse));
           }
         });
     }
@@ -308,17 +354,17 @@ export class ValidationState {
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
         if (state === undefined) { return null }
-        return state.rules
+        return state.rules;
     }
 
     @Selector()
     static report(state: ValidationStateModel): Record<string, any> {
-        return state.report
+        return state.report;
     }
 
     @Selector()
     static reportV2(state: ValidationStateModel): Ws3ValidationReport {
-        return state.reportV2
+        return state.reportV2;
     }
 
     @Selector()
@@ -358,7 +404,7 @@ export class ValidationState {
 
     @Selector()
     static initialLoadMade(state: ValidationStateModel) {
-        return state.initialLoadMade
+        return state.initialLoadMade;
     }
 
     @Selector()
@@ -368,12 +414,12 @@ export class ValidationState {
 
     @Selector()
     static validationStatus(state: ValidationStateModel) {
-        return state.status
+        return state.status;
     }
 
     @Selector()
     static lastValidationRunTime(state: ValidationStateModel) {
-        return state.lastRunTime
+        return state.lastRunTime;
     }
 
     @Selector()
@@ -386,6 +432,19 @@ export class ValidationState {
         return {
             warnings: state.reportV2.messages.violations.filter(val => val.type === 'ERROR').length,
             errors: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length}
+    }
+
+    @Selector()
+    static overrides(state: ValidationStateModel): Array<FullOverride> {
+        return state.overrides;
+    }
+
+    static specificOverride(ruleId) {
+        return createSelector([ValidationState], (state: ValidationStateModel) => { 
+            const overrideList = state.overrides.filter(val => val.rule_id === ruleId);
+            const val = overrideList[0] || null
+            return val
+        });
     }
 }
 

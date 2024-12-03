@@ -68,6 +68,8 @@ import { ValidationsV2ParentComponent } from "./validations-v2/validations-v2-pa
 import { ValidationTaskBoxComponent } from "./validations-v2/validation-task-box/validation-task-box.component";
 import { ValidationDateFormatPipe } from "./validations-v2/pipes/validation-date.pipe";
 import { OverrideModalComponent } from "./validations-v2/modals/override-modal/override-modal.component";
+import { MatRadioModule } from "@angular/material/radio";
+import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-modal/list-overrides.component";
 
 @NgModule({
   declarations: [
@@ -98,6 +100,7 @@ import { OverrideModalComponent } from "./validations-v2/modals/override-modal/o
     ValidationInfoModalComponent,
     RawViolationModalComponent,
     OverrideModalComponent,
+    ListOverridesComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,
     NoViolationsComponent,
@@ -133,6 +136,7 @@ import { OverrideModalComponent } from "./validations-v2/modals/override-modal/o
     MatTabsModule,
     MatCardModule,
     MatSelectModule,
+    MatRadioModule,
     ValidationReportSummaryComponent,
     AddSpaceBeforeCapitalPipe,
     HandleUnderscoreInReportPipe,
@@ -167,6 +171,7 @@ import { OverrideModalComponent } from "./validations-v2/modals/override-modal/o
     ValidationsV2ParentComponent,
     ValidationInfoModalComponent,
     OverrideModalComponent,
+    ListOverridesComponent,
     RawViolationModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,

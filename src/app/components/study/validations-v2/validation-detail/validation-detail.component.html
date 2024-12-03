@@ -59,8 +59,12 @@
                 </span> &nbsp; Override</button>
     
           </div>
-          <div class="spinner-container">
-
+          <div class="override-container">
+            <ng-container *ngIf="violation.overrided">
+                <span class="tag is-light">!</span> 
+                <span class="override-tag tag is-info"> Override Applied</span>
+            </ng-container>
+         
           </div>
     
         </div>

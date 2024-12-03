@@ -1,10 +1,10 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Violation } from '../interfaces/validation-report.interface';
+import { Breakdown, Violation } from '../interfaces/validation-report.interface';
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { filter, Observable } from 'rxjs';
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Breakdown, ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { OverrideModalComponent } from '../modals/override-modal/override-modal.component';
 
 @Component({
