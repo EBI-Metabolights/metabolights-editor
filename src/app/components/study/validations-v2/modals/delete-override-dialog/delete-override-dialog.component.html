@@ -1,0 +1,8 @@
+<h1 mat-dialog-title>Confirm Delete Override</h1>
+<div mat-dialog-content>
+  <p>Are you sure you want to delete the override for <strong>{{ override.rule_id }}</strong> ?</p>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button color="warn" (click)="onDelete()">Delete</button>
+</div>

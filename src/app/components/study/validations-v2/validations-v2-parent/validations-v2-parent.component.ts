@@ -168,5 +168,9 @@ export class ValidationsV2ParentComponent implements OnInit {
     this.overrideListModalOpen = false;
   }
 
+  handleDeleteOverride($event: string) {
+    this.store.dispatch(new ValidationReportV2.Override.Delete(this.studyId, $event));
+  }
+
 
 }

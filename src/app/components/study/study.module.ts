@@ -70,6 +70,9 @@ import { ValidationDateFormatPipe } from "./validations-v2/pipes/validation-date
 import { OverrideModalComponent } from "./validations-v2/modals/override-modal/override-modal.component";
 import { MatRadioModule } from "@angular/material/radio";
 import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-modal/list-overrides.component";
+import {MatDialogModule} from '@angular/material/dialog';
+import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-override-dialog/delete-override-dialog.component";
+
 
 @NgModule({
   declarations: [
@@ -104,7 +107,8 @@ import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-m
     ValidationV2DetailComponent,
     ValidationSectionComponent,
     NoViolationsComponent,
-    ValidationTaskBoxComponent
+    ValidationTaskBoxComponent,
+    DeleteOverrideDialogComponent
   ],
   imports: [
     CommonModule,
@@ -137,6 +141,7 @@ import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-m
     MatCardModule,
     MatSelectModule,
     MatRadioModule,
+    MatDialogModule,
     ValidationReportSummaryComponent,
     AddSpaceBeforeCapitalPipe,
     HandleUnderscoreInReportPipe,
@@ -176,7 +181,8 @@ import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-m
     ValidationV2DetailComponent,
     ValidationSectionComponent,
     NoViolationsComponent,
-    ValidationTaskBoxComponent
+    ValidationTaskBoxComponent,
+    DeleteOverrideDialogComponent
 
   ],
   providers: [

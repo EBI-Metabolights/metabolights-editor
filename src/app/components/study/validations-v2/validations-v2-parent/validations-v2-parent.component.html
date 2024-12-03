@@ -109,6 +109,6 @@
 
 <!--List of override modals-->
 <ng-container *ngIf="overrideListModalOpen && overrides.length > 0">
- <list-overrides [overrides]="overrides" [isCurator]="isCurator" (closeEvent)="overrideListModalClosed($event)"></list-overrides>
+ <list-overrides [overrides]="overrides" [isCurator]="isCurator" (closeEvent)="overrideListModalClosed($event)" (deleteEvent)="handleDeleteOverride($event)"></list-overrides>
 </ng-container>
 
