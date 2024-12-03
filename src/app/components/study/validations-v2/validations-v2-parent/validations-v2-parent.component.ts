@@ -137,7 +137,6 @@ export class ValidationsV2ParentComponent implements OnInit {
     });
 
     this.overrides$.pipe(filter(val => val !== null)).subscribe(value => {
-      console.log(value);
       this.overrides = value;
     })
   }

@@ -8,6 +8,8 @@ import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { Owner } from 'src/app/ngxs-store/non-study/user/user.actions';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
+import { MatDialog } from '@angular/material/dialog';
+import { DeleteOverrideDialogComponent } from '../delete-override-dialog/delete-override-dialog.component';
 
 @Component({
   selector: 'override-modal',
@@ -23,6 +25,8 @@ export class OverrideModalComponent implements OnInit, OnChanges {
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   user$: Observable<Owner> = inject(Store).select(UserState.user);
 
+  deleted = false;
+
 
   options!: FormGroup; // Ensure it is properly defined
   types = [
@@ -34,7 +38,7 @@ export class OverrideModalComponent implements OnInit, OnChanges {
   user: Owner = null;
   override: FullOverride = null;
 
-  constructor(private formBuilder: FormBuilder, private store: Store) { } 
+  constructor(private formBuilder: FormBuilder, private store: Store, private dialog: MatDialog) { } 
 
   ngOnInit(): void {
     this.initializeForm();
@@ -85,9 +89,20 @@ export class OverrideModalComponent implements OnInit, OnChanges {
     this.store.dispatch(new actionClass(this.studyId, override));
   }
 
-  delete() {
-    this.store.dispatch(new ValidationReportV2.Override.Delete(this.studyId, this.override.override_id));
-    this.closeEvent.emit('deleted');
+  openDeleteDialog() {
+    const dialogRef = this.dialog.open(DeleteOverrideDialogComponent, {
+      width: '400px'
+    });
+
+    const dialogInstance = dialogRef.componentInstance;
+    dialogInstance.override = this.override;
+    dialogRef.componentInstance.deleteConfirmed.subscribe(() => {
+      this.store.dispatch(new ValidationReportV2.Override.Delete(this.studyId, this.override.override_id));
+      //this.closeEvent.emit('deleted');
+      this.deleted = true;
+    })
+    
+
     // TODO: have a toastr message popup somewhere
+   }
   }
-}

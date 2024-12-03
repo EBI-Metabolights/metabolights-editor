@@ -1,4 +1,7 @@
-
+.blurred {
+    filter: blur(5px); 
+    pointer-events: none; 
+  }
 
 .form-container {
     display: flex;

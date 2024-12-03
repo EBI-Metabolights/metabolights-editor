@@ -5,10 +5,10 @@ import { ValidationService } from "src/app/services/decomposed/validation.servic
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
-import { interval, withLatestFrom } from "rxjs";
+import { interval, timer, withLatestFrom } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
 import { Breakdown, FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
-import * as toastr from "toastr";
+import { ToastrService } from "src/app/services/toastr.service";
 
 export interface ValidationTask {
     id: string;
@@ -47,7 +47,7 @@ const defaultState: ValidationStateModel = {
 @Injectable()
 export class ValidationState {
 
-    constructor(private validationService: ValidationService, private store: Store) {}
+    constructor(private validationService: ValidationService, private store: Store, private toastrService: ToastrService) {}
     
 
     @Action(EditorValidationRules.Get)
@@ -130,10 +130,6 @@ export class ValidationState {
                     console.log(JSON.stringify(error));
                 })
         } else {
-            /**this.validationService.getNewValidationReport().subscribe((response) => {
-                ctx.dispatch(new NewValidationReport.Set({study_id: "test", duration_in_seconds: 5,completion_time: "0.00", messages: response}));
-            });*/
-
             this.validationService.getFakeValidationReportApiResponse().subscribe((response) => {
                 ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                 ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
@@ -162,7 +158,6 @@ export class ValidationState {
         this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe(
             (response) => {
                 ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
-                //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
             },
             (error) => {
                 console.log('could not submit validation task');
@@ -249,12 +244,14 @@ export class ValidationState {
         const state = ctx.getState();
         this.validationService.overrideRule(action.studyId, action.override).subscribe({
             next: (response) => {
+                this.toastrService.pop(`Validation override for rule ${action.override.rule_id} applied`, "Success")
                 ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
-                console.log(response);
+                ctx.dispatch(new ValidationReportV2.InitialiseValidationTask(false, action.studyId));
             },
             error: (e) => {
                 console.log('unexpected error when creating override');
                 console.error(e);
+                this.toastrService.pop(`Unable to create override for ${action.override.rule_id}`, "Error");
             }
         })
     }
@@ -273,9 +270,16 @@ export class ValidationState {
         this.validationService.deleteOverride(action.studyId, action.overrideId).subscribe({
             next: (response) => {
                 ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+                this.toastrService.pop(`Deleted Override ${action.overrideId}`, "Success");
+                ctx.dispatch(new ValidationReportV2.InitialiseValidationTask(false, action.studyId));
+                const t = timer(5000);
+                t.subscribe(() => {
+                    ctx.dispatch(new ValidationReportV2.Get(action.studyId));
+                })
             },
             error: (error) => {
                 console.error(`${error}`);
+                this.toastrService.pop(`Could not delete override ${action.overrideId}`, "Error");
             }
         })
     }

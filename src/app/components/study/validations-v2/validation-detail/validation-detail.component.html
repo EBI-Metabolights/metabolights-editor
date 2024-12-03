@@ -17,6 +17,16 @@
                     <div class="row-content"> <h2>{{ violation.title }}</h2> </div>
             </div>
         </div>
+                <div class="content">
+            <div class="row-container">
+                <div class="row-key">
+                    <span class="material-symbols-outlined">
+                        my_location
+                        </span>
+                    <!--<b>LOCATION</b>-->
+                </div> <div class="row-content"> {{ violation.sourceFile}}</div>
+            </div>
+        </div>
         <div class="content">
             <div class="row-container">
                 <div class="row-key">
@@ -27,16 +37,7 @@
                 <div class="row-content"> {{ violation.description }} <br> {{violation.violation}}</div> 
             </div>
         </div>
-        <div class="content">
-            <div class="row-container">
-                <div class="row-key">
-                    <span class="material-symbols-outlined">
-                        my_location
-                        </span>
-                    <!--<b>LOCATION</b>-->
-                </div> <div class="row-content"> {{ violation.sourceFile}}</div>
-            </div>
-        </div>
+
         <div class="sidebar sidebar-top" > 
             <div class="type" [ngClass]="{
             'bg-error': violation.type === 'ERROR',

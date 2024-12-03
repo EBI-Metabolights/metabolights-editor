@@ -82,7 +82,7 @@
 .row-key {
     grid-column: 1 / 1;
     grid-row: 1 / 1;
-    background-color: #363636;
+    background: linear-gradient(0.25turn, #363636, #080808);
     color: #f5f5f5;
     padding-top: 14%;
     padding-left: 33%;
@@ -104,6 +104,10 @@
     color: #f5f5f5;
 
 
+}
+
+.bc-background {
+    background: linear-gradient(0.25turn, #363636, #2a2a2a, #363636);
 }
 
 .override-container {
@@ -180,7 +184,7 @@
 }
 
 .bg-key {
-   background-color: #363636;
+    background: linear-gradient(0.25turn, #363636, #080808);
 }
 
 .bg-error {
