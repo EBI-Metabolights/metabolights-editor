@@ -40,11 +40,7 @@ export class ListOverridesComponent {
 
   }
 
-  openEditDialog(override: FullOverride): void {
-    const dialogRef = this.dialog.open(OverrideModalComponent, {
-      width: '400px'
-    });
-  }
+
 
 
 }

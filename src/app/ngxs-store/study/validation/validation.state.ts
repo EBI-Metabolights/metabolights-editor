@@ -383,8 +383,19 @@ export class ValidationState {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
             if (state.reportV2 === null) { return [] }
             return sortViolations(
-                filterViolations(
+                filterViolationsBySection(
                     state.reportV2.messages.violations, section
+                )
+            );
+        });
+    }
+
+    static reportV2ViolationsByRuleId(ruleId) {
+        return createSelector([ValidationState], (state: ValidationStateModel) => {
+            if (state.reportV2 === null) { return [] }
+            return sortViolations(
+                filterViolationsByRuleId(
+                    state.reportV2.messages.violations, ruleId
                 )
             );
         });
@@ -397,7 +408,7 @@ export class ValidationState {
 
     static reportV2Summaries(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            return filterViolations(state.reportV2.messages.summary, section)
+            return filterViolationsBySection(state.reportV2.messages.summary, section)
         });
     }
 
@@ -453,8 +464,12 @@ export class ValidationState {
 }
 
 
-function filterViolations(violations: Violation[], filterSectionStart: string): Violation[] {
+function filterViolationsBySection(violations: Violation[], filterSectionStart: string): Violation[] {
     return violations.filter(violation => violation.section.startsWith(filterSectionStart));
+}
+
+function filterViolationsByRuleId(violations: Violation[], ruleId: string): Violation[] {
+    return violations.filter(violation => violation.identifier === ruleId);
 }
 
 function sortViolations(violations: Violation[]): Violation[] {
