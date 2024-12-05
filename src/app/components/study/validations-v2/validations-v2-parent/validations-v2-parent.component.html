@@ -21,7 +21,7 @@
               </mat-form-field>
         </div>
         <div class="download-report-button">
-            <a (click)="openOverrideListModal()" class="button is-light"> <mat-icon>picture_in_picture</mat-icon> View Enabled Overrides</a>
+            <a *ngIf="overrides.length > 0" (click)="openOverrideListModal()" class="button is-light"> <mat-icon>picture_in_picture</mat-icon> View Enabled Overrides</a>
             &nbsp;
             <a (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
 
@@ -108,7 +108,7 @@
 </ng-template>
 
 <!--List of override modals-->
-<ng-container *ngIf="overrideListModalOpen && overrides.length > 0">
+<ng-container *ngIf="overrideListModalOpen">
  <list-overrides [overrides]="overrides" [isCurator]="isCurator" (closeEvent)="overrideListModalClosed($event)" (deleteEvent)="handleDeleteOverride($event)"></list-overrides>
 </ng-container>
 

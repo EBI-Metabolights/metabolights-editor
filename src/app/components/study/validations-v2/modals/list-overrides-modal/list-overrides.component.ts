@@ -17,7 +17,7 @@ export class ListOverridesComponent {
   @Output() closeEvent = new EventEmitter<any>();
   @Output() deleteEvent = new EventEmitter<string>();
 
-  displayedColumns: string[] = ['rule_id', 'title', 'new_type', 'curator', 'created_at', 'actions'];
+  displayedColumns: string[] = ['rule_id', 'title', 'new_type', 'curator', 'comments', 'created_at', 'actions'];
 
   constructor(private dialog: MatDialog) {
     

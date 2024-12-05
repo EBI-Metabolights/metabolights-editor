@@ -26,6 +26,12 @@
         <mat-header-cell *matHeaderCellDef> Curator </mat-header-cell>
         <mat-cell *matCellDef="let override"> {{ override.curator }} </mat-cell>
       </ng-container>
+
+      <ng-container matColumnDef="comments">
+        <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
+        <mat-cell *matCellDef="let override"> {{ override.comment}} </mat-cell>
+
+      </ng-container>
   
       <!-- Created At Column -->
       <ng-container matColumnDef="created_at">
