@@ -58,7 +58,7 @@ export class HeaderInterceptor implements HttpInterceptor {
         }
       });
     }
-    else if (permissions && permissions.obfuscationCode && permissions.studyStatus.toUpperCase() === "INREVIEW"){
+    else if (permissions && permissions.obfuscationCode && ['INREVIEW', 'INCURATION'].includes(permissions.studyStatus.toUpperCase())){
         const user = this.store.snapshot().user.user;
         if (user === null || (user !== null && user.userName === permissions.userName)) {
           request = request.clone({
