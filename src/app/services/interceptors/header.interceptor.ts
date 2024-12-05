@@ -4,7 +4,7 @@ import { Observable } from "rxjs";
 import { disambiguateUserObj } from "../editor.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngxs/store";
-import { environment } from "src/environments/environment";
+
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
@@ -51,8 +51,14 @@ export class HeaderInterceptor implements HttpInterceptor {
     }
     let permissions =  null
     permissions = this.store.snapshot().application.studyPermission
-
-    if (permissions && permissions.obfuscationCode && permissions.studyStatus.toUpperCase() === "INREVIEW"){
+    if (request.url.includes('/reviewer') && ['INREVIEW', 'INCURATION'].includes(permissions.studyStatus.toUpperCase())) {
+      request = request.clone({
+        setHeaders: {
+          obfuscation_code: permissions.obfuscationCode
+        }
+      });
+    }
+    else if (permissions && permissions.obfuscationCode && permissions.studyStatus.toUpperCase() === "INREVIEW"){
         const user = this.store.snapshot().user.user;
         if (user === null || (user !== null && user.userName === permissions.userName)) {
           request = request.clone({
