@@ -265,14 +265,14 @@
                 >
                   <a>Files</a>
                 </li>
-                <!--<li
+                <li
                   *ngIf="isCurator"
                   (click)="selectCurrentTab(6, 'validations')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
                 >
                   <a>Study Validations</a>
-                </li>-->
-                <li
+                </li>
+                <li 
                 (click)="selectCurrentTab(7, 'validations')"
                 [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}">
                   <a>Study Validations</a>
@@ -326,12 +326,12 @@
                 >
                   <mtbls-files class="files-tab"></mtbls-files>
                 </div>
-                <!--<div
+               <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 6"
                 >
                   <study-validations></study-validations>
-                </div>-->
+                </div>
                 <div
                   class="tab-content fadeIn animated"
                   *ngIf="(currentTabIndex$ | async) === 7">
