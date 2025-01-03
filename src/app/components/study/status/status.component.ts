@@ -28,7 +28,6 @@ export class StatusComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
-  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
@@ -46,7 +45,6 @@ export class StatusComponent implements OnInit {
   toStatus = "Submitted";
   curationRequest: string = null;
   requestedStudy: string = null;
-  validation: IValidationSummary;
 
   validationStatus: ViolationType = null;
 
@@ -65,9 +63,7 @@ export class StatusComponent implements OnInit {
     this.toastrSettings$.subscribe((value) => {
       this.toastrSettings = value;
     })
-    this.studyValidation$.subscribe((value) => {
-      this.validation = value;
-    });
+
     this.studyStatus$.subscribe((value) => {
       this.closeModal();
       this.store.dispatch(new Loading.Disable())
@@ -149,7 +145,8 @@ export class StatusComponent implements OnInit {
       this.isModalOpen = true;
     } else {
       if (this.status != null && this.status.toLowerCase() === "submitted") {
-        if (this.validation.status === 'error' || this.validation.status === 'not ready') {
+
+        if (this.validationStatus === 'ERROR' || this.validationStatus === null) {
           toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
             timeOut: "5000",
             positionClass: "toast-top-center",
