@@ -11,7 +11,7 @@ import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
 import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
-import { Operations } from "../files/files.actions";
+import { ObfuscationCode, Operations, UploadLocation } from "../files/files.actions";
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
@@ -399,6 +399,14 @@ export class GeneralMetadataState {
                 }
                 if (assigned_status !== state.status) {
                   ctx.dispatch(new StudyStatus.Set(assigned_status));
+                }
+                if (response.hasOwnProperty("ftp_folder_path")){
+                  const ftpFolderPath = response["ftp_folder_path"]
+                  ctx.dispatch(new UploadLocation.Set(ftpFolderPath));
+                }
+                if (response.hasOwnProperty("obfuscation_code")){
+                  const obfuscationCode = response["obfuscation_code"]
+                  ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
                 }
                 const readOnlySub = this.store.select(state => state.ApplicationState.readonly).pipe(take(1))
                 readOnlySub.subscribe((ro) => {
