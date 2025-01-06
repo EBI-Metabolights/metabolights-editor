@@ -162,6 +162,8 @@ export class MafComponent implements AfterContentInit {
         data.forEach((d) => {
           if (d) {
             this.mafData.data.rows.forEach((row) => {
+              if(row === undefined) return;
+              if (d.content[0] === undefined) return;
               if (
                 row.database_identifier === d.content[0].databaseId ||
                 row.smiles === d.content[0].smiles ||
