@@ -2,7 +2,8 @@ import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { StudyPermission } from "../../../services/headers";
 import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, Guides,
   GuidesMappings, MaintenanceMode, SetProtocolExpand,
-  SetReadonly, SetSelectedLanguage, SetStudyError } from "./application.actions";
+  SetReadonly, SetSelectedLanguage, SetStudyError,
+  StudyPermissionNS} from "./application.actions";
 import { Injectable } from "@angular/core";
 import { ApplicationService } from "src/app/services/decomposed/application.service";
 
@@ -373,5 +374,18 @@ export class ApplicationState {
         return state.toastrSettings
     }
 
+    @Action(StudyPermissionNS.Set)
+    SetStudyPermissions(ctx: StateContext<ApplicationStateModel>, action: StudyPermissionNS.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            studyPermission: action.permission
+        })
+    }
+
+    @Selector()
+    static studyPermission(state: ApplicationStateModel) {
+        return state.studyPermission;
+    }
 
 }
