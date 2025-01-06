@@ -64,7 +64,7 @@ export class StatusComponent implements OnInit {
       this.toastrSettings = value;
     })
 
-    this.studyStatus$.subscribe((value) => {
+    this.studyStatus$.pipe(filter(val => val !== null)).subscribe((value) => {
       this.closeModal();
       this.store.dispatch(new Loading.Disable())
       if (value !== null) {
@@ -72,6 +72,7 @@ export class StatusComponent implements OnInit {
         this.status = value;
         this.toStatus = value;
         if (prevStatus !== null && this.requestedStudy && this.status !== prevStatus) {
+          // TODO: work out why we are unexpectedly seeing this.
           toastr.success("Study status updated.", "Success", this.toastrSettings);
           this.router.navigate(["/study", this.requestedStudy]);
         }
