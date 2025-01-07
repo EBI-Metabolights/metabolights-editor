@@ -7,3 +7,9 @@
     padding: 16px;
   }
   
+  .scrollable-table-container {
+    max-height: 500px; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+    display: block;
+  }
