@@ -60,7 +60,7 @@ export class PublicStudyComponent implements OnInit {
   permissions: StudyPermission = null;
   notReadyValidationMessage: string = null;
   validationStatus: ViolationType = null;
-
+  obfuscationCode: string = null;
   constructor(
     private store: Store,
     private editorService: EditorService,
@@ -81,10 +81,10 @@ export class PublicStudyComponent implements OnInit {
     }
     let reviewMode = false;
     const studyId = this.route.snapshot.paramMap.get("study");
-    const obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
+    this.obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
 
     if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === studyId){
-      if (obfuscationCode === this.permissions.obfuscationCode && ["INREVIEW", "INCURATION"].includes(this.permissions.studyStatus.toUpperCase())){
+      if (this.obfuscationCode === this.permissions.obfuscationCode && ["INREVIEW", "INCURATION"].includes(this.permissions.studyStatus.toUpperCase())){
         reviewMode = true;
       }
       if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){

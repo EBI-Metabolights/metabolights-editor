@@ -7,6 +7,7 @@ import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 @Component({
   selector: "nav-bar",
   templateUrl: "./nav-bar.component.html",
@@ -16,6 +17,8 @@ export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
+
   editorVersion$: Observable<MtblsEditorVersion> = inject(Store).select(ApplicationState.editorVersion);
   apiVersion$: Observable<MtblsBackendVersion> = inject(Store).select(ApplicationState.backendVersion);
 
@@ -25,7 +28,8 @@ export class NavBarComponent implements OnInit {
   baseHref: string;
   endpoint = "";
   environmentName: string;
-  studyid: string;
+  studyId: string;
+  obfuscationCode: string;
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -42,11 +46,14 @@ export class NavBarComponent implements OnInit {
   ngOnInit() {
     this.endpoint = this.configService.config.endpoint;
     this.setUpSubscriptionsNgxs();
-    
-    
+
+
   }
 
   setUpSubscriptionsNgxs() {
+    this.obfuscationCode$.subscribe((value) => {
+      this.obfuscationCode = value;
+    });
     this.editorVersion$.subscribe((value) => {
       if (value) {
         this.editorVersion = value.version + "-" + value.releaseName;
@@ -62,7 +69,7 @@ export class NavBarComponent implements OnInit {
       }
     });
     this.studyIdentifier$.subscribe((value) => {
-      this.studyid = value;
+      this.studyId = value;
     });
   }
 

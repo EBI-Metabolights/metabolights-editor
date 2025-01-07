@@ -19,8 +19,8 @@
           *ngIf="router.url != '/console' && router.url != '/guide/create'"
           class="navbar-item"
         >
-          {{ studyIdentifier | async }}&emsp;<span
-            *ngIf="studyIdentifier | async"
+          {{ studyId }}&emsp;<span
+            *ngIf="studyId"
             class="tag is-normal is-rounded"
             >PRIVATE</span
           >
@@ -47,7 +47,7 @@
       <a
         *ngIf="mode != 'light'"
         target="_blank"
-        [href]="baseHref + (studyIdentifier | async)"
+        [href]="baseHref + studyId + '?reviewCode=' + obfuscationCode"
         class="navbar-item"
       >
         <i class="material-icons"> visibility </i>&nbsp;Preview
