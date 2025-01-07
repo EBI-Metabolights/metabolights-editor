@@ -52,7 +52,9 @@ export class NavBarComponent implements OnInit {
 
   setUpSubscriptionsNgxs() {
     this.obfuscationCode$.subscribe((value) => {
-      this.obfuscationCode = value;
+      if (value !== null ) {
+        this.obfuscationCode = value;
+      }
     });
     this.editorVersion$.subscribe((value) => {
       if (value) {
