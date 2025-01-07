@@ -61,7 +61,7 @@ export class OverrideModalComponent implements OnInit, OnChanges {
 
   initializeForm(): void {
     this.options = this.formBuilder.group({
-      type: [this.violation?.type || 'ERROR'], // Use default if violation is undefined
+      type: [(this.violation.overrided ? this.violation.type : 'WARNING') || "WARNING"], // Use default if violation is undefined
       enabled: [this.violation?.overrided || true], // Default to false
       comments: [this.violation?.overrideComment || ""],
     });
