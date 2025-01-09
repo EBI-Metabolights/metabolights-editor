@@ -41,16 +41,22 @@
                   </form>
             </div>
             <div class="buttons-container">
-              <button [disabled]="false || deleted" (click)="save()" class="button is-success">
-                Save
-              </button>
-              <button (click)="close()" class="button is-info">
-                Close
-              </button>
-              <button [disabled]="deleted" *ngIf="override !== null" (click)="openDeleteDialog()" class="button om-delete-button is-danger">
-                Delete
-            </button>
+              <div class="left-buttons">
+                <button [disabled]="false || deleted" (click)="save()" class="button is-success">
+                  {{options.pristine ? 'OK' : 'Save'}}
+                </button>
+                <button (click)="close()" class="button outline-dark">
+                  Close
+                </button>
+              </div>
+              <div class="right-buttons">
+                <button [disabled]="deleted" *ngIf="override !== null" (click)="openDeleteDialog()" class="button is-danger">
+                  Delete
+                </button>
+              </div>
             </div>
+
+            
 
         </section>
  

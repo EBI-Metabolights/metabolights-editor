@@ -13,6 +13,17 @@
 
 }
 
-.om-delete-button {
-    margin-left: auto;
-}
+.buttons-container {
+    display: flex;
+    justify-content: space-between; /* Push the buttons to opposite ends */
+    align-items: center; /* Vertically align buttons */
+  }
+  
+  .left-buttons {
+    display: flex;
+    gap: 10px; /* Add spacing between Save and Close buttons */
+  }
+  
+  .right-buttons {
+    display: flex;
+  }
