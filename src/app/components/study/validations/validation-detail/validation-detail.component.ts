@@ -149,7 +149,7 @@ export class ValidationDetailComponent implements OnInit, OnChanges {
       (completed) => {
         toastr.success(
           "Success",
-          "Successfully overriden the validation",
+          "Successfully overridden the validation",
           this.defaultToastrOptions
         );
       },

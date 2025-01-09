@@ -113,7 +113,7 @@ export class LoginComponent implements OnInit {
           });
         } else if (err.status === 403) {
           this.invalidCredentials = true;
-          toastr.error("Invalid username or passoword.", "Error", {
+          toastr.error("Invalid login credentials.", "Error", {
             timeOut: "4000",
             positionClass: "toast-top-center",
             preventDuplicates: true,

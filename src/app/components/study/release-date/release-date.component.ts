@@ -101,7 +101,7 @@ export class ReleaseDateComponent implements OnInit {
           cancelButtonText: "Back",
         }).then((willChange) => {
           if (willChange.value) {
-
+            console.log()
             this.store.dispatch(new StudyReleaseDate.Update(dateTo)).subscribe(
               (completed) => {
                 this.closeModal();

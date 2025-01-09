@@ -16,7 +16,7 @@
           <div class="column">
             <h3>
               The following steps will guide you through creating your
-              metabolomics study submission request. Once created you can view and edit your
+             MetaboLights  submission request (study). Once created you can view and edit your
               submission through the MetaboLights website.
             </h3>
             <br />
@@ -27,24 +27,24 @@
               >
                 <div class="column">
                   <p class="has-text-centered">
-                    <mat-icon>info</mat-icon> Once you create a request, you
-                    can switch between the guided submission and full study view
+                    <mat-icon>info</mat-icon> Once you create a submission, you
+                    can switch between the guided  and full view
                     where you see these buttons.
                   </p>
                 </div>
                 <div class="column">
                   <div class="has-text-centered">
-                    <button class="button is-rounded no-pointer has-text-grey">
+                    <button [disabled]="true" class="button is-rounded no-pointer has-text-grey">
                       <small>
                         <mat-icon>view_carousel</mat-icon> Guided submission
                       </small></button
                     >&nbsp;
-                    <a class="button is-rounded no-pointer has-text-grey">
+                    <button [disabled]="true" class="button is-rounded no-pointer has-text-grey">
                       <small>
-                        <mat-icon>chrome_reader_mode</mat-icon> Switch to study
+                        <mat-icon>chrome_reader_mode</mat-icon> Switch to
                         overview
                       </small>
-                    </a>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -73,14 +73,14 @@
             src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
           />
           <span style="margin-left: 10px"
-            >New Request - Raw / Derived data files</span
+            >Raw / Derived data files</span
           >
         </div>
         <div class="panel-block">
           <div class="column">
             <h3>
               MetaboLights studies require raw data files. These can be added at
-              any stage to the RAW_FILES folder with in the study during the
+              any stage to the RAW_FILES folder within the study during the
               submission process. Additionally, including mzML / nmrML processed
               files to the DERIVED_FILES folder enables automatic extraction of
               some required information into your study.
@@ -88,8 +88,8 @@
             <br />
             <small
               ><mat-icon>info</mat-icon> RAW_FILES and DERIVED_FILES folders
-              will be automatically added to your study upon creation.</small
-            >
+              will be automatically added to your ftp upload folder upon creation. For more information please consult our <a href="/guides">guides</a></small
+            >.
             <div style="padding-top: 10px">
               <small class="has-text-grey-lighter">Please select</small>
               <mat-button-toggle-group
@@ -140,7 +140,7 @@
         <div class="panel-block">
           <div class="column">
             <p>
-              Your study request has been assigned with the identifier
+              Your temporary submission request is referenced by MetaboLights as
               <span class="has-text-link"
                 ><b>{{ newStudy }}</b></span
               >
@@ -149,7 +149,6 @@
               MetaboLights team.
             </p>
             <br />
-            <h3><b>How to reference your MetaboLights study</b></h3>
             <p>
               A MetaboLights accession number will be assigned to your study after you complete the submission. Please upload your dataset and complete the study metadata as soon as possible.
               <br /><br />

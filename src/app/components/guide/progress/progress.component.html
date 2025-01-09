@@ -9,14 +9,13 @@
       </span>
     </div>
     <div class="step-details">
-      <p *ngIf="!study" class="step-title">Create a Request</p>
+      <p *ngIf="!study" class="step-title">Start</p>
       <p *ngIf="study" class="step-title">
         <a
           [ngClass]="{ 'has-text-grey': step < 2 }"
           (click)="redirectTo('info', null, 1)"
         >
-          Request Created <br />
-          {{ study }}</a
+        Initiated  {{ study }} </a
         >
       </p>
     </div>
