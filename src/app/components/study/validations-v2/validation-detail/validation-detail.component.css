@@ -86,6 +86,7 @@
     color: #f5f5f5;
     padding-top: 14%;
     padding-left: 33%;
+    overflow: hidden;
 }
 
 .row-content {
