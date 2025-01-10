@@ -15,8 +15,6 @@ import { ObfuscationCode, Operations, UploadLocation } from "../files/files.acti
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
-import { ApplicationState } from "../../non-study/application/application.state";
-import { UserState } from "../../non-study/user/user.state";
 import { User } from "../../non-study/user/user.actions";
 
 
@@ -24,8 +22,8 @@ export interface GeneralMetadataStateModel {
     id: string;
     title: string;
     description: string; // analogous to abstract
-    submissionDate: Date;
-    releaseDate: Date;
+    submissionDate: string;
+    releaseDate: string;
     status: string;
     curationRequest: string;
     reviewerLink: any;
@@ -75,11 +73,11 @@ export class GeneralMetadataState {
 
                 // TODO fix, commenting this out for demo purpose
                 //this.store.dispatch(new NewValidationReport.Get());
-
+                console.log(`date as it appears from general metadata service: ${gm_response.isaInvestigation.publicReleaseDate}`)
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));
-                ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
-                ctx.dispatch(new StudyReleaseDate.Set(new Date(gm_response.isaInvestigation.publicReleaseDate)));
+                ctx.dispatch(new SetStudySubmissionDate(gm_response.isaInvestigation.submissionDate));
+                ctx.dispatch(new StudyReleaseDate.Set(gm_response.isaInvestigation.publicReleaseDate));
                 ctx.dispatch(new StudyStatus.Set(gm_response.mtblsStudy.studyStatus));
                 ctx.dispatch(new CurationRequest.Set(gm_response.mtblsStudy.curationRequest));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
@@ -181,7 +179,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeReleaseDate(action.date, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new StudyReleaseDate.Set(new Date(response.releaseDate)));
+                ctx.dispatch(new StudyReleaseDate.Set(response.releaseDate));
             })
     }
 
@@ -442,7 +440,7 @@ export class GeneralMetadataState {
     }
 
     @Selector()
-    static releaseDate(state: GeneralMetadataStateModel): Date {
+    static releaseDate(state: GeneralMetadataStateModel): string {
         return state.releaseDate
     }
 

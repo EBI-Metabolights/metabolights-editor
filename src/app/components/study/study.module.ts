@@ -26,7 +26,7 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
-import { MatCommonModule } from "@angular/material/core";
+import { DateAdapter, MatCommonModule, MatNativeDateModule } from "@angular/material/core";
 import { MatOptionModule } from "@angular/material/core";
 import { MatSelectModule } from "@angular/material/select";
 import { MatListModule} from '@angular/material/list';
@@ -72,6 +72,7 @@ import { MatRadioModule } from "@angular/material/radio";
 import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-modal/list-overrides.component";
 import {MatDialogModule} from '@angular/material/dialog';
 import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-override-dialog/delete-override-dialog.component";
+import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
 
 
 @NgModule({
@@ -114,6 +115,7 @@ import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-ov
     CommonModule,
     MatExpansionModule,
     MatDatepickerModule,
+    MatNativeDateModule,
     MatFormFieldModule,
     MatIconModule,
     MatOptionModule,
@@ -192,6 +194,8 @@ import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-ov
     EuropePMCService,
     DOIService,
     AuthService,
+    {provide: DateAdapter, useClass: IsoDateAdapter}
+    
   ],
 })
 export class StudyModule {}
