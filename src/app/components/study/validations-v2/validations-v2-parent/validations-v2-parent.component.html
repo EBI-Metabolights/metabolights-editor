@@ -10,7 +10,7 @@
     <!--History dropdown wrapper start-->
     <div class="history-wrapper-top-menu">
         <div *ngIf="report !== null" class="history-dropdown-box">
-            <mat-form-field class="select-box">
+            <mat-form-field class="select-box" appearance="fill">
                 <mat-label>Select a Report</mat-label>
                 <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
                 <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">

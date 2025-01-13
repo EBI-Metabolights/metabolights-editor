@@ -14,6 +14,10 @@ prototype-table .mat-cell, prototype-table .mat-header-cell {
     transform: translateY(5px);
 }
 
+mat-select.mat-mdc-select {
+  display: block !important;
+}
+
 
 
 section {
@@ -66,7 +70,7 @@ section {
     border-left: 2px solid #4caf50;
     border-right: 2px solid #4caf50;
     padding-bottom: 0% !important;
-    display: inline-block;
+    width: 450px !important;
   }
 
   ::ng-deep .mat-form-field {
@@ -74,7 +78,7 @@ section {
   }
 
   .select-box {
-    width: 450px !important;
+    width: 100%;
   }
 
   .blurred {
