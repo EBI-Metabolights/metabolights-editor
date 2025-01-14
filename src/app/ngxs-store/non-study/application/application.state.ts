@@ -357,7 +357,6 @@ export class ApplicationState {
     @Action(SetProtocolExpand)
     SetProtocolsExpanded(ctx: StateContext<ApplicationStateModel>, action: SetProtocolExpand) {
         const state = ctx.getState();
-        console.log(action.expand)
         ctx.setState({
             ...state,
             isProtocolsExpanded: action.expand

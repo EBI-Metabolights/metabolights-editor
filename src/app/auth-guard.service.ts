@@ -200,6 +200,8 @@ export class AuthGuard  implements OnInit {
   }
   async checkStudyObfuscationCode(url: string, obfuscationCode: string, state: RouterStateSnapshot, studyId: string) {
     const studyPermission = await this.editorService.getStudyPermissionByObfuscationCode(obfuscationCode);
+    const permissions = studyPermission;
+    this.store.dispatch(new StudyPermissionNS.Set(permissions))
     if (studyPermission === null || studyPermission.studyId === "") {
       this.editorService.redirectUrl = url;
       const errorCode = "E-0001-002";
@@ -213,14 +215,14 @@ export class AuthGuard  implements OnInit {
       return false;
     }
     if (url.startsWith("/reviewer")) {
+
       if (studyPermission.view) {
         if (url.startsWith("/reviewer")) {
           const params = { reviewCode: obfuscationCode };
           this.router.navigate(["/" + studyPermission.studyId + "/files"], { queryParams: params });
           return false;
         }
-        const permissions = studyPermission;
-        this.store.dispatch(new StudyPermissionNS.Set(permissions))
+
         return true;
       }
     }

@@ -85,6 +85,7 @@ export class PublicStudyComponent implements OnInit {
 
     if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === studyId){
       if (this.obfuscationCode === this.permissions.obfuscationCode && ["INREVIEW", "INCURATION"].includes(this.permissions.studyStatus.toUpperCase())){
+
         reviewMode = true;
       }
       if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){

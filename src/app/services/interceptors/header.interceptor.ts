@@ -11,6 +11,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngxs/store";
 import { StudyPermission } from "../headers";
 import { ActivatedRoute} from '@angular/router';
+
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
@@ -33,6 +34,7 @@ export class HeaderInterceptor implements HttpInterceptor {
     if (request.url.startsWith(endpoint) || targetUrl.startsWith(endpoint)) {
       const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
       if ( reviewCode ) {
+
           request = request.clone({
             setHeaders: {
               "Obfuscation-Code": reviewCode,
