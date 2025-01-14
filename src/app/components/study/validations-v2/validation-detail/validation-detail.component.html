@@ -17,6 +17,16 @@
                     <div class="row-content"> <h2>{{ violation.title }}</h2> </div>
             </div>
         </div>
+                <div class="content">
+            <div class="row-container">
+                <div class="row-key">
+                    <span class="material-symbols-outlined">
+                        my_location
+                        </span>
+                    <!--<b>LOCATION</b>-->
+                </div> <div class="row-content"> {{ violation.sourceFile}}</div>
+            </div>
+        </div>
         <div class="content">
             <div class="row-container">
                 <div class="row-key">
@@ -27,16 +37,7 @@
                 <div class="row-content"> {{ violation.description }} <br> {{violation.violation}}</div> 
             </div>
         </div>
-        <div class="content">
-            <div class="row-container">
-                <div class="row-key">
-                    <span class="material-symbols-outlined">
-                        my_location
-                        </span>
-                    <!--<b>LOCATION</b>-->
-                </div> <div class="row-content"> {{ violation.sourceFile}}</div>
-            </div>
-        </div>
+
         <div class="sidebar sidebar-top" > 
             <div class="type" [ngClass]="{
             'bg-error': violation.type === 'ERROR',
@@ -54,13 +55,17 @@
             violation.identifier
           " class="button bc-item is-dark"><mat-icon>mail</mat-icon>&nbsp; Contact</a>
             <button *ngIf="isCurator" class="button bc-item rounded-bottom-button is-dark" (click)="openRawModal()"><mat-icon>visibility</mat-icon>&nbsp; View Raw</button>
-            <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
+            <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" (click)="handleOverride(violation)" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
                 sword_rose
                 </span> &nbsp; Override</button>
     
           </div>
-          <div class="spinner-container">
-
+          <div class="override-container">
+            <ng-container *ngIf="violation.overrided">
+                <span class="tag is-light">!</span> 
+                <span class="override-tag tag is-info"> Override Applied</span>
+            </ng-container>
+         
           </div>
     
         </div>
@@ -76,8 +81,12 @@
                 <small><b>Section:</b> {{violation.section }}</small>
                     <div (click)="copyToClipboard(violation.section)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
             </div>
-            <div class="violation-footer-end-item footer-container-3">        
-                <small><b>Report Timestamp:</b> {{ runTime === "" ? "-" : runTime | date: 'MMM d, y, H:mm:ss z'}}</small>
+            <div class="violation-footer-end-item footer-container-3">   
+                <small>
+     
+                <b>Total Violations: </b> {{violation.totalViolations}}
+            </small>
+
             </div>
         </div>
     </div>
@@ -88,4 +97,7 @@
 </div>
 <div *ngIf="isInfoModalOpen === true">
     <violation-info-modal [violation]="violation" (closeEvent)="closeInfoModal()"></violation-info-modal>
+</div>
+<div *ngIf="isOverrideModalOpen === true">
+    <override-modal [violation]="violation" (closeEvent)="closeOverrideModal()"></override-modal>
 </div>

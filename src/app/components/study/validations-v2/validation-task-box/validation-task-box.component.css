@@ -40,3 +40,11 @@ init-button {
     height: 100% !important;
     width: 100%;
   }
+
+  .attention {
+    border: 1px solid rgb(199, 0, 0);
+  }
+
+  p {
+    margin-left: 2.3%;
+  }

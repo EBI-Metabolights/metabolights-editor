@@ -1,7 +1,7 @@
 <span *ngIf="person == null || addNewPerson; else showPersonDetails">
   <a
+    *ngIf="!isReadOnly"
     class="button is-primary is-pulled-right is-small"
-    [ngClass]="{ 'hover-button': !isReadOnly }"
     (click)="openModal()"
     >+ Add person</a
   >

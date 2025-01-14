@@ -1,0 +1,15 @@
+.mat-table {
+    width: 100%;
+  }
+  
+  mat-card {
+    margin: 16px;
+    padding: 16px;
+  }
+  
+  .scrollable-table-container {
+    max-height: 500px; 
+    overflow-y: auto; 
+    overflow-x: hidden;
+    display: block;
+  }

@@ -5,17 +5,15 @@ import { ValidationService } from "src/app/services/decomposed/validation.servic
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 
-import { interval, withLatestFrom } from "rxjs";
+import { interval, timer, withLatestFrom } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
-import { ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
-import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
-
+import { Breakdown, FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
+import { ToastrService } from "src/app/services/toastr.service";
 
 export interface ValidationTask {
     id: string;
     ws3TaskStatus: string;
 }
-
 
 
 export interface ValidationStateModel {
@@ -26,6 +24,7 @@ export interface ValidationStateModel {
     status: ViolationType;
     lastRunTime: string;
     currentValidationTask: ValidationTask;
+    overrides: Array<FullOverride>;
     history: Array<ValidationPhase>;
     initialLoadMade: boolean;
 }
@@ -37,6 +36,7 @@ const defaultState: ValidationStateModel = {
     status: null,
     lastRunTime: null,
     currentValidationTask: null,
+    overrides: [],
     history: [],
     initialLoadMade: false
 }
@@ -47,7 +47,7 @@ const defaultState: ValidationStateModel = {
 @Injectable()
 export class ValidationState {
 
-    constructor(private validationService: ValidationService, private store: Store) {}
+    constructor(private validationService: ValidationService, private store: Store, private toastrService: ToastrService) {}
     
 
     @Action(EditorValidationRules.Get)
@@ -105,7 +105,8 @@ export class ValidationState {
                 (response) => {
                     if (response.status !== 'error') {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
-                        ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
+                        ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask));
+                        ctx.dispatch( new ValidationReportV2.Override.GetAll(action.studyId));
                         if (response.content.task_status === "SUCCESS") {
                             ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                             ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
@@ -129,10 +130,6 @@ export class ValidationState {
                     console.log(JSON.stringify(error));
                 })
         } else {
-            /**this.validationService.getNewValidationReport().subscribe((response) => {
-                ctx.dispatch(new NewValidationReport.Set({study_id: "test", duration_in_seconds: 5,completion_time: "0.00", messages: response}));
-            });*/
-
             this.validationService.getFakeValidationReportApiResponse().subscribe((response) => {
                 ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
                 ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
@@ -161,7 +158,6 @@ export class ValidationState {
         this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe(
             (response) => {
                 ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
-                //this.store.dispatch(new NewValidationReport.Set(response.content.task_result));
             },
             (error) => {
                 console.log('could not submit validation task');
@@ -230,6 +226,65 @@ export class ValidationState {
         });
     }
 
+    @Action(ValidationReportV2.Override.GetAll) 
+    GetOverrides(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.GetAll) {
+        const state = ctx.getState();
+        this.validationService.getAllOverrides(action.studyId).subscribe({
+            next: (response) => {
+                ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+            },
+            error: (error) => {
+                console.error(`${error}`)
+            }
+        })
+    }
+
+    @Action([ValidationReportV2.Override.Create, ValidationReportV2.Override.Update])
+    PatchOverride(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.Create | ValidationReportV2.Override.Update) {
+        const state = ctx.getState();
+        this.validationService.overrideRule(action.studyId, action.override).subscribe({
+            next: (response) => {
+                this.toastrService.pop(`Validation override for rule ${action.override.rule_id} applied`, "Success")
+                ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+                ctx.dispatch(new ValidationReportV2.InitialiseValidationTask(false, action.studyId));
+            },
+            error: (e) => {
+                console.log('unexpected error when creating override');
+                console.error(e);
+                this.toastrService.pop(`Unable to create override for ${action.override.rule_id}`, "Error");
+            }
+        })
+    }
+
+    @Action(ValidationReportV2.Override.Set)
+    SetOverride(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            overrides: action.overrides
+        });
+    }
+
+    @Action(ValidationReportV2.Override.Delete)
+    DeleteOverride(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.Delete) {
+        this.validationService.deleteOverride(action.studyId, action.overrideId).subscribe({
+            next: (response) => {
+                ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
+                this.toastrService.pop(`Deleted Override ${action.overrideId}`, "Success");
+                ctx.dispatch(new ValidationReportV2.InitialiseValidationTask(false, action.studyId));
+                const t = timer(5000);
+                t.subscribe(() => {
+                    ctx.dispatch(new ValidationReportV2.Get(action.studyId));
+                })
+            },
+            error: (error) => {
+                console.error(`${error}`);
+                this.toastrService.pop(`Could not delete override ${action.overrideId}`, "Error");
+            }
+        })
+    }
+    
+
     @Action(ValidationReport.Refresh)
     RefreshValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Refresh) {
         const state = ctx.getState();
@@ -239,14 +294,14 @@ export class ValidationState {
                 ctx.dispatch(new EditorValidationRules.Get());
             },
             (error) => {
-                console.log("Unable to start new validation run.")
-                console.log(error)
+                console.log("Unable to start new validation run.");
+                console.log(error);
             }
         )
     }
 
     @Action(ValidationReport.ContinualRetry)
-    ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry){
+    ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry) {
         let repeat = 0;
         this.validationService.getValidationReport(action.studyId).subscribe(reportResponse => {
           if (reportResponse.validation.status === "not ready"){
@@ -256,16 +311,16 @@ export class ValidationState {
                 repeat = repeat + 1;
               if (nextReportResponse.validation.status !== "not ready"){
                 validationReportLoadSubscription.unsubscribe();
-                ctx.dispatch(new ValidationReport.Set(nextReportResponse))
+                ctx.dispatch(new ValidationReport.Set(nextReportResponse));
               }
               if (repeat > action.retries) {
                 validationReportLoadSubscription.unsubscribe();
-                ctx.dispatch(new ValidationReport.Set(nextReportResponse))
+                ctx.dispatch(new ValidationReport.Set(nextReportResponse));
               }
               });
             });
           } else {
-                ctx.dispatch(new ValidationReport.Set(reportResponse))
+                ctx.dispatch(new ValidationReport.Set(reportResponse));
           }
         });
     }
@@ -303,17 +358,17 @@ export class ValidationState {
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
         if (state === undefined) { return null }
-        return state.rules
+        return state.rules;
     }
 
     @Selector()
     static report(state: ValidationStateModel): Record<string, any> {
-        return state.report
+        return state.report;
     }
 
     @Selector()
     static reportV2(state: ValidationStateModel): Ws3ValidationReport {
-        return state.reportV2
+        return state.reportV2;
     }
 
     @Selector()
@@ -328,8 +383,19 @@ export class ValidationState {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
             if (state.reportV2 === null) { return [] }
             return sortViolations(
-                filterViolations(
+                filterViolationsBySection(
                     state.reportV2.messages.violations, section
+                )
+            );
+        });
+    }
+
+    static reportV2ViolationsByRuleId(ruleId) {
+        return createSelector([ValidationState], (state: ValidationStateModel) => {
+            if (state.reportV2 === null) { return [] }
+            return sortViolations(
+                filterViolationsByRuleId(
+                    state.reportV2.messages.violations, ruleId
                 )
             );
         });
@@ -342,7 +408,7 @@ export class ValidationState {
 
     static reportV2Summaries(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            return filterViolations(state.reportV2.messages.summary, section)
+            return filterViolationsBySection(state.reportV2.messages.summary, section)
         });
     }
 
@@ -353,7 +419,7 @@ export class ValidationState {
 
     @Selector()
     static initialLoadMade(state: ValidationStateModel) {
-        return state.initialLoadMade
+        return state.initialLoadMade;
     }
 
     @Selector()
@@ -363,23 +429,47 @@ export class ValidationState {
 
     @Selector()
     static validationStatus(state: ValidationStateModel) {
-        return state.status
+        return state.status;
     }
 
     @Selector()
     static lastValidationRunTime(state: ValidationStateModel) {
-        return state.lastRunTime
+        return state.lastRunTime;
     }
 
     @Selector()
     static currentValidationTask(state: ValidationStateModel) {
         return state.currentValidationTask;
     }
+
+    @Selector()
+    static breakdown(state: ValidationStateModel): Breakdown {
+        return {
+            warnings: state.reportV2.messages.violations.filter(val => val.type === 'ERROR').length,
+            errors: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length}
+    }
+
+    @Selector()
+    static overrides(state: ValidationStateModel): Array<FullOverride> {
+        return state.overrides;
+    }
+
+    static specificOverride(ruleId) {
+        return createSelector([ValidationState], (state: ValidationStateModel) => { 
+            const overrideList = state.overrides.filter(val => val.rule_id === ruleId);
+            const val = overrideList[0] || null
+            return val
+        });
+    }
 }
 
 
-function filterViolations(violations: Violation[], filterSectionStart: string): Violation[] {
+function filterViolationsBySection(violations: Violation[], filterSectionStart: string): Violation[] {
     return violations.filter(violation => violation.section.startsWith(filterSectionStart));
+}
+
+function filterViolationsByRuleId(violations: Violation[], ruleId: string): Violation[] {
+    return violations.filter(violation => violation.identifier === ruleId);
 }
 
 function sortViolations(violations: Violation[]): Violation[] {

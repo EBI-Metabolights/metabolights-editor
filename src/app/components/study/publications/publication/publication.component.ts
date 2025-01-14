@@ -45,7 +45,7 @@ export class PublicationComponent implements OnInit {
 
   toastrSettings: Record<string, any> = {};
 
-  isReadOnly = false;
+  isReadOnly = true;
 
   form: UntypedFormGroup;
   isFormBusy = false;

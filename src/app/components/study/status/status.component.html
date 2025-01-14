@@ -105,7 +105,7 @@
         </p>
         <br>
         <div *ngIf="validation">
-          <div *ngIf="validation.status !== 'success' && validation.status !== 'warning'">
+          <div *ngIf="validationStatus !== 'SUCCESS' && validationStatus !== 'WARNING'">
             <p class="error-message">
               Before changing status of your study, please validate your study and fix all errors.
             </p>

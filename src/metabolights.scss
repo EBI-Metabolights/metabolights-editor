@@ -4,7 +4,7 @@
 
 /* Define the palettes for primary, accent, and warn */
 $my-primary: mat.m2-define-palette(mat.$m2-green-palette, 500);
-$my-accent: mat.m2-define-palette(mat.$m2-light-green-palette, A200, A100, A400);
+$my-accent: mat.m2-define-palette(mat.$m2-light-green-palette, 400, 500, 700);
 
 
 $my-theme: mat.m2-define-light-theme((

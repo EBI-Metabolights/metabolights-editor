@@ -10,25 +10,29 @@
     <!--History dropdown wrapper start-->
     <div class="history-wrapper-top-menu">
         <div *ngIf="report !== null" class="history-dropdown-box">
-            <mat-form-field class="select-box">
+            <mat-form-field class="select-box" appearance="fill">
                 <mat-label>Select a Report</mat-label>
                 <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
                 <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
-                    {{ phase.taskId }} 
+                    {{ phase.validationTime | validationDateFormat | date: 'MMM d, y, H:mm:ss ' }} 
                     <span *ngIf="isFirst"><b>(most recent)</b></span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
         </div>
         <div class="download-report-button">
+            <a *ngIf="overrides.length > 0" (click)="openOverrideListModal()" class="button is-light"> <mat-icon>picture_in_picture</mat-icon> View Enabled Overrides</a>
+            &nbsp;
             <a (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
+
         </div>
+
     </div>
 
 
         <div *ngIf="report !== null; else noViolations" [ngClass]="{'blurred': loadingDiffReport}"  class="history-dropdown">
             <!--Violation components start-->
-            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
+            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" disablePagination>
             <mat-tab label="All">
                 <br>
                 <div *ngIf="allViolations.length > 0; else noViolations">
@@ -63,7 +67,7 @@
                 </app-validation-section>
             </mat-tab>
     
-            <mat-tab label="MAF">
+            <mat-tab label="Metabolites">
                 <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
                 </app-validation-section>
             </mat-tab>
@@ -102,4 +106,9 @@
     <app-no-violations [studyId]="studyId"></app-no-violations>
 <br>
 </ng-template>
+
+<!--List of override modals-->
+<ng-container *ngIf="overrideListModalOpen">
+ <list-overrides [overrides]="overrides" [isCurator]="isCurator" (closeEvent)="overrideListModalClosed($event)" (deleteEvent)="handleDeleteOverride($event)"></list-overrides>
+</ng-container>
 
