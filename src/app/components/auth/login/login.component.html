@@ -36,7 +36,7 @@
                   <div class="control">
                     <mat-form-field class="full-width">
                       <input
-                        class="no-scroll"
+                        class="username no-scroll"
                         formControlName="email"
                         placeholder="Email address"
                         matInput
@@ -47,7 +47,7 @@
                   <div class="control">
                     <mat-form-field class="full-width">
                       <input
-                        class="no-scroll"
+                        class="password no-scroll"
                         type="password"
                         formControlName="secret"
                         placeholder="Password"
@@ -66,7 +66,7 @@
                       [disabled]="!form.valid || isFormBusy"
                       (keyup.enter)="login($event)"
                       (click)="login($event)"
-                      class="button is-info"
+                      class="login-button button is-info"
                     >
                       Login
                     </button>
