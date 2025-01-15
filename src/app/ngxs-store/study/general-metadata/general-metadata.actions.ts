@@ -46,13 +46,13 @@ export namespace StudyAbstract {
 
 export class SetStudySubmissionDate {
     static readonly type = '[general] Set Study Submission Date'
-    constructor(public date: Date) {}
+    constructor(public date: string) {}
 }
 
 export namespace StudyReleaseDate {
     export class Set {
         static readonly type = '[general] Set Study Release Date'
-        constructor(public date: Date) {}
+        constructor(public date: string) {}
     }
 
     export class Update {

@@ -20,7 +20,7 @@ import { StudyReleaseDate } from "src/app/ngxs-store/study/general-metadata/gene
 export class ReleaseDateComponent implements OnInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  studyReleaseDate$: Observable<Date> = inject(Store).select(GeneralMetadataState.releaseDate);
+  studyReleaseDate$: Observable<string> = inject(Store).select(GeneralMetadataState.releaseDate);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
@@ -31,7 +31,7 @@ export class ReleaseDateComponent implements OnInit {
   isModalOpen = false;
   isFormBusy = false;
   requestedStudy: string = null;
-  releaseDate: Date = null;
+  releaseDate: string = null;
 
 
   constructor(private editorService: EditorService, private store: Store) {
@@ -44,6 +44,7 @@ export class ReleaseDateComponent implements OnInit {
     this.studyReleaseDate$.subscribe((value) => {
       if (value !== null) {
         if (value.toString() !== "") {
+          console.log(`date val from state ${value}`)
           this.releaseDate = value;
         } else {
           this.editorService.metaInfo().subscribe((response) => {
@@ -101,7 +102,7 @@ export class ReleaseDateComponent implements OnInit {
           cancelButtonText: "Back",
         }).then((willChange) => {
           if (willChange.value) {
-
+            console.log()
             this.store.dispatch(new StudyReleaseDate.Update(dateTo)).subscribe(
               (completed) => {
                 this.closeModal();

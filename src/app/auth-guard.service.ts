@@ -151,7 +151,11 @@ export class AuthGuard  implements OnInit {
     let obfuscationCode = null;
     if (url.startsWith("/MTBLS")) {
       studyIdentifier = url.split("/")[1];
-    } else if (url.startsWith("/study/MTBLS")) {
+    }if (url.startsWith("/REQ")) {
+      studyIdentifier = url.split("/")[1];
+    }else if (url.startsWith("/study/MTBLS")) {
+      studyIdentifier = url.split("/")[2];
+    }else if (url.startsWith("/study/REQ")) {
       studyIdentifier = url.split("/")[2];
     } else if (url.startsWith("/reviewer")) {
       obfuscationCode = url.split("/")[1].replace("reviewer", "");
@@ -238,14 +242,15 @@ export class AuthGuard  implements OnInit {
   }
 
   async checkStudyUrl(url: string, studyId: string, state: RouterStateSnapshot) {
-    const regEx = new RegExp('^(MTBLS[1-9][0-9]{0,10})($|\\?)', 'g');
+    const regEx = new RegExp('^((MTBLS[1-9][0-9]{0,10})|(REQ[0-9]{1,20}))($|\\?)', 'g');
     const studyIdResults = studyId.match(regEx);
     if (studyIdResults === null || studyIdResults.length === 0) {
-      this.editorService.redirectUrl = url;
-      const errorCode = "E-0001-003";
-      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-      return false;
+        this.editorService.redirectUrl = url;
+        const errorCode = "E-0001-003";
+        this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+        return false;
     }
+
     let studyIdentifier = studyIdResults[0];
     if (studyIdentifier.endsWith("?")) {
       studyIdentifier = studyIdResults[0].slice(0, -1);

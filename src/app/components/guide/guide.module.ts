@@ -19,6 +19,7 @@ import { MetaComponent } from "./meta/meta.component";
 import { ProgressComponent } from "./progress/progress.component";
 import { RawUploadComponent } from "./upload/upload.component";
 import { StudyModule } from "../study/study.module";
+import { RouterModule } from "@angular/router";
 
 @NgModule({ declarations: [
         GuidedAssaysComponent,
@@ -48,5 +49,6 @@ import { StudyModule } from "../study/study.module";
         MatButtonToggleModule,
         MatOptionModule,
         MatFormFieldModule,
-        MatInputModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+        MatInputModule,
+        RouterModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class GuideModule {}

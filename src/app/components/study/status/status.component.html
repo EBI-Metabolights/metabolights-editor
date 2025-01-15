@@ -100,12 +100,11 @@
           <b>What's next?</b><br />
           Check your study passes the validation checks (see the validation tab
           in your study). Once you have completed your study and it has met the
-          validation criteria, please change the study status to ‘Curation’ /
-          ‘Submission complete’
+          validation criteria, please change the study status to ‘In Curation’ 
         </p>
         <br>
         <div *ngIf="validation">
-          <div *ngIf="validation.status !== 'success' && validation.status !== 'warning'">
+          <div *ngIf="validationStatus !== 'SUCCESS' && validationStatus !== 'WARNING'">
             <p class="error-message">
               Before changing status of your study, please validate your study and fix all errors.
             </p>

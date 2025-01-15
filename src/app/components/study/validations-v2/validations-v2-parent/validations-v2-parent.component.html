@@ -2,6 +2,24 @@
     <!--Mothballed for now until it is fully featured-->
     <!--<app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>-->
     <br>
+    <!--Validation v2 information start-->
+    <!--
+    
+If you have any problems or queries, please see the Guides or contact us at metabolights-help@ebi.ac.uk. 
+    -->
+    <div  class="notification is-primary attention">
+        
+        <b><mat-icon>report</mat-icon>This is version 2 of the MetaboLights validation system. </b><br>
+        <p>
+            With the aim of improving reporting and speeding up data release, the MetaboLights team has developed a more structured and stricter new study validation ruleset - study validation v2 (<a href="https://github.com/EBI-Metabolights/mtbls-validation">https://github.com/EBI-Metabolights/mtbls-validation</a>).
+            This study validation v2 has now replaced study validation v1.
+        </p>
+        <p>
+            If you have any problems or queries, please see the <a href="https://www.ebi.ac.uk/metabolights/editor/guides/Quick_start_Guide/Quick_start_overview">guides</a>, please contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
+    </p>
+
+    </div>
+    <!--Validation v2 information end-->
     <div class="validation-panel">
         <app-validation-task-box></app-validation-task-box>
       </div>
@@ -10,25 +28,29 @@
     <!--History dropdown wrapper start-->
     <div class="history-wrapper-top-menu">
         <div *ngIf="report !== null" class="history-dropdown-box">
-            <mat-form-field class="select-box">
+            <mat-form-field class="select-box" appearance="fill">
                 <mat-label>Select a Report</mat-label>
                 <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
                 <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
-                    {{ phase.taskId }} 
+                    {{ phase.validationTime | validationDateFormat | date: 'MMM d, y, H:mm:ss ' }} 
                     <span *ngIf="isFirst"><b>(most recent)</b></span>
                   </mat-option>
                 </mat-select>
               </mat-form-field>
         </div>
         <div class="download-report-button">
+            <a *ngIf="overrides.length > 0" (click)="openOverrideListModal()" class="button is-light"> <mat-icon>picture_in_picture</mat-icon> View Enabled Overrides</a>
+            &nbsp;
             <a (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
+
         </div>
+
     </div>
 
 
         <div *ngIf="report !== null; else noViolations" [ngClass]="{'blurred': loadingDiffReport}"  class="history-dropdown">
             <!--Violation components start-->
-            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center">
+            <mat-tab-group mat-stretch-tabs="false" mat-align-tabs="center" disablePagination>
             <mat-tab label="All">
                 <br>
                 <div *ngIf="allViolations.length > 0; else noViolations">
@@ -63,7 +85,7 @@
                 </app-validation-section>
             </mat-tab>
     
-            <mat-tab label="MAF">
+            <mat-tab label="Metabolites">
                 <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
                 </app-validation-section>
             </mat-tab>
@@ -102,4 +124,9 @@
     <app-no-violations [studyId]="studyId"></app-no-violations>
 <br>
 </ng-template>
+
+<!--List of override modals-->
+<ng-container *ngIf="overrideListModalOpen">
+ <list-overrides [overrides]="overrides" [isCurator]="isCurator" (closeEvent)="overrideListModalClosed($event)" (deleteEvent)="handleDeleteOverride($event)"></list-overrides>
+</ng-container>
 

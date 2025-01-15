@@ -25,6 +25,8 @@ export class ValidationSectionComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    this.filterViolations();
+    
     if (changes.selectedSubsections || changes.selectedViolationTypes) {
       this.filterViolations();
     }

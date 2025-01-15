@@ -20,6 +20,7 @@ import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.in
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
+import { ViolationType } from "../../study/validations-v2/interfaces/validation-report.types";
 
 @Component({
   selector: "study",
@@ -38,6 +39,7 @@ export class PublicStudyComponent implements OnInit {
   investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
 
 
   loading: any = true;
@@ -57,7 +59,8 @@ export class PublicStudyComponent implements OnInit {
   reviewerLink: string = null;
   permissions: StudyPermission = null;
   notReadyValidationMessage: string = null;
-
+  validationStatus: ViolationType = null;
+  obfuscationCode: string = null;
   constructor(
     private store: Store,
     private editorService: EditorService,
@@ -78,10 +81,11 @@ export class PublicStudyComponent implements OnInit {
     }
     let reviewMode = false;
     const studyId = this.route.snapshot.paramMap.get("study");
-    const obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
+    this.obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
 
     if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === studyId){
-      if (obfuscationCode === this.permissions.obfuscationCode && ['INREVIEW', 'INCURATION'].includes(this.permissions.studyStatus.toUpperCase())){
+      if (this.obfuscationCode === this.permissions.obfuscationCode && ["INREVIEW", "INCURATION"].includes(this.permissions.studyStatus.toUpperCase())){
+
         reviewMode = true;
       }
       if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
@@ -149,6 +153,12 @@ export class PublicStudyComponent implements OnInit {
       }
     });
 
+
+    this.validationStatus$.subscribe((value) => {
+      this.validationStatus = value;
+    })
+
+
     this.curationRequest$.subscribe((value) => {
       if(value){
         this.curationRequest = value;
@@ -198,7 +208,7 @@ export class PublicStudyComponent implements OnInit {
       .split("/")
       .filter((n) => n);
     if (urlSplit.length >= 2) {
-      if (urlSplit[urlSplit.length - 1].indexOf("MTBLS") < 0) {
+      if (urlSplit[urlSplit.length - 1].indexOf("MTBLS") < 0 && urlSplit[urlSplit.length - 1].indexOf("REQ") < 0) {
         urlSplit.pop();
       }
     }

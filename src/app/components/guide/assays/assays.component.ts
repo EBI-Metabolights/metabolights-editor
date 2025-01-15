@@ -316,12 +316,12 @@ export class GuidedAssaysComponent implements OnInit {
 
   openFullStudyView() {
     Swal.fire({
-      title: "Switch to full study view? Are you sure?",
-      text: "Please add assay details by using the add/edit details button!",
+      title: "Switch to study overview?",
+      text: "",
       showCancelButton: true,
       confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Confirm",
-      cancelButtonText: "Back",
+      confirmButtonText: "Continue",
+      cancelButtonText: "Cancel",
     }).then((willDelete) => {
       if (willDelete.value) {
         this.router.navigate(["/study", this.requestedStudy]);

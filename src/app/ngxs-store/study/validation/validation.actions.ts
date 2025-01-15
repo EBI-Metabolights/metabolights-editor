@@ -1,4 +1,4 @@
-import { ValidationPhase, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface"
+import { BaseOverride, FullOverride, ValidationPhase, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface"
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types"
 import { ValidationTask } from "./validation.state"
 
@@ -86,6 +86,33 @@ export namespace ValidationReportV2 {
         export class Set {
             static readonly type = '[validation] Set Validation History'
             constructor(public history: Array<ValidationPhase>) {}
+        }
+    }
+
+    export namespace Override {
+        export class GetAll {
+            static readonly type = '[validation] Get All Overrides'
+            constructor(public studyId: string) {}
+        }
+
+        export class Set {
+            static readonly type = '[validation] Set All Overrides'
+            constructor(public overrides: FullOverride[]) {}
+        }
+
+        export class Create {
+            static readonly type = '[validation] Create New Override'
+            constructor(public studyId: string, public override: BaseOverride) {}
+        }
+
+        export class Update {
+            static readonly type = '[validation] Update Existing Override'
+            constructor(public studyId: string, public override: BaseOverride) {}
+        }
+
+        export class Delete {
+            static readonly type = '[validation] Delete Existing Override'
+            constructor(public studyId: string, public overrideId: string) {}
         }
     }
 }

@@ -155,8 +155,8 @@ export class EditorService {
     if (this.configService.config.clearJavaSession && redirect) {
       window.location.href = this.configService.config.javaLogoutURL;
     } else {
-      this.router.navigate([this.configService.config.loginURL]);
       this.resetStudyStates();
+      this.router.navigate([this.configService.config.loginURL]);
     }
   }
 

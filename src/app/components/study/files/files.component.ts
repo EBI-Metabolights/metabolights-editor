@@ -268,7 +268,7 @@ export class FilesComponent implements OnInit,  OnChanges {
           for (const item of data.errors) {
             failedFiles.push(item.file);
           }
-          toastr.error("File deletion is failed for : " + failedFiles.join(", "), "Error", {
+          toastr.error("File deletion has failed for : " + failedFiles.join(", "), "Error", {
             timeOut: "2500",
             positionClass: "toast-top-center",
             preventDuplicates: true,

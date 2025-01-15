@@ -11,18 +11,19 @@ import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
 import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
-import { Operations } from "../files/files.actions";
+import { ObfuscationCode, Operations, UploadLocation } from "../files/files.actions";
 import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
+import { User } from "../../non-study/user/user.actions";
 
 
 export interface GeneralMetadataStateModel {
     id: string;
     title: string;
     description: string; // analogous to abstract
-    submissionDate: Date;
-    releaseDate: Date;
+    submissionDate: string;
+    releaseDate: string;
     status: string;
     curationRequest: string;
     reviewerLink: any;
@@ -72,11 +73,11 @@ export class GeneralMetadataState {
 
                 // TODO fix, commenting this out for demo purpose
                 //this.store.dispatch(new NewValidationReport.Get());
-
+                console.log(`date as it appears from general metadata service: ${gm_response.isaInvestigation.publicReleaseDate}`)
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));
-                ctx.dispatch(new SetStudySubmissionDate(new Date(gm_response.isaInvestigation.submissionDate)));
-                ctx.dispatch(new StudyReleaseDate.Set(new Date(gm_response.isaInvestigation.publicReleaseDate)));
+                ctx.dispatch(new SetStudySubmissionDate(gm_response.isaInvestigation.submissionDate));
+                ctx.dispatch(new StudyReleaseDate.Set(gm_response.isaInvestigation.publicReleaseDate));
                 ctx.dispatch(new StudyStatus.Set(gm_response.mtblsStudy.studyStatus));
                 ctx.dispatch(new CurationRequest.Set(gm_response.mtblsStudy.curationRequest));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
@@ -178,7 +179,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeReleaseDate(action.date, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new StudyReleaseDate.Set(new Date(response.releaseDate)));
+                ctx.dispatch(new StudyReleaseDate.Set(response.releaseDate));
             })
     }
 
@@ -382,10 +383,39 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
             (response) => {
-                ctx.dispatch(new StudyStatus.Set(action.status));
+                const state = ctx.getState();
+                let updated_study_id = state.id;
+                if (response.hasOwnProperty("assigned_study_id")){
+                  updated_study_id = response["assigned_study_id"]
+                  if (state.id !== updated_study_id) {
+                    ctx.dispatch(new Identifier.Set(updated_study_id));
+                  }
+                }
+                let assigned_status = action.status;
+                if (response.hasOwnProperty("assigned_status")){
+                  assigned_status = response["assigned_status"]
+                }
+                if (assigned_status !== state.status) {
+                  ctx.dispatch(new StudyStatus.Set(assigned_status));
+                }
+                if (response.hasOwnProperty("ftp_folder_path")){
+                  const ftpFolderPath = response["ftp_folder_path"]
+                  ctx.dispatch(new UploadLocation.Set(ftpFolderPath));
+                }
+                if (response.hasOwnProperty("obfuscation_code")){
+                  const obfuscationCode = response["obfuscation_code"]
+                  ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
+                }
+                const readOnlySub = this.store.select(state => state.ApplicationState.readonly).pipe(take(1))
+                readOnlySub.subscribe((ro) => {
+                    this.store.dispatch(new User.Studies.Get())
+                    ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
+                })
+
             }
         )
     }
+
 
     @Action(ResetGeneralMetadataState)
     Reset(ctx: StateContext<GeneralMetadataStateModel>, action: ResetGeneralMetadataState) {
@@ -410,7 +440,7 @@ export class GeneralMetadataState {
     }
 
     @Selector()
-    static releaseDate(state: GeneralMetadataStateModel): Date {
+    static releaseDate(state: GeneralMetadataStateModel): string {
         return state.releaseDate
     }
 

@@ -1,16 +1,28 @@
-import { Injectable } from "@angular/core";
-import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from "@angular/common/http";
+import { inject, Injectable } from "@angular/core";
+import {
+  HttpRequest,
+  HttpHandler,
+  HttpEvent,
+  HttpInterceptor,
+} from "@angular/common/http";
 import { Observable } from "rxjs";
 import { disambiguateUserObj } from "../editor.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngxs/store";
+import { StudyPermission } from "../headers";
+import { ActivatedRoute} from '@angular/router';
 
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
+
+  studyPermission: StudyPermission = null;
   constructor(
     private configService: ConfigurationService,
-    private store: Store) {}
+    private activatedRoute: ActivatedRoute,
+    private store: Store
+  ) {
+  }
 
   intercept(
     request: HttpRequest<unknown>,
@@ -18,61 +30,56 @@ export class HeaderInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<unknown>> {
     const endpoint = this.configService?.config?.endpoint;
     const origin = this.configService.config?.origin;
-    const targetUrl = origin + request.url ;
-    if (request.url.startsWith(endpoint) || targetUrl.startsWith(endpoint)){
-      let userToken = localStorage.getItem("userToken");
-    if(userToken === null) {
-      const user = localStorage.getItem("user");
-      if ( user !== null) {
-        userToken = disambiguateUserObj(this.getUserObj());
-        localStorage.setItem("userToken", userToken);
-      }
-    }
-    if (userToken !== null){
-      request = request.clone({
-        setHeaders: {
-          user_token: userToken,
-        },
-      });
-    }else {
-      request = request.clone({
-        setHeaders: {
-          user_token: "",
-        },
-      });
-    }
-    const jwt = localStorage.getItem("jwt");
-    if (jwt !== null) {
-      request = request.clone({
-        setHeaders: {
-          Authorization: "Bearer " + jwt
-        },
-      });
-    }
-    let permissions =  null
-    permissions = this.store.snapshot().application.studyPermission
-    if (request.url.includes('/reviewer') && ['INREVIEW', 'INCURATION'].includes(permissions.studyStatus.toUpperCase())) {
-      request = request.clone({
-        setHeaders: {
-          obfuscation_code: permissions.obfuscationCode
-        }
-      });
-    }
-    else if (permissions && permissions.obfuscationCode && ['INREVIEW', 'INCURATION'].includes(permissions.studyStatus.toUpperCase())){
-        const user = this.store.snapshot().user.user;
-        if (user === null || (user !== null && user.userName === permissions.userName)) {
+    const targetUrl = origin + request.url;
+    if (request.url.startsWith(endpoint) || targetUrl.startsWith(endpoint)) {
+      const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
+      if ( reviewCode ) {
+
           request = request.clone({
             setHeaders: {
-              obfuscation_code: permissions.obfuscationCode
-            }
+              "Obfuscation-Code": reviewCode,
+            },
+          });
+      } else
+      {
+        let userToken = localStorage.getItem("userToken");
+        const user = this.getUserObject();
+        if (userToken === null) {
+          if (user !== null) {
+            userToken = disambiguateUserObj(this.getUserObject());
+            localStorage.setItem("userToken", userToken);
+          }
+        }
+        if (userToken !== null) {
+          request = request.clone({
+            setHeaders: {
+              user_token: userToken,
+            },
+          });
+        } else {
+          request = request.clone({
+            setHeaders: {
+              user_token: "",
+            },
           });
         }
-    }
+        const jwt = localStorage.getItem("jwt");
+        if (jwt !== null) {
+          request = request.clone({
+            setHeaders: {
+              Authorization: "Bearer " + jwt,
+            },
+          });
+        }
+      }
+
     }
     return next.handle(request);
   }
 
-  getUserObj() {
-    return JSON.parse(localStorage.getItem("user"));
+  getUserObject() {
+    const user = localStorage.getItem("user");
+    if (user !== null) return JSON.parse(user);
+    return null;
   }
 }
