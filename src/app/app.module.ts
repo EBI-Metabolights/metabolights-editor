@@ -59,6 +59,7 @@ import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.sta
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
+import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -136,6 +137,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
         {
             provide: APP_BASE_HREF,
             useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
