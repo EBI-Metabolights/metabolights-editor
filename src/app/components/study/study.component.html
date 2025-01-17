@@ -25,7 +25,7 @@
     </article>
   </div>
   <div id="status-board" *ngIf="status == 'In Curation'">
-    <article class="message is-warning">
+    <article class="message is-warning" *ngIf="isOwner || isCurator; else anonymousCurationArticle">
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> Your study
@@ -47,13 +47,14 @@
         </p>
         <br />
         <p>
-          Consider the read-only reviewer link as temporary, it will expire after the study goes
-          public. Take care to only share this link with trusted parties: <br />
+           Take care to only share this link with trusted parties: <br />
           <span *ngIf="obfuscationCode; else loadingIcon"
             ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
               endpoint + "reviewer" + obfuscationCode
             }}</a></span
           >
+          Consider the read-only reviewer link as temporary, it will expire after the study goes
+          public.
           <ng-template #loadingIcon>
             <img src="{{ baseHref }}assets/img/loading.svg" />
           </ng-template>
@@ -66,14 +67,32 @@
         </p>
       </div>
     </article>
+    <ng-template #anonymousCurationArticle>
+      <article class="message is-warning">
+        <div class="message-body">
+          This study ({{requestedStudy}}) is now in the 'In Curation' stage.
+          <p>
+            The link
+          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
+          will be the official link for referencing your MetaboLights study in any
+          paper, website or other communication.
+          </p>
+          <p>
+            If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team (metabolights-help&#64;ebi.ac.uk). 
+          </p>
+
+        </div>
+      </article>
+    </ng-template>
   </div>
+  <br><br>
   <div id="status-board" *ngIf="status == 'In Review'">
     <article class="message is-success">
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> Your study
-          ({{ requestedStudy }}) is now {{ status }}. Please
-          take a close look at the study and share the reviewer link with
+          ({{ requestedStudy }}) is now {{ status }}, and approved by the MetaboLights curation team. 
+          . Please take a close look at the study and share the reviewer link with
           journals and reviewers.
           <b
             >You cannot make changes directly at this stage, but if you have
@@ -89,25 +108,19 @@
         </p>
         <br />
         <p>
-          Consider the read-only reviewer link as temporary, it will expire after the study goes
-          public. Take care to only share this link with trusted parties: <br />
+          Consider this link as temporary, it will expire after the study goes
+          public.  <br />
+          The link 
           <span *ngIf="obfuscationCode; else loadingIcon"
             ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
               endpoint + "reviewer" + obfuscationCode
             }}</a></span
-          >
+          > should be the official link for referencing your MetaboLights study in any paper, website or other communication.
           <ng-template #loadingIcon>
             <img src="{{ baseHref }}assets/img/loading.svg" />
           </ng-template>
           <br />
           <br />
-          Consider this link as temporary, it will expire after the study goes
-          public.
-          <br /><br />
-          The link
-          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
-          is the official link for referencing your MetaboLights study in any
-          paper, website or other communication.
         </p>
       </div>
     </article>
@@ -132,6 +145,7 @@
       </div>
     </article>
   </div>
+
   <div class="main-wrapper" [ngClass]="{ smt: status != 'Submitted' }">
     <div style="margin: 20px">
       <article class="message is-small has-shadow">
