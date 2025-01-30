@@ -45,7 +45,7 @@ import { AuthService } from "./services/metabolights/auth.service";
 import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
 import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
-import { NgxsModule } from "@ngxs/store";
+import { NGXS_PLUGINS, NgxsModule } from "@ngxs/store";
 import { TransitionsState } from "./ngxs-store/non-study/transitions/transitions.state";
 import { UserState } from "./ngxs-store/non-study/user/user.state";
 import { ApplicationState } from "./ngxs-store/non-study/application/application.state";
@@ -59,6 +59,7 @@ import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.sta
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
+import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.service';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -133,6 +134,11 @@ export function configLoader(injector: Injector): () => Promise<any> {
         DOIService,
         AuthService,
         LabsWorkspaceService,
+        {
+            provide: NGXS_PLUGINS,
+            useClass: LoggingMiddleware,
+            multi: true,
+        },
         { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
