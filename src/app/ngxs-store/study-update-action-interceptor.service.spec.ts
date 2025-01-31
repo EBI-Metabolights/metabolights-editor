@@ -22,7 +22,7 @@ fdescribe('LoggingMiddleware', () => {
     TestBed.configureTestingModule({
       providers: [
         LoggingMiddleware,
-        { provide: Store, useValue: storeSpy }, // Mock NGXS Store
+        { provide: Store, useValue: storeSpy }, 
       ],
     });
 
@@ -38,7 +38,7 @@ fdescribe('LoggingMiddleware', () => {
   });
 
   it('should dispatch SetValidationRunNeeded when an action from a namespace is dispatched (excluding Get, Set, Organise)', () => {
-    const mockAction = new Assay.Delete('fake', 'MTBLS11019'); // Replace with a real action in Assay namespace
+    const mockAction = new Assay.Delete('fake', 'MTBLS11019'); 
     const nextFn: NgxsNextPluginFn = jasmine.createSpy('nextFn');
 
     middleware.handle({}, mockAction, nextFn);
