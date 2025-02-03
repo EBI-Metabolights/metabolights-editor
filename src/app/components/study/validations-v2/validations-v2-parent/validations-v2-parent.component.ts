@@ -31,6 +31,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   filesViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('files'));
 
   overrides$: Observable<FullOverride[]> = inject(Store).select(ValidationState.overrides);
+  validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
 
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
@@ -42,7 +43,8 @@ export class ValidationsV2ParentComponent implements OnInit {
   report: Ws3ValidationReport = null;
   history: Array<ValidationPhase> = [];
   selectedPhase: ValidationPhase = null;
-  lastRunTime: string = ""
+  lastRunTime: string = "";
+  validationNeeded: boolean = false;
 
   // report subsections
   allViolations: Violation[] = [];
@@ -138,6 +140,10 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.overrides$.pipe(filter(val => val !== null)).subscribe(value => {
       this.overrides = value;
+    });
+
+    this.validationNeeded$.pipe(filter(val => val !== null)).subscribe(value => {
+      this.validationNeeded = value;
     })
   }
 

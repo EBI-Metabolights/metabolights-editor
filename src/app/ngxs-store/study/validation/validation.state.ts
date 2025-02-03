@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { EditorValidationRules, ResetValidationState, SetInitialLoad, ValidationReport, ValidationReportV2 } from "./validation.actions";
+import { EditorValidationRules, ResetValidationState, SetInitialLoad, SetValidationRunNeeded, ValidationReport, ValidationReportV2 } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
@@ -27,6 +27,7 @@ export interface ValidationStateModel {
     overrides: Array<FullOverride>;
     history: Array<ValidationPhase>;
     initialLoadMade: boolean;
+    newValidationRunNeeded: boolean;
 }
 const defaultState: ValidationStateModel = {
     rules: null,
@@ -38,7 +39,8 @@ const defaultState: ValidationStateModel = {
     currentValidationTask: null,
     overrides: [],
     history: [],
-    initialLoadMade: false
+    initialLoadMade: false,
+    newValidationRunNeeded: false
 }
 @State<ValidationStateModel>({
     name: 'validation',
@@ -121,8 +123,8 @@ export class ValidationState {
                     } else {
                         const currentTask = {id: null, ws3TaskStatus: "ERROR"}
                         ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask))
-                        console.log("Could not get new ws3 report");
-                        console.log(JSON.stringify(response.errorMessage));
+                        console.debug("Could not get new ws3 report");
+                        console.debug(JSON.stringify(response.errorMessage));
                     }
                 },
                 (error)=> {
@@ -157,6 +159,7 @@ export class ValidationState {
     InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.InitialiseValidationTask) {
         this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe(
             (response) => {
+                ctx.dispatch(new SetValidationRunNeeded(false));
                 ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
             },
             (error) => {
@@ -187,10 +190,15 @@ export class ValidationState {
     @Action(ValidationReportV2.SetLastRunTime)
     SetLastRunTime(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetLastRunTime) {
         const state = ctx.getState();
-        ctx.setState({
-            ...state,
-            lastRunTime: action.time
-        });
+        const stateTime = state.lastRunTime;
+        
+        if (stateTime === null || isMoreRecentISO8601(stateTime, action.time)) {
+            ctx.setState({
+                ...state,
+                lastRunTime: action.time
+            });
+        }
+
     }
 
     @Action(ValidationReportV2.SetCurrentTask)
@@ -200,6 +208,16 @@ export class ValidationState {
             ...state,
             currentValidationTask: action.task
         });
+    }
+
+    @Action(SetValidationRunNeeded)
+    SetValidationRunNeeded(ctx: StateContext<ValidationStateModel>, action: SetValidationRunNeeded) {
+        const state = ctx.getState();
+
+        ctx.setState({
+            ...state,
+            newValidationRunNeeded: action.set
+        })
     }
 
     @Action(ValidationReportV2.History.Get)
@@ -454,6 +472,11 @@ export class ValidationState {
         return state.overrides;
     }
 
+    @Selector()
+    static validationNeeded(state: ValidationStateModel) {
+        return state.newValidationRunNeeded;
+    }
+
     static specificOverride(ruleId) {
         return createSelector([ValidationState], (state: ValidationStateModel) => { 
             const overrideList = state.overrides.filter(val => val.rule_id === ruleId);
@@ -516,4 +539,18 @@ function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
     // Note: JavaScript Date uses 0-based months, so we subtract 1 from `month`
     return new Date(year, month - 1, day, hours, minutes, seconds);
   }
+
+  function isMoreRecentISO8601(dateString: string, comparatorString: string): boolean {
+    // Parse the ISO8601 date strings into Date objects
+    const date = new Date(dateString);
+    const comparator = new Date(comparatorString);
+
+    // Validate that the date strings are properly parsed
+    if (isNaN(date.getTime()) || isNaN(comparator.getTime())) {
+        throw new Error("Invalid ISO8601 date format. Please provide valid date strings.");
+    }
+
+    // Compare the dates
+    return comparator > date;
+}
   

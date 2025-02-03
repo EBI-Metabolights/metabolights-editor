@@ -35,6 +35,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
   validationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
+  validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
 
@@ -54,6 +55,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   isCurator = false;
   validationStatus: ViolationType = null;
   validationRunTime: string =  null;
+  validationNeeded: boolean = false;
 
   constructor(
     private store: Store,
@@ -117,6 +119,10 @@ export class StudyComponent implements OnInit, OnDestroy {
 
     this.validationRunTime$.subscribe((value) => {
       this.validationRunTime = value;
+    });
+
+    this.validationNeeded$.subscribe((value) => {
+      this.validationNeeded = value;
     })
 
     this.route.params.subscribe((params) => {

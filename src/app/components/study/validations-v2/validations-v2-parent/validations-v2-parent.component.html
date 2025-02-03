@@ -3,10 +3,6 @@
     <!--<app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>-->
     <br>
     <!--Validation v2 information start-->
-    <!--
-    
-If you have any problems or queries, please see the Guides or contact us at metabolights-help@ebi.ac.uk. 
-    -->
     <div  class="notification is-primary attention">
         
         <b><mat-icon>report</mat-icon>This is version 2 of the MetaboLights Validation, which has now replaced study validation framework v1.</b><br>
@@ -27,9 +23,15 @@ If you have any problems or queries, please see the Guides or contact us at meta
     </p>
 
     </div>
+
+        <div *ngIf="validationNeeded" class="notification is-warning">
+            <mat-icon>info</mat-icon> There have been recent updates to your study. Please rerun the validation.
+          </div>
     <!--Validation v2 information end-->
     <div class="validation-panel">
-        <app-validation-task-box></app-validation-task-box>
+        <div>
+            <app-validation-task-box></app-validation-task-box>
+        </div>
       </div>
       <br>
       
