@@ -217,10 +217,5 @@ function convertToTimestamp(isoDateString: string): string {
 
     // Construct the timestamp in the format YYYYMMDDHHmmss
     const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`
-    console.log(timestamp);
     return timestamp;
-}
-
-function filterStrings(strings: string[]) {
-    return strings.filter((str) => /^(i_|m_|a_|s_)/.test(str));
 }
