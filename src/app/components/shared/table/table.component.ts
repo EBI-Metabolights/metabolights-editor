@@ -879,7 +879,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   headerClick(column: any, event) {
-    console.dir(column);
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;

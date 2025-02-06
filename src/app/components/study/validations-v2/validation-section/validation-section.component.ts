@@ -33,7 +33,6 @@ export class ValidationSectionComponent implements OnInit, OnChanges {
     this.filteredViolations = this.violations;
     this.validationStatus$.pipe(filter(val => val !== null)).subscribe((val) => {
       this.validationStatus = val;
-      console.debug(`val section status sub: ${this.validationStatus}`)
     })
   }
 

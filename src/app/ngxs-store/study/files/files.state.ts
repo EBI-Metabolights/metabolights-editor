@@ -49,7 +49,6 @@ export class FilesState {
                 const valTimeSub = this.store.selectOnce(ValidationState.lastValidationRunTime).pipe(filter(val => val !== null));
                 valTimeSub.subscribe((valTimestamp) => {
                     const convertedValTimestamp = convertToTimestamp(valTimestamp);
-                    console.dir(data);
                     const metadataFiles = data.study.filter(file =>  /^(i_|m_|a_|s_)/.test(file.file))
                     const update = metadataFiles.some(item => isMoreRecentTimestamp(item.timestamp, convertedValTimestamp))
 

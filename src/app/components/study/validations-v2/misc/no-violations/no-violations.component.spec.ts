@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NoViolationsComponent } from './no-violations.component';
+import { By } from '@angular/platform-browser';
 
 describe('NoViolationsComponent', () => {
   let component: NoViolationsComponent;
