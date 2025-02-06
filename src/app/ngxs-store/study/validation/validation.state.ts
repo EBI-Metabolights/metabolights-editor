@@ -181,6 +181,7 @@ export class ValidationState {
     @Action(ValidationReportV2.SetValidationStatus)
     SetValidationStatus(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetValidationStatus) {
         const state = ctx.getState();
+        console.debug(action.status)
         ctx.setState({
             ...state,
             status: action.status

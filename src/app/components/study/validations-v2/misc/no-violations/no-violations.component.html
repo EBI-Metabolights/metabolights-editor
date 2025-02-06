@@ -1,30 +1,52 @@
-<div class="no-violations-card">
-    <!--<img src="{{ baseHref }}assets/img/MetaboLightsLogo.png" class="ml-logo"/><br />-->
-    <br><h2><b *ngIf="section == false; else emptySectionHeader">There is no available validation report for {{studyId}}</b></h2>
-    <mat-divider></mat-divider>
-    <div *ngIf="section === false" class="no-violations-content">
-       Use the box above to queue a new validation task with our Validation server. 
-        This should typically only take a few seconds. If you are unable to queue a validation task despite repeated attempts please contact <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>
-    </div>
-    <br *ngIf="section === false">
-
+<div [ngSwitch]="success">
+    <div *ngSwitchCase="true" [ngTemplateOutlet]="successfulReport"></div>
+    <div *ngSwitchCase="false" [ngTemplateOutlet]="other"></div>
 </div>
 
-<ng-template #emptySectionHeader>
-    <div class="header-container">
-        <div class="icon-subcontainer">
-            <mat-icon *ngIf="section && filter == false" class="good-job-icon mat-icon-large">check_circle</mat-icon>
-            <mat-icon *ngIf="filter" class="mat-icon-large">info</mat-icon> &nbsp;
+<ng-template #other>
+    <div class="no-violations-card">
+        <!--<img src="{{ baseHref }}assets/img/MetaboLightsLogo.png" class="ml-logo"/><br />-->
+        <br><h2><b *ngIf="section == false; else emptySectionHeader">There is no available validation report for {{studyId}}</b></h2>
+        <mat-divider></mat-divider>
+        <div *ngIf="section === false" class="no-violations-content">
+           Use the box above to queue a new validation task with our Validation server. 
+            This should typically only take a few seconds. If you are unable to queue a validation task despite repeated attempts please contact <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>
         </div>
-        <div class="text-align">
-            <b>
-                {{ filter ? "There are no violations for your selected subsection and violation type filters." :  "There are no violations for this section."}}
-                
-            </b>
+        <br *ngIf="section === false">
+    
+    </div>
+    
+    
+    <ng-template #emptySectionHeader>
+            <div class="header-container">
+                <div class="icon-subcontainer">
+                    <mat-icon *ngIf="section && filter == false" class="good-job-icon mat-icon-large">check_circle</mat-icon>
+                    <mat-icon *ngIf="filter" class="mat-icon-large">info</mat-icon> &nbsp;
+                </div>
+                <div class="text-align">
+                    <h2><b>
+                        {{ filter ? "There are no violations for your selected subsection and violation type filters." :  "There are no violations for this section."}}
+                    </b></h2>
+                </div>
+            </div>
+    
+    </ng-template>
+</ng-template>
+
+
+<ng-template #successfulReport>
+    <div class="no-violations-card">
+        <div class="header-container">
+            <div class="icon-subcontainer">
+                <mat-icon class="good-job-icon mat-icon-large">check_circle</mat-icon>
+            </div>
+            <!--<h2><b>{{studyId}} has passed validation.</b></h2>-->
+            <div class="text-align">
+                <h2><b>
+                  {{studyId}} has passed validation.
+                </b></h2> 
+            </div>
+
         </div>
     </div>
-
-</ng-template>
-<ng-template #emptySectionContent>
-
 </ng-template>

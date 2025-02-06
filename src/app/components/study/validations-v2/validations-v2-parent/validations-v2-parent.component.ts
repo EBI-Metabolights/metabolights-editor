@@ -4,7 +4,7 @@ import { FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from '.
 import { Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
-import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList} from '../interfaces/validation-report.types';
+import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList, ViolationType} from '../interfaces/validation-report.types';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
 
@@ -32,6 +32,8 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   overrides$: Observable<FullOverride[]> = inject(Store).select(ValidationState.overrides);
   validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  
 
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
@@ -45,6 +47,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   selectedPhase: ValidationPhase = null;
   lastRunTime: string = "";
   validationNeeded: boolean = false;
+  validationStatus: ViolationType = null;
 
   // report subsections
   allViolations: Violation[] = [];
@@ -144,6 +147,10 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.validationNeeded$.pipe(filter(val => val !== null)).subscribe(value => {
       this.validationNeeded = value;
+    });
+
+    this.validationStatus$.pipe(filter(val => val !== null)).subscribe(value => {
+      this.validationStatus = value;
     })
   }
 

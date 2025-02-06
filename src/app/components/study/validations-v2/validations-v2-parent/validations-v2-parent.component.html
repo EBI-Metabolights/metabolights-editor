@@ -75,33 +75,33 @@
     
             <mat-tab label="General">
     
-                <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
+                <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations" [studyId]="studyId">
                 </app-validation-section> 
             </mat-tab>
     
             <mat-tab label="Investigation File">
-                <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
+                <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Samples">
     
-                <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
+                <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Assays">
-                <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
+                <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Metabolites">
-                <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
+                <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Files">
-                <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
+                <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
             </mat-tab-group>
@@ -131,7 +131,7 @@
 
 <!--No violations found template-->
 <ng-template #noViolations>
-    <app-no-violations [studyId]="studyId"></app-no-violations>
+    <app-no-violations [studyId]="studyId" [success]="validationStatus === 'SUCCESS'"></app-no-violations>
 <br>
 </ng-template>
 
