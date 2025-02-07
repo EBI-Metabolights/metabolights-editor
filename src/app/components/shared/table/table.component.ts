@@ -184,7 +184,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     //console.log(`event key: ${event.key}`)
     if (['Delete', 'Backspace'].includes(event.key) && !this.isEditModalOpen) {
      
-      console.log(`cell: ${console.dir(this.selectedCells)}`);
       // reusing an existing method to delete cell content by instead pasting empty strings
       if (this.selectedCells.length > 0) this.savePastedCellContent(new ClipboardEvent('paste'), null, true)
     }
@@ -729,6 +728,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         toastr.success(`Rows added successfully to the end of the ${tableType} sheet`, "Success", this.toastrSettings);
         this.rowsUpdated.emit();
         this.isFormBusy = false;
+        if(this.paginator.pageSize < 100) this.paginator.pageSize += rows.length;
       },
       error: (error) => {
         this.isFormBusy = false;
@@ -879,7 +879,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   headerClick(column: any, event) {
-    console.dir(column);
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;

@@ -126,3 +126,8 @@ export class ResetValidationState {
     static readonly type = '[validation] Reset Validation State'
     constructor() {}
 }
+
+export class SetValidationRunNeeded {
+    static readonly type = '[validation] Set Validation Run Needed'
+    constructor(public set: boolean) {}
+}

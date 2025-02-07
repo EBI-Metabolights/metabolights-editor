@@ -70,19 +70,26 @@
   </div>
 
   </div>
-
 </div>
 
 <!--No violations found template-->
 <ng-template #noViolations>
-  <app-no-violations [section]="true"></app-no-violations>
-  <br>
+  <div *ngIf="validationStatus !== 'SUCCESS'; else successfulReport">
+    <app-no-violations [studyId]="studyId" [section]="true"></app-no-violations>
+    <br>
+  </div>
+
 </ng-template>
 <!--End of no violations template-->
-
+<!--Passed validation template-->
+<ng-template #successfulReport>
+  <app-no-violations [studyId]="studyId" [success]="true"></app-no-violations>
+  <br>
+</ng-template>
+<!--End of passed validation template-->
 <!--No violations found for selected subsection and violation type filters-->
 <ng-template #noViolationsForFilterSelection>
-  <app-no-violations [section]="true" [filter]="true"></app-no-violations>
+  <app-no-violations [studyId]="studyId" [section]="true" [filter]="true"></app-no-violations>
   <br>
 </ng-template>
 <!--End of no violation found for selected filters-->

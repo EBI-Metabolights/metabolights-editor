@@ -49,6 +49,7 @@ section {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
   }
 
   .history-container {
@@ -113,4 +114,19 @@ section {
 
 p.attention {
   margin-left: 2.3%;
+}
+
+.message-header {
+  align-items: center;
+  background-color: #fcfbee;
+  border-radius: 0;
+  color: #877e17;
+  display: flex;
+  font-weight: 700;
+  justify-content: space-between;
+  line-height: 1.25;
+  padding: 0.75em 1em;
+  position: relative;
+  border: 1px solid #fff4cc;
+
 }

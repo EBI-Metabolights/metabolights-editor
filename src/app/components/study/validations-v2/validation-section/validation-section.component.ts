@@ -1,6 +1,9 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { ValidationReportSubsection } from '../interfaces/validation-report.types';
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ValidationReportSubsection, ViolationType } from '../interfaces/validation-report.types';
 import { Violation } from '../interfaces/validation-report.interface';
+import { filter, Observable } from 'rxjs';
+import { Store } from '@ngxs/store';
+import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 
 @Component({
   selector: 'app-validation-section',
@@ -12,6 +15,10 @@ export class ValidationSectionComponent implements OnInit, OnChanges {
 
   @Input() violations: Violation[];
   @Input() subsections: ValidationReportSubsection[];
+  @Input() studyId: string;
+
+  validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+
 
   selectedSubsections: ValidationReportSubsection[] = [];
   filteredViolations: Violation[] = [];
@@ -19,9 +26,14 @@ export class ValidationSectionComponent implements OnInit, OnChanges {
   violationTypes = ["ERROR", "WARNING"];
   selectedViolationTypes = ["ERROR", "WARNING"];
 
+  validationStatus: ViolationType = null;
+
   ngOnInit(): void {
     this.selectedSubsections = JSON.parse(JSON.stringify(this.subsections));
     this.filteredViolations = this.violations;
+    this.validationStatus$.pipe(filter(val => val !== null)).subscribe((val) => {
+      this.validationStatus = val;
+    })
   }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -3,10 +3,6 @@
     <!--<app-validation-report-summary [report]="report" [accession]="studyId"></app-validation-report-summary>-->
     <br>
     <!--Validation v2 information start-->
-    <!--
-    
-If you have any problems or queries, please see the Guides or contact us at metabolights-help@ebi.ac.uk. 
-    -->
     <div  class="notification is-primary attention">
         
         <b><mat-icon>report</mat-icon>This is version 2 of the MetaboLights Validation, which has now replaced study validation framework v1.</b><br>
@@ -27,9 +23,15 @@ If you have any problems or queries, please see the Guides or contact us at meta
     </p>
 
     </div>
+
+        <div *ngIf="validationNeeded" class="notification is-warning">
+            <mat-icon>info</mat-icon> There have been recent updates to your study. Please rerun the validation.
+          </div>
     <!--Validation v2 information end-->
     <div class="validation-panel">
-        <app-validation-task-box></app-validation-task-box>
+        <div>
+            <app-validation-task-box></app-validation-task-box>
+        </div>
       </div>
       <br>
       
@@ -73,33 +75,33 @@ If you have any problems or queries, please see the Guides or contact us at meta
     
             <mat-tab label="General">
     
-                <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations">
+                <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations" [studyId]="studyId">
                 </app-validation-section> 
             </mat-tab>
     
             <mat-tab label="Investigation File">
-                <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations">
+                <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Samples">
     
-                <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations">
+                <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Assays">
-                <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations">
+                <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Metabolites">
-                <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations">
+                <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
     
             <mat-tab label="Files">
-                <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations">
+                <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
             </mat-tab-group>
@@ -129,7 +131,7 @@ If you have any problems or queries, please see the Guides or contact us at meta
 
 <!--No violations found template-->
 <ng-template #noViolations>
-    <app-no-violations [studyId]="studyId"></app-no-violations>
+    <app-no-violations [studyId]="studyId" [success]="validationStatus === 'SUCCESS'"></app-no-violations>
 <br>
 </ng-template>
 
