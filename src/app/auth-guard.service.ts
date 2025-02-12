@@ -6,11 +6,10 @@ import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 
 import jwtDecode from "jwt-decode";
-import { httpOptions, MtblsJwtPayload } from "./services/headers";
+import { MtblsJwtPayload } from "./services/headers";
 import { HttpClient } from "@angular/common/http";
 
 import { ErrorMessageService } from "./services/error-message.service";
-import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
 @Injectable({
@@ -20,11 +19,8 @@ export class AuthGuard  implements OnInit {
 
   constructor(
     private editorService: EditorService,
-    private configService: ConfigurationService,
     private router: Router,
     private route: ActivatedRoute,
-    private http: HttpClient,
-    private errorMessageService: ErrorMessageService,
     private store: Store
   ) { }
 
@@ -102,7 +98,7 @@ export class AuthGuard  implements OnInit {
         if (currentUser !== userName) {
           this.editorService.clearSessionData();
           await this.editorService.loginWithJwt(jwt, userName);
-          toastr.info("User: " + userName, "Session is swithed to other user.", {
+          toastr.info("User: " + userName, "Session is switched to other user.", {
             timeOut: "5000",
             positionClass: "toast-top-center",
             preventDuplicates: true,
