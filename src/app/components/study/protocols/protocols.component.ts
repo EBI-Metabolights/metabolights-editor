@@ -5,6 +5,8 @@ import {
   OnChanges,
   SimpleChanges,
   inject,
+  computed,
+  effect,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
@@ -14,6 +16,7 @@ import { Observable } from "rxjs";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
 import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/application.actions";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 
 @Component({
   selector: "mtbls-protocols",
@@ -29,6 +32,12 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   studyProtocols$: Observable<MTBLSProtocol[]> = inject(Store).select(ProtocolsState.protocols);
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
 
+  actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
+  actionStack$ = computed(() => {
+    const filterFn = this.actionStackFn();
+    return filterFn('[protocols]')
+  });
+  
   isStudyReadOnly = false;
 
   validations: any;
@@ -38,7 +47,9 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   customProtocols: string[] = [];
   defaultProtocols: string[] = [];
 
-  protocolGuides = {}
+  protocolGuides = {};
+
+  actionStack: string[] = [];
 
   validationsId = "protocols";
   expand = true;
@@ -94,7 +105,12 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     this.protocolGuides$.subscribe((value) => {
       this.protocolGuides = value;
       console.debug(value);
-    })
+    });
+
+    effect(() => {
+      this.actionStack = this.actionStack$();
+    });
+    
   }
 
   ngOnInit() {}

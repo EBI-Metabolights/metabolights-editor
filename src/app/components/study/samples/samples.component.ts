@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, inject } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList, inject, computed, effect } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
@@ -18,6 +18,7 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { FilesLists } from "src/app/ngxs-store/study/files/files.actions";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 
 @Component({
   selector: "mtbls-samples",
@@ -34,6 +35,12 @@ export class SamplesComponent  {
   studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+
+    actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
+  actionStack$ = computed(() => {
+    const filterFn = this.actionStackFn();
+    return filterFn('[samples]')
+  });
 
   @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
   @ViewChildren(OntologyComponent)
@@ -72,6 +79,8 @@ export class SamplesComponent  {
   form: UntypedFormGroup;
 
   validationsId = "samples";
+
+  actionStack: string[] = [];
 
 
   constructor(private editorService: EditorService, private fb: UntypedFormBuilder, private store: Store) {
@@ -118,6 +127,11 @@ export class SamplesComponent  {
     });
     this.rawFiles$.pipe(filter(val => val !== null)).subscribe((val) => {
       this.rawFileNames = val.filter(file => file.type == 'raw').map(file => file.file.split(".")[0]);
+    });
+
+    effect(() => {
+      this.actionStack = this.actionStack$();
+      console.log(this.actionStack);
     });
   }
 
