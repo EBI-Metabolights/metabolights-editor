@@ -73,7 +73,6 @@ export class GeneralMetadataState {
 
                 // TODO fix, commenting this out for demo purpose
                 //this.store.dispatch(new NewValidationReport.Get());
-                console.log(`date as it appears from general metadata service: ${gm_response.isaInvestigation.publicReleaseDate}`)
                 ctx.dispatch(new Title.Set(gm_response.isaInvestigation.studies[0].title));
                 ctx.dispatch(new StudyAbstract.Set(gm_response.isaInvestigation.studies[0].description));
                 ctx.dispatch(new SetStudySubmissionDate(gm_response.isaInvestigation.submissionDate));

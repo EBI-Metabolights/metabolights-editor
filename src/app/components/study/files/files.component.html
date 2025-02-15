@@ -244,6 +244,9 @@
   </nav>
   <!--ISA Metadata panel end -->
 
+  <div *ngIf="!isReadOnly" class="notification is-warning message">
+    <small>This section shows your study folder contents. Please click the folder icon to expand the directory.</small>
+  </div>
   <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
     <span #spacer2></span>

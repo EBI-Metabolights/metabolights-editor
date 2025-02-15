@@ -44,7 +44,6 @@ export class ReleaseDateComponent implements OnInit {
     this.studyReleaseDate$.subscribe((value) => {
       if (value !== null) {
         if (value.toString() !== "") {
-          console.log(`date val from state ${value}`)
           this.releaseDate = value;
         } else {
           this.editorService.metaInfo().subscribe((response) => {
