@@ -27,7 +27,7 @@ describe("StatusComponent", () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
     component.status = "status";
-    component.toStatus = "Submitted";
+    component.toStatus = "Provisional";
     component.curator = true;
     component.requestedStudy = "MTBLSTEST";
   });

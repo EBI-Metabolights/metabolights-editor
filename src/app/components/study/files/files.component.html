@@ -14,7 +14,7 @@
     <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
     <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
     <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
-    <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
+    <mtbls-upload *ngIf="isSyncEnabled" class="upload-button"
       [type]="'any'"
       [multiple]="true"
       [mode]="'button'"
@@ -22,7 +22,7 @@
       [size]="'is'"
     ></mtbls-upload>
 
-    <span *ngIf="!isReadOnly" class="refresh-button" >
+    <span *ngIf="isSyncEnabled" class="refresh-button" >
       <a (click)="loadFilesPassively()" class="button is-light">
         <mat-icon>refresh</mat-icon> Refresh
       </a>
@@ -43,7 +43,7 @@
     </span>-->
 
 
-    <span *ngIf="!isReadOnly && curator" class="is-pulled-rightn ml-auto">
+    <span *ngIf="isSyncEnabled && curator" class="is-pulled-rightn ml-auto">
       <a *ngIf="access == null"
         (click)="getFolderStatus()"
         class="button is-light"
@@ -67,9 +67,9 @@
     </span>
   </div>
 
-  <mat-divider class="file-divider" [inset]="true"></mat-divider>
+  <mat-divider *ngIf="isSyncEnabled && curator" class="file-divider" [inset]="true"></mat-divider>
 
-  <div *ngIf="!isReadOnly" class="notification is-warning message">
+  <div *ngIf="isSyncEnabled" class="notification is-warning message">
     <small
       ><mat-icon>warning</mat-icon> Please ensure your study folder is up-to-date. Start synchronization to update study folder.
       Please note that the sync operations may take some time to complete. If your synchronization is not completed successfully, please contact us
@@ -88,7 +88,7 @@
   <!--ftp management component start-->
 <div class="container parent resync-section">
   <app-rsync
-  *ngIf="!isReadOnly"
+  *ngIf="isSyncEnabled"
   title="Metadata Files"
   helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
   [studyId]="studyIdentifier"
@@ -102,7 +102,7 @@
   ></app-rsync>
 
     <app-rsync
-    *ngIf="!isReadOnly"
+    *ngIf="isSyncEnabled"
     title="Data Files"
     helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
     [studyId]="studyIdentifier"
@@ -114,7 +114,7 @@
     pollingInterval=10000
     (filesSynchronized)="onFilesSynchronized($event)"
     ></app-rsync>
-  <div *ngIf="!isReadOnly && curator">
+  <div *ngIf="isSyncEnabled && curator">
     <app-rsync
     title="Internal Files"
     helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
@@ -130,7 +130,7 @@
   </div>
 
 </div>
-<mat-divider class="file-divider" [inset]="true"></mat-divider>
+<mat-divider *ngIf="isSyncEnabled && curator" class="file-divider" [inset]="true"></mat-divider>
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>

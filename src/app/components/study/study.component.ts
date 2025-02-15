@@ -16,6 +16,7 @@ import { ValidationReport } from "src/app/ngxs-store/study/validation/validation
 import { UserService } from "src/app/services/decomposed/user.service";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
+import { StudyPermission } from "src/app/services/headers";
 
 @Component({
   selector: "mtbls-study",
@@ -53,10 +54,11 @@ export class StudyComponent implements OnInit, OnDestroy {
   banner: string = null;
   underMaintenance = false;
   isCurator = false;
+  isOwner = false;
   validationStatus: ViolationType = null;
   validationRunTime: string =  null;
   validationNeeded: boolean = false;
-
+  permissions: StudyPermission = null;
   constructor(
     private store: Store,
     private router: Router,
@@ -69,6 +71,8 @@ export class StudyComponent implements OnInit, OnDestroy {
 
 
   setUpSubscriptionsNgxs() {
+    this.permissions = this.store.snapshot().application.studyPermission
+
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
     this.isCurator$.subscribe((value) => {
@@ -86,6 +90,13 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
+        this.isOwner = false;
+        const userName = localStorage.getItem("username");
+        if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
+          if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
+            this.isOwner = true;
+          }
+        }
       }
     });
     this.endpoint = this.configService.config.endpoint;

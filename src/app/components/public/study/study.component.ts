@@ -83,7 +83,7 @@ export class PublicStudyComponent implements OnInit {
     const studyId = this.route.snapshot.paramMap.get("study");
     this.obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
 
-    if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === studyId){
+    if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
       if (this.obfuscationCode === this.permissions.obfuscationCode && ["INREVIEW", "INCURATION"].includes(this.permissions.studyStatus.toUpperCase())){
 
         reviewMode = true;
@@ -122,6 +122,13 @@ export class PublicStudyComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
+        this.isOwner = false;
+        const userName = localStorage.getItem("username");
+        if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
+          if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
+            this.isOwner = true;
+          }
+        }
       }
     });
 

@@ -74,7 +74,7 @@ export class FilesComponent implements OnInit,  OnChanges {
   refreshingData = false;
 
   isReadOnly = false;
-
+  isSyncEnabled = false;
   MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES', 'ARCHIVED_AUDIT_FILES'];
   MANAGED_SUB_FOLDERS=['AUDIT_FILES/ARCHIVED_AUDIT_FILES', "INTERNAL_FILES/logs"];
 
@@ -122,7 +122,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     } else {
       this.asperaStatus = initAsperaStatus
     }
-    
+
   }
 
 
@@ -130,6 +130,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        updateSyncStatus();
       }
     });
     this.studyStatus$.subscribe((value) => {
@@ -493,7 +494,9 @@ export class FilesComponent implements OnInit,  OnChanges {
       }
     );
   }
-
+  updateFileUpdateStatus() {
+    return this.curator;
+  }
   passiveUpdate(syncEvent) {
     if (syncEvent === SyncEvent.metadata) {
       this.store.dispatch(new GetGeneralMetadata(this.requestedStudy, this.isReadOnly))
@@ -638,3 +641,10 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.loadFiles(true, $event);
   }
 }
+function updateSyncStatus() {
+  this.isSyncEnabled = false;
+  if (this.curator || (!this.isReadOnly && this.status && this.status === "PROVISIONAL")) {
+    this.isSyncEnabled = true;
+  }
+}
+

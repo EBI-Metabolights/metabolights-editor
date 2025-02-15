@@ -69,13 +69,13 @@
           improve your visibility.
         </p>
       </span>
-      <span *ngIf="status == 'In Curation'">
+      <span *ngIf="status == 'Private'">
         <h4>
           <mat-icon>visibility_off</mat-icon>
         </h4>
         <p>
           <b>ACCESSIBILITY</b><br />
-          Your study is currently in curation and therefore you cannot make any
+          Your study is currently Private and you cannot make any
           changes. Please be advised that we may contact you if further
           information is required to complete this process. If you would like to
           update you study at this stage please contact
@@ -88,7 +88,7 @@
           update from the MetaboLights team.
         </p>
       </span>
-      <span *ngIf="status == 'Submitted'">
+      <span *ngIf="status == 'Provisional'">
         <h4>
           <mat-icon>visibility_off</mat-icon>
         </h4>
@@ -100,7 +100,7 @@
           <b>What's next?</b><br />
           Check your study passes the validation checks (see the validation tab
           in your study). Once you have completed your study and it has met the
-          validation criteria, please change the study status to ‘In Curation’ 
+          validation criteria, please change the study status to ‘Private’
         </p>
         <br>
         <div *ngIf="validation">
@@ -119,23 +119,23 @@
           <mat-form-field>
             <mat-label>Change study status</mat-label>
             <mat-select (selectionChange)="changeStatusNgxs()" [(value)]="toStatus">
-              <mat-option value="Submitted">Submitted</mat-option>
-              <mat-option value="In Curation">In Curation</mat-option>
+              <mat-option value="Provisional">Provisional</mat-option>
+              <mat-option value="Private">Private</mat-option>
               <mat-option value="In Review">In Review</mat-option>
               <mat-option value="Public">Public</mat-option>
             </mat-select>
           </mat-form-field>
         </span>
         <ng-template #submitter>
-          <span *ngIf="status == 'Submitted'">
+          <span *ngIf="status == 'Provisional'">
             <mat-form-field>
               <mat-label>Change study status</mat-label>
               <mat-select
                 (selectionChange)="changeStatusNgxs()"
                 [(value)]="toStatus"
               >
-                <mat-option value="Submitted">Submitted</mat-option>
-                <mat-option value="In Curation">In Curation</mat-option>
+                <mat-option value="Provisional">Provisional</mat-option>
+                <mat-option value="Private">Private</mat-option>
               </mat-select>
             </mat-form-field>
           </span>

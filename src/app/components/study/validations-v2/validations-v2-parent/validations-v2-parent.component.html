@@ -4,7 +4,8 @@
     <br>
     <!--Validation v2 information start-->
     <div  class="notification is-primary attention">
-        
+
+    <div *ngIf="validationEnabled" class="notification is-primary attention">
         <b><mat-icon>report</mat-icon>This is version 2 of the MetaboLights Validation, which has now replaced study validation framework v1.</b><br>
         <p>
             With the aim of improving reporting and speeding up data release, the MetaboLights team has developed a more structured and stricter new study validation ruleset - study validation v2 (<a href="https://github.com/EBI-Metabolights/mtbls-validation">https://github.com/EBI-Metabolights/mtbls-validation</a>).
@@ -12,7 +13,7 @@
         </p>
         <br>
         <p>
-            You must address all Errors and should also address Warnings (where applicable) to progress your study and promote the status from ‘Submitted’ to ‘In Curation.
+            You must address all Errors and should also address Warnings (where applicable) to progress your study and promote the status from ‘Provisional’ to ‘Private’.
         </p>
         <br>
         <p>
@@ -23,6 +24,7 @@
     </p>
 
     </div>
+</div>
 
         <div *ngIf="validationNeeded" class="notification is-warning">
             <mat-icon>info</mat-icon> There have been recent updates to your study. Please rerun the validation.
@@ -30,11 +32,11 @@
     <!--Validation v2 information end-->
     <div class="validation-panel">
         <div>
-            <app-validation-task-box></app-validation-task-box>
+            <app-validation-task-box *ngIf="validationEnabled"></app-validation-task-box>
         </div>
       </div>
       <br>
-      
+
     <!--History dropdown wrapper start-->
     <div class="history-wrapper-top-menu">
         <div *ngIf="report !== null" class="history-dropdown-box">
@@ -42,7 +44,7 @@
                 <mat-label>Select a Report</mat-label>
                 <mat-select class="select-box" [(ngModel)]="selectedPhase" (ngModelChange)="onPhaseSelection($event)">
                 <mat-option *ngFor="let phase of history; let isFirst = first" [value]="phase">
-                    {{ phase.validationTime | validationDateFormat | date: 'MMM d, y, H:mm:ss ' }} 
+                    {{ phase.validationTime | validationDateFormat | date: 'MMM d, y, H:mm:ss ' }}
                     <span *ngIf="isFirst"><b>(most recent)</b></span>
                   </mat-option>
                 </mat-select>
@@ -72,34 +74,34 @@
                     </div>
                 </div>
             </mat-tab>
-    
+
             <mat-tab label="General">
-    
+
                 <app-validation-section [subsections]="generalSubsections" [violations]="generalViolations" [studyId]="studyId">
-                </app-validation-section> 
+                </app-validation-section>
             </mat-tab>
-    
+
             <mat-tab label="Investigation File">
                 <app-validation-section [subsections]="investigationSubsections" [violations]="investigationViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
-    
+
             <mat-tab label="Samples">
-    
+
                 <app-validation-section [subsections]="samplesSubsections" [violations]="sampleViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
-    
+
             <mat-tab label="Assays">
                 <app-validation-section [subsections]="assaySubsections" [violations]="assayViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
-    
+
             <mat-tab label="Metabolites">
                 <app-validation-section [subsections]="assignmentSubsections" [violations]="assignmentViolations" [studyId]="studyId">
                 </app-validation-section>
             </mat-tab>
-    
+
             <mat-tab label="Files">
                 <app-validation-section [subsections]="filesSubsections" [violations]="filesViolations" [studyId]="studyId">
                 </app-validation-section>
