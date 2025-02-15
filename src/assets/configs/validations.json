@@ -342,8 +342,8 @@
           "is-read-only": "false",
           "is-hidden": "false",
           "technique": "mass spectrometry|NMR spectroscopy",
-          "description": "The status of this publication, e.g. Published, Submitted, etc.",
-          "placeholder": "In preparation, published, etc",
+          "description": "The status of this publication, e.g. published, in preparation, etc.",
+          "placeholder": "in preparation, published, etc",
           "rules": [
             {
               "condition": "min",

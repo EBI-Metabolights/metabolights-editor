@@ -42,7 +42,7 @@ export class StatusComponent implements OnInit {
   isFormBusy = false;
   status: string = null;
   curator = false;
-  toStatus = "Submitted";
+  toStatus = "Provisional";
   curationRequest: string = null;
   requestedStudy: string = null;
 
@@ -145,7 +145,7 @@ export class StatusComponent implements OnInit {
     if  (this.curator){
       this.isModalOpen = true;
     } else {
-      if (this.status != null && this.status.toLowerCase() === "submitted") {
+      if (this.status != null && this.status.toLowerCase() === "provisional") {
 
         if (this.validationStatus === 'ERROR' || this.validationStatus === null) {
           toastr.error("Please validate your study and fix all errors before changing status.", "Error", {

@@ -33,7 +33,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   filterValue: string = null;
   messageExpanded = false;
   curator = false;
-  submittedStudies: any = [];
+  provisionalStudies: any = [];
   user=null;
   loginName = "";
   isConfirmationModalOpen = false;
@@ -78,7 +78,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
       this.curator = value;
     });
 
-    
+
 
   }
 
@@ -92,10 +92,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   createNewStudy() {
-    this.submittedStudies = this.studies.filter(
-      (study) => study["status"] === "Submitted"
+    this.provisionalStudies = this.studies.filter(
+      (study) => study["status"] === "Provisional"
     );
-    if (this.submittedStudies.length > 0) {
+    if (this.provisionalStudies.length > 0) {
       this.isConfirmationModalOpen = true;
     } else {
       this.router.navigate(["/guide/create"]);

@@ -39,13 +39,13 @@ export interface Violation {
     section: string // will be an enum or custom type
     sourceColumnHeader: string
     sourceColumnIndex: string
-    sourceFile: string // this seems ambiguous to me
+    sourceFile: string // points to metadata file causes violation ( if violation is not related to a file, its value empty or 'input')
     title: string
     type: ViolationType // will be an enum or custom type
     values: string[]
     violation: string // description but as it relates to this study
     technique: string // this refers to analytical technique IE LCMS
-    overrided: boolean 
+    overrided: boolean
     overrideComment: string
 }
 

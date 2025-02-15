@@ -33,14 +33,15 @@ export class ValidationsV2ParentComponent implements OnInit {
   overrides$: Observable<FullOverride[]> = inject(Store).select(ValidationState.overrides);
   validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
-  
+
 
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
   constructor(private store: Store) {
    }
-  
+
   //report variables
   report: Ws3ValidationReport = null;
   history: Array<ValidationPhase> = [];
@@ -57,15 +58,15 @@ export class ValidationsV2ParentComponent implements OnInit {
   assayViolations: Violation[] = [];
   assignmentViolations: Violation[] = [];
   filesViolations: Violation[] = [];
-  
+
   // core state variables
   studyId: string =  null
   isCurator: boolean = false;
-
+  studyStatus: string = null;
   checked: boolean = false;
   ready: boolean = true;
   loadingDiffReport = false;
-
+  validationEnabled = false;
   // Subsection buckets
   investigationSubsections = validationReportInvestigationSubsectionList;
   samplesSubsections = validationReportSamplesSubsectionList;
@@ -81,8 +82,10 @@ export class ValidationsV2ParentComponent implements OnInit {
   ngOnInit(): void {
 
     this.isCurator$.subscribe(value => {
-      this.isCurator = value;
-      }
+      this.isCurator = false
+      if (value !== null) {
+        this.isCurator = value;
+      }}
     )
 
     this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
@@ -140,7 +143,10 @@ export class ValidationsV2ParentComponent implements OnInit {
       this.store.dispatch(new ValidationReportV2.Get(this.studyId));
       this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
     });
-
+    this.studyStatus$.pipe(filter(value => value !== null)).subscribe(value => {
+      this.studyStatus = value;
+      this.updateValidationStatus();
+    });
     this.overrides$.pipe(filter(val => val !== null)).subscribe(value => {
       this.overrides = value;
     });
@@ -184,5 +190,9 @@ export class ValidationsV2ParentComponent implements OnInit {
     this.store.dispatch(new ValidationReportV2.Override.Delete(this.studyId, $event));
   }
 
+  updateValidationStatus() {
+    this.validationEnabled =  this.isCurator || (this.studyStatus && this.studyStatus.toUpperCase() == 'PROVISIONAL');
+  }
 
 }
+
