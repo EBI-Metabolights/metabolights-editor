@@ -158,7 +158,7 @@ export class AuthGuard  implements OnInit {
     }else if (url.startsWith("/study/REQ")) {
       studyIdentifier = url.split("/")[2];
     } else if (url.startsWith("/reviewer")) {
-      obfuscationCode = url.split("/")[1].replace("reviewer", "");
+      obfuscationCode = url.split("/")[1].split("?")[0].replace("reviewer", "");
     } else if (url.startsWith("/study/")) {
       this.editorService.redirectUrl = url;
       const errorCode = "E-0001-001";
