@@ -2,31 +2,12 @@
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
 
-    <div *ngIf="status == 'Public'; else onlyStatus" >
-        <span *ngIf="curationRequest == 'MANUAL_CURATION'; else noCuration">
-          <span class="tag is-link clickable" (click)="openModal()">
-            {{
-              status
-            }}
-          </span>
-        </span>
-      <ng-template #noCuration>
-        <span class="tag clickable not-curated" (click)="openModal()">
-          {{
-            status
-          }} - Unreviewed
-        </span>
-      </ng-template>
-    </div>
-    <ng-template #onlyStatus>
-      <span class="tag is-link clickable" (click)="openModal()">
-        {{
-          status
-        }}
+    <span class="tag is-link clickable" (click)="openModal()">
+      {{
+        status
+      }}
 
-      </span>
-    </ng-template>
-
+    </span>
   </div>
 </div>
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
@@ -58,9 +39,7 @@
         </h4>
         <p>
           <b>ACCESSIBILITY</b><br />
-          Curation of your study is complete. You can find a private link on
-          your study page to share your study directly with collaborators,
-          journals or reviewers.
+          Your study is in review state.
           <br /><br />
           <b>What's next?</b><br />
           Upon reaching the release date your study will automatically be
@@ -75,17 +54,16 @@
         </h4>
         <p>
           <b>ACCESSIBILITY</b><br />
-          Your study is currently Private and you cannot make any
-          changes. Please be advised that we may contact you if further
-          information is required to complete this process. If you would like to
-          update you study at this stage please contact
-          <a href="mailto:metabolights-curation@ebi.ac.uk"
-            >metabolights-curation&#64;ebi.ac.uk</a
-          >
+          Your study is currently Private and you cannot make any changes.
+          If you would like to update you study at this stage change study status to 'Provisional', make necessary changes and convert status back to 'Private'.
+          If you want to make your study public, Update study status to 'Public'. Please be aware that once you make your study public, you cannot make any status changes again.
           <br /><br />
           <b>What's next?</b><br />
-          Once curation of your study has been completed you will receive an
-          update from the MetaboLights team.
+          Your study will be public according to the first of the following criteria:
+          <br/>
+          1. With your request.
+          2. The release date is reached.
+          3. The study publication is published in a journal.
         </p>
       </span>
       <span *ngIf="status == 'Provisional'">
@@ -121,7 +99,6 @@
             <mat-select (selectionChange)="changeStatusNgxs()" [(value)]="toStatus">
               <mat-option value="Provisional">Provisional</mat-option>
               <mat-option value="Private">Private</mat-option>
-              <mat-option value="In Review">In Review</mat-option>
               <mat-option value="Public">Public</mat-option>
             </mat-select>
           </mat-form-field>
@@ -136,6 +113,19 @@
               >
                 <mat-option value="Provisional">Provisional</mat-option>
                 <mat-option value="Private">Private</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </span>
+          <span *ngIf="status == 'Private' || status == 'In Review'">
+            <mat-form-field>
+              <mat-label>Change study status</mat-label>
+              <mat-select
+                (selectionChange)="changeStatusNgxs()"
+                [(value)]="toStatus"
+              >
+                <mat-option value="Provisional">Provisional</mat-option>
+                <mat-option value="Private">Private</mat-option>
+                <mat-option value="Public">Public</mat-option>
               </mat-select>
             </mat-form-field>
           </span>

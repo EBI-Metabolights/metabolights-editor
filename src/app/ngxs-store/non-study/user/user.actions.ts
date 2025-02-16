@@ -3,6 +3,7 @@ export interface Owner {
     role: string;
     email: string;
     status: string;
+    partner: boolean;
 }
 
 export namespace User {

@@ -130,7 +130,7 @@
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon>
-          Your study ({{ requestedStudy }}) is publicly accessible. It <b><u>is not curated</u></b> in full by the MetaboLights curation team but does pass the new MetaboLights Validation and minimum submission requirements.
+          Your study ({{ requestedStudy }}) is publicly accessible.
           <br/>
           <br/>
             If you have comments or suggestions, please get in touch with MetaboLights team (<b>
@@ -186,7 +186,15 @@
         class="field is-grouped is-grouped-multiline px-20 mb-10"
       >
         <mtbls-status></mtbls-status>
-        <mtbls-release-date></mtbls-release-date>&emsp;
+
+        <span *ngIf="status == 'Public' || status == 'In Review' || status == 'Private'">
+          <div class="tags has-addons">
+            <span class="tag is-dark">Curation</span>
+            <span class="tag is-link"> {{ curationStatus }} </span>
+          </div>
+      </span>&emsp;
+
+      <mtbls-release-date></mtbls-release-date>&emsp;
         <!--Start of validation label-->
         <div *ngIf="validationStatus !== null">
 

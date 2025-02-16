@@ -46,6 +46,7 @@ export class PublicStudyComponent implements OnInit {
   requestedTab = 0;
   status = "";
   curationRequest = ""
+  curationStatus = "";
   tab = "descriptors";
   requestedStudy: string = null;
   studyError = false;
@@ -169,6 +170,7 @@ export class PublicStudyComponent implements OnInit {
     this.curationRequest$.subscribe((value) => {
       if(value){
         this.curationRequest = value;
+        this.updateCurationStatus();
       }
     });
 
@@ -267,5 +269,15 @@ export class PublicStudyComponent implements OnInit {
       this.notReadyValidationMessage = "Required";
     }
 
+  }
+
+  updateCurationStatus() {
+    if (this.curationRequest === "NO_CURATION") {
+      this.curationStatus = "Minimum";
+    } else if (this.curationRequest === "MANUAL_CURATION") {
+      this.curationStatus = "MetaboLights";
+    } else {
+      return "Minimum";
+    }
   }
 }

@@ -43,7 +43,9 @@ export class StatusComponent implements OnInit {
   status: string = null;
   curator = false;
   toStatus = "Provisional";
-  curationRequest: string = null;
+  curationRequest = "";
+  curationStatus = "";
+
   requestedStudy: string = null;
 
   validationStatus: ViolationType = null;
@@ -145,9 +147,9 @@ export class StatusComponent implements OnInit {
     if  (this.curator){
       this.isModalOpen = true;
     } else {
-      if (this.status != null && this.status.toLowerCase() === "provisional") {
+      if (this.status != null &&  ["private", "provisional", "in review"].includes(this.status.toLowerCase())) {
 
-        if (this.validationStatus === 'ERROR' || this.validationStatus === null) {
+        if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
           toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
             timeOut: "5000",
             positionClass: "toast-top-center",

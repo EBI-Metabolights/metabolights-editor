@@ -17,12 +17,14 @@ export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
 
   editorVersion$: Observable<MtblsEditorVersion> = inject(Store).select(ApplicationState.editorVersion);
   apiVersion$: Observable<MtblsBackendVersion> = inject(Store).select(ApplicationState.backendVersion);
 
-
+  studyStatus: string;
+  previewEnabled = false;
   editorVersion: string;
   apiVersion: string;
   baseHref: string;
@@ -71,7 +73,15 @@ export class NavBarComponent implements OnInit {
       }
     });
     this.studyIdentifier$.subscribe((value) => {
-      this.studyId = value;
+      if (value) {
+        this.studyId = value;
+      }
+    });
+    this.studyStatus$.subscribe((value) => {
+      if (value) {
+        this.studyStatus = value;
+        this.updatePreviewEnabled();
+      }
     });
   }
 
@@ -85,5 +95,8 @@ export class NavBarComponent implements OnInit {
 
   redirectToConsole() {
     this.router.navigate(["/console"]);
+  }
+  updatePreviewEnabled() {
+    this.previewEnabled = this.mode != 'light' && this.studyStatus != 'Provisional';
   }
 }

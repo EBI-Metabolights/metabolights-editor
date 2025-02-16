@@ -88,11 +88,6 @@
           >Private</a
         >
         <a
-          (click)="filterStudies('in review')"
-          [class.is-active]="filterValue == 'in review'"
-          >In Review</a
-        >
-        <a
           (click)="filterStudies('public')"
           [class.is-active]="filterValue == 'public'"
           >Public</a
@@ -205,15 +200,17 @@
     <div class="modal-background"></div>
     <div class="modal-card">
       <section class="modal-card-body">
-        <p *ngIf="provisionalStudies.length < 2">
+        <p *ngIf="provisionalStudies.length < 2 || curator || partner; else tooMany">
           You have {{ provisionalStudies.length }} provisional studies in progress. Are you
           sure you want to create another study?
         </p>
-        <p *ngIf="provisionalStudies.length > 1 ">
-          You have {{ provisionalStudies.length }} provisional studies in the PROVISIONAL stage.
+        <ng-template #tooMany>
+        <p>
+          You have {{ provisionalStudies.length }} provisional studies.
           To prevent spurious submissions, a maximum of 2 provisional studies are allowed at any one time.
           If you have a legitimate reason to have more than 2 provisional studies, then this is permitted, and you need to contact the MetaboLights team with your reason and how many studies you require, through the support email: metabolights-help&#64;ebi.ac.uk
         </p>
+        </ng-template>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -227,7 +224,7 @@
               </p>
             </button>
           </div>
-          <div *ngIf="provisionalStudies.length < 2 || curator " class="column is-half has-text-right">
+          <div *ngIf="provisionalStudies.length < 2 || curator || partner" class="column is-half has-text-right">
             <a [routerLink]="['/guide/create']" class="button is-success"
               >Create new</a
             >

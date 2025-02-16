@@ -46,6 +46,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   requestedStudy: string = null;
   status = "";
   curationRequest = "";
+  curationStatus = "";
   validation: any = {};
   obfuscationCode: string = null;
   endpoint: string = null;
@@ -117,6 +118,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.curationRequest$.subscribe((value) => {
       if (value) {
         this.curationRequest = value;
+        this.updateCurationStatus();
       }
     });
 
@@ -219,5 +221,14 @@ export class StudyComponent implements OnInit, OnDestroy {
   topFunction() {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+  }
+  updateCurationStatus() {
+    if (this.curationRequest === "NO_CURATION") {
+      this.curationStatus = "Minimum";
+    } else if (this.curationRequest === "MANUAL_CURATION") {
+      this.curationStatus = "MetaboLights";
+    } else {
+      return "Minimum";
+    }
   }
 }

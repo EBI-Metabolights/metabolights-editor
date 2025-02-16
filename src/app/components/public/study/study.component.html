@@ -111,7 +111,15 @@
         id="meta"
         class="field is-grouped is-grouped-multiline px-20 mb-10"
       >
-        <mtbls-status></mtbls-status>
+        <mtbls-status></mtbls-status>&emsp;
+
+        <span *ngIf="status == 'Public' ">
+            <div class="tags has-addons">
+              <span class="tag is-dark">Curation</span>
+              <span class="tag is-link"> {{ curationStatus }} </span>
+            </div>
+        </span>&emsp;
+
         <mtbls-release-date></mtbls-release-date>&emsp;
         <div *ngIf="isOwner || isCurator">
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">
@@ -211,13 +219,13 @@
                 >
                   <a>Files</a>
                 </li>
-                <li
-                  *ngIf="!studyError && (isOwner || isCurator)"
-                  (click)="selectCurrentTab(6, 'metabolites')"
+                <!-- <li
+                  *ngIf="isCurator"
+                  (click)="selectCurrentTab(6, 'validations')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
                 >
-                  <a>Validations</a>
-                </li>
+                  <a>Study Validations v1</a>
+                </li> -->
 
                 <!-- <li *ngIf="!studyError" (click)="selectCurrentTab(6, 'pathways')" [ngClass]="{'is-active': (currentTabIndex$ | async) === 6 }"><a>Pathways</a></li> -->
               </ul>
@@ -270,7 +278,7 @@
                 </span>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 6 && (isOwner || isCurator)"
+                  *ngIf="(currentTabIndex$ | async) === 7 && (isOwner || isCurator)"
                 >
                   <study-validations></study-validations>
                 </div>
