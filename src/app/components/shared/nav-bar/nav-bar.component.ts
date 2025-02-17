@@ -32,6 +32,7 @@ export class NavBarComponent implements OnInit {
   environmentName: string;
   studyId: string;
   obfuscationCode: string;
+  reviewerLink: string = null;
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -56,6 +57,7 @@ export class NavBarComponent implements OnInit {
     this.obfuscationCode$.subscribe((value) => {
       if (value !== null ) {
         this.obfuscationCode = value;
+        this.updateReviewerLink();
       }
     });
     this.editorVersion$.subscribe((value) => {
@@ -75,12 +77,14 @@ export class NavBarComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value) {
         this.studyId = value;
+        this.updateReviewerLink();
       }
     });
     this.studyStatus$.subscribe((value) => {
       if (value) {
         this.studyStatus = value;
         this.updatePreviewEnabled();
+        this.updateReviewerLink();
       }
     });
   }
@@ -98,5 +102,18 @@ export class NavBarComponent implements OnInit {
   }
   updatePreviewEnabled() {
     this.previewEnabled = this.mode != 'light' && this.studyStatus != 'Provisional';
+  }
+  updateReviewerLink() {
+    if (this.studyStatus && this.studyId ) {
+      this.reviewerLink = null;
+      if (this.studyStatus == "Private" || this.studyStatus == "In Review") {
+        if (this.obfuscationCode) {
+          this.reviewerLink = this.baseHref + this.studyId + "?reviewCode=" + this.obfuscationCode;
+        }
+      } if (this.studyStatus == "Public") {
+        this.reviewerLink = this.baseHref + this.studyId;
+      } 
+    } 
+
   }
 }

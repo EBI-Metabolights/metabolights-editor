@@ -50,7 +50,7 @@
                 <h2> Status </h2>
                 <div class="is-pulled-left">
                   <div class="tags has-addons">
-                    <span class="tag is-dark">Validation</span>
+                    <span class="tag">Validation</span>
                     <span class="tag" [ngClass]="{
                       'is-danger': validationStatus === 'ERROR',
                       'is-success': validationStatus === 'SUCCESS',
@@ -58,20 +58,20 @@
                     }" > {{validationStatus}} </span>
                   </div>
               </div>
-              
+
                 <div class="is-pulled-left">
                   <span>
                     <div class="tags has-addons">
-                      <span class="tag is-dark">Last Validation Time</span>
+                      <span class="tag">Last Validation Time</span>
                       <span class="tag is-danger" > <small> {{lastValidationRunTime == "-" ? "-" : lastValidationRunTime | date:'long'}} </small> </span>
                     </div>
                   </span>
-              
+
                 </div>
-                
+
               </div>
               <div class="content">
-                <h2>Actions</h2> 
+                <h2>Actions</h2>
                 <mat-card-actions>
                   <button mat-stroked-button color="primary" class="no-round" (click)="initNewTask()">
                     Start new validation task
@@ -106,7 +106,7 @@
       <mat-divider></mat-divider>
       <mat-card-content>
         <div class="empty-summary-content content">
-          <h2>Actions</h2> 
+          <h2>Actions</h2>
           <br>
 
           <mat-card-actions>

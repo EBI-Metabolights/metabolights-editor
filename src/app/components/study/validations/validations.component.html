@@ -14,7 +14,7 @@
   </div>
   <div class="is-pulled-right">
     <div class="tags has-addons">
-      <span class="tag is-dark">Validation</span>
+      <span class="tag">Validation</span>
       <span class="tag" [ngClass]="validationStatusClass"> {{ statusMessage() }} </span>
     </div>
 </div>
@@ -22,7 +22,7 @@
   <div class="is-pulled-right">
     <span *ngIf="studyValidation !== undefined && studyValidation.status !== 'not ready'">
       <div class="tags has-addons">
-        <span class="tag is-dark">Last Validation Time</span>
+        <span class="tag">Last Validation Time</span>
         <span class="tag" [ngClass]="validationStatusClass"> <small> {{ studyValidation !== undefined && studyValidation.last_update_timestamp > 0 ? (studyValidation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
       </div>
     </span>

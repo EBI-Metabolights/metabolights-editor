@@ -117,29 +117,16 @@
                 <div class="control py-0 mb0">
                   <div class="tags has-addons">
                     <span class="tag">Status</span>
-                    <span *ngIf="study.status == 'Public'; else onlyStatus" >
-                        <span *ngIf="study.curationRequest == 'MANUAL_CURATION'; else noCuration"
-                          class="tag is-success"
-                          >{{ study.status }} - Curated
-                        </span>
-                        <ng-template #noCuration>
-                            <span
-                            class="tag not-curated"
-                            >{{ study.status }} - Not Curated
-                          </span>
-                        </ng-template>
+                    <span>
+                      <span
+                      class="tag"
+                      [class.is-primary]="study.status == 'In Review'"
+                      [class.is-danger]="study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'"
+                      [class.is-success]="study.status == 'Public'"
+                      >{{ study.status }}</span
+                    >
                     </span>
-
-                    <ng-template #onlyStatus>
-                        <span
-                          class="tag"
-                          [class.is-primary]="study.status == 'In Review'"
-                          [class.is-danger]="study.status == 'Private'"
-                          [class.is-warning]="study.status == 'Provisional'"
-                          [class.is-success]="study.status == 'Public'"
-                          >{{ study.status }}</span
-                        >
-                    </ng-template>
                   </div>
                 </div>
                 <div class="control py-0 mb0">

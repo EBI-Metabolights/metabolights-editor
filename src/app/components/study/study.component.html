@@ -189,7 +189,7 @@
 
         <span *ngIf="status == 'Public' || status == 'In Review' || status == 'Private'">
           <div class="tags has-addons">
-            <span class="tag is-dark">Curation</span>
+            <span class="tag">Curation</span>
             <span class="tag is-link"> {{ curationStatus }} </span>
           </div>
       </span>&emsp;
@@ -202,7 +202,7 @@
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Validation</span>
+                <span class="tag">Validation</span>
                 <span class="tag is-danger"> Failed </span>
               </div>
             </div>
@@ -210,7 +210,7 @@
           <span class="clickable" *ngIf="validationStatus == null">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Validation</span>
+                <span class="tag">Validation</span>
                 <span class="tag is-warning"> Required </span>
               </div>
             </div>
@@ -220,7 +220,7 @@
           <span class="clickable" *ngIf="validationStatus == 'error'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Last Validation Time</span>
+                <span class="tag">Last Validation Time</span>
                 <span class="tag is-danger"> <small> {{ validationStatus !== null && validationRunTime !== null ? (validationRunTime | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
               </div>
             </div>

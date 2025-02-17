@@ -115,7 +115,7 @@
 
         <span *ngIf="status == 'Public' ">
             <div class="tags has-addons">
-              <span class="tag is-dark">Curation</span>
+              <span class="tag">Curation</span>
               <span class="tag is-link"> {{ curationStatus }} </span>
             </div>
         </span>&emsp;
@@ -125,7 +125,7 @@
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Validation</span>
+                <span class="tag">Validation</span>
                 <span class="tag is-danger"> Failed ( {{ validation !== undefined && validation.last_update_timestamp > 0 ? (validation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} )</span>
               </div>
             </div>
@@ -134,7 +134,7 @@
           <span class="clickable" *ngIf="validationStatus == null && notReadyValidationMessage != null">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Validation</span>
+                <span class="tag">Validation</span>
                 <span class="tag is-warning"> {{ notReadyValidationMessage }} </span>
               </div>
             </div>
@@ -146,7 +146,7 @@
           class="is-pulled-right"
         >
           <div class="tags has-addons">
-            <span class="tag is-dark">
+            <span class="tag">
               <i class="material-icons"> edit </i>
             </span>
             <a
@@ -155,7 +155,7 @@
               >Edit</a
             >
             <span *ngIf="isCurator"> &nbsp; </span>
-            <span class="tag is-dark">
+            <span class="tag">
               <i class="material-icons"> cloud_upload </i>
             </span>
             <a
