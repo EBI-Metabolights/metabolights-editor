@@ -3,13 +3,10 @@ import * as toastr from "toastr";
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, ActivatedRoute } from "@angular/router";
 import { EditorService } from "./services/editor.service";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
-import { ConfigurationService } from "./configuration.service";
 
 import jwtDecode from "jwt-decode";
 import { MtblsJwtPayload } from "./services/headers";
-import { HttpClient } from "@angular/common/http";
 
-import { ErrorMessageService } from "./services/error-message.service";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
 @Injectable({
@@ -42,14 +39,11 @@ export class AuthGuard  implements OnInit {
 
   // this will either redirect, or return false to indicate its not a private MTBLS request
   async privateMTBLSHandler(url: string, state: RouterStateSnapshot) {
-    console.log('if this log is not found we have a problem')
     if (url.startsWith("/MTBLS")) {
-      console.log('are we starting the privateMTBLSHandler method?')
       const studyIdentifier = url.split("/")[1];
       const regEx = new RegExp('^(MTBLS[1-9][0-9]{0,10})($|\\?)', 'g');
       const studyIdResults = studyIdentifier.match(regEx);
       if (studyIdResults === null || studyIdResults.length === 0) {
-        console.log('uh oh')
         this.editorService.redirectUrl = url;
         const errorCode = "E-0001-003";
         this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
@@ -57,11 +51,8 @@ export class AuthGuard  implements OnInit {
       }
       const studyPermission = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
       if (studyPermission.studyId === studyIdentifier) {
-        console.log('hitting study not public router call');
-        console.trace();
         this.editorService.redirectUrl = url;
         this.router.navigate(["/study-not-public"]);
-        //return false;
       }
 
 
@@ -74,7 +65,6 @@ export class AuthGuard  implements OnInit {
     try {
       let loginOneTimeToken = null;
       if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
-        console.log('first if clause in auth guard');
         const __ = this.privateMTBLSHandler(state.url, state);
         return true;
       }
@@ -175,7 +165,6 @@ export class AuthGuard  implements OnInit {
    * @returns boolean indicating whether the user is logged in.
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot) {
-    console.log(`${state.url}`)
     const localJwt = localStorage.getItem("jwt");
     if (url.startsWith("/login")) {
       if (localJwt !== null) {
@@ -208,9 +197,6 @@ export class AuthGuard  implements OnInit {
       return await this.checkStudyUrl(url, studyIdentifier, state);
     } else if (obfuscationCode !== null) {
       return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
-    }
-    if (url === '/study/MTBLS9058') {
-      console.log('getting to this point without redirection')
     }
     switch (this.evaluateSession(null)) {
       case SessionStatus.Active:
@@ -319,7 +305,6 @@ export class AuthGuard  implements OnInit {
 
       this.editorService.redirectUrl = url;
       const errorCode = "E-0001-004";
-      console.log("we don't actualy want to be getting here")
       //this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       const __ = this.privateMTBLSHandler(url, state);
       return false;
@@ -335,7 +320,6 @@ export class AuthGuard  implements OnInit {
           return false;
         }
         if (studyPermission.userName == null || studyPermission.userName.length === 0) {
-          console.log('finally getting here')
           const __ = this.privateMTBLSHandler(url, state);
           this.editorService.redirectUrl = url;
           this.router.navigate(["/login"]);
