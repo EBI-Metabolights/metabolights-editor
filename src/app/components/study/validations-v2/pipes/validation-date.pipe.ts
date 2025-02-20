@@ -7,7 +7,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class ValidationDateFormatPipe implements PipeTransform {
   transform(value: string): Date {
     const [datePart, timePart] = value.split('_');
-    const [year, day, month] = datePart.split('-');
+    const [year, month, day] = datePart.split('-');
     return new Date(`${year}-${month}-${day}T${timePart.replace(/-/g, ':')}`);
   }
 }
