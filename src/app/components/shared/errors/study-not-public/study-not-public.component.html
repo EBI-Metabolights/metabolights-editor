@@ -1,0 +1,52 @@
+<div class="columns" style="min-height: 100vh; margin: 60px 0">
+    <div class="column is-8 is-offset-2">
+      <div style="margin: 0 0 20px 0">
+        <article class="message is-small has-shadow">
+          <div (click)="toggleMessage()" class="message-header">
+            <p>
+              <span class="material-icons">error</span>&nbsp;{{ study }} is not public.
+            </p>
+            <button
+              *ngIf="!messageExpanded"
+              style="background-color: transparent; border: 0"
+            >
+              <span class="material-icons">keyboard_arrow_down</span>
+            </button>
+            <button
+              *ngIf="messageExpanded"
+              style="background-color: transparent; border: 0"
+            >
+              <span class="material-icons">keyboard_arrow_up</span>
+            </button>
+          </div>
+          <div  class="message-body">
+            <div class="container">
+                
+                <p>The MetaboLights study <strong>{{ study }}</strong> has been accessioned but not yet publicly released.</p>
+                <br>
+                <b>If you are a reviewer of a manuscript that includes this dataset:</b>
+                <br>
+                <ul class="ml">
+                    <li>You should also have received a private reviewer link to access this dataset <strong>{{study}}</strong>.</li>
+                    <li>If you did not, contact the journal editor about obtaining this information.</li>
+                    <li>If you did, go directly to the private reviewer link to access the data.</li>
+                </ul>
+                <br>
+                <b>If you have seen this identifier in an accepted manuscript:</b>
+                <br>
+                <ul class="ml">
+                    <li>Then this dataset should be publicly released. Probably the submitter(s) and/or journal have not contacted MetaboLights yet in order to trigger the public release.</li>
+                    <li>Please contact the MetaboLights team at <span class="email">metabolights-help&#64;ebi.ac.uk</span> to request that the dataset be associated with the article and released.</li>
+                </ul>
+                <br>
+                <b>If you are just waiting for this dataset to be released:</b>
+                <ul class="ml">
+                    <li>It is not available at this time.</li>
+                    <li>Please check again later or contact the submitter(s) or MetaboLights team to see when it will be public.</li>
+                </ul>
+            </div>
+          </div>
+        </article>
+      </div>
+  </div>
+  

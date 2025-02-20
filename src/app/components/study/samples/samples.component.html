@@ -66,6 +66,8 @@
     <mat-icon>add</mat-icon> Samples
   </a>
 </span>
+<app-prompt-refresh *ngIf="!isReadOnly && actionStack.length > 0" [context]="'samples'"></app-prompt-refresh>
+
 <mtbls-table
   [fileTypes]="fileTypes"
   (updated)="refresh()"

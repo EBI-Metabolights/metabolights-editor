@@ -3,15 +3,13 @@ import { Injector } from '@angular/core';
 import { Store } from '@ngxs/store';
 import { SetValidationRunNeeded } from './study/validation/validation.actions';
 import { Assay } from './study/assay/assay.actions';
-import { Descriptors, Factors } from './study/descriptors/descriptors.action';
-import { People, Publications, StudyAbstract, StudyReleaseDate, Title } from './study/general-metadata/general-metadata.actions';
-import { MAF } from './study/maf/maf.actions';
 import { Protocols } from './study/protocols/protocols.actions';
 import { Samples } from './study/samples/samples.actions';
 import { NgxsNextPluginFn } from '@ngxs/store';
 import { LoggingMiddleware } from './study-update-action-interceptor.service';
+import { IntermittentRefreshActionStack } from './non-study/transitions/transitions.actions';
 
-fdescribe('LoggingMiddleware', () => {
+describe('LoggingMiddleware', () => {
   let middleware: LoggingMiddleware;
   let storeSpy: jasmine.SpyObj<Store>;
   let injector: Injector;
@@ -22,7 +20,7 @@ fdescribe('LoggingMiddleware', () => {
     TestBed.configureTestingModule({
       providers: [
         LoggingMiddleware,
-        { provide: Store, useValue: storeSpy }, 
+        { provide: Store, useValue: storeSpy },
       ],
     });
 
@@ -38,7 +36,7 @@ fdescribe('LoggingMiddleware', () => {
   });
 
   it('should dispatch SetValidationRunNeeded when an action from a namespace is dispatched (excluding Get, Set, Organise)', () => {
-    const mockAction = new Assay.Delete('fake', 'MTBLS11019'); 
+    const mockAction = new Assay.Delete('fake', 'MTBLS11019');
     const nextFn: NgxsNextPluginFn = jasmine.createSpy('nextFn');
 
     middleware.handle({}, mockAction, nextFn);
@@ -53,7 +51,7 @@ fdescribe('LoggingMiddleware', () => {
 
     middleware.handle({}, mockAction, nextFn);
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(new SetValidationRunNeeded(true));
     expect(nextFn).toHaveBeenCalled();
   });
 
@@ -67,7 +65,47 @@ fdescribe('LoggingMiddleware', () => {
 
     middleware.handle({}, unrelatedAction, nextFn);
 
-    expect(storeSpy.dispatch).not.toHaveBeenCalled();
+    expect(storeSpy.dispatch).not.toHaveBeenCalledWith(new SetValidationRunNeeded(true));
     expect(nextFn).toHaveBeenCalled();
+  });
+
+  it('should dispatch IntermittentRefreshActionStack.Sync when an intermittent refresh action is detected', () => {
+    const mockAction = new Protocols.Add('newProtocol', {});
+    const nextFn: NgxsNextPluginFn = jasmine.createSpy('nextFn');
+
+    middleware.handle({}, mockAction, nextFn);
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(new IntermittentRefreshActionStack.Sync(middleware['actionStack']));
+    expect(nextFn).toHaveBeenCalled();
+  });
+
+  it('should dispatch IntermittentRefreshActionStack.Sync when an intermittent refresh action resolution is detected', () => {
+    const mockAction = new Protocols.Add('newProtocol', {});
+    middleware['actionStack'].push('[protocols] Create');
+
+    const resolutionAction = new Protocols.Set([null]);
+    const nextFn: NgxsNextPluginFn = jasmine.createSpy('nextFn');
+
+    middleware.handle({}, resolutionAction, nextFn);
+
+    expect(storeSpy.dispatch).toHaveBeenCalledWith(new IntermittentRefreshActionStack.Sync(middleware['actionStack']));
+    expect(nextFn).toHaveBeenCalled();
+  });
+
+  it('should add action to actionStack when isIntermittentRefreshAction returns true', () => {
+    const mockAction = new Protocols.Add('newProtocol', {});
+
+    middleware.isIntermittentRefreshAction(mockAction);
+
+    expect(middleware['actionStack']).toContain('[protocols] Create');
+  });
+
+  it('should remove action from actionStack when isIntermittentRefreshActionResolution returns true', () => {
+    middleware['actionStack'] = ['[protocols] Create'];
+    const resolutionAction = new Protocols.Set(['updatedProtocol']);
+
+    middleware.isIntermittentRefreshActionResolution(resolutionAction);
+
+    expect(middleware['actionStack']).not.toContain('[protocols] Create');
   });
 });

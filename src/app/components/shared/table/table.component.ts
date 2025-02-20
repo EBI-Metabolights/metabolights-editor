@@ -12,6 +12,8 @@ import {
   OnChanges,
   inject,
   HostListener,
+  computed,
+  effect,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
@@ -36,6 +38,7 @@ import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -64,6 +67,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+
+
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -134,6 +139,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ontologies = [];
   hit = false;
   baseHref: string;
+
+  actionStack: string[] = [];
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -146,13 +154,14 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   ngOnInit() {
     this.setUpSubscriptionsNgxs();
+    //console.log(this.validationsId);
     if (localStorage.getItem(this.data.file) !== null) {
       this.view = localStorage.getItem(this.data.file);
       if (this.view === "expanded") {
         this.displayedTableColumns = Object.keys(this.data.header);
       }
     } else {
-      localStorage.setItem(this.data.file, 'compact')
+      localStorage.setItem(this.data.file, 'compact');
     }
   }
 
@@ -177,6 +186,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         this.isReadOnly = value;
       }
     });
+
+
+
   }
 
   @HostListener('window:keydown', ['$event'])

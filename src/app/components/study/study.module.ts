@@ -73,6 +73,7 @@ import { ListOverridesComponent } from "./validations-v2/modals/list-overrides-m
 import {MatDialogModule} from '@angular/material/dialog';
 import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-override-dialog/delete-override-dialog.component";
 import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
+import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt-refresh.component";
 
 
 @NgModule({
@@ -148,7 +149,8 @@ import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
     AddSpaceBeforeCapitalPipe,
     HandleUnderscoreInReportPipe,
     RemoveBackslashesPipe,
-    ValidationDateFormatPipe
+    ValidationDateFormatPipe,
+    PromptRefreshComponent
 
   ],
   exports: [
