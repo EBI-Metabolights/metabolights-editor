@@ -23,6 +23,8 @@ import { MetaComponent } from "./components/guide/meta/meta.component";
 import { GuidedAssaysComponent } from "./components/guide/assays/assays.component";
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { NoStudyPageComponent } from "./components/shared/errors/no-study-page/no-study-page.component";
+import { DataPolicyComponent } from "./components/public/data-policy/data-policy.component";
+import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-license/dataset-license.component";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
@@ -69,6 +71,8 @@ const routes: Routes = [
   { path: "guides", component: GuidesComponent },
   { path: "guides/:tab", component: GuidesComponent },
   { path: "guides/:tab/:section", component: GuidesComponent },
+  { path: "datapolicy", component: DataPolicyComponent},
+  { path: "license", component: DatasetLicenseStaticPageComponent},
 
   { path: "", redirectTo: "console", pathMatch: "full" },
   { path: "console", canActivate: [AuthGuard], component: ConsoleComponent },

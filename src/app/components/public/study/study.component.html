@@ -204,7 +204,8 @@
         class="field is-grouped is-grouped-multiline px-20 mb-10"
       >
         <mtbls-status></mtbls-status>
-        <mtbls-release-date></mtbls-release-date>&emsp;
+        <mtbls-release-date></mtbls-release-date>
+        <mtbls-dataset-license></mtbls-dataset-license>&emsp;
         <div *ngIf="isOwner || isCurator">
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">

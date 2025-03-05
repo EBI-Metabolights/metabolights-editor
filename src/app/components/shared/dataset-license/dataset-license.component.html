@@ -1,0 +1,21 @@
+<div  class="control">
+    <div class="tags has-addons">
+      <span class="tag is-dark">Dataset License</span>
+  
+
+          @defer (when datasetLicense !== null) { 
+            <span class="tag clickable is-success" >
+            {{
+              datasetLicense.name
+            }} 
+          </span>
+        } @loading {
+            <span class="tag clickable is-success" >
+                Fetching...
+              </span>
+        }
+
+
+  
+    </div>
+  </div>

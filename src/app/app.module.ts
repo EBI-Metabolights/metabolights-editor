@@ -61,6 +61,9 @@ import { DescriptorInterceptor } from "./services/interceptors/descriptor.interc
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.service';
+import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
+import { MatDividerModule } from '@angular/material/divider';
+import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license/dataset-license.component';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -79,7 +82,8 @@ export function configLoader(injector: Injector): () => Promise<any> {
         HeaderComponent,
         FooterComponent,
         GuidesComponent,
-    ],
+        DataPolicyComponent,
+        DatasetLicenseStaticPageComponent    ],
     exports: [FooterComponent],
     bootstrap: [AppComponent], imports: [BrowserModule,
         StudyModule,
@@ -101,6 +105,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatButtonToggleModule,
         MatCheckboxModule,
         MatTableModule,
+        MatDividerModule,
         DragDropModule,
         NgxsModule.forRoot([
             GeneralMetadataState,
@@ -121,7 +126,8 @@ export function configLoader(injector: Injector): () => Promise<any> {
                     matchVisual: false,
                 },
             },
-        })], providers: [
+        }),
+        ], providers: [
         AuthGuard,
         {
             provide: APP_INITIALIZER,
