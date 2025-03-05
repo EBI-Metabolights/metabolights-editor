@@ -443,7 +443,9 @@ export class GeneralMetadataState {
     GetDatasetLicense( {dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.GetDatasetLicense) {
         this.datasetLicenseService.getLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
-                dispatch(new DatasetLicenseNS.SetDatasetLicense(licenseResponse.content.dataset));
+                let dataset = null;
+                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: ""} : dataset = licenseResponse.content.dataset;
+                dispatch(new DatasetLicenseNS.SetDatasetLicense(dataset));
             },
             error: (error) => {console.error(`Unable to retrieve dataset license: ${error}`);}
         })

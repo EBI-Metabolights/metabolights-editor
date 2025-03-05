@@ -3,17 +3,27 @@
       <span class="tag is-dark">Dataset License</span>
   
 
-          @defer (when datasetLicense !== null) { 
-            <span class="tag clickable is-success" >
-            {{
-              datasetLicense.name
-            }} 
-          </span>
-        } @loading {
-            <span class="tag clickable is-success" >
-                Fetching...
-              </span>
-        }
+      @defer (when datasetLicense != null) {
+        
+        <span *ngIf="datasetLicense && datasetLicense.name.length > 0; else noLicense" 
+            class="tag clickable is-success">
+        {{ datasetLicense.name }}
+      </span>
+      <ng-template #noLicense>
+        <span class="tag clickable is-error">
+          No License Found
+        </span>
+      </ng-template>
+      
+      } @loading {
+        <span class="tag clickable is-success">
+          Fetching...
+        </span>
+      } @placeholder {  
+        <span class="tag clickable is-grey">
+          Fetching...
+        </span>
+      }
 
 
   

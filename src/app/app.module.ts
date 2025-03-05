@@ -63,7 +63,7 @@ import { AuthInterceptor } from './services/interceptors/auth.interceptor';
 import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.service';
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
-import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license/dataset-license.component';
+import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */

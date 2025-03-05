@@ -5,8 +5,8 @@ import { Loading } from 'src/app/ngxs-store/non-study/transitions/transitions.ac
 @Component({
   selector: 'app-dataset-license-static-page',
   standalone: false,
-  templateUrl: './dataset-license.component.html',
-  styleUrl: './dataset-license.component.css'
+  templateUrl: './dataset-license-static.component.html',
+  styleUrl: './dataset-license-static.component.css'
 })
 export class DatasetLicenseStaticPageComponent {
   constructor(private store: Store) {

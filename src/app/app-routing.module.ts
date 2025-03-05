@@ -24,7 +24,7 @@ import { GuidedAssaysComponent } from "./components/guide/assays/assays.componen
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { NoStudyPageComponent } from "./components/shared/errors/no-study-page/no-study-page.component";
 import { DataPolicyComponent } from "./components/public/data-policy/data-policy.component";
-import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-license/dataset-license.component";
+import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-license-static/dataset-license-static.component";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
