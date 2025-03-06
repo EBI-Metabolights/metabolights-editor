@@ -29,7 +29,8 @@ describe('User', () => {
             apiToken: 'token',
             role: 'user',
             email: 'user@name.org',
-            status: 'faulted'
+            status: 'faulted',
+            partner: false
         }
         store.dispatch(new User.Set(user));
 

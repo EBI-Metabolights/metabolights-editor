@@ -440,7 +440,7 @@ export class EditorService {
   initialise(data, signInRequest) {
     interface User {
       updatedAt: number;
-      owner: { apiToken: string; role: string; email: string; status: string };
+      owner: { apiToken: string; role: string; email: string; status: string; partner: boolean; };
       message: string;
       err: string;
     }

@@ -50,7 +50,7 @@ const defaultState: ValidationStateModel = {
 export class ValidationState {
 
     constructor(private validationService: ValidationService, private store: Store, private toastrService: ToastrService) {}
-    
+
 
     @Action(EditorValidationRules.Get)
     GetValidationRules(ctx: StateContext<ValidationStateModel>) {
@@ -103,7 +103,7 @@ export class ValidationState {
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
         if (!action.test) {
-            this.validationService.getValidationV2Report(action.proxy, action.taskId, action.studyId).subscribe( 
+            this.validationService.getValidationV2Report(action.proxy, action.taskId, action.studyId).subscribe(
                 (response) => {
                     if (response.status !== 'error') {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
@@ -192,7 +192,7 @@ export class ValidationState {
     SetLastRunTime(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.SetLastRunTime) {
         const state = ctx.getState();
         const stateTime = state.lastRunTime;
-        
+
         if (stateTime === null || isMoreRecentISO8601(stateTime, action.time)) {
             ctx.setState({
                 ...state,
@@ -245,7 +245,7 @@ export class ValidationState {
         });
     }
 
-    @Action(ValidationReportV2.Override.GetAll) 
+    @Action(ValidationReportV2.Override.GetAll)
     GetOverrides(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Override.GetAll) {
         const state = ctx.getState();
         this.validationService.getAllOverrides(action.studyId).subscribe({
@@ -302,7 +302,7 @@ export class ValidationState {
             }
         })
     }
-    
+
 
     @Action(ValidationReport.Refresh)
     RefreshValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Refresh) {
@@ -372,7 +372,7 @@ export class ValidationState {
         ctx.setState(defaultState);
     }
 
-    
+
 
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
@@ -479,7 +479,7 @@ export class ValidationState {
     }
 
     static specificOverride(ruleId) {
-        return createSelector([ValidationState], (state: ValidationStateModel) => { 
+        return createSelector([ValidationState], (state: ValidationStateModel) => {
             const overrideList = state.overrides.filter(val => val.rule_id === ruleId);
             const val = overrideList[0] || null
             return val
@@ -535,7 +535,7 @@ function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
 
   function parseValidationTime(validationTime: string): Date {
     const [datePart, timePart] = validationTime.split('_');
-    const [year, day, month] = datePart.split('-').map(Number);
+    const [year, month, day] = datePart.split('-').map(Number);
     const [hours, minutes, seconds] = timePart.split('-').map(Number);
     // Note: JavaScript Date uses 0-based months, so we subtract 1 from `month`
     return new Date(year, month - 1, day, hours, minutes, seconds);
@@ -554,4 +554,4 @@ function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
     // Compare the dates
     return comparator > date;
 }
-  
+

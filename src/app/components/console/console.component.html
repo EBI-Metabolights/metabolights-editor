@@ -205,15 +205,17 @@
     <div class="modal-background"></div>
     <div class="modal-card">
       <section class="modal-card-body">
-        <p *ngIf="submittedStudies.length < 2">
+        <p *ngIf="submittedStudies.length < 2 || curator || partner; else tooMany">
           You have {{ submittedStudies.length }} Studies in progress. Are you
           sure you want to create another study?
         </p>
-        <p *ngIf="submittedStudies.length > 1 ">
+        <ng-template #tooMany>
+        <p>
           You have {{ submittedStudies.length }} studies in the SUBMITTED stage.
           To prevent spurious submissions, a maximum of 2 studies are allowed to be in the SUBMITTED stage at any one time.
           If you have a legitimate reason to have more than 2 studies in the SUBMITTED phase, then this is permitted, and you need to contact the Metabolights team with your reason and how many studies you require, through the support email: metabolights-help&#64;ebi.ac.uk
         </p>
+      </ng-template>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -227,7 +229,7 @@
               </p>
             </button>
           </div>
-          <div *ngIf="submittedStudies.length < 2 || curator " class="column is-half has-text-right">
+          <div *ngIf="submittedStudies.length < 2 || curator || partner" class="column is-half has-text-right">
             <a [routerLink]="['/guide/create']" class="button is-success"
               >Create new</a
             >
