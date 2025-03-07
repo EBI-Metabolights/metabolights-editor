@@ -125,7 +125,7 @@ export class ValidationService extends BaseConfigDependentService {
         params.set(key, this.dnvtParams[key]);
       }
       if (taskId !== null) {
-        headersObj['task_id'] = taskId
+        headersObj['task-id'] = taskId
       }
       headers = new HttpHeaders(headersObj);
       let valUrl = this.configService.config.ws3URL;
