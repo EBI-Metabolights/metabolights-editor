@@ -20,6 +20,8 @@ import { ProgressComponent } from "./progress/progress.component";
 import { RawUploadComponent } from "./upload/upload.component";
 import { StudyModule } from "../study/study.module";
 import { RouterModule } from "@angular/router";
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatTooltipModule } from "@angular/material/tooltip";
 
 @NgModule({ declarations: [
         GuidedAssaysComponent,
@@ -49,6 +51,8 @@ import { RouterModule } from "@angular/router";
         MatButtonToggleModule,
         MatOptionModule,
         MatFormFieldModule,
+        MatCheckboxModule,
+        MatTooltipModule,
         MatInputModule,
         RouterModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class GuideModule {}

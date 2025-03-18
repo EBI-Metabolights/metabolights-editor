@@ -167,6 +167,7 @@ export class PublicationComponent implements OnInit {
       this.europePMCService
         .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
         .subscribe((article) => {
+          console.dir(article)
           this.manuscriptAuthors = article.authorDetails;
         });
     }

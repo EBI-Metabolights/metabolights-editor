@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, model, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
@@ -6,6 +6,7 @@ import { environment } from "src/environments/environment";
 import { PlatformLocation } from "@angular/common";
 import { Store } from "@ngxs/store";
 import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
+import { DatasetLicenseNS } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "app-create",
@@ -16,6 +17,7 @@ export class CreateComponent implements OnInit {
   selectedCreateOption = 2;
   currentSubStep = 0;
   newStudy = "MTBLS1";
+  readonly checked = model(false)
   options: any[] = [
     {
       text: "Yes, I would like to upload files now",
@@ -51,13 +53,14 @@ export class CreateComponent implements OnInit {
 
   createStudy() {
     this.isLoading = true;
-    this.editorService.createStudy().subscribe(
-      (res) => {
+    this.editorService.createStudy().subscribe({
+      next: (res) => {
+        this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
         this.currentSubStep = 3;
         this.newStudy = res.new_study;
         this.isLoading = false;
       },
-      (err) => {
+      error: (err) => {
         toastr.error("Study creation error.", "Error", {
           timeOut: "2500",
           positionClass: "toast-top-center",
@@ -67,7 +70,7 @@ export class CreateComponent implements OnInit {
         });
         this.isLoading = false;
       }
-    );
+    });
   }
 
   proceedToNextStep() {

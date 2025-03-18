@@ -58,6 +58,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
 import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
+import { DatasetLicenseComponent } from "./dataset-license/dataset-license.component";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -96,7 +97,8 @@ import { TableComponent } from "./table/table.component";
     EditTableDirective,
     NoStudyPageComponent,
     AsyncTaskComponent,
-    AsyncStatusTransformPipe
+    AsyncStatusTransformPipe,
+    DatasetLicenseComponent
   ],
   imports: [
     CommonModule,
@@ -149,6 +151,7 @@ import { TableComponent } from "./table/table.component";
     OntologyComponent,
     OntologyDetailsComponent,
     AsyncTaskComponent,
+    DatasetLicenseComponent
   ],
   providers: [
     AuthGuard,
