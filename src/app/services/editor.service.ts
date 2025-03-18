@@ -253,7 +253,7 @@ export class EditorService {
     const url = config.metabolightsWSURL.baseURL + config.authenticationURL.getJwtWithOneTimeToken;
     const requestHeaders = new HttpHeaders({
       Accept: "application/json",
-      one_time_token: oneTimeToken
+      "one-time-token": oneTimeToken
     });
     interface RequestBody {
       jwt: string;
@@ -440,7 +440,7 @@ export class EditorService {
   initialise(data, signInRequest) {
     interface User {
       updatedAt: number;
-      owner: { apiToken: string; role: string; email: string; status: string };
+      owner: { apiToken: string; role: string; email: string; status: string; partner: boolean; };
       message: string;
       err: string;
     }
@@ -452,7 +452,7 @@ export class EditorService {
       const isCurator = user.owner.role === "ROLE_SUPER_USER" ? "true" : "false";
       localStorage.setItem("isCurator", isCurator);
       httpOptions.headers = httpOptions.headers.set(
-        "user_token",
+        "user-token",
         user.owner.apiToken
       );
 
@@ -466,7 +466,7 @@ export class EditorService {
     } else {
       const user = JSON.parse(data);
       httpOptions.headers = httpOptions.headers.set(
-        "user_token",
+        "user-token",
         disambiguateUserObj(user)
       );
       const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";

@@ -40,6 +40,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   baseHref: string;
   banner: string = null;
   underMaintenance = false;
+  partner: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -78,7 +79,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
       this.curator = value;
     });
 
-    
+
 
   }
 
@@ -112,6 +113,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
     this.user$.subscribe((value) => {
       this.user = value;
       this.loginName = this.user?.email ?? "";
+      this.partner = this.user?.partner ?? false;
     });
     this.userStudies$.subscribe((value) => {
       if (value === null) {

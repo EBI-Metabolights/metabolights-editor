@@ -53,13 +53,13 @@ export class HeaderInterceptor implements HttpInterceptor {
         if (userToken !== null) {
           request = request.clone({
             setHeaders: {
-              user_token: userToken,
+              "user-token": userToken,
             },
           });
         } else {
           request = request.clone({
             setHeaders: {
-              user_token: "",
+              "user-token": "",
             },
           });
         }

@@ -31,7 +31,7 @@ export class FtpManagementService {
    * @param configService internal config service for retrieving API configuration values.
    */
   constructor(private http: HttpClient, private configService: ConfigurationService) {
-      this.setUpSubscriptionNgxs(); 
+      this.setUpSubscriptionNgxs();
    }
 
   setUpSubscriptionNgxs() {
@@ -61,17 +61,17 @@ export class FtpManagementService {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Accept: "application/json",
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        user_token: "dummy",
+        "user-token": "dummy",
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Authorization: "Bearer dummy",
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        source_staging_area: sourceStagingArea,
+        "source-staging-area": sourceStagingArea,
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        target_staging_area: targetStaging,
+        "target-staging-area": targetStaging,
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        sync_type: syncType,
+        "sync-type": syncType,
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        dry_run: dryRun
+        "dry-run": dryRun
       }),
     };
   }
