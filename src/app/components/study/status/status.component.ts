@@ -124,20 +124,31 @@ export class StatusComponent implements OnInit {
           this.closeModal();
           this.store.dispatch(new StudyStatus.Update(toStatus)).subscribe(
             (completed) => {
-
+              this.closeModal();
+              this.store.dispatch(new Loading.Disable())
+              this.toStatus = this.status;
             }, (error) => {
               this.closeModal();
               this.store.dispatch(new Loading.Disable())
               this.toStatus = this.status;
               let message = null;
               typeof error.json === 'function' ? message = error.json().message : "Could not update study status."
-              Swal.fire({
-                title: message
-              })
+              // Swal.fire({
+              //   title: message
+              // })
+              toastr.error(message, "Error", {
+                timeOut: "10000",
+                positionClass: "toast-top-center",
+                preventDuplicates: true,
+                extendedTimeOut: 0,
+                tapToDismiss: false,
+              });
+
             }
           )
         }
-      })
+      }
+    )
     }
   }
 

@@ -85,6 +85,7 @@ export class ValidationsV2ParentComponent implements OnInit {
       this.isCurator = false
       if (value !== null) {
         this.isCurator = value;
+        this.updateValidationStatus();
       }}
     )
 
@@ -191,7 +192,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   }
 
   updateValidationStatus() {
-    this.validationEnabled =  this.isCurator || (this.studyStatus && this.studyStatus.toUpperCase() == 'PROVISIONAL');
+    this.validationEnabled =  this.isCurator || (this.studyStatus && ["private", "provisional", "in review"].includes(this.studyStatus.toLowerCase()));
   }
 
 }
