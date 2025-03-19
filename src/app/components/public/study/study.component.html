@@ -116,10 +116,10 @@
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> This study
-          ({{ requestedStudy }}) is now in the ‘In Review’ stage, and approved by MetaboLights curation team. 
-          
+          ({{ requestedStudy }}) is now in the ‘In Review’ stage, and approved by MetaboLights curation team.
+
         </p>
-        <p>The link 
+        <p>The link
           <span *ngIf="obfuscationCode; else loadingIcon"
             ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
               endpoint + "reviewer" + obfuscationCode
@@ -135,7 +135,7 @@
         <div class="message-body">
           <p>
             <mat-icon class="mat-icon material-icons">info</mat-icon> Your study
-            ({{ requestedStudy }}) is now {{ status }}, and approved by the MetaboLights curation team. 
+            ({{ requestedStudy }}) is now {{ status }}, and approved by the MetaboLights curation team.
             . Please take a close look at the study and share the reviewer link with
             journals and reviewers.
             <b
@@ -154,7 +154,7 @@
           <p>
             Consider this link as temporary, it will expire after the study goes
             public.  <br />
-            The link 
+            The link
             <span *ngIf="obfuscationCode; else loadingIcon"
               ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
                 endpoint + "reviewer" + obfuscationCode
