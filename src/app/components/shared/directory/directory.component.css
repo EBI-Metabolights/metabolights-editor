@@ -1,0 +1,7 @@
+.panel-block {
+  font-size: 0.9em;
+}
+
+.panel-block.is-active-file {
+  border-left: 7px solid #3273dc;
+}

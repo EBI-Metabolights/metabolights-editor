@@ -20,6 +20,7 @@ export class DirectoryComponent implements OnInit {
   @Input("downloadEnabled") downloadEnabled = true;
   @Input("downloadContents") downloadContents = true;
   @Input("readonlyFolder") readonlyFolder = false;
+  @Input("showReferencedFiles") showReferencedFiles = false;
   @Input("location") location = null;
   @Input("managedFolders") managedFolders = [];
 
@@ -59,12 +60,13 @@ export class DirectoryComponent implements OnInit {
         this.curator = value;
       }
     })
-  
+
   }
 
   isFolder(file) {
     return file.directory;
   }
+
 
   handleDeletedFile($event) {
     if ($event.parentDirectoryComponent != null){

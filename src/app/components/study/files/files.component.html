@@ -130,7 +130,7 @@
   </div>
 
 </div>
-<mat-divider *ngIf="isSyncEnabled && curator" class="file-divider" [inset]="true"></mat-divider>
+<mat-divider class="file-divider" [inset]="true"></mat-divider>
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>
@@ -217,6 +217,14 @@
                   </ng-template>
                 </span>
                 {{ file.file }}
+                <span class="panel-icon">
+                  <span *ngIf="file.status == 'unreferenced' && !file.directory">
+                    <img src="assets/img/icons/unreferenced.png" style="height: 18px"/>
+                  </span>
+                  <span *ngIf="file.status == 'active'">
+                    <img src="assets/img/icons/referenced.png" style="height: 18px"/>
+                  </span>
+                </span>
                 <span class="has-text-grey-lighter"
                   ><small>{{
                     file.createdAt.replace("'", "").replace("'", "")
@@ -310,6 +318,7 @@
             [deletionEnabled]="deletionEnabled(file)"
             [downloadEnabled]="downloadEnabled(file)"
             [readonlyFolder]="readonlyFolder(file)"
+            [showReferencedFiles]="true"
             (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"
           ></mtbls-directory>
         </span>
