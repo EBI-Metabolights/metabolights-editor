@@ -59,13 +59,14 @@ export class DirectoryComponent implements OnInit {
         this.curator = value;
       }
     })
-  
+
   }
 
   isFolder(file) {
     return file.directory;
   }
 
+  
   handleDeletedFile($event) {
     if ($event.parentDirectoryComponent != null){
       const files = $event.parentDirectoryComponent.file.files;
