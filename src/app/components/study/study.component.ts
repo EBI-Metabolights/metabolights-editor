@@ -17,6 +17,7 @@ import { UserService } from "src/app/services/decomposed/user.service";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
 import { StudyPermission } from "src/app/services/headers";
+import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
 
 @Component({
   selector: "mtbls-study",
@@ -38,8 +39,13 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
   validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
+  revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
+  revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
 
-
+  revisionNumber = null;
+  revisionDatetime = null;
+  revisionStatus = null;
   studyError = false;
   requestedTab = 0;
   tab = "descriptors";
@@ -60,6 +66,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationRunTime: string =  null;
   validationNeeded: boolean = false;
   permissions: StudyPermission = null;
+  revisionStatusTransform = new RevisionStatusTransformPipe()
+
   constructor(
     private store: Store,
     private router: Router,
@@ -76,6 +84,28 @@ export class StudyComponent implements OnInit, OnDestroy {
 
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
+    this.revisionNumber$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionNumber = value;
+      } else {
+        this.revisionNumber = null;
+      }
+    });
+
+    this.revisionDatetime$.subscribe((value) => {
+      if (value) {
+        this.revisionDatetime = value;
+      }
+    });
+
+    this.revisionStatus$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionStatus = this.revisionStatusTransform.transform(value);
+      } else {
+        this.revisionStatus = "";
+      }
+    });
+
     this.isCurator$.subscribe((value) => {
       this.isCurator = value;
     });
@@ -92,11 +122,8 @@ export class StudyComponent implements OnInit, OnDestroy {
       if (value !== null) {
         this.requestedStudy = value;
         this.isOwner = false;
-        const userName = localStorage.getItem("username");
-        if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
-          if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
-            this.isOwner = true;
-          }
+        if (this.permissions.submitterOfStudy){
+          this.isOwner = true;
         }
       }
     });

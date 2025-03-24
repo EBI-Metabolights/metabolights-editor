@@ -131,10 +131,24 @@
                 </div>
                 <div class="control py-0 mb0">
                   <div class="tags has-addons">
+                    <span class="tag">Curation</span>
+                    <span class="tag is-info">{{ study.curationRequest | curationStatusTransform }}</span>
+                  </div>
+                </div>
+                <div class="control py-0 mb0">
+                  <div class="tags has-addons">
                     <span class="tag">Release date</span>
                     <span class="tag is-info">{{ study["releaseDate"] }}</span>
                   </div>
                 </div>
+                <div *ngIf="study.revisionNumber > 0" class="control py-0 mb0">
+                  <div class="tags has-addons">
+                    <span class="tag">Revision</span>
+                    <span class="tag is-info"> {{ study.revisionDatetime | date: 'yyyy-MM-dd' }} ({{ study.revisionNumber }})</span>
+                  </div>
+                </div>
+
+
               </div>
               <div class="full-width">
                 <p

@@ -21,6 +21,7 @@ import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
 import { ViolationType } from "../../study/validations-v2/interfaces/validation-report.types";
+import { RevisionStatusTransformPipe } from "../../shared/pipes/revision-status-transform.pipe";
 
 @Component({
   selector: "study",
@@ -35,13 +36,18 @@ export class PublicStudyComponent implements OnInit {
   studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
+  revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
+  revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
+  revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
   studyReviewerLink$: Observable<string> = inject(Store).select(GeneralMetadataState.reviewerLink);
   investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
 
-
+  revisionNumber = null;
+  revisionDatetime = null;
+  revisionStatus = null;
   loading: any = true;
   requestedTab = 0;
   status = "";
@@ -62,6 +68,7 @@ export class PublicStudyComponent implements OnInit {
   notReadyValidationMessage: string = null;
   validationStatus: ViolationType = null;
   obfuscationCode: string = null;
+  revisionStatusTransform = new RevisionStatusTransformPipe()
   constructor(
     private store: Store,
     private editorService: EditorService,
@@ -138,6 +145,18 @@ export class PublicStudyComponent implements OnInit {
       this.calculateNotReadyValidationMessage();
     });
 
+    this.revisionNumber$.subscribe((value) => {
+      if (value) {
+        this.revisionNumber = value;
+      }
+    });
+
+    this.revisionDatetime$.subscribe((value) => {
+      if (value) {
+        this.revisionDatetime = value;
+      }
+    });
+
     this.studyFiles$.subscribe((value) => {
       this.files = value;
       this.loading = false;
@@ -176,6 +195,14 @@ export class PublicStudyComponent implements OnInit {
 
     this.studyReviewerLink$.subscribe((value) => {
       this.reviewerLink = value;
+    });
+
+    this.revisionStatus$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionStatus = this.revisionStatusTransform.transform(value)
+      } else {
+        this.revisionStatus = null;
+      }
     });
 
     this.route.params.subscribe((params) => {
@@ -270,6 +297,8 @@ export class PublicStudyComponent implements OnInit {
     }
 
   }
+
+  // this.studyValidation ? this.validationMessageTransform.transform(this.studyValidation.status) : "";
 
   updateCurationStatus() {
     if (this.curationRequest === "NO_CURATION") {

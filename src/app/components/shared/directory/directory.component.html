@@ -43,10 +43,10 @@
       </span>
 
       <span class="panel-icon" *ngIf="showReferencedFiles">
-        <span *ngIf="file.file_difference == 'NEW'" >
+        <span *ngIf="file.file_difference == 'NEW' && revisionStatus == 'Completed'" >
           <img src="assets/img/icons/new.png" style="height: 18px"/>
         </span>
-        <span *ngIf="file.file_difference == 'MODIFIED' && !file.directory">
+        <span *ngIf="file.file_difference == 'MODIFIED' && !file.directory  && revisionStatus == 'Completed'">
           <img src="assets/img/icons/updated.png" style="height: 18px"/>
         </span>
       </span>

@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -31,6 +31,9 @@ export interface GeneralMetadataStateModel {
     publications: IPublication[];
     people: IPerson[];
     datasetLicense: DatasetLicense;
+    revisionNumber: number;
+    revisionDatetime: string;
+    revisionStatus: number;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -43,7 +46,10 @@ const defaultState: GeneralMetadataStateModel = {
     reviewerLink: null,
     publications: null,
     people: null,
-    datasetLicense: null
+    datasetLicense: null,
+    revisionNumber: null,
+    revisionDatetime: null,
+    revisionStatus: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -84,6 +90,11 @@ export class GeneralMetadataState {
                 ctx.dispatch(new StudyReleaseDate.Set(gm_response.isaInvestigation.publicReleaseDate));
                 ctx.dispatch(new StudyStatus.Set(gm_response.mtblsStudy.studyStatus));
                 ctx.dispatch(new CurationRequest.Set(gm_response.mtblsStudy.curationRequest));
+                ctx.dispatch(new RevisionNumber.Set(gm_response.mtblsStudy.revisionNumber));
+                ctx.dispatch(new RevisionDateTime.Set(gm_response.mtblsStudy.revisionDatetime));
+
+                ctx.dispatch(new RevisionStatus.Set(gm_response.mtblsStudy.revisionStatus));
+
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
@@ -205,6 +216,33 @@ export class GeneralMetadataState {
         });
     }
 
+    @Action(RevisionNumber.Set)
+    SetRevisionNumber(ctx: StateContext<GeneralMetadataStateModel>, action: RevisionNumber.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            revisionNumber: action.revisionNumber
+        });
+    }
+
+    @Action(RevisionDateTime.Set)
+    SetRevisionDateTime(ctx: StateContext<GeneralMetadataStateModel>, action: RevisionDateTime.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            revisionDatetime: action.revisionDatetime
+        });
+    }
+
+
+    @Action(RevisionStatus.Set)
+    SetRevisionStatus(ctx: StateContext<GeneralMetadataStateModel>, action: RevisionStatus.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            revisionStatus: action.revisionStatus
+        });
+    }
     @Action(SetStudyReviewerLink)
     SetReviewerLink(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyReviewerLink) {
         const state = ctx.getState();
@@ -382,6 +420,33 @@ export class GeneralMetadataState {
             )
     }
 
+
+    @Action(RevisionNumber.New)
+    NewStudyRevision(ctx: StateContext<GeneralMetadataStateModel>, action: RevisionNumber.New) {
+        const state = ctx.getState();
+        this.generalMetadataService.createRevision(state.id, action.revisionComment).subscribe(
+            (response) => {
+                const state = ctx.getState();
+
+                if (response.hasOwnProperty("revision_number")){
+                  const revisionNumber = response["revision_number"]
+                  if (state.revisionNumber !== revisionNumber) {
+                    ctx.dispatch(new RevisionNumber.Set(revisionNumber));
+                  }
+                }
+                if (response.hasOwnProperty("status")){
+                    ctx.dispatch(new RevisionStatus.Set(response["status"]));
+                }
+                if (response.hasOwnProperty("revision_datetime")){
+                  const revisionDatetime = response["revision_datetime"]
+                  if (state.revisionDatetime !== revisionDatetime) {
+                    ctx.dispatch(new RevisionDateTime.Set(revisionDatetime));
+                  }
+                }
+            }
+        )
+    }
+
     @Action(StudyStatus.Update)
     ChangeStudyStatus(ctx: StateContext<GeneralMetadataStateModel>, action: StudyStatus.Update) {
         const state = ctx.getState();
@@ -410,7 +475,7 @@ export class GeneralMetadataState {
                   const obfuscationCode = response["obfuscation_code"]
                   ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
                 }
-                const readOnlySub = this.store.select(state => state.ApplicationState.readonly).pipe(take(1))
+                const readOnlySub = this.store.select(state => state.ApplicationState && state.ApplicationState.readonly).pipe(take(1))
                 readOnlySub.subscribe((ro) => {
                     this.store.dispatch(new User.Studies.Get())
                     ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
@@ -488,6 +553,20 @@ export class GeneralMetadataState {
     static curationRequest(state: GeneralMetadataStateModel): string {
         return state.curationRequest
     }
+    @Selector()
+    static revisionNumber(state: GeneralMetadataStateModel): number {
+        return state.revisionNumber
+    }
+
+    @Selector()
+    static revisionDatetime(state: GeneralMetadataStateModel): string {
+        return state.revisionDatetime
+    }
+
+    @Selector()
+    static revisionStatus(state: GeneralMetadataStateModel): number {
+        return state.revisionStatus
+    }
 
     @Selector()
     static reviewerLink(state: GeneralMetadataStateModel): string {
@@ -508,4 +587,6 @@ export class GeneralMetadataState {
     static datasetLicense(state: GeneralMetadataStateModel): DatasetLicense {
         return state.datasetLicense
     }
+
+
 }

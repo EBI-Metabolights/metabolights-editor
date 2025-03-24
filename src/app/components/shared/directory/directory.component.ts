@@ -5,6 +5,8 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { Observable } from "rxjs";
 import { Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { RevisionStatusTransformPipe } from "../pipes/revision-status-transform.pipe";
 @Component({
   selector: "mtbls-directory",
   templateUrl: "./directory.component.html",
@@ -29,13 +31,15 @@ export class DirectoryComponent implements OnInit {
 
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
+  revisionStatusTransform = new RevisionStatusTransformPipe()
 
   selectedMetaFiles: any[] = [];
   selectedRawFiles: any[] = [];
   selectedAuditFiles: any[] = [];
   selectedDerivedFiles: any[] = [];
   selectedUploadFiles: any[] = [];
-
+  revisionStatus = null
   isReadOnly = false;
   curator = false;
 
@@ -60,6 +64,13 @@ export class DirectoryComponent implements OnInit {
         this.curator = value;
       }
     })
+    this.revisionStatus$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionStatus = this.revisionStatusTransform.transform(value)
+      } else {
+        this.revisionStatus = null;
+      }
+    });
 
   }
 

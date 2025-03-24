@@ -121,6 +121,17 @@
         </span>&emsp;
 
         <mtbls-release-date></mtbls-release-date>
+
+      <span *ngIf="revisionNumber && revisionNumber > 0">
+          <div class="tags has-addons">
+            <span class="tag">Revision</span>
+
+            <span class="tag is-link">
+              {{ revisionDatetime ? (revisionDatetime  | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }})
+            </span>
+
+          </div>
+      </span>&emsp;
         <mtbls-dataset-license></mtbls-dataset-license>&emsp;
         <div *ngIf="isOwner || isCurator">
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">

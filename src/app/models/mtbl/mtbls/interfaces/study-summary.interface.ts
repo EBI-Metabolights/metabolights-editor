@@ -17,8 +17,22 @@ export interface IMtblsStudySummaryInformation {
   is_curator: boolean;
   write_access: boolean;
   reviewerLink: string;
+  revisionNumber: number;
+  revisionDatetime: string;
+  revisionStatus: number;
 }
 
+export class IStudyRevision {
+    accession_number: string;
+    revision_number: number;
+    revision_datetime: string;
+    revision_comment: string;
+    created_by: string;
+    status: number;
+    task_started_at: string;
+    task_completed_at: string;
+    task_message: string;
+}
 /*Interface to represent the small amount of validation informations we get back from the IsaInvestigation endpoint*/
 export interface IValidationStudySummaryInformation {
   errors: any[];

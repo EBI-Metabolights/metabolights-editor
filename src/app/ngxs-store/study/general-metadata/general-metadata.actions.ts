@@ -92,6 +92,44 @@ export namespace CurationRequest {
 
 }
 
+export namespace RevisionNumber {
+
+  export class New {
+      static readonly type = '[general] New Revision Number'
+      constructor(public revisionComment: string) {}
+  }
+
+  export class Set{
+      static readonly type = '[general] Set Revision Number '
+      constructor(public revisionNumber: number) {}
+  }
+
+}
+
+export namespace RevisionDateTime {
+
+  export class Update {
+      static readonly type = '[general] Change Revision DateTime'
+      constructor(public revisionDatetime: string) {}
+  }
+
+  export class Set{
+      static readonly type = '[general] Set Revision DateTime'
+      constructor(public revisionDatetime: string) {}
+  }
+
+}
+
+
+export namespace RevisionStatus {
+
+  export class Set{
+      static readonly type = '[general] Set Revision Status'
+      constructor(public revisionStatus: number) {}
+  }
+
+}
+
 export class SetStudyReviewerLink {
     static readonly type = '[general] Set Study Reviewer Link'
     constructor(public link: string) {}

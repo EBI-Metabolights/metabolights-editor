@@ -7,6 +7,9 @@ export interface IStudyDetail {
   title: string;
   description: string;
   curationRequest: string;
+  revisionStatus: number;
+  revisionNumber: number;
+  revisionDatetime: string;
 }
 
 export interface IStudyDetailWrapper {

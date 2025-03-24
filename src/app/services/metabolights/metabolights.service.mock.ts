@@ -38,7 +38,10 @@ export class MockMetabolightsService {
         "status": "Provisional",
         "curationRequest": "MANUAL_CURATION",
         "title": "Untargeted Metabolomic Analysis of primary age schoolchildren reveals Malus domestica consumption greatly increases passive resistance to onset of invasive doctorum",
-        "updated": "20240124121007"
+        "updated": "20240124121007",
+        "revisionNumber": 0,
+        "revisionStatus": 0,
+        "revisionDatetime": ""
         },
         {
           "accession": "MTBLS8578",
@@ -48,7 +51,10 @@ export class MockMetabolightsService {
           "status": "Provisional",
           "curationRequest": "MANUAL_CURATION",
           "title": "Please update the study title",
-          "updated": "20231002233501"
+          "updated": "20231002233501",
+          "revisionNumber": 0,
+          "revisionStatus": 0,
+          "revisionDatetime": ""
           }
     ]
     return of({data: studies})

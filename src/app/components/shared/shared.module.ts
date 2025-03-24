@@ -59,6 +59,8 @@ import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
 import { DatasetLicenseComponent } from "./dataset-license/dataset-license.component";
+import { RevisionStatusTransformPipe } from "./pipes/revision-status-transform.pipe";
+import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.pipe";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -98,7 +100,9 @@ import { DatasetLicenseComponent } from "./dataset-license/dataset-license.compo
     NoStudyPageComponent,
     AsyncTaskComponent,
     AsyncStatusTransformPipe,
-    DatasetLicenseComponent
+    DatasetLicenseComponent,
+    RevisionStatusTransformPipe,
+    CurationStatusTransformPipe
   ],
   imports: [
     CommonModule,
@@ -151,7 +155,9 @@ import { DatasetLicenseComponent } from "./dataset-license/dataset-license.compo
     OntologyComponent,
     OntologyDetailsComponent,
     AsyncTaskComponent,
-    DatasetLicenseComponent
+    DatasetLicenseComponent,
+    RevisionStatusTransformPipe,
+    CurationStatusTransformPipe
   ],
   providers: [
     AuthGuard,
