@@ -1,0 +1,39 @@
+<a
+  target="_blank"
+  [href]="publicGlobusUrl"
+  class="button is-default is-pulled-left globus-button"
+  >Globus Download</a
+>
+<small class="had-text-dark">
+  <a (click)="toggleHelp()">
+    <mat-icon
+      class="mat-icon notranslate material-icons mat-icon-no-color help-icon"
+      role="img"
+      aria-hidden="true"
+      >help</mat-icon
+    >
+
+  </a>
+</small>
+<div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      <p>
+        <b>Globus File Manager</b><br /><br />
+        Globus File Manager is a web-based tool that enables secure, high-speed transfer
+        and management of large datasets across different storage systems,
+        including on-premise and cloud platforms.
+        You can download public MetaboLights studies using Globus File Manager. <br /><br />
+        Note that you may need to sign up Globus (https://app.globus.org) to explore MetaboLights public studies.
+      </p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div (click)="toggleHelp()" class="column is-full has-text-right">
+          <button class="button is-default">Close</button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

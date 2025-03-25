@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -34,6 +34,10 @@ export interface GeneralMetadataStateModel {
     revisionNumber: number;
     revisionDatetime: string;
     revisionStatus: number;
+    publicHttpUrl: string;
+    publicFtpUrl: string;
+    publicGlobusUrl: string;
+    publicAsperaPath: string;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -49,7 +53,11 @@ const defaultState: GeneralMetadataStateModel = {
     datasetLicense: null,
     revisionNumber: null,
     revisionDatetime: null,
-    revisionStatus: null
+    revisionStatus: null,
+    publicHttpUrl: null,
+    publicFtpUrl: null,
+    publicGlobusUrl: null,
+    publicAsperaPath: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -94,6 +102,10 @@ export class GeneralMetadataState {
                 ctx.dispatch(new RevisionDateTime.Set(gm_response.mtblsStudy.revisionDatetime));
 
                 ctx.dispatch(new RevisionStatus.Set(gm_response.mtblsStudy.revisionStatus));
+                ctx.dispatch(new PublicFtpUrl.Set(gm_response.mtblsStudy.studyFtpUrl));
+                ctx.dispatch(new PublicHttpUrl.Set(gm_response.mtblsStudy.studyHttpUrl));
+                ctx.dispatch(new PublicGlobusUrl.Set(gm_response.mtblsStudy.studyGlobusUrl));
+                ctx.dispatch(new PublicAsperaPath.Set(gm_response.mtblsStudy.studyAsperaPath));
 
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
@@ -242,6 +254,43 @@ export class GeneralMetadataState {
             ...state,
             revisionStatus: action.revisionStatus
         });
+    }
+
+    @Action(PublicFtpUrl.Set)
+    SetPublicFtpUrl(ctx: StateContext<GeneralMetadataStateModel>, action: PublicFtpUrl.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            publicFtpUrl: action.publicFtpUrl
+      });
+    }
+
+    @Action(PublicHttpUrl.Set)
+    SetPublicHttpUrl(ctx: StateContext<GeneralMetadataStateModel>, action: PublicHttpUrl.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            publicHttpUrl: action.publicHttpUrl
+      });
+    }
+
+    @Action(PublicGlobusUrl.Set)
+    SetPublicGlobusUrl(ctx: StateContext<GeneralMetadataStateModel>, action: PublicGlobusUrl.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            publicGlobusUrl: action.publicGlobusUrl
+      });
+    }
+
+
+    @Action(PublicAsperaPath.Set)
+    SetPublicAsperaPath(ctx: StateContext<GeneralMetadataStateModel>, action: PublicAsperaPath.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            publicAsperaPath: action.publicAsperaPath
+      });
     }
     @Action(SetStudyReviewerLink)
     SetReviewerLink(ctx: StateContext<GeneralMetadataStateModel>, action: SetStudyReviewerLink) {
@@ -588,5 +637,20 @@ export class GeneralMetadataState {
         return state.datasetLicense
     }
 
-
+    @Selector()
+    static publicHttpUrl(state: GeneralMetadataStateModel): string {
+        return state.publicHttpUrl
+    }
+    @Selector()
+    static publicFtpUrl(state: GeneralMetadataStateModel): string {
+        return state.publicFtpUrl
+    }
+    @Selector()
+    static publicGlobusUrl(state: GeneralMetadataStateModel): string {
+        return state.publicGlobusUrl
+    }
+    @Selector()
+    static publicAsperaPath(state: GeneralMetadataStateModel): string {
+        return state.publicAsperaPath
+    }
 }

@@ -20,6 +20,10 @@ export interface IMtblsStudySummaryInformation {
   revisionNumber: number;
   revisionDatetime: string;
   revisionStatus: number;
+  studyHttpUrl: string;
+  studyFtpUrl: string;
+  studyGlobusUrl: string;
+  studyAsperaPath: string;
 }
 
 export class IStudyRevision {

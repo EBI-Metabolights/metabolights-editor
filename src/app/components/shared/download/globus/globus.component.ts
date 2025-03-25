@@ -1,35 +1,37 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
+import { Store } from "@ngxs/store";
 
 @Component({
-  selector: "mtbls-download-ftp",
-  templateUrl: "./ftp.component.html",
-  styleUrls: ["./ftp.component.css"],
+  selector: "mtbls-download-globus",
+  templateUrl: "./globus.component.html",
+  styleUrls: ["./globus.component.css"],
 })
-export class FtpDownloadComponent implements OnInit {
+export class GlobusDownloadComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  publicFtpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicFtpUrl);
+  publicGlobusUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicGlobusUrl);
   requestedStudy: any = null;
-  publicFtpUrl = null;
+  publicGlobusUrl = null;
+  displayHelpModal = false;
   constructor() {}
 
   ngOnInit() {
     this.setUpSubscriptionNgxs();
   }
-
+  toggleHelp() {
+    this.displayHelpModal = !this.displayHelpModal;
+  }
   setUpSubscriptionNgxs() {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
       }
     });
-    this.publicFtpUrl$.subscribe((value) => {
+    this.publicGlobusUrl$.subscribe((value) => {
       if (value != null) {
-        this.publicFtpUrl = value;
+        this.publicGlobusUrl = value;
       }
     });
-
   }
 }

@@ -10,10 +10,9 @@ import { Store } from "@ngxs/store";
 })
 export class HttpDownloadComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
-
+  publicHttpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicHttpUrl);
   requestedStudy: any = null;
-
+  publicHttpUrl = null;
   constructor() {}
 
   ngOnInit() {
@@ -24,6 +23,11 @@ export class HttpDownloadComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
+      }
+    });
+    this.publicHttpUrl$.subscribe((value) => {
+      if (value != null) {
+        this.publicHttpUrl = value;
       }
     });
   }

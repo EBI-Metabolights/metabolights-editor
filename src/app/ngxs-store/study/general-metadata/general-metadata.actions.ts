@@ -117,9 +117,34 @@ export namespace RevisionDateTime {
       static readonly type = '[general] Set Revision DateTime'
       constructor(public revisionDatetime: string) {}
   }
-
 }
 
+export namespace PublicFtpUrl {
+  export class Set{
+      static readonly type = '[general] Set Public FTP URL'
+      constructor(public publicFtpUrl: string) {}
+  }
+}
+export namespace PublicHttpUrl {
+  export class Set{
+      static readonly type = '[general] Set Public HTTP URL'
+      constructor(public publicHttpUrl: string) {}
+  }
+}
+
+export namespace PublicGlobusUrl {
+  export class Set{
+      static readonly type = '[general] Set Public Globus URL'
+      constructor(public publicGlobusUrl: string) {}
+  }
+}
+
+export namespace PublicAsperaPath {
+  export class Set{
+      static readonly type = '[general] Set Public Aspera Path'
+      constructor(public publicAsperaPath: string) {}
+  }
+}
 
 export namespace RevisionStatus {
 

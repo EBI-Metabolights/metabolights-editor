@@ -13,6 +13,7 @@
 
     <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
     <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
+    <mtbls-download-globus  *ngIf="status == 'Public'"></mtbls-download-globus>
     <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
     <mtbls-upload *ngIf="isSyncEnabled" class="upload-button"
       [type]="'any'"
