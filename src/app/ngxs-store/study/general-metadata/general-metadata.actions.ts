@@ -2,6 +2,7 @@ import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface"
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface"
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person"
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication"
+import { DatasetLicense } from "src/app/services/decomposed/dataset-license.service"
 
 export interface Title {
     title: string
@@ -154,6 +155,22 @@ export namespace People {
         constructor(public email: string) {}
     }
 
+}
+
+export namespace DatasetLicenseNS {
+    export class ConfirmAgreement {
+        static readonly type = '[general] Confirm Dataset License Agreement'
+        constructor(public studyId: string) {}
+    }
+
+    export class GetDatasetLicense {
+        static readonly type = '[general] Get Dataset License'
+        constructor(public studyId: string) {}
+    }
+    export class SetDatasetLicense {
+        static readonly type = '[general] Set Dataset License'
+        constructor(public license: DatasetLicense) {}
+    }
 }
 
 export class ResetGeneralMetadataState {

@@ -23,7 +23,7 @@ declare let AW4: any;
   styleUrls: ["./files.component.css"],
 })
 export class FilesComponent implements OnInit,  OnChanges {
-  
+
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
@@ -61,7 +61,7 @@ export class FilesComponent implements OnInit,  OnChanges {
 
   isDeleteModalOpen = false;
   forceMetaDataDelete = false;
-
+  isSyncEnabled = false;
   selectedCategory: string = null;
   fileLocation: string = null;
   status: string = null;
@@ -74,7 +74,6 @@ export class FilesComponent implements OnInit,  OnChanges {
   refreshingData = false;
 
   isReadOnly = false;
-
   MANAGED_FOLDERS = ['FILES', 'AUDIT_FILES', 'INTERNAL_FILES', 'ARCHIVED_AUDIT_FILES'];
   MANAGED_SUB_FOLDERS=['AUDIT_FILES/ARCHIVED_AUDIT_FILES', "INTERNAL_FILES/logs"];
 
@@ -122,7 +121,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     } else {
       this.asperaStatus = initAsperaStatus
     }
-    
+
   }
 
 
@@ -130,10 +129,12 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        this.updateSyncStatus();
       }
     });
     this.studyStatus$.subscribe((value) => {
       this.status = value;
+      this.updateSyncStatus();
     });
     this.studyIdentifier$.subscribe((value) => {
       this.requestedStudy = value;
@@ -141,6 +142,7 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.isCurator$.subscribe((value) => {
       if (value !== null) {
         this.curator = value;
+        this.updateSyncStatus();
       }
     });
   }
@@ -637,4 +639,12 @@ export class FilesComponent implements OnInit,  OnChanges {
   onFilesSynchronized($event: SyncEvent): void {
     this.loadFiles(true, $event);
   }
+  updateSyncStatus() {
+    this.isSyncEnabled = false;
+    if (this.curator || (!this.isReadOnly && this.status && this.status.toUpperCase() == "PROVISIONAL")) {
+      this.isSyncEnabled = true;
+    }
+  }
 }
+
+

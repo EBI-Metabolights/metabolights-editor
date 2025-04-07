@@ -53,15 +53,25 @@
           </div>
         </div>
         <div class="panel-block">
+          <div class="column central-text">
+            Please tick to indicate you agree with our <a href="https://creativecommons.org/public-domain/cc0/">dataset license</a> and  <a [routerLink]="['/datapolicy']">data policy</a>
+            <mat-checkbox class="example-margin" [(ngModel)]="checked"></mat-checkbox>
+
+          </div>
+        </div>
+        <div class="panel-block" [matTooltip]="checked() === false ? 'You must agree to the dataset license in order to create a study' : ''">
           <div class="column">
-            <button
+              <button
               (click)="nextSubStep()"
               class="button is-success is-fullwidth"
+              [disabled]="checked() == false"
             >
               <mat-icon>chevron_right</mat-icon> Let's get started
             </button>
+
           </div>
         </div>
+
       </nav>
     </div>
     <div *ngIf="currentSubStep == 1">

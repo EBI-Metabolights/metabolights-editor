@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -16,6 +16,7 @@ import { EditorValidationRules, ValidationReport } from "../validation/validatio
 import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
 import { User } from "../../non-study/user/user.actions";
+import { DatasetLicense, DatasetLicenseService } from "src/app/services/decomposed/dataset-license.service";
 
 
 export interface GeneralMetadataStateModel {
@@ -29,6 +30,7 @@ export interface GeneralMetadataStateModel {
     reviewerLink: any;
     publications: IPublication[];
     people: IPerson[];
+    datasetLicense: DatasetLicense;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -40,7 +42,8 @@ const defaultState: GeneralMetadataStateModel = {
     curationRequest: null,
     reviewerLink: null,
     publications: null,
-    people: null
+    people: null,
+    datasetLicense: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -51,6 +54,7 @@ const defaultState: GeneralMetadataStateModel = {
 export class GeneralMetadataState {
     constructor(
         private generalMetadataService: GeneralMetadataService,
+        private datasetLicenseService: DatasetLicenseService,
         private store: Store
         ) {
     }
@@ -70,6 +74,7 @@ export class GeneralMetadataState {
                 this.store.dispatch(new Factors.Set(gm_response.isaInvestigation.studies[0].factors))
                 //this.store.dispatch(new SetConfiguration());
                 this.store.dispatch(new EditorValidationRules.Get());
+                this.store.dispatch(new DatasetLicenseNS.GetDatasetLicense(action.studyId))
 
                 // TODO fix, commenting this out for demo purpose
                 //this.store.dispatch(new NewValidationReport.Get());
@@ -415,6 +420,37 @@ export class GeneralMetadataState {
         )
     }
 
+    @Action(DatasetLicenseNS.ConfirmAgreement)
+    ConfirmAgreement({dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.ConfirmAgreement) {
+        this.datasetLicenseService.confirmLicenseAgreement(studyId).subscribe({
+            next: (licenseResponse) => {
+                console.dir(licenseResponse)
+                dispatch(new DatasetLicenseNS.SetDatasetLicense(licenseResponse.content.dataset))
+            },
+            error: (error) => {console.error(`Unable to confirm license agreement: ${error}`)}
+
+        })
+    }
+
+    @Action(DatasetLicenseNS.SetDatasetLicense)
+    SetDatasetLicense( {patchState}: StateContext<GeneralMetadataStateModel>, {license}: DatasetLicenseNS.SetDatasetLicense) {
+        patchState({
+            datasetLicense: license
+        });
+    }
+
+    @Action(DatasetLicenseNS.GetDatasetLicense)
+    GetDatasetLicense( {dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.GetDatasetLicense) {
+        this.datasetLicenseService.getLicenseAgreement(studyId).subscribe({
+            next: (licenseResponse) => {
+                let dataset = null;
+                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: ""} : dataset = licenseResponse.content.dataset;
+                dispatch(new DatasetLicenseNS.SetDatasetLicense(dataset));
+            },
+            error: (error) => {console.error(`Unable to retrieve dataset license: ${error}`);}
+        })
+    }
+
 
     @Action(ResetGeneralMetadataState)
     Reset(ctx: StateContext<GeneralMetadataStateModel>, action: ResetGeneralMetadataState) {
@@ -466,5 +502,10 @@ export class GeneralMetadataState {
     @Selector()
     static people(state: GeneralMetadataStateModel): IPerson[] {
         return state.people
+    }
+
+    @Selector()
+    static datasetLicense(state: GeneralMetadataStateModel): DatasetLicense {
+        return state.datasetLicense
     }
 }

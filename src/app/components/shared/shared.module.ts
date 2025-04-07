@@ -59,6 +59,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
 import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh.component";
+import { DatasetLicenseComponent } from "./dataset-license/dataset-license.component";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -98,6 +99,7 @@ import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh
     NoStudyPageComponent,
     AsyncTaskComponent,
     AsyncStatusTransformPipe,
+    DatasetLicenseComponent
   ],
   imports: [
     CommonModule,
@@ -151,6 +153,7 @@ import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh
     OntologyComponent,
     OntologyDetailsComponent,
     AsyncTaskComponent,
+    DatasetLicenseComponent
   ],
   providers: [
     AuthGuard,

@@ -52,7 +52,7 @@ describe("HeaderInterceptor", () => {
   it("should do nothing if the user-token header already contains a non placeholder value", () => {
     http
       .get("https://www.ebi.ac.uk/metabolights/ws/", {
-        headers: { user_token: "proper_token" },
+        headers: { "user-token": "proper_token" },
       })
       .subscribe((res) => {
         expect(res).toBeTruthy();
@@ -61,19 +61,19 @@ describe("HeaderInterceptor", () => {
     const httpRequest = httpMock.expectOne(
       "https://www.ebi.ac.uk/metabolights/ws/"
     );
-    expect(httpRequest.request.headers.get("user_token")).toEqual(
+    expect(httpRequest.request.headers.get("user-token")).toEqual(
       "proper_token"
     );
   });
 
   xit("should overwrite the user-token if there is a placeholder value", () => {
     spyOn(localStorage, "getItem").and.returnValue('{"apiToken":"testing"}');
-    
+
 
     const httpRequest = httpMock.expectOne(
       "https://www.ebi.ac.uk/metabolights/ws/studies/title/title"
     );
-    expect(httpRequest.request.headers.get("user_token")).toEqual("testing");
+    expect(httpRequest.request.headers.get("user-token")).toEqual("testing");
     expect(localStorage.getItem).toHaveBeenCalled();
   });
 });
