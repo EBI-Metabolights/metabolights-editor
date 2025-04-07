@@ -58,6 +58,7 @@ import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transfo
 import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
+import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh.component";
 import { DatasetLicenseComponent } from "./dataset-license/dataset-license.component";
 
 /**
@@ -121,6 +122,7 @@ import { DatasetLicenseComponent } from "./dataset-license/dataset-license.compo
     MatExpansionModule,
     MatTooltipModule,
     QuillModule,
+    PromptRefreshComponent
   ],
   exports: [
     AddAssayComponent,

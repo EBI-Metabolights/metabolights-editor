@@ -21,3 +21,13 @@ export class SetTabIndex {
     static readonly type = '[transitions] Set Tab Index';
     constructor(public index: string) {}
 }
+
+export namespace IntermittentRefreshActionStack {
+
+    export class Sync {
+        static readonly type = '[transitions] Sync Intermittent Refresh Action Stack'
+        constructor(public actionStack: string[]) {}
+    }
+}
+
+

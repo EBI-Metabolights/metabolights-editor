@@ -1,7 +1,9 @@
 <div class="card">
   <header class="card-heading" >
     <span>
-      <p class="is-pulled-left">Factors</p>
+      <p class="is-pulled-left">Factors 
+        <span *ngIf="!isReadOnly"><mat-icon [matTooltip]="'Factors are key parameters within a study that differentiate samples into groups'" >help</mat-icon></span>
+      </p>
       <span *ngIf="!isReadOnly">
         <mtbls-factor [value]="null"></mtbls-factor>
       </span>

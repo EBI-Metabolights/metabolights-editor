@@ -1,12 +1,13 @@
 import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext, StateToken } from "@ngxs/store";
-import { Loading, SetLoadingInfo, SetTabIndex } from "./transitions.actions";
+import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { IntermittentRefreshActionStack, Loading, SetLoadingInfo, SetTabIndex } from "./transitions.actions";
 
 
 export interface TransitionStateModel {
     loading: boolean,
     loadingInformation: string,
-    currentTabIndex: string
+    currentTabIndex: string,
+    intermittentRefreshActionStack: string[]
 }
 
 @State<TransitionStateModel>({
@@ -14,7 +15,8 @@ export interface TransitionStateModel {
     defaults: {
         loading: true,
         loadingInformation: "",
-        currentTabIndex: "0"
+        currentTabIndex: "0",
+        intermittentRefreshActionStack: []
     }
 })
 @Injectable()
@@ -65,6 +67,23 @@ export class TransitionsState {
         })
     }
 
+    @Action(IntermittentRefreshActionStack.Sync)
+    sync(
+        {patchState}: StateContext<TransitionStateModel>, 
+        {actionStack}: IntermittentRefreshActionStack.Sync
+    ) {
+        patchState({
+            intermittentRefreshActionStack: actionStack
+        });
+    }
+
+    @Selector()
+    static actionStack(state: TransitionStateModel) {
+       return (stateContainer: string) => {
+        return state.intermittentRefreshActionStack.filter(action => action.includes(stateContainer));
+       }
+    }
+
     @Selector()
     static loading(state: TransitionStateModel): boolean {
         return state.loading
@@ -80,3 +99,4 @@ export class TransitionsState {
         return state.currentTabIndex
     }
 }
+

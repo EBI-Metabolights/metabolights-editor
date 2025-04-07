@@ -29,7 +29,8 @@
       </h6>
     </div>
   </div>
-
+  <app-prompt-refresh *ngIf="!isStudyReadOnly && actionStack.length > 0" [context]="'protocols'"></app-prompt-refresh>
+  
   <div *ngFor="let protocol of defaultProtocols">
     <span *ngIf="getProtocol(protocol) != null">
       <mtbls-protocol

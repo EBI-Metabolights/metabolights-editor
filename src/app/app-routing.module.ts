@@ -23,6 +23,7 @@ import { MetaComponent } from "./components/guide/meta/meta.component";
 import { GuidedAssaysComponent } from "./components/guide/assays/assays.component";
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { NoStudyPageComponent } from "./components/shared/errors/no-study-page/no-study-page.component";
+import { StudyNotPublicComponent } from "./components/shared/errors/study-not-public/study-not-public.component";
 import { DataPolicyComponent } from "./components/public/data-policy/data-policy.component";
 import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-license-static/dataset-license-static.component";
 
@@ -121,6 +122,7 @@ const routes: Routes = [
   },
   { path: "study", redirectTo: "console", pathMatch: "full" },
   { path: "study-not-found", component: NoStudyPageComponent },
+  { path: "study-not-public", component: StudyNotPublicComponent},
   { path: "page-not-found", component: PageNotFoundComponent },
   { matcher: publicStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
   { matcher: reviewerStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
