@@ -53,6 +53,7 @@
         <hr class="dropdown-divider" />
         <mtbls-factor
           (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
+          (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"
           [isDropdown]="true"
           [value]="null"
         ></mtbls-factor>

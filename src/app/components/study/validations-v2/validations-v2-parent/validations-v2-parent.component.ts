@@ -34,7 +34,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
 
-
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
@@ -61,6 +61,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   // core state variables
   studyId: string =  null
   isCurator: boolean = false;
+  studyStatus: string = null;
 
   checked: boolean = false;
   ready: boolean = true;
@@ -78,8 +79,12 @@ export class ValidationsV2ParentComponent implements OnInit {
   overrides: FullOverride[] = [];
   overrideListModalOpen = false;
 
-  ngOnInit(): void {
+  validationEnabled: boolean = null;
 
+  ngOnInit(): void {
+    this.studyStatus$.subscribe(value => {
+      this.studyStatus = value
+    })
     this.isCurator$.subscribe(value => {
       this.isCurator = false
       if (value !== null) {

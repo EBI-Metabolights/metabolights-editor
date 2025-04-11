@@ -2,22 +2,10 @@
     <div class="column is-8 is-offset-2">
       <div style="margin: 0 0 20px 0">
         <article class="message is-small has-shadow">
-          <div (click)="toggleMessage()" class="message-header">
+          <div  class="message-header">
             <p>
               <span class="material-icons">error</span>&nbsp;{{ study }} is not public.
             </p>
-            <button
-              *ngIf="!messageExpanded"
-              style="background-color: transparent; border: 0"
-            >
-              <span class="material-icons">keyboard_arrow_down</span>
-            </button>
-            <button
-              *ngIf="messageExpanded"
-              style="background-color: transparent; border: 0"
-            >
-              <span class="material-icons">keyboard_arrow_up</span>
-            </button>
           </div>
           <div  class="message-body">
             <div class="container">

@@ -19,6 +19,7 @@ import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descripto
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { FilesLists } from "src/app/ngxs-store/study/files/files.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
+import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 
 @Component({
   selector: "mtbls-samples",
@@ -83,7 +84,12 @@ export class SamplesComponent  {
   actionStack: string[] = [];
 
 
-  constructor(private editorService: EditorService, private fb: UntypedFormBuilder, private store: Store) {
+  constructor(
+    private editorService: EditorService, 
+    private fb: UntypedFormBuilder, 
+    private store: Store,
+    private ontTrackerService: OntologyComponentTrackerService
+  ) {
     if (!this.defaultCharacteristicControlList) {
       this.defaultCharacteristicControlList = {name: "", values: []};
     }
@@ -131,7 +137,6 @@ export class SamplesComponent  {
 
     effect(() => {
       this.actionStack = this.actionStack$();
-      console.log(this.actionStack);
     });
   }
 
@@ -227,10 +232,20 @@ export class SamplesComponent  {
     this.form.get("samples").setValue(this.rawFileNames.join("\n"));
   }
 
-  addColumn(type, selectedFactor?: MTBLSFactor) {
+  handleIncl(type, $event: MTBLSFactor) {
+    // this event will contain the factor and the factor unit, potentially in the 
+    // same object, i don't know 
+    // addColumn makes use of a viewChild via getOntologyComponentValue to get the factor unit
+    // we won't be able to do that here, as the ontology unit is quite far down
+    // UNLESS we tell the viewchildren to go deep in looking for children
+    this.addColumn(type, $event, true);
+  }
+
+  addColumn(type, selectedFactor?: MTBLSFactor, deepUnit: boolean = false) {
     if (type === "factor") {
       const mtblsFactorValue = new MTBLSFactorValue();
-      mtblsFactorValue.category = this.selectedFactor;
+      if (selectedFactor) mtblsFactorValue.category = selectedFactor
+      else mtblsFactorValue.category = this.selectedFactor; // TODO: change
       const columns = [];
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
@@ -238,7 +253,9 @@ export class SamplesComponent  {
         "",
         newFactorIndex
       );
-      const factorUnitValue =
+      let factorUnitValue
+      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit').values[0];
+      else factorUnitValue =
         this.getOntologyComponentValue("factorUnit").values[0];
 
       let factorUnitColumn;
@@ -353,6 +370,7 @@ export class SamplesComponent  {
 
   closeAddColumnModal() {
     this.addColumnModalOpen = false;
+    this.selectedFactor = null;
   }
 
   closeAddSamplesModal() {

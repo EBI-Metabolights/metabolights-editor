@@ -6,6 +6,7 @@ import {
   ViewChild,
   EventEmitter,
   inject,
+  model,
 } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
@@ -21,6 +22,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { Factors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Router } from "@angular/router";
+import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 
 @Component({
   selector: "mtbls-factor",
@@ -36,6 +38,8 @@ export class FactorComponent implements OnInit {
 
   @Output() addFactorToSampleSheet = new EventEmitter<any>();
 
+  @Output() addFactorToSampleSheetUnitInclusive = new EventEmitter<any>();
+
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
@@ -50,10 +54,23 @@ export class FactorComponent implements OnInit {
   validationsId = "factors.factor";
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
   defaultControlListName = "Study Factor Type";
+
+  unitSampleValidations = null;
+  factorTypeValidations = null;
+  factorNameValidations =  null;
+
   isModalOpen = false;
   isTimeLineModalOpen = false;
   isDeleteModalOpen = false;
   isDeleting = false;
+
+  addFactorColumnVisible = false
+
+  defaultUnitControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultUnitControlListName = "unit";
+  fieldValues: Record<string, any> = {};
+
+  editingFactor: boolean = false;
 
   form: UntypedFormGroup;
   isFormBusy = false;
@@ -65,7 +82,7 @@ export class FactorComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
-    private router: Router
+    private router: Router,
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
@@ -77,6 +94,10 @@ export class FactorComponent implements OnInit {
   navigateToSamples() {
     let samplesLoc = window.location.href.replace('descriptors', 'samples')
     window.location.href = samplesLoc;
+  }
+
+  toggleUnit() {
+    this.addFactorColumnVisible = !this.addFactorColumnVisible;
   }
 
 
@@ -101,7 +122,11 @@ export class FactorComponent implements OnInit {
   }
 
   ngOnInit() {
+    
     this.editorService.loadValidations();
+    this.unitSampleValidations = this.fieldValidation('unit', true);
+    this.factorTypeValidations = this.fieldValidation('factorType');
+    this.factorNameValidations = this.fieldValidation('factorName');
     if (this.factor == null) {
       this.addNewFactor = true;
       if (this.factorTypeComponent) {
@@ -124,7 +149,7 @@ export class FactorComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-  openModal() {
+  openModal(editing: boolean = false) {
     if (!this.isStudyReadOnly) {
       if (this.addNewFactor) {
         this.factor = new MTBLSFactor();
@@ -134,6 +159,7 @@ export class FactorComponent implements OnInit {
       }
       this.initialiseForm();
       this.isModalOpen = true;
+      
     }
   }
 
@@ -142,6 +168,11 @@ export class FactorComponent implements OnInit {
     this.form = this.fb.group({
       factorName: [this.factor.factorName],
     });
+    this.form.valueChanges.subscribe((values) => {
+      for (const key in values) {
+        this.fieldValues[key] = values[key];
+      }
+    })
   }
 
   confirmDelete() {
@@ -165,8 +196,10 @@ export class FactorComponent implements OnInit {
         this.store.dispatch(new Factors.Update(this.studyId, this.factor.factorName, this.compileBody())).subscribe(
           (completed) => {
             this.refreshFactors(null, "Factor updated.");
-            this.addFactorToSampleSheet.next(this.factor);
-          },
+            //this.addFactorToSampleSheet.next(this.factor);
+            if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next(this.factor)
+
+            },
           (error) => { this.isFormBusy = false;}
 
         );
@@ -176,12 +209,17 @@ export class FactorComponent implements OnInit {
           (completed) => {
             this.refreshFactors(null, "Factor saved.");
             this.isModalOpen = false;
-            this.addFactorToSampleSheet.next(newFactor.factor);
+            //this.addFactorToSampleSheet.next(newFactor.factor);
+            if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next(newFactor.factor)
+
           },
           (error) => { this.isFormBusy = false; }
         )
 
       }
+    }
+    if (this.addFactorColumnVisible) {
+
     }
   }
 
@@ -237,7 +275,9 @@ export class FactorComponent implements OnInit {
     return this.validationRules[this.validationsId];
   }
 
-  fieldValidation(fieldId) {
+  fieldValidation(fieldId, setToSamples: boolean = false) {
+    console.log(fieldId)
+    if (setToSamples) return this.validationRules['samples'][fieldId]
     return this.validation[fieldId];
   }
 
@@ -256,4 +296,18 @@ export class FactorComponent implements OnInit {
     }
     return this.defaultControlList;
   }
+
+  factorColumnControlList() {
+    let controlList = this.defaultUnitControlList;
+    let controlListName = this.defaultUnitControlListName;
+
+    if (!(controlList && controlList.name.length > 0)
+      && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists){
+        controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+        controlList.name = controlListName;
+    }
+    return controlList;
+  }
+
+
 }
