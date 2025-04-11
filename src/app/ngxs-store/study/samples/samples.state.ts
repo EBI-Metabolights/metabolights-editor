@@ -42,7 +42,7 @@ export class SampleState {
                     this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
                     ctx.dispatch(new Samples.OrganiseAndPersist(sampleSheet.file, action.studyId));
                 } else {
-                    Swal.fire({title: 'Error', text: this.samplesService.sampleSheetMissingPopupMessage, showCancelButton: false, 
+                    Swal.fire({title: 'Error', text: this.samplesService.sampleSheetMissingPopupMessage, showCancelButton: false,
                     confirmButtonColor: "#DD6B55", confirmButtonText: "OK"});
                 }
             }
@@ -83,29 +83,34 @@ export class SampleState {
                 });
                 let index = displayedColumns.indexOf("Source Name");
                 if (index > -1) {
-                  //displayedColumns.splice(index, 1);
+                  displayedColumns.splice(index, 1);
                 }
-        
+
                 index = displayedColumns.indexOf("Characteristics[Sample type]");
                 if (index > -1) {
                   displayedColumns.splice(index, 1);
                 }
-        
+
                 displayedColumns.sort(
                   (a, b) =>
                     /* eslint-disable radix */
                     parseInt(this.samplesService.samplesColumnOrder[a]) -
                     parseInt(this.samplesService.samplesColumnOrder[b])
                 );
-        
+
                 if (displayedColumns[1] !== "Protocol REF") {
                   displayedColumns.splice(displayedColumns.indexOf("Protocol REF"), 1);
                   displayedColumns.splice(1, 0, "Protocol REF");
                 }
-        
-                if (displayedColumns[2] !== "Sample Name") {
+
+                if (displayedColumns[2] !== "Source Name") {
+                  displayedColumns.splice(displayedColumns.indexOf("Source Name"), 1);
+                  displayedColumns.splice(2, 0, "Source Name");
+                }
+
+                if (displayedColumns[3] !== "Sample Name") {
                   displayedColumns.splice(displayedColumns.indexOf("Sample Name"), 1);
-                  displayedColumns.splice(2, 0, "Sample Name");
+                  displayedColumns.splice(3, 0, "Sample Name");
                 }
                 displayedColumns = displayedColumns.filter(
                   (key) =>
@@ -120,15 +125,15 @@ export class SampleState {
                 samples["data"] = data;
 
                 ctx.dispatch(new Samples.Set(samples))
-                
+
                 /**
-                 * Organisms processing 
+                 * Organisms processing
                  */
                 const organisms = {};
                 data["rows"].forEach((row) => {
                   let organismName = row["Characteristics[Organism]"] as string;
                   organismName = organismName.replace(/^[ ]+|[ ]+$/g, "");
-        
+
                   const organismPart = row["Characteristics[Organism part]"];
                   const organismVariant = row["Characteristics[Variant]"];
                   if (organismName !== "" && organismName.replace(" ", "") !== "") {
@@ -223,7 +228,7 @@ export class SampleState {
     }
 
     @Action(Organisms.Set)
-    SetStudyOrganisms(ctx: StateContext<SamplesStateModel>, action: Organisms.Set) { 
+    SetStudyOrganisms(ctx: StateContext<SamplesStateModel>, action: Organisms.Set) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
