@@ -83,7 +83,7 @@ export class SampleState {
                 });
                 let index = displayedColumns.indexOf("Source Name");
                 if (index > -1) {
-                  displayedColumns.splice(index, 1);
+                  //displayedColumns.splice(index, 1);
                 }
         
                 index = displayedColumns.indexOf("Characteristics[Sample type]");
