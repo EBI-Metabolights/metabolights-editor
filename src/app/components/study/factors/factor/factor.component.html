@@ -17,7 +17,7 @@
       <span
         *ngIf="!isStudyReadOnly"
         class="tag is-primary clickable"
-        (click)="openModal()"
+        (click)="openModal(true)"
       >
         <i class="material-icons"> edit </i>
       </span>
@@ -38,52 +38,6 @@
     </div>
   </div>
 </ng-template>
-
-<div class="modal" [ngClass]="{ 'is-active': isTimeLineModalOpen }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-marker"></div>
-          <div class="timeline-content">
-            <p class="heading">January 2016</p>
-            <p>Timeline content - Can include any HTML element</p>
-          </div>
-        </div>
-        <div class="timeline-item">
-          <div class="timeline-marker is-image is-32x32">
-            <img src="{{ baseHref }}assets/img/file.png" />
-          </div>
-          <div class="timeline-content">
-            <p class="heading">February 2016</p>
-            <p>Timeline content - Can include any HTML element</p>
-          </div>
-        </div>
-        <header class="timeline-header">
-          <span class="tag is-primary">2017</span>
-        </header>
-        <div class="timeline-item">
-          <div class="timeline-marker is-icon">
-            <i class="fa fa-flag"></i>
-          </div>
-          <div class="timeline-content">
-            <p class="heading">March 2017</p>
-            <p>Timeline content - Can include any HTML element</p>
-          </div>
-        </div>
-      </div>
-    </section>
-    <footer class="modal-card-foot">
-      <div class="columns is-gapless full-width">
-        <div class="column is-half"></div>
-        <div class="column is-half has-text-right">
-          <button (click)="closeHistory()" class="button is-info">OK</button>
-        </div>
-      </div>
-    </footer>
-  </div>
-</div>
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
@@ -121,9 +75,12 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
+        <h6 class="modal-card-title modal-form-title">
+          Add Factor to Sample Sheet
+        </h6>
         <mat-form-field class="full-width">
           <input class="no-scroll" formControlName="factorName" matInput />
-          <mat-hint>{{ fieldValidation("factorName").description }}</mat-hint>
+          <mat-hint>{{ factorNameValidations.description }}</mat-hint>
           <mat-error
             *ngIf="
               form.get('factorName').errors &&
@@ -136,13 +93,63 @@
         </mat-form-field>
         <mtbls-ontology
           #factorType
-          [validations]="fieldValidation('factorType')"
+          [id]="'factorType'"
+          [validations]="factorTypeValidations"
           [controlList]="controlList()"
           (changed)="onChanges($event)"
           [values]="[factor.factorType]"
           [inline]="true"
         ></mtbls-ontology>
+        <label
+        [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
+        >
+          Add factor column (optional)
+          <mat-checkbox 
+          [disabled]="form.get('factorName')?.pristine"
+          (change)="toggleUnit()" ></mat-checkbox>
+        </label>
       </section>
+     <!-- <section class="modal-card-body">
+        <label>
+          <input type="checkbox" (change)="toggleUnit()" />
+          ADD COLUMN??? UNIT ?????
+        </label>
+      </section>-->
+      <!--Add factor column start-->
+      <ng-container *ngIf="addFactorColumnVisible">
+      <section class="modal-card-body">
+        <h6 class="modal-card-title modal-form-title">
+          Add factor column to Sample sheet -
+          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName-->
+        </h6>
+        <mtbls-ontology
+          [id]="'factorUnit'"
+          class="mt-20"
+          #factorUnit
+          [validations]="unitSampleValidations"
+          [controlList]="factorColumnControlList()"
+          (changed)="onChanges($event)"
+          [values]="[]"
+          [inline]="true"
+        ></mtbls-ontology>
+
+      </section>
+      <!--The below is a relic from when adding a column was a separate modal-->
+      <!--<footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half"></div>
+          <div class="column is-half has-text-right">
+            <button (click)="closeAddColumnModal()" class="button">
+              Cancel
+            </button>
+            <button (click)="addColumn('factor', selectedFactor)" class="button is-info">
+              Add Factor Column
+            </button>
+          </div>
+        </div>
+      </footer>-->
+    </ng-container>
+      <!--Add factor column end-->
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">

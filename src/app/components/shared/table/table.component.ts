@@ -141,6 +141,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   baseHref: string;
 
   actionStack: string[] = [];
+  dismissed: boolean = false;
 
   constructor(
     private clipboardService: ClipboardService,

@@ -252,3 +252,9 @@ a.dropdown-item {
 .unclickable {
   pointer-events: none;
 }
+
+.dismiss {
+  position: absolute;
+  right: 2%;
+  cursor: pointer; /* This gives you the little hand */
+}

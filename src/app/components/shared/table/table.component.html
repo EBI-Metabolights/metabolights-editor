@@ -75,6 +75,10 @@
     </span>
   </div>
 </div>
+<div *ngIf="!isReadOnly && !dismissed" class="notification is-primary">
+  <small><mat-icon>info</mat-icon> When editing there is the option to switch between the 'Compact Table' and 'Expand Table' view 
+</small><span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
+</div>
 <span *ngIf="!isReadOnly" #spacer></span>
 <div
   *ngIf="!isReadOnly"

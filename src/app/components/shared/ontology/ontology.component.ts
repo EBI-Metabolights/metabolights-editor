@@ -30,6 +30,7 @@ import { JsonConvert } from "json2typescript";
 import { ConfigurationService } from "src/app/configuration.service";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { animate, state, style, transition, trigger } from "@angular/animations";
+import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 /* eslint-disable no-underscore-dangle */
 @Component({
   selector: "mtbls-ontology",
@@ -87,7 +88,8 @@ export class OntologyComponent implements OnInit, OnChanges {
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
-    private store: Store
+    private store: Store,
+    private ontTrackerService: OntologyComponentTrackerService
   ) {
 
   }
@@ -105,6 +107,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
    async ngOnInit() {
+    
     this.baseHref = this.configService.baseHref;
     this.baseURL = this.configService.config.metabolightsWSURL.baseURL;
     if (this.baseURL.endsWith("/")){
@@ -139,6 +142,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.valueInput.openPanel();
       });
     }
+    this.ontTrackerService.register(this);
 
   }
 
