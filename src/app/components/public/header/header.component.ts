@@ -7,6 +7,7 @@ import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { Select, Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "mtbls-header",
@@ -25,7 +26,7 @@ export class HeaderComponent {
   baseHref: string;
   banner: string = null;
   underMaintenance = false;
-  constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation) {
+  constructor(private configService: ConfigurationService, private platformLocation: PlatformLocation, private router: Router) {
       this.setUpSubscriptionsNgxs();
       const url = this.configService.config.endpoint;
       if(url.endsWith("/")){
