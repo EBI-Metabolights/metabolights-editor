@@ -3,10 +3,14 @@ import * as toastr from "toastr";
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, ActivatedRoute } from "@angular/router";
 import { EditorService } from "./services/editor.service";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
+import { ConfigurationService } from "./configuration.service";
 
 import jwtDecode from "jwt-decode";
-import { MtblsJwtPayload } from "./services/headers";
+import { httpOptions, MtblsJwtPayload } from "./services/headers";
+import { HttpClient } from "@angular/common/http";
 
+import { ErrorMessageService } from "./services/error-message.service";
+import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
 @Injectable({
@@ -16,8 +20,11 @@ export class AuthGuard  implements OnInit {
 
   constructor(
     private editorService: EditorService,
+    private configService: ConfigurationService,
     private router: Router,
     private route: ActivatedRoute,
+    private http: HttpClient,
+    private errorMessageService: ErrorMessageService,
     private store: Store
   ) { }
 
@@ -29,43 +36,15 @@ export class AuthGuard  implements OnInit {
     const url: string = state.url;
     const continueProcess = await this.checkAuthenticationRequest(state);
     if (continueProcess === false) {
-      // if the user is not authenticated, but there is a private MTBLS acc in the url,
-      // we want them to be able to access it.
-      //const __ = this.privateMTBLSHandler(url, state);
       return false;
     }
     return await this.checkUrlAndLogin(url, state);
-  }
-
-  // this will either redirect, or return false to indicate its not a private MTBLS request
-  async privateMTBLSHandler(url: string, state: RouterStateSnapshot) {
-    if (url.startsWith("/MTBLS")) {
-      const studyIdentifier = url.split("/")[1];
-      const regEx = new RegExp('^(MTBLS[1-9][0-9]{0,10})($|\\?)', 'g');
-      const studyIdResults = studyIdentifier.match(regEx);
-      if (studyIdResults === null || studyIdResults.length === 0) {
-        this.editorService.redirectUrl = url;
-        const errorCode = "E-0001-003";
-        this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-        return false;
-      }
-      const studyPermission = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
-      if (studyPermission.studyId === studyIdentifier) {
-        this.editorService.redirectUrl = url;
-        this.router.navigate(["/study-not-public"]);
-      }
-
-
-    }
-    return false;
-
   }
 
   async checkAuthenticationRequest(state: RouterStateSnapshot) {
     try {
       let loginOneTimeToken = null;
       if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
-        const __ = this.privateMTBLSHandler(state.url, state);
         return true;
       }
 
@@ -73,9 +52,6 @@ export class AuthGuard  implements OnInit {
       this.editorService.updateHistory(state.root);
       if (loginOneTimeToken === "") {
         this.editorService.redirectUrl = state.url;
-        // if the user is not authenticated, but there is a private MTBLS acc in the url,
-        // we want them to be able to access it.
-        const __ = this.privateMTBLSHandler(state.url, state);
         this.router.navigate(["/login"]);
         return false;
       }
@@ -93,9 +69,6 @@ export class AuthGuard  implements OnInit {
       }
       if (decoded === null) {
         this.editorService.redirectUrl = state.url;
-        // if the user is not authenticated, but there is a private MTBLS acc in the url,
-        // we want them to be able to access it.
-        const __ = this.privateMTBLSHandler(state.url, state);
         this.router.navigate(["/login"]);
         return false;
       }
@@ -129,7 +102,7 @@ export class AuthGuard  implements OnInit {
         if (currentUser !== userName) {
           this.editorService.clearSessionData();
           await this.editorService.loginWithJwt(jwt, userName);
-          toastr.info("User: " + userName, "Session is switched to other user.", {
+          toastr.info("User: " + userName, "Session is swithed to other user.", {
             timeOut: "5000",
             positionClass: "toast-top-center",
             preventDuplicates: true,
@@ -198,6 +171,7 @@ export class AuthGuard  implements OnInit {
     } else if (obfuscationCode !== null) {
       return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
     }
+
     switch (this.evaluateSession(null)) {
       case SessionStatus.Active:
         return true;
@@ -305,8 +279,7 @@ export class AuthGuard  implements OnInit {
 
       this.editorService.redirectUrl = url;
       const errorCode = "E-0001-004";
-      //this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-      const __ = this.privateMTBLSHandler(url, state);
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
     } else {
       if (studyPermission.edit) {
@@ -320,7 +293,6 @@ export class AuthGuard  implements OnInit {
           return false;
         }
         if (studyPermission.userName == null || studyPermission.userName.length === 0) {
-          const __ = this.privateMTBLSHandler(url, state);
           this.editorService.redirectUrl = url;
           this.router.navigate(["/login"]);
         } else {
