@@ -36,7 +36,6 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
   constructor(private store: Store) {
