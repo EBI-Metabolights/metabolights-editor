@@ -495,7 +495,9 @@ export class FilesComponent implements OnInit,  OnChanges {
       }
     );
   }
-
+  updateFileUpdateStatus() {
+    return this.curator;
+  }
   passiveUpdate(syncEvent) {
     if (syncEvent === SyncEvent.metadata) {
       this.store.dispatch(new GetGeneralMetadata(this.requestedStudy, this.isReadOnly))

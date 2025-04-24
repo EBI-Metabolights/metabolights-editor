@@ -3,9 +3,9 @@ export class ForbiddenError {
   constructor(error: any) {
     const errorMessage = error.error.message
       ? error.error.message
-      : error.message ? error.message : "Unauthorised access.";
+      : error.message ? error.message : "Restricted access.";
     toastr.warning(errorMessage, "", {
-      timeOut: "1000",
+      timeOut: "6000",
       positionClass: "toast-top-center",
       preventDuplicates: true,
       extendedTimeOut: 0,

@@ -13,8 +13,9 @@
 
     <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
     <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
+    <mtbls-download-globus  *ngIf="status == 'Public'"></mtbls-download-globus>
     <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
-    <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
+    <mtbls-upload *ngIf="isSyncEnabled" class="upload-button"
       [type]="'any'"
       [multiple]="true"
       [mode]="'button'"
@@ -22,7 +23,7 @@
       [size]="'is'"
     ></mtbls-upload>
 
-    <span *ngIf="!isReadOnly" class="refresh-button" >
+    <span *ngIf="isSyncEnabled" class="refresh-button" >
       <a (click)="loadFilesPassively()" class="button is-light">
         <mat-icon>refresh</mat-icon> Refresh
       </a>
@@ -37,13 +38,13 @@
     </span>
     <!--<span>
       <div class="tags has-addons refresh-button status-badge">
-        <span class="tag is-dark">Aspera Status</span><span class="tag"
+        <span class="tag">Aspera Status</span><span class="tag"
         [ngClass]="{ 'is-danger': ['RETRYING', 'OUTDATED', 'FAILED', 'EXTENSION_INSTALL'].includes(asperaStatus), 'is-success': asperaStatus === 'RUNNING', 'is-grey': asperaStatus === '-' }">{{asperaStatus}}</span>
       </div>
     </span>-->
 
 
-    <span *ngIf="!isReadOnly && curator" class="is-pulled-rightn ml-auto">
+    <span *ngIf="isSyncEnabled && curator" class="is-pulled-rightn ml-auto">
       <a *ngIf="access == null"
         (click)="getFolderStatus()"
         class="button is-light"
@@ -67,9 +68,9 @@
     </span>
   </div>
 
-  <mat-divider class="file-divider" [inset]="true"></mat-divider>
+  <mat-divider *ngIf="isSyncEnabled" class="file-divider" [inset]="true"></mat-divider>
 
-  <div *ngIf="!isReadOnly" class="notification is-warning message">
+  <div *ngIf="isSyncEnabled" class="notification is-warning message">
     <small
       ><mat-icon>warning</mat-icon> Please ensure your study folder is up-to-date. Start synchronization to update study folder.
       Please note that the sync operations may take some time to complete. If your synchronization is not completed successfully, please contact us
@@ -88,7 +89,7 @@
   <!--ftp management component start-->
 <div class="container parent resync-section">
   <app-rsync
-  *ngIf="!isReadOnly"
+  *ngIf="isSyncEnabled"
   title="Metadata Files"
   helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
   [studyId]="studyIdentifier"
@@ -102,7 +103,7 @@
   ></app-rsync>
 
     <app-rsync
-    *ngIf="!isReadOnly"
+    *ngIf="isSyncEnabled"
     title="Data Files"
     helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
     [studyId]="studyIdentifier"
@@ -114,7 +115,7 @@
     pollingInterval=10000
     (filesSynchronized)="onFilesSynchronized($event)"
     ></app-rsync>
-  <div *ngIf="!isReadOnly && curator">
+  <div *ngIf="isSyncEnabled && curator">
     <app-rsync
     title="Internal Files"
     helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
@@ -217,6 +218,14 @@
                   </ng-template>
                 </span>
                 {{ file.file }}
+                <span class="panel-icon">
+                  <span *ngIf="file.status == 'unreferenced' && !file.directory">
+                    <img src="assets/img/icons/unreferenced.png" style="height: 18px"/>
+                  </span>
+                  <span *ngIf="file.status == 'active'">
+                    <img src="assets/img/icons/referenced.png" style="height: 18px"/>
+                  </span>
+                </span>
                 <span class="has-text-grey-lighter"
                   ><small>{{
                     file.createdAt.replace("'", "").replace("'", "")
@@ -310,6 +319,7 @@
             [deletionEnabled]="deletionEnabled(file)"
             [downloadEnabled]="downloadEnabled(file)"
             [readonlyFolder]="readonlyFolder(file)"
+            [showReferencedFiles]="true"
             (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"
           ></mtbls-directory>
         </span>

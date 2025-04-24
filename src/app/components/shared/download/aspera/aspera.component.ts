@@ -15,10 +15,12 @@ export class AsperaDownloadComponent implements OnInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  publicAsperaPath$: Observable<string> = inject(Store).select(GeneralMetadataState.publicAsperaPath);
 
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
 
+  publicAsperaPath = null
   displayHelpModal = false;
   studyId: string = null;
   isAsperaDownloadModalOpen = false;
@@ -52,6 +54,11 @@ export class AsperaDownloadComponent implements OnInit {
     });
     this.editorValidationRules$.subscribe((value) => {
       this.validation = value[this.validationsId];
+    });
+    this.publicAsperaPath$.subscribe((value) => {
+      if (value != null) {
+        this.publicAsperaPath = value;
+      }
     });
   }
 
@@ -93,7 +100,7 @@ export class AsperaDownloadComponent implements OnInit {
       {
         paths: [
           {
-            source: "/studies/public/" + this.requestedStudy,
+            source: this.publicAsperaPath,
           },
         ],
         remote_host: "fasp.ebi.ac.uk",

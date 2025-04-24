@@ -227,7 +227,7 @@ export class ValidationState {
         this.validationService.getValidationHistory(action.studyId).subscribe((historyResponse) => {
             const sortedPhases = sortPhasesByTime(historyResponse.content);
             ctx.dispatch(new ValidationReportV2.History.Set(sortedPhases));
-            if (!state.initialLoadMade) {
+            if (sortedPhases && sortedPhases.length > 0 && !state.initialLoadMade) {
                 ctx.dispatch(new ValidationReportV2.Get(action.studyId, sortedPhases[0].taskId))
             }
         },

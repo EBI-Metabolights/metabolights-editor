@@ -14,4 +14,5 @@ export interface StudyFile {
   status: string;
   directory: boolean;
   files: StudyFile[];
+  file_difference: string;
 }

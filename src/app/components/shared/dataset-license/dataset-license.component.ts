@@ -18,7 +18,6 @@ export class DatasetLicenseComponent implements OnInit {
 
   ngOnInit(): void {
       this.datasetLicense$.pipe(filter(val => val !== null)).subscribe((dl) => {
-        console.log(dl)
         this.datasetLicense = dl;
       });
   }

@@ -36,6 +36,7 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
 
   constructor(private store: Store) {
@@ -58,6 +59,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   assignmentViolations: Violation[] = [];
   filesViolations: Violation[] = [];
 
+
   // core state variables
   studyId: string =  null
   isCurator: boolean = false;
@@ -66,7 +68,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   checked: boolean = false;
   ready: boolean = true;
   loadingDiffReport = false;
-
+  validationEnabled = false;
   // Subsection buckets
   investigationSubsections = validationReportInvestigationSubsectionList;
   samplesSubsections = validationReportSamplesSubsectionList;
@@ -78,8 +80,6 @@ export class ValidationsV2ParentComponent implements OnInit {
   //override variables
   overrides: FullOverride[] = [];
   overrideListModalOpen = false;
-
-  validationEnabled: boolean = null;
 
   ngOnInit(): void {
     this.studyStatus$.subscribe(value => {
@@ -148,7 +148,10 @@ export class ValidationsV2ParentComponent implements OnInit {
       this.store.dispatch(new ValidationReportV2.Get(this.studyId));
       this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
     });
-
+    this.studyStatus$.pipe(filter(value => value !== null)).subscribe(value => {
+      this.studyStatus = value;
+      this.updateValidationStatus();
+    });
     this.overrides$.pipe(filter(val => val !== null)).subscribe(value => {
       this.overrides = value;
     });
@@ -197,3 +200,4 @@ export class ValidationsV2ParentComponent implements OnInit {
   }
 
 }
+

@@ -78,19 +78,14 @@
           >All</a
         >
         <a
-          (click)="filterStudies('submitted')"
-          [class.is-active]="filterValue == 'submitted'"
-          >Submitted</a
+          (click)="filterStudies('provisional')"
+          [class.is-active]="filterValue == 'provisional'"
+          >Provisional</a
         >
         <a
-          (click)="filterStudies('in curation')"
-          [class.is-active]="filterValue == 'in curation'"
-          >In Curation</a
-        >
-        <a
-          (click)="filterStudies('in review')"
-          [class.is-active]="filterValue == 'in review'"
-          >In Review</a
+          (click)="filterStudies('private')"
+          [class.is-active]="filterValue == 'private'"
+          >Private</a
         >
         <a
           (click)="filterStudies('public')"
@@ -122,29 +117,22 @@
                 <div class="control py-0 mb0">
                   <div class="tags has-addons">
                     <span class="tag">Status</span>
-                    <span *ngIf="study.status == 'Public'; else onlyStatus" >
-                        <span *ngIf="study.curationRequest == 'MANUAL_CURATION'; else noCuration"
-                          class="tag is-success"
-                          >{{ study.status }} - Curated
-                        </span>
-                        <ng-template #noCuration>
-                            <span
-                            class="tag not-curated"
-                            >{{ study.status }} - Not Curated
-                          </span>
-                        </ng-template>
+                    <span>
+                      <span
+                      class="tag"
+                      [class.is-primary]="study.status == 'In Review'"
+                      [class.is-danger]="study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'"
+                      [class.is-success]="study.status == 'Public'"
+                      >{{ study.status }}</span
+                    >
                     </span>
-
-                    <ng-template #onlyStatus>
-                        <span
-                          class="tag"
-                          [class.is-primary]="study.status == 'In Review'"
-                          [class.is-danger]="study.status == 'In Curation'"
-                          [class.is-warning]="study.status == 'Submitted'"
-                          [class.is-success]="study.status == 'Public'"
-                          >{{ study.status }}</span
-                        >
-                    </ng-template>
+                  </div>
+                </div>
+                <div class="control py-0 mb0">
+                  <div class="tags has-addons">
+                    <span class="tag">Curation</span>
+                    <span class="tag is-info">{{ study.curationRequest | curationStatusTransform }}</span>
                   </div>
                 </div>
                 <div class="control py-0 mb0">
@@ -153,6 +141,14 @@
                     <span class="tag is-info">{{ study["releaseDate"] }}</span>
                   </div>
                 </div>
+                <div *ngIf="study.revisionNumber > 0" class="control py-0 mb0">
+                  <div class="tags has-addons">
+                    <span class="tag">Revision</span>
+                    <span class="tag is-info"> {{ study.revisionDatetime | date: 'yyyy-MM-dd' }} ({{ study.revisionNumber }})</span>
+                  </div>
+                </div>
+
+
               </div>
               <div class="full-width">
                 <p
@@ -205,31 +201,31 @@
     <div class="modal-background"></div>
     <div class="modal-card">
       <section class="modal-card-body">
-        <p *ngIf="submittedStudies.length < 2 || curator || partner; else tooMany">
-          You have {{ submittedStudies.length }} Studies in progress. Are you
+        <p *ngIf="provisionalStudies.length < 2 || curator || partner; else tooMany">
+          You have {{ provisionalStudies.length }} provisional studies in progress. Are you
           sure you want to create another study?
         </p>
         <ng-template #tooMany>
         <p>
-          You have {{ submittedStudies.length }} studies in the SUBMITTED stage.
-          To prevent spurious submissions, a maximum of 2 studies are allowed to be in the SUBMITTED stage at any one time.
-          If you have a legitimate reason to have more than 2 studies in the SUBMITTED phase, then this is permitted, and you need to contact the Metabolights team with your reason and how many studies you require, through the support email: metabolights-help&#64;ebi.ac.uk
+          You have {{ provisionalStudies.length }} provisional studies.
+          To prevent spurious submissions, a maximum of 2 provisional studies are allowed at any one time.
+          If you have a legitimate reason to have more than 2 provisional studies, then this is permitted, and you need to contact the MetaboLights team with your reason and how many studies you require, through the support email: metabolights-help&#64;ebi.ac.uk
         </p>
-      </ng-template>
+        </ng-template>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
             <button (click)="closeConfirmation()" class="button is-info">
-              <p *ngIf="submittedStudies.length < 2 ">
+              <p *ngIf="provisionalStudies.length < 2 ">
                 Cancel
               </p>
-              <p *ngIf="submittedStudies.length > 1">
+              <p *ngIf="provisionalStudies.length > 1">
                 Close
               </p>
             </button>
           </div>
-          <div *ngIf="submittedStudies.length < 2 || curator || partner" class="column is-half has-text-right">
+          <div *ngIf="provisionalStudies.length < 2 || curator || partner" class="column is-half has-text-right">
             <a [routerLink]="['/guide/create']" class="button is-success"
               >Create new</a
             >

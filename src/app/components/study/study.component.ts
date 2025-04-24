@@ -16,6 +16,8 @@ import { ValidationReport } from "src/app/ngxs-store/study/validation/validation
 import { UserService } from "src/app/services/decomposed/user.service";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
+import { StudyPermission } from "src/app/services/headers";
+import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
 
 @Component({
   selector: "mtbls-study",
@@ -37,14 +39,20 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
   validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
+  revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
+  revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
 
-
+  revisionNumber = null;
+  revisionDatetime = null;
+  revisionStatus = null;
   studyError = false;
   requestedTab = 0;
   tab = "descriptors";
   requestedStudy: string = null;
   status = "";
   curationRequest = "";
+  curationStatus = "";
   validation: any = {};
   obfuscationCode: string = null;
   endpoint: string = null;
@@ -53,9 +61,12 @@ export class StudyComponent implements OnInit, OnDestroy {
   banner: string = null;
   underMaintenance = false;
   isCurator = false;
+  isOwner = false;
   validationStatus: ViolationType = null;
   validationRunTime: string =  null;
   validationNeeded: boolean = false;
+  permissions: StudyPermission = null;
+  revisionStatusTransform = new RevisionStatusTransformPipe()
 
   constructor(
     private store: Store,
@@ -69,8 +80,32 @@ export class StudyComponent implements OnInit, OnDestroy {
 
 
   setUpSubscriptionsNgxs() {
+    this.permissions = this.store.snapshot().application.studyPermission
+
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
+    this.revisionNumber$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionNumber = value;
+      } else {
+        this.revisionNumber = null;
+      }
+    });
+
+    this.revisionDatetime$.subscribe((value) => {
+      if (value) {
+        this.revisionDatetime = value;
+      }
+    });
+
+    this.revisionStatus$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionStatus = this.revisionStatusTransform.transform(value);
+      } else {
+        this.revisionStatus = "";
+      }
+    });
+
     this.isCurator$.subscribe((value) => {
       this.isCurator = value;
     });
@@ -86,6 +121,10 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
+        this.isOwner = false;
+        if (this.permissions.submitterOfStudy){
+          this.isOwner = true;
+        }
       }
     });
     this.endpoint = this.configService.config.endpoint;
@@ -106,6 +145,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.curationRequest$.subscribe((value) => {
       if (value) {
         this.curationRequest = value;
+        this.updateCurationStatus();
       }
     });
 
@@ -208,5 +248,14 @@ export class StudyComponent implements OnInit, OnDestroy {
   topFunction() {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
+  }
+  updateCurationStatus() {
+    if (this.curationRequest === "NO_CURATION") {
+      this.curationStatus = "Minimum";
+    } else if (this.curationRequest === "MANUAL_CURATION") {
+      this.curationStatus = "MetaboLights";
+    } else {
+      return "Minimum";
+    }
   }
 }

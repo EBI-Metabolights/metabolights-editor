@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { IStudySummary } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
@@ -11,12 +11,13 @@ import { IProtocolWrapper } from 'src/app/models/mtbl/mtbls/interfaces/protocol-
 import { IPublication } from 'src/app/models/mtbl/mtbls/interfaces/publication.interface';
 import { IPublicationWrapper } from 'src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface';
 import { IPeopleWrapper } from 'src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface';
+import { IStudyRevision } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GeneralMetadataService extends DataService {
-  
+
   constructor(
     http: HttpClient,
     private configService: ConfigurationService
@@ -232,7 +233,24 @@ export class GeneralMetadataService extends DataService {
         .pipe(catchError(this.handleError));
     }
 
+  /**
+     *
+     *
+     * @param id: ID of the study to retrieve
+     */
+  createRevision(studyId: string, revisionComment: string): Observable<IStudyRevision> {
 
+    const headerOptions = {
+      headers: new HttpHeaders({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        "revision-comment": revisionComment,
+      }),
+    };
+
+
+    return this.http.post<IStudyRevision>(this.url.baseURL + "/studies" + "/" + studyId + "/revisions", {}, headerOptions)
+      .pipe(catchError(this.handleError));
+  }
 }
 
 

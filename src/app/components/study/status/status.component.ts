@@ -14,9 +14,11 @@ import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
-import { StudyStatus } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { RevisionNumber, StudyStatus } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { Loading, SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { ViolationType } from "../validations-v2/interfaces/validation-report.types";
+import { RevisionStatusTransformPipe } from "../../shared/pipes/revision-status-transform.pipe";
+import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 
 @Component({
   selector: "mtbls-status",
@@ -33,8 +35,15 @@ export class StatusComponent implements OnInit {
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
+  revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
+  revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
 
+  revisionNumber = null;
+  revisionDatetime = null;
+  revisionStatus = null;
 
+  revisionStatusTransform = new RevisionStatusTransformPipe()
 
   isReadOnly = false;
 
@@ -42,14 +51,17 @@ export class StatusComponent implements OnInit {
   isFormBusy = false;
   status: string = null;
   curator = false;
-  toStatus = "Submitted";
-  curationRequest: string = null;
+  toStatus = "Provisional";
+  curationRequest = "";
+  curationStatus = "";
+  revisionComment  = ""
   requestedStudy: string = null;
 
   validationStatus: ViolationType = null;
 
   private toastrSettings: Record<string, any> = {}
   constructor(
+    private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private route: ActivatedRoute,
     private store: Store,
@@ -63,7 +75,48 @@ export class StatusComponent implements OnInit {
     this.toastrSettings$.subscribe((value) => {
       this.toastrSettings = value;
     })
+    this.revisionNumber$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionNumber = value;
+      } else {
+        this.revisionNumber = null;
+      }
+    });
 
+    this.revisionDatetime$.subscribe((value) => {
+      if (value) {
+        this.revisionDatetime = value;
+      }
+    });
+
+    this.revisionStatus$.subscribe((value) => {
+      if (value !== null) {
+        this.revisionStatus = this.revisionStatusTransform.transform(value);
+      } else {
+        this.revisionStatus = "";
+      }
+
+      if (["initiated", "in progress"].includes(this.revisionStatus.toLowerCase())) {
+        const message = "Dataset has new revision with status " + this.revisionStatus + "."
+        toastr.info(message, "Information", {
+          timeOut: "10000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
+      }
+      else if (["failed"].includes(this.revisionStatus.toLowerCase())) {
+        const message = "Dataset has new revision with status " + this.revisionStatus + "."
+        toastr.error(message, "Error", {
+          timeOut: "10000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
+      }
+    });
     this.studyStatus$.pipe(filter(val => val !== null)).subscribe((value) => {
       this.closeModal();
       this.store.dispatch(new Loading.Disable())
@@ -102,52 +155,129 @@ export class StatusComponent implements OnInit {
       this.validationStatus = val;
     });
   }
-
   changeStatusNgxs(toStatus) {
+    this.toStatus = toStatus
+  }
+  applyChanges() {
+    let revisionComment = ""
+    if (this.revisionNumber == 0) {
+      revisionComment = 'Initial revision'
+    } else {
+      revisionComment = this.revisionComment
+    }
     if (!this.isReadOnly) {
-      if (toStatus == null) {
-        toStatus = this.toStatus;
-      }
-      Swal.fire({
-        title: "Are you sure?",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "Confirm",
-        cancelButtonText: "Back",
-      }).then((willChange) => {
-        if (willChange.value) {
+      if (this.toStatus == "New Revision") {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Dataset will be copied onto public storage. After this task has completed, the dataset will be public automatically.",
+          showCancelButton: true,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "Confirm",
+          cancelButtonText: "Back",
+        }).then((willChange) => {
+          if (willChange.value) {
 
-          this.store.dispatch(new Loading.Enable())
-          this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
-          this.closeModal();
-          this.store.dispatch(new StudyStatus.Update(toStatus)).subscribe(
-            (completed) => {
+            this.store.dispatch(new Loading.Enable())
+            this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
+            this.closeModal();
+            this.store.dispatch(new RevisionNumber.New(revisionComment)).subscribe(
+              (completed) => {
+                this.closeModal();
+                this.store.dispatch(new Loading.Disable())
+                this.toStatus = this.status;
+              },
+              (error) => {
+                this.closeModal();
+                this.store.dispatch(new Loading.Disable())
+                this.toStatus = this.status;
+                let message = null;
+                typeof error.json === 'function' ? message = error.json().message : "Could not update study status."
+                // Swal.fire({
+                //   title: message
+                // })
+                toastr.error(message, "Error", {
+                  timeOut: "10000",
+                  positionClass: "toast-top-center",
+                  preventDuplicates: true,
+                  extendedTimeOut: 0,
+                  tapToDismiss: false,
+                });
 
-            }, (error) => {
-              this.closeModal();
-              this.store.dispatch(new Loading.Disable())
-              this.toStatus = this.status;
-              let message = null;
-              typeof error.json === 'function' ? message = error.json().message : "Could not update study status."
-              Swal.fire({
-                title: message
-              })
-            }
-          )
+              }
+            )
+          } else {
+            this.toStatus = this.status
+          }
         }
-      })
+      )
+      }
+      else {
+        Swal.fire({
+          title: "Are you sure?",
+          text: "Study status will be updated to " + this.toStatus,
+          showCancelButton: true,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "Confirm",
+          cancelButtonText: "Back",
+        }).then((willChange) => {
+          if (willChange.value) {
+
+            this.store.dispatch(new Loading.Enable())
+            this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
+            this.closeModal();
+            this.store.dispatch(new StudyStatus.Update(this.toStatus)).subscribe(
+              (completed) => {
+                this.closeModal();
+                this.store.dispatch(new Loading.Disable())
+                this.toStatus = this.status;
+              }, (error) => {
+                this.closeModal();
+                this.store.dispatch(new Loading.Disable())
+                this.toStatus = this.status;
+                let message = null;
+                typeof error.json === 'function' ? message = error.json().message : "Could not update study status."
+                // Swal.fire({
+                //   title: message
+                // })
+                toastr.error(message, "Error", {
+                  timeOut: "10000",
+                  positionClass: "toast-top-center",
+                  preventDuplicates: true,
+                  extendedTimeOut: 0,
+                  tapToDismiss: false,
+                });
+
+              }
+            )
+          } else {
+            this.toStatus = this.status
+          }
+        }
+      )
+    }
     }
   }
 
   ngOnInit() {}
 
   openModal() {
+    this.toStatus = this.status;
+
     if  (this.curator){
       this.isModalOpen = true;
     } else {
-      if (this.status != null && this.status.toLowerCase() === "submitted") {
 
-        if (this.validationStatus === 'ERROR' || this.validationStatus === null) {
+      if (this.status != null &&  ["private", "provisional", "in review"].includes(this.status.toLowerCase())) {
+        if (["private", "in review"].includes(this.status.toLowerCase()) && (this.revisionNumber > 0)) {
+          toastr.error("Your dataset will be public. It is not allowed to change current status.", "Error", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
+        else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
           toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
             timeOut: "5000",
             positionClass: "toast-top-center",
@@ -169,6 +299,9 @@ export class StatusComponent implements OnInit {
     }
   }
 }
+  onCommentChange(event: any) {
+    this.revisionComment = event.target.value;
+  };
 
   closeModal() {
     this.isModalOpen = false;

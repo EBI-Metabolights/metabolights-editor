@@ -27,7 +27,7 @@ export class UserState {
     GetUserStudies(ctx: StateContext<UserStateModel>, action: User.Studies.Get) {
         this.userService.getAllStudies().subscribe((response) => {
             const sorted = response.data.sort(
-                (a, b) => +new Date(b["releaseDate"]) - +new Date(a["releaseDate"])
+                (a, b) =>  b.accession.localeCompare(a.accession)
             )
             ctx.dispatch(new User.Studies.Set(sorted));
           });

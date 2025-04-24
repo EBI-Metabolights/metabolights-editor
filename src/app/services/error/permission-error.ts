@@ -7,7 +7,7 @@ export class PermissionError {
     const errorStatus = error.statusText ? error.statusText : "";
 
     toastr.warning(errorMessage, errorStatus, {
-      timeOut: "1000",
+      timeOut: "6000",
       positionClass: "toast-top-center",
       preventDuplicates: true,
       extendedTimeOut: 0,

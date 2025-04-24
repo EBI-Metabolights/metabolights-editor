@@ -2,12 +2,18 @@ import * as toastr from "toastr";
 
 export class BadInput {
   constructor(error: any) {
-    const errorMessage = error.error.message
-      ? error.error.message
-      : error.message ? error.message
-      : "Bad request input error";
+    let errorMessage = error.error.err
+    if (!errorMessage) {
+      errorMessage = error.error?.message
+    }
+    if (!errorMessage) {
+      errorMessage = error.message
+    }
+    if (!errorMessage) {
+      errorMessage = "Invalid input value"
+    }
     const errorStatus = error.statusText ? error.statusText : "";
-    toastr.warning(errorMessage, errorStatus, {
+    toastr.error(errorMessage, errorStatus, {
       timeOut: "5000",
       positionClass: "toast-top-center",
       preventDuplicates: true,
