@@ -70,6 +70,7 @@ export class SamplesComponent  {
   addColumnModalOpen = false;
   isAddSamplesModalOpen = false;
   addColumnType = null;
+  showFactorComponent = true;
 
   emptySamplesExist = false;
   duplicateSamples: any = [];
@@ -255,8 +256,12 @@ export class SamplesComponent  {
       );
       let factorUnitValue
       if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit').values[0];
-      else factorUnitValue =
-        this.getOntologyComponentValue("factorUnit").values[0];
+      else {
+        if (this.getOntologyComponentValue("factorUnit") !== undefined) {
+          factorUnitValue = this.getOntologyComponentValue("factorUnit").values[0];
+        }
+
+      } 
 
       let factorUnitColumn;
       let factorSourceColumn;
@@ -301,6 +306,7 @@ export class SamplesComponent  {
       columns.push(factorAccessionColumn.toJSON());
 
       this.sampleTable.addColumns(columns);
+      this.refreshFactorComponent();
 
       this.toggleDropdown();
     } else {
@@ -339,6 +345,7 @@ export class SamplesComponent  {
       columns.push(characteristicsSourceColumn.toJSON());
       columns.push(characteristicsAccessionColumn.toJSON());
       this.sampleTable.addColumns(columns);
+      this.refreshFactorComponent();
     }
     this.closeAddColumnModal();
   }
@@ -352,13 +359,14 @@ export class SamplesComponent  {
       this.selectedFactor = null;
     }
 
-    this.addColumnModalOpen = true;
+    //this.addColumnModalOpen = true;
     this.addColumnType = type;
 
     this.form = this.fb.group({
       title: [""],
       samples: [],
     });
+    this.addColumn(type, selection)
   }
 
   openAddSamplesModal() {
@@ -371,6 +379,13 @@ export class SamplesComponent  {
   closeAddColumnModal() {
     this.addColumnModalOpen = false;
     this.selectedFactor = null;
+  }
+
+  // factor component never derendered from sample table so we want to make sure 
+  // it is not holding any stale data.
+  refreshFactorComponent() {
+    this.showFactorComponent = false;
+    setTimeout(() => this.showFactorComponent = true, 0)
   }
 
   closeAddSamplesModal() {

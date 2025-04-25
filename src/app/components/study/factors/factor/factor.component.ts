@@ -196,9 +196,9 @@ export class FactorComponent implements OnInit {
         this.store.dispatch(new Factors.Update(this.studyId, this.factor.factorName, this.compileBody())).subscribe(
           (completed) => {
             this.refreshFactors(null, "Factor updated.");
-            //this.addFactorToSampleSheet.next(this.factor);
+            
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next(this.factor)
-
+            else this.addFactorToSampleSheet.next(this.factor);
             },
           (error) => { this.isFormBusy = false;}
 
@@ -209,14 +209,16 @@ export class FactorComponent implements OnInit {
           (completed) => {
             this.refreshFactors(null, "Factor saved.");
             this.isModalOpen = false;
-            //this.addFactorToSampleSheet.next(newFactor.factor);
+            //
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next(newFactor.factor)
-
+            else this.addFactorToSampleSheet.next(newFactor.factor);
           },
           (error) => { this.isFormBusy = false; }
         )
 
       }
+      //this.factor = null;
+      this.addFactorColumnVisible = false;
     }
     if (this.addFactorColumnVisible) {
 
@@ -276,7 +278,6 @@ export class FactorComponent implements OnInit {
   }
 
   fieldValidation(fieldId, setToSamples: boolean = false) {
-    console.log(fieldId)
     if (setToSamples) return this.validationRules['samples'][fieldId]
     return this.validation[fieldId];
   }
