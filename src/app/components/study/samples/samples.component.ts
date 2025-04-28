@@ -247,7 +247,10 @@ export class SamplesComponent  {
       const mtblsFactorValue = new MTBLSFactorValue();
       if (selectedFactor) mtblsFactorValue.category = selectedFactor
       else mtblsFactorValue.category = this.selectedFactor; // TODO: change
+
       const columns = [];
+      const unitColumns = [];
+
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
         "Factor Value[" + mtblsFactorValue.category.factorName + "]",
@@ -264,6 +267,8 @@ export class SamplesComponent  {
       } 
 
       let factorUnitColumn;
+      let factorUnitSourceColumn;
+      let factorUnitAccessionColumn;
       let factorSourceColumn;
       let factorAccessionColumn;
 
@@ -272,20 +277,30 @@ export class SamplesComponent  {
         factorUnitValue !== null &&
         factorUnitValue.annotationValue !== ""
       ) {
-        factorUnitColumn = new MTBLSColumn("Unit", "", newFactorIndex + 1);
-        factorUnitColumn.value = factorUnitValue.annotationValue;
         factorSourceColumn = new MTBLSColumn(
           "Term Source REF",
           "",
-          newFactorIndex + 2
+          newFactorIndex + 1
         );
-        factorSourceColumn.value = factorUnitValue.termSource.name
         factorAccessionColumn = new MTBLSColumn(
           "Term Accession Number",
           "",
-          newFactorIndex + 3
+          newFactorIndex + 2
         );
-        factorAccessionColumn.value = factorUnitValue.termAccession
+        factorUnitColumn = new MTBLSColumn("Unit", "", newFactorIndex + 3);
+        factorUnitColumn.value = factorUnitValue.annotationValue;
+        factorUnitSourceColumn = new MTBLSColumn(
+          "Term Source REF",
+          "",
+          newFactorIndex + 4
+        );
+        factorUnitSourceColumn.value = factorUnitValue.termSource.name
+        factorUnitAccessionColumn = new MTBLSColumn(
+          "Term Accession Number",
+          "",
+          newFactorIndex + 5
+        );
+        factorUnitAccessionColumn.value = factorUnitValue.termAccession
       } else {
         factorSourceColumn = new MTBLSColumn(
           "Term Source REF",
@@ -298,14 +313,15 @@ export class SamplesComponent  {
           newFactorIndex + 2
         );
       }
+      if (factorUnitColumn !== undefined) unitColumns.push(factorUnitColumn.toJSON());
+      if (factorUnitSourceColumn !== undefined) unitColumns.push(factorUnitSourceColumn.toJSON());
+      if (factorUnitAccessionColumn !== undefined) unitColumns.push(factorUnitAccessionColumn.toJSON());
       columns.push(factorValueColumn.toJSON());
-      if (factorUnitColumn !== undefined) {
-        columns.push(factorUnitColumn.toJSON());
-      }
       columns.push(factorSourceColumn.toJSON());
       columns.push(factorAccessionColumn.toJSON());
 
       this.sampleTable.addColumns(columns);
+      if (unitColumns.length > 0) setTimeout(() => {this.sampleTable.addColumns(unitColumns)}, 1000)
       this.refreshFactorComponent();
 
       this.toggleDropdown();
