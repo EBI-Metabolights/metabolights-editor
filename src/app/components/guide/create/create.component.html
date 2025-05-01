@@ -5,30 +5,24 @@
     <div *ngIf="currentSubStep == 0">
       <nav class="panel has-background-white">
         <div class="panel-heading">
-          <img
-            style="height: 32px"
-            class="is-pulled-left"
-            src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-          />
+          <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
           <span style="margin-left: 10px">New Submission - Get started</span>
         </div>
         <div class="panel-block">
           <div class="column">
             <h3>
               The following steps will guide you through creating your
-             MetaboLights  submission (study). Once created you can view and edit your
+              MetaboLights submission (study). Once created you can view and edit your
               submission through the MetaboLights website.
             </h3>
             <br />
             <br />
             <div class="columns is-centered">
-              <div
-                class="column is-four-fifths cborder cborder-radius has-text-grey"
-              >
+              <div class="column is-four-fifths cborder cborder-radius has-text-grey">
                 <div class="column">
                   <p class="has-text-centered">
                     <mat-icon>info</mat-icon> Once you create a submission, you
-                    can switch between the guided  and full view
+                    can switch between the guided and full view
                     where you see these buttons.
                   </p>
                 </div>
@@ -37,8 +31,7 @@
                     <button [disabled]="true" class="button is-rounded no-pointer has-text-grey">
                       <small>
                         <mat-icon>view_carousel</mat-icon> Guided submission
-                      </small></button
-                    >&nbsp;
+                      </small></button>&nbsp;
                     <button [disabled]="true" class="button is-rounded no-pointer has-text-grey">
                       <small>
                         <mat-icon>chrome_reader_mode</mat-icon> Switch to
@@ -54,18 +47,21 @@
         </div>
         <div class="panel-block">
           <div class="column central-text">
-            Please tick to indicate you agree with our <a href="https://creativecommons.org/public-domain/cc0/">dataset license</a> and  <a [routerLink]="['/datapolicy']">data policy</a>
-            <mat-checkbox class="example-margin" [(ngModel)]="checked"></mat-checkbox>
+            Please tick to indicate you agree with our
+            <a href="https://creativecommons.org/public-domain/cc0/" target="_blank" rel="noopener noreferrer">
+              dataset license
+            </a>
+            and
+            <a [routerLink]="['/datapolicy']" target="_blank" rel="noopener noreferrer">
+              data policy
+            </a><mat-checkbox class="example-margin" [(ngModel)]="checked"></mat-checkbox>
 
           </div>
         </div>
-        <div class="panel-block" [matTooltip]="checked() === false ? 'You must agree to the dataset license in order to create a study' : ''">
+        <div class="panel-block"
+          [matTooltip]="checked() === false ? 'You must agree to the dataset license in order to create a study' : ''">
           <div class="column">
-              <button
-              (click)="nextSubStep()"
-              class="button is-success is-fullwidth"
-              [disabled]="checked() == false"
-            >
+            <button (click)="nextSubStep()" class="button is-success is-fullwidth" [disabled]="checked() == false">
               <mat-icon>chevron_right</mat-icon> Let's get started
             </button>
 
@@ -77,14 +73,8 @@
     <div *ngIf="currentSubStep == 1">
       <nav class="panel has-background-white">
         <div class="panel-heading">
-          <img
-            style="height: 32px"
-            class="is-pulled-left"
-            src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-          />
-          <span style="margin-left: 10px"
-            >Raw / Derived data files</span
-          >
+          <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
+          <span style="margin-left: 10px">Raw / Derived data files</span>
         </div>
         <div class="panel-block">
           <div class="column">
@@ -96,23 +86,15 @@
               some required information into your study.
             </h3>
             <br />
-            <small
-              ><mat-icon>info</mat-icon> RAW_FILES and DERIVED_FILES folders
-              will be automatically added to your ftp upload folder upon creation. For more information please consult our <a [routerLink]="['/guides']">guides</a></small
-            >.
+            <small><mat-icon>info</mat-icon> RAW_FILES and DERIVED_FILES folders
+              will be automatically added to your ftp upload folder upon creation. For more information please consult
+              our <a [routerLink]="['/guides']">guides</a></small>.
             <div style="padding-top: 10px">
               <small class="has-text-grey-lighter">Please select</small>
-              <mat-button-toggle-group
-                class="mat-button-toggle-group-vertical is-fullwidth"
-                [(ngModel)]="selectedCreateOption"
-                #group="matButtonToggleGroup"
-              >
-                <mat-button-toggle
-                  [disabled]="option.disabled"
-                  class="is-fullwidth mb5"
-                  *ngFor="let option of options"
-                  [value]="option.value"
-                >
+              <mat-button-toggle-group class="mat-button-toggle-group-vertical is-fullwidth"
+                [(ngModel)]="selectedCreateOption" #group="matButtonToggleGroup">
+                <mat-button-toggle [disabled]="option.disabled" class="is-fullwidth mb5" *ngFor="let option of options"
+                  [value]="option.value">
                   {{ option.text }}
                 </mat-button-toggle>
               </mat-button-toggle-group>
@@ -121,17 +103,9 @@
         </div>
         <div class="panel-block">
           <div class="column">
-            <button
-              [disabled]="!selectedCreateOption || isLoading"
-              (click)="createStudy()"
-              class="button is-success is-fullwidth"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isLoading"
-              ></mat-spinner
-              >&nbsp;Next
+            <button [disabled]="!selectedCreateOption || isLoading" (click)="createStudy()"
+              class="button is-success is-fullwidth">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
             </button>
           </div>
         </div>
@@ -140,44 +114,30 @@
     <div *ngIf="currentSubStep == 3">
       <nav class="panel has-background-white">
         <div class="panel-heading">
-          <img
-            style="height: 32px"
-            class="is-pulled-left"
-            src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-          />
+          <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
           <span style="margin-left: 10px">New Request</span>
         </div>
         <div class="panel-block">
           <div class="column">
             <p>
               Your temporary submission request is referenced by MetaboLights as
-              <span class="has-text-link"
-                ><b>{{ newStudy }}</b></span
-              >
+              <span class="has-text-link"><b>{{ newStudy }}</b></span>
               <br />
               Please refer to this identifier in any communication with the
               MetaboLights team.
             </p>
             <br />
             <p>
-              A MetaboLights accession number will be assigned to your study after you complete the submission. Please upload your dataset and complete the study metadata.
+              A MetaboLights accession number will be assigned to your study after you complete the submission. Please
+              upload your dataset and complete the study metadata.
               <br /><br />
             </p>
           </div>
         </div>
         <div class="panel-block">
           <div class="column">
-            <button
-              [disabled]="isLoading"
-              (click)="proceedToNextStep()"
-              class="button is-success is-fullwidth"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isLoading"
-              ></mat-spinner
-              >&nbsp;Next
+            <button [disabled]="isLoading" (click)="proceedToNextStep()" class="button is-success is-fullwidth">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
             </button>
           </div>
         </div>
