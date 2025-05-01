@@ -130,18 +130,14 @@ th span {
 }
 
 .top-scroll-wrapper {
-  /* 1) only horizontal scroll */
   overflow-x: auto;
   overflow-y: hidden;
 
-  /* 2) flip the container vertically */
   transform: scaleY(-1);
 }
 
 .top-scroll-wrapper table {
-  /* flip the table back to normal */
   transform: scaleY(-1);
-  /* ensure the table still sizes naturally */
   display: block;
 }
 
