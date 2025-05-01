@@ -129,6 +129,18 @@ th span {
   overflow: auto;
 }
 
+.top-scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  transform: scaleY(-1);
+}
+
+.top-scroll-wrapper table {
+  transform: scaleY(-1);
+  display: block;
+}
+
 /* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
 .mat-form-field-infix {
   border-top: none;

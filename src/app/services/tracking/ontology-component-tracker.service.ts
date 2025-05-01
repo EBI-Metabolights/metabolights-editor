@@ -12,9 +12,9 @@ export class OntologyComponentTrackerService {
   getAll(): OntologyComponent[] {
     return this.components;
   }
-  getById(id: string): OntologyComponent {
+  getById(id: string, unitId: string): OntologyComponent {
     return this.components.filter(
-      (ont) => ont.id == id
+      (ont) => ont.id == id && ont.unitId === unitId
     )[0]
   }
 }

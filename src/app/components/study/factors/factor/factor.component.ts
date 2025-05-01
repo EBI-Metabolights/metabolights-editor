@@ -197,7 +197,7 @@ export class FactorComponent implements OnInit {
           (completed) => {
             this.refreshFactors(null, "Factor updated.");
             
-            if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next(this.factor)
+            if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: this.factor, unitId: this.resolvedName})
             else this.addFactorToSampleSheet.next(this.factor);
             },
           (error) => { this.isFormBusy = false;}
@@ -210,7 +210,7 @@ export class FactorComponent implements OnInit {
             this.refreshFactors(null, "Factor saved.");
             this.isModalOpen = false;
             //
-            if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next(newFactor.factor)
+            if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: newFactor.factor, unitId: this.resolvedName})
             else this.addFactorToSampleSheet.next(newFactor.factor);
           },
           (error) => { this.isFormBusy = false; }
@@ -265,6 +265,12 @@ export class FactorComponent implements OnInit {
       Ontology
     );
     return { factor: mtblsFactor.toJSON() };
+  }
+
+  get resolvedName(): string {
+    return this.addNewFactor
+      ? this.fieldValues['factorName']
+      : this.factor.factorName;
   }
 
   get validation() {

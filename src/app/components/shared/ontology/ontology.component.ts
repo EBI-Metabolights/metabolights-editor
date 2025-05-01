@@ -53,6 +53,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("initialSearchKeyword") initialSearchKeyword = "";
   @Input("controlList") controlList: {name: string; values: Ontology[]} = {name: '', values: []};
   @Input("id") id: string;
+  @Input("unitId") unitId: string;
 
   @Output() changed = new EventEmitter<any>();
 
