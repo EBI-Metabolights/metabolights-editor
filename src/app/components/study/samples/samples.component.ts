@@ -233,23 +233,22 @@ export class SamplesComponent  {
     this.form.get("samples").setValue(this.rawFileNames.join("\n"));
   }
 
-  handleIncl(type, $event: MTBLSFactor) {
+  handleIncl(type, $event: {factor: MTBLSFactor, unitId: string}) {
     // this event will contain the factor and the factor unit, potentially in the 
     // same object, i don't know 
     // addColumn makes use of a viewChild via getOntologyComponentValue to get the factor unit
     // we won't be able to do that here, as the ontology unit is quite far down
     // UNLESS we tell the viewchildren to go deep in looking for children
-    this.addColumn(type, $event, true);
+    this.addColumn(type, $event.factor, true, $event.unitId);
   }
 
-  addColumn(type, selectedFactor?: MTBLSFactor, deepUnit: boolean = false) {
+  addColumn(type, selectedFactor?: MTBLSFactor, deepUnit: boolean = false, unitId: string = null) {
     if (type === "factor") {
       const mtblsFactorValue = new MTBLSFactorValue();
       if (selectedFactor) mtblsFactorValue.category = selectedFactor
       else mtblsFactorValue.category = this.selectedFactor; // TODO: change
 
       const columns = [];
-      const unitColumns = [];
 
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
@@ -258,7 +257,7 @@ export class SamplesComponent  {
         newFactorIndex
       );
       let factorUnitValue
-      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit').values[0];
+      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit', unitId).values[0];
       else {
         if (this.getOntologyComponentValue("factorUnit") !== undefined) {
           factorUnitValue = this.getOntologyComponentValue("factorUnit").values[0];
@@ -267,8 +266,6 @@ export class SamplesComponent  {
       } 
 
       let factorUnitColumn;
-      let factorUnitSourceColumn;
-      let factorUnitAccessionColumn;
       let factorSourceColumn;
       let factorAccessionColumn;
 
@@ -277,30 +274,20 @@ export class SamplesComponent  {
         factorUnitValue !== null &&
         factorUnitValue.annotationValue !== ""
       ) {
-        factorSourceColumn = new MTBLSColumn(
-          "Term Source REF",
-          "",
-          newFactorIndex + 1
-        );
+        factorSourceColumn = new MTBLSColumn("Unit", "", newFactorIndex + 1);
+        factorSourceColumn.value = factorUnitValue.annotationValue;
         factorAccessionColumn = new MTBLSColumn(
-          "Term Accession Number",
+          "Term Source REF",
           "",
           newFactorIndex + 2
         );
-        factorUnitColumn = new MTBLSColumn("Unit", "", newFactorIndex + 3);
-        factorUnitColumn.value = factorUnitValue.annotationValue;
-        factorUnitSourceColumn = new MTBLSColumn(
-          "Term Source REF",
-          "",
-          newFactorIndex + 4
-        );
-        factorUnitSourceColumn.value = factorUnitValue.termSource.name
-        factorUnitAccessionColumn = new MTBLSColumn(
+        factorAccessionColumn.value = factorUnitValue.termSource.name
+        factorUnitColumn = new MTBLSColumn(
           "Term Accession Number",
           "",
-          newFactorIndex + 5
+          newFactorIndex + 3
         );
-        factorUnitAccessionColumn.value = factorUnitValue.termAccession
+        factorUnitColumn.value = factorUnitValue.termAccession
       } else {
         factorSourceColumn = new MTBLSColumn(
           "Term Source REF",
@@ -313,15 +300,12 @@ export class SamplesComponent  {
           newFactorIndex + 2
         );
       }
-      if (factorUnitColumn !== undefined) unitColumns.push(factorUnitColumn.toJSON());
-      if (factorUnitSourceColumn !== undefined) unitColumns.push(factorUnitSourceColumn.toJSON());
-      if (factorUnitAccessionColumn !== undefined) unitColumns.push(factorUnitAccessionColumn.toJSON());
+      if (factorUnitColumn !== undefined) columns.push(factorUnitColumn.toJSON());
       columns.push(factorValueColumn.toJSON());
       columns.push(factorSourceColumn.toJSON());
       columns.push(factorAccessionColumn.toJSON());
 
       this.sampleTable.addColumns(columns);
-      if (unitColumns.length > 0) setTimeout(() => {this.sampleTable.addColumns(unitColumns)}, 1000)
       this.refreshFactorComponent();
 
       this.toggleDropdown();
