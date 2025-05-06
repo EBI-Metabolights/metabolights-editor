@@ -17,8 +17,6 @@ import { PublicationComponent } from "./publications/publication/publication.com
 import { ReleaseDateComponent } from "./release-date/release-date.component";
 import { SamplesComponent } from "./samples/samples.component";
 import { StatusComponent } from "./status/status.component";
-import { ValidationsComponent } from "./validations/validations.component";
-import { ValidationDetailComponent } from "./validations/validation-detail/validation-detail.component";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -36,7 +34,6 @@ import {MatCardModule} from '@angular/material/card';
 import { SharedModule } from "../shared/shared.module";
 import { MatButtonModule } from "@angular/material/button";
 import { MatInputModule } from "@angular/material/input";
-import { ValidationDetailCommentComponent } from "./validations/validation-detail/comment/validation-detail-comment.component";
 import { MatDividerModule } from "@angular/material/divider";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { MatChipsModule } from "@angular/material/chips";
@@ -95,9 +92,6 @@ import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt
     ReleaseDateComponent,
     SamplesComponent,
     StatusComponent,
-    ValidationsComponent,
-    ValidationDetailComponent,
-    ValidationDetailCommentComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
     RsyncComponent,
@@ -171,12 +165,9 @@ import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt
     ReleaseDateComponent,
     SamplesComponent,
     StatusComponent,
-    ValidationsComponent,
-    ValidationDetailComponent,
     RsyncComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
-    ValidationDetailCommentComponent,
     ValidationsV2ParentComponent,
     ValidationInfoModalComponent,
     OverrideModalComponent,
