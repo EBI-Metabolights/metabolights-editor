@@ -3,9 +3,11 @@ import { StudyPermission } from "../../../services/headers";
 import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, Guides,
   GuidesMappings, MaintenanceMode, SetProtocolExpand,
   SetReadonly, SetSelectedLanguage, SetStudyError,
+  SetTransferStatus,
   StudyPermissionNS} from "./application.actions";
 import { Injectable } from "@angular/core";
 import { ApplicationService } from "src/app/services/decomposed/application.service";
+import { TransferStatus } from "src/app/services/transfer-healthcheck.service";
 
 export interface MtblsEditorVersion {
     version: string,
@@ -39,7 +41,8 @@ export interface ApplicationStateModel {
     investigationFailed: boolean,
     readonly: boolean
     isProtocolsExpanded: boolean,
-    toastrSettings: Record<string, any>
+    toastrSettings: Record<string, any>,
+    transferStatus: TransferStatus
 
 }
 @Injectable()
@@ -77,7 +80,18 @@ export interface ApplicationStateModel {
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
-          }
+          },
+        transferStatus: {
+            private_ftp: {
+                online: null
+            },
+            public_ftp: {
+                online: null
+            },
+            aspera: {
+                online: null
+            } 
+        }
     }
 })
 export class ApplicationState {
@@ -385,6 +399,20 @@ export class ApplicationState {
     @Selector()
     static studyPermission(state: ApplicationStateModel) {
         return state.studyPermission;
+    }
+
+    @Action(SetTransferStatus)
+    SetTransferStatus({getState, setState}: StateContext<ApplicationStateModel>, {status}: SetTransferStatus) {
+        const state = getState()
+        setState({
+            ...state,
+            transferStatus: status
+        })
+    }
+
+    @Selector()
+    static transferStatus(state: ApplicationStateModel) {
+        return state.transferStatus
     }
 
 }
