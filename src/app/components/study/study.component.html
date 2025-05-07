@@ -195,22 +195,18 @@
       </span>&emsp;
 
       <mtbls-release-date></mtbls-release-date>
-        <mtbls-dataset-license></mtbls-dataset-license>&emsp;
 
-      <span *ngIf="revisionNumber && revisionNumber > 0">
+      <span *ngIf="revisionNumber && revisionNumber > 1">
         <div class="tags has-addons">
           <span class="tag">Revision</span>
 
-          <span *ngIf="revisionStatus == 'Completed' || revisionStatus == ''; else withRevisionStatus" class="tag is-link">
+          <span class="tag is-link">
             {{ revisionDatetime ? (revisionDatetime  | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }})
           </span>
-          <ng-template #withRevisionStatus>
-            <span class="tag is-link">
-              {{ revisionDatetime ? (revisionDatetime  | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }}) - {{ revisionStatus }}
-            </span>
-          </ng-template>
         </div>
     </span>&emsp;
+
+    <mtbls-dataset-license></mtbls-dataset-license>&emsp;
 
         <!--Start of validation label-->
         <div *ngIf="validationStatus !== null">

@@ -102,8 +102,10 @@ export class ValidationService extends BaseConfigDependentService {
 
       let valUrl = this.configService.config.ws3URL;
       if (proxy) valUrl = valUrl.replace('https://www-test.ebi.ac.uk', '')
-
-      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${valUrl}/validations/${studyId}`,"", {headers}).pipe(
+      const params = {
+        run_metadata_modifiers: true
+        }
+      return this.http.post<Ws3Response<Ws3ValidationTask>>(`${valUrl}/validations/${studyId}`,"", {headers, params}).pipe(
         map((res) => res),
         catchError(this.handleError)
       );

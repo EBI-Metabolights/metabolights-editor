@@ -19,6 +19,7 @@ import { Loading, SetLoadingInfo } from "src/app/ngxs-store/non-study/transition
 import { ViolationType } from "../validations-v2/interfaces/validation-report.types";
 import { RevisionStatusTransformPipe } from "../../shared/pipes/revision-status-transform.pipe";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { ConfigurationService } from "src/app/configuration.service";
 
 @Component({
   selector: "mtbls-status",
@@ -46,7 +47,7 @@ export class StatusComponent implements OnInit {
   revisionStatusTransform = new RevisionStatusTransformPipe()
 
   isReadOnly = false;
-
+  isRevisionStatusModalOpen = false;
   isModalOpen = false;
   isFormBusy = false;
   status: string = null;
@@ -56,7 +57,7 @@ export class StatusComponent implements OnInit {
   curationStatus = "";
   revisionComment  = ""
   requestedStudy: string = null;
-
+  baseHref: string;
   validationStatus: ViolationType = null;
 
   private toastrSettings: Record<string, any> = {}
@@ -66,7 +67,9 @@ export class StatusComponent implements OnInit {
     private route: ActivatedRoute,
     private store: Store,
     private router: Router,
+    private configService: ConfigurationService,
   ) {
+    this.baseHref = this.configService.baseHref;
       this.setUpSubscriptionsNgxs();
   }
 
@@ -260,6 +263,15 @@ export class StatusComponent implements OnInit {
 
   ngOnInit() {}
 
+  openRevisionStatusModel() {
+
+    this.isRevisionStatusModalOpen = true
+  }
+
+  closeRevisionStatusModel() {
+
+    this.isRevisionStatusModalOpen = false
+  }
   openModal() {
     this.toStatus = this.status;
 
