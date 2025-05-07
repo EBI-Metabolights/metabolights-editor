@@ -70,6 +70,7 @@ export class SamplesComponent  {
   addColumnModalOpen = false;
   isAddSamplesModalOpen = false;
   addColumnType = null;
+  showFactorComponent = true;
 
   emptySamplesExist = false;
   duplicateSamples: any = [];
@@ -232,21 +233,23 @@ export class SamplesComponent  {
     this.form.get("samples").setValue(this.rawFileNames.join("\n"));
   }
 
-  handleIncl(type, $event: MTBLSFactor) {
+  handleIncl(type, $event: {factor: MTBLSFactor, unitId: string}) {
     // this event will contain the factor and the factor unit, potentially in the 
     // same object, i don't know 
     // addColumn makes use of a viewChild via getOntologyComponentValue to get the factor unit
     // we won't be able to do that here, as the ontology unit is quite far down
     // UNLESS we tell the viewchildren to go deep in looking for children
-    this.addColumn(type, $event, true);
+    this.addColumn(type, $event.factor, true, $event.unitId);
   }
 
-  addColumn(type, selectedFactor?: MTBLSFactor, deepUnit: boolean = false) {
+  addColumn(type, selectedFactor?: MTBLSFactor, deepUnit: boolean = false, unitId: string = null) {
     if (type === "factor") {
       const mtblsFactorValue = new MTBLSFactorValue();
       if (selectedFactor) mtblsFactorValue.category = selectedFactor
       else mtblsFactorValue.category = this.selectedFactor; // TODO: change
+
       const columns = [];
+
       const newFactorIndex = this.keys(this.sampleTable.data.header).length;
       const factorValueColumn = new MTBLSColumn(
         "Factor Value[" + mtblsFactorValue.category.factorName + "]",
@@ -254,9 +257,13 @@ export class SamplesComponent  {
         newFactorIndex
       );
       let factorUnitValue
-      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit').values[0];
-      else factorUnitValue =
-        this.getOntologyComponentValue("factorUnit").values[0];
+      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit', unitId).values[0];
+      else {
+        if (this.getOntologyComponentValue("factorUnit") !== undefined) {
+          factorUnitValue = this.getOntologyComponentValue("factorUnit").values[0];
+        }
+
+      } 
 
       let factorUnitColumn;
       let factorSourceColumn;
@@ -267,20 +274,20 @@ export class SamplesComponent  {
         factorUnitValue !== null &&
         factorUnitValue.annotationValue !== ""
       ) {
-        factorUnitColumn = new MTBLSColumn("Unit", "", newFactorIndex + 1);
-        factorUnitColumn.value = factorUnitValue.annotationValue;
-        factorSourceColumn = new MTBLSColumn(
+        factorSourceColumn = new MTBLSColumn("Unit", "", newFactorIndex + 1);
+        factorSourceColumn.value = factorUnitValue.annotationValue;
+        factorAccessionColumn = new MTBLSColumn(
           "Term Source REF",
           "",
           newFactorIndex + 2
         );
-        factorSourceColumn.value = factorUnitValue.termSource.name
-        factorAccessionColumn = new MTBLSColumn(
+        factorAccessionColumn.value = factorUnitValue.termSource.name
+        factorUnitColumn = new MTBLSColumn(
           "Term Accession Number",
           "",
           newFactorIndex + 3
         );
-        factorAccessionColumn.value = factorUnitValue.termAccession
+        factorUnitColumn.value = factorUnitValue.termAccession
       } else {
         factorSourceColumn = new MTBLSColumn(
           "Term Source REF",
@@ -293,14 +300,13 @@ export class SamplesComponent  {
           newFactorIndex + 2
         );
       }
+      if (factorUnitColumn !== undefined) columns.push(factorUnitColumn.toJSON());
       columns.push(factorValueColumn.toJSON());
-      if (factorUnitColumn !== undefined) {
-        columns.push(factorUnitColumn.toJSON());
-      }
       columns.push(factorSourceColumn.toJSON());
       columns.push(factorAccessionColumn.toJSON());
 
       this.sampleTable.addColumns(columns);
+      this.refreshFactorComponent();
 
       this.toggleDropdown();
     } else {
@@ -339,6 +345,7 @@ export class SamplesComponent  {
       columns.push(characteristicsSourceColumn.toJSON());
       columns.push(characteristicsAccessionColumn.toJSON());
       this.sampleTable.addColumns(columns);
+      this.refreshFactorComponent();
     }
     this.closeAddColumnModal();
   }
@@ -352,13 +359,14 @@ export class SamplesComponent  {
       this.selectedFactor = null;
     }
 
-    this.addColumnModalOpen = true;
+    //this.addColumnModalOpen = true;
     this.addColumnType = type;
 
     this.form = this.fb.group({
       title: [""],
       samples: [],
     });
+    this.addColumn(type, selection)
   }
 
   openAddSamplesModal() {
@@ -371,6 +379,13 @@ export class SamplesComponent  {
   closeAddColumnModal() {
     this.addColumnModalOpen = false;
     this.selectedFactor = null;
+  }
+
+  // factor component never derendered from sample table so we want to make sure 
+  // it is not holding any stale data.
+  refreshFactorComponent() {
+    this.showFactorComponent = false;
+    setTimeout(() => this.showFactorComponent = true, 0)
   }
 
   closeAddSamplesModal() {

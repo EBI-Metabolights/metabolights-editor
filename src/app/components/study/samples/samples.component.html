@@ -51,7 +51,7 @@
           </a>
         </span>
         <hr class="dropdown-divider" />
-        <mtbls-factor
+        <mtbls-factor *ngIf="showFactorComponent"
           (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
           (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"
           [isDropdown]="true"
@@ -133,7 +133,7 @@
       <section class="modal-card-body">
         <h6 class="modal-card-title">
           Add factor column to Sample sheet -
-          <span class="highlight">{{ selectedFactor.factorName }}</span>
+          <span class="highlight">{{ selectedFactor === null ? "" : selectedFactor.factorName }}</span>
         </h6>
         <mtbls-ontology
           [id]="'factorUnit'"

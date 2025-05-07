@@ -103,7 +103,7 @@
         <label
         [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
         >
-          Add factor column (optional)
+          Add factor unit (if necessary)
           <mat-checkbox 
           [disabled]="form.get('factorName')?.pristine"
           (change)="toggleUnit()" ></mat-checkbox>
@@ -119,11 +119,12 @@
       <ng-container *ngIf="addFactorColumnVisible">
       <section class="modal-card-body">
         <h6 class="modal-card-title modal-form-title">
-          Add factor column to Sample sheet -
+          Add factor unit to Sample sheet -
           <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName-->
         </h6>
         <mtbls-ontology
           [id]="'factorUnit'"
+          [unitId]="resolvedName"
           class="mt-20"
           #factorUnit
           [validations]="unitSampleValidations"
