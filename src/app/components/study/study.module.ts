@@ -71,6 +71,7 @@ import {MatDialogModule} from '@angular/material/dialog';
 import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-override-dialog/delete-override-dialog.component";
 import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
 import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt-refresh.component";
+import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadata-modifiers-modal/metadata-modifiers-modal.component";
 
 
 @NgModule({
@@ -100,6 +101,7 @@ import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt
     RawViolationModalComponent,
     OverrideModalComponent,
     ListOverridesComponent,
+    MetadataModifiersModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,
     NoViolationsComponent,
@@ -172,6 +174,7 @@ import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt
     ValidationInfoModalComponent,
     OverrideModalComponent,
     ListOverridesComponent,
+    MetadataModifiersModalComponent,
     RawViolationModalComponent,
     ValidationV2DetailComponent,
     ValidationSectionComponent,

@@ -106,7 +106,6 @@ export class LoggingMiddleware implements NgxsPlugin {
                 console.debug(`Discarded! ${action.assay.data.file}`)
                 return true
             }
-            console.dir(action);
         }
         return false;
     }
