@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Component, OnInit, Input, OnChanges, inject } from "@angular/core";
+import { Component, OnInit, Input, OnChanges, inject, AfterViewInit } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
@@ -7,11 +7,13 @@ import { PlatformLocation } from '@angular/common';
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
-import { Observable, timer } from "rxjs";
+import { filter, Observable, timer } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { GetGeneralMetadata } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { SyncEvent } from "./rsync/rsync.component";
+import { TransferHealthcheckService, TransferStatus } from "src/app/services/transfer-healthcheck.service";
+import { SetTransferStatus } from "src/app/ngxs-store/non-study/application/application.actions";
 declare let AW4: any;
 
 
@@ -22,12 +24,13 @@ declare let AW4: any;
   templateUrl: "./files.component.html",
   styleUrls: ["./files.component.css"],
 })
-export class FilesComponent implements OnInit,  OnChanges {
+export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
+  transferStatus$: Observable<TransferStatus> = inject(Store).select(ApplicationState.transferStatus)
 
 
 
@@ -81,11 +84,13 @@ export class FilesComponent implements OnInit,  OnChanges {
   CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
   asperaWeb: any = null;
   asperaStatus: any = "-";
+  transferStatus: TransferStatus = null;
 
   constructor(
     private editorService: EditorService,
     private dataService: MetabolightsService,
     private platformLocation: PlatformLocation,
+    private transferHealthcheckService: TransferHealthcheckService,
     private store: Store
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
@@ -95,32 +100,21 @@ export class FilesComponent implements OnInit,  OnChanges {
     this.loadFiles();
 
     this.setUpSubscriptionsNgxs();
-    //this.checkAspera();
+
+  }
+
+  ngAfterViewInit(): void {
+    this.checkTransferStatus();
 
   }
 
   ngOnChanges(changes) {
   }
 
-  checkAspera() {
-    this.asperaWeb = new AW4.Connect({
-      sdkLocation: this.CONNECT_AUTOINSTALL_LOCATION,
-      minVersion: this.MIN_CONNECT_VERSION,
-    });
-    this.asperaWeb.initSession();
-
-    const initAsperaStatus = this.asperaWeb.getStatus();
-    const timerSub = timer(5000);
-    if (initAsperaStatus === "INITIALIZING") {
-      timerSub.subscribe((n) => {
-        this.asperaStatus = this.asperaWeb.getStatus();
-        }
-      )
-    } else if (initAsperaStatus === "RUNNING") {
-      this.asperaStatus = initAsperaStatus
-    } else {
-      this.asperaStatus = initAsperaStatus
-    }
+  checkTransferStatus() {
+    this.transferHealthcheckService.getHealthcheck().subscribe((response) => {
+      this.store.dispatch(new SetTransferStatus(response.content.transfer_status));
+    })
 
   }
 
@@ -145,6 +139,10 @@ export class FilesComponent implements OnInit,  OnChanges {
         this.updateSyncStatus();
       }
     });
+    this.transferStatus$.pipe(filter(val => val.aspera.online !== null)).subscribe(
+      (value) => {
+        this.transferStatus = value;
+      })
   }
 
   getFolderStatus(){

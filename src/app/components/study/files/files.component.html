@@ -41,6 +41,31 @@
         [ngClass]="{ 'is-danger': ['RETRYING', 'OUTDATED', 'FAILED', 'EXTENSION_INSTALL'].includes(asperaStatus), 'is-success': asperaStatus === 'RUNNING', 'is-grey': asperaStatus === '-' }">{{asperaStatus}}</span>
       </div>
     </span>-->
+    <span>
+      <div class="tags has-addons refresh-button status-badge">
+        <span class="tag is-dark">Aspera Status</span><span *ngIf="transferStatus !== null; else loadingStatus" class="tag"
+        [ngClass]="{ 'is-danger': transferStatus.aspera.online === false, 'is-success': transferStatus.aspera.online === true }">{{transferStatus.aspera.online === true ? 'ONLINE' : 'OFFLINE'}}</span>
+      </div>
+    </span>
+   <span>
+    <ng-container *ngIf="transferStatus as ts; else loading">
+      <div class="tags has-addons refresh-button status-badge">
+        <span class="tag is-dark">FTP Status</span>
+        <span
+          class="tag"
+          [ngClass]="{
+            'is-danger': !ts[ isReadOnly ? 'private_ftp' : 'public_ftp' ].online,
+            'is-success': ts[ isReadOnly ? 'private_ftp' : 'public_ftp' ].online
+          }"
+        >
+          {{ ts[ isReadOnly ? 'private_ftp' : 'public_ftp' ].online ? 'ONLINE' : 'OFFLINE' }}
+        </span>
+      </div>
+    </ng-container>
+    </span>
+    <ng-template #loadingStatus>
+      <span class="tag is-grey"> Unknown </span>
+    </ng-template>
 
 
     <span *ngIf="!isReadOnly && curator" class="is-pulled-rightn ml-auto">

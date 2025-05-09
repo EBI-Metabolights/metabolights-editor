@@ -7,7 +7,6 @@ import Swal from "sweetalert2";
 import { ActivatedRoute, Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
-import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { filter, Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";

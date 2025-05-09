@@ -8,6 +8,9 @@ import { Protocols } from './study/protocols/protocols.actions';
 import { Samples } from './study/samples/samples.actions';
 import { SetValidationRunNeeded } from './study/validation/validation.actions';
 import { IntermittentRefreshActionStack } from './non-study/transitions/transitions.actions';
+import { ApplicationState } from './non-study/application/application.state';
+import { GeneralMetadataState } from './study/general-metadata/general-metadata.state';
+import { of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class LoggingMiddleware implements NgxsPlugin {
@@ -64,6 +67,9 @@ export class LoggingMiddleware implements NgxsPlugin {
             this.isIntermittentRefreshAction(action) ? this.store.dispatch(new IntermittentRefreshActionStack.Sync(this.actionStack)) : null
             this.isIntermittentRefreshActionResolution(action) ? this.store.dispatch(new IntermittentRefreshActionStack.Sync(this.actionStack)) : null    
         }
+        if (this.isOtherStudyAssayAction(action)) { // if we have a polluted state and we have an assay file from another study, do not have the action proceed to its handler.
+            return of(state)
+        }
 
         return next(state, action);
     }
@@ -72,7 +78,6 @@ export class LoggingMiddleware implements NgxsPlugin {
     isIntermittentRefreshAction(action: any): boolean {
         const actionName = action.constructor.type;
         if (!['Get', 'Set', 'Organise'].some(substr => actionName.includes(substr))) {
-            console.log(actionName)
             this.actionStack.push(actionName)
             return true;
         }
@@ -88,6 +93,18 @@ export class LoggingMiddleware implements NgxsPlugin {
             if (ind > -1) {
                 this.actionStack.splice(ind, 1);
                 return true;
+            }
+        }
+        return false;
+    }
+
+    isOtherStudyAssayAction(action: any): boolean {
+        const actionName = action.constructor.type;
+        if (actionName.includes('Set Study Assay')) {
+            const currentStudyId = this.store.selectSnapshot<string>(GeneralMetadataState.id);
+            if (!action.assay.data.file.includes(currentStudyId)) {
+                console.debug(`Discarded! ${action.assay.data.file}`)
+                return true
             }
         }
         return false;
