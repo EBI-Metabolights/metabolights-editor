@@ -4,16 +4,14 @@ import { EditorService } from "./../../services/editor.service";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
 import { SetTabIndex } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
-import { Select, Store } from "@ngxs/store";
+import { Store } from "@ngxs/store";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
 import { ValidationReport } from "src/app/ngxs-store/study/validation/validation.actions";
-import { UserService } from "src/app/services/decomposed/user.service";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
 
@@ -32,7 +30,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
   maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
   studyObfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
-  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  studyValidation$: Observable<any> = inject(Store).select(ValidationState.reportV2);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
   validationRunTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
   validationNeeded$: Observable<boolean> = inject(Store).select(ValidationState.validationNeeded);

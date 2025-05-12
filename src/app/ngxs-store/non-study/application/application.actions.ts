@@ -2,6 +2,7 @@ import { Language } from "src/app/models/mtbl/mtbls/interfaces/language-mapping.
 import { StudyPermission } from "../../../services/headers"
 import { MtblsBackendVersion, MtblsEditorVersion } from "./application.state"
 import { ApiVersionInfo } from "src/app/models/mtbl/mtbls/interfaces/common"
+import { TransferStatus } from "src/app/services/transfer-healthcheck.service"
 
 export class SetStudyError {
     static readonly type = '[application] Set Study Error'
@@ -109,6 +110,11 @@ export namespace DefaultControlLists {
 export class SetProtocolExpand {
     static readonly type = '[application] Set Protocol Expand'
     constructor(public expand: boolean) {}
+}
+
+export class SetTransferStatus {
+    static readonly type = '[application] Set Transfer Status'
+    constructor(public status: TransferStatus) {}
 }
 
 

@@ -23,25 +23,17 @@ export class BaseConfigDependentService extends DataService {
      configService: ConfigurationService,
      store: Store
     ) {
-      super("", http);
+      super('', http);
       this.configService = configService;
       this.store = store;
-      //this.studyIdentifier$ = this.store.selectOnce(GeneralMetadataState.id)
-    // Create a promise to wait for configLoaded to become true
-      const configLoadedPromise = new Promise<void>((resolve, reject) => {
-      const subscription = this.configService.configLoaded$.subscribe(loaded => {
-          if (loaded === true) {
-              resolve(); // Resolve the promise when configLoaded becomes true
-              subscription.unsubscribe(); // Unsubscribe to prevent memory leaks
-            }
-        });
+    
+      firstValueFrom(
+        this.configService.configLoaded$.pipe(
+          filter(loaded => loaded === true)
+        )
+      ).then(() => {
+        this.url = this.configService.config.metabolightsWSURL;
       });
-
-  // Await the promise to wait for configLoaded to become true
-      configLoadedPromise.then(() => {
-          // Initialization logic once configLoaded is true
-          this.url = this.configService.config.metabolightsWSURL;
-
-      });
-}
+    }
+    
 }
