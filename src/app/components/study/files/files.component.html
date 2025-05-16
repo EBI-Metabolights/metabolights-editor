@@ -136,7 +136,7 @@
     sourceStagingArea="ftp-private"
     targetStagingArea="readonly-study"
     syncType="data"
-    startSyncLabel="Reindex Data Files"
+    startSyncLabel="Index Data Files"
     runSyncOnCluster="false"
     runDryRunOnCluster="false"
     pollingInterval=10000
@@ -281,7 +281,7 @@
   <!--ISA Metadata panel end -->
 
   <div *ngIf="!isReadOnly" class="notification is-warning message">
-    <small>This section shows your study folder contents. Please click the folder icon to expand the directory.</small>
+    <small>This section shows your indexed data files. Please click the folder icon to expand the directory.</small>
   </div>
   <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
@@ -343,9 +343,10 @@
             [parent]="''"
             [file]="file"
             [collapse]="autoCollapsedFolder(file)"
-            [deletionEnabled]="deletionEnabled(file)"
-            [downloadEnabled]="downloadEnabled(file)"
-            [readonlyFolder]="readonlyFolder(file)"
+            [deletionEnabled]="false"
+            [downloadEnabled]="false"
+            [downloadContents]="false"
+            [readonlyFolder]="false"
             [showReferencedFiles]="true"
             (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"
           ></mtbls-directory>
@@ -439,9 +440,9 @@
          [level]="0"
          [parent]="''"
          [file]="file"
-         [deletionEnabled]="deletionEnabled(file)"
-         [downloadEnabled]="downloadEnabled(file)"
-         [readonlyFolder]="readonlyFolder(file)"
+         [downloadEnabled]="false"
+         [downloadContents]="false"
+         [readonlyFolder]="false"
          (fileDeleted)="handleDeletedFile($event, derivedFiles, filteredDerivedFiles, selectedDerivedFiles)"
        ></mtbls-directory>
       </span>
