@@ -79,6 +79,9 @@ export class ValidationsV2ParentComponent implements OnInit {
   //override variables
   overrides: FullOverride[] = [];
   overrideListModalOpen = false;
+  metadataModifiersModalOpen = false;
+
+  modifiers: string[] = [];
 
   ngOnInit(): void {
     this.studyStatus$.subscribe(value => {
@@ -94,6 +97,7 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
       this.report = value;
+      if (![undefined, null].includes(this.report.metadata_updates)) this.modifiers = this.report.metadata_updates;
       if (this.report !== null) {
         if(this.loadingDiffReport) this.loadingDiffReport = false;
         this.ready = true;
@@ -188,6 +192,14 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   overrideListModalClosed($event) {
     this.overrideListModalOpen = false;
+  }
+
+  openMetadataModifiersModal() {
+    this.metadataModifiersModalOpen = true;
+  }
+
+  metadataModifiersModalClosed() {
+    this.metadataModifiersModalOpen = false;
   }
 
   handleDeleteOverride($event: string) {

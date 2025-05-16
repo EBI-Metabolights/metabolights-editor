@@ -42,7 +42,7 @@ export class PublicStudyComponent implements OnInit {
   studyReviewerLink$: Observable<string> = inject(Store).select(GeneralMetadataState.reviewerLink);
   investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
-  studyValidation$: Observable<any> = inject(Store).select(ValidationState.report);
+  studyValidation$: Observable<any> = inject(Store).select(ValidationState.reportV2);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
 
   revisionNumber = null;

@@ -1,11 +1,10 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { EditorValidationRules, ResetValidationState, SetInitialLoad, SetValidationRunNeeded, ValidationReport, ValidationReportV2 } from "./validation.actions";
+import { EditorValidationRules, ResetValidationState, SetInitialLoad, SetValidationRunNeeded, ValidationReportV2 } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
-import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
-import { IValidationSummary } from "src/app/models/mtbl/mtbls/interfaces/validation-summary.interface";
+import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 
-import { interval, timer, withLatestFrom } from "rxjs";
+import { timer } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
 import { Breakdown, FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
 import { ToastrService } from "src/app/services/toastr.service";
@@ -18,7 +17,6 @@ export interface ValidationTask {
 
 export interface ValidationStateModel {
     rules: Record<string, any>;
-    report: IValidationSummary;
     reportV2: Ws3ValidationReport;
     taskId: string;
     status: ViolationType;
@@ -31,7 +29,6 @@ export interface ValidationStateModel {
 }
 const defaultState: ValidationStateModel = {
     rules: null,
-    report: null,
     reportV2: null,
     taskId: null,
     status: null,
@@ -75,30 +72,6 @@ export class ValidationState {
         });
     }
 
-    @Action(ValidationReport.Get)
-    GetValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Get) {
-        this.validationService.getValidationReport(action.studyId).subscribe({
-            next: (report) => {
-                this.store.dispatch(new Loading.Disable());
-                ctx.dispatch(new ValidationReport.Set(report));
-            },
-            error: (error) => {
-                console.error(`Could not get validation report: ${error}`)
-                this.store.dispatch(new Loading.Disable());
-            }
-        }
-    );
-
-    }
-
-    @Action(ValidationReport.Set)
-    SetValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Set) {
-        const state = ctx.getState();
-        ctx.setState({
-            ...state,
-            report: action.report.validation
-        });
-    }
 
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
@@ -304,58 +277,6 @@ export class ValidationState {
     }
 
 
-    @Action(ValidationReport.Refresh)
-    RefreshValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Refresh) {
-        const state = ctx.getState();
-        this.validationService.refreshValidations(action.studyId).subscribe(
-            (response) => {
-                this.store.dispatch(new SetLoadingInfo("Loading study validations"));
-                ctx.dispatch(new EditorValidationRules.Get());
-            },
-            (error) => {
-                console.log("Unable to start new validation run.");
-                console.log(error);
-            }
-        )
-    }
-
-    @Action(ValidationReport.ContinualRetry)
-    ContinuallyRetryValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReport.ContinualRetry) {
-        let repeat = 0;
-        this.validationService.getValidationReport(action.studyId).subscribe(reportResponse => {
-          if (reportResponse.validation.status === "not ready"){
-            const validationReportPollInvertal = interval(action.interval);
-            const validationReportLoadSubscription = validationReportPollInvertal.subscribe(x => {
-              this.validationService.getValidationReport(action.studyId).subscribe(nextReportResponse => {
-                repeat = repeat + 1;
-              if (nextReportResponse.validation.status !== "not ready"){
-                validationReportLoadSubscription.unsubscribe();
-                ctx.dispatch(new ValidationReport.Set(nextReportResponse));
-              }
-              if (repeat > action.retries) {
-                validationReportLoadSubscription.unsubscribe();
-                ctx.dispatch(new ValidationReport.Set(nextReportResponse));
-              }
-              });
-            });
-          } else {
-                ctx.dispatch(new ValidationReport.Set(reportResponse));
-          }
-        });
-    }
-
-    @Action(ValidationReport.Override)
-    OverrideValidationRule(ctx: StateContext<ValidationStateModel>, action: ValidationReport.Override) {
-        const state = ctx.getState();
-        this.validationService.overrideValidations(action.rule, action.studyId).subscribe(
-            (response) => {
-                ctx.dispatch(new ValidationReport.Get(action.studyId));
-            },
-            (error) => {
-                console.log("Could not override validation rule.");
-            }
-        )
-    }
 
     @Action(SetInitialLoad)
     SetInitialLoad(ctx: StateContext<ValidationStateModel>, action: SetInitialLoad) {
@@ -372,17 +293,10 @@ export class ValidationState {
         ctx.setState(defaultState);
     }
 
-
-
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
         if (state === undefined) { return null }
         return state.rules;
-    }
-
-    @Selector()
-    static report(state: ValidationStateModel): Record<string, any> {
-        return state.report;
     }
 
     @Selector()

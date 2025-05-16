@@ -16,12 +16,19 @@ export interface Ws3ValidationTask {
 }
 
 export interface Ws3ValidationReport {
-    study_id: string
-    status: ViolationType,
-    duration_in_seconds: number
-    completion_time: string
+    study_id: string;
+    status: ViolationType;
+    duration_in_seconds: number;
+    start_time: string;
+    completion_time: string;
     message?: Record<string, any>;
-    messages?: ValidationReportContents
+    messages?: ValidationReportContents;
+    assay_file_techniques: string[];
+    maf_file_techniques: string[];
+    metadata_updates: string[];
+    metadata_modifier_enabled: boolean;
+    validation_overrides: any[]; //TODO:  type this properly 
+
 }
 
 

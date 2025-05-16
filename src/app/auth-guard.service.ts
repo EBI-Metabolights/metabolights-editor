@@ -34,11 +34,29 @@ export class AuthGuard  implements OnInit {
     state: RouterStateSnapshot
   ) {
     const url: string = state.url;
+    let studyIdentifier;
+    let isPrivateWithMTBLSAccession = false;
+    if (url.startsWith("/MTBLS")) {
+      studyIdentifier = url.split("/")[1];
+      isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
+    }
     const continueProcess = await this.checkAuthenticationRequest(state);
     if (continueProcess === false) {
+      if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"]);
       return false;
     }
-    return await this.checkUrlAndLogin(url, state);
+    return await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
+  }
+
+  async handlePrivate(studyIdentifier): Promise<boolean> {
+    const perms = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
+    const allEmptyOrFalse = (obj: Record<string, any>): boolean =>
+      Object.entries(obj)
+        .filter(([key]) => key !== 'studyId')       // skip studyId
+        .every(([, val]) => val === '' || val === false);
+    const priv = allEmptyOrFalse(perms)
+    console.log(priv);
+    return priv;
   }
 
   async checkAuthenticationRequest(state: RouterStateSnapshot) {
@@ -137,7 +155,7 @@ export class AuthGuard  implements OnInit {
    * @param url - url to be used a redirect if the user is found to be not logged in.
    * @returns boolean indicating whether the user is logged in.
    */
-  async checkUrlAndLogin(url: string, state: RouterStateSnapshot) {
+  async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
     const localJwt = localStorage.getItem("jwt");
     if (url.startsWith("/login")) {
       if (localJwt !== null) {
@@ -167,7 +185,7 @@ export class AuthGuard  implements OnInit {
     }
 
     if (studyIdentifier !== null) {
-      return await this.checkStudyUrl(url, studyIdentifier, state);
+      return await this.checkStudyUrl(url, studyIdentifier, state, isPrivateWithMTBLSAccession);
     } else if (obfuscationCode !== null) {
       return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
     }
@@ -241,7 +259,7 @@ export class AuthGuard  implements OnInit {
     return false;
   }
 
-  async checkStudyUrl(url: string, studyId: string, state: RouterStateSnapshot) {
+  async checkStudyUrl(url: string, studyId: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
     const regEx = new RegExp('^((MTBLS[1-9][0-9]{0,10})|(REQ[0-9]{1,20}))($|\\?)', 'g');
     const studyIdResults = studyId.match(regEx);
     if (studyIdResults === null || studyIdResults.length === 0) {
@@ -275,6 +293,11 @@ export class AuthGuard  implements OnInit {
       const reviewCode = state.root.queryParams.reviewCode;
       if (reviewCode) {
         return await this.checkStudyObfuscationCode(url, reviewCode, state, studyId);
+      }
+      if (isPrivateWithMTBLSAccession) {
+        this.editorService.redirectUrl = url;
+        this.router.navigate(["/study-not-public"]);
+        return false;
       }
 
       this.editorService.redirectUrl = url;

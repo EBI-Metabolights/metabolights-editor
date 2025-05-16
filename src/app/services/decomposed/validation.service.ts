@@ -1,13 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BaseConfigDependentService } from './base-config-dependent.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { ConfigurationService } from 'src/app/configuration.service';
-import { catchError, filter, map } from 'rxjs/operators';
-import { firstValueFrom, Observable } from 'rxjs';
-import { IValidationSummaryWrapper } from 'src/app/models/mtbl/mtbls/interfaces/validation-summary.interface';
-import { httpOptions } from '../headers';
-import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
-import { BaseOverride, OverrideResponse, ValidationPhase, ValidationReportContents, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations-v2/interfaces/validation-report.interface';
+import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { BaseOverride, OverrideResponse, ValidationPhase, Ws3Response, Ws3ValidationTask } from 'src/app/components/study/validations-v2/interfaces/validation-report.interface';
 import { Store } from '@ngxs/store';
 
 @Injectable({
@@ -33,56 +30,6 @@ export class ValidationService extends BaseConfigDependentService {
    */
     getValidationRules(): Observable<any> {
       return this.http.get("assets/configs/validations.json").pipe(
-        map((res) => res),
-        catchError(this.handleError)
-      );
-    }
-
-    getValidationReport(studyId: string): Observable<IValidationSummaryWrapper> {
-      return this.http
-        .get<IValidationSummaryWrapper>(
-          this.url.baseURL +
-            "/studies/" +
-            studyId +
-            "/validation-report",
-          httpOptions
-        )
-        .pipe(catchError(this.handleError));
-    }
-      /**
-   * Refresh validations file in the study directory. This kicks off a threaded process, so we only get a message as a string in response,
-   * rather than any details of validation.
-   *
-   * @returns message telling the user the update process has started.
-   */
-    refreshValidations(studyId: string): Observable<{ success: string }> {
-      return this.http
-        .post<{ success: string }>(
-          this.url.baseURL +
-            "/ebi-internal/" +
-            studyId +
-            "/validate-study/update-file",
-          {},
-          httpOptions
-        )
-        .pipe(catchError(this.handleError));
-    }
-
-    overrideValidations(data, studyId): Observable<{ success: string }> {
-      return this.http
-        .post<{ success: string }>(
-          this.url.baseURL +
-            "/ebi-internal/" +
-            studyId +
-            "/validate-study/override",
-          data,
-          httpOptions
-        )
-        .pipe(catchError(this.handleError));
-    }
-
-    getNewValidationReport(): Observable<ValidationReportContents> {
-      return this.http.get<ValidationReportContents>("assets/validation-report-v2_copy.json").pipe(
         map((res) => res),
         catchError(this.handleError)
       );
