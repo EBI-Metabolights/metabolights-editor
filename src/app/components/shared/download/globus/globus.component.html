@@ -1,20 +1,5 @@
-<a
-  target="_blank"
-  [href]="publicGlobusUrl"
-  class="button is-default is-pulled-left globus-button"
-  >Globus Download</a
->
-<small class="had-text-dark">
-  <a (click)="toggleHelp()">
-    <mat-icon
-      class="mat-icon notranslate material-icons mat-icon-no-color help-icon"
-      role="img"
-      aria-hidden="true"
-      >help</mat-icon
-    >
 
-  </a>
-</small>
+
 <div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -30,7 +15,16 @@
     </section>
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
-        <div (click)="toggleHelp()" class="column is-full has-text-right">
+        <div class="column  has-text-left">
+                <a
+        target="_blank"
+        [href]="publicGlobusUrl"
+        class="button is-primary is-pulled-left globus-button"
+        >Globus Download</a
+      >
+
+        </div>
+        <div (click)="toggleHelp()" class="column  has-text-right">
           <button class="button is-default">Close</button>
         </div>
       </div>

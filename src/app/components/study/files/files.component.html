@@ -10,11 +10,33 @@
 <ng-template #showContent>
 
   <div class="buttons-container">
-
-    <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
-    <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
-    <mtbls-download-globus  *ngIf="status == 'Public'"></mtbls-download-globus>
-    <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
+    
+    <div class="dropdown" 
+        [ngClass]="{ 'is-active': isDownloadDropdownActive }"
+        #downloadDropdown>
+      <div class="dropdown-trigger">
+        <button
+          (click)="toggleDownloadDropdown()"
+          class="button is-light"
+        >
+        <span class="icon is-small">
+          <mat-icon>cloud_download</mat-icon>
+        </span>
+          <span>Download</span>
+          
+        </button>
+      </div>
+      <div class="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <a class="dropdown-item" target="_blank" [href]="publicHttpUrl">Browse Files</a>
+          <a class="dropdown-item" target="_blank" [href]="publicFtpUrl">FTP Download</a>
+          <a class="dropdown-item" (click)="onAsperaDownload()">Aspera Download</a>
+          <a class="dropdown-item"   target="_blank" (click)="onGlobusDownload()">Globus Download
+          
+        </a>
+        </div>
+      </div>
+    </div>
     <mtbls-upload *ngIf="isSyncEnabled" class="upload-button"
       [type]="'any'"
       [multiple]="true"
@@ -579,6 +601,8 @@
 
 <!--FTP panel end-->
 </ng-template>
+<!--Modals start-->
+<!-- Delete Modal start-->
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -609,3 +633,16 @@
     </footer>
   </div>
 </div>
+<!-- Delete Modal end-->
+<!--Aspera Modal start-->
+<mtbls-download-aspera
+*ngIf="isAsperaModalActive"
+(closed)="closeAsperaModal()" #asperaDownloadModal></mtbls-download-aspera>
+
+<!--Aspera Modal end-->
+<!--Globus Modal start-->
+<mtbls-download-globus
+*ngIf="isGlobusModalActive"
+(closed)="closeGlobusModal()" #globusDownloadModal></mtbls-download-globus>
+<!--Global Modal end-->
+<!--Modals end-->

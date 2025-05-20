@@ -195,3 +195,8 @@ img {
 .status-badge {
   margin-top: 5px;
 }
+
+.dropdown-menu {
+  max-width: 250px; /* adjust as needed */
+  width: max-content;
+}
