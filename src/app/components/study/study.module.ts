@@ -72,6 +72,7 @@ import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-ov
 import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
 import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt-refresh.component";
 import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadata-modifiers-modal/metadata-modifiers-modal.component";
+import { OverviewBadgesComponent } from "./overview-badges/overview-badges.component";
 
 
 @NgModule({
@@ -106,7 +107,8 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     ValidationSectionComponent,
     NoViolationsComponent,
     ValidationTaskBoxComponent,
-    DeleteOverrideDialogComponent
+    DeleteOverrideDialogComponent,
+    OverviewBadgesComponent
   ],
   imports: [
     CommonModule,
@@ -180,7 +182,8 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     ValidationSectionComponent,
     NoViolationsComponent,
     ValidationTaskBoxComponent,
-    DeleteOverrideDialogComponent
+    DeleteOverrideDialogComponent,
+    OverviewBadgesComponent
 
   ],
   providers: [

@@ -106,7 +106,7 @@
     style="margin-top: 0; margin-bottom: 0"
   >
     <span *ngIf="requestedStudy != undefined">
-      <div
+     <!-- <div
         *ngIf="!studyError"
         id="meta"
         class="field is-grouped is-grouped-multiline px-20 mb-10"
@@ -177,12 +177,46 @@
             >
           </div>
         </div>
-      </div>
+      </div>-->
+              <!-- Right Column -->
+              <div *ngIf="isOwner || isCurator" class="study-meta-right">
+                <mtbls-dataset-license></mtbls-dataset-license>
+
+                <div class="tags has-addons">
+                  <span class="tag">
+                    <i class="material-icons">edit</i>
+                  </span>
+                  <a
+                    [href]="baseHref + 'study/' + requestedStudy"
+                    class="tag is-link clickable"
+                    >Edit</a
+                  >
+                  <span *ngIf="isCurator"> &nbsp; </span>
+                  <span class="tag">
+                    <i class="material-icons">cloud_upload</i>
+                  </span>
+                  <a
+                    [href]="endpoint + 'updatestudyform?study=' + requestedStudy"
+                    class="tag is-link clickable"
+                    >ISA</a
+                  >
+                </div>
+              </div>
       <span *ngIf="!studyError">
         <mtbls-title></mtbls-title>
         <mtbls-people></mtbls-people>
         <mtbls-description></mtbls-description>
         <mtbls-organisms></mtbls-organisms>
+      <mtbls-overview-badges 
+      [studyError]="studyError"
+      [revisionDatetime]="revisionDatetime"
+      [revisionNumber]="revisionNumber"
+      [curationStatus]="curationStatus"
+      [isOwner]="isOwner"
+      [isCurator]="isCurator"
+      [status]="status"
+      [validationStatus]="validationStatus"
+      [validation]="validation"></mtbls-overview-badges>
         <mtbls-publications></mtbls-publications>
       </span>
       <div id="tab-content-wrapper" class="px-20 mt-20">

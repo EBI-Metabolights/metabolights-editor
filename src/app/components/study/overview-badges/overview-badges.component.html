@@ -1,0 +1,34 @@
+<div class="study-meta-section ">
+
+    <h6 class="mb10">
+        <a><b><small class="has-text-grey">OVERVIEW</small></b></a>
+    </h6>
+    <div *ngIf="!studyError" id="meta" class="study-meta-wrapper">
+
+
+        <!-- Left Column -->
+        <div class="study-meta-left">
+            <mtbls-status></mtbls-status>
+
+            <span *ngIf="status == 'Public'">
+                <div class="tags has-addons">
+                    <span class="tag">Curation</span>
+                    <span class="tag is-link">{{ curationStatus }}</span>
+                </div>
+            </span>
+
+            <mtbls-release-date></mtbls-release-date>
+
+            <span *ngIf="revisionNumber && revisionNumber > 0">
+                <div class="tags has-addons">
+                    <span class="tag">Revision</span>
+                    <span class="tag is-link">
+                        {{ revisionDatetime ? (revisionDatetime | date: 'yyyy-MM-dd') : '' }} ({{ revisionNumber }})
+                    </span>
+                </div>
+            </span>
+        </div>
+
+
+    </div>
+</div>

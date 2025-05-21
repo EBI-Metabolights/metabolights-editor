@@ -3,6 +3,17 @@ import { Store } from '@ngxs/store';
 import { filter, Observable } from 'rxjs';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { DatasetLicense } from 'src/app/services/decomposed/dataset-license.service';
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'stripTermsOfUse'
+})
+export class StripTermsOfUsePipe implements PipeTransform {
+  transform(value: string): string {
+    return value.replace(/ terms of use/i, '').trim();
+  }
+}
+
 
 @Component({
   selector: 'mtbls-dataset-license',
@@ -20,6 +31,10 @@ export class DatasetLicenseComponent implements OnInit {
       this.datasetLicense$.pipe(filter(val => val !== null)).subscribe((dl) => {
         this.datasetLicense = dl;
       });
+  }
+
+  goTermsOfUse() {
+    window.open('https://www.ebi.ac.uk/about/terms-of-use/', '_blank');
   }
 
 }
