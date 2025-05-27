@@ -302,8 +302,17 @@
                 </li>
                 <li
                 (click)="selectCurrentTab(7, 'validations')"
-                [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 7}">
-                  <a>Study Validations</a>
+
+                [ngClass]="{
+                 'is-active': (currentTabIndex$ | async) === 7,
+                 'has-warning': validationNeeded || validationStatus == 'ERROR'}">
+                  <a
+                  [ngClass]="{
+                  'has-glow': validationNeeded || validationStatus == 'ERROR'
+                  }"
+                  >Study Validations
+                    &nbsp;<mat-icon *ngIf=" validationNeeded || validationStatus == 'ERROR'">build_circle</mat-icon>
+                  </a>
 
                 </li>
               </ul>

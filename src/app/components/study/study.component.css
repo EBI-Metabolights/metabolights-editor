@@ -37,3 +37,16 @@
   border-radius: 5px;
   padding: 5px;
 }
+
+.has-warning a {
+  color: #b34700 !important; 
+  font-weight: bold;
+
+}
+
+.validation-warning-icon {
+  margin-left: 0.3rem;
+  color: #ff5722; 
+  font-weight: bold;
+}
+
