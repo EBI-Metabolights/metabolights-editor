@@ -1,0 +1,15 @@
+.error-message {
+  color: red;
+}
+.not-curated {
+  background-color: orange;
+  color: white;
+}
+
+.apply-button {
+  left: 20px;
+  top: 10px;
+}
+.gold {
+  color: gold;
+}

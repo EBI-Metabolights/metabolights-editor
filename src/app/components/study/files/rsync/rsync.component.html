@@ -9,19 +9,21 @@
     <div class=" container ">
 
       <div class="interior-container right" #trackStatusHeight>
-        <a
-        class="button is-info"
-        [ngClass]="dryRunButtonClass"
-        (click)="onDryRunClick()" >
-          <mat-icon>search</mat-icon>
-          Check for Updates </a>
+
+          <!-- <a *ngIf="checkButtonEnabled"
+          class="button is-info"
+          [ngClass]="dryRunButtonClass"
+          (click)="onDryRunClick()" >
+            <mat-icon>search</mat-icon>
+            Check for Updates {{checkButtonEnabled}} </a> -->
+
 
           <a
           class="button is-info"
           [ngClass]="syncButtonClass"
           (click)="onSyncClick()">
             <mat-icon>sync</mat-icon>
-            Start Synchronisation </a>
+            {{ startSyncLabel }} </a>
           <div class="status-container">
             <!-- <div class="response"><b>LAST UPDATE:</b> {{lastResponse.last_update_timestamp > 0 ? (lastResponse.last_update_timestamp * 1000| date: 'MMM d, y, H:mm:ss z') : "-"}}</div> -->
             <div class="response top"><b>LAST TASK:</b> {{currentTaskName}} {{ lastResponse.new_task ? "(New Task)" : ""}}</div>

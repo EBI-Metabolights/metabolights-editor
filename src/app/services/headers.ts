@@ -27,6 +27,7 @@ export interface MetabolightsUser {
 export interface StudyPermission {
   userName: string;
   userRole: string;
+  partner: boolean;
   submitterOfStudy: boolean;
   obfuscationCode: string;
   studyId: string;

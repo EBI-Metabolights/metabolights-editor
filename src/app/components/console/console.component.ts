@@ -11,6 +11,8 @@ import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { filter } from "rxjs/operators";
 import { Identifier } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
+import { CurationStatusTransformPipe } from "../shared/pipes/curation-status-transform.pipe";
 
 
 /* eslint-disable @typescript-eslint/dot-notation */
@@ -26,14 +28,15 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
   maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
-
+  revisionStatusTransform = new RevisionStatusTransformPipe()
+  curationStatusTransform = new CurationStatusTransformPipe()
   studies: IStudyDetail[] = [];
   filteredStudies: IStudyDetail[] = [];
   loadingStudies = false;
   filterValue: string = null;
   messageExpanded = false;
   curator = false;
-  submittedStudies: any = [];
+  provisionalStudies: any = [];
   user=null;
   loginName = "";
   isConfirmationModalOpen = false;
@@ -93,10 +96,10 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   createNewStudy() {
-    this.submittedStudies = this.studies.filter(
-      (study) => study["status"] === "Submitted"
+    this.provisionalStudies = this.studies.filter(
+      (study) => study["status"] === "Provisional"
     );
-    if (this.submittedStudies.length > 0) {
+    if (this.provisionalStudies.length > 0) {
       this.isConfirmationModalOpen = true;
     } else {
       this.router.navigate(["/guide/create"]);

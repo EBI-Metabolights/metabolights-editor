@@ -17,12 +17,14 @@ export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
 
   editorVersion$: Observable<MtblsEditorVersion> = inject(Store).select(ApplicationState.editorVersion);
   apiVersion$: Observable<MtblsBackendVersion> = inject(Store).select(ApplicationState.backendVersion);
 
-
+  studyStatus: string;
+  previewEnabled = false;
   editorVersion: string;
   apiVersion: string;
   baseHref: string;
@@ -30,6 +32,7 @@ export class NavBarComponent implements OnInit {
   environmentName: string;
   studyId: string;
   obfuscationCode: string;
+  reviewerLink: string = null;
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -54,6 +57,7 @@ export class NavBarComponent implements OnInit {
     this.obfuscationCode$.subscribe((value) => {
       if (value !== null ) {
         this.obfuscationCode = value;
+        this.updateReviewerLink();
       }
     });
     this.editorVersion$.subscribe((value) => {
@@ -71,7 +75,17 @@ export class NavBarComponent implements OnInit {
       }
     });
     this.studyIdentifier$.subscribe((value) => {
-      this.studyId = value;
+      if (value) {
+        this.studyId = value;
+        this.updateReviewerLink();
+      }
+    });
+    this.studyStatus$.subscribe((value) => {
+      if (value) {
+        this.studyStatus = value;
+        this.updatePreviewEnabled();
+        this.updateReviewerLink();
+      }
     });
   }
 
@@ -85,5 +99,21 @@ export class NavBarComponent implements OnInit {
 
   redirectToConsole() {
     this.router.navigate(["/console"]);
+  }
+  updatePreviewEnabled() {
+    this.previewEnabled = this.mode != 'light' && this.studyStatus != 'Provisional';
+  }
+  updateReviewerLink() {
+    if (this.studyStatus && this.studyId ) {
+      this.reviewerLink = null;
+      if (this.studyStatus == "Private" || this.studyStatus == "In Review") {
+        if (this.obfuscationCode) {
+          this.reviewerLink = this.baseHref + this.studyId + "?reviewCode=" + this.obfuscationCode;
+        }
+      } if (this.studyStatus == "Public") {
+        this.reviewerLink = this.baseHref + this.studyId;
+      } 
+    } 
+
   }
 }

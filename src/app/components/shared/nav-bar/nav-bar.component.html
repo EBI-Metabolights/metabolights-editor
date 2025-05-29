@@ -45,9 +45,9 @@
         <i class="material-icons"> list </i>&nbsp;My studies
       </a>
       <a
-        *ngIf="mode != 'light'"
+        *ngIf="previewEnabled"
         target="_blank"
-        [href]="baseHref + studyId + '?reviewCode=' + obfuscationCode"
+        href="{{ reviewerLink }}"
         class="navbar-item"
       >
         <i class="material-icons"> visibility </i>&nbsp;Preview

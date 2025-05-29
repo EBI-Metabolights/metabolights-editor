@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Component, OnInit, Input, OnChanges, inject, AfterViewInit } from "@angular/core";
+import { Component, OnInit, Input, OnChanges, inject, AfterViewInit, ViewChild, ElementRef, HostListener } from "@angular/core";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
@@ -31,11 +31,15 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   transferStatus$: Observable<TransferStatus> = inject(Store).select(ApplicationState.transferStatus)
+  publicHttpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicHttpUrl);
+  publicFtpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicFtpUrl);
+  publicGlobusUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicGlobusUrl);
 
 
 
   @Input("validations") validations: any;
 
+  @ViewChild('downloadDropdown') dropdownRef!: ElementRef;
 
   containerHeight: any = 279;
 
@@ -71,6 +75,9 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   baseHref: string;
   access: string = null;
   curator = false;
+  publicHttpUrl: string = null;
+  publicFtpUrl: string = null;
+  publicGlobusUrl: string = null;
 
   requestedStudy: string = null;
 
@@ -85,6 +92,12 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   asperaWeb: any = null;
   asperaStatus: any = "-";
   transferStatus: TransferStatus = null;
+
+  isDownloadDropdownActive = false;
+  isAsperaModalActive = false;
+  isGlobusModalActive = false;
+
+
 
   constructor(
     private editorService: EditorService,
@@ -109,6 +122,16 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes) {
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    if (this.isDownloadDropdownActive &&
+        this.dropdownRef &&
+        !this.dropdownRef.nativeElement.contains(event.target)) {
+      this.isDownloadDropdownActive = false;
+        }
+
   }
 
   checkTransferStatus() {
@@ -143,7 +166,42 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
       (value) => {
         this.transferStatus = value;
       })
+    this.publicHttpUrl$.pipe(filter(val => val !== null)).subscribe(
+      (value) => {
+        this.publicHttpUrl = value
+      })
+    this.publicFtpUrl$.pipe(filter(val => val !== null)).subscribe(
+      (value) => {
+        this.publicFtpUrl = value
+      }
+    )
+    this.publicGlobusUrl$.pipe(filter(val => val !== null)).subscribe(
+      (value) => {
+        this.publicGlobusUrl = value;
+      }
+    )
   }
+
+
+toggleDownloadDropdown() {
+  this.isDownloadDropdownActive = !this.isDownloadDropdownActive;
+}
+
+
+onAsperaDownload() {
+  this.isAsperaModalActive = true;
+}
+closeAsperaModal() {
+  this.isAsperaModalActive = false;
+}
+
+onGlobusDownload() {
+  this.isGlobusModalActive = true;
+}
+closeGlobusModal() {
+  console.log('hitting globus closing method')
+  this.isGlobusModalActive = false;
+}
 
   getFolderStatus(){
     if (this.isReadOnly !== null && this.isReadOnly === false){
@@ -493,7 +551,9 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
       }
     );
   }
-
+  updateFileUpdateStatus() {
+    return this.curator;
+  }
   passiveUpdate(syncEvent) {
     if (syncEvent === SyncEvent.metadata) {
       this.store.dispatch(new GetGeneralMetadata(this.requestedStudy, this.isReadOnly))

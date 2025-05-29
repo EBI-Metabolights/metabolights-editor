@@ -5,3 +5,8 @@
   background-color: orange;
   color: white;
 }
+
+.apply-button {
+  left: 20px;
+  top: 10px;
+}

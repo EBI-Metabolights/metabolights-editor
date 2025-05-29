@@ -160,6 +160,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
 export class AppModule {
   constructor(
   ) {
-    
+
   }
 }

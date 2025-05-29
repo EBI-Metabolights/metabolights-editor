@@ -10,11 +10,34 @@
 <ng-template #showContent>
 
   <div class="buttons-container">
-
-    <mtbls-download-http  *ngIf="status == 'Public'"></mtbls-download-http>
-    <mtbls-download-ftp  *ngIf="status == 'Public'"></mtbls-download-ftp>
-    <mtbls-download-aspera *ngIf="status == 'Public'" class="aspera-download-button"></mtbls-download-aspera>
-    <mtbls-upload *ngIf="!isReadOnly" class="upload-button"
+    
+    <div class="dropdown" 
+        [ngClass]="{ 'is-active': isDownloadDropdownActive }"
+        #downloadDropdown>
+      <div class="dropdown-trigger">
+        <button
+          (click)="toggleDownloadDropdown()"
+          class="button is-light"
+        >
+        <span class="icon is-small">
+          <mat-icon>cloud_download</mat-icon>
+        </span>
+          <span>Download</span>
+          
+        </button>
+      </div>
+      <div class="dropdown-menu" role="menu">
+        <div class="dropdown-content">
+          <a class="dropdown-item" target="_blank" [href]="publicHttpUrl">Browse Files</a>
+          <a class="dropdown-item" target="_blank" [href]="publicFtpUrl">FTP Download</a>
+          <a class="dropdown-item" (click)="onAsperaDownload()">Aspera Download</a>
+          <a class="dropdown-item"   target="_blank" (click)="onGlobusDownload()">Globus Download
+          
+        </a>
+        </div>
+      </div>
+    </div>
+    <mtbls-upload *ngIf="isSyncEnabled" class="upload-button"
       [type]="'any'"
       [multiple]="true"
       [mode]="'button'"
@@ -22,7 +45,7 @@
       [size]="'is'"
     ></mtbls-upload>
 
-    <span *ngIf="!isReadOnly" class="refresh-button" >
+    <span *ngIf="isSyncEnabled" class="refresh-button" >
       <a (click)="loadFilesPassively()" class="button is-light">
         <mat-icon>refresh</mat-icon> Refresh
       </a>
@@ -37,7 +60,7 @@
     </span>
     <!--<span>
       <div class="tags has-addons refresh-button status-badge">
-        <span class="tag is-dark">Aspera Status</span><span class="tag"
+        <span class="tag">Aspera Status</span><span class="tag"
         [ngClass]="{ 'is-danger': ['RETRYING', 'OUTDATED', 'FAILED', 'EXTENSION_INSTALL'].includes(asperaStatus), 'is-success': asperaStatus === 'RUNNING', 'is-grey': asperaStatus === '-' }">{{asperaStatus}}</span>
       </div>
     </span>-->
@@ -68,7 +91,7 @@
     </ng-template>
 
 
-    <span *ngIf="!isReadOnly && curator" class="is-pulled-rightn ml-auto">
+    <span *ngIf="isSyncEnabled && curator" class="is-pulled-rightn ml-auto">
       <a *ngIf="access == null"
         (click)="getFolderStatus()"
         class="button is-light"
@@ -92,9 +115,9 @@
     </span>
   </div>
 
-  <mat-divider class="file-divider" [inset]="true"></mat-divider>
+  <mat-divider *ngIf="isSyncEnabled" class="file-divider" [inset]="true"></mat-divider>
 
-  <div *ngIf="!isReadOnly" class="notification is-warning message">
+  <div *ngIf="isSyncEnabled" class="notification is-warning message">
     <small
       ><mat-icon>warning</mat-icon> Please ensure your study folder is up-to-date. Start synchronization to update study folder.
       Please note that the sync operations may take some time to complete. If your synchronization is not completed successfully, please contact us
@@ -113,13 +136,14 @@
   <!--ftp management component start-->
 <div class="container parent resync-section">
   <app-rsync
-  *ngIf="!isReadOnly"
+  *ngIf="isSyncEnabled"
   title="Metadata Files"
   helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
   [studyId]="studyIdentifier"
   sourceStagingArea="ftp-private"
   targetStagingArea="rw-study"
   syncType="metadata"
+  startSyncLabel="Synchronise Metadata Files"
   runSyncOnCluster="false"
   runDryRunOnCluster="false"
   pollingInterval=5000
@@ -127,19 +151,20 @@
   ></app-rsync>
 
     <app-rsync
-    *ngIf="!isReadOnly"
+    *ngIf="isSyncEnabled"
     title="Data Files"
     helpMessage="Check your study FTP folder and synchronise your study data (raw, derived, supplementary) files from FTP folder to your study folder."
     [studyId]="studyIdentifier"
     sourceStagingArea="ftp-private"
     targetStagingArea="readonly-study"
     syncType="data"
+    startSyncLabel="Index Data Files"
     runSyncOnCluster="false"
     runDryRunOnCluster="false"
     pollingInterval=10000
     (filesSynchronized)="onFilesSynchronized($event)"
     ></app-rsync>
-  <div *ngIf="!isReadOnly && curator">
+  <div *ngIf="isSyncEnabled && curator">
     <app-rsync
     title="Internal Files"
     helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
@@ -242,6 +267,14 @@
                   </ng-template>
                 </span>
                 {{ file.file }}
+                <span class="panel-icon">
+                  <span *ngIf="file.status == 'unreferenced' && !file.directory">
+                    <img src="assets/img/icons/unreferenced.png" style="height: 18px"/>
+                  </span>
+                  <span *ngIf="file.status == 'active'">
+                    <img src="assets/img/icons/referenced.png" style="height: 18px"/>
+                  </span>
+                </span>
                 <span class="has-text-grey-lighter"
                   ><small>{{
                     file.createdAt.replace("'", "").replace("'", "")
@@ -270,7 +303,7 @@
   <!--ISA Metadata panel end -->
 
   <div *ngIf="!isReadOnly" class="notification is-warning message">
-    <small>This section shows your study folder contents. Please click the folder icon to expand the directory.</small>
+    <small>This section shows your indexed data files. Please click the folder icon to expand the directory.</small>
   </div>
   <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
@@ -332,9 +365,11 @@
             [parent]="''"
             [file]="file"
             [collapse]="autoCollapsedFolder(file)"
-            [deletionEnabled]="deletionEnabled(file)"
-            [downloadEnabled]="downloadEnabled(file)"
-            [readonlyFolder]="readonlyFolder(file)"
+            [deletionEnabled]="false"
+            [downloadEnabled]="false"
+            [downloadContents]="false"
+            [readonlyFolder]="false"
+            [showReferencedFiles]="true"
             (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"
           ></mtbls-directory>
         </span>
@@ -427,9 +462,9 @@
          [level]="0"
          [parent]="''"
          [file]="file"
-         [deletionEnabled]="deletionEnabled(file)"
-         [downloadEnabled]="downloadEnabled(file)"
-         [readonlyFolder]="readonlyFolder(file)"
+         [downloadEnabled]="false"
+         [downloadContents]="false"
+         [readonlyFolder]="false"
          (fileDeleted)="handleDeletedFile($event, derivedFiles, filteredDerivedFiles, selectedDerivedFiles)"
        ></mtbls-directory>
       </span>
@@ -566,6 +601,8 @@
 
 <!--FTP panel end-->
 </ng-template>
+<!--Modals start-->
+<!-- Delete Modal start-->
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -596,3 +633,16 @@
     </footer>
   </div>
 </div>
+<!-- Delete Modal end-->
+<!--Aspera Modal start-->
+<mtbls-download-aspera
+*ngIf="isAsperaModalActive"
+(closed)="closeAsperaModal()" #asperaDownloadModal></mtbls-download-aspera>
+
+<!--Aspera Modal end-->
+<!--Globus Modal start-->
+<mtbls-download-globus
+*ngIf="isGlobusModalActive"
+(closed)="closeGlobusModal()" #globusDownloadModal></mtbls-download-globus>
+<!--Global Modal end-->
+<!--Modals end-->

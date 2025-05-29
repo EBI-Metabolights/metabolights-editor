@@ -72,6 +72,9 @@ import { DeleteOverrideDialogComponent } from "./validations-v2/modals/delete-ov
 import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
 import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt-refresh.component";
 import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadata-modifiers-modal/metadata-modifiers-modal.component";
+import { OverviewBadgesComponent } from "./overview-badges/overview-badges.component";
+import { CurationStatusComponent } from "./curation-status/curation-status.component";
+
 
 
 @NgModule({
@@ -93,6 +96,7 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     ReleaseDateComponent,
     SamplesComponent,
     StatusComponent,
+    CurationStatusComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
     RsyncComponent,
@@ -106,7 +110,8 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     ValidationSectionComponent,
     NoViolationsComponent,
     ValidationTaskBoxComponent,
-    DeleteOverrideDialogComponent
+    DeleteOverrideDialogComponent,
+    OverviewBadgesComponent
   ],
   imports: [
     CommonModule,
@@ -167,6 +172,7 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     ReleaseDateComponent,
     SamplesComponent,
     StatusComponent,
+    CurationStatusComponent,
     RsyncComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
@@ -180,7 +186,8 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     ValidationSectionComponent,
     NoViolationsComponent,
     ValidationTaskBoxComponent,
-    DeleteOverrideDialogComponent
+    DeleteOverrideDialogComponent,
+    OverviewBadgesComponent
 
   ],
   providers: [
@@ -191,7 +198,7 @@ import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadat
     DOIService,
     AuthService,
     {provide: DateAdapter, useClass: IsoDateAdapter}
-    
+
   ],
 })
 export class StudyModule {}

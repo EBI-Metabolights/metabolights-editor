@@ -1,3 +1,47 @@
 .files-tab {
   padding: 0px;
 }
+
+.study-meta-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  margin-left: 1rem;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: solid 1px  gainsboro;
+}
+
+.study-meta-left {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.study-meta-right {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+/* Responsive layout for small screens: stack columns */
+@media (max-width: 767px) {
+  .study-meta-wrapper {
+    flex-direction: column;
+  }
+
+  .study-meta-left,
+  .study-meta-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+.gold {
+  color: gold;
+}

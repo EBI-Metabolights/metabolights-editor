@@ -38,137 +38,45 @@
       </div>
     </article>
   </div>
-  <div id="status-board" *ngIf="status == 'In Curation'">
+  <div id="status-board" *ngIf="status == 'Private'">
     <!--<article class="message is-success">
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> This study
-          ({{ requestedStudy }}) is now in curation. Please review and share your comments with the submitters.
+          ({{ requestedStudy }}) is now Private. Please review and share your comments with the submitters.
         </p>
       </div>
     </article>-->
-    <article class="message is-success" *ngIf="isOwner; else anonymousCurationArticle">
+    <article class="message is-success">
       <div class="message-body">
-        <p>
-          <mat-icon class="mat-icon material-icons">info</mat-icon> Your study ({{requestedStudy}}) has passed study validation (v2),
-           is now in the ‘In Curation’ stage, and eligible to go public without MetaboLights curation (please contact the MetaboLights team).
-          <b
-            >You cannot make changes directly at this stage, but if you have
-            further comments or suggestions, please communicate these to
-            <a
-              [href]="
-                'mailto:metabolights-help@ebi.ac.uk?subject=Regarding study - ' +
-                requestedStudy
-              "
-              >metabolights-help&#64;ebi.ac.uk</a
-            >.</b
-          >
-        </p>
-        <br />
-        <p>
-           Take care to only share this link with trusted parties: <br />
-          <span *ngIf="obfuscationCode;"
-            ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
-              endpoint + "reviewer" + obfuscationCode
-            }}</a></span
-          >
-          Consider the read-only reviewer link as temporary, it will expire after the study goes
-          public.
-          <ng-template #loadingIcon>
-            <img src="{{ baseHref }}assets/img/loading.svg" />
-          </ng-template>
-          <br />
-          <br />
-
-          The link
-          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
-          is the official link for referencing your MetaboLights study in any
-          paper, website or other communication.
-        </p>
-      </div>
-    </article>
-    <ng-template #anonymousCurationArticle>
-      <div class="message-body">
-        This study ({{requestedStudy}}) is now in the 'In Curation' stage.
+        This study ({{requestedStudy}}) is now in the 'Private' stage.
         <p>
           The link
           <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
           will be the official link for referencing your MetaboLights study in any
           paper, website or other communication.
         </p>
-        <p>
-          If you have comments or suggestions, please get in touch with the submitters or MetaboLights team <b> <a
-          [href]="
-            'mailto:metabolights-help@ebi.ac.uk?subject=Regarding study - ' +
-            requestedStudy
-          "
-          >metabolights-help&#64;ebi.ac.uk</a
-        >.</b
-      >
-        </p>
-      </div>
+      <br/>
 
-    </ng-template>
+      </div>
+    </article>
   </div>
 
   <div id="status-board" *ngIf="status == 'In Review'">
-    <article class="message is-success" *ngIf="!isOwner; else userReviewArticle">
+    <article class="message is-success">
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> This study
-          ({{ requestedStudy }}) is now in the ‘In Review’ stage, and approved by MetaboLights curation team.
+          ({{ requestedStudy }}) is in the 'In Review' stage.
 
         </p>
-        <p>The link
-          <span *ngIf="obfuscationCode; else loadingIcon"
-            ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
-              endpoint + "reviewer" + obfuscationCode
-            }}</a></span
-          > should be the official link for referencing your MetaboLights study in any paper, website or other communication.</p>
+
+      <br/>
           <p>
             If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team (metabolights-help&#64;ebi.ac.uk).
           </p>
       </div>
     </article>
-    <ng-template #userReviewArticle>
-      <article class="message is-success">
-        <div class="message-body">
-          <p>
-            <mat-icon class="mat-icon material-icons">info</mat-icon> Your study
-            ({{ requestedStudy }}) is now {{ status }}, and approved by the MetaboLights curation team.
-            . Please take a close look at the study and share the reviewer link with
-            journals and reviewers.
-            <b
-              >You cannot make changes directly at this stage, but if you have
-              further comments or suggestions, please communicate these to
-              <a
-                [href]="
-                  'mailto:metabolights-help@ebi.ac.uk?subject=Regarding study - ' +
-                  requestedStudy
-                "
-                >metabolights-help&#64;ebi.ac.uk</a
-              >.</b
-            >
-          </p>
-          <br />
-          <p>
-            Consider this link as temporary, it will expire after the study goes
-            public.  <br />
-            The link
-            <span *ngIf="obfuscationCode; else loadingIcon"
-              ><a [href]="endpoint + 'reviewer' + obfuscationCode">{{
-                endpoint + "reviewer" + obfuscationCode
-              }}</a></span
-            > should be the official link for referencing your MetaboLights study in any paper, website or other communication.
-            <ng-template #loadingIcon>
-              <img src="{{ baseHref }}assets/img/loading.svg" />
-            </ng-template>
-            <br />
-            <br />
-          </p>
-        </div>
-      </article>
-    </ng-template>
   </div>
 
   <div id="status-board" *ngIf="status == 'Public' && curationRequest  == 'NO_CURATION'">
@@ -198,19 +106,35 @@
     style="margin-top: 0; margin-bottom: 0"
   >
     <span *ngIf="requestedStudy != undefined">
-      <div
+     <!-- <div
         *ngIf="!studyError"
         id="meta"
         class="field is-grouped is-grouped-multiline px-20 mb-10"
       >
-        <mtbls-status></mtbls-status>
+        <mtbls-status></mtbls-status>&emsp;
+
+        <span *ngIf="status == 'Public' ">
+            <curation-status></curation-status>
+        </span>&emsp;
+
         <mtbls-release-date></mtbls-release-date>
+
+      <span *ngIf="revisionNumber && revisionNumber > 0">
+          <div class="tags has-addons">
+            <span class="tag">Revision</span>
+
+            <span class="tag is-link">
+              {{ revisionDatetime ? (revisionDatetime  | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }})
+            </span>
+
+          </div>
+      </span>&emsp;
         <mtbls-dataset-license></mtbls-dataset-license>&emsp;
         <div *ngIf="isOwner || isCurator">
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Validation</span>
+                <span class="tag">Validation</span>
                 <span class="tag is-danger"> Failed ( {{ validation !== undefined && validation.last_update_timestamp > 0 ? (validation.last_update_timestamp * 1000 | date: 'MMM d, y, H:mm:ss z') : "-" }} )</span>
               </div>
             </div>
@@ -219,7 +143,7 @@
           <span class="clickable" *ngIf="validationStatus == null && notReadyValidationMessage != null">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag is-dark">Validation</span>
+                <span class="tag">Validation</span>
                 <span class="tag is-warning"> {{ notReadyValidationMessage }} </span>
               </div>
             </div>
@@ -231,7 +155,7 @@
           class="is-pulled-right"
         >
           <div class="tags has-addons">
-            <span class="tag is-dark">
+            <span class="tag">
               <i class="material-icons"> edit </i>
             </span>
             <a
@@ -240,7 +164,7 @@
               >Edit</a
             >
             <span *ngIf="isCurator"> &nbsp; </span>
-            <span class="tag is-dark">
+            <span class="tag">
               <i class="material-icons"> cloud_upload </i>
             </span>
             <a
@@ -250,12 +174,46 @@
             >
           </div>
         </div>
-      </div>
+      </div>-->
+              <!-- Right Column -->
+              <div *ngIf="isOwner || isCurator" class="study-meta-right">
+                <mtbls-dataset-license></mtbls-dataset-license>
+
+                <div class="tags has-addons">
+                  <span class="tag">
+                    <i class="material-icons">edit</i>
+                  </span>
+                  <a
+                    [href]="baseHref + 'study/' + requestedStudy"
+                    class="tag is-link clickable"
+                    >Edit</a
+                  >
+                  <span *ngIf="isCurator"> &nbsp; </span>
+                  <span class="tag">
+                    <i class="material-icons">cloud_upload</i>
+                  </span>
+                  <a
+                    [href]="endpoint + 'updatestudyform?study=' + requestedStudy"
+                    class="tag is-link clickable"
+                    >ISA</a
+                  >
+                </div>
+              </div>
       <span *ngIf="!studyError">
         <mtbls-title></mtbls-title>
         <mtbls-people></mtbls-people>
         <mtbls-description></mtbls-description>
         <mtbls-organisms></mtbls-organisms>
+      <mtbls-overview-badges 
+      [studyError]="studyError"
+      [revisionDatetime]="revisionDatetime"
+      [revisionNumber]="revisionNumber"
+      [curationStatus]="curationStatus"
+      [isOwner]="isOwner"
+      [isCurator]="isCurator"
+      [status]="status"
+      [validationStatus]="validationStatus"
+      [validation]="validation"></mtbls-overview-badges>
         <mtbls-publications></mtbls-publications>
       </span>
       <div id="tab-content-wrapper" class="px-20 mt-20">
@@ -304,13 +262,13 @@
                 >
                   <a>Files</a>
                 </li>
-                <li
-                  *ngIf="!studyError && (isOwner || isCurator)"
-                  (click)="selectCurrentTab(6, 'metabolites')"
+                <!-- <li
+                  *ngIf="isCurator"
+                  (click)="selectCurrentTab(6, 'validations')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
                 >
-                  <a>Validations</a>
-                </li>
+                  <a>Study Validations v1</a>
+                </li> -->
 
                 <!-- <li *ngIf="!studyError" (click)="selectCurrentTab(6, 'pathways')" [ngClass]="{'is-active': (currentTabIndex$ | async) === 6 }"><a>Pathways</a></li> -->
               </ul>
@@ -363,7 +321,7 @@
                 </span>
                 <div
                   class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 6 && (isOwner || isCurator)"
+                  *ngIf="(currentTabIndex$ | async) === 7 && (isOwner || isCurator)"
                 >
                   <study-validations></study-validations>
                 </div>

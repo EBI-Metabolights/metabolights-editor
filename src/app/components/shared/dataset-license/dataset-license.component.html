@@ -1,31 +1,32 @@
 <div  class="control">
     <div class="tags has-addons">
-      <span class="tag is-dark">Dataset License</span>
-  
+      <span class="tag">Dataset License</span>
+
 
       @defer (when datasetLicense != null) {
-        
-        <span *ngIf="datasetLicense && datasetLicense.name.length > 0; else noLicense" 
-            class="tag clickable is-success">
-        {{ datasetLicense.name }}
+
+        <span *ngIf="datasetLicense && datasetLicense.name.length > 0; else noLicense"
+            class="tag clickable is-success is-info"
+            (click)="goTermsOfUse()">
+        {{ datasetLicense.name | stripTermsOfUse }}
       </span>
       <ng-template #noLicense>
-        <span class="tag clickable is-error">
+        <span class="tag clickable is-info">
           No License Found
         </span>
       </ng-template>
-      
+
       } @loading {
-        <span class="tag clickable is-success">
+        <span class="tag is-info">
           Fetching...
         </span>
-      } @placeholder {  
-        <span class="tag clickable is-grey">
+      } @placeholder {
+        <span class="tag is-info">
           Fetching...
         </span>
       }
 
 
-  
+
     </div>
   </div>

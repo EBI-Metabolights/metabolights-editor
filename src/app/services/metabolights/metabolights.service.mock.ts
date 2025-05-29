@@ -35,20 +35,26 @@ export class MockMetabolightsService {
         "createdDate": "2023-11-28",
         "description": "I don't see why i should have to type this again, kinda blows if you ask me, I'm a busy man, I've got a motorcycle, I'm the guy who tells people what theyre doing and where they do it at, I got a motorcycle and a sleeping bag, I aint ever wanted to work for nobody elses money",
         "releaseDate": "2024-11-27",
-        "status": "Submitted",
+        "status": "Provisional",
         "curationRequest": "MANUAL_CURATION",
         "title": "Untargeted Metabolomic Analysis of primary age schoolchildren reveals Malus domestica consumption greatly increases passive resistance to onset of invasive doctorum",
-        "updated": "20240124121007"
+        "updated": "20240124121007",
+        "revisionNumber": 0,
+        "revisionStatus": 0,
+        "revisionDatetime": ""
         },
         {
           "accession": "MTBLS8578",
           "createdDate": "2023-09-11",
           "description": "Please update the study abstract/description",
           "releaseDate": "2024-09-10",
-          "status": "Submitted",
+          "status": "Provisional",
           "curationRequest": "MANUAL_CURATION",
           "title": "Please update the study title",
-          "updated": "20231002233501"
+          "updated": "20231002233501",
+          "revisionNumber": 0,
+          "revisionStatus": 0,
+          "revisionDatetime": ""
           }
     ]
     return of({data: studies})

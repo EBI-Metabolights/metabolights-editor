@@ -8,11 +8,11 @@ import { Observable } from "rxjs";
   templateUrl: "./ftp.component.html",
   styleUrls: ["./ftp.component.css"],
 })
-export class FtpDownloadComponent implements OnInit {  
+export class FtpDownloadComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
+  publicFtpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicFtpUrl);
   requestedStudy: any = null;
-
+  publicFtpUrl = null;
   constructor() {}
 
   ngOnInit() {
@@ -25,5 +25,11 @@ export class FtpDownloadComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
+    this.publicFtpUrl$.subscribe((value) => {
+      if (value != null) {
+        this.publicFtpUrl = value;
+      }
+    });
+
   }
 }

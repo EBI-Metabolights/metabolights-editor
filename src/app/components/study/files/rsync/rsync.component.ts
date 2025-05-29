@@ -30,6 +30,7 @@ export class RsyncComponent implements OnInit {
   @Input('targetStagingArea') targetStagingArea: string;
   @Input('syncType') syncType: string;
 
+  @Input('startSyncLabel') startSyncLabel: string = "Start Synchronisation";
   @Input('syncOnCluster') syncOnCluster = false;
   @Input('dryRunOnCluster') dryRunOnCluster = false;
   @Input('pollingInterval') pollingInterval = 10000;
