@@ -22,13 +22,30 @@ export interface TransitionStateModel {
 @Injectable()
 export class TransitionsState {
 
+    private loadingInfoTimeout: any;
+
     @Action(SetLoadingInfo)
     setLoadingInfo(ctx: StateContext<TransitionStateModel>, action: SetLoadingInfo) {
         const state = ctx.getState();
         ctx.setState({
             ...state,
-            loadingInformation: action.info
-        })
+            loadingInformation: action.info,
+            loading: true
+        });
+
+        // Clear any existing timer
+        if (this.loadingInfoTimeout) {
+            clearTimeout(this.loadingInfoTimeout);
+        }
+
+        // Set new timer to auto-disable loading after 4s if nothing else happens
+        this.loadingInfoTimeout = setTimeout(() => {
+            const currentState = ctx.getState();
+            if (currentState.loading) {
+                console.warn('Forced to disable loading state after 4s. Possible error.')
+                ctx.dispatch(new Loading.Disable());
+            }
+        }, 4000);
     }
 
     @Action(SetTabIndex)
@@ -60,11 +77,17 @@ export class TransitionsState {
 
     @Action(Loading.Disable)
     disableLoading(ctx: StateContext<TransitionStateModel>) {
+        // Clear the timeout if manually disabled
+        if (this.loadingInfoTimeout) {
+            clearTimeout(this.loadingInfoTimeout);
+            this.loadingInfoTimeout = null;
+        }
+
         const state = ctx.getState();
         ctx.setState({
             ...state,
             loading: false
-        })
+        });
     }
 
     @Action(IntermittentRefreshActionStack.Sync)

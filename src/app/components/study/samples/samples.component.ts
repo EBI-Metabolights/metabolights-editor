@@ -1,4 +1,4 @@
-import { Component, ViewChild, ViewChildren, QueryList, inject, computed, effect } from "@angular/core";
+import { Component, ViewChild, ViewChildren, QueryList, inject, computed, effect, signal } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { MTBLSFactor } from "./../../../models/mtbl/mtbls/mtbls-factor";
@@ -20,11 +20,23 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { FilesLists } from "src/app/ngxs-store/study/files/files.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
+import { animate, style, transition, trigger } from "@angular/animations";
 
 @Component({
   selector: "mtbls-samples",
   templateUrl: "./samples.component.html",
   styleUrls: ["./samples.component.css"],
+  animations: [
+    trigger('fadeOut', [
+      transition(':leave', [
+        animate('300ms ease-out', style({ opacity: 0 }))
+      ]),
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-in', style({ opacity: 1 }))
+      ]),
+    ])
+  ]
 })
 export class SamplesComponent  {
 
@@ -37,7 +49,7 @@ export class SamplesComponent  {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
-    actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
+  actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
   actionStack$ = computed(() => {
     const filterFn = this.actionStackFn();
     return filterFn('[samples]')
@@ -82,7 +94,9 @@ export class SamplesComponent  {
 
   validationsId = "samples";
 
-  actionStack: string[] = [];
+  actionStack = signal<string[]>([]);
+  showRefreshPrompt = computed(() => this.actionStack().length > 0)
+  debounceTimeout: any;
 
 
   constructor(
@@ -137,7 +151,11 @@ export class SamplesComponent  {
     });
 
     effect(() => {
-      this.actionStack = this.actionStack$();
+      const intermediateList = this.actionStack$();
+      if (this.debounceTimeout) clearTimeout(this.debounceTimeout);
+      this.debounceTimeout= setTimeout(() => {
+        this.actionStack.set(intermediateList);
+      }, 500);
     });
   }
 

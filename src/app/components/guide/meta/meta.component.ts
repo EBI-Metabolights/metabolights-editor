@@ -84,7 +84,7 @@ export class MetaComponent implements OnInit {
     })
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
 
   setUpSubscriptionsNgxs() {
@@ -116,7 +116,7 @@ export class MetaComponent implements OnInit {
 
   }
 
-  getCurrentStudyMetaData() {}
+  getCurrentStudyMetaData() { }
 
   manuscriptOptionChange() {
     this.manuscript = {};
@@ -189,75 +189,7 @@ export class MetaComponent implements OnInit {
   }
 
 
-  saveMetadataNgxs() {
-    this.isLoading = true;
-    if (this.isManuscriptValid()) {
-      this.store.dispatch(new Title.Update({"title": this.manuscript.title})).subscribe(
-        (completed) => {
-          this.store.dispatch(new StudyAbstract.Update(this.manuscript.abstract)).subscribe(
-            (completed) => {
-              if (this.selectedManuscriptOption === 1) {
-                this.store.dispatch(new Publications.Add(this.compilePublicationBody())).subscribe(
-                  (completed) => {
-                    const authorsA = [];
-                    this.manuscript.authorDetails.forEach((author) => {
-                      if (author.checked) {
-                        this.manuscript.title = "";
-                        this.manuscript.abstract = "";
-                        this.isLoading = false;
-                        this.manuscriptIdentifier = "";
-                        this.selectedManuscriptOption = null;
-                        authorsA.push(this.compileAuthor(author));
-                      }
-                    });
-                    if (this.user.checked) {
-                      authorsA.push(this.compileSubmitter(this.user));
-                    }
-                    this.store.dispatch(new People.Add({contacts: authorsA})).subscribe(
-                      (completed) => {
-                        this.isLoading = false;
-                        this.manuscript.title = "";
-                        this.manuscript.abstract = "";
-                        this.isLoading = false;
-                        this.manuscriptIdentifier = "";
-                        this.selectedManuscriptOption = null;
-                        this.router.navigate([
-                          "/guide/assays",
-                          this.requestedStudy,
-                        ]);
-                      },
-                      (error) => {
-                        console.log("Unable to save new person");
-                        this.isLoading = false
-                      }
-                    )
-                  },
-                  (error) => {
-                    console.log("Unable to save new publication");
-                    this.isLoading = false;
 
-                  }
-                )
-              } else {
-                this.router.navigate(["/guide/assays", this.requestedStudy]);
-              }
-            },
-            (error) => {
-              console.log("Unable to save abstract of manuscript");
-              this.isLoading = false;
-            }
-          )
-        },
-        (error) => {
-          console.log("Unable to save title of manuscript.")
-          this.isLoading = false;
-        }
-      )
-    } else { // Manuscript is invalid
-      this.isLoading = false;
-      toastr.warning("Fields Missing", "Warning", this.toastrSettings)
-    }
-  }
 
   compilePublicationBody() {
     const mtblPublication = new MTBLSPublication();
@@ -270,7 +202,7 @@ export class MetaComponent implements OnInit {
     mtblPublication.status = jsonConvert.deserializeObject(
       JSON.parse(
         '{"comments": [],"annotationValue": "Published","termSource": null' +
-          ',"termAccession": "http://www.ebi.ac.uk/efo/EFO_0001796"}'
+        ',"termAccession": "http://www.ebi.ac.uk/efo/EFO_0001796"}'
       ),
       Ontology
     );
@@ -291,9 +223,9 @@ export class MetaComponent implements OnInit {
     const role = jsonConvert.deserializeObject(
       JSON.parse(
         '{"annotationValue":"Author","comments":[],"termAccession":"http://' +
-          'purl.obolibrary.org/obo/NCIT_C42781","termSource":{"comments":[],"d' +
-          'escription":"NCI Thesaurus OBO Edition","file":"http://purl.obolibra' +
-          'ry.org/obo/ncit.owl","ontology_name":"NCIT","provenance_name":"NCIT","version":"18.10e"}}'
+        'purl.obolibrary.org/obo/NCIT_C42781","termSource":{"comments":[],"d' +
+        'escription":"NCI Thesaurus OBO Edition","file":"http://purl.obolibra' +
+        'ry.org/obo/ncit.owl","ontology_name":"NCIT","provenance_name":"NCIT","version":"18.10e"}}'
       ),
       Ontology
     );
@@ -315,9 +247,9 @@ export class MetaComponent implements OnInit {
     const role = jsonConvert.deserializeObject(
       JSON.parse(
         '{"annotationValue":"Submitter","comments":[],"termAccession":"http' +
-          '://purl.obolibrary.org/obo/NCIT_C42781","termSource":{"comments":[]' +
-          ',"description":"NCI Thesaurus OBO Edition","file":"http://purl.oboli' +
-          'brary.org/obo/ncit.owl","ontology_name":"NCIT","provenance_name":"NCIT","version":"18.10e"}}'
+        '://purl.obolibrary.org/obo/NCIT_C42781","termSource":{"comments":[]' +
+        ',"description":"NCI Thesaurus OBO Edition","file":"http://purl.oboli' +
+        'brary.org/obo/ncit.owl","ontology_name":"NCIT","provenance_name":"NCIT","version":"18.10e"}}'
       ),
       Ontology
     );
@@ -325,12 +257,6 @@ export class MetaComponent implements OnInit {
     return mtblPerson.toJSON();
   }
 
-  isManuscriptValid() {
-    if (this.manuscript.title !== "" && this.manuscript.abstract !== "") {
-      return true;
-    }
-    return false;
-  }
 }
 
 export function manuscriptIDValidator(): ValidatorFn {
@@ -338,11 +264,11 @@ export function manuscriptIDValidator(): ValidatorFn {
     const value = control.value;
 
     if (!value) {
-      return null; 
+      return null;
     }
 
     if (isValidPubMedID(value) || isValidDOI(value)) {
-      return null; 
+      return null;
     }
 
     return { invalidManuscriptID: true };

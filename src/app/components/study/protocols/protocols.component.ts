@@ -7,6 +7,7 @@ import {
   inject,
   computed,
   effect,
+  signal,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
@@ -49,7 +50,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
   protocolGuides = {};
 
-  actionStack: string[] = [];
+
+  actionStack = signal<string[]>([]);
+  showRefreshPrompt = computed(() => this.actionStack().length > 0)
+  debounceTimeout: any;
 
   validationsId = "protocols";
   expand = true;
@@ -104,11 +108,14 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
     this.protocolGuides$.subscribe((value) => {
       this.protocolGuides = value;
-      console.debug(value);
     });
 
     effect(() => {
-      this.actionStack = this.actionStack$();
+      const intermediateList = this.actionStack$();
+      if (this.debounceTimeout) clearTimeout(this.debounceTimeout);
+      this.debounceTimeout= setTimeout(() => {
+        this.actionStack.set(intermediateList);
+      }, 500);
     });
     
   }
