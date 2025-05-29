@@ -1,0 +1,64 @@
+<div class="control">
+
+
+  <div class="tags has-addons">
+    <span class="tag">Curation</span>
+
+    <span class="tag clickable gold" (click)="openCurationStatusModalOpen()"
+    >
+      {{
+        curationStatus
+      }}
+    </span>
+
+  </div>
+
+</div>
+
+<div class="modal" [ngClass]="{ 'is-active': isCurationStatusModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <section class="modal-card-body">
+      You can find the MetaboLights' study curation status definitions below: <br><br>
+      <table>
+        <tbody>
+          <tr>
+            <td class="md-padding">
+<span class="gold">★</span>
+            </td>
+            <td>
+              The study was submitted before January 15, 2025 or it has not been validated yet.
+            </td>
+          </tr>
+          <tr>
+            <td>
+<span class="gold">★★</span>
+            </td>
+            <td>
+              The study has been passed the automated MetaboLights validations.
+            </td>
+          </tr>
+            <tr>
+            <td class="md-padding">
+<span class="gold">★★★</span>
+            </td>
+            <td>
+              If the study is public, it has been curated by the MetaboLights team; otherwise, it has been selected for MetaboLights curation.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <div class="columns is-gapless full-width">
+        <div class="column is-two-third"></div>
+        <div class="column is-one-third has-text-right">
+          <button class="button" [disabled]="isFormBusy" (click)="closeCurationStatusModel()">
+            Close
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>

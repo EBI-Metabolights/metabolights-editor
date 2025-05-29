@@ -22,7 +22,7 @@ export namespace EditorVersion {
     export class Get {
         static readonly type = '[application] Get Editor Version'
     }
-    
+
 }
 
 export namespace BackendVersion {
@@ -42,28 +42,28 @@ export class SetSelectedLanguage {
     constructor(public language: string) {}
 }
 
-export namespace GuidesMappings {
-    export class Set {
-        static readonly type = '[application] Set Guides Mappings'
-        constructor(public mappings: Record<string, any>) {}
-    }
-    export class Get {
-        static readonly type = '[application] Get Guides Mappings'
-    }
-}
+// export namespace GuidesMappings {
+//     export class Set {
+//         static readonly type = '[application] Set Guides Mappings'
+//         constructor(public mappings: Record<string, any>) {}
+//     }
+//     export class Get {
+//         static readonly type = '[application] Get Guides Mappings'
+//     }
+// }
 
-export namespace Guides {
-    export class Set {
-        static readonly type = '[application] Set Guides'
-        constructor(public guides: any) {} // we should type this
-    }
+// export namespace Guides {
+//     export class Set {
+//         static readonly type = '[application] Set Guides'
+//         constructor(public guides: any) {} // we should type this
+//     }
 
-    export class Get {
-        static readonly type = '[application] Get Guides'
-        constructor(public language: Language, public setLanguage: boolean = false) {}
-    }
-    
-}
+//     export class Get {
+//         static readonly type = '[application] Get Guides'
+//         constructor(public language: Language, public setLanguage: boolean = false) {}
+//     }
+
+// }
 
 
 export namespace StudyPermissionNS {

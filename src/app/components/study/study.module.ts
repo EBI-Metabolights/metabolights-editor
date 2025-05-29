@@ -73,6 +73,8 @@ import { IsoDateAdapter } from "src/app/adapters/ISO8601.adapter";
 import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt-refresh.component";
 import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadata-modifiers-modal/metadata-modifiers-modal.component";
 import { OverviewBadgesComponent } from "./overview-badges/overview-badges.component";
+import { CurationStatusComponent } from "./curation-status/curation-status.component";
+
 
 
 @NgModule({
@@ -94,6 +96,7 @@ import { OverviewBadgesComponent } from "./overview-badges/overview-badges.compo
     ReleaseDateComponent,
     SamplesComponent,
     StatusComponent,
+    CurationStatusComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
     RsyncComponent,
@@ -169,6 +172,7 @@ import { OverviewBadgesComponent } from "./overview-badges/overview-badges.compo
     ReleaseDateComponent,
     SamplesComponent,
     StatusComponent,
+    CurationStatusComponent,
     RsyncComponent,
     RsyncStatusTransformPipe,
     ValidationStatusTransformPipe,
@@ -194,7 +198,7 @@ import { OverviewBadgesComponent } from "./overview-badges/overview-badges.compo
     DOIService,
     AuthService,
     {provide: DateAdapter, useClass: IsoDateAdapter}
-    
+
   ],
 })
 export class StudyModule {}

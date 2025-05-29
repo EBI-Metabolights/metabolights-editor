@@ -129,12 +129,13 @@
                     </span>
                   </div>
                 </div>
-                <div class="control py-0 mb0">
+                <div *ngIf="study.status == 'Public' || study.status == 'Public' || study.status == 'In Review'" class="control py-0 mb0">
                   <div class="tags has-addons">
                     <span class="tag">Curation</span>
-                    <span class="tag is-info">{{ study.curationRequest | curationStatusTransform }}</span>
+                    <span class="tag is-info gold">{{ study.curationRequest | curationStatusStarTransform }}</span>
                   </div>
                 </div>
+
                 <div class="control py-0 mb0">
                   <div class="tags has-addons">
                     <span class="tag">Release date</span>
