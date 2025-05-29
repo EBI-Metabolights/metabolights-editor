@@ -21,30 +21,30 @@ export class ApplicationService extends BaseConfigDependentService {
 
   constructor(
     http: HttpClient, configService: ConfigurationService, private platformLocation: PlatformLocation, store: Store
-  ) { 
+  ) {
     super(http, configService, store);
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
 
-  getLanguageMappings(): Observable<LanguageMapping> {
-    let url = this.url.guides;
-    if (this.url.guides.endsWith("/") === false){
-      url = this.url.guides + "/";
-    }
-    return this.http
-      .get<LanguageMapping>(url + "mapping.json")
-      .pipe(catchError(this.handleError));
-  }
+  // getLanguageMappings(): Observable<LanguageMapping> {
+  //   let url = this.url.guides;
+  //   if (this.url.guides.endsWith("/") === false){
+  //     url = this.url.guides + "/";
+  //   }
+  //   return this.http
+  //     .get<LanguageMapping>(url + "mapping.json")
+  //     .pipe(catchError(this.handleError));
+  // }
 
-  getGuides(language: string): Observable<Record<string, any>> {
-    let url = this.url.guides;
-    if (this.url.guides.endsWith("/") === false){
-      url = this.url.guides + "/";
-    }
-    return this.http
-      .get(url + "I10n/" + language + ".json")
-      .pipe(catchError(this.handleError));
-  }
+  // getGuides(language: string): Observable<Record<string, any>> {
+  //   let url = this.url.guides;
+  //   if (this.url.guides.endsWith("/") === false){
+  //     url = this.url.guides + "/";
+  //   }
+  //   return this.http
+  //     .get(url + "I10n/" + language + ".json")
+  //     .pipe(catchError(this.handleError));
+  // }
 
   getVersionInfo(): Observable<VersionInfo> {
     const url = this.baseHref + "assets/configs/version.json";
@@ -54,7 +54,7 @@ export class ApplicationService extends BaseConfigDependentService {
   }
 
   getApiVersionInfo(): Observable<ApiVersionInfo> {
-    return this.http  
+    return this.http
       .get<ApiVersionInfo>(this.url.baseURL, httpOptions)
       .pipe(catchError(this.handleError));
   }

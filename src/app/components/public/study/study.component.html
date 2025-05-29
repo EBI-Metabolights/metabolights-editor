@@ -114,10 +114,7 @@
         <mtbls-status></mtbls-status>&emsp;
 
         <span *ngIf="status == 'Public' ">
-            <div class="tags has-addons">
-              <span class="tag">Curation</span>
-              <span class="tag is-link"> {{ curationStatus }} </span>
-            </div>
+            <curation-status></curation-status>
         </span>&emsp;
 
         <mtbls-release-date></mtbls-release-date>

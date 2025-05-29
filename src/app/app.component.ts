@@ -6,7 +6,7 @@ import jwtDecode from "jwt-decode";
 import { MtblsJwtPayload } from "./services/headers";
 import { Store } from "@ngxs/store";
 import { environment } from "src/environments/environment";
-import { BackendVersion, EditorVersion, Guides, GuidesMappings } from "./ngxs-store/non-study/application/application.actions";
+import { BackendVersion, EditorVersion } from "./ngxs-store/non-study/application/application.actions";
 
 export let browserRefresh = false;
 
@@ -31,7 +31,6 @@ export class AppComponent implements OnInit {
       }
     });
   }
-
   async ngOnInit() {
     const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
     const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
@@ -70,10 +69,10 @@ export class AppComponent implements OnInit {
       localStorage.removeItem("mtblsjwt");
       localStorage.removeItem("mtblsuser");
     }
-     this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
+    //  this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
      this.store.dispatch(new BackendVersion.Get());
      this.store.dispatch(new EditorVersion.Get());
-    
+
 
   }
 

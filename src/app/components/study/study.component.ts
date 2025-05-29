@@ -247,13 +247,16 @@ export class StudyComponent implements OnInit, OnDestroy {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   }
-  updateCurationStatus() {
+updateCurationStatus() {
+    if(this.status === undefined || this.status === null || this.status === "Provisional"){
+      return "★";
+    }
     if (this.curationRequest === "NO_CURATION") {
-      this.curationStatus = "Minimum";
+      this.curationStatus = "★★★";
     } else if (this.curationRequest === "MANUAL_CURATION") {
-      this.curationStatus = "MetaboLights";
+      this.curationStatus = "★★";
     } else {
-      return "Minimum";
+      return "★★";
     }
   }
 }
