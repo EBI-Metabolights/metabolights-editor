@@ -116,20 +116,13 @@ export class CurationStatusComponent implements OnInit {
     this.isCurationStatusModalOpen = false
   }
   updateCurationStatus() {
-    // if (this.curationRequest === "NO_CURATION") {
-    //   this.curationStatus = "Minimum";
-    // } else if (this.curationRequest === "MANUAL_CURATION") {
-    //   this.curationStatus = "MetaboLights";
-    // } else {
-    //   return "Minimum";
-    // }
     if(this.status === undefined || this.status === null || this.status === "Provisional"){
       return "★";
     }
     if (this.curationRequest === "NO_CURATION") {
-      this.curationStatus = "★★★";
-    } else if (this.curationRequest === "MANUAL_CURATION") {
       this.curationStatus = "★★";
+    } else if (this.curationRequest === "MANUAL_CURATION") {
+      this.curationStatus = "★★★";
     } else {
       return "★★";
     }

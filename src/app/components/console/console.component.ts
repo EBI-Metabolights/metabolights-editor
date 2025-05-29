@@ -13,6 +13,7 @@ import { filter } from "rxjs/operators";
 import { Identifier } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
 import { CurationStatusTransformPipe } from "../shared/pipes/curation-status-transform.pipe";
+import { CurationStatusStarTransformPipe } from "../shared/pipes/curation-status-star-transform.pipe";
 
 
 /* eslint-disable @typescript-eslint/dot-notation */
@@ -30,6 +31,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
   revisionStatusTransform = new RevisionStatusTransformPipe()
   curationStatusTransform = new CurationStatusTransformPipe()
+  curationStatusStarTransform = new CurationStatusStarTransformPipe()
   studies: IStudyDetail[] = [];
   filteredStudies: IStudyDetail[] = [];
   loadingStudies = false;

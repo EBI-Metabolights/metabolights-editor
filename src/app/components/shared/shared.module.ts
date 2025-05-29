@@ -61,6 +61,7 @@ import { TableComponent } from "./table/table.component";
 import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh.component";
 import { DatasetLicenseComponent, StripTermsOfUsePipe } from "./dataset-license/dataset-license.component";
 import { RevisionStatusTransformPipe } from "./pipes/revision-status-transform.pipe";
+import { CurationStatusStarTransformPipe } from "./pipes/curation-status-star-transform.pipe";
 import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.pipe";
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
 
@@ -106,7 +107,8 @@ import { GlobusDownloadComponent } from "./download/globus/globus.component";
     DatasetLicenseComponent,
     RevisionStatusTransformPipe,
     CurationStatusTransformPipe,
-    StripTermsOfUsePipe
+    StripTermsOfUsePipe,
+    CurationStatusStarTransformPipe
   ],
   imports: [
     CommonModule,
@@ -164,7 +166,8 @@ import { GlobusDownloadComponent } from "./download/globus/globus.component";
     DatasetLicenseComponent,
     RevisionStatusTransformPipe,
     CurationStatusTransformPipe,
-    StripTermsOfUsePipe
+    StripTermsOfUsePipe,
+    CurationStatusStarTransformPipe,
   ],
   providers: [
     AuthGuard,

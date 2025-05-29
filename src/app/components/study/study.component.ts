@@ -160,7 +160,6 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
 
     this.validationNeeded$.subscribe((value) => {
-      console.log(`validation needed: ${value}`)
       this.validationNeeded = value;
     })
 
@@ -248,16 +247,13 @@ export class StudyComponent implements OnInit, OnDestroy {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   }
-updateCurationStatus() {
-    if(this.status === undefined || this.status === null || this.status === "Provisional"){
-      return "★";
-    }
+  updateCurationStatus() {
     if (this.curationRequest === "NO_CURATION") {
-      this.curationStatus = "★★★";
+      this.curationStatus = "Minimum";
     } else if (this.curationRequest === "MANUAL_CURATION") {
-      this.curationStatus = "★★";
+      this.curationStatus = "MetaboLights";
     } else {
-      return "★★";
+      return "Minimum";
     }
   }
 }

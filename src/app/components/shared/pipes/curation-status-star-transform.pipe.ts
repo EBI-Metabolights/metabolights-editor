@@ -3,8 +3,8 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 
 
-@Pipe({name: 'curationStatusTransform'})
-export class CurationStatusTransformPipe implements PipeTransform {
+@Pipe({name: 'curationStatusStarTransform'})
+export class CurationStatusStarTransformPipe implements PipeTransform {
     register = {
         "MANUAL_CURATION": '★★★',
         "NO_CURATION": '★★',
@@ -16,6 +16,6 @@ export class CurationStatusTransformPipe implements PipeTransform {
       if (result !== undefined){
         return result;
       }
-      return "";
+      return "★";
     }
 }
