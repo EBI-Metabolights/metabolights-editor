@@ -6,7 +6,7 @@ import { FilesState } from "../files/files.state";
 import { Observable, Subject, forkJoin, of } from "rxjs";
 import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
-import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
+import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import { MAF } from "../maf/maf.actions";
 import { Operations } from "../files/files.actions";
 import { ApplicationState } from "../../non-study/application/application.state";
@@ -60,6 +60,7 @@ export class AssayState {
                             assayFiles.forEach((sheet) => {
                                 ctx.dispatch(new Assay.OrganiseAndPersist(sheet.filename, action.id));
                             });
+                            //this.store.dispatch(new Loading.Disable())
                         });
 
                         /**  want to load the templates first so they get interpolated
