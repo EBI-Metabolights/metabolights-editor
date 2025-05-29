@@ -19,11 +19,12 @@ export class AsperaDownloadComponent implements OnInit {
 
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
+  @Output() closed = new EventEmitter<any>();
 
   publicAsperaPath = null
   displayHelpModal = false;
   studyId: string = null;
-  isAsperaDownloadModalOpen = false;
+  isAsperaDownloadModalOpen = true;
   selectedTab = "plugin";
   file = null;
   allowMultipleSelection = false;
@@ -76,7 +77,8 @@ export class AsperaDownloadComponent implements OnInit {
   }
 
   closeDownloadModal() {
-    this.isAsperaDownloadModalOpen = false;
+    //this.isAsperaDownloadModalOpen = false;
+    this.closed.emit();
   }
 
   download() {

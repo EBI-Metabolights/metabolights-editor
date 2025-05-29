@@ -37,7 +37,14 @@
   border-radius: 5px;
   padding: 5px;
 }
+.has-warning a {
+  color: #b34700 !important; 
+  font-weight: bold;
 
-.gold {
-  color: gold;
+}
+
+.validation-warning-icon {
+  margin-left: 0.3rem;
+  color: #ff5722; 
+  font-weight: bold;
 }

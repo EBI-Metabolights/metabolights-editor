@@ -6,8 +6,9 @@
       @defer (when datasetLicense != null) {
 
         <span *ngIf="datasetLicense && datasetLicense.name.length > 0; else noLicense"
-            class="tag clickable is-success is-info">
-        {{ datasetLicense.name }}
+            class="tag clickable is-success is-info"
+            (click)="goTermsOfUse()">
+        {{ datasetLicense.name | stripTermsOfUse }}
       </span>
       <ng-template #noLicense>
         <span class="tag clickable is-info">

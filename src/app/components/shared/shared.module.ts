@@ -59,7 +59,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
 import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh.component";
-import { DatasetLicenseComponent } from "./dataset-license/dataset-license.component";
+import { DatasetLicenseComponent, StripTermsOfUsePipe } from "./dataset-license/dataset-license.component";
 import { RevisionStatusTransformPipe } from "./pipes/revision-status-transform.pipe";
 import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.pipe";
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
@@ -105,7 +105,8 @@ import { GlobusDownloadComponent } from "./download/globus/globus.component";
     AsyncStatusTransformPipe,
     DatasetLicenseComponent,
     RevisionStatusTransformPipe,
-    CurationStatusTransformPipe
+    CurationStatusTransformPipe,
+    StripTermsOfUsePipe
   ],
   imports: [
     CommonModule,
@@ -162,7 +163,8 @@ import { GlobusDownloadComponent } from "./download/globus/globus.component";
     AsyncTaskComponent,
     DatasetLicenseComponent,
     RevisionStatusTransformPipe,
-    CurationStatusTransformPipe
+    CurationStatusTransformPipe,
+    StripTermsOfUsePipe
   ],
   providers: [
     AuthGuard,

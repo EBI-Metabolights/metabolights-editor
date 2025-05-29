@@ -160,6 +160,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
 
     this.validationNeeded$.subscribe((value) => {
+      console.log(`validation needed: ${value}`)
       this.validationNeeded = value;
     })
 
