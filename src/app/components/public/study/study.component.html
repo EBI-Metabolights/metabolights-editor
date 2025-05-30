@@ -77,7 +77,7 @@
     </article>
   </div>
 
-  <div id="status-board" *ngIf="status == 'Public' && curationRequest  == 'NO_CURATION'">
+  <!-- <div id="status-board" *ngIf="status == 'Public' && curationRequest  == 'NO_CURATION'">
     <article class="message is-warning">
       <div class="message-body">
         <p>
@@ -97,7 +97,7 @@
         </p>
       </div>
     </article>
-  </div>
+  </div> -->
   <div
     *ngIf="requestedStudy != undefined && !studyError"
     class="main-wrapper"
@@ -206,7 +206,7 @@
       [studyError]="studyError"
       [revisionDatetime]="revisionDatetime"
       [revisionNumber]="revisionNumber"
-      [curationStatus]="curationStatus"
+      [curationStatus]="curationRequest | curationStatusStarTransform"
       [isOwner]="isOwner"
       [isCurator]="isCurator"
       [status]="status"
