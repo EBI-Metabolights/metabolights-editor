@@ -51,9 +51,7 @@
       <div class="message-body">
         This study ({{requestedStudy}}) is now in the 'Private' stage.
         <p>
-          The link
-          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
-          will be the official link for referencing your MetaboLights study in any
+          The link {{ endpoint + requestedStudy }} will be the official link for referencing this MetaboLights study in any
           paper, website or other communication.
         </p>
       <br/>
@@ -204,7 +202,7 @@
         <mtbls-people></mtbls-people>
         <mtbls-description></mtbls-description>
         <mtbls-organisms></mtbls-organisms>
-      <mtbls-overview-badges 
+      <mtbls-overview-badges
       [studyError]="studyError"
       [revisionDatetime]="revisionDatetime"
       [revisionNumber]="revisionNumber"
