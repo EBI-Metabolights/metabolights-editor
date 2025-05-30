@@ -272,12 +272,22 @@ export class StatusComponent implements OnInit {
     this.isRevisionStatusModalOpen = false
   }
   openModal() {
+
+    if (["Initiated", "In Progress"].includes(this.revisionStatus.toLowerCase()) && (this.revisionNumber > 0)) {
+      toastr.error("Please wait Public FTP synchronization task. You may refresh your study page to view the latest status of the study. ", "Error", {
+        timeOut: "5000",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+      });
+    }
+
     this.toStatus = this.status;
 
     if  (this.curator){
       this.isModalOpen = true;
     } else {
-
       if (this.status != null &&  ["private", "provisional", "in review"].includes(this.status.toLowerCase())) {
         if (["private", "in review"].includes(this.status.toLowerCase()) && (this.revisionNumber > 0)) {
           toastr.error("Your dataset will be public. It is not allowed to change current status.", "Error", {

@@ -18,6 +18,7 @@ import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { ConfigurationService } from "src/app/configuration.service";
 
 @Component({
   selector: "assay-details",
@@ -57,9 +58,10 @@ export class AssayDetailsComponent implements OnInit {
   sampleNames: any = [];
   existingSampleNamesInAssay: any = [];
   duplicateSampleNamesInAssay: any = [];
-
-  constructor(private editorService: EditorService, private store: Store) {
-
+  guidesUrl = ""
+  constructor(private editorService: EditorService, private store: Store,
+      private configService: ConfigurationService) {
+    this.guidesUrl = configService.config.metabolightsWSURL.guides
     this.setUpConstructorSubscriptionNgxs();
   }
 

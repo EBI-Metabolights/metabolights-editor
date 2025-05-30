@@ -19,7 +19,7 @@
             Note. Study validation will need to be re-run after making any type of edits to the study (e.g. metadata updates and/or data files uploads).
         </p>
         <p>
-            If you have any problems or queries, please see the <a href="https://www.ebi.ac.uk/metabolights/editor/guides/">guides</a>, please contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
+            If you have any problems or queries, please see the <a href="{{ guidesUrl }}" target="_blank">guides</a>, please contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
     </p>
 
 </div>
@@ -51,7 +51,7 @@
         <div class="download-report-button">
             <a *ngIf="overrides.length > 0" (click)="openOverrideListModal()" class="button is-light"> <mat-icon>picture_in_picture</mat-icon> View Enabled Overrides</a>
             &nbsp;
-            <a *ngIf="modifiers.length > 0" (click)="openMetadataModifiersModal()" class="button is-light"><mat-icon>picture_in_picture</mat-icon>View Metadata Modifiers</a>
+            <a *ngIf="modifiers.length > 0" (click)="openMetadataModifiersModal()" class="button is-light"><mat-icon>picture_in_picture</mat-icon>View Metadata Updates</a>
             &nbsp;
             <a *ngIf="report !== null" (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
         </div>

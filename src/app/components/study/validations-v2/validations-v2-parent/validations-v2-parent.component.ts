@@ -7,6 +7,7 @@ import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/
 import { validationReportFilesSubsectionList, validationReportAssaySubsectionList, validationReportAssignmentSubsectionList, validationReportInvestigationSubsectionList, validationReportSamplesSubsectionList, validationReportInputSubsectionList, ViolationType} from '../interfaces/validation-report.types';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
+import { ConfigurationService } from 'src/app/configuration.service';
 
 
 
@@ -37,8 +38,10 @@ export class ValidationsV2ParentComponent implements OnInit {
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
-
-  constructor(private store: Store) {
+  guidesUrl = ""
+  constructor(private store: Store,
+    private configService: ConfigurationService) {
+      this.guidesUrl = configService.config.metabolightsWSURL.guides
    }
 
   //report variables
