@@ -38,11 +38,14 @@ export class StatusComponent implements OnInit {
   revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
   revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
+  revisionComment$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionComment);
+  revisionTaskMessage$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionTaskMessage);
 
   revisionNumber = null;
   revisionDatetime = null;
   revisionStatus = null;
-
+  revisionTaskMessage = ""
+  revisionComment = ""
   revisionStatusTransform = new RevisionStatusTransformPipe()
 
   isReadOnly = false;
@@ -54,7 +57,7 @@ export class StatusComponent implements OnInit {
   toStatus = "Provisional";
   curationRequest = "";
   curationStatus = "";
-  revisionComment  = ""
+  newRevisionComment  = ""
   requestedStudy: string = null;
   baseHref: string;
   validationStatus: ViolationType = null;
@@ -90,7 +93,20 @@ export class StatusComponent implements OnInit {
         this.revisionDatetime = value;
       }
     });
-
+    this.revisionComment$.subscribe((value) => {
+      if (value) {
+        this.revisionComment = value;
+      } else {
+        this.revisionComment = "";
+      }
+    });
+    this.revisionTaskMessage$.subscribe((value) => {
+      if (value) {
+        this.revisionTaskMessage = value;
+      } else {
+        this.revisionTaskMessage = "";
+      }
+    });
     this.revisionStatus$.subscribe((value) => {
       if (value !== null) {
         this.revisionStatus = this.revisionStatusTransform.transform(value);
@@ -161,11 +177,11 @@ export class StatusComponent implements OnInit {
     this.toStatus = toStatus
   }
   applyChanges() {
-    let revisionComment = ""
+    let newRevisionComment = ""
     if (this.revisionNumber == 0) {
-      revisionComment = 'Initial revision'
+      newRevisionComment = 'Initial revision'
     } else {
-      revisionComment = this.revisionComment
+      newRevisionComment = this.revisionComment
     }
     if (!this.isReadOnly) {
       if (this.toStatus == "New Revision") {
@@ -182,7 +198,7 @@ export class StatusComponent implements OnInit {
             this.store.dispatch(new Loading.Enable())
             this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
             this.closeModal();
-            this.store.dispatch(new RevisionNumber.New(revisionComment)).subscribe(
+            this.store.dispatch(new RevisionNumber.New(newRevisionComment)).subscribe(
               (completed) => {
                 this.closeModal();
                 this.store.dispatch(new Loading.Disable())

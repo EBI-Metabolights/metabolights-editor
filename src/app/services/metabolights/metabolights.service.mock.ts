@@ -41,6 +41,8 @@ export class MockMetabolightsService {
         "updated": "20240124121007",
         "revisionNumber": 0,
         "revisionStatus": 0,
+          "revisionComment": "test",
+          "revisionTaskMessage": "update",
         "revisionDatetime": ""
         },
         {
@@ -54,6 +56,8 @@ export class MockMetabolightsService {
           "updated": "20231002233501",
           "revisionNumber": 0,
           "revisionStatus": 0,
+          "revisionComment": "test",
+          "revisionTaskMessage": "update",
           "revisionDatetime": ""
           }
     ]

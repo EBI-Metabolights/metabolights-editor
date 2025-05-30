@@ -13,7 +13,7 @@
       }}
     </span>
 
-  <span *ngIf="revisionStatus == 'Initiated' || revisionStatus == 'In Progress'" class="tag clickable" (click)="openRevisionStatusModel()">
+  <span *ngIf="!revisionStatus && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable" (click)="openRevisionStatusModel()">
     <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
   </span>
 
@@ -32,6 +32,11 @@
       <span *ngIf="status == 'Public'">
         After completion of the task, new study revision will be published on public FTP server.
       </span>
+
+      <span *ngIf="curator == true && revisionTaskMessage">
+        <br>Revision task message {{ revisionTaskMessage }}
+      </span>
+
 
     </section>
     <footer class="modal-card-foot buttons is-right">

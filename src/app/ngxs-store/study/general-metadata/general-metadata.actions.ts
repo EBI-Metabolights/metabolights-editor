@@ -154,6 +154,23 @@ export namespace RevisionStatus {
   }
 
 }
+export namespace RevisionComment {
+
+  export class Set{
+      static readonly type = '[general] Set Revision Comment'
+      constructor(public revisionComment: string) {}
+  }
+
+}
+
+export namespace RevisionTaskMessage {
+
+  export class Set{
+      static readonly type = '[general] Set Revision Task Message'
+      constructor(public revisionTaskMessage: string) {}
+  }
+
+}
 
 export class SetStudyReviewerLink {
     static readonly type = '[general] Set Study Reviewer Link'
