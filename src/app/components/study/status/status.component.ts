@@ -43,7 +43,7 @@ export class StatusComponent implements OnInit {
 
   revisionNumber = null;
   revisionDatetime = null;
-  revisionStatus = null;
+  revisionNumberrevisionStatus = null;
   revisionTaskMessage = ""
   revisionComment = ""
   revisionStatusTransform = new RevisionStatusTransformPipe()
@@ -61,7 +61,7 @@ export class StatusComponent implements OnInit {
   requestedStudy: string = null;
   baseHref: string;
   validationStatus: ViolationType = null;
-
+  revisionStatus = ""
   private toastrSettings: Record<string, any> = {}
   constructor(
     private fb: UntypedFormBuilder,
@@ -113,28 +113,35 @@ export class StatusComponent implements OnInit {
       } else {
         this.revisionStatus = "";
       }
+      if (!this.isReadOnly && this.revisionNumber > 0) {
+        let revisionStatusMessage = "A public FTP synchronization task is currently in progress to make the study publicly available." + " Status: " + this.revisionStatus
 
-      if (["initiated", "in progress"].includes(this.revisionStatus.toLowerCase())) {
-        const message = "Dataset has new revision with status " + this.revisionStatus + "."
-        toastr.info(message, "Information", {
-          timeOut: "10000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
+        if (this.revisionNumber > 1) {
+          revisionStatusMessage = revisionStatusMessage + " Revision: " + this.revisionNumber  +"."
+        }
+
+        if (["initiated", "in progress"].includes(this.revisionStatus.toLowerCase())) {
+          toastr.info(revisionStatusMessage, "Information", {
+            timeOut: "10000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
+        else if (["failed"].includes(this.revisionStatus.toLowerCase())) {
+          toastr.error(revisionStatusMessage, "Error", {
+            timeOut: "10000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
       }
-      else if (["failed"].includes(this.revisionStatus.toLowerCase())) {
-        const message = "Dataset has new revision with status " + this.revisionStatus + "."
-        toastr.error(message, "Error", {
-          timeOut: "10000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      }
-    });
+
+      });
+
     this.studyStatus$.pipe(filter(val => val !== null)).subscribe((value) => {
       this.closeModal();
       this.store.dispatch(new Loading.Disable())

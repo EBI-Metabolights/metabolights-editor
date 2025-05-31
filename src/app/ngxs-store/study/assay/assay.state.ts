@@ -165,7 +165,7 @@ export class AssayState {
                 const mafFiles = [];
                 data["rows"].forEach((row) => {
                     // assert that this given value in the row is a string, as we _know_ it can only be a string.
-                    const assertedRow = row["Metabolite Assignment File"] as string;
+                    const assertedRow = row["Metabolite Assignment File"] as string || "";
                     const mafFile = assertedRow.replace(/^[ ]+|[ ]+$/g, "");
                     if (mafFile !== "" && mafFiles.indexOf(mafFile) < 0) {
                         if (!mafFile.startsWith("i.e. 'm_MTBLS1")) { // if it is a template value

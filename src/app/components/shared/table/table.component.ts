@@ -156,13 +156,16 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   ngOnInit() {
     this.setUpSubscriptionsNgxs();
     //console.log(this.validationsId);
-    if (localStorage.getItem(this.data.file) !== null) {
-      this.view = localStorage.getItem(this.data.file);
+    this.data = this.tableData.data;
+    if (this.data) {
+        if (localStorage.getItem(this.data.file) !== null) {
+          this.view = localStorage.getItem(this.data.file);
       if (this.view === "expanded") {
         this.displayedTableColumns = Object.keys(this.data.header);
       }
     } else {
       localStorage.setItem(this.data.file, 'compact');
+    }
     }
   }
 
@@ -196,7 +199,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   handleDeleteKeydown(event: KeyboardEvent) {
     //console.log(`event key: ${event.key}`)
     if (['Delete', 'Backspace'].includes(event.key) && !this.isEditModalOpen) {
-     
+
       // reusing an existing method to delete cell content by instead pasting empty strings
       if (this.selectedCells.length > 0) this.savePastedCellContent(new ClipboardEvent('paste'), null, true)
     }

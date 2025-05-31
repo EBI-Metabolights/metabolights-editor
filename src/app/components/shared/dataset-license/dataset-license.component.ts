@@ -34,7 +34,9 @@ export class DatasetLicenseComponent implements OnInit {
   }
 
   goTermsOfUse() {
-    window.open('https://www.ebi.ac.uk/about/terms-of-use/', '_blank');
+    if(this.datasetLicense.licenseUrl && this.datasetLicense.licenseUrl.length > 0 ) {
+      window.open(this.datasetLicense.licenseUrl, '_blank');
+    }
   }
 
 }

@@ -562,7 +562,6 @@ export class GeneralMetadataState {
     ConfirmAgreement({dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.ConfirmAgreement) {
         this.datasetLicenseService.confirmLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
-                console.dir(licenseResponse)
                 dispatch(new DatasetLicenseNS.SetDatasetLicense(licenseResponse.content.dataset))
             },
             error: (error) => {console.error(`Unable to confirm license agreement: ${error}`)}
@@ -582,7 +581,7 @@ export class GeneralMetadataState {
         this.datasetLicenseService.getLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
                 let dataset = null;
-                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: ""} : dataset = licenseResponse.content.dataset;
+                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: "", licenseUrl: ""} : dataset = licenseResponse.content.dataset;
                 dispatch(new DatasetLicenseNS.SetDatasetLicense(dataset));
             },
             error: (error) => {console.error(`Unable to retrieve dataset license: ${error}`);}
