@@ -33,8 +33,10 @@ export class DatasetLicenseComponent implements OnInit {
       });
   }
 
-  goTermsOfUse() {
-    window.open('https://www.ebi.ac.uk/about/terms-of-use/', '_blank');
+  goFullText() {
+    if(this.datasetLicense.name === 'EMBL-EBI Terms of Use') window.open('https://www.ebi.ac.uk/about/terms-of-use/', '_blank');
+    else     window.open("https://creativecommons.org/public-domain/cc0", "_blank");
+
   }
 
 }
