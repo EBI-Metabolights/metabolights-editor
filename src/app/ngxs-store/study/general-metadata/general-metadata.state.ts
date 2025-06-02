@@ -528,7 +528,6 @@ export class GeneralMetadataState {
                 const readOnlySub = this.store.select(state => state.ApplicationState && state.ApplicationState.readonly).pipe(take(1))
                 readOnlySub.subscribe((ro) => {
                     this.store.dispatch(new User.Studies.Get())
-                    console.debug(`at general metadata dispatch point: ${updated_study_id}`)
                     ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
                 })
 

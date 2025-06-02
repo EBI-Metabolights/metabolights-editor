@@ -123,7 +123,6 @@ export class AssayState {
 
     @Action(Assay.OrganiseAndPersist)
     OrganiseAndPersist(ctx: StateContext<AssayStateModel>, action: Assay.OrganiseAndPersist) {
-        console.debug(`${action.studyId} ${action.assaySheetFilename}`)
         this.assaysService.getAssaySheet(action.assaySheetFilename, action.studyId).pipe(take(1)).subscribe(
             (data) => {
                 let assay = {};
