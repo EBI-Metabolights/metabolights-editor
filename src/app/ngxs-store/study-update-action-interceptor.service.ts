@@ -103,10 +103,24 @@ export class LoggingMiddleware implements NgxsPlugin {
         if (actionName.includes('Set Study Assay')) {
             const currentStudyId = this.store.selectSnapshot<string>(GeneralMetadataState.id);
             if (!action.assay.data.file.includes(currentStudyId)) {
-                console.debug(`Discarded! ${action.assay.data.file}`)
+                console.debug(`Discarded! ${action.assay.data.file}`);
                 return true
             }
         }
+         if(actionName.includes('Organise and Persist Assay Sheet')) {
+            const currentStudyId = this.store.selectSnapshot<string>(GeneralMetadataState.id);
+            if (!action.assaySheetFilename.includes(currentStudyId)) {
+                console.debug(`Discarded! organise and persist: ${action.assaySheetFilename}`);
+                return true
+            }
+         }
+         if (actionName.includes('Organise MAF')) {
+            const currentStudyId = this.store.selectSnapshot<string>(GeneralMetadataState.id);
+            if (!action.filename.includes(currentStudyId)) {
+                console.debug(`Discarded! organise maf: ${action.filename}`);
+                return true
+            }
+         }
         return false;
     }
 

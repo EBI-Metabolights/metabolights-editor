@@ -83,6 +83,7 @@ export class GeneralMetadataState {
             (gm_response) => {
                 const state = ctx.getState();
                 if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
+                if (state.id !== action.studyId) ctx.dispatch(new Identifier.Set(action.studyId));
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new SetLoadingInfo("Loading investigation details"));
                 this.store.dispatch(new SetReadonly(action.readonly));
@@ -523,7 +524,7 @@ export class GeneralMetadataState {
     @Action(StudyStatus.Update)
     ChangeStudyStatus(ctx: StateContext<GeneralMetadataStateModel>, action: StudyStatus.Update) {
         const state = ctx.getState();
-        this.generalMetadataService.changeStatus(action.status, state.id).subscribe(
+        this.generalMetadataService.changeStatus(action.status, state.id).pipe(take(1)).subscribe(
             (response) => {
                 const state = ctx.getState();
                 let updated_study_id = state.id;

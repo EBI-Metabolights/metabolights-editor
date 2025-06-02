@@ -32,8 +32,7 @@ export class DatasetLicenseComponent implements OnInit {
         this.datasetLicense = dl;
       });
   }
-
-  goTermsOfUse() {
+  goFullText() {
     if(this.datasetLicense.licenseUrl && this.datasetLicense.licenseUrl.length > 0 ) {
       window.open(this.datasetLicense.licenseUrl, '_blank');
     }
