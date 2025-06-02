@@ -60,8 +60,7 @@
           </ng-template>
           <br />
           <br />
-          The link
-          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
+          The link {{ endpoint + requestedStudy }}
           will be the official link for referencing your MetaboLights study in any
           paper, website or other communication.
         </p>
@@ -72,8 +71,7 @@
         <div class="message-body">
           This study ({{requestedStudy}}) is now in the 'Private' stage.
           <p>
-            The link
-          <a [href]="endpoint + requestedStudy">{{ endpoint + requestedStudy }}</a>
+            The link {{ endpoint + requestedStudy }}
           will be the official link for referencing your MetaboLights study in any
           paper, website or other communication.
           </p>
@@ -151,8 +149,7 @@
       <article class="message is-small has-shadow">
         <div (click)="toggleMessage()" class="message-header">
           <p>
-            <span class="material-icons">info</span>&nbsp;We're experiencing
-            longer than usual review times
+            <span class="material-icons">info</span>&nbsp;You can make your private studies public
           </p>
           <button
             *ngIf="!messageExpanded"
@@ -168,9 +165,7 @@
           </button>
         </div>
         <div *ngIf="messageExpanded" class="message-body">
-          Due to increased data submissions, the curation stage may be longer
-          than our standard 28 days. We apologise for any inconvenience and
-          please contact us if you have any specific requirements.
+          We are pleased to share that, following the recent update to the MetaboLights dataset submission workflow, you can now make your private studies public.
         </div>
       </article>
       <div *ngIf="banner" style="margin: 0 0 5px 0">

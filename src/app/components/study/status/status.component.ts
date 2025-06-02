@@ -38,11 +38,14 @@ export class StatusComponent implements OnInit {
   revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
   revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
+  revisionComment$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionComment);
+  revisionTaskMessage$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionTaskMessage);
 
   revisionNumber = null;
   revisionDatetime = null;
-  revisionStatus = null;
-
+  revisionNumberrevisionStatus = null;
+  revisionTaskMessage = ""
+  revisionComment = ""
   revisionStatusTransform = new RevisionStatusTransformPipe()
 
   isReadOnly = false;
@@ -54,11 +57,11 @@ export class StatusComponent implements OnInit {
   toStatus = "Provisional";
   curationRequest = "";
   curationStatus = "";
-  revisionComment  = ""
+  newRevisionComment  = ""
   requestedStudy: string = null;
   baseHref: string;
   validationStatus: ViolationType = null;
-
+  revisionStatus = ""
   private toastrSettings: Record<string, any> = {}
   constructor(
     private fb: UntypedFormBuilder,
@@ -90,35 +93,55 @@ export class StatusComponent implements OnInit {
         this.revisionDatetime = value;
       }
     });
-
+    this.revisionComment$.subscribe((value) => {
+      if (value) {
+        this.revisionComment = value;
+      } else {
+        this.revisionComment = "";
+      }
+    });
+    this.revisionTaskMessage$.subscribe((value) => {
+      if (value) {
+        this.revisionTaskMessage = value;
+      } else {
+        this.revisionTaskMessage = "";
+      }
+    });
     this.revisionStatus$.subscribe((value) => {
       if (value !== null) {
         this.revisionStatus = this.revisionStatusTransform.transform(value);
       } else {
         this.revisionStatus = "";
       }
+      if (!this.isReadOnly && this.revisionNumber > 0) {
+        let revisionStatusMessage = "A public FTP synchronization task is currently in progress to make the study publicly available." + " Status: " + this.revisionStatus
 
-      if (["initiated", "in progress"].includes(this.revisionStatus.toLowerCase())) {
-        const message = "Dataset has new revision with status " + this.revisionStatus + "."
-        toastr.info(message, "Information", {
-          timeOut: "10000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
+        if (this.revisionNumber > 1) {
+          revisionStatusMessage = revisionStatusMessage + " Revision: " + this.revisionNumber  +"."
+        }
+
+        if (["initiated", "in progress"].includes(this.revisionStatus.toLowerCase())) {
+          toastr.info(revisionStatusMessage, "Information", {
+            timeOut: "10000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
+        else if (["failed"].includes(this.revisionStatus.toLowerCase())) {
+          toastr.error(revisionStatusMessage, "Error", {
+            timeOut: "10000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
+        }
       }
-      else if (["failed"].includes(this.revisionStatus.toLowerCase())) {
-        const message = "Dataset has new revision with status " + this.revisionStatus + "."
-        toastr.error(message, "Error", {
-          timeOut: "10000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      }
-    });
+
+      });
+
     this.studyStatus$.pipe(filter(val => val !== null)).subscribe((value) => {
       this.closeModal();
       this.store.dispatch(new Loading.Disable())
@@ -161,11 +184,11 @@ export class StatusComponent implements OnInit {
     this.toStatus = toStatus
   }
   applyChanges() {
-    let revisionComment = ""
+    let newRevisionComment = ""
     if (this.revisionNumber == 0) {
-      revisionComment = 'Initial revision'
+      newRevisionComment = 'Initial revision'
     } else {
-      revisionComment = this.revisionComment
+      newRevisionComment = this.revisionComment
     }
     if (!this.isReadOnly) {
       if (this.toStatus == "New Revision") {
@@ -182,7 +205,7 @@ export class StatusComponent implements OnInit {
             this.store.dispatch(new Loading.Enable())
             this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
             this.closeModal();
-            this.store.dispatch(new RevisionNumber.New(revisionComment)).subscribe(
+            this.store.dispatch(new RevisionNumber.New(newRevisionComment)).subscribe(
               (completed) => {
                 this.closeModal();
                 this.store.dispatch(new Loading.Disable())
@@ -272,12 +295,22 @@ export class StatusComponent implements OnInit {
     this.isRevisionStatusModalOpen = false
   }
   openModal() {
+
+    if (["Initiated", "In Progress"].includes(this.revisionStatus.toLowerCase()) && (this.revisionNumber > 0)) {
+      toastr.error("Please wait Public FTP synchronization task. You may refresh your study page to view the latest status of the study. ", "Error", {
+        timeOut: "5000",
+        positionClass: "toast-top-center",
+        preventDuplicates: true,
+        extendedTimeOut: 0,
+        tapToDismiss: false,
+      });
+    }
+
     this.toStatus = this.status;
 
     if  (this.curator){
       this.isModalOpen = true;
     } else {
-
       if (this.status != null &&  ["private", "provisional", "in review"].includes(this.status.toLowerCase())) {
         if (["private", "in review"].includes(this.status.toLowerCase()) && (this.revisionNumber > 0)) {
           toastr.error("Your dataset will be public. It is not allowed to change current status.", "Error", {

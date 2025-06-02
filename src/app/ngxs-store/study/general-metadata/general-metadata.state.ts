@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -34,6 +34,8 @@ export interface GeneralMetadataStateModel {
     revisionNumber: number;
     revisionDatetime: string;
     revisionStatus: number;
+    revisionComment: string;
+    revisionTaskMessage: string;
     publicHttpUrl: string;
     publicFtpUrl: string;
     publicGlobusUrl: string;
@@ -54,6 +56,8 @@ const defaultState: GeneralMetadataStateModel = {
     revisionNumber: null,
     revisionDatetime: null,
     revisionStatus: null,
+    revisionComment: null,
+    revisionTaskMessage: null,
     publicHttpUrl: null,
     publicFtpUrl: null,
     publicGlobusUrl: null,
@@ -103,6 +107,8 @@ export class GeneralMetadataState {
                 ctx.dispatch(new RevisionDateTime.Set(gm_response.mtblsStudy.revisionDatetime));
 
                 ctx.dispatch(new RevisionStatus.Set(gm_response.mtblsStudy.revisionStatus));
+                ctx.dispatch(new RevisionComment.Set(gm_response.mtblsStudy.revisionComment));
+                ctx.dispatch(new RevisionTaskMessage.Set(gm_response.mtblsStudy.revisionTaskMessage));
                 ctx.dispatch(new PublicFtpUrl.Set(gm_response.mtblsStudy.studyFtpUrl));
                 ctx.dispatch(new PublicHttpUrl.Set(gm_response.mtblsStudy.studyHttpUrl));
                 ctx.dispatch(new PublicGlobusUrl.Set(gm_response.mtblsStudy.studyGlobusUrl));
@@ -254,6 +260,24 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             revisionStatus: action.revisionStatus
+        });
+    }
+
+    @Action(RevisionComment.Set)
+    SetRevisionComment(ctx: StateContext<GeneralMetadataStateModel>, action: RevisionComment.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            revisionComment: action.revisionComment
+        });
+    }
+
+    @Action(RevisionTaskMessage.Set)
+    SetRevisionTaskMessage(ctx: StateContext<GeneralMetadataStateModel>, action: RevisionTaskMessage.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            revisionTaskMessage: action.revisionTaskMessage
         });
     }
 
@@ -539,7 +563,6 @@ export class GeneralMetadataState {
     ConfirmAgreement({dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.ConfirmAgreement) {
         this.datasetLicenseService.confirmLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
-                console.dir(licenseResponse)
                 dispatch(new DatasetLicenseNS.SetDatasetLicense(licenseResponse.content.dataset))
             },
             error: (error) => {console.error(`Unable to confirm license agreement: ${error}`)}
@@ -559,7 +582,7 @@ export class GeneralMetadataState {
         this.datasetLicenseService.getLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
                 let dataset = null;
-                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: ""} : dataset = licenseResponse.content.dataset;
+                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: "", licenseUrl: ""} : dataset = licenseResponse.content.dataset;
                 dispatch(new DatasetLicenseNS.SetDatasetLicense(dataset));
             },
             error: (error) => {console.error(`Unable to retrieve dataset license: ${error}`);}
@@ -618,6 +641,14 @@ export class GeneralMetadataState {
         return state.revisionStatus
     }
 
+    @Selector()
+    static revisionComment(state: GeneralMetadataStateModel): string {
+        return state.revisionComment
+    }
+    @Selector()
+    static revisionTaskMessage(state: GeneralMetadataStateModel): string {
+        return state.revisionTaskMessage
+    }
     @Selector()
     static reviewerLink(state: GeneralMetadataStateModel): string {
         return state.reviewerLink

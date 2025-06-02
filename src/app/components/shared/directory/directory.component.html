@@ -81,6 +81,7 @@
 </a>
 <span *ngFor="let sfile of file.files">
   <mtbls-directory
+    [category]="category"
     [level]="level + 1"
     [parent]="parent + file.file + '/'"
     [file]="sfile"

@@ -14,6 +14,7 @@ export class DatasetLicense {
   version: string
   agreed: boolean
   agreeingUser: string
+  licenseUrl: string
 }
 
 @Injectable({

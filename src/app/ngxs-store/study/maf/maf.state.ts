@@ -3,7 +3,7 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MAF, ResetMAFState } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
 import { take } from "rxjs/operators";
-
+import * as toastr from "toastr";
 
 
 // move this
@@ -36,7 +36,7 @@ export interface MAFStateModel {
 })
 @Injectable()
 export class MAFState {
-    
+
     constructor(private store: Store, private mafService: MafService) {}
 
     @Action(MAF.Set)
@@ -55,11 +55,11 @@ export class MAFState {
 
     @Action(MAF.Organise)
     OrganiseMAF(ctx: StateContext<MAFStateModel>, action: MAF.Organise) {
-        this.mafService.getMAFSheet(action.filename, action.studyId).pipe(take(1)).subscribe(
-            (mdata) => {
+        this.mafService.getMAFSheet(action.filename, action.studyId).pipe(take(1)).subscribe({
+            next: (mdata) => {
                 const mcolumns = [];
                 const maf = {};
-          
+
                 mcolumns.push({
                   columnDef: "Structure",
                   sticky: "true",
@@ -67,7 +67,7 @@ export class MAFState {
                   structure: true,
                   cell: (element) => eval("element['database_identifier']"),
                 });
-          
+
                 Object.keys(mdata.header).forEach((key) => {
                   const fn = "element['" + key + "']";
                   mcolumns.push({
@@ -77,7 +77,7 @@ export class MAFState {
                     cell: (element) => eval(fn),
                   });
                 });
-          
+
                 let mdisplayedColumns = mcolumns.map((a) => a.columnDef);
                 mdisplayedColumns.unshift("Select");
                 mdisplayedColumns.sort((a, b) => {
@@ -91,22 +91,41 @@ export class MAFState {
                     key.indexOf("Term Accession Number") < 0 &&
                     key.indexOf("Term Source REF") < 0
                 );
-          
+
                 mdata["columns"] = mcolumns;
                 mdata["displayedColumns"] = mdisplayedColumns;
                 mdata["rows"] = mdata.data.rows;
                 mdata["file"] = action.filename;
                 delete mdata.data;
-          
+
                 maf["data"] = mdata;
                 ctx.dispatch(new MAF.Set(maf))
             },
-            (error) => {
+            error: (error) => {
+                if (error.status === 404) {
+                    toastr.warning("'" +action.filename+ "' MAF file referenced in an assay does not exists.", "Error", {
+                    timeOut: "5000",
+                    positionClass: "toast-top-center",
+                    preventDuplicates: true,
+                    extendedTimeOut: 0,
+                    tapToDismiss: false,
+                  });
+                } else {
+                    toastr.warning("Unable to get '" +action.filename+ "' MAF file.", "Error", {
+                  timeOut: "5000",
+                  positionClass: "toast-top-center",
+                  preventDuplicates: true,
+                  extendedTimeOut: 0,
+                  tapToDismiss: false,
+                });
+                }
+
                 console.log("Unable to get MAF sheet")
                 console.log(error)
             }
-        )
-        
+    });
+
+
     }
 
     @Action(MAF.AddRows)

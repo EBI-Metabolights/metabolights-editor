@@ -25,6 +25,8 @@ export class DirectoryComponent implements OnInit {
   @Input("showReferencedFiles") showReferencedFiles = false;
   @Input("location") location = null;
   @Input("managedFolders") managedFolders = [];
+  @Input("category") category;
+
 
 
   @Output() fileDeleted = new EventEmitter<any>();
@@ -106,7 +108,10 @@ export class DirectoryComponent implements OnInit {
     }
   }
 
-  childDirectoryDeletionEnabled(file): boolean {
+  childDirectoryDeletionEnabled(file, category): boolean {
+    if (category === "raw" || category == "derived") {
+      return false
+    }
     if (!this.curator && this.file.type === 'audit') return false
     return !this.readonlyFolder
   }

@@ -9,7 +9,7 @@
     padding-bottom: 1rem;
     border-bottom: solid 1px  gainsboro;
   }
-  
+
   .study-meta-left {
     flex: 1 1 0;
     min-width: 0;
@@ -18,20 +18,20 @@
     gap: 0.5rem;
     align-items: center;
   }
-  
+
   .study-meta-right {
     flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
     align-items: center;
   }
-  
+
   /* Responsive layout for small screens: stack columns */
   @media (max-width: 767px) {
     .study-meta-wrapper {
       flex-direction: column;
     }
-  
+
     .study-meta-left,
     .study-meta-right {
       width: 100%;
@@ -47,5 +47,9 @@
 
 h6.mb10 {
   margin-left: 1rem;
-  margin-bottom: 0.5rem; 
+  margin-bottom: 0.5rem;
+}
+
+.gold {
+  color: gold;
 }

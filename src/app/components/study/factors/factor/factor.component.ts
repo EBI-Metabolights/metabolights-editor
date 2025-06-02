@@ -113,6 +113,9 @@ export class FactorComponent implements OnInit {
 
     this.editorValidationRules$.subscribe((value) => {
       this.validationRules = value;
+      this.unitSampleValidations = this.fieldValidation('unit', true);
+      this.factorTypeValidations = this.fieldValidation('factorType');
+      this.factorNameValidations = this.fieldValidation('factorName');
     });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
@@ -122,7 +125,6 @@ export class FactorComponent implements OnInit {
   }
 
   ngOnInit() {
-    
     this.editorService.loadValidations();
     this.unitSampleValidations = this.fieldValidation('unit', true);
     this.factorTypeValidations = this.fieldValidation('factorType');
@@ -159,7 +161,7 @@ export class FactorComponent implements OnInit {
       }
       this.initialiseForm();
       this.isModalOpen = true;
-      
+
     }
   }
 
@@ -196,7 +198,7 @@ export class FactorComponent implements OnInit {
         this.store.dispatch(new Factors.Update(this.studyId, this.factor.factorName, this.compileBody())).subscribe(
           (completed) => {
             this.refreshFactors(null, "Factor updated.");
-            
+
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: this.factor, unitId: this.resolvedName})
             else this.addFactorToSampleSheet.next(this.factor);
             },
@@ -284,8 +286,12 @@ export class FactorComponent implements OnInit {
   }
 
   fieldValidation(fieldId, setToSamples: boolean = false) {
-    if (setToSamples) return this.validationRules['samples'][fieldId]
-    return this.validation[fieldId];
+    if (this.validationRules != null) {
+      if (setToSamples) return this.validationRules['samples'][fieldId]
+      return this.validation[fieldId];
+    }
+    return {name: '', values: []};
+
   }
 
   getFieldValue(name) {

@@ -20,6 +20,8 @@ export interface IMtblsStudySummaryInformation {
   revisionNumber: number;
   revisionDatetime: string;
   revisionStatus: number;
+  revisionComment: string;
+  revisionTaskMessage: string;
   studyHttpUrl: string;
   studyFtpUrl: string;
   studyGlobusUrl: string;

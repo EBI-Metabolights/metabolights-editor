@@ -14,7 +14,7 @@
           >
         </span>
         <div *ngIf="!isReadOnly" class="notification is-primary">
-<small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. <span *ngIf="templateRowPresent">The first row in light blue is an example row. It is not included in the assay or ‘ISA METADATA’.</span> <b> <br>Please see the <a href="https://www.ebi.ac.uk/metabolights/guides/Assay/#assay_overview" target="_blank">Guides</a> for more information on how to complete your Assays section.</b></small>
+<small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. <span *ngIf="templateRowPresent">The first row in light blue is an example row. It is not included in the assay or ‘ISA METADATA’.</span> <b> <br>Please see the <a href="{{ guidesUrl }}/Assay/#assay_overview" target="_blank">Guides</a> for more information on how to complete your Assays section.</b></small>
         </div>
         <mtbls-table
           [fileTypes]="fileTypes"
