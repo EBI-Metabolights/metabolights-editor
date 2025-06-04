@@ -114,10 +114,10 @@ export class StatusComponent implements OnInit {
         this.revisionStatus = "";
       }
       if (!this.isReadOnly && this.revisionNumber > 0) {
-        let revisionStatusMessage = "A public FTP synchronization task is currently in progress to make the study publicly available." + " Status: " + this.revisionStatus
+        let revisionStatusMessage = "A public FTP synchronization task is currently in progress to make the study publicly available." + "<br/> Status: " + this.revisionStatus
 
         if (this.revisionNumber > 1) {
-          revisionStatusMessage = revisionStatusMessage + " Revision: " + this.revisionNumber  +"."
+          revisionStatusMessage = revisionStatusMessage + "<br/> Revision: " + this.revisionNumber
         }
 
         if (["initiated", "in progress"].includes(this.revisionStatus.toLowerCase())) {

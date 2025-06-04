@@ -135,31 +135,63 @@
       </span>
       <br />
       <span *ngIf="!isReadOnly">
-        <span *ngIf="curator; else submitter">
-          <mat-form-field>
-            <mat-label>Change study status</mat-label>
-            <mat-select (selectionChange)="changeStatusNgxs(toStatus)" [(value)]="toStatus">
-              <mat-option value="Provisional">Provisional</mat-option>
-              <mat-option value="Private">Private</mat-option>
-              <mat-option *ngIf="revisionNumber == 0" value="New Revision">Public</mat-option>
-              <mat-option *ngIf="revisionNumber > 0 && revisionStatus == 'Completed'"  value="New Revision">New Revision</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field *ngIf="toStatus == 'New Revision' && revisionNumber > 0" class="full-width">
-            <mat-label>Revision Comment</mat-label>
-            <input
-              class="no-scroll"
-              matInput
-              (change)="onCommentChange($event)"
-            />
-            <mat-hint>Revision Comment</mat-hint>
 
-          </mat-form-field>
-          <div class="column is-one-third">
-            <button *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
-              Apply
-            </button>
-          </div>
+        <span *ngIf="curator; else submitter">
+          <span *ngIf="status == 'Public'">
+            <table >
+              <tbody>
+              <tr>
+                <td>
+                  <mat-form-field>
+                    <mat-label>Change study status</mat-label>
+                    <mat-select
+                      (selectionChange)="changeStatusNgxs(toStatus)"
+                      [(value)]="toStatus"
+                    >
+                      <mat-option value="New Revision">New Revision</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </td>
+                <td >
+                  <div class="is-offset-10 mt-5">
+                  <button  *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
+                    Apply
+                  </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            </table>
+          </span>
+          <span *ngIf="status != 'Public'">
+            <table>
+              <tbody>
+              <tr>
+                <td>
+            <mat-form-field>
+              <mat-label>Change study status</mat-label>
+              <mat-select
+                (selectionChange)="changeStatusNgxs(toStatus)"
+                [(value)]="toStatus"
+              >
+                <mat-option value="Provisional">Provisional</mat-option>
+                <mat-option value="Private">Private</mat-option>
+
+                <mat-option value="New Revision">Public</mat-option>
+              </mat-select>
+            </mat-form-field>
+            </td>
+            <td >
+              <div class="is-offset-2 mt-5">
+                <button *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
+                  Apply
+                </button>
+              </div>
+            </td>
+              </tr>
+            </tbody>
+        </table>
+          </span>
         </span>
         <ng-template #submitter>
           <span *ngIf="status == 'Provisional'">

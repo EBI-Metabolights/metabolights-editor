@@ -11,7 +11,7 @@
 
   <div class="buttons-container">
 
-    <div class="dropdown"
+    <div *ngIf="status == 'Public'"  class="dropdown"
         [ngClass]="{ 'is-active': isDownloadDropdownActive }"
         #downloadDropdown>
       <div class="dropdown-trigger">
