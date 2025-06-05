@@ -50,7 +50,7 @@
                 <h2> Status </h2>
                 <div class="is-pulled-left">
                   <div class="tags has-addons">
-                    <span class="tag">Validation</span>
+                    <span class="tag is-dark">Validation</span>
                     <span class="tag" [ngClass]="{
                       'is-danger': validationStatus === 'ERROR',
                       'is-success': validationStatus === 'SUCCESS',
@@ -62,7 +62,7 @@
                 <div class="is-pulled-left">
                   <span>
                     <div class="tags has-addons">
-                      <span class="tag">Last Validation Time</span>
+                      <span class="tag is-dark">Last Validation Time</span>
                       <span class="tag is-danger" > <small> {{lastValidationRunTime == "-" ? "-" : lastValidationRunTime | date:'long'}} </small> </span>
                     </div>
                   </span>

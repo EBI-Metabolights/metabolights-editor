@@ -190,7 +190,7 @@
 
       <span *ngIf="revisionNumber && revisionNumber > 1">
         <div class="tags has-addons">
-          <span class="tag">Revision</span>
+          <span class="tag is-dark">Revision</span>
 
           <span class="tag is-link">
             {{ revisionDatetime ? (revisionDatetime  | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }})
@@ -207,7 +207,7 @@
           <span class="clickable" *ngIf="validationStatus == 'ERROR'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag">Validation</span>
+                <span class="tag is-dark">Validation</span>
                 <span class="tag is-danger"> Failed </span>
               </div>
             </div>
@@ -215,7 +215,7 @@
           <span class="clickable" *ngIf="validationStatus == null">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag">Validation</span>
+                <span class="tag is-dark">Validation</span>
                 <span class="tag is-warning"> Required </span>
               </div>
             </div>
@@ -225,7 +225,7 @@
           <span class="clickable" *ngIf="validationStatus == 'error'">
             <div (click)="selectCurrentTab(7, 'validationsv2')" class="control">
               <div class="tags has-addons">
-                <span class="tag">Last Validation Time</span>
+                <span class="tag is-dark">Last Validation Time</span>
                 <span class="tag is-danger"> <small> {{ validationStatus !== null && validationRunTime !== null ? (validationRunTime | date: 'MMM d, y, H:mm:ss z') : "-" }} </small> </span>
               </div>
             </div>

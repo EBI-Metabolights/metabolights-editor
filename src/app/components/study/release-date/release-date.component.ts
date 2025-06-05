@@ -21,6 +21,7 @@ export class ReleaseDateComponent implements OnInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyReleaseDate$: Observable<string> = inject(Store).select(GeneralMetadataState.releaseDate);
+  studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
@@ -32,6 +33,7 @@ export class ReleaseDateComponent implements OnInit {
   isFormBusy = false;
   requestedStudy: string = null;
   releaseDate: string = null;
+  status: string = null;
 
 
   constructor(private editorService: EditorService, private store: Store) {
@@ -56,6 +58,11 @@ export class ReleaseDateComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
+      }
+    });
+    this.studyStatus$.subscribe((value) => {
+      if (value != null) {
+        this.status = value;
       }
     });
     this.readonly$.subscribe((value) => {

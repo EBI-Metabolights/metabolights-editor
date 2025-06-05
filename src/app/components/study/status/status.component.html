@@ -34,10 +34,17 @@
       </span>
 
       <span *ngIf="revisionNumber > 0">
-        <br>Scheduled revision: {{ revisionNumber }}
-        <span *ngIf="revisionTaskMessage != null">
+        <br/>
+        <br/>Scheduled revision: <b>{{ revisionNumber }}</b>
+        <span>
+          <br>Revision created at: <b>{{ revisionDatetime }}</b>
+        </span>
+        <span *ngIf="revisionTaskMessage != null && revisionTaskMessage.length > 0">
 
-        <br>Revision task message: {{ revisionTaskMessage }}
+          <br>Revision task message: <b>{{ revisionTaskMessage }}</b>
+        </span>
+          <span>
+          <br>Revision status: <b>{{ revisionStatus }}</b>
         </span>
       </span>
 

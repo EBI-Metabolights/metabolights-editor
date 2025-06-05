@@ -10,18 +10,11 @@
         <div class="study-meta-left">
             <mtbls-status></mtbls-status>
             <curation-status></curation-status>
-            <!-- <span *ngIf="status == 'Public'">
-                <div class="tags has-addons">
-                    <span class="tag">Curation</span>
-                    <span class="tag gold">{{ curationStatus }}</span>
-                </div>
-            </span> -->
-
             <mtbls-release-date></mtbls-release-date>
 
             <span *ngIf="revisionNumber && revisionNumber > 1">
                 <div class="tags has-addons">
-                    <span class="tag">Revision</span>
+                    <span class="tag is-dark">Revision</span>
                     <span class="tag is-link">
                         {{ revisionDatetime ? (revisionDatetime | date: 'yyyy-MM-dd') : '' }} ({{ revisionNumber }})
                     </span>

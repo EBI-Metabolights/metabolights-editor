@@ -10,6 +10,19 @@
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
+      <span *ngIf="status != 'Public'">
+      <span>
+      If you study reaches 'Private' status, you can make your study public at any time.
+      MetaboLights will automatically release your dataset to the public upon <b>notification of the corresponding publication</b>.
+      MetaboLights team selects your study for manual curation, it will be public after the curation is complete.
+      Otherwise, if <b>the selected release date</b> is reached, it will be made public automatically.
+      </span>
+      <br/>
+      <br/>
+      Please select a release date for this study.
+      </span>
+      <br>
+      <br>
       <mat-form-field>
         <input
           matInput
@@ -21,6 +34,15 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
+      <br>
+      <br>
+      <span>
+        <b>Note:</b>
+      </span>
+      <br/>
+      <span>
+        Due to increased data submissions, MetaboLights curation stage may be longer than the selected release date.
+      </span>
     </section>
     <footer class="modal-card-foot buttons is-right">
       <div class="columns is-gapless full-width">
