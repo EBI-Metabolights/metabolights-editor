@@ -22,7 +22,7 @@
     "Parameter Value[Scan m/z range]": "100-1000",
     "Parameter Value[Instrument]": "Thermo Scientific Q Exactive HF",
     "Term Source REF.2": "MTBLS",
-    "Term Accession Number.2": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_002243",
+    "Term Accession Number.2": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000660",
     "Parameter Value[Ion source]": "electrospray ionization",
     "Term Source REF.3": "MS",
     "Term Accession Number.3": "http://purl.obolibrary.org/obo/MS_1000073",

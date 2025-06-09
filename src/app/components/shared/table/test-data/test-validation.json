@@ -1663,7 +1663,7 @@
                       "values": [
                         {
                           "name": "HILIC",
-                          "value": "hilic",
+                          "value": "HILIC",
                           "header": "Column Type"
                         },
                         {
@@ -1712,8 +1712,8 @@
                       "disabled": false,
                       "values": [
                         {
-                          "name": "Hilic",
-                          "value": "hilic",
+                          "name": "HILIC",
+                          "value": "HILIC",
                           "header": "Column Type"
                         },
                         {

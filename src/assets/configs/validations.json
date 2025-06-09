@@ -368,7 +368,7 @@
       "is-read-only": "false",
       "is-hidden": "false",
       "technique": "mass spectrometry|NMR spectroscopy",
-      "description": "Add terms describing study design type eg. Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolomics",
+      "description": "Add terms describing study design type eg. Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolites",
       "placeholder": "Metabolomics, Lipidomics",
       "rules": [
         {
@@ -1339,6 +1339,7 @@
           "columnDef": "sample",
           "sticky": "false",
           "header": "Sample Name",
+          "is-required": "true",
           "cell": "(element) => element.outputs[0].name"
         },
         {
@@ -1352,7 +1353,7 @@
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry|NMR spectroscopy",
-            "description": "The type of the Factor driving this study, e.g. NCBITaxon:9606 (Homo sapiens), etc.",
+            "description": "The species name of the organism from which the sample originates e.g. Homo sapiens (NCBITaxon:9606).",
             "placeholder": "NCBITaxon:9606",
             "rules": [
               {
@@ -1383,7 +1384,7 @@
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry|NMR spectroscopy",
-            "description": "The type of the Factor driving this study, e.g. BTO:0000131 (Blood plasma), etc.",
+            "description": "The part of the organism from which the sample originates e.g. Blood plasma (BTO:0000131) etc.",
             "placeholder": "BTO:0000131",
             "rules": [
               {
@@ -1410,11 +1411,11 @@
           "data-type": "ontology",
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "true",
+            "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry|NMR spectroscopy",
-            "description": "The type of the Factor driving this study, e.g. PATO:0001227 (Variant), etc.",
+            "description": "",
             "placeholder": "PATO:0001227",
             "rules": [
               {
@@ -1441,7 +1442,7 @@
           "data-type": "ontology",
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "true",
+            "is-required": "false",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry|NMR spectroscopy",
@@ -1493,6 +1494,7 @@
         {
           "columnDef": "source",
           "sticky": "false",
+          "is-required": "true",
           "header": "Source Name",
           "conditional": false,
           "cell": "(element) => element "
@@ -2217,7 +2219,7 @@
                         "values": [
                           {
                             "name": "HILIC",
-                            "value": "hilic",
+                            "value": "HILIC",
                             "header": "Column Type"
                           },
                           {
@@ -2267,7 +2269,7 @@
                         "values": [
                           {
                             "name": "Hilic",
-                            "value": "hilic",
+                            "value": "HILIC",
                             "header": "Column Type"
                           },
                           {
