@@ -76,7 +76,7 @@
   </div>
 </div>
 <div *ngIf="!isReadOnly && !dismissed" class="notification is-primary">
-  <small><mat-icon>info</mat-icon> When editing there is the option to switch between the 'Compact Table' and 'Expand Table' view 
+  <small><mat-icon>info</mat-icon> When editing there is the option to switch between the 'Compact Table' and 'Expand Table' view
 </small><span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
 <span *ngIf="!isReadOnly" #spacer></span>
@@ -89,7 +89,7 @@
     padding: 10px;
     border: 1px solid rgba(0, 0, 0, 0.03);
   "
-  
+
   [spacer]="spacer"
   marginTop="50"
 >
@@ -110,14 +110,14 @@
       </p>
     </div>
     &nbsp;
-    <span *ngIf="data">
+    <!-- <span *ngIf="data">
       <mtbls-upload
         [fileTypes]="fileTypes"
         [type]="'file'"
         [multiple]="false"
         [file]="data.file"
       ></mtbls-upload>
-    </span>
+    </span> -->
     &nbsp;
     <span *ngIf="data && data.file">
       <mtbls-download [value]="data.file"></mtbls-download>
@@ -282,10 +282,10 @@
         mat-header-row
         *matHeaderRowDef="displayedTableColumns"
       ></tr>
-      <tr mat-row 
+      <tr mat-row
       *matRowDef="let row; columns: displayedTableColumns"
       [ngClass]="{
-        'first-row': isFirstRow(row) && templateRowPresent, 
+        'first-row': isFirstRow(row) && templateRowPresent,
         'unclickable': isFirstRow(row) && templateRowPresent,
         'watermark': isFirstRow(row) && templateRowPresent
       }"></tr>

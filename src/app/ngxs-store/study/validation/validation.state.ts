@@ -76,8 +76,8 @@ export class ValidationState {
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
         if (!action.test) {
-            this.validationService.getValidationV2Report(action.proxy, action.taskId, action.studyId).subscribe(
-                (response) => {
+            this.validationService.getValidationV2Report(action.proxy, action.taskId, action.studyId).subscribe({
+                next: (response) => {
                     if (response.status !== 'error') {
                         const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
                         ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask));
@@ -100,10 +100,10 @@ export class ValidationState {
                         console.debug(JSON.stringify(response.errorMessage));
                     }
                 },
-                (error)=> {
+                error: (error)=> {
                     console.log("Could not get new ws3 report");
                     console.log(JSON.stringify(error));
-                })
+                }})
         } else {
             this.validationService.getFakeValidationReportApiResponse().subscribe((response) => {
                 ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
