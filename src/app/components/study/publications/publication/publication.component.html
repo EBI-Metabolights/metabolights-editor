@@ -14,14 +14,14 @@
       <div class="content">
         <h4 class="publication-title">
           <b>
-            {{ publication.title | slice: 0:90
-            }}<span *ngIf="publication.title.length > 90">...</span>
+            {{ publication.title | slice: 0:100
+            }}<span *ngIf="publication.title.length > 100">...</span>
           </b>
         </h4>
         <h6 class="publication-authors" style="margin-bottom: 0">
           <small>
-            <mat-icon>people</mat-icon> {{ publication.authorList | slice: 0:60
-            }}<span *ngIf="publication.authorList.length > 60">...</span>
+            <mat-icon>people</mat-icon> {{ publication.authorList | slice: 0:90  }}
+            <span *ngIf="publication.authorList.length > 90">...</span>
           </small>
         </h6>
         <a
@@ -38,7 +38,9 @@
         >
           <mat-icon>insert_link</mat-icon>
         </a>
-        <span *ngIf="publication?.status?.annotationValue?.length > 0" class="tag is-default is-small publication-status"><ontology-details [value]="publication.status"></ontology-details></span>
+        <span *ngIf="publication?.status?.annotationValue?.length > 0" class="tag is-default is-small publication-status">
+          {{publication.status.annotationValue}}
+        </span>
 
       </div>
     </article>

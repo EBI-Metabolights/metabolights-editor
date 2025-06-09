@@ -9,6 +9,7 @@ import * as toastr from "toastr";
   styleUrls: ["./ontology-details.component.css"],
 })
 export class OntologyDetailsComponent implements OnInit {
+  @Input("showOntologyDetail") showOntologyDetail: boolean = true;
   @Input(/*'value'*/) value: Ontology;
   details: any = null;
   isModalOpen = false;
@@ -31,6 +32,9 @@ export class OntologyDetailsComponent implements OnInit {
   }
 
   displayOntologyInfo() {
+    if (!this.showOntologyDetail) {
+      return
+    }
     this.isLoading = true;
     const value = Object.assign({}, this.value);
     this.editorService.getOntologyDetails(value).subscribe(
