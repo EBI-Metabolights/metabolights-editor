@@ -7,7 +7,7 @@
       "data-type": "ontology",
       "ontology-details": {
         "data-type": "ontology",
-        "is-required": "true",
+        "is-required": "false",
         "is-read-only": "false",
         "is-hidden": "false",
         "technique": "",
@@ -582,7 +582,7 @@
           "columns": {
             "Parameter Value[Scan polarity]": {
               "data-type": "list",
-              "is-required": "false",
+              "is-required": "true",
               "is-read-only": "true",
               "is-hidden": "false",
               "technique": "Mass spectrometry",
@@ -599,7 +599,7 @@
             },
             "Parameter Value[Scan m/z range]": {
               "data-type": "string",
-              "is-required": "false",
+              "is-required": "true",
               "is-read-only": "true",
               "is-hidden": "false",
               "technique": "Mass spectrometry",
@@ -616,7 +616,7 @@
             },
             "Parameter Value[Instrument]": {
               "data-type": "ontology",
-              "is-required": "false",
+              "is-required": "true",
               "is-read-only": "true",
               "is-hidden": "false",
               "technique": "Mass spectrometry",
@@ -1671,7 +1671,7 @@
           "data-type": "ontology",
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "false",
+            "is-required": "true",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1721,7 +1721,7 @@
           "data-type": "string",
           "ontology-details": {
             "data-type": "string",
-            "is-required": "false",
+            "is-required": "true",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1746,7 +1746,7 @@
           "data-type": "string",
           "ontology-details": {
             "data-type": "string",
-            "is-required": "false",
+            "is-required": "true",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
@@ -1822,11 +1822,11 @@
           "data-type": "string",
           "ontology-details": {
             "data-type": "string",
-            "is-required": "false",
+            "is-required": "true",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",
-            "description": "Please select the scan polarity.",
+            "description": "An acquisition mode to which specifies weather polarity is negative, positive or alternating. Please select the scan polarity.",
             "placeholder": "",
             "rules": [
             ],
@@ -1848,7 +1848,7 @@
           "techniqueNames": ["LCMS"],
           "ontology-details": {
             "data-type": "ontology",
-            "is-required": "false",
+            "is-required": "true",
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry",

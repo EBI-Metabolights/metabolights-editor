@@ -82,7 +82,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   ontologyDetails: any = {};
   readonly = false;
   baseHref: string;
-
+  isRequired: boolean = false
   fadeState: 'in' | 'out' = 'out';
 
 
@@ -108,7 +108,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
    async ngOnInit() {
-    
+
     this.baseHref = this.configService.baseHref;
     this.baseURL = this.configService.config.metabolightsWSURL.baseURL;
     if (this.baseURL.endsWith("/")){
@@ -129,6 +129,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
       }
     }
+    this.isRequired = this.validations["is-required"] == "true"
     this.isFormBusy = false;
     this.searchedMore = false;
     this.getDefaultTerms();
