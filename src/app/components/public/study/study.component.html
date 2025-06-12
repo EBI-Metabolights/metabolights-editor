@@ -174,7 +174,7 @@
         </div>
       </div>-->
               <!-- Right Column -->
-              <div *ngIf="isOwner || isCurator" class="study-meta-right">
+              <div *ngIf="false" class="study-meta-right">
                 <div class="tags has-addons">
                   <span class="tag">
                     <i class="material-icons">edit</i>
@@ -196,11 +196,7 @@
                 </div>
               </div>
       <span *ngIf="!studyError">
-        <mtbls-title></mtbls-title>
-        <mtbls-people></mtbls-people>
-        <mtbls-description></mtbls-description>
-        <mtbls-organisms></mtbls-organisms>
-      <mtbls-overview-badges
+              <mtbls-overview-badges
       [studyError]="studyError"
       [revisionDatetime]="revisionDatetime"
       [revisionNumber]="revisionNumber"
@@ -210,6 +206,10 @@
       [status]="status"
       [validationStatus]="validationStatus"
       [validation]="validation"></mtbls-overview-badges>
+        <mtbls-title></mtbls-title>
+        <mtbls-people></mtbls-people>
+        <mtbls-description></mtbls-description>
+        <mtbls-organisms></mtbls-organisms>
         <mtbls-publications></mtbls-publications>
       </span>
       <div id="tab-content-wrapper" class="px-20 mt-20">
