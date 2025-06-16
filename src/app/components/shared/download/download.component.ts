@@ -35,6 +35,7 @@ export class DownloadComponent implements OnInit {
   ngOnInit() {}
 
   getDownloadLink() {
-    return this.metabolightsService.downloadLink(this.file, this.code);
+    const link = this.metabolightsService.downloadLink(this.file, this.code);
+    return link;
   }
 }

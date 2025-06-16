@@ -1,6 +1,8 @@
+import { PlatformLocation } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngxs/store';
+import { ConfigurationService } from 'src/app/configuration.service';
 import { Loading } from 'src/app/ngxs-store/non-study/transitions/transitions.actions';
 import { EditorService } from 'src/app/services/editor.service';
 import { ErrorMessageService } from 'src/app/services/error-message.service';
@@ -14,29 +16,38 @@ import { ErrorMessageService } from 'src/app/services/error-message.service';
 })
 export class StudyNotPublicComponent implements OnInit {
   study: string = ""
+  metabolightsWebsiteUrl = ""
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
     private router: Router,
-    private editorService: EditorService
-) {}
+    private editorService: EditorService,
+    private configService: ConfigurationService) {
+      const url = this.configService.config.endpoint;
+      if(url.endsWith("/")){
+        this.metabolightsWebsiteUrl = url.slice(0, -1);
+      } else {
+        this.metabolightsWebsiteUrl = url;
+      }
+}
 
   ngOnInit() {
     
     this.store.dispatch(new Loading.Disable())
-     
-      this.route.queryParams.subscribe((params) => {
 
+      this.route.queryParams.subscribe((params) => {
+        this.study = params.studyIdentifier;
         const url = this.editorService.redirectUrl ?? "";
-        if (url !== "" ) {
-          const path = url.split("?")[0].replace("/", "");
-          if(!path.includes('MTBLS')) {
-            this.router.navigate(['login']); 
-          } //safeguard in case we somehow arrived here by some manual way
-          this.study = path;
-        } else {
-        }
       });
+  }
+
+  login(){
+    this.router.navigate(['login']);
+  }
+
+  homePage(){
+    window.location.href = this.metabolightsWebsiteUrl
   }
 
 }

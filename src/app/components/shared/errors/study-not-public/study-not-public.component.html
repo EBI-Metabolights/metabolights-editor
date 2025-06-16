@@ -9,7 +9,7 @@
           </div>
           <div  class="message-body">
             <div class="container">
-                
+
                 <p>The MetaboLights study <strong>{{ study }}</strong> has been accessioned but not yet publicly released.</p>
                 <br>
                 <b>If you are a reviewer of a manuscript that includes this dataset:</b>
@@ -32,9 +32,16 @@
                     <li>It is not available at this time.</li>
                     <li>Please check again later or contact the submitter(s) or MetaboLights team to see when it will be public.</li>
                 </ul>
+                <br>
+                <b>If you are submitter of this study:</b>
+                <ul class="ml">
+                    <li>You can update your study (e.g., publication DOI, public release date, etc.) or make it public.</li>
+                    <br>
+                    <a class="button is-info" (click)="login()" > Login </a>
+                     <a class="button is-info ml" (click)="homePage()" > MetaboLights Home Page </a>
+                </ul>
             </div>
           </div>
         </article>
       </div>
   </div>
-  

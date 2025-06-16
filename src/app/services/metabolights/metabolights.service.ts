@@ -289,16 +289,28 @@ export class MetabolightsService extends DataService {
   }
 
   downloadLink(name, code) {
+    if (code) {
+      return (
+        this.url.baseURL +
+        "/studies" +
+        "/" +
+        this.id +
+        "/download/" +
+        code +
+        "?file=" +
+        name
+      );
+    }
     return (
-      this.url.baseURL +
-      "/studies" +
-      "/" +
-      this.id +
-      "/download/" +
-      code +
-      "?file=" +
-      name
-    );
+        this.url.baseURL +
+        "/studies" +
+        "/" +
+        this.id +
+        "/download" +
+        "?file=" +
+        name
+      );
+
   }
 
   copyFiles() {

@@ -40,9 +40,13 @@ export class AuthGuard  implements OnInit {
       studyIdentifier = url.split("/")[1];
       isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
     }
+    else if (url.startsWith("/study/MTBLS")) {
+      studyIdentifier = url.split("/")[2];
+      isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
+    }
     const continueProcess = await this.checkAuthenticationRequest(state);
     if (continueProcess === false) {
-      if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"]);
+      if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
       return false;
     }
     return await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
@@ -296,7 +300,7 @@ export class AuthGuard  implements OnInit {
       }
       if (isPrivateWithMTBLSAccession) {
         this.editorService.redirectUrl = url;
-        this.router.navigate(["/study-not-public"]);
+        this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
         return false;
       }
 
@@ -310,6 +314,16 @@ export class AuthGuard  implements OnInit {
         this.store.dispatch(new StudyPermissionNS.Set(permissions))
         return true;
       } else {
+        if (url.startsWith("/study/MTBLS") && studyPermission.view === false ){
+          this.editorService.redirectUrl = url;
+          const errorCode = "E-0001-004";
+          if (isPrivateWithMTBLSAccession){
+            this.router.navigate([url.replace("/study/", "/")]);
+            return false
+          }
+          this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+          return false
+        }
         if (studyPermission.submitterOfStudy === true && studyPermission.view === true && url.startsWith("/study/MTBLS")) {
           this.editorService.redirectUrl = url;
           this.router.navigate([url.replace("/study","")]);
