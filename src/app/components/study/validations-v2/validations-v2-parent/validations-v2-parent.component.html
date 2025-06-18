@@ -5,23 +5,15 @@
     <!--Validation v2 information start-->
 
     <div *ngIf="validationEnabled" class="notification is-primary attention">
-        <b><mat-icon>report</mat-icon>This is version 2 of the MetaboLights Validation, which has now replaced study validation framework v1.</b><br>
         <p>
-            With the aim of improving reporting and speeding up data release, the MetaboLights team has developed a more structured and stricter new study validation ruleset - study validation v2 (<a href="https://github.com/EBI-Metabolights/mtbls-validation">https://github.com/EBI-Metabolights/mtbls-validation</a>).
-            This study validation v2 has now replaced study validation v1.
+            <mat-icon>report</mat-icon> You <strong>must address all Errors and should also fix Warnings (where applicable) </strong> to progress your study and promote the status from 'Provisional' to 'Private' (or from 'Private' to 'Public').
+            Study validation will need to be re-run after making any type of edits to the study (e.g. metadata updates and/or data files uploads).
         </p>
         <br>
-        <p>
-            You must address all Errors and should also address Warnings (where applicable) to progress your study and promote the status from ‘Provisional’ to ‘Private’.
-        </p>
-        <br>
-        <p>
-            Note. Study validation will need to be re-run after making any type of edits to the study (e.g. metadata updates and/or data files uploads).
-        </p>
-        <p>
-            If you have any problems or queries, please see the <a href="{{ guidesUrl }}" target="_blank">guides</a>, please contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
-    </p>
 
+        <p>
+          If you have any problems or queries, please see the <a href="{{ guidesUrl }}" target="_blank">guides</a>, or think some validation rules may not be applicable for your study, contact us at <a href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.
+    </p>
 </div>
 
         <div *ngIf="validationNeeded" class="notification is-warning">
