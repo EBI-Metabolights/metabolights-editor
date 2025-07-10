@@ -1,16 +1,16 @@
 .material-modal-card {
     width: 100%;
-    max-width: 700px;
-    margin: auto;                      
+    max-width: 900px;
+    margin: auto;
     display: flex;
     flex-direction: column;
-    background: #fff;                   
+    background: #fff;
     border-radius: 4px;
     box-shadow: 0 5px 5px -3px rgba(0,0,0,0.2),
                 0 8px 10px 1px rgba(0,0,0,0.14),
                 0 3px 14px 2px rgba(0,0,0,0.12);
   }
-  
+
 
   .close-btn {
     align-self: flex-end;
@@ -29,16 +29,16 @@
   .flex-row {
     display: flex;
     align-items: flex-start;
-    gap: 0.5rem;         
+    gap: 0.5rem;
   }
-  
+
 
   .blocks-container {
     max-height: 50vh;
     overflow-y: auto;
     padding-right: 8px;
   }
-  
+
   .log-entry {
     display: flex;
     align-items: flex-start;
@@ -46,30 +46,71 @@
     border-radius: 4px;
     position: relative;
     transition: background-color 0.2s;
-    cursor: pointer; 
+    cursor: pointer;
   }
   .log-entry:hover {
     background-color: rgba(0, 0, 0, 0.04);
   }
-  
+
   .build-icon {
     margin-right: 8px;
     flex-shrink: 0;
   }
-  
+
   .log-text {
     white-space: normal;
     word-break: break-word;
     flex: 1 1 auto;
   }
-  
+
   .copy-icon {
     margin-left: 8px;
     visibility: hidden;
     cursor: pointer;
     flex-shrink: 0;
   }
-  
+
   .log-entry:hover .copy-icon {
     visibility: visible;
   }
+.mat-table {
+    width: 100%;
+  }
+
+  mat-card {
+    margin: 16px;
+    padding: 16px;
+  }
+
+  .scrollable-table-container {
+    max-height: 900px;
+    /* min-width: 600px; */
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: block;
+  }
+
+.mat-column-source {
+    flex: none;
+    width: 200px;
+    word-break: break-all;
+}
+.mat-column-action {
+    flex: none;
+    width: 200px;
+    word-break: break-all;
+}
+.mat-column-oldValue {
+    flex: none;
+    width: 200px;
+    word-break: break-all;
+}
+.mat-column-newValue {
+    flex: none;
+    width: 200px;
+    word-break: break-all;
+}
+
+.modal-content, .modal-card {
+  width: 900px;
+}
