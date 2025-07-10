@@ -79,8 +79,8 @@ export class GeneralMetadataState {
 
     @Action(GetGeneralMetadata)
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
-        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
-            (gm_response) => {
+        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe({
+            next: (gm_response) => {
                 const state = ctx.getState();
                 if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
                 if (state.id !== action.studyId) ctx.dispatch(new Identifier.Set(action.studyId));
@@ -128,7 +128,7 @@ export class GeneralMetadataState {
                     this.store.dispatch(new SetReadonly(false));
                 }
             },
-            (error) => {
+            error: (error) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new Loading.Disable());
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
@@ -137,7 +137,7 @@ export class GeneralMetadataState {
                 }
 
 
-            })
+            }})
     }
 
     @Action(Identifier.Set)
