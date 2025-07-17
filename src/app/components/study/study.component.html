@@ -89,7 +89,7 @@
   </div>
 
   <div class="main-wrapper" [ngClass]="{ smt: status != 'Provisional' }">
-    <div style="margin: 20px">
+    <!-- <div style="margin: 20px">
       <article class="message is-small has-shadow">
         <div (click)="toggleMessage()" class="message-header">
           <p>
@@ -117,7 +117,7 @@
           <div class="banner"[innerHTML]="banner"></div>
         </div>
       </div>
-    </div>
+    </div> -->
     <span *ngIf="requestedStudy != undefined">
       <div
         *ngIf="!studyError"
