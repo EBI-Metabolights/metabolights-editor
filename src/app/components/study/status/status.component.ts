@@ -13,12 +13,14 @@ import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
-import { RevisionNumber, StudyStatus } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { RevisionNumber, StudyStatus, StudyStatusUpdateTask } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { Loading, SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { ViolationType } from "../validations-v2/interfaces/validation-report.types";
 import { RevisionStatusTransformPipe } from "../../shared/pipes/revision-status-transform.pipe";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ConfigurationService } from "src/app/configuration.service";
+import { IStudy } from "src/app/models/mtbl/mtbls/interfaces/study.interface";
+import { IStudyStatusUpdateTask } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
 
 @Component({
   selector: "mtbls-status",
@@ -40,16 +42,16 @@ export class StatusComponent implements OnInit {
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
   revisionComment$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionComment);
   revisionTaskMessage$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionTaskMessage);
+  statusUpdateTask$: Observable<IStudyStatusUpdateTask> = inject(Store).select(GeneralMetadataState.statusUpdateTask);
 
   revisionNumber = null;
   revisionDatetime = null;
-  revisionNumberrevisionStatus = null;
   revisionTaskMessage = ""
   revisionComment = ""
   revisionStatusTransform = new RevisionStatusTransformPipe()
 
   isReadOnly = false;
-  isRevisionStatusModalOpen = false;
+  isStatusUpdateModalOpen = false;
   isModalOpen = false;
   isFormBusy = false;
   status: string = null;
@@ -57,11 +59,13 @@ export class StatusComponent implements OnInit {
   toStatus = "Provisional";
   curationRequest = "";
   curationStatus = "";
-  newRevisionComment  = ""
+  newRevisionComment = ""
   requestedStudy: string = null;
   baseHref: string;
   validationStatus: ViolationType = null;
   revisionStatus = ""
+  statusUpdateTask: IStudyStatusUpdateTask = null;
+  openModalRequested = false;
   private toastrSettings: Record<string, any> = {}
   constructor(
     private fb: UntypedFormBuilder,
@@ -72,11 +76,20 @@ export class StatusComponent implements OnInit {
     private configService: ConfigurationService,
   ) {
     this.baseHref = this.configService.baseHref;
-      this.setUpSubscriptionsNgxs();
+    this.setUpSubscriptionsNgxs();
   }
 
 
   setUpSubscriptionsNgxs() {
+
+
+    this.statusUpdateTask$.subscribe((value) => {
+      this.statusUpdateTask = value;
+      if (this.openModalRequested && (this.statusUpdateTask == null || this.statusUpdateTask.taskId == null || this.statusUpdateTask.taskId === "")) {
+        this.isModalOpen = true;
+        this.openModalRequested = false;
+      }
+    });
     this.toastrSettings$.subscribe((value) => {
       this.toastrSettings = value;
     })
@@ -140,7 +153,7 @@ export class StatusComponent implements OnInit {
         }
       }
 
-      });
+    });
 
     this.studyStatus$.pipe(filter(val => val !== null)).subscribe((value) => {
       this.closeModal();
@@ -184,6 +197,10 @@ export class StatusComponent implements OnInit {
     this.toStatus = toStatus
   }
   applyChanges() {
+    if (this.hasStatusUpdateTask()) {
+      return;
+    }
+
     let newRevisionComment = ""
     if (this.revisionNumber == 0) {
       newRevisionComment = 'Initial revision'
@@ -205,13 +222,13 @@ export class StatusComponent implements OnInit {
             this.store.dispatch(new Loading.Enable())
             this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
             this.closeModal();
-            this.store.dispatch(new RevisionNumber.New(newRevisionComment)).subscribe(
-              (completed) => {
+            this.store.dispatch(new RevisionNumber.New(newRevisionComment)).subscribe({
+              next: (completed) => {
                 this.closeModal();
                 this.store.dispatch(new Loading.Disable())
                 this.toStatus = this.status;
               },
-              (error) => {
+              error: (error) => {
                 this.closeModal();
                 this.store.dispatch(new Loading.Disable())
                 this.toStatus = this.status;
@@ -229,12 +246,13 @@ export class StatusComponent implements OnInit {
                 });
 
               }
+            }
             )
           } else {
             this.toStatus = this.status
           }
         }
-      )
+        )
       }
       else {
         Swal.fire({
@@ -250,12 +268,13 @@ export class StatusComponent implements OnInit {
             this.store.dispatch(new Loading.Enable())
             this.store.dispatch(new SetLoadingInfo("Updating study status ..."))
             this.closeModal();
-            this.store.dispatch(new StudyStatus.Update(this.toStatus)).subscribe(
-              (completed) => {
+            this.store.dispatch(new StudyStatus.Update(this.toStatus)).subscribe({
+              next: (completed) => {
                 this.closeModal();
                 this.store.dispatch(new Loading.Disable())
                 this.toStatus = this.status;
-              }, (error) => {
+              },
+              error: (error) => {
                 this.closeModal();
                 this.store.dispatch(new Loading.Disable())
                 this.toStatus = this.status;
@@ -273,65 +292,97 @@ export class StatusComponent implements OnInit {
                 });
 
               }
+            }
             )
           } else {
             this.toStatus = this.status
           }
         }
-      )
+        )
+      }
     }
+  }
+
+  ngOnInit() { }
+
+  openStatusUpdateModel() {
+
+    this.isStatusUpdateModalOpen = true
+  }
+
+  closeStatusUpdateModel() {
+
+    this.isStatusUpdateModalOpen = false
+  }
+  checkAndOpenModal() {
+    if (this.hasStatusUpdateTask()) {
+      return;
     }
+    this.openModalRequested = true;
+    this.store.dispatch(new StudyStatusUpdateTask.Check()).subscribe({
+      next: (result) => {
+        this.store.dispatch(new Loading.Disable())
+      },
+      error: (error) => {
+        this.store.dispatch(new Loading.Disable())
+      }
+    });
+
   }
 
-  ngOnInit() {}
+  onCommentChange(event: any) {
+    this.revisionComment = event.target.value;
+  };
 
-  openRevisionStatusModel() {
-
-    this.isRevisionStatusModalOpen = true
+  closeModal() {
+    this.isModalOpen = false;
+    this.openModalRequested = false;
   }
 
-  closeRevisionStatusModel() {
-
-    this.isRevisionStatusModalOpen = false
-  }
-  openModal() {
-
-    if (["Initiated", "In Progress"].includes(this.revisionStatus.toLowerCase()) && (this.revisionNumber > 0)) {
-      toastr.error("Please wait Public FTP synchronization task. You may refresh your study page to view the latest status of the study. ", "Error", {
-        timeOut: "5000",
+  hasStatusUpdateTask() {
+    if (this.statusUpdateTask !== null && this.statusUpdateTask.taskId !== "") {
+      const message = "Status update task is already in progress.";
+      toastr.error(message, "Error", {
+        timeOut: "10000",
         positionClass: "toast-top-center",
         preventDuplicates: true,
         extendedTimeOut: 0,
         tapToDismiss: false,
       });
+      return true;
+    }
+    return false;
+  }
+
+  showModel() {
+    this.openModalRequested = false;
+    if (this.hasStatusUpdateTask()) {
+      return;
     }
 
     this.toStatus = this.status;
 
-    if  (this.curator){
-      this.isModalOpen = true;
-    } else {
-      if (this.status != null &&  ["private", "provisional", "in review"].includes(this.status.toLowerCase())) {
-        if (["private", "in review"].includes(this.status.toLowerCase()) && (this.revisionNumber > 0)) {
-          toastr.error("Your dataset will be public. It is not allowed to change current status.", "Error", {
-            timeOut: "5000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-        }
-        else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
-          toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
-            timeOut: "5000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-        } else {
-          this.isModalOpen = true;
-        }
+    if (this.status != null && ["private", "provisional", "in review"].includes(this.status.toLowerCase())) {
+      if (["private", "in review"].includes(this.status.toLowerCase()) && (this.revisionNumber > 0)) {
+        toastr.error("Your dataset will be public. It is not allowed to change current status.", "Error", {
+          timeOut: "5000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
+      }
+      else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
+        toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
+          timeOut: "5000",
+          positionClass: "toast-top-center",
+          preventDuplicates: true,
+          extendedTimeOut: 0,
+          tapToDismiss: false,
+        });
+      } else {
+        this.isModalOpen = true;
+      }
     } else {
       toastr.error("You can not update your study status.", "Error", {
         timeOut: "5000",
@@ -341,13 +392,5 @@ export class StatusComponent implements OnInit {
         tapToDismiss: false,
       });
     }
-  }
-}
-  onCommentChange(event: any) {
-    this.revisionComment = event.target.value;
-  };
-
-  closeModal() {
-    this.isModalOpen = false;
   }
 }

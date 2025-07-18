@@ -2,7 +2,7 @@
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
 
-    <span class="tag clickable" (click)="openModal()"
+    <span class="tag clickable" (click)="checkAndOpenModal()"
     [class.is-primary]="status == 'In Review'"
     [class.is-primary]="status == 'Private'"
     [class.is-warning]="status == 'Provisional'"
@@ -13,23 +13,31 @@
       }}
     </span>
 
-  <span *ngIf="!isReadOnly && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable" (click)="openRevisionStatusModel()">
+  <!-- <span *ngIf="!isReadOnly && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable" (click)="openStatusUpdateModel()">
+    <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
+  </span> -->
+  <span *ngIf="statusUpdateTask.taskId" class="tag clickable" (click)="openStatusUpdateModel()">
     <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
   </span>
-
   </div>
 
 </div>
-<div class="modal" [ngClass]="{ 'is-active': isRevisionStatusModalOpen }">
+<div class="modal" [ngClass]="{ 'is-active': isStatusUpdateModalOpen }">
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
-      The study metadata and data files are being copied to Public FTP server.
+      <span *ngIf="status == 'Provisional'">
+        The study metadata and data files are being validated.
+        After completion of the task, study status will be updated. <br>
+        If your study status is not updated within 24 hours, please contact with MetaboLights team.
+      </span>
       <span *ngIf="status == 'Private'">
+        The study metadata and data files are being copied to Public FTP server. <br>
         After completion of the task, study status will be updated to Public.
         If your study is not public within 24 hours, please contact with MetaboLights team.
       </span>
       <span *ngIf="status == 'Public'">
+        The study metadata and data files are being copied to Public FTP server. <br>
         After completion of the task, new study revision will be published on public FTP server.
       </span>
 
@@ -54,7 +62,7 @@
       <div class="columns is-gapless full-width">
         <div class="column is-two-third"></div>
         <div class="column is-one-third has-text-right">
-          <button class="button" [disabled]="isFormBusy" (click)="closeRevisionStatusModel()">
+          <button class="button" [disabled]="isFormBusy" (click)="closeStatusUpdateModel()">
             Close
           </button>
         </div>
