@@ -9,6 +9,7 @@ export interface IStudySummary {
 
 export interface IStudyStatusUpdateTask {
   taskId: string;
+  taskStatus: string;
   currentStatus: string;
   currentStudyId: string;
 }
@@ -29,6 +30,7 @@ export interface IMtblsStudySummaryInformation {
   revisionComment: string;
   revisionTaskMessage: string;
   statusUpdateTaskId: string;
+  statusUpdateTaskResult: string;
   studyHttpUrl: string;
   studyFtpUrl: string;
   studyGlobusUrl: string;

@@ -16,7 +16,7 @@
   <!-- <span *ngIf="!isReadOnly && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable" (click)="openStatusUpdateModel()">
     <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
   </span> -->
-  <span *ngIf="statusUpdateTask.taskId" class="tag clickable" (click)="openStatusUpdateModel()">
+  <span *ngIf="statusUpdateInProgress" class="tag clickable" (click)="openStatusUpdateModel()">
     <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
   </span>
   </div>
@@ -26,15 +26,10 @@
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
-      <span *ngIf="status == 'Provisional'">
-        The study metadata and data files are being validated.
-        After completion of the task, study status will be updated. <br>
-        If your study status is not updated within 24 hours, please contact with MetaboLights team.
-      </span>
       <span *ngIf="status == 'Private'">
-        The study metadata and data files are being copied to Public FTP server. <br>
-        After completion of the task, study status will be updated to Public.
-        If your study is not public within 24 hours, please contact with MetaboLights team.
+        The study metadata and data files are being validated. <br/>
+        After completion of the task, study status will be updated or rolled back. <br>
+        If your study status is not updated within 24 hours, please contact with MetaboLights team.
       </span>
       <span *ngIf="status == 'Public'">
         The study metadata and data files are being copied to Public FTP server. <br>

@@ -25,7 +25,7 @@
     </article>
   </div>
   <div id="status-board" *ngIf="status == 'Private'">
-    <article class="message is-warning" *ngIf="isOwner || isCurator; else anonymousCurationArticle">
+    <article class="message is-warning" *ngIf=" isOwner || isCurator; else anonymousCurationArticle">
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> Your study

@@ -43,7 +43,7 @@ export class StatusComponent implements OnInit {
   revisionComment$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionComment);
   revisionTaskMessage$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionTaskMessage);
   statusUpdateTask$: Observable<IStudyStatusUpdateTask> = inject(Store).select(GeneralMetadataState.statusUpdateTask);
-
+  statusUpdateInProgress: boolean = false;
   revisionNumber = null;
   revisionDatetime = null;
   revisionTaskMessage = ""
@@ -85,6 +85,7 @@ export class StatusComponent implements OnInit {
 
     this.statusUpdateTask$.subscribe((value) => {
       this.statusUpdateTask = value;
+      this.checkStatusUpdateInProgress();
       if (this.openModalRequested && (this.statusUpdateTask == null || this.statusUpdateTask.taskId == null || this.statusUpdateTask.taskId === "")) {
         this.isModalOpen = true;
         this.openModalRequested = false;
@@ -339,8 +340,18 @@ export class StatusComponent implements OnInit {
     this.openModalRequested = false;
   }
 
+  checkStatusUpdateInProgress() {
+    this.statusUpdateInProgress = false;
+    if (this.statusUpdateTask
+      && this.statusUpdateTask.taskId
+      && this.statusUpdateTask.taskStatus
+      && ["INITIATED", "EXECUTING"].includes(this.statusUpdateTask.taskStatus.toUpperCase())) {
+      this.statusUpdateInProgress = true;
+    }
+  }
+
   hasStatusUpdateTask() {
-    if (this.statusUpdateTask !== null && this.statusUpdateTask.taskId !== "") {
+    if (this.statusUpdateTask !== null && this.statusUpdateTask.taskId !== "" && this.statusUpdateTask.taskId !== null) {
       const message = "Status update task is already in progress.";
       toastr.error(message, "Error", {
         timeOut: "10000",

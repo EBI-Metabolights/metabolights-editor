@@ -113,6 +113,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new RevisionTaskMessage.Set(gm_response.mtblsStudy.revisionTaskMessage));
                 ctx.dispatch(new StudyStatusUpdateTask.Set({
                     taskId: gm_response.mtblsStudy.statusUpdateTaskId,
+                    taskStatus: gm_response.mtblsStudy.statusUpdateTaskResult,
                     currentStatus: gm_response.mtblsStudy.studyStatus,
                     currentStudyId: action.studyId
                 }));
@@ -571,9 +572,10 @@ export class GeneralMetadataState {
                   const obfuscationCode = response["obfuscation_code"]
                   ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
                 }
-                if (response.hasOwnProperty("task_id")){
+                if (response.hasOwnProperty("task_id") && response.hasOwnProperty("task_id") ){
                   const statusUpdateTaskId = response["task_id"]
                   ctx.dispatch(new StudyStatusUpdateTask.Set({taskId: statusUpdateTaskId,
+                    taskStatus: response["task_status"],
                     currentStatus: assigned_status,
                     currentStudyId: updated_study_id}));
                 }
@@ -607,10 +609,17 @@ export class GeneralMetadataState {
                 if (assigned_status.toLocaleLowerCase() !== state.status.toLocaleLowerCase()) {
                   ctx.dispatch(new StudyStatus.Set(assigned_status));
                 }
+                let statusUpdateTaskId = null;
                 if (response.hasOwnProperty("statusUpdateTaskId")){
-                  const statusUpdateTaskId = response["statusUpdateTaskId"]
-                  ctx.dispatch(new StudyStatusUpdateTask.Set({taskId: statusUpdateTaskId, currentStatus: assigned_status, currentStudyId: updated_study_id}));
+                  statusUpdateTaskId = response["statusUpdateTaskId"]
+
                 }
+                let statusUpdateTaskResult = null;
+                if (response.hasOwnProperty("statusUpdateTaskResult")){
+                  statusUpdateTaskResult = response["statusUpdateTaskResult"]
+
+                }
+                ctx.dispatch(new StudyStatusUpdateTask.Set({taskId: statusUpdateTaskId, taskStatus: statusUpdateTaskResult, currentStatus: assigned_status, currentStudyId: updated_study_id}));
             }
         )
     }
