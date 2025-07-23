@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, StudyStatusUpdateTask } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -17,6 +17,7 @@ import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
 import { User } from "../../non-study/user/user.actions";
 import { DatasetLicense, DatasetLicenseService } from "src/app/services/decomposed/dataset-license.service";
+import { IStudyStatusUpdateTask } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
 
 
 export interface GeneralMetadataStateModel {
@@ -36,6 +37,7 @@ export interface GeneralMetadataStateModel {
     revisionStatus: number;
     revisionComment: string;
     revisionTaskMessage: string;
+    statusUpdateTask: IStudyStatusUpdateTask;
     publicHttpUrl: string;
     publicFtpUrl: string;
     publicGlobusUrl: string;
@@ -58,11 +60,12 @@ const defaultState: GeneralMetadataStateModel = {
     revisionStatus: null,
     revisionComment: null,
     revisionTaskMessage: null,
+    statusUpdateTask: null,
     publicHttpUrl: null,
     publicFtpUrl: null,
     publicGlobusUrl: null,
     publicAsperaPath: null
-}
+};
 
 @State<GeneralMetadataStateModel>({
     name: 'general',
@@ -105,10 +108,14 @@ export class GeneralMetadataState {
                 ctx.dispatch(new CurationRequest.Set(gm_response.mtblsStudy.curationRequest));
                 ctx.dispatch(new RevisionNumber.Set(gm_response.mtblsStudy.revisionNumber));
                 ctx.dispatch(new RevisionDateTime.Set(gm_response.mtblsStudy.revisionDatetime));
-
                 ctx.dispatch(new RevisionStatus.Set(gm_response.mtblsStudy.revisionStatus));
                 ctx.dispatch(new RevisionComment.Set(gm_response.mtblsStudy.revisionComment));
                 ctx.dispatch(new RevisionTaskMessage.Set(gm_response.mtblsStudy.revisionTaskMessage));
+                ctx.dispatch(new StudyStatusUpdateTask.Set({
+                    taskId: gm_response.mtblsStudy.statusUpdateTaskId,
+                    currentStatus: gm_response.mtblsStudy.studyStatus,
+                    currentStudyId: action.studyId
+                }));
                 ctx.dispatch(new PublicFtpUrl.Set(gm_response.mtblsStudy.studyFtpUrl));
                 ctx.dispatch(new PublicHttpUrl.Set(gm_response.mtblsStudy.studyHttpUrl));
                 ctx.dispatch(new PublicGlobusUrl.Set(gm_response.mtblsStudy.studyGlobusUrl));
@@ -223,6 +230,16 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             status: action.status
+        });
+    }
+
+
+    @Action(StudyStatusUpdateTask.Set)
+    SetStatusUpdateTask(ctx: StateContext<GeneralMetadataStateModel>, action: StudyStatusUpdateTask.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            statusUpdateTask: action.statusUpdateTask
         });
     }
 
@@ -501,7 +518,12 @@ export class GeneralMetadataState {
         this.generalMetadataService.createRevision(state.id, action.revisionComment).subscribe(
             (response) => {
                 const state = ctx.getState();
-
+                if (response.hasOwnProperty("task_id")){
+                  const taskId = response["task_id"]
+                  if (taskId) {
+                    ctx.dispatch(new StudyStatusUpdateTask.Set(taskId));
+                  }
+                }
                 if (response.hasOwnProperty("revision_number")){
                   const revisionNumber = response["revision_number"]
                   if (state.revisionNumber !== revisionNumber) {
@@ -549,12 +571,46 @@ export class GeneralMetadataState {
                   const obfuscationCode = response["obfuscation_code"]
                   ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
                 }
+                if (response.hasOwnProperty("task_id")){
+                  const statusUpdateTaskId = response["task_id"]
+                  ctx.dispatch(new StudyStatusUpdateTask.Set({taskId: statusUpdateTaskId,
+                    currentStatus: assigned_status,
+                    currentStudyId: updated_study_id}));
+                }
                 const readOnlySub = this.store.select(state => state.ApplicationState && state.ApplicationState.readonly).pipe(take(1))
                 readOnlySub.subscribe((ro) => {
                     this.store.dispatch(new User.Studies.Get())
                     ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
                 })
 
+            }
+        )
+    }
+
+    @Action(StudyStatusUpdateTask.Check)
+    StatusUpdateTaskCheck(ctx: StateContext<GeneralMetadataStateModel>, action: StudyStatusUpdateTask.Check) {
+        const state = ctx.getState();
+        this.generalMetadataService.getStatusUpdateTask(state.id).pipe(take(1)).subscribe(
+            (response) => {
+                const state = ctx.getState();
+                let updated_study_id = state.id;
+                if (response.hasOwnProperty("currentStudyId")){
+                  updated_study_id = response["currentStudyId"]
+                  if (state.id !== updated_study_id) {
+                    ctx.dispatch(new Identifier.Set(updated_study_id));
+                  }
+                }
+                let assigned_status = state.status;
+                if (response.hasOwnProperty("currentStatus")){
+                  assigned_status = response["currentStatus"]
+                }
+                if (assigned_status.toLocaleLowerCase() !== state.status.toLocaleLowerCase()) {
+                  ctx.dispatch(new StudyStatus.Set(assigned_status));
+                }
+                if (response.hasOwnProperty("statusUpdateTaskId")){
+                  const statusUpdateTaskId = response["statusUpdateTaskId"]
+                  ctx.dispatch(new StudyStatusUpdateTask.Set({taskId: statusUpdateTaskId, currentStatus: assigned_status, currentStudyId: updated_study_id}));
+                }
             }
         )
     }
@@ -684,5 +740,9 @@ export class GeneralMetadataState {
     @Selector()
     static publicAsperaPath(state: GeneralMetadataStateModel): string {
         return state.publicAsperaPath
+    }
+    @Selector()
+    static statusUpdateTask(state: GeneralMetadataStateModel): IStudyStatusUpdateTask {
+        return state.statusUpdateTask
     }
 }

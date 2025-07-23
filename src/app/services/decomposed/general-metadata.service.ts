@@ -224,10 +224,32 @@ export class GeneralMetadataService extends DataService {
 
     // Status
     changeStatus(status, id) {
+
+      if (status && status.toLowerCase() === "provisional") {
       return this.http
-        .put(
-          this.url.baseURL + "/studies" + "/" + id + "/status",
+        .post(
+          this.url.baseURL + "/provisional-studies" + "/" + id,
           { status },
+          httpOptions
+        )
+        .pipe(catchError(this.handleError));
+      }
+      else if (status && status.toLowerCase() === "private") {
+        return this.http
+          .post(
+            this.url.baseURL + "/private-studies" + "/" + id,
+            { status },
+            httpOptions
+          )
+          .pipe(catchError(this.handleError));
+      }
+    }
+
+      // Status
+    getStatusUpdateTask(id) {
+      return this.http
+        .get(
+          this.url.baseURL + "/studies" + "/" + id + "/status-update-tasks",
           httpOptions
         )
         .pipe(catchError(this.handleError));

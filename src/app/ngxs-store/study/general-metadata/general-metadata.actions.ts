@@ -1,5 +1,6 @@
 import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface"
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface"
+import { IStudyStatusUpdateTask } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface"
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person"
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication"
 import { DatasetLicense } from "src/app/services/decomposed/dataset-license.service"
@@ -169,6 +170,20 @@ export namespace RevisionTaskMessage {
       static readonly type = '[general] Set Revision Task Message'
       constructor(public revisionTaskMessage: string) {}
   }
+
+}
+
+export namespace StudyStatusUpdateTask {
+
+    export class Check{
+        static readonly type = '[general] Check Study Status Update Task'
+        constructor() {}
+    }
+
+    export class Set{
+        static readonly type = '[general] Set Study Status Update Task'
+        constructor(public statusUpdateTask: IStudyStatusUpdateTask) {}
+    }
 
 }
 

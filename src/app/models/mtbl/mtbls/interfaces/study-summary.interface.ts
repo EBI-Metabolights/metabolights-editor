@@ -7,6 +7,12 @@ export interface IStudySummary {
   validation: IValidationStudySummaryInformation;
 }
 
+export interface IStudyStatusUpdateTask {
+  taskId: string;
+  currentStatus: string;
+  currentStudyId: string;
+}
+
 /*Interface to represent the minute study information returned by our IsaInvestigation endpoint*/
 export interface IMtblsStudySummaryInformation {
   studyStatus: string;
@@ -22,6 +28,7 @@ export interface IMtblsStudySummaryInformation {
   revisionStatus: number;
   revisionComment: string;
   revisionTaskMessage: string;
+  statusUpdateTaskId: string;
   studyHttpUrl: string;
   studyFtpUrl: string;
   studyGlobusUrl: string;
