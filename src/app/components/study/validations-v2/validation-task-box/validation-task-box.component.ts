@@ -84,7 +84,7 @@ export class ValidationTaskBoxComponent implements OnInit {
         this.studyId = id;
       }
     })
-      
+
   }
 
   // we also need this to subscribe to validation task updates so that the user doesnt have to do it.
@@ -94,10 +94,11 @@ export class ValidationTaskBoxComponent implements OnInit {
     this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).pipe( // currently proxying, this will not work outside of dev
       tap(() => {
         this.isInitiated = true
-        
+
       })
     ).subscribe({
       next: (next) => {
+        
         const taskSub = this.store.selectOnce(ValidationState.currentValidationTask)
         let newTask: ValidationTask | null = null
 
@@ -105,7 +106,7 @@ export class ValidationTaskBoxComponent implements OnInit {
          * Below we are defining an observable, which emits every 1 seconds. We also modify this Observable using pipe,
          * and the operators takeWhile and tap. We use these operators to make the following modifications:
          *  takeWhile: automatically close the subscription once a task has completed, by checking whether the current task state is a termination state.
-         *  tap: Add the side effect of assigning a value to newTask via selectOnce, if one hasn't been already. newTask.id is used in every subsequent 
+         *  tap: Add the side effect of assigning a value to newTask via selectOnce, if one hasn't been already. newTask.id is used in every subsequent
          *    validation get action,  and the value that we receive has been previously set in the handler of InitialiseValidationTask.
          */
         const timer = interval(1000);
@@ -127,7 +128,7 @@ export class ValidationTaskBoxComponent implements OnInit {
             this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
             console.debug('finished & subscription closed.') }
       })
-       
+
       },
       error: (error) => {},
     })
@@ -138,7 +139,7 @@ export class ValidationTaskBoxComponent implements OnInit {
       return 'Awaiting Response'
     } else if (this.isInitiated) {
       return 'Submitting Validation task'
-    } 
+    }
     else {
       return 'Initiate Validation Task'
     }

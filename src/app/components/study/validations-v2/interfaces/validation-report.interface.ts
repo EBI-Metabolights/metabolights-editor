@@ -8,29 +8,74 @@ export interface Ws3Response<T> {
     content: T
 }
 
+export interface ValidationHistoryRecord {
+    validationTime: string,
+    taskId: string
+}
+export interface PaginatedData<T> {
+  data: T[]
+  offset: number
+  size: number
+}
+export interface Ws3HistoryResponse {
+    status: string
+    successMessage: string
+    errorMessage: string
+    errors: any[]
+    content: PaginatedData<ValidationHistoryRecord>
+}
+
+
 export interface Ws3ValidationTask {
-    task_id: string,
-    task_status: string,
+    taskId: string,
+    taskStatus: string,
     message: string,
-    task_result?: Ws3ValidationReport
+    ready: boolean,
+    isSuccessful: boolean
+}
+
+export interface ModifierMetadataFileUpdate {
+  action: string;
+  source: string;
+  oldValue: string;
+  newValue: string
 }
 
 export interface Ws3ValidationReport {
-    study_id: string;
+    resourceId: string;
     status: ViolationType;
-    duration_in_seconds: number;
-    start_time: string;
-    completion_time: string;
+    durationInSeconds: number;
+    startTime: string;
+    completionTime: string;
     message?: Record<string, any>;
     messages?: ValidationReportContents;
-    assay_file_techniques: string[];
-    maf_file_techniques: string[];
-    metadata_updates: string[];
-    metadata_modifier_enabled: boolean;
-    validation_overrides: any[]; //TODO:  type this properly 
+    assayFileTechniques: Record<string, any>;
+    mafFileTechniques: Record<string, any>;
+    metadataUpdates: ModifierMetadataFileUpdate[];
+    metadataModifierEnabled: boolean;
+    validation_overrides: Record<string, any>; //TODO:  type this properly
 
 }
+export interface Ws3ValidationTaskSummary {
+    task: Ws3ValidationTask,
+    taskResult: Ws3ValidationReport
+}
 
+export interface Ws3ValidationTaskResponse {
+    status: string
+    successMessage: string
+    errorMessage: string
+    errors: any[]
+    content: Ws3ValidationTaskSummary
+}
+
+export interface Ws3ValidationTaskInitiationResponse {
+    status: string
+    successMessage: string
+    errorMessage: string
+    errors: any[]
+    content: Ws3ValidationTaskSummary
+}
 
 export interface ValidationReportContents {
     summary: Violation[]
@@ -52,14 +97,10 @@ export interface Violation {
     values: string[]
     violation: string // description but as it relates to this study
     technique: string // this refers to analytical technique IE LCMS
-    overrided: boolean
+    overridden: boolean
     overrideComment: string
 }
 
-export interface ValidationPhase {
-    validationTime: string,
-    taskId: string
-}
 
 export interface OverrideResponse {
     studyId: string,
@@ -75,21 +116,21 @@ export interface Breakdown {
 
 // we should eventually do some proper schemas WS3 side in order to stop using snake case here
 export interface BaseOverride {
+    overrideId: string,
     enabled: boolean,
-    rule_id: string,
-    new_type: ViolationType,
+    ruleId: string,
+    newType: ViolationType,
     curator: string,
     comment: string,
-    source_file: string,
-    source_column_header: string,
-    source_column_index: string
+    sourceFile: string,
+    sourceColumnHeader: string,
+    sourceColumnIndex: string
 }
 
 export interface FullOverride extends BaseOverride {
-    override_id: string,
     title: string,
     description: string,
-    old_type: ViolationType,
-    created_at: string,
-    modified_at: string
+    oldType: ViolationType,
+    createdAt: string,
+    modifiedAt: string
 }

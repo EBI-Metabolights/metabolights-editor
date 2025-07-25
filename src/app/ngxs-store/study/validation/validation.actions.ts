@@ -1,4 +1,4 @@
-import { BaseOverride, FullOverride, ValidationPhase, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface"
+import { BaseOverride, FullOverride, ValidationHistoryRecord, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface"
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types"
 import { ValidationTask } from "./validation.state"
 
@@ -41,7 +41,7 @@ export namespace ValidationReport {
 }
 
 export namespace ValidationReportV2 {
-    
+
     export class InitialiseValidationTask {
         static readonly type = '[validation] Init New validation Task'
         constructor(public proxy: boolean = false, public studyId: string) {}
@@ -85,7 +85,7 @@ export namespace ValidationReportV2 {
 
         export class Set {
             static readonly type = '[validation] Set Validation History'
-            constructor(public history: Array<ValidationPhase>) {}
+            constructor(public history: Array<ValidationHistoryRecord>) {}
         }
     }
 

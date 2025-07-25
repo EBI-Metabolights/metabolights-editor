@@ -17,10 +17,10 @@ export class ListOverridesComponent {
   @Output() closeEvent = new EventEmitter<any>();
   @Output() deleteEvent = new EventEmitter<string>();
 
-  displayedColumns: string[] = ['rule_id', 'title', 'new_type', 'curator', 'comments', 'created_at', 'actions'];
+  displayedColumns: string[] = ['ruleId', 'title', 'newType', 'curator', 'comments', 'createdAt', 'actions'];
 
   constructor(private dialog: MatDialog) {
-    
+
   }
 
   close() {
@@ -35,7 +35,7 @@ export class ListOverridesComponent {
     const dialogInstance = dialogRef.componentInstance;
     dialogInstance.override = override;
     dialogRef.componentInstance.deleteConfirmed.subscribe(() => {
-      this.deleteEvent.emit(`${override.override_id}`);
+      this.deleteEvent.emit(`${override.overrideId}`);
     })
 
   }

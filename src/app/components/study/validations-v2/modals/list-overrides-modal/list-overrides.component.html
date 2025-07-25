@@ -6,9 +6,9 @@
     <div class="scrollable-table-container">
       <mat-table [dataSource]="overrides" class="mat-elevation-z8">
         <!-- Rule ID Column -->
-        <ng-container matColumnDef="rule_id">
+        <ng-container matColumnDef="ruleId">
           <mat-header-cell *matHeaderCellDef> Rule ID </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.rule_id }} </mat-cell>
+          <mat-cell *matCellDef="let override"> {{ override.ruleId }} </mat-cell>
         </ng-container>
 
         <!-- Title Column -->
@@ -18,9 +18,9 @@
         </ng-container>
 
         <!-- New Type Column -->
-        <ng-container matColumnDef="new_type">
+        <ng-container matColumnDef="newType">
           <mat-header-cell *matHeaderCellDef> New Type </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.new_type }} </mat-cell>
+          <mat-cell *matCellDef="let override"> {{ override.newType }} </mat-cell>
         </ng-container>
 
         <!-- Curator Column -->
@@ -36,10 +36,10 @@
         </ng-container>
 
         <!-- Created At Column -->
-        <ng-container matColumnDef="created_at">
+        <ng-container matColumnDef="createdAt">
           <mat-header-cell *matHeaderCellDef> Created At </mat-header-cell>
           <mat-cell *matCellDef="let override">
-            {{ override.created_at | date: 'medium' }}
+            {{ override.createdAt | date: 'medium' }}
           </mat-cell>
         </ng-container>
 

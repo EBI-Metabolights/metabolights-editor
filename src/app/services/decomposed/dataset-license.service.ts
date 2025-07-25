@@ -33,7 +33,7 @@ export class DatasetLicenseService extends BaseConfigDependentService {
     });
     let baseUrl = this.configService.config.ws3URL;
 
-    return this.http.post<Ws3Response<DatasetLicenseResponse>>(`${baseUrl}/dataset-license/${studyId}`, {}, { headers }).pipe(
+    return this.http.put<Ws3Response<DatasetLicenseResponse>>(`${baseUrl}/submissions/v2/dataset-licenses/${studyId}`, {}, { headers }).pipe(
       map((res) => res),
       catchError(this.handleError)
     );
@@ -46,7 +46,7 @@ export class DatasetLicenseService extends BaseConfigDependentService {
     });
     let baseUrl = this.configService.config.ws3URL;
 
-    return this.http.get<Ws3Response<DatasetLicenseResponse>>(`${baseUrl}/dataset-license/${studyId}`, { headers }).pipe(
+    return this.http.get<Ws3Response<DatasetLicenseResponse>>(`${baseUrl}/submissions/v2/dataset-licenses/${studyId}`, { headers }).pipe(
       map((res) => res),
       catchError(this.handleError)
     );
