@@ -230,10 +230,10 @@
                 <li><a href="{{ metabolightsWebsiteUrl }}/about">About</a></li>
                 <li><a [routerLink]="['/datapolicy']">Data Policy</a></li>
                 <li><a href="{{ metabolightsWebsiteUrl }}/training">Training</a></li>
+                <li><a href="{{ metabolightsWebsiteUrl }}/presubmit">Submit Study</a></li>
 
               </ul>
               <ul class="nav navbar-nav cnav navbar-right">
-                <li><a href="{{ metabolightsWebsiteUrl }}/presubmit">Submit Study</a></li>
                 <li *ngIf="authUser && authUser.firstName">
                   <a href="{{ metabolightsWebsiteUrl }}/useroptions">{{
                     authUser.firstName
