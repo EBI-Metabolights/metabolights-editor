@@ -35,6 +35,17 @@
                   {{dm[currentTaskState.ws3TaskStatus]}}
   
                 </ng-template>
+                <!--Metadata confirmation modal-->
+                <ng-container>
+                    <app-confirmation-dialog
+                      *ngIf="showModal"
+                      [title]="'Automated Metadata Updates'"
+                      [actionType]="'info'"
+                      [message]="'MetaboLights will occasionally make small automated changes to your study metadata files (‘ISA METADATA’) to fix encoding, remove unsupported characters, populate terms and resolve common issues, helping to make your metadata submission-ready.'"
+                      [moreinfo]="'For more information see ‘Metadata File Updates’.'"
+                      (confirm)="handleConfirmation($event)">
+                    </app-confirmation-dialog>
+                </ng-container>
               <br>
               </div>
             </div>

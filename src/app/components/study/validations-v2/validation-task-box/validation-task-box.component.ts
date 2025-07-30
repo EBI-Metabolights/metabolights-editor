@@ -6,6 +6,8 @@ import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validati
 import { ValidationState, ValidationTask } from 'src/app/ngxs-store/study/validation/validation.state';
 import { ViolationType } from '../interfaces/validation-report.types';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
+import { GetGeneralMetadata } from 'src/app/ngxs-store/study/general-metadata/general-metadata.actions';
+import { FtpManagementService } from 'src/app/services/ftp-management.service';
 
 
 export const DescriptionMessages = {
@@ -55,9 +57,9 @@ export class ValidationTaskBoxComponent implements OnInit {
 
   studyId: string = "";
 
-  constructor(private store: Store) {
+  showModal = false; // Flag to control modal visibility
 
-  }
+  constructor(private store: Store, private ftpService: FtpManagementService) {}
 
 
   ngOnInit(): void {
@@ -125,6 +127,7 @@ export class ValidationTaskBoxComponent implements OnInit {
             this.isInitiated = false;
             this.taskStarted = false;
             this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
+            this.showModal = true; // Show the confirmation modal
             console.debug('finished & subscription closed.') }
       })
        
@@ -143,5 +146,16 @@ export class ValidationTaskBoxComponent implements OnInit {
       return 'Initiate Validation Task'
     }
   }
-
+  metadataUpdateSync(){
+    this.ftpService.startRsync(true, "metadata", "rw-study").subscribe(nextRsyncResponse => {
+      this.store.dispatch(new GetGeneralMetadata(this.studyId, false)) // update latest metadata changes
+      console.debug(nextRsyncResponse);
+    });
+  }
+  handleConfirmation(result: boolean) {
+    this.showModal = false;
+    if (result) {
+      this.metadataUpdateSync();
+    }
+  }
 }
