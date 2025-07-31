@@ -155,8 +155,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   ngOnInit() {
     this.setUpSubscriptionsNgxs();
-    //console.log(this.validationsId);
-    this.data = this.tableData.data;
+    if (this.tableData?.data) {
+      this.data = this.tableData.data;
+    }
     if (this.data) {
         if (localStorage.getItem(this.data.file) !== null) {
           this.view = localStorage.getItem(this.data.file);

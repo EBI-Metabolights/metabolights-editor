@@ -1,0 +1,25 @@
+<div class="modal is-active" >
+    <div class="modal-background" (click)="actionType === 'confirm' ? onCancel() : onClose()"></div>
+    
+    <div class="modal-content">
+        <mat-card>
+            <div class="modal-header">
+                <h2>{{ title }}</h2>
+            </div>
+            <div class="blocks-container">
+                <p>{{ message }}</p>
+                &nbsp;
+                <p>{{ moreinfo }}</p>
+            </div>
+            <div class="modal-footer keep-right">
+                <ng-container *ngIf="actionType === 'confirm'">
+                    <button class="button is-info" (click)="onConfirm()">Confirm</button>
+                    <button class="button" (click)="onCancel()">Cancel</button>
+                </ng-container>
+                <ng-container *ngIf="actionType === 'info'">
+                    <button class="button is-info" (click)="onClose()">Close</button>
+                </ng-container>
+            </div>
+        </mat-card>
+    </div>
+</div>

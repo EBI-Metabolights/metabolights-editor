@@ -1,0 +1,95 @@
+.material-modal-card {
+    width: 100%;
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 5px 5px -3px rgba(0,0,0,0.2),
+                0 8px 10px 1px rgba(0,0,0,0.14),
+                0 3px 14px 2px rgba(0,0,0,0.12);
+  }
+
+/* Header */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  /* border-bottom: 1px solid #ddd; */
+}
+
+.modal-header h2 {
+  margin: 0;
+}
+
+  .close-btn {
+    align-self: flex-end;
+    margin-top: 16px;
+  }
+
+  .material-dialog-description {
+    margin: 8px 0 16px;
+    font-size: 0.95rem;
+    color: rgba(0,0,0,0.7);
+    line-height: 1.4;
+    padding-left: 3%;
+    padding-right: 3%;
+  }
+
+  .flex-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+
+  .blocks-container {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 0rem 1rem;
+  }
+
+.mat-table {
+    width: 100%;
+  }
+
+  mat-card {
+    margin: 16px;
+    padding: 16px;
+  }
+
+  .scrollable-table-container {
+    max-height: 900px;
+    /* min-width: 600px; */
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: block;
+  }
+/* Content */
+
+.modal-content, .modal-card {
+  width: 900px;
+  padding: 1rem;
+}
+/* Modal Footer */
+.modal-footer {
+  align-items: center;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  padding: 20px;
+  position: relative;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  background-color: white;
+
+}
+.modal-footer .button:not(:last-child) {
+    margin-right: .5em;
+}
+.keep-right{
+  justify-content: flex-end;
+}

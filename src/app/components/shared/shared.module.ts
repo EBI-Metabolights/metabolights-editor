@@ -64,6 +64,8 @@ import { RevisionStatusTransformPipe } from "./pipes/revision-status-transform.p
 import { CurationStatusStarTransformPipe } from "./pipes/curation-status-star-transform.pipe";
 import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.pipe";
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
+import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
+import { MatCardModule } from "@angular/material/card";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -131,7 +133,9 @@ import { GlobusDownloadComponent } from "./download/globus/globus.component";
     MatExpansionModule,
     MatTooltipModule,
     QuillModule,
-    PromptRefreshComponent
+    PromptRefreshComponent,
+    MatCardModule,
+    ConfirmationDialogComponent
   ],
   exports: [
     AddAssayComponent,

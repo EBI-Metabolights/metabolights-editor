@@ -74,6 +74,7 @@ import { PromptRefreshComponent } from "../shared/messages/prompt-refresh/prompt
 import { MetadataModifiersModalComponent } from "./validations-v2/modals/metadata-modifiers-modal/metadata-modifiers-modal.component";
 import { OverviewBadgesComponent } from "./overview-badges/overview-badges.component";
 import { CurationStatusComponent } from "./curation-status/curation-status.component";
+import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confirmation-dialog.component";
 
 
 
@@ -151,7 +152,8 @@ import { CurationStatusComponent } from "./curation-status/curation-status.compo
     HandleUnderscoreInReportPipe,
     RemoveBackslashesPipe,
     ValidationDateFormatPipe,
-    PromptRefreshComponent
+    PromptRefreshComponent,
+    ConfirmationDialogComponent
 
   ],
   exports: [
