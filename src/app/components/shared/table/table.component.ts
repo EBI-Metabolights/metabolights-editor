@@ -1026,7 +1026,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.cellOntologyValue();
         }
       }
-      const isTermAccessionColumn = this.selectedCell["column"]["columnDef"] === "Term Accession Number" ;
+      const isTermAccessionColumn = (this.selectedCell["column"]["columnDef"]).indexOf("Term Accession Number") > -1 ;
       this.editCellform = this.fb.group({
         cell: [
           row[column.columnDef],
