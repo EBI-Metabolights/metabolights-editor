@@ -39,6 +39,7 @@ import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
+import {urlValidator} from "../../shared/ontology/ontology.validator";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -142,7 +143,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
 
   actionStack: string[] = [];
   dismissed: boolean = false;
-
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -154,6 +154,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   ngOnInit() {
+
     this.setUpSubscriptionsNgxs();
     if (this.tableData?.data) {
       this.data = this.tableData.data;
@@ -168,6 +169,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       localStorage.setItem(this.data.file, 'compact');
     }
     }
+
   }
 
   setUpSubscriptionsNgxs() {
@@ -177,8 +179,8 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       this.studyId = value;
     })
 
-
     this.editorValidationRules$.subscribe((value) => {
+      
       this.validations = value;
     });
     this.studyFiles$.subscribe((value) => {
@@ -999,6 +1001,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   editCell(row: any, column: any, event) {
+    
     if (!this.isReadOnly) {
       this.isCellTypeFile = false;
       this.isCellTypeOntology = false;
@@ -1023,11 +1026,15 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
           this.cellOntologyValue();
         }
       }
-
+      const isTermAccessionColumn = this.selectedCell["column"]["columnDef"] === "Term Accession Number" ;
       this.editCellform = this.fb.group({
-        cell: [row[column.columnDef]],
+        cell: [
+          row[column.columnDef],
+          isTermAccessionColumn ? [urlValidator()] : []
+        ]
       });
     }
+    
   }
 
   getOntologyComponentValue(id) {

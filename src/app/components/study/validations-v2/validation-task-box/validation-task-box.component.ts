@@ -1,13 +1,14 @@
 import { Component, inject, OnInit } from '@angular/core';
 import {Store } from '@ngxs/store';
 import { interval, Observable } from 'rxjs';
-import { takeWhile, tap } from 'rxjs/operators';
+import { filter, takeWhile, tap } from 'rxjs/operators';
 import { ValidationReportV2 } from 'src/app/ngxs-store/study/validation/validation.actions';
 import { ValidationState, ValidationTask } from 'src/app/ngxs-store/study/validation/validation.state';
 import { ViolationType } from '../interfaces/validation-report.types';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { GetGeneralMetadata } from 'src/app/ngxs-store/study/general-metadata/general-metadata.actions';
 import { FtpManagementService } from 'src/app/services/ftp-management.service';
+import { Ws3ValidationReport } from '../interfaces/validation-report.interface';
 
 
 export const DescriptionMessages = {
@@ -36,6 +37,7 @@ export class ValidationTaskBoxComponent implements OnInit {
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
   lastValidationTime$: Observable<string> = inject(Store).select(ValidationState.lastValidationRunTime);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  reportV2$: Observable<Ws3ValidationReport> = inject(Store).select(ValidationState.reportV2);
 
   buttonTexts = "Initiate Validation Task"
   startButtonClass = "";
@@ -58,11 +60,15 @@ export class ValidationTaskBoxComponent implements OnInit {
   studyId: string = "";
 
   showModal = false; // Flag to control modal visibility
-
+  report: Ws3ValidationReport;
+  modifiers: string[];
+  
   constructor(private store: Store, private ftpService: FtpManagementService) {}
 
 
   ngOnInit(): void {
+
+    
     this.currentTask$.subscribe((task) => {
       if (task !== null) {
         this.currentTaskState = task;
@@ -86,6 +92,12 @@ export class ValidationTaskBoxComponent implements OnInit {
         this.studyId = id;
       }
     })
+
+    this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
+      this.report = value;
+      if (![undefined, null].includes(this.report.metadata_updates)) this.modifiers = this.report.metadata_updates;
+      else this.modifiers = [];
+    });
       
   }
 
@@ -127,7 +139,11 @@ export class ValidationTaskBoxComponent implements OnInit {
             this.isInitiated = false;
             this.taskStarted = false;
             this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
-            this.showModal = true; // Show the confirmation modal
+            // if the modifiers array is not empty, we show the info modal
+            if (this.modifiers.length > 0) { 
+              this.showModal = true; // Show the Info modal
+            }
+
             console.debug('finished & subscription closed.') }
       })
        

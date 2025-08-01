@@ -28,3 +28,17 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
     return null;
   };
 }
+
+export function urlValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: any } | null => {
+    if(!control.value) {
+      return null; // No value, no validation error
+    }
+    try{
+      new URL(control.value);
+      return null; // Valid URL
+    } catch (e) {
+      return { 'invalidUrl': true }; // Invalid URL  
+    }
+  }  
+}
