@@ -39,7 +39,7 @@ import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
-import {urlValidator} from "../../shared/ontology/ontology.validator";
+import { urlValidator, notANumberValidator } from "../../shared/ontology/ontology.validator";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -1027,10 +1027,21 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
         }
       }
       const isTermAccessionColumn = (this.selectedCell["column"]["columnDef"]).indexOf("Term Accession Number") > -1 ;
+      const isTermSourceColumn = (this.selectedCell["column"]["columnDef"]).indexOf("Term Source REF") > -1 ;
+      
+      // Setup validators dynamically
+      const cellValidators = [];
+      if (isTermAccessionColumn) {
+        cellValidators.push(urlValidator());
+      }
+      if (isTermSourceColumn) {
+        cellValidators.push(notANumberValidator());
+      }
+
       this.editCellform = this.fb.group({
         cell: [
           row[column.columnDef],
-          isTermAccessionColumn ? [urlValidator()] : []
+          cellValidators
         ]
       });
     }

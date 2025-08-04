@@ -461,9 +461,12 @@
                     formatHeader(selectedCell["column"]["columnDef"])
                   }}</label>
                   <mat-form-field class="full-width">
-                    <input class="no-scroll" formControlName="cell" matInput placeholder="Enter URL" required/>
+                    <input class="no-scroll" formControlName="cell" matInput required/>
                      <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
-                      Please enter a valid URL.
+                      Please enter a valid URL
+                    </mat-error>
+                    <mat-error *ngIf="editCellform.get('cell')?.hasError('numberNotAllowed')">
+                      Please enter a valid text
                     </mat-error>
                   </mat-form-field>
                 </div>
