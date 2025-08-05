@@ -1,4 +1,4 @@
-import { AbstractControl, ValidatorFn } from "@angular/forms";
+import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
 export function ValidateRules(field: string, validation: any): ValidatorFn {
@@ -41,4 +41,11 @@ export function urlValidator(): ValidatorFn {
       return { 'invalidUrl': true }; // Invalid URL  
     }
   }  
+}
+
+export function notANumberValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+    return !isNaN(value) && value.trim() !== '' ? { numberNotAllowed: true } : null;
+  };
 }
