@@ -33,7 +33,7 @@
       </span>
 
       {{ file.file }}
-      <span class="panel-icon" *ngIf="showReferencedFiles" >
+      <span *ngIf="showReferencedFiles" >
         <span *ngIf="file.status == 'unreferenced' && !file.directory">
           <img src="assets/img/icons/unreferenced.png" style="height: 18px"/>
         </span>
@@ -42,7 +42,7 @@
         </span>
       </span>
 
-      <span class="panel-icon" *ngIf="showReferencedFiles">
+      <span *ngIf="showReferencedFiles">
         <span *ngIf="file.file_difference == 'NEW' && revisionStatus == 'Completed'" >
           <img src="assets/img/icons/new.png" style="height: 18px"/>
         </span>
