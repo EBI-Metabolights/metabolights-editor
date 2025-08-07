@@ -313,6 +313,15 @@ export class MetabolightsService extends DataService {
 
   }
 
+  openTextFileInNewTab(url: string): void {
+    this.http.get(url, { responseType: 'text' }).subscribe((data) => {
+      const blob = new Blob([data], { type: 'text/plain' });
+      const fileURL = URL.createObjectURL(blob);
+      window.open(fileURL, '_blank');
+      URL.revokeObjectURL(fileURL); // optionally in a timeout
+    });
+  }
+
   copyFiles() {
     return this.http
       .get(
