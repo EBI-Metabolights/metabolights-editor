@@ -38,4 +38,9 @@ export class DownloadComponent implements OnInit {
     const link = this.metabolightsService.downloadLink(this.file, this.code);
     return link;
   }
+  viewFile() {
+    const link = this.metabolightsService.downloadLink(this.file, this.code);
+    this.metabolightsService.openTextFileInNewTab(link);
+  }
+  
 }

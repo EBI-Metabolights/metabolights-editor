@@ -75,11 +75,17 @@
     </span>
   </div>
 </div>
+
 <div *ngIf="!isReadOnly && !dismissed && columnHidden" class="notification is-primary">
-  
-  <small><mat-icon>info</mat-icon> Per sample abundance data present, click to download .
+  <small><mat-icon>info</mat-icon> You are not seeing the complete MAF sheet in the table. Please download m_xxx_v2_maf.tsv file to see the entire data.</small>
+  <span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
+</div>
+
+<div *ngIf="!isReadOnly && !dismissed && sampleAbundance" class="notification is-primary">
+  <small><mat-icon>info</mat-icon> Per sample abundance data present, click to download.
 </small><span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
+
 <span *ngIf="!isReadOnly" #spacer></span>
 <div
   *ngIf="!isReadOnly"
@@ -283,6 +289,7 @@
         mat-header-row
         *matHeaderRowDef="displayedTableColumns"
       ></tr>
+      
       <tr mat-row
       *matRowDef="let row; columns: displayedTableColumns"
       [ngClass]="{

@@ -14,6 +14,8 @@ import {
   HostListener,
   computed,
   effect,
+  ChangeDetectorRef,
+  AfterViewInit,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
@@ -47,7 +49,7 @@ import { urlValidator, notANumberValidator } from "../../shared/ontology/ontolog
   templateUrl: "./table.component.html",
   styleUrls: ["./table.component.css"],
 })
-export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
+export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, OnChanges {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
@@ -88,7 +90,7 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   validations: any = {};
   mlPageSizeOptions: any = [10, 100];
 
-  dataSource: MatTableDataSource<any>;
+  dataSource: MatTableDataSource<any> = new MatTableDataSource();
   data: any = null;
   files: any = null;
 
@@ -144,12 +146,17 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   actionStack: string[] = [];
   dismissed: boolean = false;
   columnHidden: boolean = false;
+  fullRows: any;
+  actualRows: any;
+  private isInitialized = false;
+  sampleAbundance: any;
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private assayService: AssaysService,
-    private store: Store
+    private store: Store,
+    private cdRef: ChangeDetectorRef
   ) {
     this.baseHref = this.editorService.configService.baseHref;
   }
@@ -161,7 +168,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
       this.data = this.tableData.data;
     }
     if (this.data) {
+     
       this.columnHidden = this.data.columns_hidden;
+      this.sampleAbundance = this.data.sample_abundance;
       if (localStorage.getItem(this.data.file) !== null) {
           this.view = localStorage.getItem(this.data.file);
       if (this.view === "expanded") {
@@ -173,6 +182,23 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
 
   }
+  
+  setupPaginator() {
+    if (!this.paginator || !this.dataSource) return;
+    const length = this.dataSource.filteredData?.length;
+    if (length > 500) {
+      this.paginator.pageSizeOptions = [50, 100, 500, length];
+      this.paginator.pageSize = 50;
+    } else {
+      this.paginator.pageSizeOptions = [10, 100, length];
+      this.paginator.pageSize = length || 10;
+    }
+
+    this.dataSource.paginator = this.paginator;
+
+    // Manually trigger change detection to avoid ExpressionChangedAfterItHasBeenCheckedError
+    this.cdRef.detectChanges();
+}
 
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe(value => this.toastrSettings = value);
@@ -225,6 +251,32 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
     return [];
   }
+  ngAfterViewInit(): void {
+    // try to initialize here, but data might not be ready yet
+    this.setDataSourceBindings();
+  }
+
+  ngAfterViewChecked(): void {
+    // in case paginator/sort/dataSource weren’t ready earlier
+    if (!this.isInitialized && this.dataSource && this.paginator && this.sort) {
+      setTimeout(() => {
+        this.setDataSourceBindings();
+      });
+    }
+  }
+
+  private setDataSourceBindings(): void {
+    if (this.dataSource && this.paginator && this.sort) {
+       this.setupPaginator();
+      this.dataSource.sort = this.sort;
+      this.isInitialized = true;
+    }
+  }
+
+compare(a: any, b: any, isAsc: boolean) {
+  return (a < b ? -1 : a > b ? 1 : 0) * (isAsc ? 1 : -1);
+}
+
 
   initialise() {
     this.deSelect();
@@ -232,11 +284,50 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     if (this.data) {
       this.hit = true;
       this.displayedTableColumns = this.data.displayedColumns;
-      this.dataSource = new MatTableDataSource<any>(this.data.rows);
-      this.dataSource.paginator = this.paginator;
+      this.fullRows = this.data.rows;
+      this.dataSource = new MatTableDataSource(this.fullRows);
+      
+      // Important: reattach paginator & sort every time dataSource is recreated
+      if (this.paginator) {
+        this.dataSource.paginator = this.paginator;
+      }
+
+      if (this.sort) {
+        this.dataSource.sort = this.sort;
+      }
       this.dataSource.filterPredicate = (data, filter) =>
         this.getDataString(data).indexOf(filter.toLowerCase()) > -1;
-      this.dataSource.sort = this.sort;
+
+      this.dataSource.sortData = (data, sort) => {
+        if (!sort.active || sort.direction === '') {
+          return data;
+        }
+
+        let sorted = data.slice();
+
+        // If template row is present, keep first row intact and sort the rest
+        if (this.templateRowPresent) {
+          const sampleRow = sorted[0];
+          const rest = sorted.slice(1);
+
+          rest.sort((a, b) => {
+            const isAsc = sort.direction === 'asc';
+            return this.compare(a[sort.active], b[sort.active], isAsc);
+          });
+
+          return [sampleRow, ...rest];
+        }
+
+        // Normal sort
+        sorted.sort((a, b) => {
+          const isAsc = sort.direction === 'asc';
+          return this.compare(a[sort.active], b[sort.active], isAsc);
+        });
+
+        return sorted;
+      };
+
+      this.setupPaginator();
       this.detectFileColumns();
       this.validateTableOntologyColumns();
       if (this.view === "expanded") {
@@ -245,30 +336,6 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
     }
   }
 
-  ngAfterViewChecked() {
-    setTimeout(() => {
-      if (this.dataSource && !this.dataSource.paginator) {
-        if (this.dataSource.filteredData.length > 500) {
-          this.paginator.pageSizeOptions = [
-            50,
-            100,
-            500,
-            this.dataSource.filteredData.length,
-          ];
-          this.paginator.pageSize = 50;
-        } else {
-          // this is what is throwing the ExpressionChangedAfterItHasBeenCheckedError
-          this.paginator.pageSizeOptions = [
-            10,
-            100,
-            this.dataSource.filteredData.length,
-          ];
-          this.paginator.pageSize = this.dataSource.filteredData.length;
-        }
-        this.dataSource.paginator = this.paginator;
-      }
-    });
-  }
 
   onCopy(e) {
     this.copyCellContent(e);
@@ -1624,11 +1691,9 @@ export class TableComponent implements OnInit, AfterViewChecked, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.tableData) {
-      if (this.tableData) {
+    if (changes.tableData && this.tableData) {
         this.initialise();
         this.triggerChanges();
-      }
     }
   }
 
