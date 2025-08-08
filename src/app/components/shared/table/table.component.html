@@ -77,7 +77,7 @@
 </div>
 
 <div *ngIf="!isReadOnly && !dismissed && columnHidden" class="notification is-primary">
-  <small><mat-icon>info</mat-icon> You are not seeing the complete MAF sheet in the table. Please download m_xxx_v2_maf.tsv file to see the entire data.</small>
+  <small><mat-icon>info</mat-icon> Truncated MAF sheet. Download m_xxx_v2_maf.tsv file to see the complete data.</small>
   <span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
 
