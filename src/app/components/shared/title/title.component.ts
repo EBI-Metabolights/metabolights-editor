@@ -1,6 +1,8 @@
 import {
   Component,
+  ElementRef,
   OnInit,
+  ViewChild,
   inject,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
@@ -20,6 +22,8 @@ import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadat
   styleUrls: ["./title.component.css"],
 })
 export class TitleComponent implements OnInit {
+
+  @ViewChild("contentToCopy") contentToCopy!: ElementRef;
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
@@ -131,4 +135,8 @@ export class TitleComponent implements OnInit {
   get validation() {
     return this.validations[this.validationsId];
   }
+  copyTitle() {
+    const text = this.contentToCopy.nativeElement.innerText;
+    this.editorService.copyContent(text);
+  } 
 }
