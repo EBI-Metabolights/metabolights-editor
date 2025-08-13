@@ -4,6 +4,8 @@ import {
   OnChanges,
   SimpleChanges,
   inject,
+  ViewChild,
+  ElementRef,
 } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
@@ -24,6 +26,8 @@ import { StudyAbstract } from "src/app/ngxs-store/study/general-metadata/general
 })
 export class DescriptionComponent implements OnChanges, OnInit {
 
+  @ViewChild("descriptionToCopy") descriptionToCopy!: ElementRef;
+  
   studyDescription$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
@@ -183,5 +187,9 @@ export class DescriptionComponent implements OnChanges, OnInit {
     if (changes.value !== undefined) {
       this.description = changes.value.currentValue;
     }
+  }
+  copyDescription() {
+    const text = this.descriptionToCopy.nativeElement.innerText;
+    this.editorService.copyContent(text);
   }
 }

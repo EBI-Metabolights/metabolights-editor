@@ -67,9 +67,12 @@ export class EditorService {
   samples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
   mafs$: Observable<Record<string, any>> = inject(Store).select(MAFState.mafs);
 
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
+
   private assays: Record<string, any>;
   private samples: Record<string, any>;
   private mafs: Record<string, any>;
+  private toastrSettings: Record<string, any> = {};
 
   study: MTBLSStudy;
   baseHref: string;
@@ -105,6 +108,7 @@ export class EditorService {
   }
 
   setUpSubscriptionsNgxs() {
+    this.toastrSettings$.subscribe((settings) => {this.toastrSettings = settings});
     this.studyIdentifier$.subscribe((value) => {
       this.currentStudyIdentifier = value;
     });
@@ -792,6 +796,12 @@ export class EditorService {
   toggleFolderAccess() {
     return this.dataService.toggleFolderAccess();
   }
-
+    copyContent(content: string) {
+      navigator.clipboard.writeText(content).then(() => {
+        toastr.success("Content copied to clipboard", "Success", this.toastrSettings);
+      }).catch((error) => {
+        toastr.error("Failed to copy content: " + error, "Error", this.toastrSettings);
+      });
+    }
 
 }

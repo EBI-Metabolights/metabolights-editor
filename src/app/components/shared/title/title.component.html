@@ -1,10 +1,13 @@
 <div [ngClass]="{ 'hover-highlight': !isReadOnly }" class="px-20 mtbls-section">
-  <h2 class="title is-3">
+  <span class="copy-btn" (click)="copyTitle()"><mat-icon matTooltip="Copy content">content_copy</mat-icon></span>
+  <h2 #contentToCopy class="title is-3" >
     <b>
-      <span>{{ requestedStudy }}: </span
-      ><span [innerHTML]="title" class="clickable" (click)="openModal()"></span>
+      <span >{{ requestedStudy }}: </span
+      ><span [innerHTML]="title" class="clickable" (click)="openModal()"  matTooltip="Click in here to edit"></span>
     </b>
+    
   </h2>
+  
 </div>
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
