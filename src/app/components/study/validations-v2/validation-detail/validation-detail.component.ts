@@ -20,6 +20,8 @@ export class ValidationV2DetailComponent implements OnInit {
 
   @Input() violation: Violation
   @Input() overrides: any;
+  @Input() studyId: any;
+
   isRawModalOpen: boolean = false;
   isInfoModalOpen: boolean = false;
   isOverrideModalOpen: boolean = false;
@@ -76,4 +78,10 @@ export class ValidationV2DetailComponent implements OnInit {
     this.isOverrideModalOpen = false;
   }
 
+  getMailtoLink(): string {
+    if (!this.violation || !this.violation.identifier) {
+      return '';
+    }
+    return `mailto:metabolights-help@ebi.ac.uk?subject=Regarding validation rule - ${this.violation.identifier} of study ${this.studyId}`;
+  }
 }

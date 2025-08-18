@@ -50,10 +50,7 @@
           <div class="button-container sidebar-bottom"> 
     
             <button *ngIf="violation.values.length > 0 " (click)="openInfoModal()" class="button bc-item rounded-top-button is-dark"><mat-icon>info</mat-icon>&nbsp; Details</button>
-            <a   [href]="
-            'mailto:metabolights-help@ebi.ac.uk?subject=Regarding validation rule - ' +
-            violation.identifier
-          " class="button bc-item is-dark"><mat-icon>mail</mat-icon>&nbsp; Contact</a>
+            <a [href]="getMailtoLink()" class="button bc-item is-dark"><mat-icon>mail</mat-icon>&nbsp; Contact</a>
             <button *ngIf="isCurator" class="button bc-item rounded-bottom-button is-dark" (click)="openRawModal()"><mat-icon>visibility</mat-icon>&nbsp; View Raw</button>
             <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" (click)="handleOverride(violation)" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
                 sword_rose
