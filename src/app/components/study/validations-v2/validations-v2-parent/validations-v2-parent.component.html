@@ -59,7 +59,7 @@
                 <div *ngIf="allViolations.length > 0; else noViolations">
                     <div *ngIf="allViolations !== null">
                         <div *ngFor="let violation of allViolations; let i = index;">
-                            <validation-v2-detail [violation]="violation"></validation-v2-detail>
+                            <validation-v2-detail [violation]="violation" [studyId]="studyId"></validation-v2-detail>
                             <br>
                         </div>
                     </div>
