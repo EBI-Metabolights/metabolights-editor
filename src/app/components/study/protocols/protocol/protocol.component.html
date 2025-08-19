@@ -46,15 +46,16 @@
           class="button is-light is-pulled-right is-small"
           ><mat-icon>edit</mat-icon> Edit Description</a
         >
-        
+        <span class="copy-btn mtbls-button" (click)="copyContent()"><mat-icon matTooltip="Copy content">content_copy</mat-icon></span>
         <div *ngIf="protocolInGuides">
           <br>
           <small class="guide-text"> <i> {{ guideText}} </i></small>
         </div>
       </span>
+      
     </header>
     <div *ngIf="expand" class="card-content">
-      <div class="content">
+      <div #contentToCopy class="content">
         <mtbls-content
           (editContent)="openModal(protocol)"
           [count]="500"

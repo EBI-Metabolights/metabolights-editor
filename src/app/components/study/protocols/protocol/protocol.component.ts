@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject, ElementRef } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
@@ -31,6 +31,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
+  @ViewChild("contentToCopy") contentToCopy!: ElementRef;
 
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
@@ -485,5 +486,9 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   isCoreProtocol(name: string): boolean {
     return this.coreProtocols.includes(name.toLowerCase())
+  }
+  copyContent() {
+    const text = this.contentToCopy.nativeElement.innerText;
+    this.editorService.copyContent(text);
   }
 }

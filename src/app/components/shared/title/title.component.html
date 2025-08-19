@@ -3,7 +3,7 @@
   <h2 #contentToCopy class="title is-3" >
     <b>
       <span >{{ requestedStudy }}: </span
-      ><span [innerHTML]="title" class="clickable" (click)="openModal()"  matTooltip="Click in here to edit"></span>
+      ><span [innerHTML]="title" class="clickable" (click)="openModal()"  matTooltip="Click in here to edit" [matTooltipDisabled]="isReadOnly"></span>
     </b>
     
   </h2>
