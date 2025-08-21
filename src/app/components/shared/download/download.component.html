@@ -11,7 +11,7 @@
   >
     <mat-icon>cloud_download</mat-icon> Download
   </a>&nbsp;
-  <a
+  <a *ngIf="!selectedMetaFiles || selectedMetaFiles.length === 1"
     (click)="viewFile()"
     class="button is-small is-light"
   >

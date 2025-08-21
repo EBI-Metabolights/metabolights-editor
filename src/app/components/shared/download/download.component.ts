@@ -12,6 +12,8 @@ import { Observable } from "rxjs";
 export class DownloadComponent implements OnInit {
   @Input("value") file: string;
   @Input("type") type: string;
+  @Input("selectedMetaFiles") selectedMetaFiles: number;
+
 
   obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
 

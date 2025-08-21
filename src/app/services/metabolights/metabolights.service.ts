@@ -315,10 +315,64 @@ export class MetabolightsService extends DataService {
 
   openTextFileInNewTab(url: string): void {
     this.http.get(url, { responseType: 'text' }).subscribe((data) => {
-      const blob = new Blob([data], { type: 'text/plain' });
-      const fileURL = URL.createObjectURL(blob);
-      window.open(fileURL, '_blank');
-      URL.revokeObjectURL(fileURL); // optionally in a timeout
+      const rows = data.split('\n').map(r => r.split('\t'));
+      const maxCols = Math.max(...rows.map(r => r.length));
+
+      const newTab = window.open('', '_blank');
+      if (newTab) {
+        let html = `
+          <html>
+            <head>
+              <title>File Preview</title>
+              <style>
+                body {
+                  margin: 0;
+                  padding: 10px;
+                  font-family: monospace;
+                  overflow: auto;
+                  background: #fff;
+                }
+                .container {
+                  display: inline-block; /* allow horizontal scroll */
+                }
+                .row {
+                  display: grid;
+                  grid-auto-flow: column;
+                  grid-auto-columns: minmax(100px, auto);
+                  border-bottom: 1px solid #999; /* row border */
+                  box-sizing: border-box;
+                }
+                .cell {
+                  border-right: 1px solid #ccc; /* cell border */
+                  padding: 2px 6px;
+                  white-space: pre-wrap;
+                  word-break: break-word;
+                  box-sizing: border-box;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="container">
+        `;
+
+        rows.forEach(row => {
+          html += '<div class="row">';
+          for (let i = 0; i < maxCols; i++) {
+            const cellContent = row[i] !== undefined && row[i] !== '' ? row[i] : '&nbsp;';
+            html += `<div class="cell">${cellContent}</div>`;
+          }
+          html += '</div>';
+        });
+
+        html += `
+              </div>
+            </body>
+          </html>
+        `;
+
+        newTab.document.write(html);
+        newTab.document.close();
+      }
     });
   }
 
