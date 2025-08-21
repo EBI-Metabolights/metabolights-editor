@@ -201,7 +201,7 @@
         />&nbsp;&nbsp;ISA METADATA
       </label>
       <span class="is-pulled-right">
-        <mtbls-download [value]="selectedDownloadFiles()"></mtbls-download>
+        <mtbls-download [value]="selectedDownloadFiles()" [selectedMetaFiles]= "selectedMetaFiles"></mtbls-download>
       </span>
       <span
         *ngIf="selectedMetaFiles.length > 0 && !isReadOnly"
