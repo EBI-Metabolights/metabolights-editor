@@ -256,6 +256,24 @@
               "allowFreeText": false
             }
           }
+        },
+         "orcid": {
+          "data-type": "string",
+          "sort-order": "10",
+          "is-required": "false",
+          "is-read-only": "false",
+          "is-hidden": "false",
+          "technique": "mass spectrometry|NMR spectroscopy",
+          "description": "Unique digital identifier (ORCID) for this contact.",
+          "placeholder": "ORCID (e.g. 0000-0002-1825-0097)",
+          "rules": [
+            {
+              "condition": "pattern",
+              "value": "^\\d{4}-\\d{4}-\\d{4}-\\d{4}$",
+              "error": "Please provide a valid orcid for the contact. This should be formatted as '0000-0002-1825-0097'",
+              "type": "string"
+            }
+          ]
         }
       }
     },

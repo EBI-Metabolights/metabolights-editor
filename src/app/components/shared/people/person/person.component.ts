@@ -20,6 +20,7 @@ import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 
 @Component({
   selector: "mtbls-person",
@@ -154,6 +155,10 @@ export class PersonComponent implements OnInit {
       roles: [
         this.person.roles,
         ValidateRules("roles", this.fieldValidation("roles")),
+      ],
+      orcid: [
+        this.person?.comments?.[0]?.value || "",
+        ValidateRules("orcid", this.fieldValidation("orcid")),
       ],
     });
   }
@@ -328,6 +333,7 @@ export class PersonComponent implements OnInit {
     this.rolesComponent.values.forEach((role) => {
       mtblPerson.roles.push(jsonConvert.deserializeObject(role, Ontology));
     });
+    mtblPerson.comments = this.getFieldValue("orcid")?.trim()?[new MTBLSComment("Study Person ORCID", this.getFieldValue("orcid"))]: [];
     return { contacts: [mtblPerson.toJSON()] };
   }
 
