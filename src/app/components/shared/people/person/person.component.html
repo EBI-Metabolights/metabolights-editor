@@ -291,6 +291,7 @@
             {{ form.get("affiliation").errors.affiliation.error }}
           </mat-error>
         </mat-form-field>
+        
         <span *ngIf="!isReadOnly">
           <mtbls-ontology
             class="mt-20"
@@ -311,6 +312,25 @@
         >
           <small>{{ form.get("roles").errors.roles.error }}</small>
         </mat-error>
+        <mat-form-field class="full-width">
+          <input
+          class="no-scroll"
+          formControlName="orcid"
+          [readonly]="isReadOnly"
+          matInput
+          placeholder="ORCID (e.g. 0000-0002-1825-0097)"
+          />
+          <mat-hint>{{ fieldValidation("orcid").description }}</mat-hint>
+          <mat-error
+          *ngIf="
+          form.get('orcid').errors &&
+          form.get('orcid').dirty &&
+          form.get('orcid').errors.orcid
+          "
+          >
+            {{ form.get("orcid").errors.orcid.error }}
+          </mat-error>
+        </mat-form-field>
       </section>
       <footer *ngIf="!isReadOnly" class="modal-card-foot">
         <div class="columns is-gapless full-width">

@@ -22,6 +22,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
+import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 
 @Component({
   selector: "mtbls-publication",
@@ -144,6 +145,7 @@ export class PublicationComponent implements OnInit {
     mtblPerson.fax = "";
     mtblPerson.address = "";
     mtblPerson.affiliation = author.affiliation ? author.affiliation : "";
+    mtblPerson.comments = author?.authorId?.type==="ORCID"? [new MTBLSComment("Study Person ORCID", author.authorId.value)] : [];
     const role = jsonConvert.deserializeObject(
       JSON.parse(
         '{"annotationValue":"Author","comments":[],"termAccession":' +
