@@ -5,15 +5,18 @@ export class MTBLSComment {
   @JsonProperty("name", String)
   name = "";
 
-  @JsonProperty("value")
-  value: any = "";
+  @JsonProperty("value", String)
+  value = "";
 
+  constructor(name?: string, value?: string) {
+      this.name = name;
+      this.value = value;
+  }
+  
   toJSON() {
-    if (this.name !== "" || this.name !== null) {
-      return {
-        name: this.name,
-        value: JSON.stringify(this.value),
-      };
-    }
+    return {
+      name: this.name,
+      value: this.value,
+    };
   }
 }
