@@ -66,6 +66,7 @@ import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.p
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { MatCardModule } from "@angular/material/card";
+import { FactorlistComponent } from "./factorlist/factorlist.component";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -110,7 +111,8 @@ import { MatCardModule } from "@angular/material/card";
     RevisionStatusTransformPipe,
     CurationStatusTransformPipe,
     StripTermsOfUsePipe,
-    CurationStatusStarTransformPipe
+    CurationStatusStarTransformPipe,
+    FactorlistComponent
   ],
   imports: [
     CommonModule,
@@ -172,6 +174,7 @@ import { MatCardModule } from "@angular/material/card";
     CurationStatusTransformPipe,
     StripTermsOfUsePipe,
     CurationStatusStarTransformPipe,
+    FactorlistComponent
   ],
   providers: [
     AuthGuard,

@@ -1,0 +1,164 @@
+
+<div class="tags has-addons">
+    <span
+        *ngIf="!isStudyReadOnly"
+        class="tag is-primary clickable"
+        (click)="openModal(true)"
+    >
+        <i class="material-icons"> edit </i>
+    </span>
+    <span class="tag is-default is-small">
+        <span
+        *ngIf="
+            factor.factorType &&
+            factor.factorType.annotationValue &&
+            factor.factorType.annotationValue != '';
+            else emptyFactorValue
+        "
+        >
+            <b>{{ factor.factorName }}</b> :
+            <ontology-details [value]="factor.factorType"></ontology-details>
+        </span>
+        <ng-template #emptyFactorValue> - </ng-template>
+    </span>
+</div>
+            
+
+<div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <div *ngIf="isDeleting" class="load-bar">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+    <section class="modal-card-body">
+      <p>Are you sure you want to delete?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <div class="columns is-gapless full-width">
+        <div class="column is-half">
+          <button (click)="closeDelete()" class="button is-info">Cancel</button>
+        </div>
+        <div class="column is-half has-text-right">
+          <button (click)="delete()" class="button is-danger">
+            OK! Delete Permanently
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+  <form *ngIf="form" [formGroup]="form">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <div *ngIf="isFormBusy" class="load-bar">
+        <div class="bar"></div>
+        <div class="bar"></div>
+        <div class="bar"></div>
+      </div>
+      <section class="modal-card-body">
+        <h6 class="modal-card-title modal-form-title">
+          Add Factor to Sample Sheet
+        </h6>
+        <mat-form-field class="full-width">
+          <input class="no-scroll" formControlName="factorName" matInput />
+          <mat-hint>{{ factorNameValidations.description }}</mat-hint>
+          <mat-error
+            *ngIf="
+              form.get('factorName').errors &&
+              form.get('factorName').dirty &&
+              form.get('factorName').errors.factorName
+            "
+          >
+            {{ form.get("factorName").errors.factorName.error }}
+          </mat-error>
+        </mat-form-field>
+        <mtbls-ontology
+          #factorType
+          [id]="'factorType'"
+          [validations]="factorTypeValidations"
+          [controlList]="controlList()"
+          (changed)="onChanges($event)"
+          [values]="[factor.factorType]"
+          [inline]="true"
+        ></mtbls-ontology>
+        <label
+        [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
+        >
+          Add factor unit (if necessary)
+          <mat-checkbox 
+          [disabled]="form.get('factorName')?.pristine"
+          (change)="toggleUnit()" ></mat-checkbox>
+        </label>
+      </section>
+      <ng-container *ngIf="addFactorColumnVisible">
+      <section class="modal-card-body">
+        <h6 class="modal-card-title modal-form-title">
+          Add factor unit to Sample sheet -
+          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName-->
+        </h6>
+        <mtbls-ontology
+          [id]="'factorUnit'"
+          [unitId]="resolvedName"
+          class="mt-20"
+          #factorUnit
+          [validations]="unitSampleValidations"
+          [controlList]="factorColumnControlList()"
+          (changed)="onChanges($event)"
+          [values]="[]"
+          [inline]="true"
+        ></mtbls-ontology>
+
+      </section>
+    </ng-container>
+      <!--Add factor column end-->
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button
+              *ngIf="!addNewFactor"
+              class="button is-danger is-pulled-left"
+              (click)="confirmDelete()"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+            <mtbls-help target="factors"></mtbls-help>
+            <!-- <button *ngIf="!addNewFactor" class="button is-light is-pulled-left" (click)='showHistory()' ><mat-icon>history</mat-icon></button> -->
+          </div>
+          <div class="column is-half has-text-right">
+            <button
+              *ngIf="!form.pristine"
+              [disabled]="!form.valid || isFormBusy"
+              (click)="saveNgxs()"
+              class="button is-info"
+            >
+              <mat-spinner
+                [diameter]="20"
+                [strokeWidth]="3"
+                *ngIf="isFormBusy"
+              ></mat-spinner>
+              Save
+            </button>
+            <button
+              *ngIf="form.pristine"
+              (click)="closeModal()"
+              class="button is-info"
+            >
+              OK
+            </button>
+            <button
+              class="button"
+              [disabled]="isFormBusy"
+              (click)="closeModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </form>
+</div>

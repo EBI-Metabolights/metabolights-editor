@@ -54,6 +54,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
   @Input("tableData") tableData: any;
+  @Input("factors") factors: any;
   @Input("validationsId") validationsId: any;
   @Input("enableControlList") enableControlList = true;
   @Input("templateRowPresent") templateRowPresent: boolean = false;

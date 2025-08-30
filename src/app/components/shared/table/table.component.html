@@ -74,6 +74,23 @@
       </span>
     </span>
   </div>
+  <div *ngIf="factors && factors.length > 0" class="notification is-primary">
+    <div id="meta">
+      <span>
+        <p>
+          <small
+          ><b>Factors</b
+          >:</small>
+          <span class="content">
+          <div *ngFor="let factor of factors">
+            <mtbls-factorlist [value]="factor" ></mtbls-factorlist>
+          </div>
+        </span>
+        </p>
+      </span>
+    </div>
+  </div>
+  
 </div>
 
 <div *ngIf="!isReadOnly && !dismissed && columnHidden" class="notification is-primary">
