@@ -272,3 +272,14 @@ a.dropdown-item {
   right: 2%;
   cursor: pointer; /* This gives you the little hand */
 }
+.scroll-wrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+#wrapper1 {
+  height: 20px;
+}
+#wrapper2 {
+  height: auto !important;
+}

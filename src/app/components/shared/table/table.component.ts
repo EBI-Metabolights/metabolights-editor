@@ -16,6 +16,7 @@ import {
   effect,
   ChangeDetectorRef,
   AfterViewInit,
+  ElementRef,
 } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
@@ -53,6 +54,11 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
+
+  @ViewChild('wrapper1') wrapper1!: ElementRef<HTMLDivElement>;
+  @ViewChild('wrapper2') wrapper2!: ElementRef<HTMLDivElement>;
+  @ViewChild('div2') div2!: ElementRef<HTMLDivElement>;
+
   @Input("tableData") tableData: any;
   @Input("factors") factors: any;
   @Input("validationsId") validationsId: any;
@@ -74,6 +80,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
 
 
 
+
   @Input("fileTypes") fileTypes: any = [
     {
       filter_name: "All types", // eslint-disable-line
@@ -82,6 +89,11 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   ];
 
   private toastrSettings: Record<string, any> = null;
+
+  // store default styles
+  private defaultWrapper1Style!: { overflowX: string; overflowY: string; height: string; width: string; };
+  private defaultWrapper2Style!: { overflowX: string; overflowY: string; height: string; width: string; };
+
 
   private studyId: string;
 
@@ -151,6 +163,8 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   actualRows: any;
   private isInitialized = false;
   sampleAbundance: any;
+  isScrollingEnabled: boolean = true;
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -163,10 +177,11 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   }
 
   ngOnInit() {
-
+    
     this.setUpSubscriptionsNgxs();
     if (this.tableData?.data) {
       this.data = this.tableData.data;
+     
     }
     if (this.data) {
      
@@ -179,10 +194,12 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
       }
     } else {
       localStorage.setItem(this.data.file, 'compact');
+       
     }
     }
 
   }
+  
   
   setupPaginator() {
     if (!this.paginator || !this.dataSource) return;
@@ -255,6 +272,26 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   ngAfterViewInit(): void {
     // try to initialize here, but data might not be ready yet
     this.setDataSourceBindings();
+     // save default styles on init
+  if (this.wrapper1) {
+    const style = this.wrapper1.nativeElement.style;
+    this.defaultWrapper1Style = {
+      overflowX: style.overflowX || 'auto',
+      overflowY: style.overflowY || 'hidden',
+      height: style.height || '20px',
+      width: style.width || '100%',
+    };
+  }
+
+  if (this.wrapper2) {
+    const style = this.wrapper2.nativeElement.style;
+    this.defaultWrapper2Style = {
+      overflowX: style.overflowX || 'auto',
+      overflowY: style.overflowY || 'hidden',
+      height: style.height || 'auto',
+      width: style.width || '100%',
+    };
+  }
   }
 
   ngAfterViewChecked(): void {
@@ -584,11 +621,14 @@ compare(a: any, b: any, isAsc: boolean) {
       this.displayedTableColumns.unshift("Select")
       this.view = "expanded";
       localStorage.setItem(this.data.file, 'expanded')
+      // Enable scrolling for expanded view (more columns)
+      this.enableScrolling();
     } else {
       this.displayedTableColumns = this.data.displayedColumns;
       this.view = "compact";
       localStorage.setItem(this.data.file, 'compact')
-
+      // Disable scrolling for compact view (fewer columns)
+      this.disableScrolling();
     }
   }
 
@@ -1697,5 +1737,69 @@ compare(a: any, b: any, isAsc: boolean) {
         this.triggerChanges();
     }
   }
+
+enableScrolling(): void {
+  this.isScrollingEnabled = true;
+  this.updateScrollBehavior();
+}
+
+disableScrolling(): void {
+  this.isScrollingEnabled = false;
+  this.restoreDefaultScrollBehavior();
+}
+
+private updateScrollBehavior(): void {
+  const overflowStyle = this.isScrollingEnabled ? 'auto' : 'hidden';
+
+  if (this.wrapper1) {
+    this.wrapper1.nativeElement.style.overflowX = overflowStyle;
+  }
+  
+  if (this.wrapper2) {
+    this.wrapper2.nativeElement.style.overflowX = overflowStyle;
+  }
+
+  // update inner div width based on displayed columns
+  const columnWidth = 150;
+  const tableWidth = this.displayedTableColumns.length * columnWidth;
+
+  if (this.div2) {
+    this.div2.nativeElement.style.width = `${tableWidth}px`;
+    this.div2.nativeElement.style.overflowX = overflowStyle;
+  }
+
+  const div1 = document.getElementById('div1');
+  if (div1) div1.style.width = `${tableWidth}px`;
+}
+
+// restore default styles for compact view
+private restoreDefaultScrollBehavior(): void {
+  if (this.wrapper1 && this.defaultWrapper1Style) {
+    Object.assign(this.wrapper1.nativeElement.style, this.defaultWrapper1Style);
+  }
+  
+  if (this.wrapper2 && this.defaultWrapper2Style) {
+    Object.assign(this.wrapper2.nativeElement.style, this.defaultWrapper2Style);
+  }
+
+  // also reset inner div width to default
+  const div1 = document.getElementById('div1');
+  if (div1) div1.style.width = '';
+
+  if (this.div2) this.div2.nativeElement.style.width = '';
+}
+
+
+onWrapper1Scroll(event: Event): void {
+  if (!this.isScrollingEnabled) return;
+  const scrollLeft = (event.target as HTMLDivElement).scrollLeft;
+  if (this.wrapper2) this.wrapper2.nativeElement.scrollLeft = scrollLeft;
+}
+
+onWrapper2Scroll(event: Event): void {
+  if (!this.isScrollingEnabled) return;
+  const scrollLeft = (event.target as HTMLDivElement).scrollLeft;
+  if (this.wrapper1) this.wrapper1.nativeElement.scrollLeft = scrollLeft;
+}
 
 }
