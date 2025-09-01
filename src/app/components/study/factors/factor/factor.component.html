@@ -4,7 +4,7 @@
       class="button is-light is-pulled-right is-small"
       [routerLink]="['/study', studyId, 'samples' ]"
             >    <mat-icon>info</mat-icon>
-       Add factor in the sample sheet</a
+       Add, modify or delete Factors in the Samples section</a  
     >
   </span>
   <ng-template #showDropdownOption>
@@ -14,13 +14,13 @@
 <ng-template #showFactorDetails>
   <div class="control">
     <div class="tags has-addons">
-      <span
+      <!-- <span
         *ngIf="!isStudyReadOnly"
         class="tag is-primary clickable"
         (click)="openModal(true)"
       >
         <i class="material-icons"> edit </i>
-      </span>
+      </span> -->
       <span class="tag is-default is-small">
         <span
           *ngIf="

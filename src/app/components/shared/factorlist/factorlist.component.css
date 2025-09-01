@@ -2,3 +2,6 @@
 .modal-form-title {
     padding-bottom: 1%;
 }
+.no-margin{
+    margin-bottom: 0px !important ;
+}
