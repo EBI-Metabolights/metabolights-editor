@@ -219,11 +219,11 @@
 <span *ngIf="tableData && data">
   <!-- In your component template -->
 <div #wrapper1 id="wrapper1" class="scroll-wrapper" (scroll)="onWrapper1Scroll($event)">
-  <div id="div1"></div>
+  <div id="div1" class="mat-elevation-z1 tableclass"></div>
 </div>
 
 <div #wrapper2 id="wrapper2" class="scroll-wrapper" (scroll)="onWrapper2Scroll($event)">
-  <div id="div2">
+  <div id="div2" class="mat-elevation-z1 prevent-deselect">
    <!--table start-->
     <table
       editTable
