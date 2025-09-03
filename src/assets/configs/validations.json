@@ -269,7 +269,7 @@
           "rules": [
             {
               "condition": "pattern",
-              "value": "^\\d{4}-\\d{4}-\\d{4}-\\d{4}$",
+              "value": "(^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)|(^\\d{4}-\\d{4}-\\d{4}-\\d{3}X$)",
               "error": "Please provide a valid orcid for the contact. This should be formatted as '0000-0002-1825-0097'",
               "type": "string"
             }

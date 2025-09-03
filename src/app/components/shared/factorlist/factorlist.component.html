@@ -1,43 +1,28 @@
-<div *ngIf="addNewFactor || factor == null; else showFactorDetails">
-  <span *ngIf="!isDropdown; else showDropdownOption">
-    <a
-      class="button is-light is-pulled-right is-small"
-      [routerLink]="['/study', studyId, 'samples' ]"
-            >    <mat-icon>info</mat-icon>
-       Add, modify or delete Factors in the Samples section</a  
-    >
-  </span>
-  <ng-template #showDropdownOption>
-    <a (click)="openModal()" class="dropdown-item"> Add new factor </a>
-  </ng-template>
-</div>
-<ng-template #showFactorDetails>
-  <div class="control">
-    <div class="tags has-addons">
-      <!-- <span
+
+<div class="tags has-addons no-margin">
+    <span
         *ngIf="!isStudyReadOnly"
         class="tag is-primary clickable"
         (click)="openModal(true)"
-      >
+    >
         <i class="material-icons"> edit </i>
-      </span> -->
-      <span class="tag is-default is-small">
+    </span>
+    <span class="tag is-default is-small">
         <span
-          *ngIf="
+        *ngIf="
             factor.factorType &&
-              factor.factorType.annotationValue &&
-              factor.factorType.annotationValue != '';
+            factor.factorType.annotationValue &&
+            factor.factorType.annotationValue != '';
             else emptyFactorValue
-          "
+        "
         >
-          <b>{{ factor.factorName }}</b> :
-          <ontology-details [value]="factor.factorType"></ontology-details>
+            <b>{{ factor.factorName }}</b> :
+            <ontology-details [value]="factor.factorType"></ontology-details>
         </span>
         <ng-template #emptyFactorValue> - </ng-template>
-      </span>
-    </div>
-  </div>
-</ng-template>
+    </span>
+</div>
+            
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
   <div class="modal-background"></div>
@@ -109,13 +94,6 @@
           (change)="toggleUnit()" ></mat-checkbox>
         </label>
       </section>
-     <!-- <section class="modal-card-body">
-        <label>
-          <input type="checkbox" (change)="toggleUnit()" />
-          ADD COLUMN??? UNIT ?????
-        </label>
-      </section>-->
-      <!--Add factor column start-->
       <ng-container *ngIf="addFactorColumnVisible">
       <section class="modal-card-body">
         <h6 class="modal-card-title modal-form-title">
@@ -135,20 +113,6 @@
         ></mtbls-ontology>
 
       </section>
-      <!--The below is a relic from when adding a column was a separate modal-->
-      <!--<footer class="modal-card-foot">
-        <div class="columns is-gapless full-width">
-          <div class="column is-half"></div>
-          <div class="column is-half has-text-right">
-            <button (click)="closeAddColumnModal()" class="button">
-              Cancel
-            </button>
-            <button (click)="addColumn('factor', selectedFactor)" class="button is-info">
-              Add Factor Column
-            </button>
-          </div>
-        </div>
-      </footer>-->
     </ng-container>
       <!--Add factor column end-->
       <footer class="modal-card-foot">
