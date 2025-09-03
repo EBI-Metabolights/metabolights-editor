@@ -67,7 +67,7 @@ export class SampleState {
                   const fn = "element['" + key + "']";
                   columns.push({
                     columnDef: key,
-                    sticky: key === "Protocol REF" ? "true" : "false",
+                    sticky: "false",
                     header: key,
                     cell: (element) => eval(fn),
                   });

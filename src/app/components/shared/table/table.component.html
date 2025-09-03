@@ -74,6 +74,23 @@
       </span>
     </span>
   </div>
+  <div *ngIf="factors && factors.length > 0" class="notification is-primary">
+    <div id="meta">
+      <span>
+        <p>
+          <small
+          ><b>Factors</b
+          >:</small>
+          <span class="content">
+          <div *ngFor="let factor of factors">
+            <mtbls-factorlist [value]="factor" ></mtbls-factorlist>
+          </div>
+        </span>
+        </p>
+      </span>
+    </div>
+  </div>
+  
 </div>
 
 <div *ngIf="!isReadOnly && !dismissed && columnHidden" class="notification is-primary">
@@ -200,9 +217,14 @@
   </span>
 </div>
 <span *ngIf="tableData && data">
-  <div class="top-scroll-wrapper wrapper mat-elevation-z1 prevent-deselect">
+  <!-- In your component template -->
+<div #wrapper1 id="wrapper1" class="scroll-wrapper" (scroll)="onWrapper1Scroll($event)">
+  <div id="div1" class="mat-elevation-z1 tableclass"></div>
+</div>
 
-        <!--table start-->
+<div #wrapper2 id="wrapper2" class="scroll-wrapper" (scroll)="onWrapper2Scroll($event)">
+  <div id="div2" class="mat-elevation-z1 prevent-deselect">
+   <!--table start-->
     <table
       editTable
       (copy)="onCopy($event)"
@@ -299,7 +321,12 @@
       }"></tr>
     </table>
         <!--table end-->
-      </div>
+  </div>
+</div>
+  <!-- <div class="top-scroll-wrapper wrapper mat-elevation-z1 prevent-deselect">
+
+       
+      </div> -->
   <!--empty table message end-->
   <div class="wrapper mat-elevation-z1">
     <span *ngIf="dataSource && dataSource.data.length === 0">
@@ -315,7 +342,7 @@
     </span>
   </div>
   <!--empty table message end-->
-</span>
+<!-- </span> -->
 
 <!--Edit column modal start-->
 <div
