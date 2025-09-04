@@ -2,7 +2,7 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } fro
 import * as toastr from "toastr";
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { Observable, take, withLatestFrom } from 'rxjs';
 import { MTBLSFactor } from 'src/app/models/mtbl/mtbls/mtbls-factor';
 import { ApplicationState } from 'src/app/ngxs-store/non-study/application/application.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
@@ -13,6 +13,7 @@ import { Factors } from 'src/app/ngxs-store/study/descriptors/descriptors.action
 import { JsonConvert } from 'json2typescript';
 import { Ontology } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology';
 import { Router } from '@angular/router';
+import { SampleState } from 'src/app/ngxs-store/study/samples/samples.state';
 
 
 @Component({
@@ -35,6 +36,7 @@ export class FactorlistComponent implements OnInit {
     readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
     toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
     studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+    studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
   
   
     private toastrSettings: Record<string, any> = {};
@@ -113,6 +115,7 @@ export class FactorlistComponent implements OnInit {
           this.isStudyReadOnly = value;
         }
       });
+      this.refreshSamplesTable();
     }
   
     ngOnInit() {
@@ -126,6 +129,7 @@ export class FactorlistComponent implements OnInit {
           this.factorTypeComponent.values = [];
         }
       }
+      
     }
   
     onChanges() {
@@ -181,7 +185,15 @@ export class FactorlistComponent implements OnInit {
     closeModal() {
       this.isModalOpen = false;
     }
-  
+    
+    refreshSamplesTable() {
+      this.studySamples$
+        .pipe(withLatestFrom(this.studyIdentifier$), take(1))
+        .subscribe(([, studyIdentifierValue]) => {
+          this.editorService.loadStudySamples(studyIdentifierValue);
+      });
+    }    
+
     saveNgxs() {
       if(!this.isStudyReadOnly && this.getFieldValue("factorName") !== "") {
         this.isFormBusy = true;
@@ -208,12 +220,11 @@ export class FactorlistComponent implements OnInit {
             },
             (error) => { this.isFormBusy = false; }
           )
-  
         }
         //this.factor = null;
         this.addFactorColumnVisible = false;
       }
-      if (this.addFactorColumnVisible) {
+     if (this.addFactorColumnVisible) {
   
       }
     }
@@ -227,6 +238,7 @@ export class FactorlistComponent implements OnInit {
             this.isDeleteModalOpen = false;
             this.isModalOpen = false;
             this.isDeleting = false;
+            
           },
           (error) => {
             this.isFormBusy = false;
@@ -243,6 +255,7 @@ export class FactorlistComponent implements OnInit {
             this.form.markAsPristine();
             this.initialiseForm();
             this.isModalOpen = true;
+            this.refreshSamplesTable();
           }
         )
       }
