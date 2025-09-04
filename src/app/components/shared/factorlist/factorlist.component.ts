@@ -115,7 +115,7 @@ export class FactorlistComponent implements OnInit {
           this.isStudyReadOnly = value;
         }
       });
-      this.refreshSamplesTable();
+      this.refreshSamplesTableWithoutPopup();
     }
   
     ngOnInit() {
@@ -186,6 +186,13 @@ export class FactorlistComponent implements OnInit {
       this.isModalOpen = false;
     }
     
+    refreshSamplesTableWithoutPopup() {
+      this.studySamples$
+        .pipe(withLatestFrom(this.studyIdentifier$), take(1))
+        .subscribe(([, studyIdentifierValue]) => {
+          this.editorService.loadStudySamplesWithoutPopup(studyIdentifierValue);
+      });
+    }  
     refreshSamplesTable() {
       this.studySamples$
         .pipe(withLatestFrom(this.studyIdentifier$), take(1))

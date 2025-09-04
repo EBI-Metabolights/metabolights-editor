@@ -608,6 +608,30 @@ export class EditorService {
     }
   }
 
+  loadStudySamplesWithoutPopup(studyId: string) {
+    if (this.files === null) {
+      //this.store.dispatch(new Operations.GetFreshFilesList(false)) // causing issues currently
+    } else {
+      let samplesExist = false;
+      this.files.study.forEach((file) => {
+        if (file.file.indexOf("s_") === 0 && file.status === "active") {
+          // this.store.dispatch(new SetLoadingInfo("Loading samples data"))
+          samplesExist = true;
+          this.store.dispatch(new Samples.OrganiseAndPersist(file.file, studyId));
+        }
+      });
+      if (!samplesExist) {
+        Swal.fire({
+          title: "Error",
+          text: "Sample sheet missing. Please upload sample sheet.",
+          showCancelButton: false,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: "OK",
+        });
+      }
+    }
+  }
+
   search(term, type) {
     return this.dataService.search(term, type).pipe(map((data) => data));
   }
