@@ -81,16 +81,8 @@ export class SampleState {
                   const assertB = data.header[b] as number;
                   return assertA - assertB;
                 });
-                let index = displayedColumns.indexOf("Source Name");
-                if (index > -1) {
-                  displayedColumns.splice(index, 1);
-                }
-               // Reconstruct the order of comment columns to be after the first five columns to display in compact view
-                const commentColumns = displayedColumns.filter(col => col.startsWith("Comment["));
-                displayedColumns = displayedColumns.filter(col => !col.startsWith("Comment["));
-                displayedColumns.splice(5, 0, ...commentColumns);
 
-                index = displayedColumns.indexOf("Characteristics[Sample type]");
+                let index = displayedColumns.indexOf("Characteristics[Sample type]");
                 if (index > -1) {
                   displayedColumns.splice(index, 1);
                 }
@@ -116,8 +108,6 @@ export class SampleState {
                   displayedColumns.splice(displayedColumns.indexOf("Sample Name"), 1);
                   displayedColumns.splice(3, 0, "Sample Name");
                 }
-                
-               
 
                 displayedColumns = displayedColumns.filter(
                   (key) =>
