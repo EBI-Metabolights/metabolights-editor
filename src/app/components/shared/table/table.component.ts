@@ -35,7 +35,7 @@ import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { TableColumnAction, TableRowAction, TableType } from "./table-type.type";
+import { TableColumnAction, TableRowAction, TableType, TableTypeVal } from "./table-type.type";
 import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
@@ -162,7 +162,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   private isInitialized = false;
   sampleAbundance: any;
   isScrollingEnabled: boolean = true;
-
+  tableTypeValue: string = "";
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -194,6 +194,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
       localStorage.setItem(this.data.file, 'compact');
        
     }
+    this.tableTypeValue = this.getTableTypeVal(this.data.file);
     }
 
   }
@@ -853,6 +854,13 @@ compare(a: any, b: any, isAsc: boolean) {
     if (filename.startsWith('m_')) return 'maf'
     if (filename.startsWith('s_')) return 'samples'
   }
+
+   getTableTypeVal(filename: string): TableTypeVal {
+    if (filename.startsWith('a_')) return 'Assay files'
+    if (filename.startsWith('m_')) return 'MAF files'
+    if (filename.startsWith('s_')) return 'Sample sheet'
+  }
+
 
   getTableUpdateAction(action: TableRowAction, tableType: TableType): any {
     switch (action) {

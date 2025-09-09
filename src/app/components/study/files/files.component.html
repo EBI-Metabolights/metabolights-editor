@@ -180,7 +180,11 @@
   </div>
 
 </div>
+
 <mat-divider class="file-divider" [inset]="true"></mat-divider>
+<div *ngIf="!isReadOnly" class="notification is-warning message">
+    <small>This section shows your metadata files (‘ISA METADATA’). Metadata can be edited online or downloaded, edited locally (e.g., MS Excel) and re-uploaded. Please note, do not change filenames, extensions, encodings, etc.</small>
+</div>
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>
