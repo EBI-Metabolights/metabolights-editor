@@ -81,12 +81,8 @@ export class SampleState {
                   const assertB = data.header[b] as number;
                   return assertA - assertB;
                 });
-                let index = displayedColumns.indexOf("Source Name");
-                if (index > -1) {
-                  displayedColumns.splice(index, 1);
-                }
 
-                index = displayedColumns.indexOf("Characteristics[Sample type]");
+                let index = displayedColumns.indexOf("Characteristics[Sample type]");
                 if (index > -1) {
                   displayedColumns.splice(index, 1);
                 }
@@ -112,6 +108,7 @@ export class SampleState {
                   displayedColumns.splice(displayedColumns.indexOf("Sample Name"), 1);
                   displayedColumns.splice(3, 0, "Sample Name");
                 }
+
                 displayedColumns = displayedColumns.filter(
                   (key) =>
                     key.indexOf("Term Accession Number") < 0 &&

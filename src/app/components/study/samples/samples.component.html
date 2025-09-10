@@ -1,11 +1,8 @@
 <div *ngIf="!isReadOnly" class="notification is-primary">
-  <small><mat-icon>info</mat-icon>Please complete the table below to include organism & organism part. You must also add at least one factor that describe samples, such as gender or drug treatment.
-  <button class="button is-light is-small add-factor-button">
-    <span><mat-icon>add</mat-icon>Factor</span>
-  </button>
-    <br /><span style="font-size: 0.8em"
-      ><mtbls-help target="samples"></mtbls-help
-    ></span></small>
+  <small><mat-icon>info</mat-icon>Please complete the table below to describe the samples (including QCs). Values for ‘Characteristics’ such as ‘Organism’ and ‘Organism Part’ must be added as well as ‘Factor’ information to describe experimental design and groups of samples, for example, ‘Disease’, ‘Treatment’ or ‘Timepoint’.
+  <br/>
+  <b>Please see the <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_BLANK">Guides</a> for more information on how to complete your Samples section.</b>
+  </small>
 </div>
 <div
   *ngIf="duplicateSamples.length > 0 && !isReadOnly"
