@@ -1685,12 +1685,14 @@
                     "sticky": "false",
                     "header": "Parameter Value[Chromatography Instrument]",
                     "data-type": "ontology",
+                    "techniqueNames": [
+                        "LCMS"
+                        ],
                     "ontology-details": {
                         "data-type": "ontology",
                         "is-required": "true",
                         "is-read-only": "false",
                         "is-hidden": "false",
-                        "technique": "mass spectrometry",
                         "description": "Please specify the chromatography instrument e.g. Waters ACQUITY UPLC H-Class System.",
                         "placeholder": "",
                         "rules": [],
@@ -1709,12 +1711,14 @@
                     "sticky": "false",
                     "header": "Parameter Value[Chromatography Instrument]",
                     "data-type": "ontology",
+                    "techniqueNames": [
+                        "GCMS"
+                        ],
                     "ontology-details": {
                         "data-type": "ontology",
                         "is-required": "true",
                         "is-read-only": "false",
                         "is-hidden": "false",
-                        "technique": "mass spectrometry",
                         "description": "Please specify the chromatography instrument e.g. Thermo Scientific TRACE 1310 GC.",
                         "placeholder": "",
                         "rules": [],
@@ -1893,30 +1897,6 @@
                             "is-forced-ontology": "false",
                             "ontology": {
                                 "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Scan%20Polarity&term=",
-                                "allowFreeText": true
-                            }
-                        }
-                    },
-                    "cell": "(element) => element.name"
-                },
-                {
-                    "columnDef": "Parameter Value[Scan m/z range]",
-                    "sticky": "false",
-                    "header": "Parameter Value[Scan m/z range]",
-                    "data-type": "string",
-                    "ontology-details": {
-                        "data-type": "string",
-                        "is-required": "true",
-                        "is-read-only": "false",
-                        "is-hidden": "false",
-                        "technique": "mass spectrometry",
-                        "description": "Please specify the mass spectrometry scan range e.g. 100-1000.",
-                        "placeholder": "",
-                        "rules": [],
-                        "recommended-ontologies": {
-                            "is-forced-ontology": "false",
-                            "ontology": {
-                                "url": "/ebi-internal/ontology?branch=Mass%20Spectrometry%20Scan%20m/z%20range&term=",
                                 "allowFreeText": true
                             }
                         }
