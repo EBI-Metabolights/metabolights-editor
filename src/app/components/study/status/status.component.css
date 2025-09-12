@@ -10,3 +10,11 @@
   left: 20px;
   top: 10px;
 }
+.list-data-policy{
+    list-style: disc;
+    padding: 20px;
+}
+.sub-list-data-policy{
+    list-style: circle;
+    list-style-position: inside;
+}

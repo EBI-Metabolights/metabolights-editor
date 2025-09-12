@@ -1,7 +1,7 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -40,6 +40,8 @@ export interface GeneralMetadataStateModel {
     publicFtpUrl: string;
     publicGlobusUrl: string;
     publicAsperaPath: string;
+    firstPrivateDate: string;
+    firstPublicDate: string;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -61,7 +63,9 @@ const defaultState: GeneralMetadataStateModel = {
     publicHttpUrl: null,
     publicFtpUrl: null,
     publicGlobusUrl: null,
-    publicAsperaPath: null
+    publicAsperaPath: null,
+    firstPrivateDate: null,
+    firstPublicDate: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -114,6 +118,8 @@ export class GeneralMetadataState {
                 ctx.dispatch(new PublicGlobusUrl.Set(gm_response.mtblsStudy.studyGlobusUrl));
                 ctx.dispatch(new PublicAsperaPath.Set(gm_response.mtblsStudy.studyAsperaPath));
 
+                ctx.dispatch(new FirstPrivateDate.Set(gm_response.mtblsStudy.firstPrivateDate));
+                ctx.dispatch(new FirstPublicDate.Set(gm_response.mtblsStudy.firstPublicDate));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
@@ -308,6 +314,23 @@ export class GeneralMetadataState {
       });
     }
 
+    @Action(FirstPrivateDate.Set)
+    SetFirstPrivateDate(ctx: StateContext<GeneralMetadataStateModel>, action: FirstPrivateDate.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            firstPrivateDate: action.firstPrivateDate
+      });
+    }
+
+    @Action(FirstPublicDate.Set)
+    SetFirstPublicDate(ctx: StateContext<GeneralMetadataStateModel>, action: FirstPublicDate.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            firstPublicDate: action.firstPublicDate
+      });
+    }
 
     @Action(PublicAsperaPath.Set)
     SetPublicAsperaPath(ctx: StateContext<GeneralMetadataStateModel>, action: PublicAsperaPath.Set) {
@@ -684,5 +707,13 @@ export class GeneralMetadataState {
     @Selector()
     static publicAsperaPath(state: GeneralMetadataStateModel): string {
         return state.publicAsperaPath
+    }
+     @Selector()
+    static firstPrivateDate(state: GeneralMetadataStateModel): string {
+        return state.firstPrivateDate
+    }
+     @Selector()
+    static firstPublicDate(state: GeneralMetadataStateModel): string {
+        return state.firstPublicDate
     }
 }
