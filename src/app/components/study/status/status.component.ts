@@ -17,7 +17,7 @@ import { RevisionNumber, StudyStatus } from "src/app/ngxs-store/study/general-me
 import { Loading, SetLoadingInfo } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import { ViolationType } from "../validations-v2/interfaces/validation-report.types";
 import { RevisionStatusTransformPipe } from "../../shared/pipes/revision-status-transform.pipe";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder } from "@angular/forms";
 import { ConfigurationService } from "src/app/configuration.service";
 
 @Component({
@@ -36,6 +36,7 @@ export class StatusComponent implements OnInit {
 
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
   revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
+  firstPrivateDate$: Observable<string> = inject(Store).select(GeneralMetadataState.firstPrivateDate);
   revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
   revisionComment$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionComment);
@@ -63,6 +64,10 @@ export class StatusComponent implements OnInit {
   validationStatus: ViolationType = null;
   revisionStatus = ""
   private toastrSettings: Record<string, any> = {}
+  isPopupOpen = false;
+  userAgreed = false;
+  firstPrivateDate: string = '';
+
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
@@ -179,6 +184,9 @@ export class StatusComponent implements OnInit {
     this.validationStatus$.pipe(filter(val => val !== null)).subscribe((val) => {
       this.validationStatus = val;
     });
+    this.firstPrivateDate$.pipe(filter(val => val !== null)).subscribe((val) => {
+      this.firstPrivateDate = val;
+    });
   }
   changeStatusNgxs(toStatus) {
     this.toStatus = toStatus
@@ -194,7 +202,11 @@ export class StatusComponent implements OnInit {
       if (this.toStatus == "New Revision") {
         Swal.fire({
           title: "Are you sure?",
-          text: "Dataset will be copied onto public storage. After this task has completed, the dataset will be public automatically.",
+          html: `
+            <p style='text-align: justify;'> 
+              <strong>Dataset will be copied onto EBI’s public storage.</strong><br/>
+              After this task has completed, study status will be updated to ‘Public’ and can not be modified.Submitters should contact the MetaboLights team to modify or remove a public study, which should only happen in very exceptional circumstances. Please check the ‘Public Data’ section of the <a href='https://www.ebi.ac.uk/metabolights/editor/datapolicy' target='_BLANK' style="text-decoration: underline;">MetaboLights Data Policy</a> for more information.
+            </p>`,
           showCancelButton: true,
           confirmButtonColor: "#DD6B55",
           confirmButtonText: "Confirm",
@@ -239,7 +251,7 @@ export class StatusComponent implements OnInit {
       else {
         Swal.fire({
           title: "Are you sure?",
-          text: "Study status will be updated to " + this.toStatus,
+          text: "Study status will be updated to '" + this.toStatus + "'",
           showCancelButton: true,
           confirmButtonColor: "#DD6B55",
           confirmButtonText: "Confirm",
@@ -283,7 +295,31 @@ export class StatusComponent implements OnInit {
     }
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    
+      
+  }
+
+onCheckboxChange(checkbox: HTMLInputElement) {
+  if (checkbox.checked) {
+    this.isPopupOpen = true;
+  }
+}
+
+handlePopupClose(agreed: boolean) {
+  this.isPopupOpen = false;
+  if (agreed) {
+    this.userAgreed = true;
+  } else {
+  this.userAgreed = false;
+  }
+}
+
+  openPopup() {
+    if (!this.userAgreed) {
+      this.isPopupOpen = true;
+    }
+  }
 
   openRevisionStatusModel() {
 
@@ -320,15 +356,15 @@ export class StatusComponent implements OnInit {
             extendedTimeOut: 0,
             tapToDismiss: false,
           });
-        }
-        else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
-          toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
-            timeOut: "5000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
+        // }
+        // else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
+        //   toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
+        //     timeOut: "5000",
+        //     positionClass: "toast-top-center",
+        //     preventDuplicates: true,
+        //     extendedTimeOut: 0,
+        //     tapToDismiss: false,
+        //   });
         } else {
           this.isModalOpen = true;
         }
@@ -350,4 +386,5 @@ export class StatusComponent implements OnInit {
   closeModal() {
     this.isModalOpen = false;
   }
+
 }
