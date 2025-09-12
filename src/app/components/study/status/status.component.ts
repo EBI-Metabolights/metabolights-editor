@@ -356,15 +356,15 @@ handlePopupClose(agreed: boolean) {
             extendedTimeOut: 0,
             tapToDismiss: false,
           });
-        // }
-        // else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
-        //   toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
-        //     timeOut: "5000",
-        //     positionClass: "toast-top-center",
-        //     preventDuplicates: true,
-        //     extendedTimeOut: 0,
-        //     tapToDismiss: false,
-        //   });
+        }
+        else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
+          toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
+            timeOut: "5000",
+            positionClass: "toast-top-center",
+            preventDuplicates: true,
+            extendedTimeOut: 0,
+            tapToDismiss: false,
+          });
         } else {
           this.isModalOpen = true;
         }
