@@ -40,8 +40,8 @@ export interface GeneralMetadataStateModel {
     publicFtpUrl: string;
     publicGlobusUrl: string;
     publicAsperaPath: string;
-    firstPrivateDate: Date;
-    firstPublicDate: Date;
+    firstPrivateDate: string;
+    firstPublicDate: string;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -119,7 +119,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new PublicAsperaPath.Set(gm_response.mtblsStudy.studyAsperaPath));
 
                 ctx.dispatch(new FirstPrivateDate.Set(gm_response.mtblsStudy.firstPrivateDate));
-                ctx.dispatch(new FirstPublicDate.Set(gm_response.mtblsStudy.firstPrivateDate));
+                ctx.dispatch(new FirstPublicDate.Set(gm_response.mtblsStudy.firstPublicDate));
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
@@ -707,5 +707,13 @@ export class GeneralMetadataState {
     @Selector()
     static publicAsperaPath(state: GeneralMetadataStateModel): string {
         return state.publicAsperaPath
+    }
+     @Selector()
+    static firstPrivateDate(state: GeneralMetadataStateModel): string {
+        return state.firstPrivateDate
+    }
+     @Selector()
+    static firstPublicDate(state: GeneralMetadataStateModel): string {
+        return state.firstPublicDate
     }
 }

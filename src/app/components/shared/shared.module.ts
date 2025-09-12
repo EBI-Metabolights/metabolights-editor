@@ -66,7 +66,9 @@ import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.p
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { MatCardModule } from "@angular/material/card";
+import { MatDivider } from "@angular/material/divider";
 import { FactorlistComponent } from "./factorlist/factorlist.component";
+import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.component";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -112,7 +114,8 @@ import { FactorlistComponent } from "./factorlist/factorlist.component";
     CurationStatusTransformPipe,
     StripTermsOfUsePipe,
     CurationStatusStarTransformPipe,
-    FactorlistComponent
+    FactorlistComponent,
+    DataPolicyModalComponent
   ],
   imports: [
     CommonModule,
@@ -137,7 +140,8 @@ import { FactorlistComponent } from "./factorlist/factorlist.component";
     QuillModule,
     PromptRefreshComponent,
     MatCardModule,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    MatDivider
   ],
   exports: [
     AddAssayComponent,
@@ -174,7 +178,8 @@ import { FactorlistComponent } from "./factorlist/factorlist.component";
     CurationStatusTransformPipe,
     StripTermsOfUsePipe,
     CurationStatusStarTransformPipe,
-    FactorlistComponent
+    FactorlistComponent,
+    DataPolicyModalComponent
   ],
   providers: [
     AuthGuard,

@@ -26,8 +26,8 @@ export interface IMtblsStudySummaryInformation {
   studyFtpUrl: string;
   studyGlobusUrl: string;
   studyAsperaPath: string;
-  firstPrivateDate: Date;
-  firstPublicDate: Date;
+  firstPrivateDate: string;
+  firstPublicDate: string;
 }
 
 export class IStudyRevision {

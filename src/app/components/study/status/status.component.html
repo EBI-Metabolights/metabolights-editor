@@ -101,18 +101,25 @@
         </h4>
         <p>
           <b>ACCESSIBILITY</b><br />
-          Your study is currently Private and you cannot make any changes.
-          Only the study submitters are able to view but ca not make changes to the study. If you would like to update you study at this stage, change study status to 'Provisional', make necessary changes and convert its status back to 'Private'.
-
+          Your study is Private and you cannot make any changes.<br /><br/>
+          If you would like to update your study at this stage, please change study status to 'Provisional', make necessary changes and then revert status back to 'Private'. <br/>
+          <a href="https://ebi-metabolights.github.io/guides/#reviewer-link" target="_BLANK" style="text-decoration: underline;">private read-only link</a> 
+          is now available at the top of your study page to share with the editor of the journal, reviewers, collaborators, etc. 
           <br /><br />
           <b>What's next?</b><br />
-          Your study will be public according to the first of the following criteria:
-          <br/>
-          1. With your status update.<br/>
-          2. The study publication is published in a journal.<br/>
-          3. The release date is reached.<br/>
-          If you want to make your study public, update study status to 'Public'.
-          Please be aware that once you make your study public, you cannot make any status update again.
+          </p>
+          <ul class="list-data-policy">
+            <li><strong>Manual status update: </strong> can make your study public by selecting ‘Public’ from the drop-down menu below.</li>
+            <li><strong>Automatic status update:</strong> Your study will be made public according to the first of the following criteria:
+              <ul class="sub-list-data-policy">
+                <li>The study publication is published in a journal.</li>
+                <li>The release date has been reached.</li>
+              </ul>
+            </li>
+          </ul>
+        <p>
+          Please be aware that once you make your study public, you cannot make any status update again.<br/><br />
+          Please check our  <a href="https://ebi-metabolights.github.io/guides/#overview" target="_BLANK" style="text-decoration: underline;">guides</a> for information on how to reference your MetaboLights study in your publication.
         </p>
       </span>
       <span *ngIf="status == 'Provisional'">
@@ -121,15 +128,14 @@
         </h4>
         <p>
           <b>ACCESSIBILITY</b><br />
-          Your study is provisional. Only the study submitters are able to view and
-          make changes to the study.
+          Your study is provisional. Only study submitters are able to view and make changes to the study
           <br /><br />
           <b>What's next?</b><br />
-          Check your study passes the validation checks (see the Study Validations tab
-          in your study). Once you have completed your study and it has met the
-          validation criteria, please change the study status to ‘Private’
+          Please check our <a target="_BLANK" href="https://ebi-metabolights.github.io/guides/" style="text-decoration: underline;">guides</a> for more information on how to complete your study. Check that your study passes the required validations checks (see the Study Validations tab in your study). 
+          <br />Once you have completed your study and it has met the validation criteria, please click in the drop-down menu below to change the study status from ‘Provisional’ to ‘Private’.
         </p>
         <br>
+        
         <div *ngIf="validation">
           <div *ngIf="validationStatus !== 'SUCCESS' && validationStatus !== 'WARNING'">
             <p class="error-message">
@@ -159,13 +165,6 @@
                     </mat-select>
                   </mat-form-field>
                 </td>
-                <td >
-                  <div class="is-offset-10 mt-5">
-                  <button  *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
-                    Apply
-                  </button>
-                  </div>
-                </td>
               </tr>
             </tbody>
             </table>
@@ -184,18 +183,20 @@
                 <mat-option value="Provisional">Provisional</mat-option>
                 <mat-option value="Private">Private</mat-option>
 
-                <mat-option value="New Revision">Public</mat-option>
+                <mat-option *ngIf="status !== 'Provisional'" value="New Revision">Public</mat-option>
               </mat-select>
             </mat-form-field>
             </td>
-            <td >
-              <div class="is-offset-2 mt-5">
-                <button *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
-                  Apply
-                </button>
-              </div>
-            </td>
               </tr>
+              <tr *ngIf="
+                toStatus !== status &&
+                status === 'Provisional' && !firstPrivateDate">
+                <td colspan="2">
+                  <p>
+                    <mat-checkbox class="example-margin" #policycheck (change)="onCheckboxChange(policycheck)"></mat-checkbox>&nbsp;I have read the terms and conditions associated with holding Private Data in MetaboLights 
+                  </p>
+                </td>
+              </tr>  
             </tbody>
         </table>
           </span>
@@ -217,14 +218,15 @@
                     </mat-select>
                   </mat-form-field>
                 </td>
-                <td >
-                  <div class="is-offset-10 mt-5">
-                  <button  *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
-                    Apply
-                  </button>
-                  </div>
-                </td>
               </tr>
+              <tr *ngIf="
+                toStatus !== status && !firstPrivateDate">
+                <td colspan="2">
+                  <p>
+                    <mat-checkbox class="example-margin" #policycheck (change)="onCheckboxChange(policycheck)"></mat-checkbox>&nbsp;I have read the terms and conditions associated with holding Private Data in MetaboLights 
+                  </p>
+                </td>
+              </tr> 
             </tbody>
             </table>
           </span>
@@ -246,13 +248,6 @@
               </mat-select>
             </mat-form-field>
             </td>
-            <td >
-              <div class="is-offset-2 mt-5">
-                <button *ngIf="toStatus != status" class="button apply-button" [disabled]="isFormBusy" (click)="applyChanges()">
-                  Apply
-                </button>
-              </div>
-            </td>
               </tr>
             </tbody>
         </table>
@@ -262,8 +257,18 @@
     </section>
     <footer class="modal-card-foot buttons is-right">
       <div class="columns is-gapless full-width">
-        <div class="column is-two-third"></div>
+        <div class="column is-two-third">
+         <small *ngIf="toStatus !== status &&
+                status === 'Provisional' && !firstPrivateDate" class="error-message">Tick the data policy checkbox to enable the ‘Apply’ button</small>
+        </div>
         <div class="column is-one-third has-text-right">
+           <button
+            class="button is-info"
+            *ngIf="toStatus !== status"
+            [disabled]="isFormBusy || (status === 'Provisional' && !firstPrivateDate && !userAgreed)"
+            (click)="applyChanges()">
+            Apply
+          </button>&nbsp;
           <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
             Close
           </button>
@@ -272,3 +277,7 @@
     </footer>
   </div>
 </div>
+<data-policy-modal 
+  *ngIf="isPopupOpen" 
+  (confirm)="handlePopupClose($event)">
+</data-policy-modal>
