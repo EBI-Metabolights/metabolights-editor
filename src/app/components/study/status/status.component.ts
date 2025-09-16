@@ -205,7 +205,7 @@ export class StatusComponent implements OnInit {
           html: `
             <p style='text-align: justify;'> 
               <strong>Dataset will be copied onto EBI’s public storage.</strong><br/>
-              After this task has completed, study status will be updated to ‘Public’ and can not be modified.Submitters should contact the MetaboLights team to modify or remove a public study, which should only happen in very exceptional circumstances. Please check the ‘Public Data’ section of the <a href='https://www.ebi.ac.uk/metabolights/editor/datapolicy' target='_BLANK' style="text-decoration: underline;">MetaboLights Data Policy</a> for more information.
+              After this task has completed, study status will be updated to ‘Public’ and can not be modified. Submitters should contact the MetaboLights team to modify or remove a study once public, which should only happen in very exceptional circumstances.<br/><br/>Please check the ‘Public Data’ section of the <a href='https://www.ebi.ac.uk/metabolights/editor/datapolicy' target='_BLANK' style="text-decoration: underline;">MetaboLights Data Policy</a> for more information.
             </p>`,
           showCancelButton: true,
           confirmButtonColor: "#DD6B55",
