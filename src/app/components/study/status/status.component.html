@@ -102,15 +102,15 @@
         <p>
           <b>ACCESSIBILITY</b><br />
           Your study is Private and you cannot make any changes.<br /><br/>
-          If you would like to update your study at this stage, please change study status to 'Provisional', make necessary changes and then revert status back to 'Private'. <br/>
+          Private studies can be modified at any point. Simply revert to Provisional, edit the study, and remember to re-index data files, re-run study validation and change back to Private. <br/>
           <a href="https://ebi-metabolights.github.io/guides/#reviewer-link" target="_BLANK" style="text-decoration: underline;">private read-only link</a> 
-          is now available at the top of your study page to share with the editor of the journal, reviewers, collaborators, etc. 
+          is available at the top of your study page to share with the editor of the journal, reviewers, collaborators, etc. 
           <br /><br />
           <b>What's next?</b><br />
           </p>
           <ul class="list-data-policy">
-            <li><strong>Manual status update: </strong> can make your study public by selecting ‘Public’ from the drop-down menu below.</li>
-            <li><strong>Automatic status update:</strong> Your study will be made public according to the first of the following criteria:
+            <li><strong>Manual status update: </strong>You can make your study public by selecting ‘Public’ from the drop-down menu below.</li>
+            <li><strong>Automatic status update:</strong> MetaboLights can make your study public according to following criteria:
               <ul class="sub-list-data-policy">
                 <li>The study publication is published in a journal.</li>
                 <li>The release date has been reached.</li>
@@ -188,7 +188,7 @@
             </mat-form-field>
             </td>
               </tr>
-              <tr *ngIf="
+              <!-- <tr *ngIf="
                 toStatus !== status &&
                 status === 'Provisional' && !firstPrivateDate">
                 <td colspan="2">
@@ -196,7 +196,7 @@
                     <mat-checkbox class="example-margin" #policycheck (change)="onCheckboxChange(policycheck)"></mat-checkbox>&nbsp;I have read the terms and conditions associated with holding Private Data in MetaboLights 
                   </p>
                 </td>
-              </tr>  
+              </tr>   -->
             </tbody>
         </table>
           </span>
@@ -219,14 +219,14 @@
                   </mat-form-field>
                 </td>
               </tr>
-              <tr *ngIf="
+              <!-- <tr *ngIf="
                 toStatus !== status && !firstPrivateDate">
                 <td colspan="2">
                   <p>
                     <mat-checkbox class="example-margin" #policycheck (change)="onCheckboxChange(policycheck)"></mat-checkbox>&nbsp;I have read the terms and conditions associated with holding Private Data in MetaboLights 
                   </p>
                 </td>
-              </tr> 
+              </tr>  -->
             </tbody>
             </table>
           </span>
@@ -258,14 +258,21 @@
     <footer class="modal-card-foot buttons is-right">
       <div class="columns is-gapless full-width">
         <div class="column is-two-third">
-         <small *ngIf="toStatus !== status &&
-                status === 'Provisional' && !firstPrivateDate" class="error-message">Tick the data policy checkbox to enable the ‘Apply’ button</small>
+         <!-- <small *ngIf="toStatus !== status &&
+                status === 'Provisional' && !firstPrivateDate" class="error-message">Tick the data policy checkbox to enable the ‘Apply’ button</small> -->
         </div>
         <div class="column is-one-third has-text-right">
-           <button
+           <!-- <button
             class="button is-info"
             *ngIf="toStatus !== status"
             [disabled]="isFormBusy || (status === 'Provisional' && !firstPrivateDate && !userAgreed)"
+            (click)="applyChanges()">
+            Apply
+          </button>&nbsp; -->
+          <button
+            class="button is-info"
+            *ngIf="toStatus !== status"
+            [disabled]="isFormBusy"
             (click)="applyChanges()">
             Apply
           </button>&nbsp;
