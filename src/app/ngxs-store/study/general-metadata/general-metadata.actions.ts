@@ -138,6 +138,19 @@ export namespace PublicGlobusUrl {
       constructor(public publicGlobusUrl: string) {}
   }
 }
+export namespace FirstPrivateDate {
+  export class Set{
+      static readonly type = '[general] Set First Private Date'
+      constructor(public firstPrivateDate: string) {}
+  }
+}
+
+export namespace FirstPublicDate {
+  export class Set{
+      static readonly type = '[general] Set First Public Date'
+      constructor(public firstPublicDate: string) {}
+  }
+}
 
 export namespace PublicAsperaPath {
   export class Set{
