@@ -71,6 +71,7 @@ import { FactorlistComponent } from "./factorlist/factorlist.component";
 import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.component";
 import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
 
+
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
  * that can be broken out are components common to different study views
@@ -183,6 +184,7 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     FactorlistComponent,
     DataPolicyModalComponent,
     DragAndDropComponent
+
   ],
   providers: [
     AuthGuard,
