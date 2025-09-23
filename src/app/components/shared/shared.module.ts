@@ -69,6 +69,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatDivider } from "@angular/material/divider";
 import { FactorlistComponent } from "./factorlist/factorlist.component";
 import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.component";
+import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
 
 /**
  * TODO: break this shared module out so that it doesnt become bloated. One lot of components
@@ -115,7 +116,8 @@ import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.
     StripTermsOfUsePipe,
     CurationStatusStarTransformPipe,
     FactorlistComponent,
-    DataPolicyModalComponent
+    DataPolicyModalComponent,
+    DragAndDropComponent
   ],
   imports: [
     CommonModule,
@@ -179,7 +181,8 @@ import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.
     StripTermsOfUsePipe,
     CurationStatusStarTransformPipe,
     FactorlistComponent,
-    DataPolicyModalComponent
+    DataPolicyModalComponent,
+    DragAndDropComponent
   ],
   providers: [
     AuthGuard,

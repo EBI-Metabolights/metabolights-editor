@@ -1,0 +1,84 @@
+<div class="box" style="position: relative;">
+  <!-- Close button (Material icon) -->
+  <button *ngIf="iscloseable" mat-icon-button aria-label="Close upload" (click)="closeUpload.emit()" style="position: absolute; top: 0.5rem; right: 0.5rem;">
+    <mat-icon>close</mat-icon>
+  </button>
+
+  <!-- Drag and drop area -->
+  <div
+    class="has-text-centered p-5 drag-and-drop-area"
+    [class.has-background-primary-light]="isDragOver"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+    (click)="fileInput.click()"
+  >
+    <mat-icon class="cloud-upload">cloud_upload</mat-icon>
+    <p class="is-size-5 mt-3" [class.has-text-primary]="isDragOver">
+      Drag and drop to upload or <a style="text-decoration:underline;">browse for files</a>
+    </p>
+    <input
+      #fileInput
+      type="file"
+      multiple
+      hidden
+      (change)="onFileSelected($event)"
+    />
+  </div>
+
+  <!-- File list -->
+  <div *ngIf="files.length > 0" class="mt-4">
+    <table class="table is-fullwidth is-striped is-hoverable">
+      <thead>
+        <tr>
+          <th>File Name</th>
+          <th>Size</th>
+          <th>Status</th>
+          <th style="width: 100px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let file of files; let i = index">
+          <td class="break-filename">{{ file.name }}</td>
+          <td>
+            {{ (file.size / 1024 / 1024 < 1) ? 
+              ((file.size / 1024) | number:'1.0-1') + ' KB' : 
+              ((file.size / 1024 / 1024) | number:'1.2-2') + ' MB' 
+            }}
+          </td>
+          <td>
+            <progress
+              class="progress is-primary"
+              [value]="file.progress"
+              max="100"
+              *ngIf="file.progress < 100"
+            ></progress>
+            <span *ngIf="file.progress === 100" class="has-text-success">Uploaded</span>
+          </td>
+          <td>
+            <button
+              class="button is-small is-danger is-light"
+              (click)="removeFile(i)"
+              [disabled]="file.progress > 0 && file.progress < 100"
+              matTooltip="Remove file"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Upload all button -->
+    <button
+      class="button is-primary is-fullwidth mt-3 upload-button"
+      (click)="uploadFiles()"
+      [disabled]="files.length === 0 || uploading"
+      [ngClass]="{'active': files.length > 0 && !uploading}"
+      mat-raised-button
+    >
+      <mat-icon>cloud_upload</mat-icon>
+      <span style="margin-left: 0.5rem;">Upload All</span>
+    </button>
+  </div>
+</div>

@@ -1,0 +1,41 @@
+/* Highlight drag area on drag over */
+.has-background-primary-light {
+  background-color: #ebf8f7 !important; /* Bulma primary light */
+}
+
+/* Style progress bar */
+progress.progress.is-primary {
+  height: 1rem;
+  border-radius: 4px;
+}
+
+/* Style close button hover */
+button[mat-icon-button]:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Cursor pointer for clickable drag area */
+div[style*="cursor: pointer"] {
+  user-select: none;
+}
+.break-filename{
+    word-break: break-all;
+}
+.drag-and-drop-area{
+  border: 2px dashed #00d1b2; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  padding: 40px;
+}
+.cloud-upload{
+  font-size: 23px; 
+  color: #00d1b2;
+}
+.upload-button {
+  background-color: gray; /* default disabled color */
+  color: white;
+}
+.upload-button.active {
+  background-color: #00d1b2; /* example: Bulma primary blue */
+  color: white;
+}

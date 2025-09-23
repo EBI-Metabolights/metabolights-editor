@@ -145,6 +145,10 @@
     &nbsp;
     <span *ngIf="data && data.file">
       <mtbls-download [value]="data.file"></mtbls-download>
+      <a style="margin-left: 0.5rem;" (click)="setFilePattern(data.file);openUploadArea = true" class="button is-small is-light" [ngClass]="size">
+        <mat-icon>cloud_upload</mat-icon> Upload
+      </a>
+      <div *ngIf="openUploadArea" style="margin-top: 1rem;"> <app-drag-and-drop  [iscloseable]="true" [filePatternString]="filePatternString" (uploadComplete)="onUploadComplete($event)" (closeUpload)="openUploadArea = false" ></app-drag-and-drop> </div>
     </span>
     &nbsp;
     <span
@@ -163,12 +167,12 @@
         ><mat-icon>info</mat-icon> items selected</small
       >
     </span>
-    <span>
+    <!-- <span>
       <span class="button is-light is-pulled-right is-small">    
         <mat-icon>info</mat-icon>
         To upload {{ tableTypeValue }}, go to Files Tab
       </span>
-    </span>
+    </span> -->
     <span *ngIf="isFormBusy">
       <small class="has-text-grey-lighter">Saving</small
       ><img

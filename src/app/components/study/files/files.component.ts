@@ -703,6 +703,68 @@ closeGlobusModal() {
       this.isSyncEnabled = true;
     }
   }
+  
+  onUploadComplete(event: any) {
+    // Reload general metadata (ISA files may affect study metadata)
+    this.store.dispatch(new GetGeneralMetadata(this.requestedStudy, this.isReadOnly)).subscribe(() => {
+      // Reload file list after metadata update
+      this.editorService
+        .getStudyFilesList(this.requestedStudy, null, null)
+        .subscribe((data) => {
+          this.sortUniqueFiles(data);
+        });
+    });
+  }
+  sortUniqueFiles(data) {
+  // Clear main arrays
+  this.rawFiles = [];
+  this.metaFiles = [];
+  this.auditFiles = [];
+  this.derivedFiles = [];
+  this.uploadFiles = data.latest;
+  this.filteredUploadFiles = this.uploadFiles;
+  this.filesLoading = false;
+  this.refreshingData = false;
+
+  // Clear filtered arrays to avoid duplicates
+  this.filteredRawFiles = [];
+  this.filteredMetaFiles = [];
+  this.filteredAuditFiles = [];
+  this.filteredDerivedFiles = [];
+  this.filteredDerivedDataFiles = [];
+
+  data.study?.forEach((file) => {
+    if (
+      file.type === "raw" ||
+      file.type === "unknown" ||
+      file.type === "compressed" ||
+      file.type === "derived"
+    ) {
+      this.rawFiles.push(file);
+      this.filteredRawFiles.push(file);
+    } else if (file.type.indexOf("metadata") > -1) {
+      this.metaFiles.push(file);
+      this.filteredMetaFiles.push(file);
+    } else if (file.type === "audit") {
+      this.auditFiles.push(file);
+      this.filteredAuditFiles.push(file);
+    } else if (
+      file.type === "internal_mapping" ||
+      file.type === "spreadsheet"
+    ) {
+      this.derivedFiles.push(file);
+      this.filteredDerivedFiles.push(file);
+    } else if (file.type === "derived_data") {
+      this.derivedFiles.push(file);
+      this.filteredDerivedDataFiles.push(file);
+    } else {
+      this.rawFiles.push(file);
+      this.filteredRawFiles.push(file);
+    }
+  });
+
+  this.rawFilesLoading = false;
+}
 }
 
 

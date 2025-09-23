@@ -19,6 +19,7 @@ import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ConfigurationService } from "src/app/configuration.service";
+import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 
 @Component({
   selector: "assay-details",
@@ -178,4 +179,19 @@ export class AssayDetailsComponent implements OnInit {
       }
     });
   }
+  refreshData() {
+  // Reload the current assay sheet
+  this.store.dispatch(new Assay.OrganiseAndPersist(this.assayName, this.studyId)).subscribe(() => {
+    // After assay reload, get the updated assay object
+    this.assays$.subscribe((assays) => {
+      const assay = assays[this.assayName];
+      if (assay && assay.mafs && Array.isArray(assay.mafs)) {
+        // Reload each referenced MAF sheet
+        assay.mafs.forEach((mafFile) => {
+          this.store.dispatch(new MAF.Organise(mafFile, this.studyId));
+        });
+      }
+    });
+  });
+}
 }
