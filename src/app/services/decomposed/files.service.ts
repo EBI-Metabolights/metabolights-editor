@@ -1,9 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { IStudyFiles } from 'src/app/models/mtbl/mtbls/interfaces/study-files.interface';
 import { BaseConfigDependentService } from './base-config-dependent.service';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { httpOptions } from '../headers';
 import { ConfigurationService } from 'src/app/configuration.service';
 import { Store } from '@ngxs/store';
@@ -87,6 +87,40 @@ export class FilesService extends BaseConfigDependentService {
     delete data.obfuscationCode;
     delete data.uploadPath;
     return data;
+  }
+
+  uploadFile(studyId: string, file: File): Observable<{ progress: number; success?: boolean; error?: string }> {
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    const uploadUrl = `${this.url.baseURL}/studies/${studyId}/drag-drop-upload`;
+    return this.http.post(uploadUrl, formData, {
+      reportProgress: true,
+      observe: 'events'
+    }).pipe(
+      map(event => {
+        switch (event.type) {
+          case HttpEventType.UploadProgress:
+            if (event.total) {
+              return { progress: Math.round((event.loaded / event.total) * 100) };
+            }
+            return { progress: 0 };
+          case HttpEventType.Response:
+            return { progress: 100, success: true };
+          default:
+            return { progress: 0 };
+        }
+      })
+    );
+  }
+
+  createAuditFolder(studyId: string): Observable<any> {
+    const auditUrl = `${this.url.baseURL}/studies/${studyId}/audit`;
+    return this.http
+      .post(
+        auditUrl,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
   }
 
 }

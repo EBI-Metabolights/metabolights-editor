@@ -304,6 +304,14 @@
       <a class="panel-block"> No metadata files </a>
     </ng-template>
   </nav>
+   <!--ISA Metadata upload area -->
+  <div style="margin-bottom: 1rem;">
+      <app-drag-and-drop
+        (uploadComplete)="onUploadComplete($event)"
+        [iscloseable]="false"
+        filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$"
+      ></app-drag-and-drop>
+  </div>
   <!--ISA Metadata panel end -->
 
   <div *ngIf="!isReadOnly" class="notification is-warning message">

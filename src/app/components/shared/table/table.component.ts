@@ -71,6 +71,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   @Output() updated = new EventEmitter<any>();
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
+  @Output() refreshTableData = new EventEmitter<void>();
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
@@ -163,6 +164,8 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   sampleAbundance: any;
   isScrollingEnabled: boolean = true;
   tableTypeValue: string = "";
+  openUploadArea: boolean = false;
+  filePatternString: string = "^([asi]_.+\.txt|m_.+\.tsv)$";
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -1778,5 +1781,24 @@ onWrapper2Scroll(event: Event): void {
   this.isSyncing = false;
 }
 
-
+  setFilePattern(filename: string) {
+    const tableType = this.getTableType(filename);
+    this.filePatternString = this.getFilePatternString(tableType);
+  }
+  getFilePatternString(tableType: TableType): string {
+    switch (tableType) {
+      case 'assay':
+        return '^(a_.+\.txt)$';
+      case 'samples':
+        return '^(s_.+\.txt)$';
+      case 'maf':
+        return '^(m_.+\.tsv)$';
+      default:
+        return '^([asi]_.+\.txt|m_.+\.tsv)$';
+    }
+  }
+  onUploadComplete(event: any) {
+    // handle uploaded files
+    this.refreshTableData.emit();
+  }
 }
