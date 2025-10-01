@@ -1,0 +1,17 @@
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap; /* allows checkbox and message to wrap on small screens */
+}
+
+.footer-left .msg {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.footer-left .auto-fill {
+  display: flex;
+  align-items: center;
+}
