@@ -175,7 +175,10 @@ export class AssayDetailsComponent implements OnInit {
     const ignoreColumns = [
       "Extract Name",
       "Raw Spectral Data File",
-      "Derived Spectral Data File"
+      "Derived Spectral Data File",
+      "MS Assay Name",
+      "Normalization Name",
+      "Data Transformation Name"
     ];
 
     const candidateKeysFor = (name: string) => {
