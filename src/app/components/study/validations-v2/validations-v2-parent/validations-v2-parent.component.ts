@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { combineLatest, filter, Observable, withLatestFrom } from 'rxjs';
-import { FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
+import { FullOverride, ModifierMetadataFileUpdate, ValidationHistoryRecord, Violation, Ws3ValidationReport } from '../interfaces/validation-report.interface';
 import { Store } from '@ngxs/store';
 import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
@@ -21,7 +21,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   reportV2$: Observable<Ws3ValidationReport> = inject(Store).select(ValidationState.reportV2);
   allViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2ViolationsAll);
 
-  history$: Observable<Array<ValidationPhase>> = inject(Store).select(ValidationState.history);
+  history$: Observable<Array<ValidationHistoryRecord>> = inject(Store).select(ValidationState.history);
   initialLoadMade$: Observable<boolean> = inject(Store).select(ValidationState.initialLoadMade);
 
   generalViolations$: Observable<Violation[]> = inject(Store).select(ValidationState.reportV2Violations('input'));
@@ -46,8 +46,8 @@ export class ValidationsV2ParentComponent implements OnInit {
 
   //report variables
   report: Ws3ValidationReport = null;
-  history: Array<ValidationPhase> = [];
-  selectedPhase: ValidationPhase = null;
+  history: Array<ValidationHistoryRecord> = [];
+  selectedPhase: ValidationHistoryRecord = null;
   lastRunTime: string = "";
   validationNeeded: boolean = false;
   validationStatus: ViolationType = null;
@@ -84,7 +84,7 @@ export class ValidationsV2ParentComponent implements OnInit {
   overrideListModalOpen = false;
   metadataModifiersModalOpen = false;
 
-  modifiers: string[] = [];
+  modifierMetadataFileUpdates: ModifierMetadataFileUpdate[] = [];
 
   ngOnInit(): void {
     this.studyStatus$.subscribe(value => {
@@ -100,7 +100,7 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
       this.report = value;
-      if (![undefined, null].includes(this.report.metadata_updates)) this.modifiers = this.report.metadata_updates;
+      if (![undefined, null].includes(this.report.metadataUpdates)) this.modifierMetadataFileUpdates = this.report.metadataUpdates;
       if (this.report !== null) {
         if(this.loadingDiffReport) this.loadingDiffReport = false;
         this.ready = true;
@@ -150,9 +150,11 @@ export class ValidationsV2ParentComponent implements OnInit {
 
 
     this.studyId$.pipe(filter(value => value !== null)).subscribe(value => {
-      this.studyId = value;
-      this.store.dispatch(new ValidationReportV2.Get(this.studyId));
-      this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
+      if (value) {
+        this.studyId = value;
+        this.store.dispatch(new ValidationReportV2.Get(this.studyId));
+        this.store.dispatch(new ValidationReportV2.History.Get(this.studyId))
+      }
     });
     this.studyStatus$.pipe(filter(value => value !== null)).subscribe(value => {
       this.studyStatus = value;
@@ -172,8 +174,10 @@ export class ValidationsV2ParentComponent implements OnInit {
   }
 
   onPhaseSelection($event) {
-    this.store.dispatch(new ValidationReportV2.Get(this.studyId, $event.taskId));
-    this.loadingDiffReport = true;
+    if (this.studyId && $event.taskId) {
+      this.store.dispatch(new ValidationReportV2.Get(this.studyId, $event.taskId));
+      this.loadingDiffReport = true;
+    }
   }
 
   downloadReport() {
