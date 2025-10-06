@@ -100,7 +100,11 @@ export class ValidationsV2ParentComponent implements OnInit {
 
     this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
       this.report = value;
-      if (![undefined, null].includes(this.report.metadataUpdates)) this.modifierMetadataFileUpdates = this.report.metadataUpdates;
+      if (this.report.metadataUpdates && this.report.metadataUpdates.length > 0) {
+        this.modifierMetadataFileUpdates = this.report.metadataUpdates;
+      } else {
+        this.modifierMetadataFileUpdates = []
+      }
       if (this.report !== null) {
         if(this.loadingDiffReport) this.loadingDiffReport = false;
         this.ready = true;

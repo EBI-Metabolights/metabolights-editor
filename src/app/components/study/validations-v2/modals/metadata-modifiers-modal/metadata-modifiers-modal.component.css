@@ -11,6 +11,13 @@
                 0 3px 14px 2px rgba(0,0,0,0.12);
   }
 
+  .scrollable-table-container {
+    max-height: 900px;
+    /* min-width: 600px; */
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: block;
+  }
 
   .close-btn {
     align-self: flex-end;
