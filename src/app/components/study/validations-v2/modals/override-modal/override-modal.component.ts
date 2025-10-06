@@ -17,7 +17,7 @@ import { DeleteOverrideDialogComponent } from '../delete-override-dialog/delete-
   styleUrls: ['./override-modal.component.css'], // Corrected `styleUrl` to `styleUrls`
 })
 export class OverrideModalComponent implements OnInit, OnChanges {
-  
+
   @Input() violation!: Violation;
 
   @Output() closeEvent = new EventEmitter<any>();
@@ -38,13 +38,13 @@ export class OverrideModalComponent implements OnInit, OnChanges {
   user: Owner = null;
   override: FullOverride = null;
 
-  constructor(private formBuilder: FormBuilder, private store: Store, private dialog: MatDialog) { } 
+  constructor(private formBuilder: FormBuilder, private store: Store, private dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.studyId$.pipe(filter(val => val !== null)).subscribe((id) => this.studyId = id);
     this.user$.pipe(filter(val => val !== null)).subscribe((user) => this.user = user);
-    
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -61,8 +61,8 @@ export class OverrideModalComponent implements OnInit, OnChanges {
 
   initializeForm(): void {
     this.options = this.formBuilder.group({
-      type: [(this.violation.overrided ? this.violation.type : 'WARNING') || "WARNING"], // Use default if violation is undefined
-      enabled: [this.violation?.overrided || true], // Default to false
+      type: [(this.violation.overridden ? this.violation.type : 'WARNING') || "WARNING"], // Use default if violation is undefined
+      enabled: [this.violation?.overridden || true], // Default to false
       comments: [this.violation?.overrideComment || ""],
     });
   }
@@ -76,16 +76,16 @@ export class OverrideModalComponent implements OnInit, OnChanges {
     const formValues = this.options.value;
     override = {
       enabled: formValues.enabled,
-      rule_id: this.violation.identifier,
-      new_type: formValues.type,
+      ruleId: this.violation.identifier,
+      newType: formValues.type,
       curator: this.user.email,
       comment: formValues.comments,
-      source_file: "",
-      source_column_header: "",
-      source_column_index: ""
+      sourceFile: "",
+      sourceColumnHeader: "",
+      sourceColumnIndex: ""
     }
     let actionClass = null;
-    this.violation.overrided ? actionClass = ValidationReportV2.Override.Update : actionClass = ValidationReportV2.Override.Create;
+    this.violation.overridden ? actionClass = ValidationReportV2.Override.Update : actionClass = ValidationReportV2.Override.Create;
     this.store.dispatch(new actionClass(this.studyId, override));
   }
 
@@ -97,11 +97,11 @@ export class OverrideModalComponent implements OnInit, OnChanges {
     const dialogInstance = dialogRef.componentInstance;
     dialogInstance.override = this.override;
     dialogRef.componentInstance.deleteConfirmed.subscribe(() => {
-      this.store.dispatch(new ValidationReportV2.Override.Delete(this.studyId, this.override.override_id));
+      this.store.dispatch(new ValidationReportV2.Override.Delete(this.studyId, this.override.overrideId));
       //this.closeEvent.emit('deleted');
       this.deleted = true;
     })
-    
+
 
     // TODO: have a toastr message popup somewhere
    }

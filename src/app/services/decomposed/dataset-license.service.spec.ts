@@ -62,7 +62,7 @@ describe('DatasetLicenseService', () => {
         expect(response).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`${mockBaseUrl}/dataset-license/${studyId}`);
+      const req = httpMock.expectOne(`${mockBaseUrl}//submissions/v2/dataset-licenses/${studyId}`);
       expect(req.request.method).toBe('POST');
       expect(req.request.headers.get('Accept')).toBe('application/json');
       req.flush(mockResponse);
@@ -80,7 +80,7 @@ describe('DatasetLicenseService', () => {
         }
       );
 
-      const req = httpMock.expectOne(`${mockBaseUrl}/dataset-license/${studyId}`);
+      const req = httpMock.expectOne(`${mockBaseUrl}//submissions/v2/dataset-licenses/${studyId}`);
       req.flush({}, mockError);
     });
   });
@@ -107,7 +107,7 @@ describe('DatasetLicenseService', () => {
         expect(response).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`${mockBaseUrl}/dataset-license/${studyId}`);
+      const req = httpMock.expectOne(`${mockBaseUrl}//submissions/v2/dataset-licenses/${studyId}`);
       expect(req.request.method).toBe('GET');
       expect(req.request.headers.get('Accept')).toBe('application/json');
       req.flush(mockResponse);
@@ -125,7 +125,7 @@ describe('DatasetLicenseService', () => {
         }
       );
 
-      const req = httpMock.expectOne(`${mockBaseUrl}/dataset-license/${studyId}`);
+      const req = httpMock.expectOne(`${mockBaseUrl}//submissions/v2/dataset-licenses/${studyId}`);
       req.flush({}, mockError);
     });
   });

@@ -7,9 +7,11 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './metadata-modifiers-modal.component.css'
 })
 export class MetadataModifiersModalComponent {
-  @Input() metadataModifiers: string[] = [];
+  @Input() modifierMetadataFileUpdates: string[] = [];
 
   @Output() closeEvent = new EventEmitter<void>();
+  displayedColumns: string[] = ['source', 'action', 'oldValue', 'newValue'];
+
 
   close() {
     this.closeEvent.emit();
