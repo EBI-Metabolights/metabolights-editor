@@ -38,7 +38,7 @@ export class TransferHealthcheckService extends BaseConfigDependentService {
         });
         let baseUrl = this.configService.config.ws3URL;
 
-        return this.http.get<Ws3Response<TransferStatusResponse>>(`${baseUrl}/transfer-healthcheck`).pipe(
+        return this.http.get<Ws3Response<TransferStatusResponse>>(`${baseUrl}/system/v2/transfer-status`).pipe(
               map((res) => res),
               catchError(this.handleError)
             );
