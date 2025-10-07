@@ -23,6 +23,7 @@
             [tableData]="assay"
             [templateRowPresent]="templateRowPresent"
             validationsId="assays"
+            (refreshTableData)="refreshData()"
           ></mtbls-table>
         </span>
       </span>
@@ -46,35 +47,54 @@
           </mat-form-field>
         </div>
       </div>
-      <ul>
-        <li *ngFor="let s of filteredSampleNames">
-          {{ s }}
-        </li>
-      </ul>
+      <div *ngIf="filteredSampleNames.length > 0" class="select-all-row">
+        <mat-checkbox
+          [checked]="areAllSelected()"
+          (change)="toggleSelectAll($event.checked)"
+        ><strong>
+          Select all
+          </strong>
+        </mat-checkbox>
+      </div>
+
+        <ul>
+          <ng-container *ngFor="let s of filteredSampleNames">
+            <li *ngIf="s && s.toString().trim().length > 0" class="sample-row">
+              <mat-checkbox [(ngModel)]="selectedSampleMap[s]">{{ s }}</mat-checkbox>
+            </li>
+          </ng-container>
+        </ul>
+
     </section>
     <footer class="modal-card-foot">
-      <div class="columns is-gapless full-width">
-        <div class="column is-half">
-          <span *ngIf="duplicateSampleNamesInAssay.length > 0">
-            <mat-icon>info</mat-icon>
-            <small>Sample rows already exist in assay sheet</small>
-          </span>
+  <div class="columns is-gapless full-width is-mobile is-vcentered">
+    <div class="column">
+      <div class="footer-left">
+        <div class="msg" *ngIf="duplicateSampleNamesInAssay.length > 0">
+          <mat-icon>info</mat-icon>
+          <small>Sample rows already exist in assay sheet</small>
         </div>
-        <div class="column is-half has-text-right">
-          <button class="button is-default" (click)="closeAddSamplesModal()">
-            Cancel
-          </button>
-          <button
-            (click)="addSamples()"
-            [disabled]="filteredSampleNames.length < 1"
-            class="button is-info"
-          >
-            Add&nbsp;<span *ngIf="filteredSampleNames.length > 0"
-              >{{ filteredSampleNames.length }} Samples</span
-            >
-          </button>
-        </div>
+
+        <label class="auto-fill">
+          <mat-checkbox [(ngModel)]="autoFillColumns" aria-label="Enable autofill">
+            <small>Autofill assay columns from the first row </small>
+          </mat-checkbox>
+        </label>
       </div>
-    </footer>
+    </div>
+
+    <div class="column has-text-right">
+      <button class="button is-default" (click)="closeAddSamplesModal()">Cancel</button>
+      <button (click)="addSamples()" [disabled]="(filteredSampleNames.length === 0) && (namesToAddCount === 0)" class="button is-info">
+        Add&nbsp;<span *ngIf="namesToAddCount > 0; else showFiltered">
+      {{ namesToAddCount }} Samples
+    </span>
+    <ng-template #showFiltered>
+      <span *ngIf="filteredSampleNames.length > 0">{{ filteredSampleNames.length }} Samples</span>
+    </ng-template>
+      </button>
+    </div>
+  </div>
+</footer>
   </div>
 </div>

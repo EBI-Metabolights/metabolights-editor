@@ -19,6 +19,7 @@ import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ConfigurationService } from "src/app/configuration.service";
+import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 
 @Component({
   selector: "assay-details",
@@ -54,17 +55,34 @@ export class AssayDetailsComponent implements OnInit {
   assay: any = null;
   addSamplesModalOpen = false;
   filteredSampleNames: any = [];
+  autoFillColumns: boolean = true;
 
   sampleNames: any = [];
   existingSampleNamesInAssay: any = [];
   duplicateSampleNamesInAssay: any = [];
   guidesUrl = ""
+  // map of sampleName -> whether that sample should be autofilled
+  selectedSampleMap: { [sampleName: string]: boolean } = {};
+
   constructor(private editorService: EditorService, private store: Store,
       private configService: ConfigurationService) {
     this.guidesUrl = configService.config.metabolightsWSURL.guides
     this.setUpConstructorSubscriptionNgxs();
   }
 
+  get namesToAdd(): string[] {
+    return Object.keys(this.selectedSampleMap || {}).filter(
+      (k) =>
+        !!this.selectedSampleMap[k] &&
+        (this.filteredSampleNames || []).includes(k) &&
+        k.toString().trim().length > 0
+    );
+  }
+
+  // optional convenience getter
+  get namesToAddCount(): number {
+    return this.namesToAdd.length;
+  }
 
   setUpConstructorSubscriptionNgxs() {
     this.readonly$.subscribe((value) => {
@@ -88,8 +106,8 @@ export class AssayDetailsComponent implements OnInit {
     });
     this.studySamples$.subscribe((value) => {
       if (value && value.data) {
-        this.sampleNames = value.data.rows.map((r) => r["Sample Name"]);
-        this.filteredSampleNames = this.sampleNames;
+        this.sampleNames = (value.data.rows || []).map((r) => (r ? r["Sample Name"] : "")).filter((s) => s && s.toString().trim().length > 0);
+        this.filteredSampleNames = [...this.sampleNames];
       }
     });
     this.studyIdentifier$.subscribe(id => this.studyId = id);
@@ -110,32 +128,112 @@ export class AssayDetailsComponent implements OnInit {
   }
 
   filterSampleNames(filterValue) {
-    this.duplicateSampleNamesInAssay = [];
-    if (filterValue === "") {
-      this.filteredSampleNames = this.sampleNames;
-    } else {
-      this.filteredSampleNames = this.sampleNames.filter(
-        (s) => s.toString().indexOf(filterValue) !== -1
+      this.duplicateSampleNamesInAssay = [];
+      const source = (this.sampleNames || []).filter((s) => s && s.toString().trim().length > 0);
+      const f = (filterValue || "").toString().trim().toLowerCase();
+      if(f === "") {
+        this.filteredSampleNames = source.slice();
+      } else {
+        this.filteredSampleNames = source.filter((s) =>
+          s.toString().toLowerCase().includes(f)
+        );
+      }
+      this.duplicateSampleNamesInAssay = (this.existingSampleNamesInAssay || []).filter(
+        (n) => this.filteredSampleNames.indexOf(n) > -1
       );
-    }
+  }
 
-    this.existingSampleNamesInAssay.forEach((n) => {
-      if (this.filteredSampleNames.indexOf(n) > -1) {
-        this.duplicateSampleNamesInAssay.push(n);
+
+  toggleSelectAll(checked: boolean) {
+    (this.filteredSampleNames || []).forEach((n) => {
+      if (n && n.toString().trim().length > 0) {
+        this.selectedSampleMap[n] = checked;
       }
     });
   }
 
-  addSamples() {
+  areAllSelected(): boolean {
+    if (!this.filteredSampleNames || this.filteredSampleNames.length === 0) return false;
+    const valid = (this.filteredSampleNames || []).filter(n => n && n.toString().trim().length > 0);
+    if (valid.length === 0) return false;
+    return valid.every((n) => !!this.selectedSampleMap[n]);
+  }
+
+ addSamples() {
     const emptyRow = this.assayTable.getEmptyRow();
-    const dataToWrite = [];
-    this.filteredSampleNames.forEach((n) => {
-      const tempRow = JSON.parse(JSON.stringify(emptyRow));
-      tempRow["Sample Name"] = n;
-      dataToWrite.push(tempRow);
+    const dataToWrite: any[] = [];
+
+    // get current rows
+    const rows =
+      this.assay && this.assay.data && Array.isArray(this.assay.data.rows)
+        ? this.assay.data.rows
+        : [];
+     // always copy from the first row (if present), otherwise use emptyRow
+    const sourceRow = rows.length > 0 ? rows[0] : emptyRow;
+
+    // columns to clear when copying from sourceRow
+    const ignoreColumns = [
+      "Extract Name",
+      "Raw Spectral Data File",
+      "Derived Spectral Data File",
+      "MS Assay Name",
+      "Normalization Name",
+      "Data Transformation Name"
+    ];
+
+    const candidateKeysFor = (name: string) => {
+      const noSpace = name.replace(/\s+/g, "");
+      const camel = noSpace.charAt(0).toLowerCase() + noSpace.slice(1);
+      return [name, noSpace, camel];
+    };
+
+  // namesToAdd computed from selectedSampleMap earlier in the file
+    const namesToAdd = Object.keys(this.selectedSampleMap || {}).filter(
+      (k) => this.selectedSampleMap[k] && (this.filteredSampleNames || []).includes(k)
+    );
+
+    // use footer toggle to decide whether to copy columns for selected samples
+    const useSourceForAll = !!this.autoFillColumns;
+
+    namesToAdd.forEach((s) => {
+      if (!s || s.toString().trim().length === 0) return;
+      const useSource = !!(useSourceForAll && this.selectedSampleMap[s]);
+      const base = useSource ? sourceRow : emptyRow;
+      const newRow = JSON.parse(JSON.stringify(base));
+
+      if (newRow["Sample Name"] !== undefined) newRow["Sample Name"] = s;
+      else if (newRow.sampleName !== undefined) newRow.sampleName = s;
+      else newRow["Sample Name"] = s;
+
+      if (useSource) {
+        ignoreColumns.forEach((col) =>
+          candidateKeysFor(col).forEach((k) => {
+            if (newRow[k] !== undefined) newRow[k] = "";
+          })
+        );
+      }
+
+      if (newRow.index !== undefined) delete newRow.index;
+      if (newRow._internalId !== undefined) delete newRow._internalId;
+
+      dataToWrite.push(newRow);
     });
-    this.assayTable.addRows(dataToWrite, 0);
+
+    if (dataToWrite.length > 0) {
+      // append to bottom of sheet: insertion index = current rows length
+      const insertionIndex = rows.length;
+      this.assayTable.addRows(dataToWrite, insertionIndex);
+    }
+
     this.addSamplesModalOpen = false;
+    this.selectedSampleMap = {};
+    this.autoFillColumns = false;
+  }
+
+  closeAddSamplesModal() {
+    this.addSamplesModalOpen = false;
+    this.autoFillColumns = false;
+    this.selectedSampleMap = {};
   }
 
   validateAssaySheet() {
@@ -145,11 +243,22 @@ export class AssayDetailsComponent implements OnInit {
   }
 
   openAddSamplesModal() {
-    this.addSamplesModalOpen = true;
-  }
 
-  closeAddSamplesModal() {
-    this.addSamplesModalOpen = false;
+    // ensure filteredSampleNames populated if needed
+    if (!this.filteredSampleNames || this.filteredSampleNames.length === 0) {
+      this.filteredSampleNames = (this.sampleNames || []).filter(
+        (s) => s && s.toString().trim().length > 0
+      );
+    }
+
+    this.addSamplesModalOpen = true;
+    this.autoFillColumns = true;
+    // mark all visible (filtered) samples as selected by default
+    (this.filteredSampleNames || []).forEach((s) => {
+      if (s && s.toString().trim().length > 0) {
+        this.selectedSampleMap[s] = true;
+      }
+    });
   }
 
   deleteSelectedAssay(name) {
@@ -178,4 +287,19 @@ export class AssayDetailsComponent implements OnInit {
       }
     });
   }
+  refreshData() {
+  // Reload the current assay sheet
+  this.store.dispatch(new Assay.OrganiseAndPersist(this.assayName, this.studyId)).subscribe(() => {
+    // After assay reload, get the updated assay object
+    this.assays$.subscribe((assays) => {
+      const assay = assays[this.assayName];
+      if (assay && assay.mafs && Array.isArray(assay.mafs)) {
+        // Reload each referenced MAF sheet
+        assay.mafs.forEach((mafFile) => {
+          this.store.dispatch(new MAF.Organise(mafFile, this.studyId));
+        });
+      }
+    });
+  });
+}
 }

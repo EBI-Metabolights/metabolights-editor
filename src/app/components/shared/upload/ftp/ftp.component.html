@@ -48,7 +48,13 @@
       >
         <tbody>
           <tr>
-            <th>User</th>
+            <th>Server (Host)</th>
+            <td>
+              {{ details.server }}
+            </td>
+          </tr>
+          <tr>
+            <th>Username</th>
             <td>
               {{ details.user }}
             </td>
@@ -60,13 +66,7 @@
             </td>
           </tr>
           <tr>
-            <th>Server</th>
-            <td>
-              {{ details.server }}
-            </td>
-          </tr>
-          <tr>
-            <th>Remote folder</th>
+            <th>Remote folder (Remote site)</th>
             <td>{{ uploadLocation$ | async }}</td>
           </tr>
         </tbody>

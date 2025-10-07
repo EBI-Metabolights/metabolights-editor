@@ -11,7 +11,7 @@ import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
-import { filter, Observable, withLatestFrom } from "rxjs";
+import { filter, Observable, take, withLatestFrom } from "rxjs";
 import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SampleState } from "src/app/ngxs-store/study/samples/samples.state";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
@@ -450,5 +450,12 @@ export class SamplesComponent  {
         controlList.name = controlListName;
     }
     return controlList;
+  }
+  refreshSamplesTableWithoutPopup() {
+    this.studySamples$
+      .pipe(withLatestFrom(this.studyIdentifier$), take(1))
+      .subscribe(([, studyIdentifierValue]) => {
+        this.editorService.loadStudySamplesWithoutPopup(studyIdentifierValue);
+    });
   }
 }
