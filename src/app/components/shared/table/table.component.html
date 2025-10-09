@@ -93,7 +93,7 @@
   
 </div>
 
-<div *ngIf="!isReadOnly && !dismissed && columnHidden" class="notification is-primary">
+<div *ngIf="!dismissed && columnHidden" class="notification is-primary">
   <small><mat-icon>info</mat-icon> Truncated MAF sheet. Download m_xxx_v2_maf.tsv file to see the complete data.</small>
   <span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
