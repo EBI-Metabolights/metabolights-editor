@@ -305,7 +305,7 @@
     </ng-template>
   </nav>
    <!--ISA Metadata upload area -->
-  <div style="margin-bottom: 1rem;">
+  <div *ngIf="!isReadOnly"  style="margin-bottom: 1rem;">
       <app-drag-and-drop
         (uploadComplete)="onUploadComplete($event)"
         [iscloseable]="false"
