@@ -283,3 +283,9 @@ a.dropdown-item {
 #wrapper2 {
   height: auto !important;
 }
+.no-structure-message {
+  display: flex;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+}
