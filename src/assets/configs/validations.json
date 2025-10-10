@@ -94,7 +94,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The last name/surname of the contact",
+                    "description": "The last name/surname of the contact. e.g. Smith",
                     "placeholder": "Doe",
                     "rules": [
                         {
@@ -112,7 +112,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The first name of the contact",
+                    "description": "The first name of the contact. e.g. Emma ",
                     "placeholder": "Joe",
                     "rules": [
                         {
@@ -130,7 +130,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The mid initial of the contact.",
+                    "description": "The mid initial of the contact. e.g. A.",
                     "placeholder": "M.",
                     "rules": [
                         {
@@ -141,20 +141,64 @@
                         }
                     ]
                 },
+                "roles": {
+                    "data-type": "ontology",
+                    "sort-order": "4",
+                    "label": "User role",
+                    "is-required": "true",
+                    "is-read-only": "false",
+                    "is-hidden": "false",
+                    "technique": "mass spectrometry|NMR spectroscopy",
+                    "description": "The role of the contact in this Study.",
+                    "placeholder": "Primary investigator",
+                    "rules": [
+                        {
+                            "condition": "array_min",
+                            "value": "1",
+                            "error": "Please provide an role for this contact.",
+                            "type": "string"
+                        }
+                    ],
+                    "recommended-ontologies": {
+                        "is-forced-ontology": "true",
+                        "ontology": {
+                            "url": "/ebi-internal/ontology?branch=Study%20Person%20Role&term=",
+                            "allowFreeText": false
+                        }
+                    }
+                },
                 "email": {
                     "data-type": "string",
-                    "sort-order": "4",
+                    "sort-order": "5",
                     "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The email corresponding to this contact.",
+                    "description": "The (primary) email for this contact. e.g. emma.smith@university.ac.uk  ",
                     "placeholder": "joe.doe@gmail.com, joe.doe@university.ac.uk",
                     "rules": [
                         {
                             "condition": "pattern",
-                            "value": "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}$",
-                            "error": "Please provide a valid email address for the contact. This should include something like 'name@something.somewhere'",
+                            "value": "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$", 
+                            "error": "Please provide a valid email address for the contact. eg:'name@something.somewhere'",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "alternativeEmail": {
+                    "data-type": "string",
+                    "sort-order": "6",
+                    "is-required": "false",
+                    "is-read-only": "false",
+                    "is-hidden": "false",
+                    "technique": "mass spectrometry|NMR spectroscopy",
+                    "description": "The alternative email for this contact. e.g. emma.smith@gmail.com",
+                    "placeholder": "joe.doe@gmail.com, joe.doe@university.ac.uk",
+                    "rules": [
+                        {
+                            "condition": "pattern",
+                            "value": "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$", 
+                            "error": "Please provide a valid email address for the contact. eg:'name@something.somewhere'",
                             "type": "string"
                         }
                     ]
@@ -195,82 +239,74 @@
                         }
                     ]
                 },
-                "address": {
+                "orcid": {
                     "data-type": "string",
                     "sort-order": "7",
                     "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The address for this contact, preferably, their institution.",
-                    "placeholder": "12 Street, Place, postcode, Country",
+                    "description": "The ORCID identifier for this contact e.g. 0000-0001-8604-1732",
+                    "placeholder": "ORCID (e.g. 0000-0001-8604-1732)",
                     "rules": [
                         {
-                            "condition": "min",
-                            "value": "30",
-                            "error": "Please provide an institutional ddress for this contact. This should be a minimum of 30 characters long",
+                            "condition": "pattern",
+                            "value": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[X0-9]$",
+                            "error": "Please provide a valid ORCID for the contact. Format: '0000-0001-8604-1732'",
                             "type": "string"
                         }
                     ]
                 },
-                "affiliation": {
+                "address": {
                     "data-type": "string",
                     "sort-order": "8",
                     "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The affiliation for this contact.",
-                    "placeholder": "Institute or Company Name",
+                    "description": "The (primary) address for this contact. e.g. 12 Street, Place, postcode, Country",
+                    "placeholder": "12 Street, Place, postcode, Country",
                     "rules": [
                         {
                             "condition": "min",
-                            "value": "8",
-                            "error": "Please provide an institutional affiliation for this contact. This should be a minimum of 8 characters long",
+                            "value": "30",
+                            "error": "Please provide an primary address for this contact. This should be a minimum of 30 characters long",
                             "type": "string"
                         }
                     ]
                 },
-                "roles": {
-                    "data-type": "ontology",
+                "affiliation": {
+                    "data-type": "string",
                     "sort-order": "9",
-                    "label": "User role",
-                    "is-required": "true",
+                    "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The role of the person in this Study.",
-                    "placeholder": "Primary investigator",
+                    "description": "The (primary) affiliation, institution or organisation for this contact. e.g. European Bioinformatics Institute",
+                    "placeholder": "Institute or Company Name",
                     "rules": [
                         {
-                            "condition": "array_min",
-                            "value": "1",
-                            "error": "Please provide an role for this contact.",
+                            "condition": "min",
+                            "value": "10",
+                            "error": "Please provide an institutional affiliation for this contact. This should be a minimum of 10 characters long",
                             "type": "string"
                         }
-                    ],
-                    "recommended-ontologies": {
-                        "is-forced-ontology": "true",
-                        "ontology": {
-                            "url": "/ebi-internal/ontology?branch=Study%20Person%20Role&term=",
-                            "allowFreeText": false
-                        }
-                    }
+                    ]
                 },
-                "orcid": {
+                "rorid": {
                     "data-type": "string",
                     "sort-order": "10",
                     "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "Unique digital identifier (ORCID) for this contact.",
-                    "placeholder": "ORCID (e.g. 0000-0002-1825-0097)",
+                    "description": "The ROR identifier of affiliation for this contact e.g. https://ror.org/02catss52",
+                    "placeholder": "eg: https://ror.org/02catss52",
                     "rules": [
                         {
                             "condition": "pattern",
-                            "value": "(^\\d{4}-\\d{4}-\\d{4}-\\d{4}$)|(^\\d{4}-\\d{4}-\\d{4}-\\d{3}X$)",
-                            "error": "Please provide a valid orcid for the contact. This should be formatted as '0000-0002-1825-0097'",
+                            "value": "^(https:\\/\\/ror\\.org\\/[0-9a-z]{9}|https:\\/\\/www\\.wikidata\\.org\\/wiki\\/Q[1-9][0-9]{0,19})$", 
+                            "error": "Please provide a valid affliation Research Organization Registry(ROR) Id. Format: 'https://ror.org/02catss52'",
                             "type": "string"
                         }
                     ]
