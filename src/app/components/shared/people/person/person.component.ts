@@ -9,18 +9,21 @@ import {
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import * as toastr from "toastr";
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
+
 
 @Component({
   selector: "mtbls-person",
@@ -51,7 +54,6 @@ export class PersonComponent implements OnInit {
 
 
   isReadOnly = false;
-
   validations: any = {};
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
   defaultControlListName = "Study Person Role";
@@ -75,6 +77,8 @@ export class PersonComponent implements OnInit {
   validationsId = "people.person";
 
   private toastrSettings: Record<string, any> = {};
+  isPiRole: boolean= false;
+  filteredOrganizations$: Observable<any[]> = of([]);
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -104,12 +108,25 @@ export class PersonComponent implements OnInit {
         this.requestedStudy = value;
       }
     });
-
   }
 
   ngOnInit() {
     if (this.person == null) {
       this.addNewPerson = true;
+    }
+  }
+  private getCommentValue(label: string): string {
+    return (
+      this.person?.comments?.find((c) => c.name === label)?.value || ""
+    );
+  }
+  onAffiliationSelected(event: MatAutocompleteSelectedEvent): void {
+    const org = event.option.value as { name: string; id: string };
+    if (org) {
+      this.form.patchValue({
+        affiliation: org.name,
+        rorid: org.id
+      });
     }
   }
 
@@ -136,13 +153,17 @@ export class PersonComponent implements OnInit {
       ],
       email: [
         this.person.email,
-        ValidateRules("email", this.fieldValidation("email")),
+        ValidateRules("email", this.fieldValidation("email")), // RFC 5322 Official Standard (https://emailregex.com/)
       ],
-      phone: [
-        this.person.phone,
-        ValidateRules("phone", this.fieldValidation("phone")),
+      alternativeEmail: [
+        this.getCommentValue("Study Person Alternative Email"),
+        ValidateRules("alternativeEmail", this.fieldValidation("alternativeEmail")), // RFC 5322 Official Standard 
       ],
-      fax: [this.person.fax, ValidateRules("fax", this.fieldValidation("fax"))],
+      // phone: [
+      //   this.person.phone,
+      //   ValidateRules("phone", this.fieldValidation("phone")),
+      // ],
+      // fax: [this.person.fax, ValidateRules("fax", this.fieldValidation("fax"))],
       address: [
         this.person.address,
         ValidateRules("address", this.fieldValidation("address")),
@@ -150,6 +171,10 @@ export class PersonComponent implements OnInit {
       affiliation: [
         this.person.affiliation,
         ValidateRules("affiliation", this.fieldValidation("affiliation")),
+      ],
+      rorid: [
+        this.getCommentValue("Study Person Affiliation ROR ID"),
+        ValidateRules("rorid", this.fieldValidation("rorid")),
       ],
       comment: [],
       roles: [
@@ -161,6 +186,36 @@ export class PersonComponent implements OnInit {
         ValidateRules("orcid", this.fieldValidation("orcid")),
       ],
     });
+
+    // Debounced autocomplete logic
+   this.filteredOrganizations$ = this.form.get('affiliation')!.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap((query: string) => {
+        if (!query || query.length < 3) {
+          return of([]);
+        }
+
+        return this.editorService.getRorOrganizations(query).pipe(
+          switchMap((res: any) => {
+            const items =
+              res.items?.map((item: any) => {
+                const nameObj = item.organization.names.find(
+                  (n: any) => n.lang === 'en'
+                );
+                return {
+                  name:
+                    nameObj?.value ||
+                    item.organization.names[0]?.value ||
+                    '(Unknown name)',
+                  id: item.organization.id,
+                };
+              }) || [];
+            return of(items);
+          })
+        );
+      })
+    );
   }
 
   showHistory() {
@@ -308,11 +363,61 @@ export class PersonComponent implements OnInit {
 
 
   onChanges() {
-    this.form.controls.roles.setValue(this.rolesComponent.values);
-    if (this.rolesComponent.values.length !== 0) {
-      this.form.controls.roles.markAsDirty();
+  this.form.controls.roles.setValue(this.rolesComponent.values);
+  
+  if (this.rolesComponent.values.length !== 0) {
+    this.form.controls.roles.markAsDirty();
+  }
+
+  const rolesValue = this.form.get('roles')?.value || [];
+
+  // Dynamically detect PI role
+  this.isPiRole = rolesValue.some((role: any) =>
+    role.annotationValue?.includes('Principal Investigator')
+  );
+
+  this.updatePiValidators(this.isPiRole);
+}
+private updatePiValidators(isPi: boolean): void {
+  const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+
+  piFields.forEach(fieldName => {
+    const fieldControl = this.form.get(fieldName);
+    if (!fieldControl) return;
+
+    const currentValidators = fieldControl.validator
+      ? [fieldControl.validator]
+      : [];
+
+    const validatorFns = currentValidators.length
+      ? (fieldControl as any)._rawValidators || currentValidators
+      : [];
+
+    const asyncValidators = fieldControl.asyncValidator
+      ? [fieldControl.asyncValidator]
+      : [];
+
+    let updatedValidators: any[];
+    if (isPi) {
+      updatedValidators = [
+        ...validatorFns.filter(v => v !== Validators.required),
+        Validators.required
+      ];
+    } else {
+      updatedValidators = validatorFns.filter(v => v !== Validators.required);
     }
-    this.form.markAsDirty();
+
+    fieldControl.setValidators(updatedValidators);
+    fieldControl.setAsyncValidators(asyncValidators);
+
+    fieldControl.updateValueAndValidity({ emitEvent: false });
+  });
+
+  this.form.updateValueAndValidity({ emitEvent: false });
+}
+
+  getIsRequired(fieldName: string): boolean {
+    return this.isPiRole; 
   }
 
   getObject(data) {
@@ -326,19 +431,46 @@ export class PersonComponent implements OnInit {
     mtblPerson.firstName = this.getFieldValue("firstName");
     mtblPerson.midInitials = this.getFieldValue("midInitials");
     mtblPerson.email = this.getFieldValue("email");
-    mtblPerson.phone = this.getFieldValue("phone");
-    mtblPerson.fax = this.getFieldValue("fax");
+    // mtblPerson.phone = this.getFieldValue("phone");
+    // mtblPerson.fax = this.getFieldValue("fax");
     mtblPerson.address = this.getFieldValue("address");
     mtblPerson.affiliation = this.getFieldValue("affiliation");
     this.rolesComponent.values.forEach((role) => {
       mtblPerson.roles.push(jsonConvert.deserializeObject(role, Ontology));
     });
-    mtblPerson.comments = this.getFieldValue("orcid")?.trim()?[new MTBLSComment("Study Person ORCID", this.getFieldValue("orcid"))]: [];
+
+    const comments: MTBLSComment[] = [];
+
+    const orcid = this.getFieldValue("orcid")?.trim();
+    const rorid = this.getFieldValue("rorid")?.trim();
+    const altEmail = this.getFieldValue("alternativeEmail")?.trim();
+
+    if (orcid) {
+      comments.push(new MTBLSComment("Study Person ORCID", orcid));
+    }
+    if (rorid) {
+      comments.push(new MTBLSComment("Study Person Affiliation ROR ID", rorid));
+    }
+    if (altEmail) {
+      comments.push(new MTBLSComment("Study Person Alternative Email", altEmail));
+    }
+
+    mtblPerson.comments = comments;
+
     return { contacts: [mtblPerson.toJSON()] };
   }
 
   getFieldValue(name) {
     return this.form.get(name).value;
+  }
+  getRoridUrl(): string {
+    const affiliation = this.getFieldValue("affiliation")?.trim();
+    return affiliation ? `https://ror.org/search?query=${encodeURIComponent(affiliation)}` : 'https://ror.org/';
+  }
+  getOrcidUrl(): string {
+    const lastName = this.getFieldValue("lastName")?.trim();
+    const firstName = this.getFieldValue("firstName")?.trim();
+    return lastName || firstName ? `https://orcid.org/orcid-search/search?firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}&otherFields=true` : 'https://orcid.org/';
   }
   controlList() {
     if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
@@ -348,4 +480,6 @@ export class PersonComponent implements OnInit {
     }
     return this.defaultControlList;
   }
+  
 }
+

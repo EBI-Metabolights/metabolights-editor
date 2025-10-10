@@ -618,6 +618,7 @@ export class MetabolightsService extends DataService {
       )
       .pipe(catchError(this.handleError));
   }
-
-
+  getRorid(url: string): Observable<any> {
+    return this.http.get<any>(url).pipe(catchError(this.handleError));
+    }
 }

@@ -167,6 +167,7 @@
       </div>
       <section class="modal-card-body">
         <mat-form-field class="full-width">
+          <mat-label>Title</mat-label>
           <textarea
             class="no-scroll"
             formControlName="title"
@@ -189,6 +190,7 @@
           </mat-error>
         </mat-form-field>
         <mat-form-field class="full-width">
+          <mat-label>Authors</mat-label>
           <textarea
             class="no-scroll"
             formControlName="authorList"
@@ -211,6 +213,7 @@
           </mat-error>
         </mat-form-field>
         <mat-form-field class="full-width">
+          <mat-label>DOI</mat-label>
           <input
             class="no-scroll"
             formControlName="doi"
@@ -230,6 +233,7 @@
           </mat-error>
         </mat-form-field>
         <mat-form-field class="full-width">
+          <mat-label>PubMed ID</mat-label>
           <input
             class="no-scroll"
             [tabIndex]="4"
@@ -256,6 +260,7 @@
           (changed)="onChanges($event)"
           [values]="[publication.status]"
           [inline]="true"
+          [label]="'Status'"
         ></mtbls-ontology>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />

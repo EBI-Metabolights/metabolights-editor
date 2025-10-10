@@ -1,0 +1,64 @@
+mat-form-field.extra-margin {
+  margin-bottom: 24px; /* only when message is long */
+}
+mat-form-field.margin-normal {
+  margin-bottom: 25px; 
+}
+.right{
+  float: right;
+  text-decoration: none;
+  color: blue;
+}
+.form-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px; /* spacing between fields */
+  box-sizing: border-box;
+}
+
+.half-width {
+  flex: 1;
+  min-width: 515px;
+}
+
+.field-new {
+  flex: 1;
+  min-width: 0; /* prevents field overflow */
+}
+
+/* prevent extra padding that forces wrapping */
+.field-new .mat-form-field-flex {
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* make them fit even in narrower modals */
+@media (max-width: 720px) {
+  .form-row {
+    flex-direction: column;
+  }
+  .field-new {
+    width: 100%;
+  }
+}
+
+.search-link {
+  text-decoration: none;
+  cursor: pointer;
+  padding: 10px;
+  color: #3273dc;
+}
+.search-link:hover {
+  text-decoration: underline;
+}
+.badge {
+  background-color: #1976d2;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0 4px;
+  border-radius: 4px;
+  vertical-align: super;
+}
