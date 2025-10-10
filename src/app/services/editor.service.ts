@@ -828,4 +828,16 @@ export class EditorService {
       });
     }
 
+    getRorOrganizations(query: string): Observable<any> {
+      if (!query || query.trim().length < 3) {
+        // Avoid unnecessary API calls
+        return of({ items: [] });
+      }
+
+      const encodedQuery = encodeURIComponent(query);
+      const url = `https://api.ror.org/organizations?affiliation=${encodedQuery}`;
+
+      return this.dataService.getRorid(url);
+    }
+
 }
