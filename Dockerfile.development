@@ -1,4 +1,6 @@
-FROM nginx:stable
+ARG CONTAINER_REGISTRY_PREFIX=docker.io/
+
+FROM ${CONTAINER_REGISTRY_PREFIX}nginx:1.28
 LABEL maintainer="MetaboLights (metabolights-help @ ebi.ac.uk)"
 
 COPY /dist /usr/share/nginx/html
