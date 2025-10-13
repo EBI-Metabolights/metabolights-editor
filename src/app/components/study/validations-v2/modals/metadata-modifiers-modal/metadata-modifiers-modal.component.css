@@ -80,3 +80,11 @@
   .log-entry:hover .copy-icon {
     visibility: visible;
   }
+  
+  ::ng-deep .mat-header-cell.mat-mdc-header-cell,
+  ::ng-deep .mat-cell.mat-mdc-cell,
+  ::ng-deep .mat-footer-cell.mat-mdc-footer-cell {
+    align-self: stretch;
+    display: block;
+    padding: 15px;
+  }
