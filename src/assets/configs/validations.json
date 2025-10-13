@@ -167,9 +167,27 @@
                         }
                     }
                 },
-                "email": {
+                "orcid": {
                     "data-type": "string",
                     "sort-order": "5",
+                    "is-required": "false",
+                    "is-read-only": "false",
+                    "is-hidden": "false",
+                    "technique": "mass spectrometry|NMR spectroscopy",
+                    "description": "The ORCID identifier for this contact e.g. 0000-0001-8604-1732",
+                    "placeholder": "ORCID (e.g. 0000-0001-8604-1732)",
+                    "rules": [
+                        {
+                            "condition": "pattern",
+                            "value": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[X0-9]$",
+                            "error": "Please provide a valid ORCID for the contact. Format: '0000-0001-8604-1732'",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "email": {
+                    "data-type": "string",
+                    "sort-order": "6",
                     "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
@@ -187,7 +205,7 @@
                 },
                 "alternativeEmail": {
                     "data-type": "string",
-                    "sort-order": "6",
+                    "sort-order": "7",
                     "is-required": "false",
                     "is-read-only": "false",
                     "is-hidden": "false",
@@ -235,24 +253,6 @@
                             "condition": "min",
                             "value": "10",
                             "error": "Please provide an international Fax number for this contact. This should be a minimum of 10 numbers long",
-                            "type": "string"
-                        }
-                    ]
-                },
-                "orcid": {
-                    "data-type": "string",
-                    "sort-order": "7",
-                    "is-required": "false",
-                    "is-read-only": "false",
-                    "is-hidden": "false",
-                    "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The ORCID identifier for this contact e.g. 0000-0001-8604-1732",
-                    "placeholder": "ORCID (e.g. 0000-0001-8604-1732)",
-                    "rules": [
-                        {
-                            "condition": "pattern",
-                            "value": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[X0-9]$",
-                            "error": "Please provide a valid ORCID for the contact. Format: '0000-0001-8604-1732'",
                             "type": "string"
                         }
                     ]
