@@ -188,35 +188,38 @@ export class PersonComponent implements OnInit {
     });
 
     // Debounced autocomplete logic
-   this.filteredOrganizations$ = this.form.get('affiliation')!.valueChanges.pipe(
-      debounceTime(400),
-      distinctUntilChanged(),
-      switchMap((query: string) => {
-        if (!query || query.length < 3) {
-          return of([]);
-        }
+    this.filteredOrganizations$ = this.form.get('affiliation')!.valueChanges.pipe(
+    debounceTime(1000),
+    distinctUntilChanged(),
+    switchMap((query: string) => {
+      if (!query || query.length < 3) {
+        return of([]);
+      }
 
-        return this.editorService.getRorOrganizations(query).pipe(
-          switchMap((res: any) => {
-            const items =
-              res.items?.map((item: any) => {
-                const nameObj = item.organization.names.find(
-                  (n: any) => n.lang === 'en'
-                );
-                return {
-                  name:
-                    nameObj?.value ||
-                    item.organization.names[0]?.value ||
-                    '(Unknown name)',
-                  id: item.organization.id,
-                };
-              }) || [];
-            return of(items);
-          })
-        );
-      })
-    );
+      return this.editorService.getRorOrganizations(query).pipe(
+        switchMap((res: any) => {
+          const items =
+            res.items?.map((item: any) => {
+              const org = item.organization;
+              const nameObj = org.names.find((n: any) => n.lang === 'en');
+              const name =
+                nameObj?.value || org.names[0]?.value || '(Unknown name)';
+              const countryName =
+                org.locations?.[0]?.geonames_details?.country_name || '(Unknown country)';
+              return {
+                id: org.id,
+                name,
+                countryName,
+              };
+            }) || [];
+
+          return of(items);
+        })
+      );
+    })
+  );
   }
+
 
   showHistory() {
     this.isModalOpen = false;
@@ -231,9 +234,6 @@ export class PersonComponent implements OnInit {
   openModal() {
     this.initialiseForm();
     this.isModalOpen = true;
-    if (this.rolesComponent) {
-      this.rolesComponent.setValues([]);
-    }
   }
 
   toogleShowAdvanced() {
@@ -283,6 +283,14 @@ export class PersonComponent implements OnInit {
   fieldValidation(fieldId) {
     return this.validation[fieldId];
   }
+ isFieldRequired(fieldId: string): boolean {
+  const fieldValidation = this.fieldValidation(fieldId);
+  if (fieldValidation && fieldValidation["is-required"]) {
+    const isRequired = JSON.parse(fieldValidation["is-required"]);
+    return isRequired === true || isRequired === "true";
+  }
+  return false;
+}
 
   approveGrantSubmitterRole() {
     this.isModalOpen = false;
