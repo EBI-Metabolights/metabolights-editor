@@ -15,7 +15,7 @@ stages:
 - deploy
 build_docker:
   stage: build
-  image: $CI_REGISTRY_NAME/docker:latest
+  image: $CI_REGISTRY/docker:latest
   tags:
   - mtbls
   - docker
@@ -36,7 +36,7 @@ build_docker:
 
 deploy_editor:
   stage: deploy
-  image: $CI_REGISTRY_NAME/k8s:1.23.17
+  image: $CI_REGISTRY/k8s:1.23.17
   tags:
   - mtbls
   - docker
