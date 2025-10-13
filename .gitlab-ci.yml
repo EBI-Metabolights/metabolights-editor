@@ -15,7 +15,7 @@ stages:
 - deploy
 build_docker:
   stage: build
-  image: $CI_REGISTRY_IMAGE/docker:latest
+  image: ${CICD_GITLAB_REGISTRY}docker:28.5.1-dind
   tags:
   - mtbls
   - docker
@@ -29,14 +29,14 @@ build_docker:
   - cat src/assets/configs/version.json
   - echo "docker build -t $IMAGE_NAME ."
   - docker build -t $IMAGE_NAME .
-  - echo "docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ -t $LATEST_IMAGE_NAME ."
-  - docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CI_REGISTRY_IMAGE/ -t $LATEST_IMAGE_NAME .
+  - echo "docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CICD_GITLAB_REGISTRY -t $LATEST_IMAGE_NAME ."
+  - docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CICD_GITLAB_REGISTRY -t $LATEST_IMAGE_NAME .
   - docker push $IMAGE_NAME
   - docker push $LATEST_IMAGE_NAME
 
 deploy_editor:
   stage: deploy
-  image: $CI_REGISTRY_IMAGE/k8s:1.23.17
+  image: ${CICD_GITLAB_REGISTRY}k8s:1.23.17
   tags:
   - mtbls
   - docker
@@ -52,34 +52,39 @@ deploy_editor:
   - apk add --no-cache git
   - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
   - CURRENT_PATH="$(pwd)"
+  - export CICD_PROJECT_ROOT_PATH="$CURRENT_PATH/$CONFIG_DIR"
+  - export K8S_CONFIG_FILE_PATH="$CICD_PROJECT_ROOT_PATH/$K8S_CONFIG_FILE_PATH"
+  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
+  - DEPLOYMENTS_CHART_PATH="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
+
   - echo "CURRENT_PATH $CURRENT_PATH"
+  - echo "CICD_PROJECT_ROOT_PATH $CICD_PROJECT_ROOT_PATH"
+  - echo "K8S_CONFIG_FILE_PATH $K8S_CONFIG_FILE_PATH"
+  - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
+
   - rm -rf $CONFIG_DIR
   - echo git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
   - git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
-  - echo "CONFIG_DIR $CONFIG_DIR"
-  - CICD_PROJECT_ROOT_PATH="$(realpath $CONFIG_DIR)"
-  - export K8S_CONFIG_FILE_PATH=$CICD_PROJECT_ROOT_PATH/$K8S_CONFIG_FILE_PATH
-  - echo $K8S_CONFIG_FILE_PATH
   - cd $CONFIG_DIR
   - ls -al
   - echo checkout $APPS_PROJECT_BRANCH_NAME
   - git checkout $APPS_PROJECT_BRANCH_NAME
   - git status
-  - git pull
-  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
-  - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
-  - ls -al
+  - echo "cd $DEPLOYMENTS_FOLDER_SCRIPTS"
   - cd $DEPLOYMENTS_FOLDER_SCRIPTS
+  - echo "initial_setup.sh file content"
   - cat initial_setup.sh
   - bash initial_setup.sh
-  - DEPLOYMENTS_CHART_PATH="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
   - echo "DEPLOYMENTS_CHART_PATH $DEPLOYMENTS_CHART_PATH"
   - cd $DEPLOYMENTS_CHART_PATH
+  - echo "template.sh.sh file content"
   - cat template.sh
   - echo template.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash template.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
+  - echo "install.sh file content"
   - cat install.sh
   - echo install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - cd $CURRENT_PATH
+  - echo "Cleanup - remove config directory"
   - rm -rf $CONFIG_DIR
