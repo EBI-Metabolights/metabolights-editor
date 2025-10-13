@@ -15,10 +15,12 @@ stages:
 - deploy
 build_docker:
   stage: build
-  image: ${CICD_GITLAB_REGISTRY}docker:28.5.1-dind
+  image:
+    name: ${CICD_GITLAB_REGISTRY}docker:28.5.1-dind
+    pull_policy: if-not-present
   tags:
-  - mtbls
   - docker
+  - mtbls
   script:
   - docker version
   - git reset --hard origin/$APPS_PROJECT_BRANCH_NAME
@@ -36,7 +38,9 @@ build_docker:
 
 deploy_editor:
   stage: deploy
-  image: ${CICD_GITLAB_REGISTRY}k8s:1.23.17
+  image:
+    name: ${CICD_GITLAB_REGISTRY}k8s:1.23.17
+    pull_policy: if-not-present
   tags:
   - mtbls
   - docker
