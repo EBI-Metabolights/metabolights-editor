@@ -125,8 +125,7 @@
             class="field-new"
             [ngClass]="
               form.get('lastName').errors &&
-              form.get('lastName').dirty &&
-              form.get('lastName').errors.lastName
+              form.get('lastName').dirty 
                 ? 'extra-margin'
                 : ''
             "
@@ -137,7 +136,11 @@
               formControlName="lastName"
               [readonly]="isReadOnly"
             />
-            <mat-hint>{{ fieldValidation("lastName").description }}</mat-hint>
+            <mat-hint>{{ fieldValidation("lastName").description }}
+              <span *ngIf="isFieldRequired('firstName')">
+                <b>(required)</b>
+              </span>
+            </mat-hint>
             <mat-error *ngIf="form.get('lastName')?.errors?.lastName">
               {{ form.get("lastName").errors.lastName.error }}
             </mat-error>
@@ -162,8 +165,7 @@
             class="field-new"
             [ngClass]="
               form.get('firstName').errors &&
-              form.get('firstName').dirty &&
-              form.get('firstName').errors.firstName
+              form.get('firstName').dirty 
                 ? 'extra-margin'
                 : ''
             "
@@ -174,7 +176,11 @@
               formControlName="firstName"
               [readonly]="isReadOnly"
             />
-            <mat-hint>{{ fieldValidation("firstName").description }}</mat-hint>
+            <mat-hint>{{ fieldValidation("firstName").description }}
+               <span *ngIf="isFieldRequired('firstName')">
+                <b>(required)</b>
+              </span>
+            </mat-hint>
             <mat-error *ngIf="form.get('firstName')?.errors?.firstName">
               {{ form.get("firstName").errors.firstName.error }}
             </mat-error>
@@ -367,7 +373,7 @@
               *ngFor="let org of filteredOrganizations$ | async"
               [value]="org"
             >
-              {{ org.name }}
+              {{ org.name }} ({{ org.countryName }}) - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
             </mat-option>
           </mat-autocomplete>
           <mat-hint>
