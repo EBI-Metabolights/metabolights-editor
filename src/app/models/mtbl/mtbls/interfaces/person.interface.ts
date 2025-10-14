@@ -12,4 +12,5 @@ export interface IPerson {
   midInitials: string;
   phone: string;
   roles: IOntology[];
+  contactIndex?: number; // internal-only field
 }

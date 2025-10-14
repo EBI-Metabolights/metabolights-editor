@@ -168,13 +168,17 @@ export class GeneralMetadataService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
-  updatePerson(email, name, body, id): Observable<any> {
+  updatePerson(email, name, body, id, contactIndex?: number): Observable<any> {
     let query = "";
-    if (email && email !== "" && email !== null) {
-      query = "email=" + email;
-    } else if (name && name !== "" && name !== null) {
-      query = "full_name=" + name;
-    }
+
+  if (contactIndex !== undefined && contactIndex !== null) {
+    query = "contact_index=" + contactIndex;
+  } else if (email) {
+    query = "email=" + email;
+  } else if (name) {
+    query = "full_name=" + name;
+  }
+
     return this.http
       .put(
         this.url.baseURL + "/studies" + "/" + id + "/contacts?" + query,
@@ -207,13 +211,16 @@ export class GeneralMetadataService extends DataService {
     }
   }
 
-  deletePerson(email, name, id) {
-    let query = "";
-    if (email && email !== "" && email !== null) {
-      query = "email=" + email;
-    } else if (name && name !== "" && name !== null) {
-      query = "full_name=" + name;
-    }
+  deletePerson(email, name, id, contactIndex) {
+       let query = "";
+
+  if (contactIndex !== undefined && contactIndex !== null) {
+    query = "contact_index=" + contactIndex;
+  } else if (email) {
+    query = "email=" + email;
+  } else if (name) {
+    query = "full_name=" + name;
+  }
     return this.http
       .delete(
         this.url.baseURL + "/studies" + "/" + id + "/contacts?" + query,

@@ -1,4 +1,5 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
+import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
 import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate } from "./general-metadata.actions";
@@ -65,7 +66,7 @@ const defaultState: GeneralMetadataStateModel = {
     publicGlobusUrl: null,
     publicAsperaPath: null,
     firstPrivateDate: null,
-    firstPublicDate: null
+    firstPublicDate: null,
 }
 
 @State<GeneralMetadataStateModel>({
@@ -425,7 +426,8 @@ export class GeneralMetadataState {
         const jsonConvert: JsonConvert = new JsonConvert();
         let temp = [];
 
-        action.people.forEach((person) => {
+        action.people.forEach((person, index) => {
+            person.contactIndex = index; // assign contactIndex if not present
             temp.push(jsonConvert.deserialize(person, MTBLSPerson));
         });
         if (action.extend) temp = temp.concat(state.people);
@@ -455,10 +457,16 @@ export class GeneralMetadataState {
         this.generalMetadataService.savePerson(action.body, state.id).subscribe(
             (response) => {
                 ctx.dispatch(new People.Set(response.contacts as IPerson[], false))
+                 toastr.success("Person Added.", "Success", {
+                          timeOut: 5000,
+                          positionClass: "toast-top-center",
+                          preventDuplicates: true,
+                          extendedTimeOut: 0,
+                          tapToDismiss: true,
+                        });
             },
             (error) => {
                 console.log("Could not add new study person.");
-                console.error(error);
             }
         )
     }
@@ -466,25 +474,23 @@ export class GeneralMetadataState {
     @Action(People.Update)
     UpdatePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Update) {
         const state = ctx.getState();
-        /**let name = `${action.body.contacts[0].firstName}${action.body.contacts[0].lastName}`
-        let email = "a";
-        let duds = [null, undefined, ''];
-        let emailDud = duds.includes(action.existingEmail);
-        if (!emailDud) {
-            email = action.existingEmail;
-        }
-        else email = action.body.contacts[0].email;*/
 
-        this.generalMetadataService.updatePerson(action.email, action.fullName, action.body, state.id).subscribe(
+        this.generalMetadataService.updatePerson(action.email, action.fullName, action.body, state.id, action.contactIndex).subscribe(
             (response) => {
                 let body = null
                 if (!Object.keys(response).includes('contacts')) body = [response]
                 else body = response.contacts
                 ctx.dispatch(new People.Get());
+                toastr.success("Person Updated.", "Success", {
+                          timeOut: 5000,
+                          positionClass: "toast-top-center",
+                          preventDuplicates: true,
+                          extendedTimeOut: 0,
+                          tapToDismiss: true,
+                        });
             },
             (error) => {
                 console.log("Could not update study person");
-                console.error(error);
             }
         )
     }
@@ -492,13 +498,19 @@ export class GeneralMetadataState {
     @Action(People.Delete)
     DeletePerson(ctx: StateContext<GeneralMetadataStateModel>, action: People.Delete) {
         const state = ctx.getState();
-        this.generalMetadataService.deletePerson(action.email, action.fullName, state.id).subscribe(
+        this.generalMetadataService.deletePerson(action.email, action.fullName, state.id, action.contactIndex).subscribe(
             (response) => {
                 ctx.dispatch(new People.Get());
+                toastr.success("Person Deleted.", "Success", {
+                          timeOut: 5000,
+                          positionClass: "toast-top-center",
+                          preventDuplicates: true,
+                          extendedTimeOut: 0,
+                          tapToDismiss: true,
+                        });
             },
             (error) => {
                 console.log(`Unable to delete study person ${action.fullName}`);
-                console.error(error);
             }
         )
     }
@@ -512,7 +524,6 @@ export class GeneralMetadataState {
             },
             (error) => {
                 console.log("Unable to make person submitter");
-                console.error(error)
             }
             )
     }
