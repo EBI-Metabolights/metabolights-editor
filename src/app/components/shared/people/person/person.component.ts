@@ -9,7 +9,7 @@ import {
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import * as toastr from "toastr";
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -18,7 +18,7 @@ import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
 import { Observable, of } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Store } from "@ngxs/store";
+import {Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
@@ -257,17 +257,18 @@ export class PersonComponent implements OnInit {
   deleteNgxs() {
     const identifier = this.person.email !== "" ? this.person.email : null;
     const name = this.person.email === "" ? `${this.person.firstName}${this.person.lastName}` : null;
+    const contactIndex = this.person.contactIndex || 0;
     
-    this.store.dispatch(new People.Delete(identifier, name)).subscribe(
-      (response) => {
-        this.refreshContacts("Person deleted.");
+    this.store.dispatch(new People.Delete(identifier, name, contactIndex)).subscribe({
+      next: () => {
+        // this.refreshContacts("Person deleted.");
         this.isDeleteModalOpen = false;
-        this.isModalOpen = false;
-      },
-      (error) => {
         this.isFormBusy = false;
-      }
-    );
+      },
+      error: () => {
+        this.isFormBusy = false;
+      },
+    });
   }
 
   get validation() {
@@ -315,52 +316,53 @@ export class PersonComponent implements OnInit {
       )
   }
 
-  saveNgxs() {
-    if (!this.isReadOnly) {
-      this.isFormBusy = true;
-      if (!this.addNewPerson) { // if we are updating an existing person
-        const name = `${this.person.firstName}${this.person.lastName}`
-        if ( this.getFieldValue("email") !== this.person.email && this.person.email !== "") {
-          this.store.dispatch(new People.Update(this.compileBody(), this.person.email, null)).subscribe(
-            (completed) => {
-              this.refreshContacts("Person updated.");
-            },
-            (error) => {
-              this.isFormBusy = false;
-            }
-          );
-        } else {
-          this.store.dispatch(new People.Update(this.compileBody(), null, name)).subscribe(
-            (completed) => {
-              this.refreshContacts("Person updated.");
-            },
-            (error) => {
-              this.isFormBusy = false;
-            }
-          );
-        }
+ saveNgxs() {
+  if (this.isReadOnly) return;
 
-       /**  this.store.dispatch(new People.Update(this.compileBody(), this.person.email, name)).subscribe(
-          (completed) => {
-            this.refreshContacts("Person updated.");
-          },
-          (error) => {
-            this.isFormBusy = false;
-          }
-        );*/
-      } else { // if we are adding a new person
-        this.store.dispatch(new People.Add(this.compileBody())).subscribe(
-          (completed) => {
-            this.refreshContacts("New person added.");
-            this.closeModal();
-          },
-          (error) => {
-            this.isFormBusy = false;
-          }
-        )
-      }
+  this.isFormBusy = true;
+  const body = this.compileBody();
+
+  if (!this.addNewPerson) {
+    const { email, firstName, lastName, contactIndex } = this.person;
+    const name = `${firstName}${lastName}`;
+    const newEmail = this.getFieldValue("email");
+
+    let updateAction: People.Update;
+
+    if (contactIndex !== undefined && contactIndex !== null) {
+      updateAction = new People.Update(body, null, null, contactIndex);
+    } else if (newEmail !== email && email !== "") {
+      updateAction = new People.Update(body, email, null);
+    } else {
+      updateAction = new People.Update(body, null, name);
     }
+
+    this.store.dispatch(updateAction).subscribe({
+      next: () => {
+        // this.refreshContacts('Person updated.');
+        this.isFormBusy = false;
+      },
+      error: () => {
+        // loader reset on any error (BadInput will show toasts)
+        this.isFormBusy = false;
+      },
+    });
+
+  } else {
+    // Adding a new person
+    this.store.dispatch(new People.Add(body)).subscribe({
+      next: () => {
+        // this.refreshContacts('Person Added.');
+        this.isFormBusy = false;
+      },
+      error: () => {
+        this.isFormBusy = false;
+      },
+    });
   }
+}
+
+
 
   refreshContacts(message) {
     if (!this.isReadOnly) {

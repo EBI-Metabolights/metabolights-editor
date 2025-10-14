@@ -230,7 +230,7 @@ export namespace People {
 
     export class Update {
         static readonly type = '[general] Update Study Person'
-        constructor(public body: Record<string, any>, public email: string, public fullName: string) {}
+        constructor(public body: Record<string, any>, public email: string, public fullName: string,  public contactIndex?: number) {}
     }
 
     export class Add {
@@ -240,7 +240,7 @@ export namespace People {
 
     export class Delete {
         static readonly type = '[general] Delete Study Person'
-        constructor(public email: string, public fullName: string) {}
+        constructor(public email: string, public fullName: string, public contactIndex?: number) {}
     }
 
     export class GrantSubmitter {
