@@ -53,6 +53,7 @@
     "@angular/cli": "^18.2.7",
     "@angular/compiler-cli": "^18.2.7",
     "@angular/language-service": "^18.2.7",
+    "@ngxs/devtools-plugin": "^20.1.0",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "^14.16.0",

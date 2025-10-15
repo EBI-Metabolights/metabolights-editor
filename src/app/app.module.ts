@@ -112,6 +112,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatDividerModule,
         MatStepperModule,
         DragDropModule,
+        environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot(),
         NgxsModule.forRoot([
             GeneralMetadataState,
             UserState,
