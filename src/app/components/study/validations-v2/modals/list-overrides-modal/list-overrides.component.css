@@ -13,3 +13,30 @@
     overflow-x: hidden;
     display: block;
   }
+  /* Modal Footer */
+.modal-footer {
+  align-items: center;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-shrink: 0;
+  justify-content: flex-start;
+  padding: 20px;
+  position: relative;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  background-color: white;
+
+}
+.modal-footer .button:not(:last-child) {
+    margin-right: .5em;
+}
+.keep-right{
+  justify-content: flex-end;
+}
+:host ::ng-deep .mat-mdc-table .mat-mdc-header-cell,
+:host ::ng-deep .mat-mdc-table .mat-mdc-cell,
+:host ::ng-deep .mat-mdc-table .mat-mdc-footer-cell {
+  align-self: stretch;
+  display: block;
+  padding: 15px;
+}
