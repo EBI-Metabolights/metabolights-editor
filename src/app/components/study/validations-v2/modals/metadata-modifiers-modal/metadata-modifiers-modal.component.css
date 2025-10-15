@@ -81,6 +81,17 @@
     visibility: visible;
   }
   
+<<<<<<< HEAD
+=======
+  :host ::ng-deep .mat-mdc-table .mat-mdc-header-cell,
+  :host ::ng-deep .mat-mdc-table .mat-mdc-cell,
+  :host ::ng-deep .mat-mdc-table .mat-mdc-footer-cell {
+    align-self: stretch;
+    display: block;
+    padding: 15px;
+  }
+
+>>>>>>> 52db761 (Info: beautify metadata-modifier modal)
 /* Modal Footer */
 .modal-footer {
   align-items: center;
@@ -100,4 +111,8 @@
 }
 .keep-right{
   justify-content: flex-end;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 52db761 (Info: beautify metadata-modifier modal)
