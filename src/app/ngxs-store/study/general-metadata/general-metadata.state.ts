@@ -457,16 +457,24 @@ export class GeneralMetadataState {
         this.generalMetadataService.savePerson(action.body, state.id).subscribe(
             (response) => {
                 ctx.dispatch(new People.Set(response.contacts as IPerson[], false))
-                 toastr.success("Person Added.", "Success", {
-                          timeOut: 5000,
-                          positionClass: "toast-top-center",
-                          preventDuplicates: true,
-                          extendedTimeOut: 0,
-                          tapToDismiss: true,
-                        });
+                this.generalMetadataService.emitMessage({
+                    type: 'add',
+                    status: 'success',
+                    message: 'Person added successfully!'
+                });
             },
             (error) => {
                 console.log("Could not add new study person.");
+                const errorsArray: string[] = 
+                (error.error?.errors && Array.isArray(error.error.errors))
+                    ? error.error.errors
+                    : [error.message || 'Could not add new study person'];
+
+                this.generalMetadataService.emitMessage({
+                    type: 'add',
+                    status: 'error',
+                    message: errorsArray.join(', ')
+                });  
             }
         )
     }
@@ -481,16 +489,27 @@ export class GeneralMetadataState {
                 if (!Object.keys(response).includes('contacts')) body = [response]
                 else body = response.contacts
                 ctx.dispatch(new People.Get());
-                toastr.success("Person Updated.", "Success", {
-                          timeOut: 5000,
-                          positionClass: "toast-top-center",
-                          preventDuplicates: true,
-                          extendedTimeOut: 0,
-                          tapToDismiss: true,
-                        });
+
+                this.generalMetadataService.emitMessage({
+                    type: 'update',
+                    status: 'success',
+                    message: 'Person updated successfully!'
+                });
             },
             (error) => {
                 console.log("Could not update study person");
+                
+                const errorsArray: string[] = 
+                (error.error?.errors && Array.isArray(error.error.errors))
+                    ? error.error.errors
+                    : [error.message || 'Could not update study person'];
+
+                this.generalMetadataService.emitMessage({
+                    type: 'update',
+                    status: 'error',
+                    message: errorsArray.join(', ')
+                });  
+                
             }
         )
     }
@@ -501,16 +520,24 @@ export class GeneralMetadataState {
         this.generalMetadataService.deletePerson(action.email, action.fullName, state.id, action.contactIndex).subscribe(
             (response) => {
                 ctx.dispatch(new People.Get());
-                toastr.success("Person Deleted.", "Success", {
-                          timeOut: 5000,
-                          positionClass: "toast-top-center",
-                          preventDuplicates: true,
-                          extendedTimeOut: 0,
-                          tapToDismiss: true,
-                        });
+                this.generalMetadataService.emitMessage({
+                    type: 'delete',
+                    status: 'success',
+                    message: 'Person deleted successfully!'
+                });
             },
             (error) => {
                 console.log(`Unable to delete study person ${action.fullName}`);
+                const errorsArray: string[] = 
+                (error.error?.errors && Array.isArray(error.error.errors))
+                    ? error.error.errors
+                    : [error.message || `Unable to delete study person ${action.fullName}`];
+
+                this.generalMetadataService.emitMessage({
+                    type: 'delete',
+                    status: 'error',
+                    message: errorsArray.join(', ')
+                });  
             }
         )
     }
@@ -520,10 +547,24 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.makePersonSubmitter(action.email, state.id).subscribe(
             (response) => {
-
+               this.generalMetadataService.emitMessage({
+                    type: 'makesubmitter',
+                    status: 'success',
+                    message: 'Person deleted successfully!'
+                }); 
             },
             (error) => {
                 console.log("Unable to make person submitter");
+                const errorsArray: string[] = 
+                (error.error?.errors && Array.isArray(error.error.errors))
+                    ? error.error.errors
+                    : [error.message || 'Unable to make person submitter'];
+
+                this.generalMetadataService.emitMessage({
+                    type: 'makesubmitter',
+                    status: 'error',
+                    message: errorsArray.join(', ')
+                });  
             }
             )
     }
