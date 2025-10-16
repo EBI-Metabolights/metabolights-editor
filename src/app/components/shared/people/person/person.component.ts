@@ -16,13 +16,14 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
-import { Observable, of } from "rxjs";
+import { Observable, of, Subscription } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import {Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
+import { AppMessage, GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 
 
 @Component({
@@ -79,10 +80,13 @@ export class PersonComponent implements OnInit {
   private toastrSettings: Record<string, any> = {};
   isPiRole: boolean= false;
   filteredOrganizations$: Observable<any[]> = of([]);
-
+  private subscription: Subscription;  // For unsubscribing
+  message: AppMessage | null = null;
+   
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
+    private generalMetadataService: GeneralMetadataService,
     private store: Store
   ) {
     this.setUpSubscriptionsNgxs();
@@ -114,6 +118,15 @@ export class PersonComponent implements OnInit {
     if (this.person == null) {
       this.addNewPerson = true;
     }
+    this.subscription = this.generalMetadataService.messageSubject.subscribe((appMessage: AppMessage) => {
+      this.message = appMessage;  
+      if (appMessage.status === 'success') {
+        this.refreshContacts(appMessage.message);
+        this.isModalOpen = false;
+        this.isDeleteModalOpen = false;
+        this.isApproveSubmitterModalOpen = false;
+      }
+    });
   }
   private getCommentValue(label: string): string {
     return (
@@ -138,6 +151,7 @@ export class PersonComponent implements OnInit {
       this.person = mtblsPerson;
       this.person.roles = [];
     }
+    
 
     this.form = this.fb.group({
       lastName: [
@@ -190,7 +204,7 @@ export class PersonComponent implements OnInit {
 
     // Debounced autocomplete logic
     this.filteredOrganizations$ = this.form.get('affiliation')!.valueChanges.pipe(
-    debounceTime(1000),
+    debounceTime(600),
     distinctUntilChanged(),
     switchMap((query: string) => {
       if (!query || query.length < 3) {
@@ -235,6 +249,7 @@ export class PersonComponent implements OnInit {
   openModal() {
     this.initialiseForm();
     this.isModalOpen = true;
+    this.updateValidatorsBasedOnRoles();
   }
 
   toogleShowAdvanced() {
@@ -339,15 +354,13 @@ export class PersonComponent implements OnInit {
     }
 
     this.store.dispatch(updateAction).subscribe({
-      next: () => {
-        // this.refreshContacts('Person updated.');
-        this.isFormBusy = false;
-      },
-      error: () => {
-        // loader reset on any error (BadInput will show toasts)
-        this.isFormBusy = false;
-      },
-    });
+        next: () => {
+          this.isFormBusy = false;  // Success handling
+        },
+        error: () => {
+          this.isFormBusy = false;  // Fallback
+        },
+      });
 
   } else {
     // Adding a new person
@@ -362,16 +375,34 @@ export class PersonComponent implements OnInit {
     });
   }
 }
-
+ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();  // Unsubscribe to prevent memory leaks
+    }
+  }
 
 
   refreshContacts(message) {
     if (!this.isReadOnly) {
-      this.form.markAsPristine();
+      // this.form.markAsPristine();
       toastr.success(message, "Success", this.toastrSettings);
     }
   }
+private updateValidatorsBasedOnRoles() {
+    if (!this.form) {
+      console.error('Form is not initialized yet!');
+      return;
+    }
 
+    const rolesValue = this.person?.roles || this.form.get('roles')?.value || [];
+
+    // Dynamically detect PI role
+    this.isPiRole = rolesValue.some((role: any) =>
+      role.annotationValue?.includes('Principal Investigator')
+    );
+
+    this.updatePiValidators(this.isPiRole);
+  }
 
   onChanges() {
   this.form.controls.roles.setValue(this.rolesComponent.values);
@@ -380,52 +411,45 @@ export class PersonComponent implements OnInit {
     this.form.controls.roles.markAsDirty();
   }
 
-  const rolesValue = this.form.get('roles')?.value || [];
-
-  // Dynamically detect PI role
-  this.isPiRole = rolesValue.some((role: any) =>
-    role.annotationValue?.includes('Principal Investigator')
-  );
-
-  this.updatePiValidators(this.isPiRole);
+  this.updateValidatorsBasedOnRoles();
 }
 private updatePiValidators(isPi: boolean): void {
-  const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+    const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
 
-  piFields.forEach(fieldName => {
-    const fieldControl = this.form.get(fieldName);
-    if (!fieldControl) return;
+    piFields.forEach(fieldName => {
+      const fieldControl = this.form.get(fieldName);
+      if (!fieldControl) {
+        console.warn(`Control for ${fieldName} does not exist in the form. Skipping.`);
+        return;
+      }
 
-    const currentValidators = fieldControl.validator
-      ? [fieldControl.validator]
-      : [];
+      const currentValidators = fieldControl.validator ? [fieldControl.validator] : [];
+      let validatorFns = currentValidators.length ? (fieldControl as any)._rawValidators || currentValidators : [];
 
-    const validatorFns = currentValidators.length
-      ? (fieldControl as any)._rawValidators || currentValidators
-      : [];
+      // Ensure validatorFns is an array
+      if (!Array.isArray(validatorFns)) {
+        validatorFns = [];  
+      }
 
-    const asyncValidators = fieldControl.asyncValidator
-      ? [fieldControl.asyncValidator]
-      : [];
+      const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
 
-    let updatedValidators: any[];
-    if (isPi) {
-      updatedValidators = [
-        ...validatorFns.filter(v => v !== Validators.required),
-        Validators.required
-      ];
-    } else {
-      updatedValidators = validatorFns.filter(v => v !== Validators.required);
-    }
+      let updatedValidators: any[] = validatorFns;  // Start with the array
 
-    fieldControl.setValidators(updatedValidators);
-    fieldControl.setAsyncValidators(asyncValidators);
+      if (isPi) {
+        if (!updatedValidators.includes(Validators.required)) {
+          updatedValidators = [...updatedValidators, Validators.required];
+        }
+      } else {
+        updatedValidators = updatedValidators.filter(v => v !== Validators.required);
+      }
 
-    fieldControl.updateValueAndValidity({ emitEvent: false });
-  });
+      fieldControl.setValidators(updatedValidators);
+      fieldControl.setAsyncValidators(asyncValidators);
+      fieldControl.updateValueAndValidity({ emitEvent: false });
+    });
 
-  this.form.updateValueAndValidity({ emitEvent: false });
-}
+    this.form.updateValueAndValidity({ emitEvent: false });
+  }
 
   getIsRequired(fieldName: string): boolean {
     return this.isPiRole; 

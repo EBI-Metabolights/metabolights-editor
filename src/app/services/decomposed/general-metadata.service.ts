@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { IStudySummary } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
 import { DataService } from '../data.service';
 import { httpOptions } from '../headers';
@@ -12,6 +12,12 @@ import { IPublication } from 'src/app/models/mtbl/mtbls/interfaces/publication.i
 import { IPublicationWrapper } from 'src/app/models/mtbl/mtbls/interfaces/publication-wrapper.interface';
 import { IPeopleWrapper } from 'src/app/models/mtbl/mtbls/interfaces/people-wrapper.interface';
 import { IStudyRevision } from 'src/app/models/mtbl/mtbls/interfaces/study-summary.interface';
+
+export interface AppMessage {
+  type: 'add' | 'update' | 'delete' | 'makesubmitter';  // The operation type
+  status: 'success' | 'error';       // Success or error
+  message: string;                   // The actual message to display
+}
 
 @Injectable({
   providedIn: 'root'
@@ -40,7 +46,7 @@ export class GeneralMetadataService extends DataService {
 
       });
 }
-
+   messageSubject = new Subject<AppMessage>();  // Subject for messages
 
   /**
    * This method hits our API's IsaInvestigation resource. It does not return a MTBLSStudy object, but instead returns a
@@ -257,6 +263,10 @@ export class GeneralMetadataService extends DataService {
 
     return this.http.post<IStudyRevision>(this.url.baseURL + "/studies" + "/" + studyId + "/revisions", {}, headerOptions)
       .pipe(catchError(this.handleError));
+  }
+  
+  emitMessage(message: AppMessage) {
+    this.messageSubject.next(message);
   }
 }
 
