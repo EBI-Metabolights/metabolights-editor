@@ -64,8 +64,6 @@ import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
-import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
-import { environment } from 'src/environments/environment';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -109,7 +107,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatTableModule,
         MatDividerModule,
         DragDropModule,
-        environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot(),
         NgxsModule.forRoot([
             GeneralMetadataState,
             UserState,
