@@ -20,9 +20,10 @@ import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/appl
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 
 @Component({
-  selector: "mtbls-protocols",
-  templateUrl: "./protocols.component.html",
-  styleUrls: ["./protocols.component.css"],
+    selector: "mtbls-protocols",
+    templateUrl: "./protocols.component.html",
+    styleUrls: ["./protocols.component.css"],
+    standalone: false
 })
 export class ProtocolsComponent implements OnInit, OnChanges {
   @Input("assay") assay: any;

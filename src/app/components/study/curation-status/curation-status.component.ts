@@ -21,9 +21,10 @@ import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { ConfigurationService } from "src/app/configuration.service";
 
 @Component({
-  selector: "curation-status",
-  templateUrl: "./curation-status.component.html",
-  styleUrls: ["./curation-status.component.css"],
+    selector: "curation-status",
+    templateUrl: "./curation-status.component.html",
+    styleUrls: ["./curation-status.component.css"],
+    standalone: false
 })
 export class CurationStatusComponent implements OnInit {
 

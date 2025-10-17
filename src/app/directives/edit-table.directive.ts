@@ -1,7 +1,8 @@
 import { Directive, HostListener, Output, EventEmitter } from "@angular/core";
 /* eslint-disable @angular-eslint/no-output-native */
 @Directive({
-  selector: "[editTable]", // eslint-disable-line @angular-eslint/directive-selector
+    selector: "[editTable]",
+    standalone: false
 })
 export class EditTableDirective {
   @Output() copy: EventEmitter<any> = new EventEmitter();

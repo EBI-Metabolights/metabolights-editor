@@ -21,9 +21,10 @@ import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
 import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 
 @Component({
-  selector: "guide-assays",
-  templateUrl: "./assays.component.html",
-  styleUrls: ["./assays.component.css"],
+    selector: "guide-assays",
+    templateUrl: "./assays.component.html",
+    styleUrls: ["./assays.component.css"],
+    standalone: false
 })
 export class GuidedAssaysComponent implements OnInit {
 

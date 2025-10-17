@@ -4,9 +4,10 @@ import { Observable } from "rxjs";
 import { Store } from "@ngxs/store";
 
 @Component({
-  selector: "mtbls-download-globus",
-  templateUrl: "./globus.component.html",
-  styleUrls: ["./globus.component.css"],
+    selector: "mtbls-download-globus",
+    templateUrl: "./globus.component.html",
+    styleUrls: ["./globus.component.css"],
+    standalone: false
 })
 export class GlobusDownloadComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);

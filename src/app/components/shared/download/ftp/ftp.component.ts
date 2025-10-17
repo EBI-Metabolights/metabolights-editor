@@ -4,9 +4,10 @@ import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 
 @Component({
-  selector: "mtbls-download-ftp",
-  templateUrl: "./ftp.component.html",
-  styleUrls: ["./ftp.component.css"],
+    selector: "mtbls-download-ftp",
+    templateUrl: "./ftp.component.html",
+    styleUrls: ["./ftp.component.css"],
+    standalone: false
 })
 export class FtpDownloadComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);

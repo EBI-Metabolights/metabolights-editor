@@ -2,9 +2,10 @@ import { Component, OnInit, Input } from "@angular/core";
 import { Router } from "@angular/router";
 
 @Component({
-  selector: "mtbls-progress",
-  templateUrl: "./progress.component.html",
-  styleUrls: ["./progress.component.css"],
+    selector: "mtbls-progress",
+    templateUrl: "./progress.component.html",
+    styleUrls: ["./progress.component.css"],
+    standalone: false
 })
 export class ProgressComponent implements OnInit {
   @Input() step: number;

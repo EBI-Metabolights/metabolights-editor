@@ -27,21 +27,22 @@ import { AppMessage, GeneralMetadataService } from "src/app/services/decomposed/
 
 
 @Component({
-  selector: "mtbls-person",
-  templateUrl: "./person.component.html",
-  styleUrls: ["./person.component.css"],
-  animations: [
-    trigger("enterAnimation", [
-      transition(":enter", [
-        style({ transform: "translateX(100%)", opacity: 0 }),
-        animate("500ms", style({ transform: "translateX(0)", opacity: 1 })),
-      ]),
-      transition(":leave", [
-        style({ transform: "translateX(0)", opacity: 1 }),
-        animate("500ms", style({ transform: "translateX(100%)", opacity: 0 })),
-      ]),
-    ]),
-  ],
+    selector: "mtbls-person",
+    templateUrl: "./person.component.html",
+    styleUrls: ["./person.component.css"],
+    animations: [
+        trigger("enterAnimation", [
+            transition(":enter", [
+                style({ transform: "translateX(100%)", opacity: 0 }),
+                animate("500ms", style({ transform: "translateX(0)", opacity: 1 })),
+            ]),
+            transition(":leave", [
+                style({ transform: "translateX(0)", opacity: 1 }),
+                animate("500ms", style({ transform: "translateX(100%)", opacity: 0 })),
+            ]),
+        ]),
+    ],
+    standalone: false
 })
 export class PersonComponent implements OnInit {
   @Input("value") person: MTBLSPerson;

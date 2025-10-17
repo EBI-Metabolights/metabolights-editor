@@ -4,9 +4,10 @@ import { Observable } from "rxjs";
 import { Select, Store } from "@ngxs/store";
 
 @Component({
-  selector: "mtbls-organisms",
-  templateUrl: "./organisms.component.html",
-  styleUrls: ["./organisms.component.css"],
+    selector: "mtbls-organisms",
+    templateUrl: "./organisms.component.html",
+    styleUrls: ["./organisms.component.css"],
+    standalone: false
 })
 export class OrganismsComponent implements OnInit {
 

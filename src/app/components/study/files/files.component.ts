@@ -20,9 +20,10 @@ declare let AW4: any;
 
 
 @Component({
-  selector: "mtbls-files",
-  templateUrl: "./files.component.html",
-  styleUrls: ["./files.component.css"],
+    selector: "mtbls-files",
+    templateUrl: "./files.component.html",
+    styleUrls: ["./files.component.css"],
+    standalone: false
 })
 export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
 

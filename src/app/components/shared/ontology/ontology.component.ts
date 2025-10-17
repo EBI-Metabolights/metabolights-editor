@@ -33,17 +33,18 @@ import { animate, state, style, transition, trigger } from "@angular/animations"
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 /* eslint-disable no-underscore-dangle */
 @Component({
-  selector: "mtbls-ontology",
-  templateUrl: "./ontology.component.html",
-  styleUrls: ["./ontology.component.css"],
-  animations: [
-    trigger('fadeInOut', [
-      state('in', style({ opacity: 1 })),
-      state('out', style({ opacity: 0 })),
-      transition('in => out', [animate('500ms ease-in-out')]),
-      transition('out => in', [animate('500ms ease-in-out')]),
-    ]),
-  ]
+    selector: "mtbls-ontology",
+    templateUrl: "./ontology.component.html",
+    styleUrls: ["./ontology.component.css"],
+    animations: [
+        trigger('fadeInOut', [
+            state('in', style({ opacity: 1 })),
+            state('out', style({ opacity: 0 })),
+            transition('in => out', [animate('500ms ease-in-out')]),
+            transition('out => in', [animate('500ms ease-in-out')]),
+        ]),
+    ],
+    standalone: false
 })
 export class OntologyComponent implements OnInit, OnChanges {
   @Input("validations") validations: any;

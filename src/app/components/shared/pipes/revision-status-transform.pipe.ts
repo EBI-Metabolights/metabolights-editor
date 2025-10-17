@@ -3,7 +3,10 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 
 
-@Pipe({name: 'revisionStatusTransform'})
+@Pipe({
+    name: 'revisionStatusTransform',
+    standalone: false
+})
 export class RevisionStatusTransformPipe implements PipeTransform {
     register = {
         0: 'Initiated',

@@ -4,9 +4,10 @@ import { EditorService } from "../../../../services/editor.service";
 import * as toastr from "toastr";
 
 @Component({
-  selector: "ontology-details",
-  templateUrl: "./ontology-details.component.html",
-  styleUrls: ["./ontology-details.component.css"],
+    selector: "ontology-details",
+    templateUrl: "./ontology-details.component.html",
+    styleUrls: ["./ontology-details.component.css"],
+    standalone: false
 })
 export class OntologyDetailsComponent implements OnInit {
   @Input("showOntologyDetail") showOntologyDetail: boolean = true;

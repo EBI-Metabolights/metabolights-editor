@@ -18,9 +18,10 @@ export enum SyncEvent {
 }
 
 @Component({
-  selector: 'app-rsync',
-  templateUrl: './rsync.component.html',
-  styleUrls: ['./rsync.component.css']
+    selector: 'app-rsync',
+    templateUrl: './rsync.component.html',
+    styleUrls: ['./rsync.component.css'],
+    standalone: false
 })
 export class RsyncComponent implements OnInit {
   @Input('title') title  = "Sample Title";

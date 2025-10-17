@@ -2,7 +2,7 @@
 import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
 
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule, isDevMode, APP_INITIALIZER, Injector } from "@angular/core";
+import { NgModule, isDevMode, Injector, inject, provideAppInitializer } from "@angular/core";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 
 import { AppRoutingModule } from "./app-routing.module";
@@ -132,12 +132,10 @@ export function configLoader(injector: Injector): () => Promise<any> {
         }),
         ], providers: [
         AuthGuard,
-        {
-            provide: APP_INITIALIZER,
-            useFactory: configLoader,
-            deps: [Injector],
-            multi: true,
-        },
+        provideAppInitializer(() => {
+        const initializerFn = (configLoader)(inject(Injector));
+        return initializerFn();
+      }),
         EditorService,
         MetabolightsService,
         EuropePMCService,

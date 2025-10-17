@@ -10,9 +10,10 @@ import { Observable } from "rxjs";
 import { Store } from "@ngxs/store";
 
 @Component({
-  selector: "mtbls-file-delete",
-  templateUrl: "./delete-file.component.html",
-  styleUrls: ["./delete-file.component.css"],
+    selector: "mtbls-file-delete",
+    templateUrl: "./delete-file.component.html",
+    styleUrls: ["./delete-file.component.css"],
+    standalone: false
 })
 export class DeleteFileComponent implements OnInit {
   @Input("value") file: string;

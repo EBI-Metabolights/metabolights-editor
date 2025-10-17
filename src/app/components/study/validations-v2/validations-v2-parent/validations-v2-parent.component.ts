@@ -12,9 +12,10 @@ import { ConfigurationService } from 'src/app/configuration.service';
 
 
 @Component({
-  selector: 'validations-v2-parent',
-  templateUrl: './validations-v2-parent.component.html',
-  styleUrls: ['./validations-v2-parent.component.css']
+    selector: 'validations-v2-parent',
+    templateUrl: './validations-v2-parent.component.html',
+    styleUrls: ['./validations-v2-parent.component.css'],
+    standalone: false
 })
 export class ValidationsV2ParentComponent implements OnInit {
 

@@ -17,9 +17,10 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
-  selector: "mtbls-title",
-  templateUrl: "./title.component.html",
-  styleUrls: ["./title.component.css"],
+    selector: "mtbls-title",
+    templateUrl: "./title.component.html",
+    styleUrls: ["./title.component.css"],
+    standalone: false
 })
 export class TitleComponent implements OnInit {
 

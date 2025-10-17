@@ -12,9 +12,10 @@ import {PlatformLocation} from '@angular/common';
 import { Store } from "@ngxs/store";
 import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 @Component({
-  selector: "app-login",
-  templateUrl: "./login.component.html",
-  styleUrls: ["./login.component.css"],
+    selector: "app-login",
+    templateUrl: "./login.component.html",
+    styleUrls: ["./login.component.css"],
+    standalone: false
 })
 export class LoginComponent implements OnInit {
   form: UntypedFormGroup;

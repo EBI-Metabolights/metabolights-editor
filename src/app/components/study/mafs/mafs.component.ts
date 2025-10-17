@@ -8,9 +8,10 @@ import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
 
 @Component({
-  selector: "mtbls-mafs",
-  templateUrl: "./mafs.component.html",
-  styleUrls: ["./mafs.component.css"],
+    selector: "mtbls-mafs",
+    templateUrl: "./mafs.component.html",
+    styleUrls: ["./mafs.component.css"],
+    standalone: false
 })
 export class MafsComponent implements OnInit {
   @Input("assayName") assayName: any;

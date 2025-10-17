@@ -2,9 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Violation } from '../../interfaces/validation-report.interface';
 
 @Component({
-  selector: 'raw-violation-modal',
-  templateUrl: './raw-violation-modal.component.html',
-  styleUrls: ['./raw-violation-modal.component.css']
+    selector: 'raw-violation-modal',
+    templateUrl: './raw-violation-modal.component.html',
+    styleUrls: ['./raw-violation-modal.component.css'],
+    standalone: false
 })
 export class RawViolationModalComponent implements OnInit {
 

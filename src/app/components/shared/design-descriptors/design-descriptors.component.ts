@@ -7,9 +7,10 @@ import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descripto
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 
 @Component({
-  selector: "mtbls-design-descriptors",
-  templateUrl: "./design-descriptors.component.html",
-  styleUrls: ["./design-descriptors.component.css"],
+    selector: "mtbls-design-descriptors",
+    templateUrl: "./design-descriptors.component.html",
+    styleUrls: ["./design-descriptors.component.css"],
+    standalone: false
 })
 export class DesignDescriptorsComponent implements OnInit {
 

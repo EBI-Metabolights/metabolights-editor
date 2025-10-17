@@ -5,9 +5,10 @@ import { OverrideModalComponent } from '../override-modal/override-modal.compone
 import { DeleteOverrideDialogComponent } from '../delete-override-dialog/delete-override-dialog.component';
 
 @Component({
-  selector: 'list-overrides',
-  templateUrl: './list-overrides.component.html',
-  styleUrl: './list-overrides.component.css'
+    selector: 'list-overrides',
+    templateUrl: './list-overrides.component.html',
+    styleUrl: './list-overrides.component.css',
+    standalone: false
 })
 export class ListOverridesComponent {
 

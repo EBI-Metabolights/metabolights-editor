@@ -6,9 +6,10 @@ import { Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
-  selector: "mtbls-factors",
-  templateUrl: "./factors.component.html",
-  styleUrls: ["./factors.component.css"],
+    selector: "mtbls-factors",
+    templateUrl: "./factors.component.html",
+    styleUrls: ["./factors.component.css"],
+    standalone: false
 })
 export class FactorsComponent implements OnInit {
 

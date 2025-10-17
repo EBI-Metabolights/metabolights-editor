@@ -7,9 +7,10 @@ import { HttpClient } from '@angular/common/http';
 import { httpOptions } from 'src/app/services/headers';
 
 @Component({
-  selector: 'app-async-task',
-  templateUrl: './async-task.component.html',
-  styleUrls: ['./async-task.component.css']
+    selector: 'app-async-task',
+    templateUrl: './async-task.component.html',
+    styleUrls: ['./async-task.component.css'],
+    standalone: false
 })
 export class AsyncTaskComponent implements OnInit {
   @Input('title') title: string;

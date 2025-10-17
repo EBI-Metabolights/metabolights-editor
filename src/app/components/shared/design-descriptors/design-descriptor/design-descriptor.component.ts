@@ -23,9 +23,10 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 @Component({
-  selector: "mtbls-design-descriptor",
-  templateUrl: "./design-descriptor.component.html",
-  styleUrls: ["./design-descriptor.component.css"],
+    selector: "mtbls-design-descriptor",
+    templateUrl: "./design-descriptor.component.html",
+    styleUrls: ["./design-descriptor.component.css"],
+    standalone: false
 })
 export class DesignDescriptorComponent implements OnInit {
 

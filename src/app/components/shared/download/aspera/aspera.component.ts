@@ -7,9 +7,10 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
-  selector: "mtbls-download-aspera",
-  templateUrl: "./aspera.component.html",
-  styleUrls: ["./aspera.component.css"],
+    selector: "mtbls-download-aspera",
+    templateUrl: "./aspera.component.html",
+    styleUrls: ["./aspera.component.css"],
+    standalone: false
 })
 export class AsperaDownloadComponent implements OnInit {
 

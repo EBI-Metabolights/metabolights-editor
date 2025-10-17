@@ -3,7 +3,10 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 
 
-@Pipe({name: 'rsyncStatusTransform'})
+@Pipe({
+    name: 'rsyncStatusTransform',
+    standalone: false
+})
 export class RsyncStatusTransformPipe implements PipeTransform {
     register = {
         NO_TASK: '-',

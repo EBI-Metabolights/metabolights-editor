@@ -8,11 +8,10 @@ import { EditorService } from 'src/app/services/editor.service';
 import { ErrorMessageService } from 'src/app/services/error-message.service';
 
 @Component({
-  selector: 'app-study-not-public',
-  standalone: true,
-  imports: [],
-  templateUrl: './study-not-public.component.html',
-  styleUrl: './study-not-public.component.css'
+    selector: 'app-study-not-public',
+    imports: [],
+    templateUrl: './study-not-public.component.html',
+    styleUrl: './study-not-public.component.css'
 })
 export class StudyNotPublicComponent implements OnInit {
   study: string = ""

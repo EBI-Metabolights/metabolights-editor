@@ -43,9 +43,10 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
-  selector: "mtbls-paginated-table",
-  templateUrl: "./paginated-table.component.html",
-  styleUrls: ["./paginated-table.component.css"],
+    selector: "mtbls-paginated-table",
+    templateUrl: "./paginated-table.component.html",
+    styleUrls: ["./paginated-table.component.css"],
+    standalone: false
 })
 export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @ViewChild(MatPaginator) paginator: MatPaginator;

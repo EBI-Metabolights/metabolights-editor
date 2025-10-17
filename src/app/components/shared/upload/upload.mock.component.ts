@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 
 @Component({
-  selector: "mtbls-upload",
-  template: "",
+    selector: "mtbls-upload",
+    template: "",
+    standalone: false
 })
 export class MockUploadComponent {
   @Input("mode") mode = "button";

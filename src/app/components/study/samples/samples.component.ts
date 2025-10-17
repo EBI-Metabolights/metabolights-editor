@@ -23,20 +23,21 @@ import { OntologyComponentTrackerService } from "src/app/services/tracking/ontol
 import { animate, style, transition, trigger } from "@angular/animations";
 
 @Component({
-  selector: "mtbls-samples",
-  templateUrl: "./samples.component.html",
-  styleUrls: ["./samples.component.css"],
-  animations: [
-    trigger('fadeOut', [
-      transition(':leave', [
-        animate('300ms ease-out', style({ opacity: 0 }))
-      ]),
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-in', style({ opacity: 1 }))
-      ]),
-    ])
-  ]
+    selector: "mtbls-samples",
+    templateUrl: "./samples.component.html",
+    styleUrls: ["./samples.component.css"],
+    animations: [
+        trigger('fadeOut', [
+            transition(':leave', [
+                animate('300ms ease-out', style({ opacity: 0 }))
+            ]),
+            transition(':enter', [
+                style({ opacity: 0 }),
+                animate('300ms ease-in', style({ opacity: 1 }))
+            ]),
+        ])
+    ],
+    standalone: false
 })
 export class SamplesComponent  {
 

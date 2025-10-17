@@ -25,9 +25,10 @@ import { Router } from "@angular/router";
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 
 @Component({
-  selector: "mtbls-factor",
-  templateUrl: "./factor.component.html",
-  styleUrls: ["./factor.component.css"],
+    selector: "mtbls-factor",
+    templateUrl: "./factor.component.html",
+    styleUrls: ["./factor.component.css"],
+    standalone: false
 })
 export class FactorComponent implements OnInit {
   @Input("value") factor: MTBLSFactor;

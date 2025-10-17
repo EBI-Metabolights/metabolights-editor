@@ -25,9 +25,10 @@ import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/s
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 
 @Component({
-  selector: "mtbls-publication",
-  templateUrl: "./publication.component.html",
-  styleUrls: ["./publication.component.css"],
+    selector: "mtbls-publication",
+    templateUrl: "./publication.component.html",
+    styleUrls: ["./publication.component.css"],
+    standalone: false
 })
 export class PublicationComponent implements OnInit {
   @Input("value") publication: any;

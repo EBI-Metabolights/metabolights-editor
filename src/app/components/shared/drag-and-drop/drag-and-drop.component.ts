@@ -14,9 +14,10 @@ interface UploadFile {
 }
 
 @Component({
-  selector: 'app-drag-and-drop',
-  templateUrl: './drag-and-drop.component.html',
-  styleUrls: ['./drag-and-drop.component.css'],
+    selector: 'app-drag-and-drop',
+    templateUrl: './drag-and-drop.component.html',
+    styleUrls: ['./drag-and-drop.component.css'],
+    standalone: false
 })
 export class DragAndDropComponent implements OnInit  {
   @Input() iscloseable: Boolean = false;

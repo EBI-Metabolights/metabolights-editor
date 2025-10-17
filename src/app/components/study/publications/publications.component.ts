@@ -12,9 +12,10 @@ import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.i
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
-  selector: "mtbls-publications",
-  templateUrl: "./publications.component.html",
-  styleUrls: ["./publications.component.css"],
+    selector: "mtbls-publications",
+    templateUrl: "./publications.component.html",
+    styleUrls: ["./publications.component.css"],
+    standalone: false
 })
 export class PublicationsComponent implements OnInit {
   @Input("validations") studyValidations: any;

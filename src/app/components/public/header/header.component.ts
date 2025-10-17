@@ -10,9 +10,10 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { Router } from "@angular/router";
 
 @Component({
-  selector: "mtbls-header",
-  templateUrl: "./header.component.html",
-  styleUrls: ["./header.component.css"],
+    selector: "mtbls-header",
+    templateUrl: "./header.component.html",
+    styleUrls: ["./header.component.css"],
+    standalone: false
 })
 export class HeaderComponent {
   user$: Observable<Owner> = inject(Store).select(UserState.user);

@@ -3,7 +3,10 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 
 
-@Pipe({name: 'asyncTaskStatusTransform'})
+@Pipe({
+    name: 'asyncTaskStatusTransform',
+    standalone: false
+})
 export class AsyncStatusTransformPipe implements PipeTransform {
     register = {
         PENDING: '-',

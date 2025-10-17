@@ -20,9 +20,10 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { StudyAbstract } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
-  selector: "mtbls-description",
-  templateUrl: "./description.component.html",
-  styleUrls: ["./description.component.css"],
+    selector: "mtbls-description",
+    templateUrl: "./description.component.html",
+    styleUrls: ["./description.component.css"],
+    standalone: false
 })
 export class DescriptionComponent implements OnChanges, OnInit {
 

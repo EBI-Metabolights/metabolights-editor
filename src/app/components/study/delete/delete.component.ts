@@ -7,9 +7,10 @@ import { Store } from "@ngxs/store";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 
 @Component({
-  selector: "mtbls-delete",
-  templateUrl: "./delete.component.html",
-  styleUrls: ["./delete.component.css"],
+    selector: "mtbls-delete",
+    templateUrl: "./delete.component.html",
+    styleUrls: ["./delete.component.css"],
+    standalone: false
 })
 export class DeleteComponent implements OnInit {
 

@@ -1,9 +1,10 @@
 import { Component, OnInit, Input } from "@angular/core";
 
 @Component({
-  selector: "mtbls-organism",
-  templateUrl: "./organism.component.html",
-  styleUrls: ["./organism.component.css"],
+    selector: "mtbls-organism",
+    templateUrl: "./organism.component.html",
+    styleUrls: ["./organism.component.css"],
+    standalone: false
 })
 export class OrganismComponent implements OnInit {
   @Input("value") organism: any;

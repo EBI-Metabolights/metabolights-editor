@@ -9,9 +9,10 @@ import { Store } from "@ngxs/store";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 @Component({
-  selector: "nav-bar",
-  templateUrl: "./nav-bar.component.html",
-  styleUrls: ["./nav-bar.component.css"],
+    selector: "nav-bar",
+    templateUrl: "./nav-bar.component.html",
+    styleUrls: ["./nav-bar.component.css"],
+    standalone: false
 })
 export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;

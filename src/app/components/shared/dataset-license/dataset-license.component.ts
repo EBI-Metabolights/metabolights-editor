@@ -6,7 +6,8 @@ import { DatasetLicense } from 'src/app/services/decomposed/dataset-license.serv
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'stripTermsOfUse'
+    name: 'stripTermsOfUse',
+    standalone: false
 })
 export class StripTermsOfUsePipe implements PipeTransform {
   transform(value: string): string {

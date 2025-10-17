@@ -8,9 +8,10 @@ import {
   SimpleChanges,
 } from "@angular/core";
 @Component({
-  selector: "mtbls-content",
-  templateUrl: "./content.component.html",
-  styleUrls: ["./content.component.css"],
+    selector: "mtbls-content",
+    templateUrl: "./content.component.html",
+    styleUrls: ["./content.component.css"],
+    standalone: false
 })
 export class ContentComponent implements OnInit, OnChanges {
   @Input("value") content: any;

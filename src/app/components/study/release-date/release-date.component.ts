@@ -13,9 +13,10 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { StudyReleaseDate } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
-  selector: "mtbls-release-date",
-  templateUrl: "./release-date.component.html",
-  styleUrls: ["./release-date.component.css"],
+    selector: "mtbls-release-date",
+    templateUrl: "./release-date.component.html",
+    styleUrls: ["./release-date.component.css"],
+    standalone: false
 })
 export class ReleaseDateComponent implements OnInit {
 

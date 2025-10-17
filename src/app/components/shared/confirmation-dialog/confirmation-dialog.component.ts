@@ -3,11 +3,10 @@ import { Component, EventEmitter, Input, OnInit, Output, } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({
-  selector: 'app-confirmation-dialog',
-  standalone: true,
-  imports: [MatCardModule, NgIf],
-  templateUrl: './confirmation-dialog.component.html',
-  styleUrl: './confirmation-dialog.component.css'
+    selector: 'app-confirmation-dialog',
+    imports: [MatCardModule, NgIf],
+    templateUrl: './confirmation-dialog.component.html',
+    styleUrl: './confirmation-dialog.component.css'
 })
 export class ConfirmationDialogComponent{
   @Input() title: string = 'Confirm';

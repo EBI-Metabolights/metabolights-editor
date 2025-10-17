@@ -2,9 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Violation } from '../../interfaces/validation-report.interface';
 
 @Component({
-  selector: 'violation-info-modal',
-  templateUrl: './validation-info-modal.component.html',
-  styleUrls: ['./validation-info-modal.component.css']
+    selector: 'violation-info-modal',
+    templateUrl: './validation-info-modal.component.html',
+    styleUrls: ['./validation-info-modal.component.css'],
+    standalone: false
 })
 export class ValidationInfoModalComponent implements OnInit {
 

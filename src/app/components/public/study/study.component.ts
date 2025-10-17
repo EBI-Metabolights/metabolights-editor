@@ -24,9 +24,10 @@ import { ViolationType } from "../../study/validations-v2/interfaces/validation-
 import { RevisionStatusTransformPipe } from "../../shared/pipes/revision-status-transform.pipe";
 
 @Component({
-  selector: "study",
-  templateUrl: "./study.component.html",
-  styleUrls: ["./study.component.css"],
+    selector: "study",
+    templateUrl: "./study.component.html",
+    styleUrls: ["./study.component.css"],
+    standalone: false
 })
 export class PublicStudyComponent implements OnInit {
 

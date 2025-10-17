@@ -4,9 +4,10 @@ import { Observable } from "rxjs";
 import { Store } from "@ngxs/store";
 
 @Component({
-  selector: "mtbls-download-http",
-  templateUrl: "./http.component.html",
-  styleUrls: ["./http.component.css"],
+    selector: "mtbls-download-http",
+    templateUrl: "./http.component.html",
+    styleUrls: ["./http.component.css"],
+    standalone: false
 })
 export class HttpDownloadComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);

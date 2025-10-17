@@ -46,9 +46,10 @@ import { urlValidator, notANumberValidator } from "../../shared/ontology/ontolog
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
-  selector: "mtbls-table",
-  templateUrl: "./table.component.html",
-  styleUrls: ["./table.component.css"],
+    selector: "mtbls-table",
+    templateUrl: "./table.component.html",
+    styleUrls: ["./table.component.css"],
+    standalone: false
 })
 export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, OnChanges {
   @ViewChild(MatPaginator) paginator: MatPaginator;

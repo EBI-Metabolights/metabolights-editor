@@ -6,9 +6,10 @@ import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
-  selector: "mtbls-assays",
-  templateUrl: "./assays.component.html",
-  styleUrls: ["./assays.component.css"],
+    selector: "mtbls-assays",
+    templateUrl: "./assays.component.html",
+    styleUrls: ["./assays.component.css"],
+    standalone: false
 })
 export class AssaysComponent {
 

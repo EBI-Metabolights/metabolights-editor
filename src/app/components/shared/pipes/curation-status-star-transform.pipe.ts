@@ -3,7 +3,10 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 
 
-@Pipe({name: 'curationStatusStarTransform'})
+@Pipe({
+    name: 'curationStatusStarTransform',
+    standalone: false
+})
 export class CurationStatusStarTransformPipe implements PipeTransform {
     register = {
         "MANUAL_CURATION": '★★★',

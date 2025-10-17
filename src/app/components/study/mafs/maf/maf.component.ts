@@ -9,9 +9,10 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { deepCopy } from "src/app/ngxs-store/utils";
 
 @Component({
-  selector: "mtbls-maf",
-  templateUrl: "./maf.component.html",
-  styleUrls: ["./maf.component.css"],
+    selector: "mtbls-maf",
+    templateUrl: "./maf.component.html",
+    styleUrls: ["./maf.component.css"],
+    standalone: false
 })
 export class MafComponent implements AfterContentInit {
   @Input("value") value: any;

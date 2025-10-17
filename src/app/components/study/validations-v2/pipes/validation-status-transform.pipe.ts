@@ -3,7 +3,10 @@ import { Pipe, PipeTransform } from "@angular/core";
 
 
 
-@Pipe({name: 'validationStatusTransform'})
+@Pipe({
+    name: 'validationStatusTransform',
+    standalone: false
+})
 export class ValidationStatusTransformPipe implements PipeTransform {
     register = {
         error: 'Failed',

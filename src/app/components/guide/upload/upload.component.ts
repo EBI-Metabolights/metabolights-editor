@@ -13,9 +13,10 @@ import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.in
 import { Operations } from "src/app/ngxs-store/study/files/files.actions";
 
 @Component({
-  selector: "raw-upload",
-  templateUrl: "./upload.component.html",
-  styleUrls: ["./upload.component.css"],
+    selector: "raw-upload",
+    templateUrl: "./upload.component.html",
+    styleUrls: ["./upload.component.css"],
+    standalone: false
 })
 export class RawUploadComponent implements OnInit {
 

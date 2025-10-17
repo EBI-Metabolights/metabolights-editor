@@ -10,7 +10,10 @@ import { MockEditorService } from "src/app/services/editor.service.mock";
 
 import { ProtocolComponent } from "./protocol.component";
 
-@Component({ selector: "mtbls-ontology", template: "" })
+@Component({
+    selector: "mtbls-ontology", template: "",
+    standalone: false
+})
 class MockOntologyComponent {
   @Input("validations") validations: any;
   @Input("values") values: Ontology[] = [];

@@ -5,9 +5,10 @@ import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 @Component({
-  selector: "mtbls-download",
-  templateUrl: "./download.component.html",
-  styleUrls: ["./download.component.css"],
+    selector: "mtbls-download",
+    templateUrl: "./download.component.html",
+    styleUrls: ["./download.component.css"],
+    standalone: false
 })
 export class DownloadComponent implements OnInit {
   @Input("value") file: string;

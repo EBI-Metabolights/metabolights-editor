@@ -19,9 +19,10 @@ import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/s
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 
 @Component({
-  selector: "app-meta",
-  templateUrl: "./meta.component.html",
-  styleUrls: ["./meta.component.css"],
+    selector: "app-meta",
+    templateUrl: "./meta.component.html",
+    styleUrls: ["./meta.component.css"],
+    standalone: false
 })
 export class MetaComponent implements OnInit {
 

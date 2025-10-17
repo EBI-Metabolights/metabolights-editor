@@ -15,9 +15,10 @@ import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 
 
 @Component({
-  selector: "add-assay",
-  templateUrl: "./add-assay.component.html",
-  styleUrls: ["./add-assay.component.css"],
+    selector: "add-assay",
+    templateUrl: "./add-assay.component.html",
+    styleUrls: ["./add-assay.component.css"],
+    standalone: false
 })
 export class AddAssayComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);

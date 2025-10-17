@@ -11,10 +11,11 @@ import { BackendVersion, EditorVersion } from "./ngxs-store/non-study/applicatio
 export let browserRefresh = false;
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.css"],
-  encapsulation: ViewEncapsulation.None,
+    selector: "app-root",
+    templateUrl: "./app.component.html",
+    styleUrls: ["./app.component.css"],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class AppComponent implements OnInit {
   subscription: Subscription;

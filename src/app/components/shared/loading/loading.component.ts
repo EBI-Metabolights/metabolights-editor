@@ -5,9 +5,10 @@ import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 
 @Component({
-  selector: "mtbls-loading",
-  templateUrl: "./loading.component.html",
-  styleUrls: ["./loading.component.css"],
+    selector: "mtbls-loading",
+    templateUrl: "./loading.component.html",
+    styleUrls: ["./loading.component.css"],
+    standalone: false
 })
 export class LoadingComponent implements OnInit {
 

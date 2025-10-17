@@ -2,8 +2,9 @@ import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 
 @Component({
-  selector: "mtbls-ontology",
-  template: "",
+    selector: "mtbls-ontology",
+    template: "",
+    standalone: false
 })
 export class MockOntologyComponent {
   @Input("validations") validations: any;

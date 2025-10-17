@@ -20,9 +20,10 @@ declare let AW4: any;
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable space-before-function-paren */
 @Component({
-  selector: "mtbls-aspera",
-  templateUrl: "./aspera.component.html",
-  styleUrls: ["./aspera.component.css"],
+    selector: "mtbls-aspera",
+    templateUrl: "./aspera.component.html",
+    styleUrls: ["./aspera.component.css"],
+    standalone: false
 })
 export class AsperaUploadComponent implements OnInit {
 

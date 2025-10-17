@@ -19,9 +19,10 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
 
 @Component({
-  selector: "mtbls-protocol",
-  templateUrl: "./protocol.component.html",
-  styleUrls: ["./protocol.component.css"],
+    selector: "mtbls-protocol",
+    templateUrl: "./protocol.component.html",
+    styleUrls: ["./protocol.component.css"],
+    standalone: false
 })
 export class ProtocolComponent implements OnInit, OnChanges {
   @Input("value") protocol: any;

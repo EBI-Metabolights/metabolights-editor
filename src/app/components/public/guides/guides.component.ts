@@ -11,9 +11,10 @@ import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.ac
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
 @Component({
-  selector: "app-guides",
-  templateUrl: "./guides.component.html",
-  styleUrls: ["./guides.component.css"],
+    selector: "app-guides",
+    templateUrl: "./guides.component.html",
+    styleUrls: ["./guides.component.css"],
+    standalone: false
 })
 export class GuidesComponent implements OnInit {
 

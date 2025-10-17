@@ -17,9 +17,10 @@ import { SampleState } from 'src/app/ngxs-store/study/samples/samples.state';
 
 
 @Component({
-  selector: 'mtbls-factorlist',
-  templateUrl: './factorlist.component.html',
-  styleUrls: ['./factorlist.component.css']
+    selector: 'mtbls-factorlist',
+    templateUrl: './factorlist.component.html',
+    styleUrls: ['./factorlist.component.css'],
+    standalone: false
 })
 export class FactorlistComponent implements OnInit {
     @Input("value") factor: MTBLSFactor;

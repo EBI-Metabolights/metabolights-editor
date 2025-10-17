@@ -3,9 +3,10 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FullOverride } from '../../interfaces/validation-report.interface';
 
 @Component({
-  selector: 'app-delete-override-dialog',
-  templateUrl: './delete-override-dialog.component.html',
-  styleUrl: './delete-override-dialog.component.css'
+    selector: 'app-delete-override-dialog',
+    templateUrl: './delete-override-dialog.component.html',
+    styleUrl: './delete-override-dialog.component.css',
+    standalone: false
 })
 export class DeleteOverrideDialogComponent {
   @Input() override: FullOverride;

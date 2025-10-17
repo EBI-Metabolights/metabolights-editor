@@ -5,9 +5,10 @@ import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 
 @Component({
-  selector: "quick-link",
-  templateUrl: "./quick-link.component.html",
-  styleUrls: ["./quick-link.component.css"],
+    selector: "quick-link",
+    templateUrl: "./quick-link.component.html",
+    styleUrls: ["./quick-link.component.css"],
+    standalone: false
 })
 export class QuickLinkComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);

@@ -3,9 +3,10 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { VideoURL } from "src/environment.interface";
 
 @Component({
-  selector: "mtbls-help",
-  templateUrl: "./help.component.html",
-  styleUrls: ["./help.component.css"],
+    selector: "mtbls-help",
+    templateUrl: "./help.component.html",
+    styleUrls: ["./help.component.css"],
+    standalone: false
 })
 export class HelpComponent implements OnInit {
   @Input("target") target: string;

@@ -18,9 +18,10 @@ import { CurationStatusStarTransformPipe } from "../shared/pipes/curation-status
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
-  selector: "mtbls-console",
-  templateUrl: "./console.component.html",
-  styleUrls: ["./console.component.css"],
+    selector: "mtbls-console",
+    templateUrl: "./console.component.html",
+    styleUrls: ["./console.component.css"],
+    standalone: false
 })
 export class ConsoleComponent implements OnInit, AfterContentInit {
 

@@ -26,11 +26,10 @@ export interface GraphSeries {
 }
 
 @Component({
-  selector: 'app-validation-report-summary',
-  standalone: true,
-  imports: [MatCardModule, MatDividerModule, FormsModule, MatButtonModule, MatButtonToggleModule, MatRadioModule, NgxChartsModule, BrowserAnimationsModule],
-  templateUrl: './validation-report-summary.component.html',
-  styleUrl: './validation-report-summary.component.css'
+    selector: 'app-validation-report-summary',
+    imports: [MatCardModule, MatDividerModule, FormsModule, MatButtonModule, MatButtonToggleModule, MatRadioModule, NgxChartsModule, BrowserAnimationsModule],
+    templateUrl: './validation-report-summary.component.html',
+    styleUrl: './validation-report-summary.component.css'
 })
 export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, OnChanges {
 

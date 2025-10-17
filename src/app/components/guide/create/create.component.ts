@@ -9,9 +9,10 @@ import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.ac
 import { DatasetLicenseNS } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
-  selector: "app-create",
-  templateUrl: "./create.component.html",
-  styleUrls: ["./create.component.css"],
+    selector: "app-create",
+    templateUrl: "./create.component.html",
+    styleUrls: ["./create.component.css"],
+    standalone: false
 })
 export class CreateComponent implements OnInit {
   selectedCreateOption = 2;

@@ -8,9 +8,10 @@ import { ValidationState } from 'src/app/ngxs-store/study/validation/validation.
 import { OverrideModalComponent } from '../modals/override-modal/override-modal.component';
 
 @Component({
-  selector: 'validation-v2-detail',
-  templateUrl: './validation-detail.component.html',
-  styleUrls: ['./validation-detail.component.css'],
+    selector: 'validation-v2-detail',
+    templateUrl: './validation-detail.component.html',
+    styleUrls: ['./validation-detail.component.css'],
+    standalone: false
 })
 export class ValidationV2DetailComponent implements OnInit {
 

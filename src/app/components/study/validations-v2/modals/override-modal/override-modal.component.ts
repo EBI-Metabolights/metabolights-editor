@@ -12,9 +12,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { DeleteOverrideDialogComponent } from '../delete-override-dialog/delete-override-dialog.component';
 
 @Component({
-  selector: 'override-modal',
-  templateUrl: './override-modal.component.html',
-  styleUrls: ['./override-modal.component.css'], // Corrected `styleUrl` to `styleUrls`
+    selector: 'override-modal',
+    templateUrl: './override-modal.component.html',
+    styleUrls: ['./override-modal.component.css'],
+    standalone: false
 })
 export class OverrideModalComponent implements OnInit, OnChanges {
 

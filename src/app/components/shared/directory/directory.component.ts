@@ -8,9 +8,10 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { RevisionStatusTransformPipe } from "../pipes/revision-status-transform.pipe";
 @Component({
-  selector: "mtbls-directory",
-  templateUrl: "./directory.component.html",
-  styleUrls: ["./directory.component.css"],
+    selector: "mtbls-directory",
+    templateUrl: "./directory.component.html",
+    styleUrls: ["./directory.component.css"],
+    standalone: false
 })
 export class DirectoryComponent implements OnInit {
   @Input("file") file: StudyFile;

@@ -2,9 +2,10 @@ import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { UntypedFormBuilder } from "@angular/forms";
 
 @Component({
-  selector: "mtbls-upload",
-  templateUrl: "./upload.component.html",
-  styleUrls: ["./upload.component.css"],
+    selector: "mtbls-upload",
+    templateUrl: "./upload.component.html",
+    styleUrls: ["./upload.component.css"],
+    standalone: false
 })
 export class UploadComponent implements OnInit {
   @Input("mode") mode = "button";

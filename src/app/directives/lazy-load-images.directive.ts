@@ -7,7 +7,8 @@ import {
 } from "@angular/core";
 
 @Directive({
-  selector: "img[appLazyLoad]",
+    selector: "img[appLazyLoad]",
+    standalone: false
 })
 export class LazyLoadImagesDirective implements AfterViewInit {
   @HostBinding("attr.src") srcAttr = null;

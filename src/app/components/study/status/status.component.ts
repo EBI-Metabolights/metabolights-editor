@@ -21,9 +21,10 @@ import { UntypedFormBuilder } from "@angular/forms";
 import { ConfigurationService } from "src/app/configuration.service";
 
 @Component({
-  selector: "mtbls-status",
-  templateUrl: "./status.component.html",
-  styleUrls: ["./status.component.css"],
+    selector: "mtbls-status",
+    templateUrl: "./status.component.html",
+    styleUrls: ["./status.component.css"],
+    standalone: false
 })
 export class StatusComponent implements OnInit {
 

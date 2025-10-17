@@ -7,9 +7,10 @@ import { Loading } from 'src/app/ngxs-store/non-study/transitions/transitions.ac
 import { Store } from '@ngxs/store';
 
 @Component({
-  selector: 'app-no-study-page',
-  templateUrl: './no-study-page.component.html',
-  styleUrls: ['./no-study-page.component.css']
+    selector: 'app-no-study-page',
+    templateUrl: './no-study-page.component.html',
+    styleUrls: ['./no-study-page.component.css'],
+    standalone: false
 })
 export class NoStudyPageComponent implements OnInit {
   messageHeader = "Study page not found";

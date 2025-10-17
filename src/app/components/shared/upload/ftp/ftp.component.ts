@@ -14,9 +14,10 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 }
 
 @Component({
-  selector: "mtbls-ftp",
-  templateUrl: "./ftp.component.html",
-  styleUrls: ["./ftp.component.css"],
+    selector: "mtbls-ftp",
+    templateUrl: "./ftp.component.html",
+    styleUrls: ["./ftp.component.css"],
+    standalone: false
 })
 export class FTPUploadComponent implements OnInit {
 

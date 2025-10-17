@@ -13,9 +13,10 @@ import { IPerson } from "src/app/models/mtbl/mtbls/interfaces/person.interface";
 import { Store } from "@ngxs/store";
 
 @Component({
-  selector: "mtbls-people",
-  templateUrl: "./people.component.html",
-  styleUrls: ["./people.component.css"],
+    selector: "mtbls-people",
+    templateUrl: "./people.component.html",
+    styleUrls: ["./people.component.css"],
+    standalone: false
 })
 export class PeopleComponent implements OnInit {
 

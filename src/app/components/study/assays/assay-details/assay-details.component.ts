@@ -22,9 +22,10 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { MAF } from "src/app/ngxs-store/study/maf/maf.actions";
 
 @Component({
-  selector: "assay-details",
-  templateUrl: "./assay-details.component.html",
-  styleUrls: ["./assay-details.component.css"],
+    selector: "assay-details",
+    templateUrl: "./assay-details.component.html",
+    styleUrls: ["./assay-details.component.css"],
+    standalone: false
 })
 export class AssayDetailsComponent implements OnInit {
   @Input("assayName") assayName: any;
