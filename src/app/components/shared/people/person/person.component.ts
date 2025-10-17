@@ -190,7 +190,6 @@ export class PersonComponent implements OnInit {
     if (this.person == null) {
       const mtblsPerson = new MTBLSPerson();
       this.person = mtblsPerson;
-      this.person.roles = [];
     }
     
 
