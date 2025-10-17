@@ -82,7 +82,7 @@ export class PersonComponent implements OnInit {
   filteredOrganizations$: Observable<any[]> = of([]);
   private subscription: Subscription;  // For unsubscribing
   message: AppMessage | null = null;
-   
+  showOntology: boolean = true;
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
@@ -122,7 +122,7 @@ export class PersonComponent implements OnInit {
       this.message = appMessage;  
       if (appMessage.status === 'success') {
         this.refreshContacts(appMessage.message);
-        this.isModalOpen = false;
+        this.closeModal();
         this.isDeleteModalOpen = false;
         this.isApproveSubmitterModalOpen = false;
       }
@@ -149,7 +149,6 @@ export class PersonComponent implements OnInit {
     if (this.person == null) {
       const mtblsPerson = new MTBLSPerson();
       this.person = mtblsPerson;
-      this.person.roles = [];
     }
     
 
@@ -249,6 +248,7 @@ export class PersonComponent implements OnInit {
   openModal() {
     this.initialiseForm();
     this.isModalOpen = true;
+    this.showOntology = true;
     this.updateValidatorsBasedOnRoles();
   }
 
@@ -258,6 +258,8 @@ export class PersonComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    if(this.person)
+      this.showOntology = false;
   }
 
   confirmDelete() {
@@ -394,7 +396,7 @@ private updateValidatorsBasedOnRoles() {
       return;
     }
 
-    const rolesValue = this.person?.roles || this.form.get('roles')?.value || [];
+    const rolesValue = this.form.get('roles')?.value || this.person?.roles || [];
 
     // Dynamically detect PI role
     this.isPiRole = rolesValue.some((role: any) =>

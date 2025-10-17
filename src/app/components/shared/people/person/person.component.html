@@ -189,7 +189,8 @@
         <div class="form-row">
           <div class="half-width">
             <span>
-              <mtbls-ontology
+              <mtbls-ontology 
+                *ngIf="showOntology"
                 class="mt-20"
                 #personRoles
                 [validations]="fieldValidation('roles')"
