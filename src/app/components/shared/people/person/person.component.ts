@@ -9,7 +9,7 @@ import {
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import * as toastr from "toastr";
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -423,11 +423,28 @@ private updatePiValidators(isPi: boolean): void {
   const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
   const alwaysRequiredFields = ['firstName', 'lastName'];
 
+  // Helper to normalize validators to an array
+  const getValidatorArray = (fieldControl: AbstractControl): any[] => {
+    const raw = (fieldControl as any)._rawValidators;
+    const validator = fieldControl.validator;
+    if (Array.isArray(raw)) {
+      return [...raw];
+    }
+    if (typeof raw === 'function') {
+      return [raw];
+    }
+    if (typeof validator === 'function') {
+      return [validator];
+    }
+    return [];
+  };
+
+  // Handle PI-specific fields
   piFields.forEach(fieldName => {
     const fieldControl = this.form.get(fieldName);
     if (!fieldControl) return;
 
-    const existingValidators = (fieldControl as any)._rawValidators || [];
+    const existingValidators = getValidatorArray(fieldControl);
     const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
 
     let updatedValidators: any[];
@@ -450,7 +467,7 @@ private updatePiValidators(isPi: boolean): void {
     const fieldControl = this.form.get(fieldName);
     if (!fieldControl) return;
 
-    const existingValidators = (fieldControl as any)._rawValidators || [];
+    const existingValidators = getValidatorArray(fieldControl);
     const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
 
     const updatedValidators = [
@@ -465,6 +482,7 @@ private updatePiValidators(isPi: boolean): void {
 
   this.form.updateValueAndValidity({ emitEvent: false });
 }
+
 
 
   getIsRequired(fieldName: string): boolean {
