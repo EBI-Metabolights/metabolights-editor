@@ -406,52 +406,66 @@ private updateValidatorsBasedOnRoles() {
     this.updatePiValidators(this.isPiRole);
   }
 
-  onChanges() {
-  this.form.controls.roles.setValue(this.rolesComponent.values);
-  
-  if (this.rolesComponent.values.length !== 0) {
-    this.form.controls.roles.markAsDirty();
-  }
+ onChanges() {
+  const prevRoles = this.form.controls.roles.value;
+  const newRoles = this.rolesComponent.values;
 
-  this.updateValidatorsBasedOnRoles();
+  if (JSON.stringify(prevRoles) !== JSON.stringify(newRoles)) {
+    this.form.controls.roles.setValue(newRoles);
+    if (newRoles.length !== 0) {
+      this.form.controls.roles.markAsDirty();
+    }
+    this.updateValidatorsBasedOnRoles();
+  }
 }
+
 private updatePiValidators(isPi: boolean): void {
-    const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+  const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+  const alwaysRequiredFields = ['firstName', 'lastName'];
 
-    piFields.forEach(fieldName => {
-      const fieldControl = this.form.get(fieldName);
-      if (!fieldControl) {
-        console.warn(`Control for ${fieldName} does not exist in the form. Skipping.`);
-        return;
-      }
+  piFields.forEach(fieldName => {
+    const fieldControl = this.form.get(fieldName);
+    if (!fieldControl) return;
 
-      const currentValidators = fieldControl.validator ? [fieldControl.validator] : [];
-      let validatorFns = currentValidators.length ? (fieldControl as any)._rawValidators || currentValidators : [];
+    const existingValidators = (fieldControl as any)._rawValidators || [];
+    const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
 
-      // Ensure validatorFns is an array
-      if (!Array.isArray(validatorFns)) {
-        validatorFns = [];  
-      }
+    let updatedValidators: any[];
 
-      const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
+    if (isPi) {
+      updatedValidators = [
+        ...existingValidators.filter(v => v !== Validators.required),
+        Validators.required
+      ];
+    } else {
+      updatedValidators = existingValidators.filter(v => v !== Validators.required);
+    }
 
-      let updatedValidators: any[] = validatorFns;  // Start with the array
+    fieldControl.setValidators(updatedValidators);
+    fieldControl.setAsyncValidators(asyncValidators);
+    fieldControl.updateValueAndValidity({ emitEvent: false });
+  });
 
-      if (isPi) {
-        if (!updatedValidators.includes(Validators.required)) {
-          updatedValidators = [...updatedValidators, Validators.required];
-        }
-      } else {
-        updatedValidators = updatedValidators.filter(v => v !== Validators.required);
-      }
+  alwaysRequiredFields.forEach(fieldName => {
+    const fieldControl = this.form.get(fieldName);
+    if (!fieldControl) return;
 
-      fieldControl.setValidators(updatedValidators);
-      fieldControl.setAsyncValidators(asyncValidators);
-      fieldControl.updateValueAndValidity({ emitEvent: false });
-    });
+    const existingValidators = (fieldControl as any)._rawValidators || [];
+    const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
 
-    this.form.updateValueAndValidity({ emitEvent: false });
-  }
+    const updatedValidators = [
+      ...existingValidators.filter(v => v !== Validators.required),
+      Validators.required
+    ];
+
+    fieldControl.setValidators(updatedValidators);
+    fieldControl.setAsyncValidators(asyncValidators);
+    fieldControl.updateValueAndValidity({ emitEvent: false });
+  });
+
+  this.form.updateValueAndValidity({ emitEvent: false });
+}
+
 
   getIsRequired(fieldName: string): boolean {
     return this.isPiRole; 

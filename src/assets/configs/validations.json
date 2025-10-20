@@ -130,13 +130,13 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The mid initial of the contact. e.g. A.",
+                    "description": "The middle names or initials of the contact e.g. Anna, A.",
                     "placeholder": "M.",
                     "rules": [
                         {
                             "condition": "min",
                             "value": "1",
-                            "error": "The middle initial of the contact. This should be a minimum of 1 characters long",
+                            "error": "The middle names or initials of the contact. This should be a minimum of 1 characters long",
                             "type": "string"
                         }
                     ]
