@@ -8,7 +8,7 @@ import { ViolationType } from '../interfaces/validation-report.types';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { GetGeneralMetadata } from 'src/app/ngxs-store/study/general-metadata/general-metadata.actions';
 import { FtpManagementService } from 'src/app/services/ftp-management.service';
-import { Ws3ValidationReport } from '../interfaces/validation-report.interface';
+import { ModifierMetadataFileUpdate, Ws3ValidationReport } from '../interfaces/validation-report.interface';
 
 
 export const DescriptionMessages = {
@@ -61,14 +61,14 @@ export class ValidationTaskBoxComponent implements OnInit {
 
   showModal = false; // Flag to control modal visibility
   report: Ws3ValidationReport;
-  modifiers: string[];
-  
+  modifierMetadataFileUpdates: ModifierMetadataFileUpdate[] = [];
+
   constructor(private store: Store, private ftpService: FtpManagementService) {}
 
 
   ngOnInit(): void {
 
-    
+
     this.currentTask$.subscribe((task) => {
       if (task !== null) {
         this.currentTaskState = task;
@@ -95,10 +95,10 @@ export class ValidationTaskBoxComponent implements OnInit {
 
     this.reportV2$.pipe(filter(val => val !== null)).subscribe(value => {
       this.report = value;
-      if (![undefined, null].includes(this.report.metadata_updates)) this.modifiers = this.report.metadata_updates;
-      else this.modifiers = [];
+      if (![undefined, null].includes(this.report.metadataUpdates)) this.modifierMetadataFileUpdates = this.report.metadataUpdates;
+      else this.modifierMetadataFileUpdates = [];
     });
-      
+
   }
 
   // we also need this to subscribe to validation task updates so that the user doesnt have to do it.
@@ -108,7 +108,7 @@ export class ValidationTaskBoxComponent implements OnInit {
     this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).pipe( // currently proxying, this will not work outside of dev
       tap(() => {
         this.isInitiated = true
-        
+
       })
     ).subscribe({
       next: (next) => {
@@ -119,7 +119,7 @@ export class ValidationTaskBoxComponent implements OnInit {
          * Below we are defining an observable, which emits every 1 seconds. We also modify this Observable using pipe,
          * and the operators takeWhile and tap. We use these operators to make the following modifications:
          *  takeWhile: automatically close the subscription once a task has completed, by checking whether the current task state is a termination state.
-         *  tap: Add the side effect of assigning a value to newTask via selectOnce, if one hasn't been already. newTask.id is used in every subsequent 
+         *  tap: Add the side effect of assigning a value to newTask via selectOnce, if one hasn't been already. newTask.id is used in every subsequent
          *    validation get action,  and the value that we receive has been previously set in the handler of InitialiseValidationTask.
          */
         const timer = interval(1000);
@@ -140,13 +140,13 @@ export class ValidationTaskBoxComponent implements OnInit {
             this.taskStarted = false;
             this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
             // if the modifiers array is not empty, we show the info modal
-            if (this.modifiers.length > 0) { 
+            if (this.modifierMetadataFileUpdates.length > 0) {
               this.showModal = true; // Show the Info modal
             }
 
             console.debug('finished & subscription closed.') }
       })
-       
+
       },
       error: (error) => {},
     })
@@ -157,7 +157,7 @@ export class ValidationTaskBoxComponent implements OnInit {
       return 'Awaiting Response'
     } else if (this.isInitiated) {
       return 'Submitting Validation task'
-    } 
+    }
     else {
       return 'Initiate Validation Task'
     }

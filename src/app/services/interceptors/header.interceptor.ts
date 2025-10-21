@@ -31,6 +31,17 @@ export class HeaderInterceptor implements HttpInterceptor {
     const endpoint = this.configService?.config?.endpoint;
     const origin = this.configService.config?.origin;
     const targetUrl = origin + request.url;
+    const endpointWs3 = this.configService?.config?.ws3URL;
+    if (request.url.startsWith(endpointWs3) || targetUrl.startsWith(endpointWs3)) {
+      const jwt = localStorage.getItem("jwt");
+        if (jwt !== null) {
+          request = request.clone({
+            setHeaders: {
+              Authorization: "Bearer " + jwt,
+            },
+          });
+        }
+    }
     if (request.url.startsWith(endpoint) || targetUrl.startsWith(endpoint)) {
       const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
       if ( reviewCode ) {

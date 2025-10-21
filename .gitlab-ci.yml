@@ -6,50 +6,44 @@ variables:
   IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${IMAGE_TAG}"
   IMAGE_LATEST_TAG: "${CI_COMMIT_REF_NAME}-latest"
   LATEST_IMAGE_NAME: "${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}-latest"
+  CONFIG_DIR: "config-files"
 workflow:
   rules:
   - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging"
 stages:
 - build
 - deploy
-
-configuration_parameters:
-  stage: build
-  script:
-  - id
-  - echo "CI_BUILDS_DIR $CI_BUILDS_DIR"
-  - echo "CI_REGISTRY_USER $CI_REGISTRY_USER"
-  - echo "CI_REGISTRY $CI_REGISTRY"
-  - echo "BRANCH $CI_COMMIT_REF_NAME"
-  - echo "CI_PIPELINE_ID $CI_PIPELINE_ID"
-  - echo "CI_COMMIT_SHORT_SHA $CI_COMMIT_SHORT_SHA"
-  - echo "CI_REGISTRY_IMAGE $CI_REGISTRY_IMAGE"
-  - echo "APP_VERSION $APP_VERSION"
-  - echo "IMAGE_TAG $IMAGE_TAG"
-  - echo "IMAGE NAME $IMAGE_NAME"
-  - echo "IMAGE NAME (with latest tag) $LATEST_IMAGE_NAME"
-  - echo "APPS_ROOT_PATH $APPS_ROOT_PATH"
-  - echo "DEPLOYMENTS_FOLDER $DEPLOYMENTS_FOLDER"
-  - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
-  - echo "APPS_PROJECT_BRANCH_NAME $APPS_PROJECT_BRANCH_NAME"
-
 build_docker:
   stage: build
+  image:
+    name: ${CICD_GITLAB_REGISTRY}docker:28.5.1-dind
+    pull_policy: if-not-present
+  tags:
+  - docker
+  - mtbls
   script:
-  - docker image prune -f
-  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+  - docker version
+  - git reset --hard origin/$APPS_PROJECT_BRANCH_NAME
+  - git status
+  - ls -al
   - |-
     echo {\"version\": \"$APP_VERSION\", \"releaseName\": \"$BUILD_NUMBER\"} > src/assets/configs/version.json
   - cat src/assets/configs/version.json
   - echo "docker build -t $IMAGE_NAME ."
   - docker build -t $IMAGE_NAME .
-  - echo "docker docker build -t $LATEST_IMAGE_NAME ."
-  - docker build -t $LATEST_IMAGE_NAME .
+  - echo "docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CICD_GITLAB_REGISTRY -t $LATEST_IMAGE_NAME ."
+  - docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CICD_GITLAB_REGISTRY -t $LATEST_IMAGE_NAME .
   - docker push $IMAGE_NAME
   - docker push $LATEST_IMAGE_NAME
 
 deploy_editor:
   stage: deploy
+  image:
+    name: ${CICD_GITLAB_REGISTRY}alpine/k8s:1.23.17
+    pull_policy: if-not-present
+  tags:
+  - mtbls
+  - docker
   variables:
     CHART_NAME: metabolights-editor
   rules:
@@ -59,30 +53,42 @@ deploy_editor:
     when: manual
     allow_failure: true
   script:
-  - BUILD_PATH=$(realpath tmp)
-  - echo "BUILD_PATH $BUILD_PATH"
-  - mkdir -p $BUILD_PATH
-  - cd $BUILD_PATH
-  - APPS_ROOT_PATH="$BUILD_PATH/apps"
-  - rm -rf $APPS_ROOT_PATH
-  - echo git clone https://$CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD@${APPS_PROJECT_URL}
-  - git clone https://$CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD@${APPS_PROJECT_URL}
-  - cd $APPS_ROOT_PATH
-  - git switch $APPS_PROJECT_BRANCH_NAME
-  - git status
-  - git pull
-  - DEPLOYMENTS_FOLDER_SCRIPTS="$APPS_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
+  - apk add --no-cache git
+  - echo "APPS_PROJECT_URL $APPS_PROJECT_URL"
+  - CURRENT_PATH="$(pwd)"
+  - export CICD_PROJECT_ROOT_PATH="$CURRENT_PATH/$CONFIG_DIR"
+  - export K8S_CONFIG_FILE_PATH="$CICD_PROJECT_ROOT_PATH/$K8S_CONFIG_FILE_PATH"
+  - DEPLOYMENTS_FOLDER_SCRIPTS="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/scripts"
+  - DEPLOYMENTS_CHART_PATH="$CICD_PROJECT_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
+
+  - echo "CURRENT_PATH $CURRENT_PATH"
+  - echo "CICD_PROJECT_ROOT_PATH $CICD_PROJECT_ROOT_PATH"
+  - echo "K8S_CONFIG_FILE_PATH $K8S_CONFIG_FILE_PATH"
   - echo "DEPLOYMENTS_FOLDER_SCRIPTS $DEPLOYMENTS_FOLDER_SCRIPTS"
+
+  - rm -rf $CONFIG_DIR
+  - echo git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
+  - git clone https://$GITLAB_USER:$GITLAB_USER_TOKEN@${APPS_PROJECT_URL} $CONFIG_DIR
+  - cd $CONFIG_DIR
+  - ls -al
+  - echo checkout $APPS_PROJECT_BRANCH_NAME
+  - git checkout $APPS_PROJECT_BRANCH_NAME
+  - git status
+  - echo "cd $DEPLOYMENTS_FOLDER_SCRIPTS"
   - cd $DEPLOYMENTS_FOLDER_SCRIPTS
+  - echo "initial_setup.sh file content"
   - cat initial_setup.sh
   - bash initial_setup.sh
-  - DEPLOYMENTS_CHART_PATH="$APPS_ROOT_PATH/$DEPLOYMENTS_FOLDER/charts/$CHART_NAME"
   - echo "DEPLOYMENTS_CHART_PATH $DEPLOYMENTS_CHART_PATH"
   - cd $DEPLOYMENTS_CHART_PATH
+  - echo "template.sh.sh file content"
   - cat template.sh
   - echo template.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash template.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
+  - echo "install.sh file content"
   - cat install.sh
   - echo install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
   - bash install.sh "image.repository=$CI_REGISTRY_IMAGE,image.tag=$IMAGE_TAG"
-  - rm -rf $BUILD_PATH
+  - cd $CURRENT_PATH
+  - echo "Cleanup - remove config directory"
+  - rm -rf $CONFIG_DIR

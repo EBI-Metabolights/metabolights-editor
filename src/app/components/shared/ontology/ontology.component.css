@@ -47,3 +47,13 @@
 .selectable-chip-content {
   user-select: text !important;
 }
+::ng-deep .custom-chip-list .mat-mdc-chip.mat-mdc-standard-chip {
+  --mdc-chip-container-height: 25px !important;
+}
+::ng-deep .custom-chip-list .mat-mdc-chip-set .mdc-evolution-chip {
+  margin: 0px 0 0px 8px !important;
+}
+
+::ng-deep .custom-padding .mat-mdc-form-field-infix {
+  padding-bottom: 0px !important;
+}

@@ -1,29 +1,53 @@
-<div class="modal is-active" >
-    <div class="modal-background" (click)="close()"></div>
+<div class="modal is-active">
+  <div class="modal-background" (click)="close()"></div>
 
-    <div class="modal-content">
-      <mat-card class="material-modal-card">
-        <mat-card-header>
-          <mat-card-title>Metadata File Updates</mat-card-title>
-        </mat-card-header>
-        <p  class="material-dialog-description">We will sometimes make automated changes to your study metadata files to ensure they meet our guidelines for submission, and to solve issues relating to encoding, the presence of illegal characters and other quality of data fixes.</p>
+  <div class="modal-content" style="width: min-content;">
+    <mat-card style="padding: 16px;">
+      <header class="modal-card-head">
+      <p class="modal-card-title">Metadata file updates</p>
+      </header>
+      <!-- Scrollable Container for mat-table -->
+      <div class="scrollable-table-container">
+        <mat-table
+          [dataSource]="modifierMetadataFileUpdates"
+          class="mat-elevation-z8"
+        >
+          <!-- File Column -->
+          <ng-container matColumnDef="source">
+            <mat-header-cell *matHeaderCellDef> File </mat-header-cell>
+            <mat-cell *matCellDef="let s"> {{ s.source }} </mat-cell>
+          </ng-container>
 
-        <mat-card-content class="blocks-container">
-            <div
-              *ngFor="let s of metadataModifiers"
-              class="log-entry"
-              (click)="copyText(s)"
+          <!-- Rule ID Column -->
+          <ng-container matColumnDef="action">
+            <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
+            <mat-cell *matCellDef="let s"> {{ s.action }} </mat-cell>
+          </ng-container>
 
-            >
-              <mat-icon class="build-icon">build</mat-icon>
-              <span class="log-text">{{ s }}</span>
-              <mat-icon class="copy-icon">content_copy</mat-icon>
-            </div>
+          <!-- New Type Column -->
+          <ng-container matColumnDef="oldValue">
+            <mat-header-cell *matHeaderCellDef> Old Value </mat-header-cell>
+            <mat-cell *matCellDef="let s"> {{ s.oldValue }} </mat-cell>
+          </ng-container>
 
-            <button (click)="close()" class="button is-info">Close</button>
-          </mat-card-content>
-      </mat-card>
-    </div>
+          <!-- Curator Column -->
+          <ng-container matColumnDef="newValue">
+            <mat-header-cell *matHeaderCellDef> New Value </mat-header-cell>
+            <mat-cell *matCellDef="let s"> {{ s.newValue }} </mat-cell>
+          </ng-container>
 
-
+          <!-- Header and Row Definitions -->
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+        </mat-table>
+      </div>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-full has-text-right">
+            <button class="button is-info" (click)="close()">Close</button>
+          </div>
+        </div>
+      </footer>
+    </mat-card>
   </div>
+</div>
