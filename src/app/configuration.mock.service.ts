@@ -11,6 +11,7 @@ export class MockConfigurationService {
       origin: "test",
       endpoint: "test",
       loginURL: "login",
+      logoutURL: "logout",
       clearJavaSession: true,
       javaLogoutURL: "http://localhost:8080/metabolights/logout",
       redirectURL: "console",

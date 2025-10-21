@@ -11,10 +11,11 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { Store } from "@ngxs/store";
 import { StudyPermission } from "../headers";
 import { ActivatedRoute} from '@angular/router';
-
+import Keycloak from "keycloak-js";
 /* eslint-disable @typescript-eslint/naming-convention */
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
+  private readonly keycloak = inject(Keycloak);
 
   studyPermission: StudyPermission = null;
   constructor(
@@ -33,7 +34,7 @@ export class HeaderInterceptor implements HttpInterceptor {
     const targetUrl = origin + request.url;
     const endpointWs3 = this.configService?.config?.ws3URL;
     if (request.url.startsWith(endpointWs3) || targetUrl.startsWith(endpointWs3)) {
-      const jwt = localStorage.getItem("jwt");
+      const jwt = this.keycloak.token
         if (jwt !== null) {
           request = request.clone({
             setHeaders: {

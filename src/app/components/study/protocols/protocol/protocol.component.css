@@ -2,7 +2,7 @@
   padding: 10px 10px;
 }
 
-:host /deep/ .ql-container {
+:host ::ng-deep .ql-container {
   min-height: 250px;
 }
 

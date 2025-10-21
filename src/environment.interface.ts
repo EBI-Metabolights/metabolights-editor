@@ -5,6 +5,7 @@ export interface Environment {
   origin: string; // Origin of webservice ie localhost:4200
   endpoint: string; // Root endpoint of metabolights.
   loginURL: string; // Url to route users who are not logged in the event they try and access auth guarded pages.logoutURL
+  logoutURL: string;
   clearJavaSession: boolean; // Flag to decid whether to clear Java Spring session
   javaLogoutURL: string; // Url to route browser to logout from Java spring session
   redirectURL: string; // Holds the url of the page that the user tried to access, in the event of successful authentication.

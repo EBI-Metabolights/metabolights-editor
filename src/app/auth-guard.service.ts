@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from "@angular/core";
+import { inject, Injectable, OnInit } from "@angular/core";
 import * as toastr from "toastr";
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, ActivatedRoute } from "@angular/router";
 import { EditorService } from "./services/editor.service";
@@ -13,11 +13,13 @@ import { ErrorMessageService } from "./services/error-message.service";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
+import Keycloak from "keycloak-js";
 @Injectable({
   providedIn: "root",
 })
 export class AuthGuard  implements OnInit {
 
+  private readonly keycloak = inject(Keycloak)
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
@@ -25,7 +27,7 @@ export class AuthGuard  implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private store: Store
+    private store: Store,
   ) { }
 
 
@@ -49,7 +51,16 @@ export class AuthGuard  implements OnInit {
       if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
       return false;
     }
-    return await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
+
+    if (url.startsWith("/login")) {
+      if (this.keycloak.authenticated) {
+        this.router.navigate(["/console"]);
+        return false;
+      }
+      return true;
+    }
+    // const result= await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
+    // return result
   }
 
   async handlePrivate(studyIdentifier): Promise<boolean> {
@@ -65,6 +76,7 @@ export class AuthGuard  implements OnInit {
 
   async checkAuthenticationRequest(state: RouterStateSnapshot) {
     try {
+
       let loginOneTimeToken = null;
       if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
         return true;
@@ -94,45 +106,48 @@ export class AuthGuard  implements OnInit {
         this.router.navigate(["/login"]);
         return false;
       }
-
-      const localJwt = localStorage.getItem("jwt");
-
-      if (localJwt !== null && jwt === localJwt) {
-        return true;
+      if (!this.keycloak.authenticated) {
+        return true
       }
 
-      const userName = decoded.sub;
+      // const localJwt = localStorage.getItem("jwt");
 
-      if (localJwt === null) {
-        this.editorService.redirectUrl = state.url;
-        await this.editorService.loginWithJwt(jwt, userName);
-        localStorage.setItem("loginOneTimeToken", loginOneTimeToken);
-        toastr.success(userName + "is logged in successfully.", "Metabolights Editor session is activated.", {
-          timeOut: "5000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      } else {
-        let localDecoded = null;
-        try {
-          localDecoded = jwtDecode<MtblsJwtPayload>(localJwt);
-        } catch (err) {
-        }
-        const currentUser = localDecoded.sub;
-        if (currentUser !== userName) {
-          this.editorService.clearSessionData();
-          await this.editorService.loginWithJwt(jwt, userName);
-          toastr.info("User: " + userName, "Session is swithed to other user.", {
-            timeOut: "5000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-        }
-      }
+      // if (localJwt !== null && jwt === localJwt) {
+      //   return true;
+      // }
+
+      // const userName = decoded.sub;
+
+      // if (localJwt === null) {
+      //   this.editorService.redirectUrl = state.url;
+      //   await this.editorService.loginWithJwt(jwt, userName);
+      //   localStorage.setItem("loginOneTimeToken", loginOneTimeToken);
+      //   toastr.success(userName + "is logged in successfully.", "Metabolights Editor session is activated.", {
+      //     timeOut: "5000",
+      //     positionClass: "toast-top-center",
+      //     preventDuplicates: true,
+      //     extendedTimeOut: 0,
+      //     tapToDismiss: false,
+      //   });
+      // } else {
+      //   let localDecoded = null;
+      //   try {
+      //     localDecoded = jwtDecode<MtblsJwtPayload>(localJwt);
+      //   } catch (err) {
+      //   }
+      //   const currentUser = localDecoded.sub;
+      //   if (currentUser !== userName) {
+      //     this.editorService.clearSessionData();
+      //     await this.editorService.loginWithJwt(jwt, userName);
+      //     toastr.info("User: " + userName, "Session is swithed to other user.", {
+      //       timeOut: "5000",
+      //       positionClass: "toast-top-center",
+      //       preventDuplicates: true,
+      //       extendedTimeOut: 0,
+      //       tapToDismiss: false,
+      //     });
+      //   }
+      // }
       return true;
     } catch (err) {
       this.editorService.redirectUrl = state.url;
@@ -160,15 +175,19 @@ export class AuthGuard  implements OnInit {
    * @returns boolean indicating whether the user is logged in.
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
-    const localJwt = localStorage.getItem("jwt");
     if (url.startsWith("/login")) {
-      if (localJwt !== null) {
+      if (this.keycloak.authenticated) {
+        if (this.keycloak.authenticated && this.keycloak.token) {
+                const user = await this.keycloak.loadUserProfile()
+                this.editorService.loginWithJwt(this.keycloak.token, user.email)
+                return false
+            }
         this.router.navigate(["/console"]);
         return false;
-      } else {
-        return true;
       }
+      return true;
     }
+
     let studyIdentifier = null;
     let obfuscationCode = null;
     if (url.startsWith("/MTBLS")) {
@@ -192,6 +211,12 @@ export class AuthGuard  implements OnInit {
       return await this.checkStudyUrl(url, studyIdentifier, state, isPrivateWithMTBLSAccession);
     } else if (obfuscationCode !== null) {
       return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
+    }
+
+    if (this.keycloak.authenticated && this.keycloak.token) {
+        const user = await this.keycloak.loadUserProfile()
+        this.editorService.loginWithJwt(this.keycloak.token, user.email)
+        return false
     }
 
     switch (this.evaluateSession(null)) {

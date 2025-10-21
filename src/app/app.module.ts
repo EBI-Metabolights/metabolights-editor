@@ -2,10 +2,10 @@
 import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
 
 import { BrowserModule } from "@angular/platform-browser";
-import { NgModule, isDevMode, Injector, inject, provideAppInitializer } from "@angular/core";
+import { NgModule, isDevMode, Injector, inject, provideAppInitializer, APP_INITIALIZER, provideZoneChangeDetection } from "@angular/core";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 
-import { AppRoutingModule } from "./app-routing.module";
+import { routes, AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { StudyComponent } from "./components/study/study.component";
 import { AuthGuard } from "./auth-guard.service";
@@ -34,7 +34,7 @@ import { HeaderComponent } from "./components/public/header/header.component";
 import { FooterComponent } from "./components/public/footer/footer.component";
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { StudyModule } from "./components/study/study.module";
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors, withInterceptorsFromDi } from "@angular/common/http";
 import { SharedModule } from "./components/shared/shared.module";
 import { GuideModule } from "./components/guide/guide.module";
 import { ConfigurationService } from "./configuration.service";
@@ -66,7 +66,18 @@ import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
 import { NgxsReduxDevtoolsPluginModule } from "@ngxs/devtools-plugin";
 import { environment } from 'src/environments/environment';
-
+import { provideRouter } from '@angular/router';
+import {
+  provideKeycloak,
+  createInterceptorCondition,
+  IncludeBearerTokenCondition,
+  INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+  includeBearerTokenInterceptor
+} from 'keycloak-angular';
+const urlCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
+  urlPattern: /^(http:\/\/localhost:8080)(\/.*)?$/i,
+  bearerPrefix: 'Bearer'
+});
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
 export function configLoader(injector: Injector): () => Promise<any> {
@@ -135,7 +146,25 @@ export function configLoader(injector: Injector): () => Promise<any> {
         provideAppInitializer(() => {
         const initializerFn = (configLoader)(inject(Injector));
         return initializerFn();
-      }),
+        }),
+        provideKeycloak({
+            config: {
+              url: 'http://hh-rke-wp-webadmin-33-worker-3.caas.ebi.ac.uk:32063',
+              realm: 'metabolights',
+              clientId: 'metabolights-editor-localhost'
+            },
+            initOptions: {
+              onLoad: 'check-sso',
+              silentCheckSsoRedirectUri: `${window.location.origin}/assets/silent-check-sso.html`
+            }
+          }),
+    {
+      provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+      useValue: [urlCondition] // <-- Note that multiple conditions might be added.
+    },
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
         EditorService,
         MetabolightsService,
         EuropePMCService,

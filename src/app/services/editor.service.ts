@@ -11,7 +11,7 @@ import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
 import { HttpHeaders } from "@angular/common/http";
-import { Observable, of, asapScheduler } from "rxjs";
+import { Observable, of, asapScheduler, firstValueFrom } from "rxjs";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
 import { Store } from "@ngxs/store";
@@ -35,6 +35,8 @@ import { ValidationService } from "./decomposed/validation.service";
 import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
 import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
+import { CookieService } from "ngx-cookie-service";
+import Keycloak from "keycloak-js"
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -73,7 +75,7 @@ export class EditorService {
   private samples: Record<string, any>;
   private mafs: Record<string, any>;
   private toastrSettings: Record<string, any> = {};
-
+  private readonly keycloak = inject(Keycloak);
   study: MTBLSStudy;
   baseHref: string;
   redirectUrl = "";
@@ -99,7 +101,8 @@ export class EditorService {
     private dataService: MetabolightsService,
     private validationService: ValidationService, // this is an antipattern, dont repeat
     public configService: ConfigurationService,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    private cookieService: CookieService
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.setUpSubscriptionsNgxs();
@@ -154,14 +157,16 @@ export class EditorService {
   }
 
   logout(redirect) {
-
     this.clearSessionData();
-    if (this.configService.config.clearJavaSession && redirect) {
-      window.location.href = this.configService.config.javaLogoutURL;
-    } else {
-      this.resetStudyStates();
-      this.router.navigate([this.configService.config.loginURL]);
-    }
+    this.keycloak.logout();
+
+    this.resetStudyStates();
+    this.router.navigate(["/login"]);
+    // if (redirect) {
+    //   this.router.navigate(["/login"]);
+    // } else {
+    //   this.router.navigate(["/login"]);
+    // }
   }
 
   resetStudyStates() {
@@ -323,8 +328,16 @@ export class EditorService {
    * @returns
    */
   async updateSession(){
-    const activeJwt = localStorage.getItem("jwt");
-    const localUser = localStorage.getItem("user");
+    // const activeJwt = localStorage.getItem("jwt");
+    let  localUser = localStorage.getItem("user");
+
+
+    if (!localUser && this.keycloak.authenticated && this.keycloak.token) {
+        const user = await this.keycloak.loadUserProfile()
+        await this.loginWithJwt(this.keycloak.token, user.email)
+        localUser = localStorage.getItem("user");
+    }
+
     const user: MetabolightsUser = JSON.parse(localUser);
 
     if (environment.useNewState) {
@@ -333,57 +346,60 @@ export class EditorService {
       this.store.dispatch(new DefaultControlLists.Get());
 
      } else {
-      this.getDefaultControlLists().subscribe(
-        (response) => {
+      this.getDefaultControlLists().subscribe({
+        next: (response) => {
           const controlLists = response.controlLists;
           this.store.dispatch(new DefaultControlLists.Set(controlLists));
           },
-          (error) => {
+          error: (error) => {
             this.store.dispatch(new DefaultControlLists.Set({}));
 
-          }
+          }}
       );
-      this.getBannerHeader().subscribe(
-        (response) => {
+      this.getBannerHeader().subscribe({
+        next: (response) => {
           const message = response.content;
           this.store.dispatch(new BannerMessage.Set(message))
           },
-          (error) => {
+          error: (error) => {
             this.store.dispatch(new BannerMessage.Set(null))
-          }
+          }}
       );
-      this.checkMaintenanceMode().subscribe(
-        (response) => {
+      this.checkMaintenanceMode().subscribe({
+        next: (response) => {
           const result = response.content;
           this.store.dispatch(new MaintenanceMode.Set(result));
           },
-          (error) => {
+          error: (error) => {
             this.store.dispatch(new MaintenanceMode.Set(false));
-          }
+          }}
       );
      }
 
 
 
-    if(activeJwt !== null){
-      const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
-      const username = decoded.sub;
-      if (user === null || user.email !== username){
-        this.clearSessionData();
-        await this.loginWithJwt(activeJwt, username);
-        return true;
-      } else {
-        const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
-        localStorage.setItem("isCurator", isCurator);
-        const apiToken = user.apiToken ?? "";
-        localStorage.setItem("apiToken", apiToken);
-        localStorage.setItem("username", user.email);
-        localStorage.setItem("jwtExpirationTime", decoded.exp.toString());
-        this.initialise(localUser, false);
-      }
+    if(this.keycloak.authenticated){
+      const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
+      const username = decoded.email;
+      this.initialise(localUser, false);
+      // if (user === null || user.email !== username){
+      //   this.clearSessionData();
+      //   // await this.loginWithJwt(activeJwt, username);
+
+      //   return true;
+      // } else {
+      //   // const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+      //   // localStorage.setItem("isCurator", isCurator);
+      //   // const apiToken = user.apiToken ?? "";
+      //   // localStorage.setItem("apiToken", apiToken);
+      //   // localStorage.setItem("username", user.email);
+      //   // localStorage.setItem("jwtExpirationTime", decoded.exp.toString());
+      //   this.initialise(localUser, false);
+      // }
       return false;
     } else {
       this.clearSessionData();
+      this.keycloak.login()
     }
     return false;
   }
@@ -417,26 +433,25 @@ export class EditorService {
   }
 
   clearSessionData(){
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("username");
-    localStorage.removeItem("jwtExpirationTime");
-    localStorage.removeItem("user");
-    localStorage.removeItem("isCurator");
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("apiToken");
-    localStorage.removeItem("loginOneTimeToken");
+    localStorage.clear()
+    sessionStorage.clear()
+    // this.cookieService.deleteAll()
+    // this.keycloak.logout();
+    // localStorage.removeItem("jwt");
+    // localStorage.removeItem("username");
+    // localStorage.removeItem("jwtExpirationTime");
+    // localStorage.removeItem("user");
+    // localStorage.removeItem("isCurator");
+    // localStorage.removeItem("userToken");
+    // localStorage.removeItem("apiToken");
+    // localStorage.removeItem("loginOneTimeToken");
   }
 
   async loginWithJwt(jwtToken: string, userName: string) {
     const body = { jwt: jwtToken, user: userName };
     const url = this.configService.config.metabolightsWSURL.baseURL + this.configService.config.authenticationURL.initialise;
-    const response = await this.authService.http.post(url, body, httpOptions).toPromise();
+    const response = await firstValueFrom(this.authService.http.post(url, body, httpOptions));
     const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
-    const expiration = decoded.exp;
-    localStorage.setItem("jwt", jwtToken);
-
-    localStorage.setItem("username", userName);
-    localStorage.setItem("jwtExpirationTime", expiration.toString());
     return this.initialise(response, true);
   }
 
@@ -448,7 +463,6 @@ export class EditorService {
       message: string;
       err: string;
     }
-
     if (signInRequest) {
       const userstr = data.content;
       const user: User = JSON.parse(userstr);

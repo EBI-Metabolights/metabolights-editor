@@ -67,7 +67,7 @@ export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
   return null;
 }
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: "login", canActivate: [AuthGuard], component: LoginComponent },
   { path: "guides", component: GuidesComponent },
   { path: "guides/:tab", component: GuidesComponent },

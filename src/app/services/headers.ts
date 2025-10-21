@@ -15,6 +15,7 @@ export interface MtblsJwtPayload {
   aud?: string[] | string;
   exp?: number;
   role?: string;
+  email?: string;
 }
 
 export interface MetabolightsUser {
