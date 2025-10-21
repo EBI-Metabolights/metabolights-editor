@@ -1,8 +1,11 @@
 <div class="modal is-active">
   <div class="modal-background" (click)="close()"></div>
 
-  <div class="modal-content">
-    <mat-card>
+  <div class="modal-content" style="width: min-content;">
+    <mat-card style="padding: 16px;">
+      <header class="modal-card-head">
+      <p class="modal-card-title">Metadata file updates</p>
+      </header>
       <!-- Scrollable Container for mat-table -->
       <div class="scrollable-table-container">
         <mat-table
@@ -38,9 +41,13 @@
           <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
         </mat-table>
       </div>
-      <div class="modal-footer keep-right">
-        <button class="button is-info" (click)="close()">Close</button>
-      </div>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-full has-text-right">
+            <button class="button is-info" (click)="close()">Close</button>
+          </div>
+        </div>
+      </footer>
     </mat-card>
   </div>
 </div>
