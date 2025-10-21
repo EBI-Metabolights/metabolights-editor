@@ -457,6 +457,7 @@ export class GeneralMetadataState {
         this.generalMetadataService.savePerson(action.body, state.id).subscribe(
             (response) => {
                 ctx.dispatch(new People.Set(response.contacts as IPerson[], false))
+                ctx.dispatch(new People.Get());
                 this.generalMetadataService.emitMessage({
                     type: 'add',
                     status: 'success',
