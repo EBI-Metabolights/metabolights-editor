@@ -178,7 +178,11 @@
             cdkTextareaAutosize
           >
           </textarea>
-          <mat-hint>{{ fieldValidation("title").description }}</mat-hint>
+          <mat-hint>{{ fieldValidation("title").description }}
+            <span *ngIf="isFieldRequired('title')">
+              <b>(required)</b>
+            </span>
+          </mat-hint>
           <mat-error
             *ngIf="
               form.get('title').errors &&
@@ -221,7 +225,11 @@
             (blur)="getArticleFromDOI()"
             matInput
           />
-          <mat-hint>{{ fieldValidation("doi").description }}</mat-hint>
+          <mat-hint>{{ fieldValidation("doi").description }}
+            <span *ngIf="isFieldRequired('doi')">
+              <b>(required)</b>
+            </span>
+          </mat-hint>
           <mat-error
             *ngIf="
               form.get('doi').errors &&
