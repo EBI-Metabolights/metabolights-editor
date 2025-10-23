@@ -33,10 +33,3 @@
 .keep-right{
   justify-content: flex-end;
 }
-:host ::ng-deep .mat-mdc-table .mat-mdc-header-cell,
-:host ::ng-deep .mat-mdc-table .mat-mdc-cell,
-:host ::ng-deep .mat-mdc-table .mat-mdc-footer-cell {
-  align-self: stretch;
-  display: block;
-  padding: 15px;
-}
