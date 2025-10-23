@@ -327,8 +327,8 @@
                     "placeholder": "19567706",
                     "rules": [
                         {
-                            "condition": "min",
-                            "value": "6",
+                            "condition": "pattern",
+                            "value": "^[1-9]([0-9]{1,8})?$",
                             "error": "Please only provide the id number, not prefixed with PMID:",
                             "type": "integer"
                         }
@@ -346,7 +346,7 @@
                     "rules": [
                         {
                             "condition": "pattern",
-                            "value": "^10.\\d{4,9}/[-._;()/:A-Z0-9]+$",
+                            "value": "^10[.].+/.+$",
                             "error": "Please only provide the DOI, not the URL/http address",
                             "type": "string"
                         }
@@ -373,7 +373,7 @@
                 "title": {
                     "data-type": "string",
                     "sort-order": "3",
-                    "is-required": "false",
+                    "is-required": "true",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
@@ -382,8 +382,8 @@
                     "rules": [
                         {
                             "condition": "min",
-                            "value": "25",
-                            "error": "Please provide the (tentative) title of your publication. This should be a minimum of 25 characters long",
+                            "value": "20",
+                            "error": "Please provide the (tentative) title of your publication. This should be a minimum of 20 characters long",
                             "type": "string"
                         }
                     ]
@@ -392,7 +392,7 @@
                     "data-type": "ontology",
                     "sort-order": "9",
                     "label": "",
-                    "is-required": "false",
+                    "is-required": "true",
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
@@ -400,9 +400,9 @@
                     "placeholder": "in preparation, published, etc",
                     "rules": [
                         {
-                            "condition": "min",
-                            "value": "5",
-                            "error": "Please provide the publication status of your publication. This should be a minimum of 5 characters long",
+                            "condition": "array_min",
+                            "value": "1",
+                            "error": "Please provide the publication status of your publication.",
                             "type": "string"
                         }
                     ],

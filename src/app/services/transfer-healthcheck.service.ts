@@ -12,13 +12,13 @@ interface ProtocolStatus {
 }
 
 export interface TransferStatus {
-  private_ftp: ProtocolStatus;
-  public_ftp: ProtocolStatus;
+  privateFtp: ProtocolStatus;
+  publicFtp: ProtocolStatus;
   aspera: ProtocolStatus;
 }
 
 interface TransferStatusResponse {
-  transfer_status: TransferStatus;
+  transferStatus: TransferStatus;
   message: string;
 }
 

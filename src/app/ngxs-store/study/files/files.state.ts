@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { IStudyFiles, StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
-import { FilesLists, ObfuscationCode, Operations, ResetFilesState, UploadLocation } from "./files.actions";
+import { FilesLists, ObfuscationCode, Operations, PrivateFtpAccessible, ResetFilesState, UploadLocation } from "./files.actions";
 import { FilesService } from "src/app/services/decomposed/files.service";
 import { Samples } from "../samples/samples.actions";
 import { AssayList } from "../assay/assay.actions";
@@ -14,7 +14,8 @@ export interface FilesStateModel {
     uploadLocation: string,
     files: IStudyFiles,
     selectedFiles: IStudyFiles,
-    rawFiles: StudyFile[]
+    rawFiles: StudyFile[],
+    privateFtpAccessible: boolean
 }
 
 const defaultState: FilesStateModel = {
@@ -22,7 +23,8 @@ const defaultState: FilesStateModel = {
     uploadLocation: null,
     files: null,
     selectedFiles: null,
-    rawFiles: null
+    rawFiles: null,
+    privateFtpAccessible: true
 }
 
 @State<FilesStateModel>({
@@ -42,6 +44,11 @@ export class FilesState {
             next: (data) => {
                 ctx.dispatch(new UploadLocation.Set(data.uploadPath));
                 ctx.dispatch(new ObfuscationCode.Set(data.obfuscationCode));
+                if (data.hasOwnProperty("privateFtpAccessible")){
+                  ctx.dispatch(new PrivateFtpAccessible.Set(data.privateFtpAccessible))
+                } else {
+                  ctx.dispatch(new PrivateFtpAccessible.Set(true))
+                }
                 data = this.filesService.deleteProperties(data);
                 ctx.dispatch(new FilesLists.SetStudyFiles(data));
 
@@ -73,6 +80,11 @@ export class FilesState {
             (data) => {
                 ctx.dispatch(new UploadLocation.Set(data.uploadPath));
                 ctx.dispatch(new ObfuscationCode.Set(data.obfuscationCode));
+                if (data.hasOwnProperty("privateFtpAccessible")){
+                  ctx.dispatch(new PrivateFtpAccessible.Set(data.privateFtpAccessible))
+                } else {
+                  ctx.dispatch(new PrivateFtpAccessible.Set(true))
+                }
                 data = this.filesService.deleteProperties(data);
                 ctx.dispatch(new FilesLists.SetStudyFiles(data));
             }
@@ -89,6 +101,14 @@ export class FilesState {
         })
     }
 
+    @Action(PrivateFtpAccessible.Set)
+    SetPrivateFtpAccessible(ctx: StateContext<FilesStateModel>, action: PrivateFtpAccessible.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            privateFtpAccessible: action.privateFtpAccessible
+        })
+    }
     @Action(ObfuscationCode.Set)
     SetObfuscationCode(ctx: StateContext<FilesStateModel>, action: ObfuscationCode.Set) {
         const state = ctx.getState();
@@ -170,6 +190,11 @@ export class FilesState {
     }
 
     @Selector()
+    static privateFtpAccessible(state: FilesStateModel) {
+        return state.privateFtpAccessible;
+    }
+
+    @Selector()
     static files(state: FilesStateModel) {
         return state.files;
     }
@@ -194,7 +219,7 @@ function isMoreRecentTimestamp(comparator: string, subject: string): boolean {
     if (comparator.length !== 14 || subject.length !== 14) {
         throw new Error("Invalid timestamp format. Expected format is 'YYYYMMDDHHmmss'.");
     }
-    return comparator > subject; 
+    return comparator > subject;
 };
 
 function convertToTimestamp(isoDateString: string): string {

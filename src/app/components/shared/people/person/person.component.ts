@@ -167,17 +167,12 @@ export class PersonComponent implements OnInit {
       ],
       email: [
         this.person.email,
-        ValidateRules("email", this.fieldValidation("email")), // RFC 5322 Official Standard (https://emailregex.com/)
+        ValidateRules("email", this.fieldValidation("email")), // RFC 5322 Official Standard 
       ],
       alternativeEmail: [
         this.getCommentValue("Study Person Alternative Email"),
         ValidateRules("alternativeEmail", this.fieldValidation("alternativeEmail")), // RFC 5322 Official Standard 
       ],
-      // phone: [
-      //   this.person.phone,
-      //   ValidateRules("phone", this.fieldValidation("phone")),
-      // ],
-      // fax: [this.person.fax, ValidateRules("fax", this.fieldValidation("fax"))],
       address: [
         this.person.address,
         ValidateRules("address", this.fieldValidation("address")),
