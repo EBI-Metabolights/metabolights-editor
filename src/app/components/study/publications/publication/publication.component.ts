@@ -301,6 +301,18 @@ export class PublicationComponent implements OnInit {
         this.setFieldValue("title", article.title.trim());
         this.setFieldValue("authorList", article.authorList.trim());
         this.statusComponent.setValue("Published");
+
+        const statusVals = Array.isArray(this.statusComponent.values) && this.statusComponent.values.length
+          ? this.statusComponent.values
+          : ["Published"];
+        if (this.form && this.form.controls && this.form.controls.status) {
+          this.form.controls.status.setValue(statusVals);
+          this.setDoiRequiredBasedOnStatus();
+          if (this.form.controls.doi) {
+            this.form.controls.doi.updateValueAndValidity();
+          }
+          this.form.updateValueAndValidity();
+        }
       });
       this.europePMCService
         .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
@@ -323,6 +335,15 @@ export class PublicationComponent implements OnInit {
           this.setFieldValue("title", article.title.trim());
           this.setFieldValue("authorList", article.authorList.trim());
           this.setFieldValue("doi", article.doi.trim());
+
+          if (this.form) {
+            this.setDoiRequiredBasedOnStatus();
+            if (this.form.controls.doi) {
+              this.form.controls.doi.updateValueAndValidity();
+            }
+            this.form.updateValueAndValidity();
+          }
+
           this.publicationAbstract = article.abstract;
         });
     }
