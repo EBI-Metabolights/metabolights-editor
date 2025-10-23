@@ -193,6 +193,11 @@ export class FilesState {
     }
 
     @Selector()
+    static privateFtpAccessible(state: FilesStateModel) {
+        return state.privateFtpAccessible;
+    }
+
+    @Selector()
     static files(state: FilesStateModel) {
         return state?.files;
     }
