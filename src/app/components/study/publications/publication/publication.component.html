@@ -71,7 +71,7 @@
   <div class="modal-background"></div>
   <div class="modal-card vw80">
     <section class="modal-card-body">
-      <p>Please select the authors you would like to import</p>
+      <p>Please select the authors you would like to import:</p>
       <br />
       <div *ngIf="manuscriptAuthors">
         <span *ngFor="let author of manuscriptAuthors">
@@ -110,7 +110,7 @@
     <section class="modal-card-body">
       <p>
         Your MetaboLights study title will be updated to match your publication
-        title
+        title.
       </p>
     </section>
     <footer class="modal-card-foot">
@@ -136,7 +136,7 @@
     <section class="modal-card-body">
       <p>
         Your MetaboLights study abstract will be updated to match your
-        publication abstract
+        publication abstract.
       </p>
     </section>
     <footer class="modal-card-foot">
@@ -213,7 +213,7 @@
               form.get('authorList').errors.authorList
             "
           >
-            {{ form.get("authorList").authorList.title.error }}
+            {{ form.get("authorList").errors.authorList.error }}
           </mat-error>
         </mat-form-field>
         <mat-form-field class="full-width">
