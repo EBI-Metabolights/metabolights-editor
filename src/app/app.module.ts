@@ -150,7 +150,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
             config: {
               url: 'https://wwwdev.ebi.ac.uk/metabolights/test/iam',
               realm: 'metabolights',
-              clientId: 'metabolights-editor-localhost'
+              clientId: 'metabolights-editor-test'
             },
             initOptions: {
               onLoad: 'check-sso',
