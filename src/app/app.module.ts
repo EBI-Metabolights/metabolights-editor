@@ -149,7 +149,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         }),
         provideKeycloak({
             config: {
-              url: 'http://hh-rke-wp-webadmin-33-worker-3.caas.ebi.ac.uk:32063',
+              url: 'https://wwwdev.ebi.ac.uk/metabolights/test/iam',
               realm: 'metabolights',
               clientId: 'metabolights-editor-localhost'
             },

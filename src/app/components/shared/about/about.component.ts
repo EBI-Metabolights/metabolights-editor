@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output } from "@angular/core";
 
 @Component({
     selector: "mtbls-about",
@@ -9,10 +9,8 @@ import { Component, OnInit, Input } from "@angular/core";
 export class AboutComponent implements OnInit {
   @Input("editorVersion") editorVersion: string;
   @Input("apiVersion") apiVersion: string;
-
-  isModalOpen = false;
-
-
+  @Input("isModalOpen") isModalOpen: boolean = false;
+  
   ngOnInit() {
   }
 

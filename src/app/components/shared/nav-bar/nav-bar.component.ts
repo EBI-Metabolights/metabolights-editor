@@ -34,6 +34,7 @@ export class NavBarComponent implements OnInit {
   studyId: string;
   obfuscationCode: string;
   reviewerLink: string = null;
+  versionShown = false;
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -89,7 +90,9 @@ export class NavBarComponent implements OnInit {
       }
     });
   }
-
+  showVersion() {
+    this.versionShown = true
+  }
   logOut() {
     this.editorService.logout(true);
   }
@@ -101,6 +104,10 @@ export class NavBarComponent implements OnInit {
   redirectToConsole() {
     this.router.navigate(["/console"]);
   }
+  redirectToProfile() {
+    window.location.href = "https://wwwdev.ebi.ac.uk/metabolights/test/iam/realms/metabolights/account"
+  }
+
   updatePreviewEnabled() {
     this.previewEnabled = this.mode != 'light' && this.studyStatus != 'Provisional';
   }
@@ -113,8 +120,8 @@ export class NavBarComponent implements OnInit {
         }
       } if (this.studyStatus == "Public") {
         this.reviewerLink = this.baseHref + this.studyId;
-      } 
-    } 
+      }
+    }
 
   }
 }

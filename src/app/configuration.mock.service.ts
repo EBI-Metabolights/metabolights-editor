@@ -13,7 +13,7 @@ export class MockConfigurationService {
       loginURL: "login",
       logoutURL: "logout",
       clearJavaSession: true,
-      javaLogoutURL: "http://localhost:8080/metabolights/logout",
+      javaLogoutURL: "/login",
       redirectURL: "console",
       metabolightsWSURL: {
         baseURL: "https://www.ebi.ac.uk/metabolights/ws",

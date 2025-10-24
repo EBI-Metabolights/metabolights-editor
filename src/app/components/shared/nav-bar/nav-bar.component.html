@@ -38,23 +38,39 @@
 
     </div>
     <div class="navbar-end">
-      <mtbls-about class="version" [apiVersion]="apiVersion" [editorVersion]="editorVersion"></mtbls-about>
+      <mtbls-about class="version" [apiVersion]="apiVersion" [editorVersion]="editorVersion" [isModalOpen]="versionShown"></mtbls-about>
 
-      <a
-      (click)="redirectToConsole()" class="navbar-item">
-        <i class="material-icons"> list </i>&nbsp;My studies
-      </a>
-      <a
-        *ngIf="previewEnabled"
-        target="_blank"
-        href="{{ reviewerLink }}"
-        class="navbar-item"
-      >
-        <i class="material-icons"> visibility </i>&nbsp;Preview
-      </a>
-      <a (click)="logOut()" class="navbar-item">
-        <i class="material-icons"> exit_to_app </i>&nbsp;Logout
-      </a>
+      <div class="navbar-item has-dropdown is-hoverable is-right">
+        <a class="navbar-link" aria-haspopup="true" aria-expanded="false">
+          <span class="icon"><i class="material-icons">menu</i></span>
+        </a>
+
+        <div class="navbar-dropdown is-right">
+          <a (click)="redirectToConsole()" class="navbar-item">
+            <i class="material-icons">list</i>&nbsp;My studies
+          </a>
+          <a (click)="redirectToProfile()" class="navbar-item">
+            <i class="material-icons">account_circle</i>&nbsp;My profile
+          </a>
+          <a
+            *ngIf="previewEnabled"
+            target="_blank"
+            href="{{ reviewerLink }}"
+            class="navbar-item"
+          >
+            <i class="material-icons">visibility</i>&nbsp;Preview
+          </a>
+
+          <hr class="navbar-divider" />
+
+           <a (click)="showVersion()" class="navbar-item">
+            <i class="material-icons">info</i>&nbsp;Version
+           </a>
+
+          <a (click)="logOut()" class="navbar-item">
+            <i class="material-icons">exit_to_app</i>&nbsp;Logout
+          </a>
+        </div>
+      </div>
     </div>
   </div>
-</nav>
