@@ -1,11 +1,11 @@
 ARG CONTAINER_REGISTRY_PREFIX=docker.io/
 
-FROM ${CONTAINER_REGISTRY_PREFIX}node:18 as build
+FROM ${CONTAINER_REGISTRY_PREFIX}node:20 as build
 RUN mkdir /app-root
 WORKDIR /app-root
 COPY . .
 ENV NODE_OPTIONS=--max-old-space-size=8192
-RUN npm install --legacy-peer-deps
+RUN npm install
 ARG CONFIGURATION=production
 ARG BASE_HREF=/metabolights/editor
 RUN npm run build -- --configuration $CONFIGURATION --base-href="$BASE_HREF/"
