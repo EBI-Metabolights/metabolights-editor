@@ -58,8 +58,12 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
       </mat-table>
     </div>
-     <div class="modal-footer keep-right">
-        <button class="button is-info" (click)="close()">Close</button>
-      </div>
+    <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-full has-text-right">
+            <button class="button is-info" (click)="close()">Close</button>
+          </div>
+        </div>
+      </footer>
   </mat-card>
 </div>

@@ -147,7 +147,7 @@
           </mat-form-field>
 
           <mat-form-field class="field-new">
-            <mat-label>Middle name</mat-label>
+            <mat-label>Middle name(s)</mat-label>
             <input
               matInput
               formControlName="midInitials"
@@ -189,7 +189,8 @@
         <div class="form-row">
           <div class="half-width">
             <span>
-              <mtbls-ontology
+              <mtbls-ontology 
+                *ngIf="showOntology"
                 class="mt-20"
                 #personRoles
                 [validations]="fieldValidation('roles')"
@@ -429,14 +430,14 @@
       <footer *ngIf="!isReadOnly" class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
-            <button
+            <button type="button"
               *ngIf="!addNewPerson"
               class="button is-danger is-pulled-left"
               (click)="confirmDelete()"
             >
               <mat-icon>delete</mat-icon>
             </button>
-            <button
+            <button type="button"
               *ngIf="!addNewPerson && person.email"
               class="button is-secondary is-pulled-left"
               (click)="approveGrantSubmitterRole()"
@@ -445,7 +446,7 @@
             </button>
           </div>
           <div class="column is-half has-text-right">
-            <button
+            <button type="submit"
               *ngIf="!form.pristine"
               [disabled]="!form.valid || isFormBusy"
               (click)="saveNgxs()"
@@ -458,14 +459,14 @@
               ></mat-spinner>
               Save
             </button>
-            <button
+            <button type="submit"
               *ngIf="form.pristine"
               (click)="closeModal()"
               class="button is-info"
             >
               OK
             </button>
-            <button
+            <button type="button"  
               class="button"
               [disabled]="isFormBusy"
               (click)="closeModal()"

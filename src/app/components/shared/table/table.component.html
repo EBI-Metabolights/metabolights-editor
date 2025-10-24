@@ -93,7 +93,7 @@
   
 </div>
 
-<div *ngIf="!isReadOnly && !dismissed && columnHidden" class="notification is-primary">
+<div *ngIf="!dismissed && columnHidden" class="notification is-primary">
   <small><mat-icon>info</mat-icon> Truncated MAF sheet. Download m_xxx_v2_maf.tsv file to see the complete data.</small>
   <span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
@@ -298,17 +298,22 @@
             <span
               *ngIf="isChEBIId(row['database_identifier']); else notChEBIId"
             >
-              <img
-                appLazyLoad
-                width="200"
-                height="200"
-                [src]="
-                  'https://www.ebi.ac.uk/chebi/displayImage.do?defaultImage=true&imageIndex=0&chebiId=' +
-                  row['database_identifier'] +
-                  '&dimensions=500&scaleMolecule=false'
-                "
-                alt=""
-              />
+              <ng-container *ngIf="!imageErrorMap.get(row['database_identifier']); else noStructure">
+                <img
+                  appLazyLoad
+                  width="200"
+                  height="200"
+                  [src]="getStructureUrl(row)"
+                  alt="Chemical structure"
+                  (error)="onImageError(row)"
+                />
+              </ng-container>
+
+              <ng-template #noStructure>
+                <div class="no-structure-message">
+                  <small>Structure unavailable</small>
+                </div>
+              </ng-template>
             </span>
             <ng-template #notChEBIId>
               <small><i>Structure not available</i></small>

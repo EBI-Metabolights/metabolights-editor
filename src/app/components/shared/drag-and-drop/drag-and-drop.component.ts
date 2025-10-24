@@ -89,7 +89,7 @@ export class DragAndDropComponent implements OnInit  {
           Swal.fire('Invalid File', `File "${file.name}" does not match the required pattern and will be skipped.`, 'error');
           continue;
         }
-        if(file.name.indexOf(this.studyId) === -1){
+        if( file.name.trim() !== "i_Investigation.txt" && file.name.indexOf(this.studyId) === -1){
           Swal.fire('Invalid File', `File "${file.name}" does not contain the study identifier "${this.studyId}" and will be skipped.`, 'error');
           continue;
         }

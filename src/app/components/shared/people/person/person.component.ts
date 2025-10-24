@@ -9,7 +9,7 @@ import {
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
 import { trigger, style, animate, transition } from "@angular/animations";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import * as toastr from "toastr";
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
@@ -83,7 +83,7 @@ export class PersonComponent implements OnInit {
   filteredOrganizations$: Observable<any[]> = of([]);
   private subscription: Subscription;  // For unsubscribing
   message: AppMessage | null = null;
-   
+  showOntology: boolean = true;
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
@@ -123,7 +123,7 @@ export class PersonComponent implements OnInit {
       this.message = appMessage;  
       if (appMessage.status === 'success') {
         this.refreshContacts(appMessage.message);
-        this.isModalOpen = false;
+        this.closeModal();
         this.isDeleteModalOpen = false;
         this.isApproveSubmitterModalOpen = false;
       }
@@ -150,7 +150,6 @@ export class PersonComponent implements OnInit {
     if (this.person == null) {
       const mtblsPerson = new MTBLSPerson();
       this.person = mtblsPerson;
-      this.person.roles = [];
     }
     
 
@@ -169,17 +168,12 @@ export class PersonComponent implements OnInit {
       ],
       email: [
         this.person.email,
-        ValidateRules("email", this.fieldValidation("email")), // RFC 5322 Official Standard (https://emailregex.com/)
+        ValidateRules("email", this.fieldValidation("email")), // RFC 5322 Official Standard 
       ],
       alternativeEmail: [
         this.getCommentValue("Study Person Alternative Email"),
         ValidateRules("alternativeEmail", this.fieldValidation("alternativeEmail")), // RFC 5322 Official Standard 
       ],
-      // phone: [
-      //   this.person.phone,
-      //   ValidateRules("phone", this.fieldValidation("phone")),
-      // ],
-      // fax: [this.person.fax, ValidateRules("fax", this.fieldValidation("fax"))],
       address: [
         this.person.address,
         ValidateRules("address", this.fieldValidation("address")),
@@ -250,6 +244,7 @@ export class PersonComponent implements OnInit {
   openModal() {
     this.initialiseForm();
     this.isModalOpen = true;
+    this.showOntology = true;
     this.updateValidatorsBasedOnRoles();
   }
 
@@ -259,6 +254,8 @@ export class PersonComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    if(this.person)
+      this.showOntology = false;
   }
 
   confirmDelete() {
@@ -395,7 +392,7 @@ private updateValidatorsBasedOnRoles() {
       return;
     }
 
-    const rolesValue = this.person?.roles || this.form.get('roles')?.value || [];
+    const rolesValue = this.form.get('roles')?.value || this.person?.roles || [];
 
     // Dynamically detect PI role
     this.isPiRole = rolesValue.some((role: any) =>
@@ -405,52 +402,84 @@ private updateValidatorsBasedOnRoles() {
     this.updatePiValidators(this.isPiRole);
   }
 
-  onChanges() {
-  this.form.controls.roles.setValue(this.rolesComponent.values);
-  
-  if (this.rolesComponent.values.length !== 0) {
-    this.form.controls.roles.markAsDirty();
-  }
+ onChanges() {
+  const prevRoles = this.form.controls.roles.value;
+  const newRoles = this.rolesComponent.values;
 
-  this.updateValidatorsBasedOnRoles();
+  if (JSON.stringify(prevRoles) !== JSON.stringify(newRoles)) {
+    this.form.controls.roles.setValue(newRoles);
+    if (newRoles.length !== 0) {
+      this.form.controls.roles.markAsDirty();
+    }
+    this.updateValidatorsBasedOnRoles();
+  }
 }
+
 private updatePiValidators(isPi: boolean): void {
-    const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+  const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+  const alwaysRequiredFields = ['firstName', 'lastName'];
 
-    piFields.forEach(fieldName => {
-      const fieldControl = this.form.get(fieldName);
-      if (!fieldControl) {
-        console.warn(`Control for ${fieldName} does not exist in the form. Skipping.`);
-        return;
-      }
+  // Helper to normalize validators to an array
+  const getValidatorArray = (fieldControl: AbstractControl): any[] => {
+    const raw = (fieldControl as any)._rawValidators;
+    const validator = fieldControl.validator;
+    if (Array.isArray(raw)) {
+      return [...raw];
+    }
+    if (typeof raw === 'function') {
+      return [raw];
+    }
+    if (typeof validator === 'function') {
+      return [validator];
+    }
+    return [];
+  };
 
-      const currentValidators = fieldControl.validator ? [fieldControl.validator] : [];
-      let validatorFns = currentValidators.length ? (fieldControl as any)._rawValidators || currentValidators : [];
+  // Handle PI-specific fields
+  piFields.forEach(fieldName => {
+    const fieldControl = this.form.get(fieldName);
+    if (!fieldControl) return;
 
-      // Ensure validatorFns is an array
-      if (!Array.isArray(validatorFns)) {
-        validatorFns = [];  
-      }
+    const existingValidators = getValidatorArray(fieldControl);
+    const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
 
-      const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
+    let updatedValidators: any[];
 
-      let updatedValidators: any[] = validatorFns;  // Start with the array
+    if (isPi) {
+      updatedValidators = [
+        ...existingValidators.filter(v => v !== Validators.required),
+        Validators.required
+      ];
+    } else {
+      updatedValidators = existingValidators.filter(v => v !== Validators.required);
+    }
 
-      if (isPi) {
-        if (!updatedValidators.includes(Validators.required)) {
-          updatedValidators = [...updatedValidators, Validators.required];
-        }
-      } else {
-        updatedValidators = updatedValidators.filter(v => v !== Validators.required);
-      }
+    fieldControl.setValidators(updatedValidators);
+    fieldControl.setAsyncValidators(asyncValidators);
+    fieldControl.updateValueAndValidity({ emitEvent: false });
+  });
 
-      fieldControl.setValidators(updatedValidators);
-      fieldControl.setAsyncValidators(asyncValidators);
-      fieldControl.updateValueAndValidity({ emitEvent: false });
-    });
+  alwaysRequiredFields.forEach(fieldName => {
+    const fieldControl = this.form.get(fieldName);
+    if (!fieldControl) return;
 
-    this.form.updateValueAndValidity({ emitEvent: false });
-  }
+    const existingValidators = getValidatorArray(fieldControl);
+    const asyncValidators = fieldControl.asyncValidator ? [fieldControl.asyncValidator] : [];
+
+    const updatedValidators = [
+      ...existingValidators.filter(v => v !== Validators.required),
+      Validators.required
+    ];
+
+    fieldControl.setValidators(updatedValidators);
+    fieldControl.setAsyncValidators(asyncValidators);
+    fieldControl.updateValueAndValidity({ emitEvent: false });
+  });
+
+  this.form.updateValueAndValidity({ emitEvent: false });
+}
+
+
 
   getIsRequired(fieldName: string): boolean {
     return this.isPiRole; 

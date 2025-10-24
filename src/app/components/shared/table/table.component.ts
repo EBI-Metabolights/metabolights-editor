@@ -167,6 +167,8 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   tableTypeValue: string = "";
   openUploadArea: boolean = false;
   filePatternString: string = "^([asi]_.+\.txt|m_.+\.tsv)$";
+  imageErrorMap = new Map<string, boolean>(); 
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -455,7 +457,18 @@ compare(a: any, b: any, isAsc: boolean) {
     }
     return false;
   }
-
+  getStructureUrl(row: any): string {
+    const id = row?.['database_identifier']?.replace(/^CHEBI:/, '');
+    return id
+      ? `https://www.ebi.ac.uk/chebi/backend/api/public/compound/${id}/structure/?width=300&height=300`
+      : '';
+  }
+  onImageError(row: any): void {
+  const id = row?.['database_identifier'];
+  if (id) {
+    this.imageErrorMap.set(id, true); // mark this ID as failed
+  }
+}
   savePastedCellContent(e, pvalue, deleting: boolean = false) {
     const cellsToUpdate = [];
     if (!this.isEditModalOpen) {

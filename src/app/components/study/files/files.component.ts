@@ -14,6 +14,7 @@ import { GetGeneralMetadata } from "src/app/ngxs-store/study/general-metadata/ge
 import { SyncEvent } from "./rsync/rsync.component";
 import { TransferHealthcheckService, TransferStatus } from "src/app/services/transfer-healthcheck.service";
 import { SetTransferStatus } from "src/app/ngxs-store/non-study/application/application.actions";
+import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 declare let AW4: any;
 
 
@@ -35,6 +36,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   publicHttpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicHttpUrl);
   publicFtpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicFtpUrl);
   publicGlobusUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicGlobusUrl);
+  privateFtpAccessible$: Observable<boolean> = inject(Store).select(FilesState.privateFtpAccessible);
 
 
 
@@ -73,6 +75,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   selectedCategory: string = null;
   fileLocation: string = null;
   status: string = null;
+  privateFtpAccessible: boolean = true;
   baseHref: string;
   access: string = null;
   curator = false;
@@ -137,7 +140,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
 
   checkTransferStatus() {
     this.transferHealthcheckService.getHealthcheck().subscribe((response) => {
-      this.store.dispatch(new SetTransferStatus(response.content.transfer_status));
+      this.store.dispatch(new SetTransferStatus(response.content.transferStatus));
     })
 
   }
@@ -153,6 +156,10 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
     this.studyStatus$.subscribe((value) => {
       this.status = value;
       this.updateSyncStatus();
+    });
+
+    this.privateFtpAccessible$.subscribe((value) => {
+      this.privateFtpAccessible = value;
     });
     this.studyIdentifier$.subscribe((value) => {
       this.requestedStudy = value;
@@ -704,7 +711,7 @@ closeGlobusModal() {
       this.isSyncEnabled = true;
     }
   }
-  
+
   onUploadComplete(event: any) {
     // Reload general metadata (ISA files may affect study metadata)
     this.store.dispatch(new GetGeneralMetadata(this.requestedStudy, this.isReadOnly)).subscribe(() => {

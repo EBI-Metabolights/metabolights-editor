@@ -120,7 +120,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatTableModule,
         MatDividerModule,
         DragDropModule,
-        environment.production ? [] : NgxsReduxDevtoolsPluginModule.forRoot(),
         NgxsModule.forRoot([
             GeneralMetadataState,
             UserState,
