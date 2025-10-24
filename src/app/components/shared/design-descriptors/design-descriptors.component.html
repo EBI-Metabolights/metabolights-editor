@@ -40,15 +40,14 @@
         </div>
         <ng-template #emptyMessage>
           <span *ngIf="!isReadOnly; else emptyReadOnlyMessage">
-            <p class="has-text-grey-light has-text-centered">
+            <p class="placeholder-text">
               <small
-                >Add terms that define your study eg. technique, disease,
-                targeted / untargeted metabolites </small
+                >Include terms that define your study. These should cover concepts related to your research field (e.g., Lipidomics, Exposomics, etc.), the techniques and analytical scope used (e.g., ultra-performance liquid chromatography-mass spectrometry, tandem mass spectrometry, targeted or untargeted metabolite analysis, etc.), and any other relevant keywords commonly found in scientific publications (e.g., specific diseases, specific compounds, etc.). </small
               ><br />
             </p>
           </span>
           <ng-template #emptyReadOnlyMessage>
-            <p class="has-text-grey-light has-text-centered">
+            <p class="placeholder-text">
               <small>No design descriptors defined.</small><br />
             </p>
           </ng-template>
