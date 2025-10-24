@@ -154,7 +154,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
             },
             initOptions: {
               onLoad: 'check-sso',
-              silentCheckSsoRedirectUri: `${window.location.origin}/assets/silent-check-sso.html`
+              silentCheckSsoRedirectUri: `https://wwwdev.ebi.ac.uk/metabolights/keycloak/editor/assets/silent-check-sso.html`
             }
           }),
     {
