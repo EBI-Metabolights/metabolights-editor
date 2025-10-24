@@ -7,3 +7,8 @@
   padding-right: 1em;
   width: 1.4em;
 }
+.placeholder-text {
+  color: #b5b5b5;
+  font-size: .875em;
+  font-style: italic;
+}
