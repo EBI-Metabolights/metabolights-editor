@@ -7,6 +7,7 @@ import {
   SimpleChanges,
   EventEmitter,
   ViewChild,
+  ElementRef,
 } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER } from "@angular/cdk/keycodes";
@@ -55,7 +56,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("id") id: string;
   @Input("unitId") unitId: string;
   @Input("label") label: string;
-
+  @ViewChild('input', { static: false }) inputRef!: ElementRef<HTMLInputElement>;
   @Output() changed = new EventEmitter<any>();
 
   @ViewChild("input", { read: MatAutocompleteTrigger })
@@ -240,7 +241,7 @@ export class OntologyComponent implements OnInit, OnChanges {
             this.searchedMore = remoteSearch;
             this.isFormBusy = false;
             this.setCurrentOptions(this.allvalues);
-
+            // this.valueCtrl.disable();
           },
           (err) => {
             console.log(err);
@@ -340,6 +341,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (this.values.length === 0 && !(this.inputValue && this.inputValue.length > 0)) {
       this.getDefaultTerms();
       this.valueCtrl.setValue("");
+      // this.valueCtrl.enable();
     }
     this.triggerChanges();
   }
@@ -369,6 +371,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.valueCtrl.setValue(null);
         this.getDefaultTerms();
         this.triggerChanges();
+        // this.valueCtrl.enable();
       }
     }
   }
@@ -385,6 +388,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
     this.valueCtrl.setValue(null);
     this.triggerChanges();
+    // this.valueCtrl.enable();
   }
 
   setValue(value) {
@@ -419,6 +423,10 @@ export class OntologyComponent implements OnInit, OnChanges {
 
     this.values = [];
     this.valueCtrl.setValue(null);
+    if (this.inputRef?.nativeElement) {
+      this.inputRef.nativeElement.value = '';
+    }
+    // this.valueCtrl.enable();
   }
 
   triggerChanges() {

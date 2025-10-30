@@ -374,7 +374,7 @@
               *ngFor="let org of filteredOrganizations$ | async"
               [value]="org"
             >
-              {{ org.name }} ({{ org.countryName }}) - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
+              {{ org.name }} ({{ org.countryName }}) - ROR: {{ org.id?.split('/').pop() || '(Unknown ID)' }}
             </mat-option>
           </mat-autocomplete>
           <mat-hint>
