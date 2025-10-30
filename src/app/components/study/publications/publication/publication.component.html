@@ -223,6 +223,7 @@
             formControlName="doi"
             [tabIndex]="3"
             (blur)="getArticleFromDOI()"
+            (keydown.enter)="getArticleFromDOI()"
             matInput
           />
           <mat-hint>{{ fieldValidation("doi").description }}
@@ -247,6 +248,7 @@
             [tabIndex]="4"
             formControlName="pubMedID"
             (blur)="getArticleFromPubMedID()"
+            (keydown.enter)="getArticleFromDOI()"
             matInput
           />
           <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
