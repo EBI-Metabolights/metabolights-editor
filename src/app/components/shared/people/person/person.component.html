@@ -8,9 +8,8 @@
 </span>
 <ng-template #showPersonDetails>
   <span class="clickable" (click)="openModal()">
-    {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}
+  {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
     <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
-  </span>
 </ng-template>
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
@@ -198,7 +197,7 @@
                 (changed)="onChanges($event)"
                 [values]="person.roles"
                 [inline]="true"
-                [label]="'Role'"
+                [label]="'Role*'"
               ></mtbls-ontology>
             </span>
             <mat-error

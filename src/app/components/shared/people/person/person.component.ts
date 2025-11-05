@@ -191,7 +191,7 @@ export class PersonComponent implements OnInit {
         ValidateRules("roles", this.fieldValidation("roles")),
       ],
       orcid: [
-        this.person?.comments?.[0]?.value || "",
+        this.getCommentValue("Study Person ORCID"),
         ValidateRules("orcid", this.fieldValidation("orcid")),
       ],
     });
