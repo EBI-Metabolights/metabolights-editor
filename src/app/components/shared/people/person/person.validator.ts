@@ -6,10 +6,6 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
     const value = control.value;
     let invalid = false;
     let errorMessage = "";
-    // const isRequired =
-    // control.hasValidator && control.hasValidator(Validators.required)
-    //   ? true
-    //   : JSON.parse(validation["is-required"]) === true || JSON.parse(validation["is-required"]) === "true";
 
     validation.rules.forEach((rule) => {
       switch (rule.condition) {
