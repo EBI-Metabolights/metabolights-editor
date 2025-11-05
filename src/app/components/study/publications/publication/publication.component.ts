@@ -358,9 +358,10 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.isFormBusy = false;
 
-      if (this.publication === null) {
+      if (this.publication === null || this.publication.title === "") {
         const mtblsPublication = new MTBLSPublication();
         this.publication = mtblsPublication;
+        this.publication.status = [];
       }
 
       this.form = this.fb.group({

@@ -176,6 +176,7 @@
             cdkAutosizeMinRows="3"
             cdkAutosizeMaxRows="3"
             cdkTextareaAutosize
+            required
           >
           </textarea>
           <mat-hint>{{ fieldValidation("title").description }}
@@ -216,7 +217,7 @@
             {{ form.get("authorList").errors.authorList.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width" [hideRequiredMarker]="true">
+        <mat-form-field class="full-width">
           <mat-label>DOI</mat-label>
           <input
             class="no-scroll"
@@ -270,7 +271,7 @@
           (changed)="onChanges($event)"
           [values]="[publication.status]"
           [inline]="true"
-          [label]="'Status'"
+          [label]="'Status*'"
         ></mtbls-ontology>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />
