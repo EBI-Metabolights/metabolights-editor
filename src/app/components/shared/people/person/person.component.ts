@@ -415,7 +415,7 @@ private updateValidatorsBasedOnRoles() {
 }
 
 private updatePiValidators(isPi: boolean): void {
-  const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+  const piFields = ['affiliation', 'email'];
   const alwaysRequiredFields = ['firstName', 'lastName'];
 
   // Helper to normalize validators to an array
