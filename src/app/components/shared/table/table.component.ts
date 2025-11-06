@@ -1092,24 +1092,27 @@ columnValidations(header) {
     );
   }
 
-  isSelected(row, column) {
-    if (row && column && this.selectedCells.length > 0) {
-      return (
-        this.selectedCells.filter(
-          (cell) => cell[0] === column.columnDef && cell[1] === row.index
-        ).length > 0
-      );
-    } else if (this.selectedColumns.length === 0) {
-      if (this.selectedRows.indexOf(row.index) > -1) {
-        return true;
-      }
-    } else if (this.selectedRows.length === 0) {
-      if (this.selectedColumns.indexOf(column.columnDef) > -1) {
-        return true;
-      }
+  isSelected(row: any, column?: any): boolean {
+  if (!row) return false;
+
+  if (column && this.selectedCells.length > 0) {
+    return (
+      this.selectedCells.filter(
+        (cell) => cell[0] === column.columnDef && cell[1] === row.index
+      ).length > 0
+    );
+  } else if (this.selectedColumns.length === 0) {
+    if (this.selectedRows.indexOf(row.index) > -1) {
+      return true;
     }
-    return false;
+  } else if (this.selectedRows.length === 0 && column) {
+    if (this.selectedColumns.indexOf(column.columnDef) > -1) {
+      return true;
+    }
   }
+  return false;
+}
+
 
   deSelect() {
     this.selectedRows = [];
