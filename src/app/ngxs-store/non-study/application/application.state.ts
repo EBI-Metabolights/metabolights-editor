@@ -69,7 +69,7 @@ export interface ApplicationStateModel {
         studyPermission: null,
         bannerMessage: null,
         maintenanceMode: false,
-        controlLists: null,
+        controlLists: {},              // legacy map
         investigationFailed: null,
         readonly: null,
         isProtocolsExpanded: true,
@@ -340,7 +340,12 @@ export class ApplicationState {
         return state.maintenanceMode
     }
 
-    @Action(DefaultControlLists.Get)
+    // @Action(DefaultControlLists.Get)
+    // GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>) {
+    //     return ctx.getState().controlLists; //just for development purposes
+    // }
+
+    @Action(DefaultControlLists.Get) //enable thsis when production
     GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Get) {
         this.applicationService.getDefaultControlLists().subscribe(
             (response) => {
@@ -353,14 +358,33 @@ export class ApplicationState {
         )
     }
 
-    @Action(DefaultControlLists.Set)
-    SetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
-        const state = ctx.getState();
-        ctx.setState({
-            ...state,
-            controlLists: action.lists
-        });
-    }
+@Action(DefaultControlLists.Set)
+  setDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
+    const payload = action.lists || {};
+    const state = ctx.getState();
+
+    const incomingFlat: Record<string, any[]> = (payload && (payload as any).controlLists)
+      ? (payload as any).controlLists
+      : payload;
+
+   const merged = {
+      ...(state.controlLists || {}),
+      ...(incomingFlat || {})
+    };
+
+   ctx.patchState({
+      controlLists: merged
+    });
+  }
+
+    // @Action(DefaultControlLists.Set)
+    // SetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
+    //     const state = ctx.getState();
+    //     ctx.setState({
+    //         ...state,
+    //         controlLists: action.lists
+    //     });
+    // }
 
     @Selector()
     static controlLists(state: ApplicationStateModel) {

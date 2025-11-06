@@ -43,6 +43,7 @@ import { AssaysService } from "src/app/services/decomposed/assays.service";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { urlValidator, notANumberValidator } from "../../shared/ontology/ontology.validator";
+import { FieldValueValidation, getValidationRuleForField, MetabolightsFieldControls, ValidationRuleSelectionInput, StudyCategoryStr, getOntologyHandling } from "src/app/models/mtbl/mtbls/control-list";
 
 /* eslint-disable @typescript-eslint/dot-notation */
 @Component({
@@ -72,6 +73,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
   @Output() refreshTableData = new EventEmitter<void>();
+
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
@@ -166,6 +168,15 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   tableTypeValue: string = "";
   openUploadArea: boolean = false;
   filePatternString: string = "^([asi]_.+\.txt|m_.+\.tsv)$";
+  // legacy flat control-lists from store (key -> array of terms)
+  private legacyControlLists: Record<string, any[]> | null = null;
+  
+
+  private studyCategory: StudyCategoryStr = "other";
+  private templateVersion: string = "1.0";
+  private sampleTemplate: string = "minimum";
+
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -175,6 +186,14 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
     private cdRef: ChangeDetectorRef
   ) {
     this.baseHref = this.editorService.configService.baseHref;
+    // read legacy flat controlLists from NGXS store for dev usage (key -> array of terms)
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+      this.legacyControlLists = lists || {};
+      // if you want to trigger control-list detection when lists arrive:
+      if (this.data && this.data.header && this.controlListColumns.size === 0) {
+        this.detectControlListColumns();
+      }
+    });
   }
 
   ngOnInit() {
@@ -225,6 +244,12 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
 
     this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
       this.studyId = value;
+      const cat = this.store.selectSnapshot((state: any) => state.study?.generalMetadata?.studyCategory);
+      this.studyCategory = cat || "other";
+      const ver = this.store.selectSnapshot((state: any) => state.study?.generalMetadata?.templateVersion);
+      this.templateVersion = ver || "1.0";
+      const sampTemp = this.store.selectSnapshot((state: any) => state.study?.generalMetadata?.sampleTemplate);
+      this.sampleTemplate = sampTemp || "minimum";  
     })
 
     this.editorValidationRules$.subscribe((value) => {
@@ -577,29 +602,121 @@ compare(a: any, b: any, isAsc: boolean) {
     });
   }
 
-  detectControlListColumns() {
-    Object.keys(this.data.header).forEach((col) => {
-      if (!this.controlListColumns.has(col)) {
-        const formattedColumnName = col.replace(/\.[0-9]+$/, "");
-        const definition = this.getValidationDefinition(formattedColumnName);
-        if (definition
-          && "ontology-details" in definition
-          && "recommended-ontologies" in definition["ontology-details"]
-          && definition["ontology-details"]["recommended-ontologies"]) {
-          const prefix = definition["ontology-details"]["recommended-ontologies"].ontology?.url;
-          let branch = "";
-          const branchParam = prefix.split("branch=");
-          if (branchParam.length > 1) {
-            branch = decodeURI(branchParam[1].split("&")[0]);
-          }
-          if (branch.length > 0) {
-            this.controlListNames.set(col, branch);
-            this.controlListColumns.set(col, Object.freeze(definition));
-          }
-        }
+detectControlListColumns() {
+  Object.keys(this.data.header).forEach((col) => {
+    if (this.controlListColumns.has(col)) return;
+
+    const formattedColumnName = col.replace(/\.[0-9]+$/, "");
+
+    // Keep old logic: Set controlListColumns from validation.json for display
+    const definition = this.getValidationDefinition(formattedColumnName);
+    if (
+      definition &&
+      "ontology-details" in definition &&
+      "recommended-ontologies" in definition["ontology-details"] &&
+      definition["ontology-details"]["recommended-ontologies"]
+    ) {
+      const prefix = definition["ontology-details"]["recommended-ontologies"].ontology?.url;
+      let branch = "";
+      const branchParam = prefix.split("branch=");
+      if (branchParam.length > 1) {
+        branch = decodeURI(branchParam[1].split("&")[0]);
       }
-    });
+      if (branch.length > 0) {
+        this.controlListNames.set(col, branch);
+        this.controlListColumns.set(col, Object.freeze(definition));  // Keep old validations for display
+      }
+    }
+
+    // Overlay new rule-based logic for search/API
+    const isaFileType = this.getTableType(this.data.file) || "assay";
+    const selectionInput: ValidationRuleSelectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: new Date(),
+      isaFileType,
+      isaFileTemplateName: this.sampleTemplate,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule: FieldValueValidation | null = null;
+    try {
+      if (this.legacyControlLists && Object.keys(this.legacyControlLists).length > 0) {
+        rule = getValidationRuleForField(
+          { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
+          formattedColumnName,
+          selectionInput
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+
+    if (rule) {
+      // For rule-based columns, merge rule into existing controlListColumns for search
+      const existing = this.controlListColumns.get(col) || {};
+      this.controlListColumns.set(col, Object.freeze({
+        ...existing,  // Keep old validations for display
+        rule,  // Add rule for search
+        dataType: rule.validationType,
+        renderAsDropdown: rule.validationType === "selected-ontology-term",
+      }));
+
+      // Set controlLists for initial terms
+      if (rule.terms && rule.terms.length > 0) {
+        const ontologiesValues: Ontology[] = rule.terms.map((t: any) => {
+          const o = new Ontology();
+          o.annotationValue = t.term;
+          o.termAccession = t.termAccessionNumber || "";
+          o.termSource = new OntologySourceReference();
+          o.termSource.name = t.termSourceRef || "";
+          o.termSource.description = existing?.description || "";
+          o.termSource.file = "";
+          o.termSource.version = "";
+          o.termSource.provenance_name = "";
+          return o;
+        });
+        this.controlLists.set(col, { name: col, values: ontologiesValues });
+      }
+
+      // Ensure ontology columns are recognized for rule-based types
+      if ((rule.validationType === "ontology-term-in-selected-ontologies" || rule.validationType === "child-ontology-term") &&
+          this.ontologyColumns.indexOf(col) === -1) {
+        this.ontologyColumns.push(col);
+      }
+    }
+  });
+}
+
+columnControlList(header) {
+  if (this.enableControlList && header && this.controlListNames.has(header)) {
+    const controlList = this.controlLists.get(header);
+    if (controlList) {
+      const colData = this.controlListColumns.get(header);
+      return {
+        ...controlList,
+        renderAsDropdown: colData?.renderAsDropdown || false,
+        rule: colData?.rule || null,  // Rule for search
+      };
+    }
   }
+  if (this.enableControlList) {
+    return this.defaultControlList;
+  }
+  return {};
+}
+
+
+columnValidations(header) {
+  if (this.enableControlList && header && this.controlListColumns.size > 0 && this.controlListColumns.has(header)) {
+    const colData = this.controlListColumns.get(header)["ontology-details"];
+    return colData;   
+  }
+  if (this.enableControlList) {
+    return this.validations.default_ontology_validation["ontology-details"];
+  }
+  return {};
+}
+
 
   toggleView() {
     if (this.view === "compact") {
@@ -1489,58 +1606,6 @@ compare(a: any, b: any, isAsc: boolean) {
     });
     return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
-  columnControlList(header) {
-    if (this.enableControlList && header && this.controlListNames.has(header)) {
-      if (this.controlLists.has(header)) {
-        return this.controlLists.get(header);
-      } else {
-        const controlListName = this.controlListNames.get(header);
-        if (controlListName in this.editorService.defaultControlLists) {
-          const ontologies = this.editorService.defaultControlLists[controlListName].OntologyTerm;
-          this.controlLists.set(header, { name: header, values: ontologies });
-          return this.controlLists.get(header);
-        }
-      }
-    }
-    if (this.enableControlList) {
-      return this.defaultControlList;
-    }
-    return {};
-  }
-
-  columnValidations(header) {
-    if (this.enableControlList && header && this.controlListColumns.size > 0 && this.controlListColumns.has(header)) {
-      return this.controlListColumns.get(header)["ontology-details"];
-    }
-    if (this.enableControlList) {
-      return this.validations.default_ontology_validation["ontology-details"];
-    }
-    return {};
-    // const formattedColumnName = header.replace(/\.[0-9]+$/, "");
-    // let selectedColumn = null;
-    // const tableTechnique = this.assayTechnique.name;
-    // const validation = this.validation;
-    // const detail = "ontology-details";
-    // if ("default_order" in validation) {
-    //   this.validation.default_order.forEach((col) => {
-    //     if (col.header === formattedColumnName &&  detail in col && col[detail] && "recommended-ontologies" in col[detail]) {
-    //       if (tableTechnique && "techniqueNames" in col && col["techniqueNames"] && col["techniqueNames"].length > 0) {
-    //         if (col["techniqueNames"].indexOf(tableTechnique) > -1 ){
-    //           selectedColumn = col;
-    //         }
-    //       } else {
-    //         selectedColumn = col;
-    //       }
-    //     }
-    //   });
-    // }
-
-    // if (selectedColumn) {
-    //   return selectedColumn[id];
-    // } else {
-    //   return this.validations.default_ontology_validation["ontology-details"];
-    // }
-  }
 
   closeEditModal() {
     this.isEditModalOpen = false;
@@ -1553,10 +1618,6 @@ compare(a: any, b: any, isAsc: boolean) {
       this.isEditColumnModalOpen = true;
 
       this.selectedColumn = column;
-
-      // if (this.fileColumns.indexOf(column.header) > -1) {
-      //   this.isCellTypeFile = true;
-      // }
 
       if (this.enableControlList && this.ontologyColumns.indexOf(column.header) > -1) {
         this.isCellTypeOntology = true;
