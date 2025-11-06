@@ -621,4 +621,12 @@ export class MetabolightsService extends DataService {
   getRorid(url: string): Observable<any> {
     return this.http.get<any>(url).pipe(catchError(this.handleError));
     }
+
+  getOntologyTermsV2(keyword: string, body: any): Observable<any> {
+    const url = this.configService.config.ws3URL + '/public/v2/ontology-terms/search?q=' + encodeURIComponent(keyword);
+    return this.http
+      .post<any>(url, body, httpOptions)  // Use POST with JSON body
+      .pipe(catchError(this.handleError));
+  }
+
 }

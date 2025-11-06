@@ -10,7 +10,7 @@ import { ConfigurationService } from "../configuration.service";
 import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
-import { HttpHeaders } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Observable, of, asapScheduler } from "rxjs";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
@@ -35,6 +35,7 @@ import { ValidationService } from "./decomposed/validation.service";
 import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
 import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
+import { MetabolightsFieldControls } from "../models/mtbl/mtbls/control-list";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -91,7 +92,12 @@ export class EditorService {
     "Source Name": 7,
   };
   ontologyDetails: any = {};
-
+  // keep raw control-lists payload (may include assayFileControls/sampleFileControls/etc)
+  controlListControls: MetabolightsFieldControls | null = null;
+  // convenience references to specific parts (if present)
+  controlListAssayRules: any = null;
+  controlListSampleRules: any = null;
+  controlListInvestigationRules: any = null;
   constructor(
     public store: Store,
     private router: Router,
@@ -99,12 +105,14 @@ export class EditorService {
     private dataService: MetabolightsService,
     private validationService: ValidationService, // this is an antipattern, dont repeat
     public configService: ConfigurationService,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    private http: HttpClient,
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.setUpSubscriptionsNgxs();
     this.redirectUrl = this.configService.config.redirectURL;
-
+    // load dev control-lists (asset) and merge into NGXS without overwriting existing controlLists
+    // this.loadAndMergeDevControlLists();
   }
 
   setUpSubscriptionsNgxs() {
@@ -120,34 +128,136 @@ export class EditorService {
     });
 
     this.controlLists$.subscribe((value) => {
-      if (value) {
-        Object.keys(value).forEach((label: string)=>{
-          this.defaultControlLists[label] = {OntologyTerm: []};
-          value[label].forEach(term => {
-            this.defaultControlLists[label].OntologyTerm.push({
-              annotationDefinition: term.definition,
-              annotationValue: term.name,
-              termAccession: term.iri,
+      // if (value) {
+      //   Object.keys(value).forEach((label: string)=>{
+      //     this.defaultControlLists[label] = {OntologyTerm: []};
+      //     value[label].forEach(term => {
+      //       this.defaultControlLists[label].OntologyTerm.push({
+      //         annotationDefinition: term.definition,
+      //         annotationValue: term.name,
+      //         termAccession: term.iri,
+      //         comments: [],
+      //         termSource: {
+      //           comments: [],
+      //           name: term.onto_name,
+      //           description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
+      //           file: term.provenance_name,
+      //           provenance_name: term.provenance_name,
+      //           version: ""
+      //         },
+      //         wormsID: ""
+      //       });
+      //     });
+      //   });
+      // }
+      if (!value) return;
+
+      let controlListsPayload: Record<string, any> = value;
+      if ((value as any).controlLists) {
+        // store raw controls for other components to use
+       this.controlListControls = value as MetabolightsFieldControls;
+        this.controlListAssayRules = (value as any).assayFileControls || null;
+        this.controlListSampleRules = (value as any).sampleFileControls || null;
+       this.controlListInvestigationRules = (value as any).investigationFileControls || null;
+        controlListsPayload = (value as any).controlLists || {};
+      } else {
+        this.controlListControls = null;
+        this.controlListAssayRules = null;
+        this.controlListSampleRules = null;
+       this.controlListInvestigationRules = null;
+      }
+      // reset before rebuild to avoid accumulated entries on repeated emissions
+      this.defaultControlLists = {};
+      Object.keys(controlListsPayload).forEach((label: string) => {
+        const entry: any = controlListsPayload[label];
+        // support either: direct array of terms OR wrapper { OntologyTerm: [...] }
+       const termsArray = Array.isArray(entry)
+          ? entry
+          : entry && Array.isArray(entry.OntologyTerm)
+          ? entry.OntologyTerm
+         : null;
+
+        if (!termsArray) {
+          // skip non-array entries
+          return;
+        }
+
+        this.defaultControlLists[label] = { OntologyTerm: [] };
+        termsArray.forEach((term: any) => {
+          this.defaultControlLists[label].OntologyTerm.push({
+            annotationDefinition: term.definition,
+            annotationValue: term.name || term.annotationValue || "",
+            termAccession: term.iri || term.termAccession || "",
+            comments: [],
+            termSource: {
               comments: [],
-              termSource: {
-                comments: [],
-                name: term.onto_name,
-                description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
-                file: term.provenance_name,
-                provenance_name: term.provenance_name,
-                version: ""
-              },
-              wormsID: ""
-            });
+             name: term.onto_name || term.termSourceRef || "",
+              description: (term.onto_name || term.termSourceRef) === "MTBLS" ? "Metabolights Ontology" : "",
+              file: term.provenance_name || "",
+              provenance_name: term.provenance_name || "",
+              version: "",
+            },
+            wormsID: "",
           });
         });
-      }
+      });
     });
     this.assays$.subscribe((assays) => this.assays = assays);
     this.samples$.subscribe((samples) => this.samples = samples);
     this.mafs$.subscribe((mafs) => this.mafs = mafs)
 
   }
+
+//   private loadAndMergeDevControlLists(): void {
+//   this.http.get<any>("/assets/control-lists.json").subscribe(
+//     (assetLists) => {
+//       try {
+//         // Get the existing state snapshot safely
+//         const existingState = this.store.selectSnapshot(ApplicationState.controlLists) || {};
+
+//         // Normalize the incoming asset payload (in case some fields are missing)
+//         const assetFull = assetLists?.controlLists
+//           ? assetLists
+//           : {
+//               controlLists: assetLists?.controlLists || assetLists || {},
+//               assayFileControls: assetLists?.assayFileControls || {},
+//               sampleFileControls: assetLists?.sampleFileControls || {},
+//               investigationFileControls: assetLists?.investigationFileControls || {},
+//               defaultOntologies: assetLists?.defaultOntologies || [],
+//               defaultOtherSources: assetLists?.defaultOtherSources || [],
+//             };
+
+//         // Create a new shallow-merged flat control list (immutable)
+//         const mergedFlat = {
+//           ...existingState.controlLists,
+//           ...assetFull.controlLists,
+//         };
+
+//         // Create a new merged full payload (immutable)
+//         const mergedFull = {
+//           ...existingState,
+//           ...assetFull,
+//           controlLists: mergedFlat,
+//         };
+
+//         // Dispatch new immutable object → NGXS detects reference change
+//         this.store.dispatch(new DefaultControlLists.Set(structuredClone(mergedFull)));
+
+//       } catch (e) {
+//         console.error("Error merging control lists:", e);
+//         // Fallback: dispatch a minimal payload
+//         const fallbackFull =
+//           assetLists?.controlLists ? assetLists : { controlLists: assetLists || {} };
+//         this.store.dispatch(new DefaultControlLists.Set(structuredClone(fallbackFull)));
+//       }
+//     },
+//     (error) => {
+//       console.warn("Dev control list file not found — skipping", error);
+//       // Optional: handle gracefully
+//     }
+//   );
+// }
+
 
   login(body) {
     return this.authService.login(body);
@@ -839,5 +949,20 @@ export class EditorService {
 
       return this.dataService.getRorid(url);
     }
-
+    // New method for ontology term search with rule-based validation
+  searchOntologyTermsWithRuleV2(
+    keyword: string,
+    validationType: string,
+    ontologies: string[],
+    allowedParentOntologyTerms?: any
+  ): Observable<any> {
+    const body: any = {
+      ontologyValidationType: validationType,
+      ontologies: ontologies
+    };
+    if (allowedParentOntologyTerms) {
+      body.allowedParentOntologyTerms = allowedParentOntologyTerms;
+    }
+    return this.dataService.getOntologyTermsV2(keyword, body);
+  }
 }

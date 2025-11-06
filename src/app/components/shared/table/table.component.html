@@ -354,7 +354,7 @@
   <!--empty table message end-->
 <!-- </span> -->
 
-<!--Edit column modal start-->
+<!-- Edit column modal start -->
 <div
   class="modal prevent-deselect"
   [ngClass]="{ 'is-active': isEditColumnModalOpen }"
@@ -373,20 +373,26 @@
             <div class="field">
               <div class="control">
                 <label>{{ formatHeader(selectedColumn.header) }}</label>
-                <div *ngIf="isCellTypeOntology; else cellInputField">
+                <div *ngIf="isCellTypeOntology && !columnControlList(selectedColumn['header']).renderAsDropdown; else dropdownField">
                   <mtbls-ontology
                     [id]="'editOntologyColumn'"
-                    [validations]="
-                      columnValidations(selectedColumn['header'])
-                    "
+                    [validations]="columnValidations(selectedColumn['header'])"
                     [controlList]="columnControlList(selectedColumn['header'])"
                     (changed)="onChanges($event)"
                     [values]="[]"
                     [inline]="true"
+                    [rule]="columnControlList(selectedCell['column']['header']).rule"
                   ></mtbls-ontology>
                 </div>
-                <ng-template #cellInputField>
-                  <mat-form-field class="full-width">
+                <ng-template #dropdownField>
+                  <mat-form-field class="full-width" *ngIf="columnControlList(selectedColumn['header']).renderAsDropdown">
+                    <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedColumn.header) }}">
+                      <mat-option *ngFor="let option of columnControlList(selectedColumn['header']).values" [value]="option.annotationValue">
+                        {{ option.annotationValue }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field class="full-width" *ngIf="!columnControlList(selectedColumn['header']).renderAsDropdown && !isCellTypeOntology">
                     <input class="no-scroll" formControlName="cell" matInput />
                   </mat-form-field>
                 </ng-template>
@@ -427,9 +433,9 @@
     </div>
   </form>
 </div>
-<!--edit column modal end-->
+<!-- edit column modal end -->
 
-<!--edit cell modal start-->
+<!-- edit cell modal start -->
 <div
   class="modal editModal prevent-deselect"
   *ngIf="isEditModalOpen"
@@ -448,35 +454,26 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <div *ngIf="isCellTypeOntology && !isCellTypeControlList">
-                  <label>{{
-                    formatHeader(selectedCell["column"]["columnDef"])
-                  }}</label>
+                <div *ngIf="isCellTypeOntology && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                  <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
                   <mtbls-ontology
                     [id]="'editOntologyCell'"
-                    [validations]="
-                      columnValidations(
-                        selectedCell['column']['header']
-                      )
-                    "
+                    [validations]="columnValidations(selectedCell['column']['header'])"
                     [controlList]="columnControlList(selectedCell['column']['header'])"
                     (changed)="onEditCellChanges($event)"
                     [values]="[selectedCellOntology]"
                     [inline]="true"
+                    [rule]="columnControlList(selectedCell['column']['header']).rule"
                   ></mtbls-ontology>
                 </div>
                 <div *ngIf="isCellTypeFile">
                   <mat-form-field class="full-width">
                     <mat-select
                       formControlName="cell"
-                      placeholder="{{
-                        formatHeader(selectedCell['column']['columnDef'])
-                      }}"
+                      placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}"
                     >
                       <mat-option
-                        *ngFor="
-                          let file of getFiles(selectedCell['column']['header'])
-                        "
+                        *ngFor="let file of getFiles(selectedCell['column']['header'])"
                         [value]="file.file"
                       >
                         {{ file.file }}
@@ -484,30 +481,33 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
-                <div *ngIf="isCellTypeControlList">
-                  <label>{{
-                    formatHeader(selectedCell["column"]["columnDef"])
-                  }}</label>
+                <div *ngIf="isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                  <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
                   <mtbls-ontology
                     [id]="'editControlListCell'"
-                    [validations]="
-                      columnValidations(
-                        selectedCell['column']['header']
-                      )
-                    "
+                    [validations]="columnValidations(selectedCell['column']['header'])"
                     [controlList]="columnControlList(selectedCell['column']['header'])"
                     (changed)="onEditCellChanges($event)"
                     [values]="[selectedCellOntology]"
                     [inline]="true"
+                    [rule]="columnControlList(selectedCell['column']['header']).rule"
                   ></mtbls-ontology>
                 </div>
-                <div *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList">
-                  <label>{{
-                    formatHeader(selectedCell["column"]["columnDef"])
-                  }}</label>
+                <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                  <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                  <mat-form-field class="full-width">
+                    <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
+                      <mat-option *ngFor="let option of columnControlList(selectedCell['column']['header']).values" [value]="option.annotationValue">
+                        {{ option.annotationValue }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+                <div *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                  <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
                   <mat-form-field class="full-width">
                     <input class="no-scroll" formControlName="cell" matInput required/>
-                     <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
+                    <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
                       Please enter a valid URL
                     </mat-error>
                     <mat-error *ngIf="editCellform.get('cell')?.hasError('numberNotAllowed')">
@@ -552,7 +552,7 @@
     </div>
   </form>
 </div>
-<!--edit cell modal end-->
+<!-- edit cell modal end -->
 
 <!--Delete modal start-->
 <div
@@ -599,6 +599,7 @@
               [values]="[selectedMissingVal]"
               [initialSearchKeyword]="selectedMissingVal"
               [inline]="true"
+              [rule]="columnControlList(selectedMissingKey).rule"
             ></mtbls-ontology>
           </div>
         </div>
