@@ -17,7 +17,7 @@ import {
 } from "@angular/material/autocomplete";
 import { MatChipInputEvent } from "@angular/material/chips";
 import { firstValueFrom, Observable } from "rxjs";
-import { debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { debounceTime, distinctUntilChanged, filter } from "rxjs/operators";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
 
@@ -169,7 +169,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.getDefaultTerms();
 
     this.valueCtrl.valueChanges
-      .pipe(distinctUntilChanged(), debounceTime(300))
+      .pipe(distinctUntilChanged(), debounceTime(300), filter(value => value && value.trim().length >= 3))
       .subscribe((value) => this.searchTerm(value, false));
 
     this.valueCtrl.setValue(this.initialSearchKeyword);
@@ -219,6 +219,13 @@ export class OntologyComponent implements OnInit, OnChanges {
       this.searchedMore = false;
       this.loading = false;
       return this.currentOptions;
+    }
+    if (value.trim().length < 3) {
+      this.setCurrentOptions(this.controlList.values);
+      this.searchedMore = false;
+      this.loading = false;
+      this.isFormBusy = false;
+      return;
     }
     this.inputValue = value;
     this.values = this.values.filter((el) => el !== null);
