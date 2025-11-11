@@ -56,8 +56,10 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("id") id: string;
   @Input("unitId") unitId: string;
   @Input("label") label: string;
+  
   @ViewChild('input', { static: false }) inputRef!: ElementRef<HTMLInputElement>;
   @Output() changed = new EventEmitter<any>();
+  @Output() emptyError = new EventEmitter<boolean>();
 
   @ViewChild("input", { read: MatAutocompleteTrigger })
   valueInput: MatAutocompleteTrigger;
@@ -265,7 +267,10 @@ export class OntologyComponent implements OnInit, OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges) {
-    this.values = this.values.filter((val) => val !== null);
+      this.values = this.values.filter((val) => val !== null);
+
+      // Emit to parent when array becomes empty
+      this.emptyError.emit(this.values.length === 0);
   }
 
   setValues(values) {
