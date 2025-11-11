@@ -76,7 +76,9 @@ export class PersonComponent implements OnInit {
   options: string[] = ["One", "Two", "Three"];
 
   validationsId = "people.person";
+  showError = false;
 
+  
   private toastrSettings: Record<string, any> = {};
   isPiRole: boolean= false;
   filteredOrganizations$: Observable<any[]> = of([]);
@@ -128,6 +130,11 @@ export class PersonComponent implements OnInit {
       }
     });
   }
+  
+  onEmptyError(isEmpty: boolean) {
+    this.showError = isEmpty;
+  }
+
   private getCommentValue(label: string): string {
     return (
       this.person?.comments?.find((c) => c.name === label)?.value || ""

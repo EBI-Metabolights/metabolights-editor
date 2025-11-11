@@ -62,10 +62,11 @@ export class PublicationComponent implements OnInit {
   isUpdateTitleModalOpen = false;
   isUpdateAbstractModalOpen = false;
   isImportAuthorsModalOpen = false;
-
+  showOntology: boolean = true;
   manuscriptAuthors: any = null;
 
   publicationAbstract = "";
+  showError = false;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -195,6 +196,7 @@ export class PublicationComponent implements OnInit {
         this.setDoiRequiredBasedOnStatus();
         this.form.controls.doi.updateValueAndValidity();
       }
+      
   }
 
   showHistory() {
@@ -211,6 +213,7 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.initialiseForm();
       this.isModalOpen = true;
+      this.showOntology = true;
       this.publicationAbstract = "";
       this.getAbstract();
     }
@@ -385,10 +388,11 @@ export class PublicationComponent implements OnInit {
           ValidateRules("title", this.fieldValidation("title")),
         ],
         status: [
-          this.publication.status,
+          this.publication?.status,
           ValidateRules("status", this.fieldValidation("status")),
         ],
       });
+      
       // ensure DOI validator runs for initial status value
       if (this.form.controls.doi) {
         this.setDoiRequiredBasedOnStatus();
@@ -549,6 +553,8 @@ export class PublicationComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    if(this.publication)
+        this.showOntology = false;
   }
 
   get validation() {
@@ -592,5 +598,9 @@ export class PublicationComponent implements OnInit {
       this.defaultControlList.name = this.defaultControlListName;
     }
     return this.defaultControlList;
+  }
+
+  onEmptyError(isEmpty: boolean) {
+    this.showError = isEmpty;
   }
 }

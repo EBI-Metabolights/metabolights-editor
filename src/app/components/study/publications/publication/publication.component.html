@@ -264,15 +264,22 @@
           </mat-error>
         </mat-form-field>
         <mtbls-ontology
+          *ngIf="showOntology"
           class="mt-20"
           #publicationStatus
           [validations]="fieldValidation('status')"
           [controlList]="controlList()"
           (changed)="onChanges($event)"
-          [values]="[publication.status]"
+          [values]="[publication?.status]"
           [inline]="true"
           [label]="'Status*'"
+          (emptyError)="onEmptyError($event)"
         ></mtbls-ontology>
+        <mat-error
+              *ngIf="showError"
+            >
+              <small>{{ form?.get("status")?.errors?.status?.error }}</small>
+        </mat-error>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />
           <label
@@ -321,8 +328,7 @@
           </div>
           <div class="column is-one-third has-text-right">
             <button
-              *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
+              [disabled]="!form.valid || isFormBusy || form.pristine"
               (click)="saveNgxs()"
               class="button is-info"
             >
@@ -333,14 +339,14 @@
               ></mat-spinner>
               Save
             </button>
-            <button
+            <!-- <button
               *ngIf="form.pristine"
               (click)="closeModal()"
               [tabIndex]="6"
               class="button is-info"
             >
               OK
-            </button>
+            </button> -->
             <button
               class="button"
               [disabled]="isFormBusy"

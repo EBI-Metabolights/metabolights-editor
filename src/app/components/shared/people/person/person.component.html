@@ -195,19 +195,16 @@
                 [validations]="fieldValidation('roles')"
                 [controlList]="controlList()"
                 (changed)="onChanges($event)"
-                [values]="person.roles"
+                [values]="person?.roles"
                 [inline]="true"
                 [label]="'Role*'"
+                (emptyError)="onEmptyError($event)"
               ></mtbls-ontology>
             </span>
             <mat-error
-              *ngIf="
-                form.get('roles').errors &&
-                form.get('roles').dirty &&
-                form.get('roles').errors.roles
-              "
+              *ngIf="showError"
             >
-              <small>{{ form.get("roles").errors.roles.error }}</small>
+              <small>{{ form?.get("roles")?.errors?.roles?.error }}</small>
             </mat-error>
           </div>
           <mat-form-field class="half-width">
@@ -446,8 +443,7 @@
           </div>
           <div class="column is-half has-text-right">
             <button type="submit"
-              *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
+              [disabled]="!form.valid || isFormBusy || form.pristine"
               (click)="saveNgxs()"
               class="button is-info"
             >
@@ -458,13 +454,13 @@
               ></mat-spinner>
               Save
             </button>
-            <button type="submit"
+            <!-- <button type="submit"
               *ngIf="form.pristine"
               (click)="closeModal()"
               class="button is-info"
             >
               OK
-            </button>
+            </button> -->
             <button type="button"  
               class="button"
               [disabled]="isFormBusy"
