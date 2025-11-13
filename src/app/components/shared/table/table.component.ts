@@ -211,10 +211,8 @@ export class TableComponent
     private cdRef: ChangeDetectorRef
   ) {
     this.baseHref = this.editorService.configService.baseHref;
-    // read legacy flat controlLists from NGXS store for dev usage (key -> array of terms)
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
       this.legacyControlLists = lists || {};
-      // if you want to trigger control-list detection when lists arrive:
       if (this.data && this.data.header && this.controlListColumns.size === 0) {
         this.detectControlListColumns();
       }
@@ -702,7 +700,8 @@ export class TableComponent
       const isOntologyType = [
         "selected-ontology-term",
         "ontology-term-in-selected-ontologies",
-        "child-ontology-term"
+        "child-ontology-term",
+        "any-ontology-term",
       ].includes(rule.validationType);
       this.controlListColumns.set(
         col,

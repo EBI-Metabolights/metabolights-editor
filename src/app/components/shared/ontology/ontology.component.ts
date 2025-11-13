@@ -121,6 +121,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     "HP",
     "MP",
   ];
+  
 
   constructor(
     private editorService: EditorService,
@@ -169,8 +170,17 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.getDefaultTerms();
 
     this.valueCtrl.valueChanges
-      .pipe(distinctUntilChanged(), debounceTime(300), filter(value => value && value.trim().length >= 3))
-      .subscribe((value) => this.searchTerm(value, false));
+    .pipe(
+      distinctUntilChanged(),
+      debounceTime(300),
+      filter(value => typeof value === 'string' && value.trim().length >= 3) 
+    )
+    .subscribe((value) => this.searchTerm(value, false));
+
+
+    if (this.rule && (this.rule.validationType === "child-ontology-term" || this.rule.validationType === "ontology-term-in-selected-ontologies")) {
+      this.setCurrentOptions(this.controlList.values);  // Show initial terms immediately
+    }
 
     this.valueCtrl.setValue(this.initialSearchKeyword);
     if (this.initialSearchKeyword && this.initialSearchKeyword.length > 0) {
@@ -269,7 +279,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         if (
           this.rule &&
           (this.rule.validationType === "child-ontology-term" ||
-            this.rule.validationType === "ontology-term-in-selected-ontologies")
+            this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")
         ) {
           // Always call new API for these types, even if initial terms exist
           const validationType = this.rule.validationType;
@@ -489,23 +499,27 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   remove(value: Ontology): void {
-    const index = this.indexOfObject(
-      this.values,
-      "annotationValue",
-      value.annotationValue
-    );
-    if (index >= 0) {
-      this.values.splice(index, 1);
-    }
-    if (
-      this.values.length === 0 &&
-      !(this.inputValue && this.inputValue.length > 0)
-    ) {
-      this.getDefaultTerms();
-      this.valueCtrl.setValue("");
-    }
-    this.triggerChanges();
+  const index = this.indexOfObject(
+    this.values,
+    "annotationValue",
+    value.annotationValue
+  );
+  if (index >= 0) {
+    this.values.splice(index, 1);
   }
+  if (
+    this.values.length === 0 &&
+    !(this.inputValue && this.inputValue.length > 0)
+  ) {
+    this.getDefaultTerms();
+    this.valueCtrl.setValue("");
+    if (this.rule && (this.rule.validationType === "child-ontology-term" || this.rule.validationType === "ontology-term-in-selected-ontologies")) {
+      this.setCurrentOptions(this.controlList.values);  // Explicitly show initial terms
+    }
+  }
+  this.triggerChanges();
+}
+
 
   add(event: MatChipInputEvent): void {
     if (this.addOnBlur) {
@@ -531,6 +545,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         inputElement.value = "";
         this.valueCtrl.setValue(null);
         this.getDefaultTerms();
+        this.valueInput.closePanel();
         this.triggerChanges();
       }
     }
