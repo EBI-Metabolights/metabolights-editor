@@ -1,4 +1,4 @@
-import { AbstractControl, ValidatorFn } from "@angular/forms";
+import { AbstractControl, ValidatorFn, Validators } from "@angular/forms";
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
 export function ValidateRules(field: string, validation: any): ValidatorFn {
@@ -6,12 +6,12 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
     const value = control.value;
     let invalid = false;
     let errorMessage = "";
+
     validation.rules.forEach((rule) => {
       switch (rule.condition) {
         case "min": {
           if (
-            value.toString().length < rule.value &&
-            JSON.parse(validation["is-required"])
+            value.toString().length < rule.value && value !== "" 
           ) {
             invalid = true;
             errorMessage = errorMessage + rule.error;
@@ -29,7 +29,7 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
         case "array_min": {
           if (
             value.length < rule.value &&
-            JSON.parse(validation["is-required"])
+            value !== "" 
           ) {
             invalid = true;
             errorMessage = errorMessage + rule.error;

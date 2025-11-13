@@ -12,13 +12,13 @@ interface ProtocolStatus {
 }
 
 export interface TransferStatus {
-  private_ftp: ProtocolStatus;
-  public_ftp: ProtocolStatus;
+  privateFtp: ProtocolStatus;
+  publicFtp: ProtocolStatus;
   aspera: ProtocolStatus;
 }
 
 interface TransferStatusResponse {
-  transfer_status: TransferStatus;
+  transferStatus: TransferStatus;
   message: string;
 }
 
@@ -38,7 +38,7 @@ export class TransferHealthcheckService extends BaseConfigDependentService {
         });
         let baseUrl = this.configService.config.ws3URL;
 
-        return this.http.get<Ws3Response<TransferStatusResponse>>(`${baseUrl}/transfer-healthcheck`).pipe(
+        return this.http.get<Ws3Response<TransferStatusResponse>>(`${baseUrl}/system/v2/transfer-status`).pipe(
               map((res) => res),
               catchError(this.handleError)
             );

@@ -14,6 +14,13 @@ export namespace ObfuscationCode {
     }
 }
 
+export namespace PrivateFtpAccessible {
+    export class Set {
+        static readonly type = '[files] Set Private Ftp Accessible'
+        constructor(public privateFtpAccessible: boolean) {}
+    }
+}
+
 export namespace FilesLists {
     export class SetStudyFiles {
         static readonly type = '[files] Set Study Files'
@@ -39,7 +46,7 @@ export namespace Operations {
         static readonly type = '[files] Get Study Files'
 
         /**
-         * 
+         *
          * @param id Study ID
          * @param includeSubDir Whether to include subdirectories in the response
          * @param dir Whether to only list the contents of a specific directory
@@ -47,10 +54,10 @@ export namespace Operations {
          * @param location Unclear
          */
         constructor(
-            public id: string, 
-            public includeSubDir: boolean, 
-            public dir: string, 
-            public parent: string, 
+            public id: string,
+            public includeSubDir: boolean,
+            public dir: string,
+            public parent: string,
             public location: 'study') { }
     }
 

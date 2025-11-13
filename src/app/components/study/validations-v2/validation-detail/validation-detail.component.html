@@ -13,7 +13,7 @@
                     <span class="material-symbols-outlined">
                         breaking_news
                         </span>
-                </div> 
+                </div>
                     <div class="row-content"> <h2>{{ violation.title }}</h2> </div>
             </div>
         </div>
@@ -33,12 +33,12 @@
                     <span class="material-symbols-outlined">
                         description
                         </span>
-                </div> 
-                <div class="row-content"> {{ violation.description }} <br> {{violation.violation}}</div> 
+                </div>
+                <div class="row-content"> {{ violation.description }} <br> {{violation.violation}}</div>
             </div>
         </div>
 
-        <div class="sidebar sidebar-top" > 
+        <div class="sidebar sidebar-top" >
             <div class="type" [ngClass]="{
             'bg-error': violation.type === 'ERROR',
             'bg-warning': violation.type === 'WARNING',
@@ -47,26 +47,26 @@
           }"><span class="material-symbols-outlined">
             {{typeIcon}}
             </span><b>{{ violation.type }}</b> </div>
-          <div class="button-container sidebar-bottom"> 
-    
+          <div class="button-container sidebar-bottom">
+
             <button *ngIf="violation.values.length > 0 " (click)="openInfoModal()" class="button bc-item rounded-top-button is-dark"><mat-icon>info</mat-icon>&nbsp; Details</button>
             <a [href]="getMailtoLink()" class="button bc-item is-dark"><mat-icon>mail</mat-icon>&nbsp; Contact</a>
             <button *ngIf="isCurator" class="button bc-item rounded-bottom-button is-dark" (click)="openRawModal()"><mat-icon>visibility</mat-icon>&nbsp; View Raw</button>
             <button *ngIf="isCurator && (violation.type === 'ERROR' || violation.type === 'WARNING')" (click)="handleOverride(violation)" class="button bc-item rounded-bottom-button is-dark"><span class="material-symbols-outlined">
                 sword_rose
                 </span> &nbsp; Override</button>
-    
+
           </div>
           <div class="override-container">
-            <ng-container *ngIf="violation.overrided">
-                <span class="tag is-light">!</span> 
+            <ng-container *ngIf="violation.overridden">
+                <span class="tag is-light">!</span>
                 <span class="override-tag tag is-info"> Override Applied</span>
             </ng-container>
-         
+
           </div>
-    
+
         </div>
-    
+
     </div>
     <div class="violation-footer">
         <div class="footer-container">
@@ -78,9 +78,9 @@
                 <small><b>Section:</b> {{violation.section }}</small>
                     <div (click)="copyToClipboard(violation.section)" class="icon-container"><mat-icon>content_copy</mat-icon></div>
             </div>
-            <div class="violation-footer-end-item footer-container-3">   
+            <div class="violation-footer-end-item footer-container-3">
                 <small>
-     
+
                 <b>Total Violations: </b> {{violation.totalViolations}}
             </small>
 

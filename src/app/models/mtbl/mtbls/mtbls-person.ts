@@ -34,6 +34,9 @@ export class MTBLSPerson {
   @JsonProperty("roles", [Ontology])
   roles: Ontology[] = [];
 
+  @JsonProperty("contactIndex", Number, true)
+  contactIndex?: number = 0;
+
   toJSON() {
     return {
       comments: this.comments.map((a) => a.toJSON()),
@@ -45,6 +48,7 @@ export class MTBLSPerson {
       fax: this.fax,
       midInitials: this.midInitials,
       phone: this.phone,
+      contactIndex: this.contactIndex,
       roles: this.roles.map((a) => a.toJSON()),
     };
   }

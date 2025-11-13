@@ -4,6 +4,7 @@ export interface IStudyFiles {
   private: StudyFile[];
   uploadPath: string;
   obfuscationCode: string;
+  privateFtpAccessible: boolean;
 }
 
 export interface StudyFile {

@@ -6,7 +6,7 @@ import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions"
 
 import { timer } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
-import { Breakdown, FullOverride, ValidationPhase, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
+import { Breakdown, FullOverride, ValidationHistoryRecord, Violation, Ws3ValidationReport } from "src/app/components/study/validations-v2/interfaces/validation-report.interface";
 import { ToastrService } from "src/app/services/toastr.service";
 
 export interface ValidationTask {
@@ -23,7 +23,7 @@ export interface ValidationStateModel {
     lastRunTime: string;
     currentValidationTask: ValidationTask;
     overrides: Array<FullOverride>;
-    history: Array<ValidationPhase>;
+    history: Array<ValidationHistoryRecord>;
     initialLoadMade: boolean;
     newValidationRunNeeded: boolean;
 }
@@ -75,18 +75,18 @@ export class ValidationState {
 
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
-        if (!action.test) {
+        if (!action.test && action.studyId && action.taskId) {
             this.validationService.getValidationV2Report(action.proxy, action.taskId, action.studyId).subscribe({
                 next: (response) => {
                     if (response.status !== 'error') {
-                        const currentTask = {id: response.content.task_id, ws3TaskStatus: response.content.task_status}
+                        const currentTask = {id: response.content.task.taskId, ws3TaskStatus: response.content.task.taskStatus}
                         ctx.dispatch(new ValidationReportV2.SetCurrentTask(currentTask));
                         ctx.dispatch( new ValidationReportV2.Override.GetAll(action.studyId));
-                        if (response.content.task_status === "SUCCESS") {
-                            ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
-                            ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
-                            ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
-                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time));
+                        if (response.content.task.taskStatus === "SUCCESS") {
+                            ctx.dispatch(new ValidationReportV2.Set(response.content.taskResult));
+                            ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task.taskId));
+                            ctx.dispatch(new ValidationReportV2.SetValidationStatus(response.content.taskResult.status));
+                            ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.taskResult.completionTime));
                             ctx.dispatch(new SetInitialLoad(true));
                         } else {
                             // some other task status handling here "INITIATED, STARTED, PENDING, FAILURE" etc
@@ -104,12 +104,12 @@ export class ValidationState {
                     console.log("Could not get new ws3 report");
                     console.log(JSON.stringify(error));
                 }})
-        } else {
+        } else if (action.studyId && action.taskId) {
             this.validationService.getFakeValidationReportApiResponse().subscribe((response) => {
-                ctx.dispatch(new ValidationReportV2.Set(response.content.task_result));
-                ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task_id));
-                ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.task_result)));
-                ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.task_result.completion_time))
+                ctx.dispatch(new ValidationReportV2.Set(response.content.taskResult));
+                ctx.dispatch(new ValidationReportV2.SetTaskID(response.content.task.taskId));
+                ctx.dispatch(new ValidationReportV2.SetValidationStatus(calculateStudyValidationStatus(response.content.taskResult)));
+                ctx.dispatch(new ValidationReportV2.SetLastRunTime(response.content.taskResult.completionTime))
             })
         }
 
@@ -130,16 +130,16 @@ export class ValidationState {
 
     @Action(ValidationReportV2.InitialiseValidationTask)
     InitNewValidationTask(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.InitialiseValidationTask) {
-        this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe(
-            (response) => {
+        this.validationService.createStudyValidationTask(action.proxy, action.studyId).subscribe({
+            next: (response) => {
                 ctx.dispatch(new SetValidationRunNeeded(false));
-                ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task_id, ws3TaskStatus: response.content.task_status}))
+                ctx.dispatch(new ValidationReportV2.SetCurrentTask({id: response.content.task.taskId, ws3TaskStatus: response.content.task.taskStatus}))
             },
-            (error) => {
+            error: (error) => {
                 console.log('could not submit validation task');
                 console.log(JSON.stringify(error));
             }
-        )
+    })
     }
 
     @Action(ValidationReportV2.SetTaskID)
@@ -197,16 +197,17 @@ export class ValidationState {
     @Action(ValidationReportV2.History.Get)
     GetHistory(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.History.Get) {
         const state = ctx.getState();
-        this.validationService.getValidationHistory(action.studyId).subscribe((historyResponse) => {
-            const sortedPhases = sortPhasesByTime(historyResponse.content);
+        this.validationService.getValidationHistory(action.studyId).subscribe({
+          next: (historyResponse) => {
+            const sortedPhases = sortPhasesByTime(historyResponse.content.data);
             ctx.dispatch(new ValidationReportV2.History.Set(sortedPhases));
             if (sortedPhases && sortedPhases.length > 0 && !state.initialLoadMade) {
                 ctx.dispatch(new ValidationReportV2.Get(action.studyId, sortedPhases[0].taskId))
             }
         },
-        (error) => {
+        error: (error) => {
             console.error(`Could not get history for current study: ${error}`);
-        })
+        }})
     }
 
     @Action(ValidationReportV2.History.Set)
@@ -236,14 +237,14 @@ export class ValidationState {
         const state = ctx.getState();
         this.validationService.overrideRule(action.studyId, action.override).subscribe({
             next: (response) => {
-                this.toastrService.pop(`Validation override for rule ${action.override.rule_id} applied`, "Success")
+                this.toastrService.pop(`Validation override for rule ${action.override.ruleId} applied`, "Success")
                 ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
                 ctx.dispatch(new ValidationReportV2.InitialiseValidationTask(false, action.studyId));
             },
             error: (e) => {
                 console.log('unexpected error when creating override');
                 console.error(e);
-                this.toastrService.pop(`Unable to create override for ${action.override.rule_id}`, "Error");
+                this.toastrService.pop(`Unable to create override for ${action.override.ruleId}`, "Error");
             }
         })
     }
@@ -262,7 +263,7 @@ export class ValidationState {
         this.validationService.deleteOverride(action.studyId, action.overrideId).subscribe({
             next: (response) => {
                 ctx.dispatch(new ValidationReportV2.Override.Set(response.content.validationOverrides));
-                this.toastrService.pop(`Deleted Override ${action.overrideId}`, "Success");
+                this.toastrService.pop(`Deleted Override  ${action.overrideId} for rule ${action.studyId}`, "Success");
                 ctx.dispatch(new ValidationReportV2.InitialiseValidationTask(false, action.studyId));
                 const t = timer(5000);
                 t.subscribe(() => {
@@ -394,7 +395,7 @@ export class ValidationState {
 
     static specificOverride(ruleId) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            const overrideList = state.overrides.filter(val => val.rule_id === ruleId);
+            const overrideList = state.overrides.filter(val => val.ruleId === ruleId);
             const val = overrideList[0] || null
             return val
         });
@@ -439,7 +440,7 @@ function calculateStudyValidationStatus(report: Ws3ValidationReport): ViolationT
 }
 
 
-function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
+function sortPhasesByTime(phases: ValidationHistoryRecord[]): ValidationHistoryRecord[]{
     return phases.sort((a, b) => {
         const dateA = parseValidationTime(a.validationTime);
         const dateB = parseValidationTime(b.validationTime);
@@ -468,4 +469,3 @@ function sortPhasesByTime(phases: ValidationPhase[]): ValidationPhase[]{
     // Compare the dates
     return comparator > date;
 }
-

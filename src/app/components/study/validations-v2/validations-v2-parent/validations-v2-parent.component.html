@@ -43,7 +43,7 @@
         <div class="download-report-button">
             <a *ngIf="overrides.length > 0" (click)="openOverrideListModal()" class="button is-light"> <mat-icon>picture_in_picture</mat-icon> View Enabled Overrides</a>
             &nbsp;
-            <a *ngIf="modifiers.length > 0" (click)="openMetadataModifiersModal()" class="button is-info"><mat-icon>picture_in_picture</mat-icon>View Metadata Updates</a>
+            <a *ngIf="modifierMetadataFileUpdates.length > 0" (click)="openMetadataModifiersModal()" class="button is-light"><mat-icon>picture_in_picture</mat-icon>View Metadata Updates</a>
             &nbsp;
             <a *ngIf="report !== null" (click)="downloadReport()" class="button is-light"> <mat-icon>cloud_download</mat-icon> Download Report</a>
         </div>
@@ -59,7 +59,7 @@
                 <div *ngIf="allViolations.length > 0; else noViolations">
                     <div *ngIf="allViolations !== null">
                         <div *ngFor="let violation of allViolations; let i = index;">
-                            <validation-v2-detail [violation]="violation" [studyId]="studyId"></validation-v2-detail>
+                            <validation-v2-detail [violation]="violation"></validation-v2-detail>
                             <br>
                         </div>
                     </div>
@@ -135,5 +135,5 @@
 
 <!--Metadata modifiers modal-->
 <ng-container *ngIf="metadataModifiersModalOpen">
-    <metadata-modifiers-modal [metadataModifiers]="modifiers" (closeEvent)="metadataModifiersModalClosed()"></metadata-modifiers-modal>
+    <metadata-modifiers-modal [modifierMetadataFileUpdates]="modifierMetadataFileUpdates" (closeEvent)="metadataModifiersModalClosed()"></metadata-modifiers-modal>
 </ng-container>
