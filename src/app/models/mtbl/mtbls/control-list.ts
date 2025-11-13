@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type IsaTabFileType = "assay" | "sample" | "investigation";
+export type IsaTabFileType = "assay" | "samples" | "investigation";
 export type StudyCategoryStr = "other" | "ms-mhd-enabled" | "ms-imaging" | "ms-other" | "nmr" | "ms-mhd-legacy";
 /**
  * Validation rule type
@@ -260,7 +260,7 @@ export function getValidationRuleForField(
         case "assay":
             controlsMap = controls.controlLists.controls.assayFileControls;
             break;
-        case "sample":
+        case "samples":
             controlsMap = controls.controlLists.controls.sampleFileControls;
             break;
         case "investigation":
