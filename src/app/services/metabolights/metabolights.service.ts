@@ -4,7 +4,7 @@ import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
@@ -623,9 +623,12 @@ export class MetabolightsService extends DataService {
     }
 
   getOntologyTermsV2(keyword: string, body: any): Observable<any> {
-    const url = this.configService.config.ws3URL + '/public/v2/ontology-terms/search?q=' + encodeURIComponent(keyword);
+    const url = `${this.configService.config.ws3URL}/public/v2/ontology-terms/search`;
+
+    const params = new HttpParams().set('q', keyword);
+
     return this.http
-      .post<any>(url, body, httpOptions)  // Use POST with JSON body
+      .post<any>(url, body, { params, ...httpOptions })
       .pipe(catchError(this.handleError));
   }
 
