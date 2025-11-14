@@ -260,9 +260,9 @@ export class OntologyComponent implements OnInit, OnChanges {
             // } else {
             //   term = encodeURI(value);
             // }
-            term = encodeURI(value);
+            term = value;
           } else if ("annotationValue" in value) {
-            term = encodeURI(value.annotationValue);
+            term = value.annotationValue;
           }
         } catch (err) {
           console.log(err);
