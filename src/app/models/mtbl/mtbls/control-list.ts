@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type IsaTabFileType = "assay" | "samples" | "investigation";
+export type IsaTabFileType = "assay" | "sample" | "investigation";
 export type StudyCategoryStr = "other" | "ms-mhd-enabled" | "ms-imaging" | "ms-other" | "nmr" | "ms-mhd-legacy";
 /**
  * Validation rule type
@@ -217,14 +217,14 @@ function selectValidationRule(
             (!selectionCriteria.studyCreatedBefore || 
                 ruleSelectionInput.studyCreatedAt < new Date(selectionCriteria.studyCreatedBefore)),
 
-            // Template version check
+            // // Template version check
             !selectionCriteria.templateVersionFilter ||
             selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
 
             // ISA file type check
             selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
 
-            // ISA file template check
+            // // ISA file template check
             !selectionCriteria.isaFileTemplateNameFilter ||
             selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
 
@@ -260,7 +260,7 @@ export function getValidationRuleForField(
         case "assay":
             controlsMap = controls.controlLists.controls.assayFileControls;
             break;
-        case "samples":
+        case "sample":
             controlsMap = controls.controlLists.controls.sampleFileControls;
             break;
         case "investigation":
@@ -274,66 +274,4 @@ export function getValidationRuleForField(
     if (rules.length === 0) return null;
 
     return selectValidationRule(rules, ruleSelectionInput);
-}
-
-/**
- * Common validation function: Determines how to handle ontology validation based on the rule.
- * Returns an object with properties for UI/component behavior.
- */
-export function getOntologyHandling(rule: FieldValueValidation | null): {
-  disableSearch: boolean;
-  initialTerms: OntologyTerm[];
-  useLegacy: boolean;
-  searchEndpoint?: string; // New endpoint for rule-based search
-} {
-  if (!rule || rule.validationType === "any-ontology-term") {
-    // Follow previous logic: Enable search, no initial terms, use legacy if no rule
-    return {
-      disableSearch: false,
-      initialTerms: [],
-      useLegacy: true,
-      searchEndpoint: undefined, // Use existing search logic
-    };
-  }
-
-  if (rule.validationType === "selected-ontology-term") {
-    // Use .terms and disable search, do not call search API
-    return {
-      disableSearch: true,
-      initialTerms: rule.terms || [],
-      useLegacy: false,
-      searchEndpoint: undefined,
-    };
-  }
-
-  if (rule.validationType === "ontology-term-in-selected-ontologies" || rule.validationType === "child-ontology-term") {
-    // Use initial list from .terms and enable search with new endpoint
-    return {
-      disableSearch: false,
-      initialTerms: rule.terms || [],
-      useLegacy: false,
-      searchEndpoint: "/ebi-internal/ontology/search-with-rule", // New endpoint: accepts { keyword: string, rule: FieldValueValidation }
-    };
-  }
-
-  // Fallback (should not reach here)
-  return {
-    disableSearch: false,
-    initialTerms: [],
-    useLegacy: true,
-  };
-}
-
-/**
- * Helper: Checks if search should be disabled based on the rule.
- */
-export function shouldDisableSearch(rule: FieldValueValidation | null): boolean {
-  return getOntologyHandling(rule).disableSearch;
-}
-
-/**
- * Helper: Gets initial terms from the rule for seeding the ontology list.
- */
-export function getInitialTerms(rule: FieldValueValidation | null): OntologyTerm[] {
-  return getOntologyHandling(rule).initialTerms;
 }

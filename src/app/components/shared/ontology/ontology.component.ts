@@ -252,14 +252,15 @@ export class OntologyComponent implements OnInit, OnChanges {
 
         try {
           if (typeof value === "string") {
-            if (value.startsWith("http://"))
-              value = value.replace("http://", "");
-            if (value && value.indexOf(":") > -1) {
-              term = encodeURI(value.split(":")[1]);
-              ontologyFilter = value.split(":")[0];
-            } else {
-              term = encodeURI(value);
-            }
+            // if (value.startsWith("http://"))
+            //   value = value.replace("http://", "");
+            // if (value && value.indexOf(":") > -1) {
+            //   term = encodeURI(value.split(":")[1]);
+            //   ontologyFilter = value.split(":")[0];
+            // } else {
+            //   term = encodeURI(value);
+            // }
+            term = encodeURI(value);
           } else if ("annotationValue" in value) {
             term = encodeURI(value.annotationValue);
           }
@@ -275,15 +276,13 @@ export class OntologyComponent implements OnInit, OnChanges {
 
         this.allvalues = [];
 
-        // New: If rule is present, use the new API with conditional allowedParentOntologyTerms
         if (
           this.rule &&
           (this.rule.validationType === "child-ontology-term" ||
             this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")
         ) {
-          // Always call new API for these types, even if initial terms exist
           const validationType = this.rule.validationType;
-          const ontologies = this.rule.ontologies || ["BTO", "EFO", "NCIT"];
+          const ontologies = this.rule.ontologies || [];
           const allowedParentOntologyTerms =
             validationType === "child-ontology-term"
               ? this.rule.allowedParentOntologyTerms
