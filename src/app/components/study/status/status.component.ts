@@ -357,7 +357,7 @@ handlePopupClose(agreed: boolean) {
             tapToDismiss: false,
           });
         }
-        else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR' || this.validationStatus === null)) {
+        else if (this.status.toLowerCase() == 'provisional' && (this.validationStatus === 'ERROR')) {
           toastr.error("Please validate your study and fix all errors before changing status.", "Error", {
             timeOut: "5000",
             positionClass: "toast-top-center",
