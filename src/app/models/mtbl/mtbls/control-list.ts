@@ -211,22 +211,22 @@ function selectValidationRule(
             !selectionCriteria.studyCategoryFilter || 
             selectionCriteria.studyCategoryFilter.includes(ruleSelectionInput.studyCategory),
 
-            // Creation date range check
-            (!selectionCriteria.studyCreatedAtOrAfter || 
-                ruleSelectionInput.studyCreatedAt >= new Date(selectionCriteria.studyCreatedAtOrAfter)),
-            (!selectionCriteria.studyCreatedBefore || 
-                ruleSelectionInput.studyCreatedAt < new Date(selectionCriteria.studyCreatedBefore)),
+            // // Creation date range check
+            // (!selectionCriteria.studyCreatedAtOrAfter || 
+            //     ruleSelectionInput.studyCreatedAt >= new Date(selectionCriteria.studyCreatedAtOrAfter)),
+            // (!selectionCriteria.studyCreatedBefore || 
+            //     ruleSelectionInput.studyCreatedAt < new Date(selectionCriteria.studyCreatedBefore)),
 
-            // Template version check
-            !selectionCriteria.templateVersionFilter ||
-            selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
+            // // Template version check
+            // !selectionCriteria.templateVersionFilter ||
+            // selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
 
-            // ISA file type check
-            selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
+            // // ISA file type check
+            // selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
 
-            // ISA file template check
-            !selectionCriteria.isaFileTemplateNameFilter ||
-            selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
+            // // ISA file template check
+            // !selectionCriteria.isaFileTemplateNameFilter ||
+            // selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
 
             // Linked fields check (if provided)
             // !selectionCriteria.linkedFieldAndValueFilter ||
