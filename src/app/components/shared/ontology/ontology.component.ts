@@ -140,44 +140,59 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.isFormBusy = false;
     this.searchedMore = false;
     this.getDefaultTerms();
-
-     // Listen to all relevant value changes so we can show default terms for short/empty input
-    this.valueCtrl.valueChanges
-      .pipe(distinctUntilChanged(), debounceTime(300))
-      .subscribe((value) => {
-       // user typed a plain string -> search (searchTerm will show defaults for <3 chars)
-        if (typeof value === "string") {
-          this.searchTerm(value, false);
-          return;
-       }
-
-        // null/empty -> show default terms
-        if (value === null || value === undefined || value === "") {
-          // ensure default terms are shown
-          this.getDefaultTerms();
-          return;
-        }
-
-       // if the control emits an ontology object (e.g. from option selected),
-        // use its annotationValue to trigger search/display defaults as needed
-        try {
-          if (value && typeof value === "object" && "annotationValue" in value) {
-            const v = value.annotationValue || "";
-            // show defaults when cleared, otherwise perform search with the selected term
-            if (!v || v.trim().length < 3) {
-              this.getDefaultTerms();
-            } else {
-              this.searchTerm(v, false);
-            }
+    
+    // ensure defaults are visible immediately
+    this.setCurrentOptions(this.allvalues);
+    // Safe subscription helper: valueCtrl may be undefined during some init flows,
+    // retry a few times (short delay) until available.
+    const subscribeToValueChanges = () => {
+      if (!this.valueCtrl || !this.valueCtrl.valueChanges) {
+        // retry once after short delay
+        setTimeout(() => {
+          if (!this.valueCtrl || !this.valueCtrl.valueChanges) {
+            // nothing to subscribe to — leave defaults populated
             return;
           }
-        } catch (e) {
-          // fall through to default behaviour
-        }
+          subscribeToValueChanges();
+        }, 50);
+        return;
+      }
 
-        // Fallback: show default terms
-        this.getDefaultTerms();
-      });
+      this.valueCtrl.valueChanges
+        .pipe(distinctUntilChanged(), debounceTime(300))
+        .subscribe((value) => {
+          if (typeof value === "string") {
+            this.searchTerm(value, false);
+            return;
+          }
+
+          if (value === null || value === undefined || value === "") {
+            this.getDefaultTerms();
+            this.setCurrentOptions(this.allvalues);
+            return;
+          }
+
+          try {
+            if (value && typeof value === "object" && "annotationValue" in value) {              
+              const v = value.annotationValue || "";
+              if (!v || v.trim().length < 3) {
+                this.getDefaultTerms();
+                this.setCurrentOptions(this.allvalues);
+              } else {
+                this.searchTerm(v, false);
+              }
+              return;
+            }
+          } catch (e) {
+            // fall through
+          }
+
+          this.getDefaultTerms();
+          this.setCurrentOptions(this.allvalues);
+        });
+    };
+
+    subscribeToValueChanges();
   }
 
   async getReadonly() {
@@ -213,18 +228,14 @@ export class OntologyComponent implements OnInit, OnChanges {
     });
   }
   searchTerm(value: any, remoteSearch: boolean = false) {
-  if (value === null || value === undefined || value.length < 3) {
-    this.setCurrentOptions(this.controlList.values);
-    this.searchedMore = false;
-    this.loading = false;
-    return this.currentOptions;
-  }
-  if (value.trim().length < 3) {
-    this.setCurrentOptions(this.controlList.values);
+    
+  if (value === null || value === undefined || (typeof value === "string" && value.trim().length < 3)) {
+    this.getDefaultTerms();
+    this.setCurrentOptions(this.allvalues);
     this.searchedMore = false;
     this.loading = false;
     this.isFormBusy = false;
-    return;
+    return this.currentOptions;
   }
   this.inputValue = value;
   this.values = this.values.filter((el) => el !== null);
@@ -391,14 +402,35 @@ export class OntologyComponent implements OnInit, OnChanges {
 }
 
   getDefaultTerms() {
-    if (
-      !this.readonly &&
-      this.controlList &&
-      this.controlList.values !== null
-    ) {
-      this.allvalues = this.controlList.values;
+    if (this.readonly) return;
+
+    // Prefer explicit rule.terms if provided (map to Ontology instances)
+    if (this.rule && Array.isArray(this.rule.terms) && this.rule.terms.length > 0) {
+      this.allvalues = this.rule.terms.map((t: any) => {
+        const o = new Ontology();
+        o.annotationValue = t.term || t.label || "";
+        o.termAccession = t.termAccessionNumber || t.termAccession || "";
+        o.termSource = new OntologySourceReference();
+        o.termSource.name = t.termSourceRef || (t.termSource && t.termSource.name) || "";
+        o.termSource.file = t.provenance_uri || "";
+        o.termSource.provenance_name = t.provenance_name || "";
+        o.comments = [];
+        return o;
+      });
       this.searchedMore = false;
+      return;
     }
+
+    // Fallback to controlList.values if available
+    if (this.controlList && Array.isArray(this.controlList.values) && this.controlList.values.length > 0) {
+      this.allvalues = this.controlList.values.slice();
+      this.searchedMore = false;
+      return;
+    }
+
+    // Final fallback: empty list
+    this.allvalues = [];
+    this.searchedMore = false;
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -473,10 +505,12 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.values.length === 0 &&
     !(this.inputValue && this.inputValue.length > 0)
   ) {
+    // restore defaults for all relevant validation types (including any-ontology-term)
     this.getDefaultTerms();
     this.valueCtrl.setValue("");
-    if (this.rule && (this.rule.validationType === "child-ontology-term" || this.rule.validationType === "ontology-term-in-selected-ontologies")) {
-      this.setCurrentOptions(this.controlList.values);  // Explicitly show initial terms
+    this.setCurrentOptions(this.allvalues); // explicitly show initial terms (from rule.terms or controlList.values)
+    if (this.rule && (this.rule.validationType === "child-ontology-term" || this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")) {
+      // no-op: handled by setCurrentOptions(this.allvalues) above, kept for clarity
     }
   }
   this.triggerChanges();
