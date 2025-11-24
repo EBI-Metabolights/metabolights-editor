@@ -17,6 +17,7 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
+import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
 
 @Component({
   selector: "mtbls-protocol",
@@ -28,7 +29,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
   @Input("required") required = false;
   @Input("validations") validations: any;
   @Input("guides") guides: Record<string, any> = {};
-
+  @Input("rule") rule: any = null;
+  @Input("defaultOntologies") defaultOntologies: string[] = [];
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
   @ViewChild("contentToCopy") contentToCopy!: ElementRef;
@@ -70,6 +72,13 @@ export class ProtocolComponent implements OnInit, OnChanges {
   protocolInGuides: boolean = false;
   guideText: string = "";
   coreProtocols: string[] = ['sample collection', 'extraction', 'chromatography', 'mass spectrometry', 'data transformation', 'metabolite identification']
+  // store-backed legacy control lists (flat shape) and helper fields
+  private legacyControlLists: Record<string, any> | null = null;
+  private defaultControlListName: string = "Study Protocol Parameter Name";
+  defaultControlList: { name: string; values: any[] } = { name: "", values: [] };
+  private studyCategory: string = null;
+  private sampleTemplate: string = null;
+  private templateVersion: string = null;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -98,6 +107,10 @@ export class ProtocolComponent implements OnInit, OnChanges {
     this.studyId$.subscribe((id) => {
       this.studyId = id;
     })
+    // subscribe to controlLists stored in application state (legacy flat payload)
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+     this.legacyControlLists = lists || {};
+    });
     this.isProtocolsExpanded$.subscribe((value) => {
       this.expand = value;
     });
@@ -275,13 +288,37 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   closeModal() {
     this.isModalOpen = false;
-    this.protocolSubscription.unsubscribe();
-    this.form.removeControl("description");
+    try {
+      if (this.protocolSubscription && typeof this.protocolSubscription.unsubscribe === "function") {
+        this.protocolSubscription.unsubscribe();
+      }
+    } catch (e) {
+      console.warn("Failed to unsubscribe protocolSubscription:", e);
+    }
+
+    try {
+      if (this.form && this.form.contains && this.form.contains("description")) {
+        this.form.removeControl("description");
+      }
+    } catch (e) {
+      console.warn("Failed to remove 'description' control:", e);
+    }
   }
 
   openParameterModal() {
     this.parameterName.values = [];
     this.isParameterModalOpen = true;
+    // ensure ontology child has rule/defaults forwarded before opening modal
+    try {
+      if (this.parameterName) {
+       (this.parameterName as any).rule = this.rule || (this.parameterName as any).rule;
+        (this.parameterName as any).defaultOntologies = this.defaultOntologies || (this.parameterName as any).defaultOntologies;
+        this.parameterName.values = this.parameterName.values || [];
+      }
+    } catch (e) {
+      // ignore if child not yet available
+    }
+   this.isParameterModalOpen = true;
   }
 
   closeParameterModal() {
@@ -490,5 +527,63 @@ export class ProtocolComponent implements OnInit, OnChanges {
   copyContent() {
     const text = this.contentToCopy.nativeElement.innerText;
     this.editorService.copyContent(text);
+  }
+  /**
+   * Build a controlList payload for a protocol field.
+   * Prefers legacy controlLists from the store, falls back to editorService.defaultControlLists.
+   */
+  controlList() {
+    // if no explicit defaultControlListName set, try derive from protocol name (adjust to your naming convention)
+    if (!this.defaultControlListName && this.protocol && this.protocol.name) {
+      this.defaultControlListName = this.formatTitle(this.protocol.name);
+    }
+
+    // fill default from legacy editorService payload if available and not already set
+    if (
+      (!this.defaultControlList || !this.defaultControlList.name || this.defaultControlList.name.length === 0) &&
+      this.editorService.defaultControlLists &&
+      this.defaultControlListName in this.editorService.defaultControlLists
+    ) {
+      this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm || [];
+      this.defaultControlList.name = this.defaultControlListName;
+    }
+
+    // defaultOntologies extracted from legacy structured payload if present
+    let defaultOntologies: string[] = [];
+    if (
+      this.legacyControlLists &&
+      this.legacyControlLists.controls &&
+      this.legacyControlLists.controls["investigationFileControls"] &&
+      this.legacyControlLists.controls["investigationFileControls"].__default__
+    ) {
+      const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+      defaultOntologies = defaultRule?.ontologies || [];
+    }
+
+    const selectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.protocol && this.protocol.created ? new Date(this.protocol.created) : new Date(),
+      isaFileType: "investigation" as any,
+      isaFileTemplateName:this.sampleTemplate,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule = null;
+    try {
+      if (this.legacyControlLists && Object.keys(this.legacyControlLists).length > 0) {
+        rule = getValidationRuleForField(
+          { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
+          this.defaultControlListName,
+          selectionInput as any
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+    return {
+      ...this.defaultControlList,
+      rule,
+      defaultOntologies,
+    };
   }
 }

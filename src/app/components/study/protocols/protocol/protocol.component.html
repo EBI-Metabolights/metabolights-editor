@@ -92,7 +92,10 @@
                         <div class="column is-11">
                           <mtbls-ontology
                             [validations]="fieldValidation('parameterName')"
+                            [controlList]="controlList()"
+                            [rule]="controlList().rule"
                             (changed)="col.values[0] = $event"
+                            [defaultOntologies]="controlList().defaultOntologies"
                             [inline]="true"
                           ></mtbls-ontology>
                         </div>
@@ -504,8 +507,11 @@
       <mtbls-ontology
         #parameterName
         [validations]="fieldValidation('parameterName')"
+        [controlList]="controlList()"
         [values]="[]"
         [inline]="true"
+        [rule]="controlList().rule"
+        [defaultOntologies]="controlList().defaultOntologies"
       ></mtbls-ontology>
     </section>
     <footer class="modal-card-foot">
