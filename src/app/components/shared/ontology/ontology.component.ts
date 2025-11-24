@@ -55,6 +55,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("inline") isInline: boolean;
   @Input("sourceValueType") sourceValueType = "ontology";
   @Input("initialSearchKeyword") initialSearchKeyword = "";
+  @Input() defaultOntologies: string[] = [];
   @Input("controlList") controlList: { name: string; values: Ontology[] } = {
     name: "",
     values: [],
@@ -93,35 +94,6 @@ export class OntologyComponent implements OnInit, OnChanges {
   baseHref: string;
   isRequired: boolean = false;
   fadeState: "in" | "out" = "out";
-
-  private defaultOntologies = [
-    "OBI",
-    "EFO",
-    "CHMO",
-    "NCIT",
-    "NCBITAXON",
-    "MS",
-    "BTO",
-    "CHEBI",
-    "UO",
-    "MESH",
-    "BAO",
-    "OMIT",
-    "GO",
-    "ENVO",
-    "MSIO",
-    "PO",
-    "MONDO",
-    "UBERON",
-    "SNOMED",
-    "CL",
-    "CLO",
-    "MI",
-    "EDAM",
-    "HP",
-    "MP",
-  ];
-  
 
   constructor(
     private editorService: EditorService,
@@ -169,26 +141,43 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.searchedMore = false;
     this.getDefaultTerms();
 
+     // Listen to all relevant value changes so we can show default terms for short/empty input
     this.valueCtrl.valueChanges
-    .pipe(
-      distinctUntilChanged(),
-      debounceTime(300),
-      filter(value => typeof value === 'string' && value.trim().length >= 3) 
-    )
-    .subscribe((value) => this.searchTerm(value, false));
+      .pipe(distinctUntilChanged(), debounceTime(300))
+      .subscribe((value) => {
+       // user typed a plain string -> search (searchTerm will show defaults for <3 chars)
+        if (typeof value === "string") {
+          this.searchTerm(value, false);
+          return;
+       }
 
+        // null/empty -> show default terms
+        if (value === null || value === undefined || value === "") {
+          // ensure default terms are shown
+          this.getDefaultTerms();
+          return;
+        }
 
-    if (this.rule && (this.rule.validationType === "child-ontology-term" || this.rule.validationType === "ontology-term-in-selected-ontologies")) {
-      this.setCurrentOptions(this.controlList.values);  // Show initial terms immediately
-    }
+       // if the control emits an ontology object (e.g. from option selected),
+        // use its annotationValue to trigger search/display defaults as needed
+        try {
+          if (value && typeof value === "object" && "annotationValue" in value) {
+            const v = value.annotationValue || "";
+            // show defaults when cleared, otherwise perform search with the selected term
+            if (!v || v.trim().length < 3) {
+              this.getDefaultTerms();
+            } else {
+              this.searchTerm(v, false);
+            }
+            return;
+          }
+        } catch (e) {
+          // fall through to default behaviour
+        }
 
-    this.valueCtrl.setValue(this.initialSearchKeyword);
-    if (this.initialSearchKeyword && this.initialSearchKeyword.length > 0) {
-      setTimeout(() => {
-        this.valueInput.openPanel();
+        // Fallback: show default terms
+        this.getDefaultTerms();
       });
-    }
-    this.ontTrackerService.register(this);
   }
 
   async getReadonly() {
@@ -224,209 +213,183 @@ export class OntologyComponent implements OnInit, OnChanges {
     });
   }
   searchTerm(value: any, remoteSearch: boolean = false) {
-    if (value === null || value === undefined || value.length === 0) {
-      this.setCurrentOptions(this.controlList.values);
-      this.searchedMore = false;
-      this.loading = false;
-      return this.currentOptions;
-    }
-    if (value.trim().length < 3) {
-      this.setCurrentOptions(this.controlList.values);
-      this.searchedMore = false;
-      this.loading = false;
-      this.isFormBusy = false;
-      return;
-    }
-    this.inputValue = value;
-    this.values = this.values.filter((el) => el !== null);
-    let urlSuffix = "";
-    if (remoteSearch) {
-      urlSuffix = "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}";
-    }
+  if (value === null || value === undefined || value.length < 3) {
+    this.setCurrentOptions(this.controlList.values);
     this.searchedMore = false;
-    this.allvalues = [];
-    if (value && value !== "") {
-      if (this.values.length < 2) {
-        let term = "";
-        let ontologyFilter = null;
-
-        try {
-          if (typeof value === "string") {
-            // if (value.startsWith("http://"))
-            //   value = value.replace("http://", "");
-            // if (value && value.indexOf(":") > -1) {
-            //   term = encodeURI(value.split(":")[1]);
-            //   ontologyFilter = value.split(":")[0];
-            // } else {
-            //   term = encodeURI(value);
-            // }
-            term = value;
-          } else if ("annotationValue" in value) {
-            term = value.annotationValue;
-          }
-        } catch (err) {
-          console.log(err);
-        }
-
-        this.termsLoading = true;
-        this.loading = true;
-        this.isFormBusy = true;
-        this.setCurrentOptions([]);
-        this.termsLoading = true;
-
-        this.allvalues = [];
-
-        if (
-          this.rule &&
-          (this.rule.validationType === "child-ontology-term" ||
-            this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")
-        ) {
-          const validationType = this.rule.validationType;
-          const ontologies = this.rule.ontologies || [];
-          const allowedParentOntologyTerms =
-            validationType === "child-ontology-term"
-              ? this.rule.allowedParentOntologyTerms
-              : undefined;
-
-          this.editorService
-            .searchOntologyTermsWithRuleV2(
-              term,
-              validationType,
-              ontologies,
-              allowedParentOntologyTerms
-            )
-            .subscribe(
-              (response) => {
-                this.allvalues = [];
-                this.termsLoading = false;
-                this.loading = false;
-                if (response.content && response.content.result) {
-                  response.content.result.forEach((t) => {
-                    // Manually create Ontology object to avoid JsonConvert issues with missing "comments"
-                    const tempOntTerm = new Ontology();
-                    tempOntTerm.annotationValue = t.term;
-                    tempOntTerm.termAccession = t.termAccessionNumber;
-                    tempOntTerm.annotationDefinition = t.description || "";
-                    tempOntTerm.termSource = new OntologySourceReference();
-                    tempOntTerm.termSource.name = t.termSourceRef;
-                    tempOntTerm.termSource.description = t.description || "";
-                    tempOntTerm.termSource.file = "";
-                    tempOntTerm.termSource.version = "";
-                    tempOntTerm.termSource.provenance_name = "";
-                    tempOntTerm.comments = []; // Keep empty as requested
-
-                    if (ontologyFilter) {
-                      if (tempOntTerm.termSource.name === ontologyFilter) {
-                        this.allvalues.push(tempOntTerm);
-                      }
-                    } else {
-                      this.allvalues.push(tempOntTerm);
-                    }
-                  });
-                }
-                this.searchedMore = remoteSearch;
-                this.isFormBusy = false;
-                this.setCurrentOptions(this.allvalues);
-              },
-              (err) => {
-                console.error("New API error:", err);
-                this.loading = false;
-                this.termsLoading = false;
-                this.searchedMore = false;
-                this.isFormBusy = false;
-              }
-            );
-        } else {
-          // this.editorService
-          //   .getOntologyTerms(this.baseURL + this.url + term + urlSuffix)
-          //   .subscribe(
-          //     (terms) => {
-          //       this.allvalues = [];
-          //       this.termsLoading = false;
-          //       this.loading = false;
-          //       const jsonConvert: JsonConvert = new JsonConvert();
-          //       if (terms.OntologyTerm) {
-          //         terms.OntologyTerm.forEach((t) => {
-          //           const tempOntTerm = jsonConvert.deserializeObject(
-          //             t,
-          //             Ontology
-          //           );
-          //           if (ontologyFilter) {
-          //             if (tempOntTerm.termSource.name === ontologyFilter) {
-          //               this.allvalues.push(tempOntTerm);
-          //             }
-          //           } else {
-          //             this.allvalues.push(tempOntTerm);
-          //           }
-          //         });
-          //       }
-          //       this.searchedMore = remoteSearch;
-          //       this.isFormBusy = false;
-          //       this.setCurrentOptions(this.allvalues);
-          //     },
-          //     (err) => {
-          //       console.log(err);
-          //       this.loading = false;
-          //       this.termsLoading = false;
-          //       this.searchedMore = false;
-          //       this.isFormBusy = false;
-          //     }
-          //   );
-          // Replace old API with new API for legacy path
-          this.editorService
-            .searchOntologyTermsWithRuleV2(
-              term,
-              "any-ontology-term",
-              this.defaultOntologies,
-              null
-            )
-            .subscribe(
-              (response) => {
-                this.allvalues = [];
-                this.termsLoading = false;
-                this.loading = false;
-                if (response.content && response.content.result) {
-                  response.content.result.forEach((t) => {
-                    // Manually create Ontology object
-                    const tempOntTerm = new Ontology();
-                    tempOntTerm.annotationValue = t.term;
-                    tempOntTerm.termAccession = t.termAccessionNumber;
-                    tempOntTerm.annotationDefinition = t.description || "";
-                    tempOntTerm.termSource = new OntologySourceReference();
-                    tempOntTerm.termSource.name = t.termSourceRef;
-                    tempOntTerm.termSource.description = t.description || "";
-                    tempOntTerm.termSource.file = "";
-                    tempOntTerm.termSource.version = "";
-                    tempOntTerm.termSource.provenance_name = "";
-                    tempOntTerm.comments = []; // Keep empty
-
-                    if (ontologyFilter) {
-                      if (tempOntTerm.termSource.name === ontologyFilter) {
-                        this.allvalues.push(tempOntTerm);
-                      }
-                    } else {
-                      this.allvalues.push(tempOntTerm);
-                    }
-                  });
-                }
-                this.searchedMore = remoteSearch;
-                this.isFormBusy = false;
-                this.setCurrentOptions(this.allvalues);
-              },
-              (err) => {
-                console.error("Legacy API error:", err);
-                this.loading = false;
-                this.termsLoading = false;
-                this.searchedMore = false;
-                this.isFormBusy = false;
-              }
-            );
-        }
-      }
-    } else {
-      this.getDefaultTerms();
-    }
+    this.loading = false;
+    return this.currentOptions;
   }
+  if (value.trim().length < 3) {
+    this.setCurrentOptions(this.controlList.values);
+    this.searchedMore = false;
+    this.loading = false;
+    this.isFormBusy = false;
+    return;
+  }
+  this.inputValue = value;
+  this.values = this.values.filter((el) => el !== null);
+  let urlSuffix = "";
+  if (remoteSearch) {
+    urlSuffix = "&queryFields={MTBLS,MTBLS_Zooma,Zooma,OLS,Bioportal}";
+  }
+  this.searchedMore = false;
+  this.allvalues = [];
+  if (value && value !== "") {
+    if (this.values.length < 2) {
+      let term = "";
+      let ontologyFilter = null;
+
+      try {
+        if (typeof value === "string") {
+          term = value;
+        } else if ("annotationValue" in value) {
+          term = value.annotationValue;
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      // New: Check if the term is present in initial terms (controlList.values)
+      const initialTerms = this.controlList?.values || [];
+      const matchingTerms = initialTerms.filter(t => 
+        t.annotationValue.toLowerCase().includes(term.toLowerCase()) ||
+        (t.termAccession && t.termAccession.toLowerCase().includes(term.toLowerCase()))
+      );
+
+      if (matchingTerms.length > 0) {
+        // Found matches in initial terms, no API call needed
+        this.allvalues = matchingTerms;
+        this.searchedMore = remoteSearch;
+        this.isFormBusy = false;
+        this.setCurrentOptions(this.allvalues);
+        return;
+      }
+
+      // No matches in initial terms, proceed with API call
+      this.termsLoading = true;
+      this.loading = true;
+      this.isFormBusy = true;
+      this.setCurrentOptions([]);
+      this.termsLoading = true;
+
+      this.allvalues = [];
+
+      if (
+        this.rule &&
+        (this.rule.validationType === "child-ontology-term" ||
+          this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")
+      ) {
+        const validationType = this.rule.validationType;
+        const ontologies = this.rule.ontologies || [];
+        const allowedParentOntologyTerms =
+          validationType === "child-ontology-term"
+            ? this.rule.allowedParentOntologyTerms
+            : undefined;
+
+        this.editorService
+          .searchOntologyTermsWithRuleV2(
+            term,
+            validationType,
+            ontologies,
+            allowedParentOntologyTerms
+          )
+          .subscribe(
+            (response) => {
+              this.allvalues = [];
+              this.termsLoading = false;
+              this.loading = false;
+              if (response.content && response.content.result) {
+                response.content.result.forEach((t) => {
+                  // Manually create Ontology object to avoid JsonConvert issues with missing "comments"
+                  const tempOntTerm = new Ontology();
+                  tempOntTerm.annotationValue = t.term;
+                  tempOntTerm.termAccession = t.termAccessionNumber;
+                  tempOntTerm.annotationDefinition = t.description || "";
+                  tempOntTerm.termSource = new OntologySourceReference();
+                  tempOntTerm.termSource.name = t.termSourceRef;
+                  tempOntTerm.termSource.description = t.description || "";
+                  tempOntTerm.termSource.file = "";
+                  tempOntTerm.termSource.version = "";
+                  tempOntTerm.termSource.provenance_name = "";
+                  tempOntTerm.comments = []; // Keep empty as requested
+
+                  if (ontologyFilter) {
+                    if (tempOntTerm.termSource.name === ontologyFilter) {
+                      this.allvalues.push(tempOntTerm);
+                    }
+                  } else {
+                    this.allvalues.push(tempOntTerm);
+                  }
+                });
+              }
+              this.searchedMore = remoteSearch;
+              this.isFormBusy = false;
+              this.setCurrentOptions(this.allvalues);
+            },
+            (err) => {
+              console.error("New API error:", err);
+              this.loading = false;
+              this.termsLoading = false;
+              this.searchedMore = false;
+              this.isFormBusy = false;
+            }
+          );
+      } else {
+        this.editorService
+          .searchOntologyTermsWithRuleV2(
+            term,
+            "any-ontology-term",
+            this.defaultOntologies,
+            null
+          )
+          .subscribe(
+            (response) => {
+              this.allvalues = [];
+              this.termsLoading = false;
+              this.loading = false;
+              if (response.content && response.content.result) {
+                response.content.result.forEach((t) => {
+                  // Manually create Ontology object
+                  const tempOntTerm = new Ontology();
+                  tempOntTerm.annotationValue = t.term;
+                  tempOntTerm.termAccession = t.termAccessionNumber;
+                  tempOntTerm.annotationDefinition = t.description || "";
+                  tempOntTerm.termSource = new OntologySourceReference();
+                  tempOntTerm.termSource.name = t.termSourceRef;
+                  tempOntTerm.termSource.description = t.description || "";
+                  tempOntTerm.termSource.file = "";
+                  tempOntTerm.termSource.version = "";
+                  tempOntTerm.termSource.provenance_name = "";
+                  tempOntTerm.comments = []; // Keep empty
+
+                  if (ontologyFilter) {
+                    if (tempOntTerm.termSource.name === ontologyFilter) {
+                      this.allvalues.push(tempOntTerm);
+                    }
+                  } else {
+                    this.allvalues.push(tempOntTerm);
+                  }
+                });
+              }
+              this.searchedMore = remoteSearch;
+              this.isFormBusy = false;
+              this.setCurrentOptions(this.allvalues);
+            },
+            (err) => {
+              console.error("Legacy API error:", err);
+              this.loading = false;
+              this.termsLoading = false;
+              this.searchedMore = false;
+              this.isFormBusy = false;
+            }
+          );
+      }
+    }
+  } else {
+    this.getDefaultTerms();
+  }
+}
+
   getDefaultTerms() {
     if (
       !this.readonly &&

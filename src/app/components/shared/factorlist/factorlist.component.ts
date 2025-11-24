@@ -14,6 +14,7 @@ import { JsonConvert } from 'json2typescript';
 import { Ontology } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology';
 import { Router } from '@angular/router';
 import { SampleState } from 'src/app/ngxs-store/study/samples/samples.state';
+import { getValidationRuleForField, MetabolightsFieldControls } from 'src/app/models/mtbl/mtbls/control-list';
 
 
 @Component({
@@ -70,6 +71,10 @@ export class FactorlistComponent implements OnInit {
     addNewFactor = false;
     baseHref: string;
     validationRules: any = null;
+    private legacyControlLists: Record<string, any[]> | null = null;
+    studyCategory: any;
+    templateVersion: any;
+    sampleTemplate: any;
   
     constructor(
       private fb: UntypedFormBuilder,
@@ -80,6 +85,9 @@ export class FactorlistComponent implements OnInit {
       if (!this.defaultControlList) {
         this.defaultControlList = {name: "", values: []};
       }
+      this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+        this.legacyControlLists = lists || {};
+    });
       this.setUpSubscriptionsNgxs();
       this.baseHref = editorService.baseHref
     }
@@ -99,7 +107,19 @@ export class FactorlistComponent implements OnInit {
       this.studyIdentifier$.subscribe(
         (id) => {
           this.studyId = id;
-        })
+          const cat = this.store.selectSnapshot(
+            (state: any) => state.study?.generalMetadata?.studyCategory
+          );
+          this.studyCategory = cat || null;
+          const ver = this.store.selectSnapshot(
+            (state: any) => state.study?.generalMetadata?.templateVersion
+          );
+          this.templateVersion = ver || null;
+          const sampTemp = this.store.selectSnapshot(
+            (state: any) => state.study?.generalMetadata?.sampleTemplate
+          );
+          this.sampleTemplate = sampTemp || null;
+      })
       this.toastrSettings$.subscribe((value) => {
         this.toastrSettings;
       });
@@ -314,23 +334,99 @@ export class FactorlistComponent implements OnInit {
     }
     controlList() {
       if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
+        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
         this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
         this.defaultControlList.name = this.defaultControlListName;
       }
-      return this.defaultControlList;
-    }
-  
-    factorColumnControlList() {
-      let controlList = this.defaultUnitControlList;
-      let controlListName = this.defaultUnitControlListName;
-  
-      if (!(controlList && controlList.name.length > 0)
-        && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists){
-          controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
-          controlList.name = controlListName;
+
+      
+      let defaultOntologies = [];
+        if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default_factor_value__) {
+        const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default_factor_value__[0];
+        defaultOntologies =  defaultRule?.ontologies;
       }
-      return controlList;
+
+      const selectionInput = {
+        studyCategory: this.studyCategory,
+        studyCreatedAt: new Date(),
+        isaFileType: "investigation" as any,
+        isaFileTemplateName: this.sampleTemplate,
+        templateVersion: this.templateVersion,
+      };
+
+      let rule = null;
+      try {
+        if (
+          this.legacyControlLists &&
+          Object.keys(this.legacyControlLists).length > 0
+        ) {
+          rule = getValidationRuleForField(
+            {
+              controlLists: this.legacyControlLists,
+            } as MetabolightsFieldControls,
+            this.defaultControlListName,  
+            selectionInput
+          );
+        }
+      } catch (e) {
+        rule = null;
+      }
+
+      return {
+        ...this.defaultControlList,
+        rule,
+        defaultOntologies
+      };
     }
+  
+    // factorColumnControlList() {
+    //   let controlList = this.defaultUnitControlList;
+    //   let controlListName = this.defaultUnitControlListName;
+
+    //   if (!(controlList && controlList.name.length > 0)
+    //     && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists) {
+    //     controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+    //     controlList.name = controlListName;
+    //   }
+
+    //   let defaultOntologies = [];
+    //   if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["sampleFileControls"] && this.legacyControlLists.controls["sampleFileControls"].__default_characteristic__) {
+    //     const defaultRule = this.legacyControlLists.controls["sampleFileControls"].__default_characteristic__[0];
+    //     defaultOntologies = defaultRule?.ontologies || [];
+    //   }
+
+    //   const selectionInput = {
+    //     studyCategory: this.studyCategory,
+    //     studyCreatedAt: new Date(),
+    //     isaFileType: "sample" as any,
+    //     isaFileTemplateName: this.sampleTemplate,
+    //     templateVersion: this.templateVersion,
+    //   };
+
+    //   let rule = null;
+    //   try {
+    //     if (
+    //       this.legacyControlLists &&
+    //       Object.keys(this.legacyControlLists).length > 0
+    //     ) {
+    //       rule = getValidationRuleForField(
+    //         {
+    //           controlLists: this.legacyControlLists,
+    //         } as MetabolightsFieldControls,
+    //         controlListName,  
+    //         selectionInput
+    //       );
+    //     }
+    //   } catch (e) {
+    //     rule = null;
+    //   }
+
+    //   // Return the controlList with added properties
+    //   return {
+    //     ...controlList,
+    //     rule,
+    //     defaultOntologies
+    //   };
+    // }
   
 }

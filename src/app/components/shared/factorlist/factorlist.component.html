@@ -84,21 +84,23 @@
           (changed)="onChanges($event)"
           [values]="[factor.factorType]"
           [inline]="true"
+          [rule]="controlList().rule"
+          [defaultOntologies]="controlList().defaultOntologies"
         ></mtbls-ontology>
-        <label
+        <!-- <label
         [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
         >
           Add factor unit (if necessary)
           <mat-checkbox 
           [disabled]="form.get('factorName')?.pristine"
           (change)="toggleUnit()" ></mat-checkbox>
-        </label>
+        </label> -->
       </section>
-      <ng-container *ngIf="addFactorColumnVisible">
+     <!--<ng-container *ngIf="addFactorColumnVisible">
       <section class="modal-card-body">
         <h6 class="modal-card-title modal-form-title">
           Add factor unit to Sample sheet -
-          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName-->
+          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName
         </h6>
         <mtbls-ontology
           [id]="'factorUnit'"
@@ -110,10 +112,12 @@
           (changed)="onChanges($event)"
           [values]="[]"
           [inline]="true"
-        ></mtbls-ontology>
+          [rule]="factorColumnControlList().rule" 
+          [defaultOntologies]="factorColumnControlList().defaultOntologies"
+        ></mtbls-ontology> 
 
       </section>
-    </ng-container>
+    </ng-container> -->
       <!--Add factor column end-->
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">

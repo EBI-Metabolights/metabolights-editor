@@ -97,6 +97,8 @@
             (changed)="onChanges($event)"
             [values]="[]"
             [inline]="true"
+            [rule]="controlList('Characteristics').rule" 
+          [defaultOntologies]="controlList('Characteristics').defaultOntologies"
           ></mtbls-ontology>
         </div>
       </section>
@@ -142,6 +144,8 @@
           (changed)="onChanges($event)"
           [values]="[]"
           [inline]="true"
+          [rule]="controlList('unit').rule" 
+          [defaultOntologies]="controlList('unit').defaultOntologies"
         ></mtbls-ontology>
       </section>
       <footer class="modal-card-foot">

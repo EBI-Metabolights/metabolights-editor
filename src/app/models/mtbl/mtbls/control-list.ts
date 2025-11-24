@@ -217,14 +217,14 @@ function selectValidationRule(
             (!selectionCriteria.studyCreatedBefore || 
                 ruleSelectionInput.studyCreatedAt < new Date(selectionCriteria.studyCreatedBefore)),
 
-            // // Template version check
+            // Template version check
             !selectionCriteria.templateVersionFilter ||
             selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
 
             // ISA file type check
             selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
 
-            // // ISA file template check
+            // ISA file template check
             !selectionCriteria.isaFileTemplateNameFilter ||
             selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
 

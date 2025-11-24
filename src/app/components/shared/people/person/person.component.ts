@@ -24,6 +24,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { AppMessage, GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
+import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
 
 
 @Component({
@@ -57,7 +58,7 @@ export class PersonComponent implements OnInit {
   isReadOnly = false;
   validations: any = {};
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
-  defaultControlListName = "Study Person Role";
+  defaultControlListName = "Study Person Roles";
   requestedStudy: string = null;
 
   form: UntypedFormGroup;
@@ -74,7 +75,7 @@ export class PersonComponent implements OnInit {
   roleError = false;
 
   options: string[] = ["One", "Two", "Three"];
-
+  private legacyControlLists: Record<string, any[]> | null = null;
   validationsId = "people.person";
 
   private toastrSettings: Record<string, any> = {};
@@ -83,12 +84,18 @@ export class PersonComponent implements OnInit {
   private subscription: Subscription;  // For unsubscribing
   message: AppMessage | null = null;
   showOntology: boolean = true;
+  studyCategory: any;
+  templateVersion: any;
+  sampleTemplate: any;
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private generalMetadataService: GeneralMetadataService,
     private store: Store
   ) {
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+        this.legacyControlLists = lists || {};
+    });
     this.setUpSubscriptionsNgxs();
   }
 
@@ -110,6 +117,18 @@ export class PersonComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
+        const cat = this.store.selectSnapshot(
+            (state: any) => state.study?.generalMetadata?.studyCategory
+          );
+          this.studyCategory = cat || null;
+          const ver = this.store.selectSnapshot(
+            (state: any) => state.study?.generalMetadata?.templateVersion
+          );
+          this.templateVersion = ver || null;
+          const sampTemp = this.store.selectSnapshot(
+            (state: any) => state.study?.generalMetadata?.sampleTemplate
+          );
+          this.sampleTemplate = sampTemp || null;
       }
     });
   }
@@ -538,11 +557,49 @@ private updatePiValidators(isPi: boolean): void {
   }
   controlList() {
     if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
+      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
       this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
       this.defaultControlList.name = this.defaultControlListName;
     }
-    return this.defaultControlList;
+
+    
+    let defaultOntologies = [];
+      if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
+      const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+      defaultOntologies =  defaultRule?.ontologies;
+    }
+
+    const selectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: new Date(),
+      isaFileType: "investigation" as any,
+      isaFileTemplateName: this.sampleTemplate,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule = null;
+    try {
+      if (
+        this.legacyControlLists &&
+        Object.keys(this.legacyControlLists).length > 0
+      ) {
+        rule = getValidationRuleForField(
+          {
+            controlLists: this.legacyControlLists,
+          } as MetabolightsFieldControls,
+          this.defaultControlListName,  
+          selectionInput
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+
+    return {
+      ...this.defaultControlList,
+      rule,
+      defaultOntologies
+    };
   }
   
 }

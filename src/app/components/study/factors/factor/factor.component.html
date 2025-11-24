@@ -99,6 +99,8 @@
           (changed)="onChanges($event)"
           [values]="[factor.factorType]"
           [inline]="true"
+          [rule]="controlList().rule"
+          [defaultOntologies]="controlList().defaultOntologies"
         ></mtbls-ontology>
         <label
         [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
@@ -132,6 +134,8 @@
           (changed)="onChanges($event)"
           [values]="[]"
           [inline]="true"
+          [rule]="factorColumnControlList().rule"
+          [defaultOntologies]="factorColumnControlList().defaultOntologies"
         ></mtbls-ontology>
 
       </section>
