@@ -281,7 +281,8 @@
                       [validations]="columnValidations(selectedColumn['header'])"
                       [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
                       [values]="[]" [inline]="true"
-                      [rule]="columnControlList(selectedCell['column']['header']).rule"></mtbls-ontology>
+                      [rule]="columnControlList(selectedCell['column']['header']).rule"
+                      [defaultOntologies]="getDefaultOntologies()"></mtbls-ontology>
                   </div>
                   <ng-template #dropdownField>
                     <mat-form-field class="full-width"
@@ -343,7 +344,8 @@
                       [validations]="columnValidations(selectedCell['column']['header'])"
                       [controlList]="columnControlList(selectedCell['column']['header'])"
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
-                      [rule]="columnControlList(selectedCell['column']['header']).rule"></mtbls-ontology>
+                      [rule]="columnControlList(selectedCell['column']['header']).rule"
+                      [defaultOntologies]="getDefaultOntologies()"></mtbls-ontology>
                   </div>
                   <div *ngIf="isCellTypeFile">
                     <mat-form-field class="full-width">
@@ -362,7 +364,8 @@
                       [validations]="columnValidations(selectedCell['column']['header'])"
                       [controlList]="columnControlList(selectedCell['column']['header'])"
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
-                      [rule]="columnControlList(selectedCell['column']['header']).rule"></mtbls-ontology>
+                      [rule]="columnControlList(selectedCell['column']['header']).rule"
+                      [defaultOntologies]="getDefaultOntologies()"></mtbls-ontology>
                   </div>
                   <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
@@ -446,7 +449,8 @@
               <mtbls-ontology [id]="'editMissingOntology'" [validations]="columnValidations(selectedMissingKey)"
                 [controlList]="columnControlList(selectedMissingKey)" (changed)="onChanges($event)"
                 [values]="[selectedMissingVal]" [initialSearchKeyword]="selectedMissingVal" [inline]="true"
-                [rule]="columnControlList(selectedMissingKey).rule"></mtbls-ontology>
+                [rule]="columnControlList(selectedMissingKey).rule"
+                [defaultOntologies]="getDefaultOntologies()"></mtbls-ontology>
             </div>
           </div>
         </div>

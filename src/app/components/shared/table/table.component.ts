@@ -195,12 +195,11 @@ export class TableComponent
   tableTypeValue: string = "";
   openUploadArea: boolean = false;
   filePatternString: string = "^([asi]_.+.txt|m_.+.tsv)$";
-  // legacy flat control-lists from store (key -> array of terms)
   private legacyControlLists: Record<string, any[]> | null = null;
 
-  private studyCategory: StudyCategoryStr = "other";
-  private templateVersion: string = "1.0";
-  private sampleTemplate: string = "minimum";
+  private studyCategory: StudyCategoryStr = null;
+  private templateVersion: string = null;
+  private sampleTemplate: string = null;
 
   constructor(
     private clipboardService: ClipboardService,
@@ -266,15 +265,15 @@ export class TableComponent
         const cat = this.store.selectSnapshot(
           (state: any) => state.study?.generalMetadata?.studyCategory
         );
-        this.studyCategory = cat || "other";
+        this.studyCategory = cat || null;
         const ver = this.store.selectSnapshot(
           (state: any) => state.study?.generalMetadata?.templateVersion
         );
-        this.templateVersion = ver || "1.0";
+        this.templateVersion = ver || null;
         const sampTemp = this.store.selectSnapshot(
           (state: any) => state.study?.generalMetadata?.sampleTemplate
         );
-        this.sampleTemplate = sampTemp || "minimum";
+        this.sampleTemplate = sampTemp || null;
       });
 
     this.editorValidationRules$.subscribe((value) => {
@@ -2094,5 +2093,15 @@ export class TableComponent
   onUploadComplete(event: any) {
     // handle uploaded files
     this.refreshTableData.emit();
+  }
+  getDefaultOntologies(): string[] {
+    const fileType = this.getIsaFileType(this.data.file); 
+    const fileTypeKey = `${fileType}FileControls`; 
+    
+    if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls[fileTypeKey] && this.legacyControlLists.controls[fileTypeKey].__default__) {
+      const defaultRule = this.legacyControlLists.controls[fileTypeKey].__default__[0];
+      return defaultRule?.ontologies || [];
+    }
+    return [];
   }
 }

@@ -199,6 +199,8 @@
                 [values]="person.roles"
                 [inline]="true"
                 [label]="'Role'"
+                [rule]="controlList().rule"
+                [defaultOntologies]="controlList().defaultOntologies"
               ></mtbls-ontology>
             </span>
             <mat-error

@@ -269,6 +269,8 @@
           [values]="[publication.status]"
           [inline]="true"
           [label]="'Status'"
+          [rule]="controlList().rule"
+          [defaultOntologies]="controlList().defaultOntologies"
         ></mtbls-ontology>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />

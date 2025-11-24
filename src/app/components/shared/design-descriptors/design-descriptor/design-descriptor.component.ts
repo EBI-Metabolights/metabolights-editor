@@ -22,6 +22,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
+import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
 @Component({
   selector: "mtbls-design-descriptor",
   templateUrl: "./design-descriptor.component.html",
@@ -68,14 +69,21 @@ export class DesignDescriptorComponent implements OnInit {
 
   loading = false;
   baseHref: string;
-
+  private legacyControlLists: Record<string, any[]> | null = null;
+  studyCategory: any;
+  templateVersion: any;
+  sampleTemplate: any;
+  defaultControlListName = "Study Design Type";
+  
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
     private europePMCService: EuropePMCService
   ) {
-
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+        this.legacyControlLists = lists || {};
+    });
     this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
@@ -342,12 +350,50 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   controlList() {
-    if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-      && this.editorService.defaultControlLists && "Study Design Type" in this.editorService.defaultControlLists){
-      this.defaultControlList.values = this.editorService.defaultControlLists["Study Design Type"].OntologyTerm;
-      this.defaultControlList.name = "Study Design Type";
+      if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
+        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
+        this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
+        this.defaultControlList.name = this.defaultControlListName;
+      }
+  
+      
+      let defaultOntologies = [];
+        if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
+        const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+        defaultOntologies =  defaultRule?.ontologies;
+      }
+  
+      const selectionInput = {
+        studyCategory: this.studyCategory,
+        studyCreatedAt: new Date(),
+        isaFileType: "investigation" as any,
+        isaFileTemplateName: this.sampleTemplate,
+        templateVersion: this.templateVersion,
+      };
+  
+      let rule = null;
+      try {
+        if (
+          this.legacyControlLists &&
+          Object.keys(this.legacyControlLists).length > 0
+        ) {
+          rule = getValidationRuleForField(
+            {
+              controlLists: this.legacyControlLists,
+            } as MetabolightsFieldControls,
+            this.defaultControlListName,  
+            selectionInput
+          );
+        }
+      } catch (e) {
+        rule = null;
+      }
+  
+      return {
+        ...this.defaultControlList,
+        rule,
+        defaultOntologies
+      };
     }
-    return this.defaultControlList;
-  }
 
 }

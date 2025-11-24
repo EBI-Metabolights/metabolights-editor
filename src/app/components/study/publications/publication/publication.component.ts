@@ -23,6 +23,7 @@ import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
+import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
 
 @Component({
   selector: "mtbls-publication",
@@ -66,7 +67,11 @@ export class PublicationComponent implements OnInit {
   manuscriptAuthors: any = null;
 
   publicationAbstract = "";
-
+  private legacyControlLists: Record<string, any[]> | null = null;
+  studyCategory: any;
+  templateVersion: any;
+  sampleTemplate: any;
+  
   constructor(
     private fb: UntypedFormBuilder,
     private doiService: DOIService,
@@ -77,6 +82,9 @@ export class PublicationComponent implements OnInit {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
     }
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+        this.legacyControlLists = lists || {};
+    });
     this.setUpSubscriptionsNgxs();
   }
 
@@ -585,11 +593,50 @@ export class PublicationComponent implements OnInit {
     return this.form.get(name).setValue(value);
   }
   controlList() {
-    if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
-      this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
-      this.defaultControlList.name = this.defaultControlListName;
+      if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
+        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
+        this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
+        this.defaultControlList.name = this.defaultControlListName;
+      }
+  
+      
+      let defaultOntologies = [];
+        if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
+        const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+        defaultOntologies =  defaultRule?.ontologies;
+      }
+  
+      const selectionInput = {
+        studyCategory: this.studyCategory,
+        studyCreatedAt: new Date(),
+        isaFileType: "investigation" as any,
+        isaFileTemplateName: this.sampleTemplate,
+        templateVersion: this.templateVersion,
+      };
+  
+      let rule = null;
+      try {
+        if (
+          this.legacyControlLists &&
+          Object.keys(this.legacyControlLists).length > 0
+        ) {
+          rule = getValidationRuleForField(
+            {
+              controlLists: this.legacyControlLists,
+            } as MetabolightsFieldControls,
+            this.defaultControlListName,  
+            selectionInput
+          );
+        }
+      } catch (e) {
+        rule = null;
+      }
+  
+      return {
+        ...this.defaultControlList,
+        rule,
+        defaultOntologies
+      };
     }
-    return this.defaultControlList;
-  }
+    
 }
