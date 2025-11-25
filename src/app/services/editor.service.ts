@@ -952,13 +952,17 @@ export class EditorService {
     // New method for ontology term search with rule-based validation
   searchOntologyTermsWithRuleV2(
     keyword: string,
+    ruleName: string,
+    fieldName: string,
     validationType: string,
     ontologies: string[],
     allowedParentOntologyTerms?: any
   ): Observable<any> {
     const body: any = {
       ontologyValidationType: validationType,
-      ontologies: ontologies
+      ontologies: ontologies,
+      ruleName: ruleName,
+      fieldName: fieldName
     };
     if (allowedParentOntologyTerms) {
       body.allowedParentOntologyTerms = allowedParentOntologyTerms;

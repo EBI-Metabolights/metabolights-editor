@@ -104,6 +104,18 @@ export class TableComponent
   studyIdentifier$: Observable<string> = inject(Store).select(
     GeneralMetadataState.id
   );
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -200,6 +212,7 @@ export class TableComponent
   private studyCategory: StudyCategoryStr = null;
   private templateVersion: string = null;
   private sampleTemplate: string = null;
+  private studyCreatedAt: any;
 
   constructor(
     private clipboardService: ClipboardService,
@@ -258,23 +271,21 @@ export class TableComponent
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((value) => (this.toastrSettings = value));
 
-    this.studyIdentifier$
-      .pipe(filter((value) => value !== null))
-      .subscribe((value) => {
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
         this.studyId = value;
-        const cat = this.store.selectSnapshot(
-          (state: any) => state.study?.generalMetadata?.studyCategory
-        );
-        this.studyCategory = cat || null;
-        const ver = this.store.selectSnapshot(
-          (state: any) => state.study?.generalMetadata?.templateVersion
-        );
-        this.templateVersion = ver || null;
-        const sampTemp = this.store.selectSnapshot(
-          (state: any) => state.study?.generalMetadata?.sampleTemplate
-        );
-        this.sampleTemplate = sampTemp || null;
-      });
+    });
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
 
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
@@ -645,7 +656,7 @@ export class TableComponent
       const isaFileType = this.getIsaFileType(this.data.file);
       const selectionInput: ValidationRuleSelectionInput = {
         studyCategory: this.studyCategory,
-        studyCreatedAt: new Date(),
+        studyCreatedAt: this.studyCreatedAt,
         isaFileType,
         isaFileTemplateName: this.sampleTemplate,
         templateVersion: this.templateVersion,
@@ -708,7 +719,7 @@ export class TableComponent
             ...existing, // Keep old validations for display
             rule, // Add rule for search
             "data-type": isOntologyType ? "ontology" : rule.validationType,
-            renderAsDropdown: rule.validationType === "selected-ontology-term",
+            renderAsDropdown: rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required"
           })
         );
 

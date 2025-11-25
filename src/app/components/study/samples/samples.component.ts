@@ -21,7 +21,7 @@ import { FilesLists } from "src/app/ngxs-store/study/files/files.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 import { animate, style, transition, trigger } from "@angular/animations";
-import { FieldValueValidation, getValidationRuleForField, MetabolightsFieldControls, ValidationRuleSelectionInput } from "src/app/models/mtbl/mtbls/control-list";
+import { FieldValueValidation, getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr, ValidationRuleSelectionInput } from "src/app/models/mtbl/mtbls/control-list";
 
 @Component({
   selector: "mtbls-samples",
@@ -49,7 +49,18 @@ export class SamplesComponent  {
   studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
+   sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
   actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
   actionStack$ = computed(() => {
     const filterFn = this.actionStackFn();
@@ -102,6 +113,7 @@ export class SamplesComponent  {
   templateVersion: any;
   sampleTemplate: any;
   private legacyControlLists: Record<string, any[]> | null = null;
+  studyCreatedAt: any;
 
 
   constructor(
@@ -130,22 +142,18 @@ export class SamplesComponent  {
     this.studyFactors$.subscribe((value) => {
       this.factors = value;
     });
-    this.studyIdentifier$
-      .pipe(filter((value) => value !== null))
-      .subscribe((value) => {
-        const cat = this.store.selectSnapshot(
-          (state: any) => state.study?.generalMetadata?.studyCategory
-        );
-        this.studyCategory = cat || null;
-        const ver = this.store.selectSnapshot(
-          (state: any) => state.study?.generalMetadata?.templateVersion
-        );
-        this.templateVersion = ver || null;
-        const sampTemp = this.store.selectSnapshot(
-          (state: any) => state.study?.generalMetadata?.sampleTemplate
-        );
-        this.sampleTemplate = sampTemp || null;
-      });
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
       this.legacyControlLists = lists || {};
     });
@@ -481,7 +489,7 @@ export class SamplesComponent  {
     // Get rule using the same logic as table component
     const selectionInput: ValidationRuleSelectionInput = {
       studyCategory: this.studyCategory,
-      studyCreatedAt: new Date(),
+      studyCreatedAt: this.studyCreatedAt,
       isaFileType: "sample" as any,
       isaFileTemplateName: this.sampleTemplate,
       templateVersion: this.templateVersion,

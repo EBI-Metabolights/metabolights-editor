@@ -7,10 +7,11 @@ import {
   Input,
   ViewChild,
   inject,
+  ChangeDetectorRef,
 } from "@angular/core";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPublication } from "./../../../../models/mtbl/mtbls/mtbls-publication";
-import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, ValidatorFn, Validators } from "@angular/forms";
+import { AbstractControl, UntypedFormBuilder, UntypedFormControl, UntypedFormGroup, ValidatorFn, Validators } from "@angular/forms";
 import { ValidateRules } from "./publication.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { JsonConvert } from "json2typescript";
@@ -23,7 +24,8 @@ import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { People, Publications, StudyAbstract, Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
-import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 
 @Component({
   selector: "mtbls-publication",
@@ -35,15 +37,36 @@ export class PublicationComponent implements OnInit {
 
   @ViewChild(OntologyComponent) statusComponent: OntologyComponent;
 
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
-  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
-  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
+  editorValidationRules$: Observable<Record<string, any>> = inject(
+    Store
+  ).select(ValidationState.rules);
+  readonly$: Observable<boolean> = inject(Store).select(
+    ApplicationState.readonly
+  );
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(
+    ApplicationState.toastrSettings
+  );
   id$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   title$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
-  description$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
-
-  private title: string = ""
-  private description: string = ""
+  description$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.description
+  );
+  
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
+  private title: string = "";
+  private description: string = "";
+  private _controlList: any = null;
 
   toastrSettings: Record<string, any> = {};
 
@@ -55,7 +78,10 @@ export class PublicationComponent implements OnInit {
 
   validations: any;
   validationsId = "publications.publication";
-  defaultControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultControlList: { name: string; values: any[] } = {
+    name: "",
+    values: [],
+  };
   defaultControlListName = "Study Publication Status";
   isModalOpen = false;
   isTimeLineModalOpen = false;
@@ -71,23 +97,24 @@ export class PublicationComponent implements OnInit {
   studyCategory: any;
   templateVersion: any;
   sampleTemplate: any;
-  
+  studyCreatedAt: any;
+
   constructor(
     private fb: UntypedFormBuilder,
     private doiService: DOIService,
     private europePMCService: EuropePMCService,
     private editorService: EditorService,
-    private store: Store
+    private store: Store,
+    private cdRef: ChangeDetectorRef
   ) {
     if (!this.defaultControlList) {
-      this.defaultControlList = {name: "", values: []};
+      this.defaultControlList = { name: "", values: [] };
     }
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
-        this.legacyControlLists = lists || {};
+      this.legacyControlLists = lists || {};
     });
     this.setUpSubscriptionsNgxs();
   }
-
 
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((settings) => {
@@ -101,12 +128,20 @@ export class PublicationComponent implements OnInit {
         this.isReadOnly = value;
       }
     });
-    this.title$.subscribe((value) => {
-
+    this.title$.subscribe((value) => {});
+    this.description$.subscribe((value) => {});
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
     });
-    this.description$.subscribe((value) => {
-
-    })
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
   }
 
   openImportAuthorsModal() {
@@ -130,15 +165,18 @@ export class PublicationComponent implements OnInit {
           authorsA.push(this.compileAuthor(author));
         }
       });
-      this.store.dispatch(new People.Add({contacts: authorsA})).subscribe(
+      this.store.dispatch(new People.Add({ contacts: authorsA })).subscribe(
         (completed) => {
           toastr.success("Authors imported.", "Success", this.toastrSettings);
         },
         (error) => {
-          toastr.error("Failed to import authors.", "Error", this.toastrSettings);
+          toastr.error(
+            "Failed to import authors.",
+            "Error",
+            this.toastrSettings
+          );
         }
-      )
-
+      );
     }
   }
 
@@ -153,7 +191,10 @@ export class PublicationComponent implements OnInit {
     mtblPerson.fax = "";
     mtblPerson.address = "";
     mtblPerson.affiliation = author.affiliation ? author.affiliation : "";
-    mtblPerson.comments = author?.authorId?.type==="ORCID"? [new MTBLSComment("Study Person ORCID", author.authorId.value)] : [];
+    mtblPerson.comments =
+      author?.authorId?.type === "ORCID"
+        ? [new MTBLSComment("Study Person ORCID", author.authorId.value)]
+        : [];
     const role = jsonConvert.deserializeObject(
       JSON.parse(
         '{"annotationValue":"Author","comments":[],"termAccession":' +
@@ -177,7 +218,7 @@ export class PublicationComponent implements OnInit {
       this.europePMCService
         .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
         .subscribe((article) => {
-          console.dir(article)
+          console.dir(article);
           this.manuscriptAuthors = article.authorDetails;
         });
     }
@@ -190,19 +231,26 @@ export class PublicationComponent implements OnInit {
   }
 
   onChanges(value) {
-    const statusNew = this.statusComponent.values;
-    const prevStatus = this.form.controls.status.value;
+    // support both ontology component and plain select/form-control
+    const statusNew =
+      this.statusComponent && Array.isArray(this.statusComponent.values)
+        ? this.statusComponent.values
+        : this.form?.controls?.status?.value || [];
+    const prevStatus = this.form?.controls?.status?.value || [];
 
     if (JSON.stringify(prevStatus) !== JSON.stringify(statusNew)) {
-      this.form.controls.status.setValue(statusNew);
-      if (statusNew.length !== 0) {
-        this.form.controls.status.markAsDirty();
+      // update form control safely
+      if (this.form && this.form.controls && this.form.controls.status) {
+        this.form.controls.status.setValue(statusNew);
+        if (Array.isArray(statusNew) && statusNew.length !== 0) {
+          this.form.controls.status.markAsDirty();
+        }
       }
     }
     if (this.form && this.form.controls && this.form.controls.doi) {
-        this.setDoiRequiredBasedOnStatus();
-        this.form.controls.doi.updateValueAndValidity();
-      }
+      this.setDoiRequiredBasedOnStatus();
+      this.form.controls.doi.updateValueAndValidity();
+    }
   }
 
   showHistory() {
@@ -216,12 +264,36 @@ export class PublicationComponent implements OnInit {
   }
 
   openModal() {
-    if (!this.isReadOnly) {
-      this.initialiseForm();
-      this.isModalOpen = true;
-      this.publicationAbstract = "";
-      this.getAbstract();
+    if (this.isReadOnly) return;
+
+    try {
+      this._controlList = this.controlList();
+    } catch (e) {
+      this._controlList = null;
     }
+
+    this.initialiseForm();
+
+    try {
+      const statusControl = this.form?.get("status");
+      if (statusControl) {
+        if (this._controlList && this._controlList.renderAsDropdown) {
+          const initStr = this.publication?.status?.annotationValue || "";
+          statusControl.setValue(initStr, { emitEvent: false });
+        } else {
+          const initObj = this.publication?.status || null;
+          statusControl.setValue(initObj, { emitEvent: false });
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to set status control initial value", e);
+    }
+
+    this.isModalOpen = true;
+    this.publicationAbstract = "";
+    this.getAbstract();
+
+    this.cdRef.detectChanges();
   }
 
   confirmDelete() {
@@ -254,17 +326,13 @@ export class PublicationComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-
-
   updateStudyTitleNgxs() {
     const title = this.getFieldValue("title");
-    this.store.dispatch(new Title.Update({title})).subscribe(
-      (completed) => {
-        toastr.success("Title updated.", "Success", this.toastrSettings);
-        this.closeUpdateTitleModal();
-        this.isFormBusy = false;
-      }
-    );
+    this.store.dispatch(new Title.Update({ title })).subscribe((completed) => {
+      toastr.success("Title updated.", "Success", this.toastrSettings);
+      this.closeUpdateTitleModal();
+      this.isFormBusy = false;
+    });
   }
 
   getAbstract() {
@@ -308,12 +376,29 @@ export class PublicationComponent implements OnInit {
       this.doiService.getArticleInfo(doiURL).subscribe((article) => {
         this.setFieldValue("title", article.title.trim());
         this.setFieldValue("authorList", article.authorList.trim());
-        this.statusComponent.setValue("Published");
 
-        const statusVals = Array.isArray(this.statusComponent.values) && this.statusComponent.values.length
-          ? this.statusComponent.values
-          : ["Published"];
+        // prefer updating ontology component if present, otherwise update form control
+        const statusVals = ["Published"];
+        if (
+          this.statusComponent &&
+          typeof this.statusComponent.setValue === "function"
+        ) {
+          try {
+            this.statusComponent.setValue("Published");
+            if (
+              Array.isArray(this.statusComponent.values) &&
+              this.statusComponent.values.length
+            ) {
+              // keep statusVals in sync with component
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              // (we still update form below to keep validators in sync)
+            }
+          } catch (e) {
+            // ignore component update failure
+          }
+        }
         if (this.form && this.form.controls && this.form.controls.status) {
+          // set the same value into the form control (array or object as expected)
           this.form.controls.status.setValue(statusVals);
           this.setDoiRequiredBasedOnStatus();
           if (this.form.controls.doi) {
@@ -332,7 +417,29 @@ export class PublicationComponent implements OnInit {
         });
     }
   }
+  statusValuesForComponent(): any[] {
+    try {
+      const v = this.form?.get('status')?.value;
+      if (v === null || v === undefined || v === "") {
+        return this.publication && this.publication.status ? [this.publication.status] : [];
+      }
 
+     if (this._controlList && this._controlList.renderAsDropdown) {
+        const str = Array.isArray(v) ? (v[0] || "") : v;
+        if (!str) return [];
+        const candidates = this._controlList?.values || [];
+        const match = candidates.find((c: any) => (c.annotationValue || c.value || c.label) === str);
+        if (match) return [match];
+        return [{ annotationValue: str }];
+      }
+
+      // Not a dropdown: expect object(s) - normalize to array
+      return Array.isArray(v) ? v : [v];
+    } catch {
+      return this.publication && this.publication.status ? [this.publication.status] : [];
+    }
+  }
+  
   getArticleFromPubMedID() {
     this.publicationAbstract = "";
     const pubMedID = this.getFieldValue("pubMedID");
@@ -343,20 +450,24 @@ export class PublicationComponent implements OnInit {
           this.setFieldValue("title", article.title.trim());
           this.setFieldValue("authorList", article.authorList.trim());
           this.setFieldValue("doi", article.doi.trim());
-          this.statusComponent.setValue("Published");
 
-        const statusVals = Array.isArray(this.statusComponent.values) && this.statusComponent.values.length
-          ? this.statusComponent.values
-          : ["Published"];
-        if (this.form && this.form.controls && this.form.controls.status) {
-          this.form.controls.status.setValue(statusVals);
-          this.setDoiRequiredBasedOnStatus();
-          if (this.form.controls.doi) {
-            this.form.controls.doi.updateValueAndValidity();
+          // update component if present, otherwise update form control
+          if (
+            this.statusComponent &&
+            typeof this.statusComponent.setValue === "function"
+          ) {
+            try {
+              this.statusComponent.setValue("Published");
+            } catch (e) {}
           }
-          this.form.updateValueAndValidity();
-        }
-
+          if (this.form && this.form.controls && this.form.controls.status) {
+            this.form.controls.status.setValue(["Published"]);
+            this.setDoiRequiredBasedOnStatus();
+            if (this.form.controls.doi) {
+              this.form.controls.doi.updateValueAndValidity();
+            }
+            this.form.updateValueAndValidity();
+          }
           this.publicationAbstract = article.abstract;
         });
     }
@@ -371,6 +482,16 @@ export class PublicationComponent implements OnInit {
         this.publication = mtblsPublication;
       }
 
+      let statusInit = null;
+
+      if (this.publication?.status) {
+        statusInit = this._controlList?.renderAsDropdown
+          ? this.publication.status?.annotationValue || ""
+          : this.publication.status;
+      } else {
+        statusInit = this._controlList?.renderAsDropdown ? "" : null;
+      }
+
       this.form = this.fb.group({
         pubMedID: [
           this.publication.pubMedID,
@@ -380,8 +501,8 @@ export class PublicationComponent implements OnInit {
           this.publication.doi,
           [
             ValidateRules("doi", this.fieldValidation("doi")),
-            this.doiRequiredIfPublished()
-          ]
+            this.doiRequiredIfPublished(),
+          ],
         ],
         authorList: [
           this.publication.authorList,
@@ -392,34 +513,47 @@ export class PublicationComponent implements OnInit {
           ValidateRules("title", this.fieldValidation("title")),
         ],
         status: [
-          this.publication.status,
+          statusInit,
           ValidateRules("status", this.fieldValidation("status")),
         ],
       });
       // ensure DOI validator runs for initial status value
       if (this.form.controls.doi) {
         this.setDoiRequiredBasedOnStatus();
-        this.form.controls.doi.updateValueAndValidity({ onlySelf: true, emitEvent: false });
+        this.form.controls.doi.updateValueAndValidity({
+          onlySelf: true,
+          emitEvent: false,
+        });
       }
     }
   }
-  
+
   // helper to decide if status contains Published or Preprint
   private isStatusPublishedOrPreprint(statusVal: any): boolean {
-      const entries = Array.isArray(statusVal) ? statusVal : statusVal ? [statusVal] : [];
-      return entries.some((s) => {
-        if (!s) return false;
-        if (typeof s === "string") {
-          const vv = s.toLowerCase();
-          return vv === "published" || vv === "preprint";
-        }
-        const annotation = (s.annotationValue || s.annotationvalue || s.annotation || s.termName || s.label || s.value);
-        if (annotation && typeof annotation === "string") {
-          const vv = annotation.toLowerCase();
-          return vv === "published" || vv === "preprint";
-        }
-        return false;
-      });
+    const entries = Array.isArray(statusVal)
+      ? statusVal
+      : statusVal
+      ? [statusVal]
+      : [];
+    return entries.some((s) => {
+      if (!s) return false;
+      if (typeof s === "string") {
+        const vv = s.toLowerCase();
+        return vv === "published" || vv === "preprint";
+      }
+      const annotation =
+        s.annotationValue ||
+        s.annotationvalue ||
+        s.annotation ||
+        s.termName ||
+        s.label ||
+        s.value;
+      if (annotation && typeof annotation === "string") {
+        const vv = annotation.toLowerCase();
+        return vv === "published" || vv === "preprint";
+      }
+      return false;
+    });
   }
   // toggle required validator on DOI based on status values
   private setDoiRequiredBasedOnStatus(): void {
@@ -431,10 +565,12 @@ export class PublicationComponent implements OnInit {
 
     const baseValidators = [
       ValidateRules("doi", this.fieldValidation("doi")),
-      this.doiRequiredIfPublished()
+      this.doiRequiredIfPublished(),
     ];
 
-    const newValidators = mustBeRequired ? [...baseValidators, Validators.required] : baseValidators;
+    const newValidators = mustBeRequired
+      ? [...baseValidators, Validators.required]
+      : baseValidators;
     doiControl.setValidators(newValidators);
   }
 
@@ -442,7 +578,11 @@ export class PublicationComponent implements OnInit {
   doiRequiredIfPublished(): ValidatorFn {
     return (control: AbstractControl) => {
       const statusVal = this.form?.controls?.status?.value;
-      const entries = Array.isArray(statusVal) ? statusVal : statusVal ? [statusVal] : [];
+      const entries = Array.isArray(statusVal)
+        ? statusVal
+        : statusVal
+        ? [statusVal]
+        : [];
 
       const isPublishedOrPreprint = entries.some((s) => {
         if (!s) return false;
@@ -451,7 +591,13 @@ export class PublicationComponent implements OnInit {
           return vv === "published" || vv === "preprint";
         }
         // common object shapes: { annotationValue: "Published" } or { termName, label, value }
-        const annotation = (s.annotationValue || s.annotationvalue || s.annotation || s.termName || s.label || s.value);
+        const annotation =
+          s.annotationValue ||
+          s.annotationvalue ||
+          s.annotation ||
+          s.termName ||
+          s.label ||
+          s.value;
         if (annotation && typeof annotation === "string") {
           const vv = annotation.toLowerCase();
           return vv === "published" || vv === "preprint";
@@ -460,7 +606,7 @@ export class PublicationComponent implements OnInit {
       });
 
       const doiVal = control.value ?? "";
-      if (isPublishedOrPreprint && (String(doiVal).trim() === "")) {
+      if (isPublishedOrPreprint && String(doiVal).trim() === "") {
         // match existing error shape used by ValidateRules: { [field]: { error: string } }
         const msg = "DOI is required when status is Published or Preprint.";
         return { doi: { error: msg } };
@@ -470,26 +616,65 @@ export class PublicationComponent implements OnInit {
   }
 
   updateStudyAbstractNgxs() {
-    if (!this.isReadOnly)  {
-      this.store.dispatch(new StudyAbstract.Update(this.publicationAbstract)).subscribe(
-        (completed) => {
-            toastr.success("Study abstract updated.", "Success", this.toastrSettings);
-            this.closeUpdateAbstractModal();
-        }
-      );
+    if (!this.isReadOnly) {
+      this.store
+        .dispatch(new StudyAbstract.Update(this.publicationAbstract))
+        .subscribe((completed) => {
+          toastr.success(
+            "Study abstract updated.",
+            "Success",
+            this.toastrSettings
+          );
+          this.closeUpdateAbstractModal();
+        });
     }
-
   }
 
+  private getStatusValue(): any | null {
+    // Prefer ontology component values if present
+    try {
+      if (
+        this.statusComponent &&
+        Array.isArray(this.statusComponent.values) &&
+        this.statusComponent.values.length > 0
+      ) {
+        return this.statusComponent.values[0];
+      }
+    } catch (_) {}
 
+    // Fallback to form control
+    const controlVal = this.form?.get("status")?.value;
+    if (controlVal === null || controlVal === undefined) return null;
+    if (Array.isArray(controlVal)) {
+      return controlVal.length > 0 ? controlVal[0] : null;
+    }
+    // string or object
+    return controlVal;
+  }
   saveNgxs() {
     if (!this.isReadOnly) {
-      if (this.statusComponent.values[0] === undefined) {
-        toastr.warning("Publication status cannot be empty", "Warning", this.toastrSettings);
-      } else {
-        this.isFormBusy = true;
-        if(!this.addNewPublication) {// if we are updating a publication
-          this.store.dispatch(new Publications.Update(this.publication.title, this.compileBody())).subscribe(
+      const statusVal = this.getStatusValue();
+      if (
+        !statusVal ||
+        (typeof statusVal === "object" &&
+          Object.keys(statusVal).length === 0) ||
+        (typeof statusVal === "string" && String(statusVal).trim() === "")
+      ) {
+        toastr.warning(
+          "Publication status cannot be empty",
+          "Warning",
+          this.toastrSettings
+        );
+        return;
+      }
+
+      this.isFormBusy = true;
+      if (!this.addNewPublication) {
+        this.store
+          .dispatch(
+            new Publications.Update(this.publication.title, this.compileBody())
+          )
+          .subscribe(
             (completed) => {
               this.updatePublicationsNgxs("Publication updated.");
             },
@@ -497,47 +682,19 @@ export class PublicationComponent implements OnInit {
               this.isFormBusy = false;
             }
           );
-        } else { // if we are adding a new publication
-          this.store.dispatch(new Publications.Add(this.compileBody())).subscribe(
-            (completed) => {
-                this.updatePublicationsNgxs("Publication saved.");
-                this.isModalOpen = false;
-              },
-              (error) => {
-                this.isFormBusy = false;
-              }
-            )
-        }
-      }
-    }
-  }
-
-  deleteNgxs() {
-    if (!this.isReadOnly) {
-      this.store.dispatch(new Publications.Delete(this.publication.title)).subscribe(
-        (response) => {
-            this.updatePublicationsNgxs("Publication Deleted");
-            this.isDeleteModalOpen = false;
+      } else {
+        this.store.dispatch(new Publications.Add(this.compileBody())).subscribe(
+          (completed) => {
+            this.updatePublicationsNgxs("Publication saved.");
             this.isModalOpen = false;
           },
           (error) => {
             this.isFormBusy = false;
           }
-        )
+        );
+      }
     }
   }
-
-
-  updatePublicationsNgxs(message) {
-    if (!this.isReadOnly) {
-      this.form.markAsPristine();
-      this.initialiseForm();
-      this.isModalOpen = false;
-      toastr.success(message, "Success", this.toastrSettings);
-    }
-
-  }
-
 
   compileBody() {
     const mtblPublication = new MTBLSPublication();
@@ -547,12 +704,92 @@ export class PublicationComponent implements OnInit {
     mtblPublication.pubMedID = this.getFieldValue("pubMedID");
     mtblPublication.comments = [];
     const jsonConvert: JsonConvert = new JsonConvert();
-    mtblPublication.status = jsonConvert.deserializeObject(
-      this.statusComponent.values[0],
-      Ontology
-    );
+
+    const statusRaw = this.getStatusValue();
+    if (!statusRaw) {
+      mtblPublication.status = null;
+    } else {
+      // If already an instance of Ontology, use it; otherwise deserialize/construct an object
+      if (statusRaw instanceof Ontology) {
+        mtblPublication.status = statusRaw;
+      } else if (typeof statusRaw === "object") {
+        try {
+          mtblPublication.status = jsonConvert.deserializeObject(
+            statusRaw,
+            Ontology
+          );
+        } catch {
+          // best-effort fallback: map common fields
+          const tmp = new Ontology();
+          tmp.annotationValue =
+            statusRaw.annotationValue ||
+            statusRaw.termName ||
+            statusRaw.label ||
+            "";
+          tmp.termAccession =
+            statusRaw.termAccession ||
+            statusRaw.termAccessionNumber ||
+            statusRaw.iri ||
+            "";
+          tmp.termSource = new OntologySourceReference();
+          tmp.termSource.name =
+            statusRaw.termSourceRef || statusRaw.termSource?.name || "";
+          mtblPublication.status = tmp;
+        }
+      } else if (typeof statusRaw === "string") {
+        const tmp = new Ontology();
+        tmp.annotationValue = statusRaw;
+        tmp.termSource = new OntologySourceReference();
+        tmp.termAccession = "";
+        mtblPublication.status = tmp;
+      } else {
+        mtblPublication.status = null;
+      }
+    }
+
     return { publication: mtblPublication.toJSON() };
   }
+
+  deleteNgxs() {
+    if (!this.isReadOnly) {
+      this.store
+        .dispatch(new Publications.Delete(this.publication.title))
+        .subscribe(
+          (response) => {
+            this.updatePublicationsNgxs("Publication Deleted");
+            this.isDeleteModalOpen = false;
+            this.isModalOpen = false;
+          },
+          (error) => {
+            this.isFormBusy = false;
+          }
+        );
+    }
+  }
+
+  updatePublicationsNgxs(message) {
+    if (!this.isReadOnly) {
+      this.form.markAsPristine();
+      this.initialiseForm();
+      this.isModalOpen = false;
+      toastr.success(message, "Success", this.toastrSettings);
+    }
+  }
+
+  // compileBody() {
+  //   const mtblPublication = new MTBLSPublication();
+  //   mtblPublication.title = this.getFieldValue("title");
+  //   mtblPublication.authorList = this.getFieldValue("authorList");
+  //   mtblPublication.doi = this.getFieldValue("doi");
+  //   mtblPublication.pubMedID = this.getFieldValue("pubMedID");
+  //   mtblPublication.comments = [];
+  //   const jsonConvert: JsonConvert = new JsonConvert();
+  //   mtblPublication.status = jsonConvert.deserializeObject(
+  //     this.statusComponent.values[0],
+  //     Ontology
+  //   );
+  //   return { publication: mtblPublication.toJSON() };
+  // }
 
   closeModal() {
     this.isModalOpen = false;
@@ -578,7 +815,9 @@ export class PublicationComponent implements OnInit {
 
   isFieldRequired(field: string): boolean {
     try {
-      const cfgRequired = JSON.parse(this.fieldValidation(field)?.["is-required"] ?? "false");
+      const cfgRequired = JSON.parse(
+        this.fieldValidation(field)?.["is-required"] ?? "false"
+      );
       if (field === "doi") {
         if (cfgRequired) return true;
         const statusVal = this.form?.controls?.status?.value;
@@ -593,50 +832,86 @@ export class PublicationComponent implements OnInit {
     return this.form.get(name).setValue(value);
   }
   controlList() {
-      if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
-        this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
-        this.defaultControlList.name = this.defaultControlListName;
-      }
-  
-      
-      let defaultOntologies = [];
-        if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
-        const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
-        defaultOntologies =  defaultRule?.ontologies;
-      }
-  
-      const selectionInput = {
-        studyCategory: this.studyCategory,
-        studyCreatedAt: new Date(),
-        isaFileType: "investigation" as any,
-        isaFileTemplateName: this.sampleTemplate,
-        templateVersion: this.templateVersion,
-      };
-  
-      let rule = null;
-      try {
-        if (
-          this.legacyControlLists &&
-          Object.keys(this.legacyControlLists).length > 0
-        ) {
-          rule = getValidationRuleForField(
-            {
-              controlLists: this.legacyControlLists,
-            } as MetabolightsFieldControls,
-            this.defaultControlListName,  
-            selectionInput
-          );
-        }
-      } catch (e) {
-        rule = null;
-      }
-  
-      return {
-        ...this.defaultControlList,
-        rule,
-        defaultOntologies
-      };
+    if (
+      !(this.defaultControlList && this.defaultControlList.name.length > 0) &&
+      this.editorService.defaultControlLists &&
+      this.defaultControlListName in this.editorService.defaultControlLists
+    ) {
+      this.defaultControlList.values =
+        this.editorService.defaultControlLists[
+          this.defaultControlListName
+        ].OntologyTerm;
+      this.defaultControlList.name = this.defaultControlListName;
     }
-    
+
+    let defaultOntologies = [];
+    if (
+      this.legacyControlLists &&
+      this.legacyControlLists.controls &&
+      this.legacyControlLists.controls["investigationFileControls"] &&
+      this.legacyControlLists.controls["investigationFileControls"].__default__
+    ) {
+      const defaultRule =
+        this.legacyControlLists.controls["investigationFileControls"]
+          .__default__[0];
+      defaultOntologies = defaultRule?.ontologies;
+    }
+
+    const selectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      isaFileType: "investigation" as any,
+      isaFileTemplateName: this.sampleTemplate,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule = null;
+    try {
+      if (
+        this.legacyControlLists &&
+        Object.keys(this.legacyControlLists).length > 0
+      ) {
+        rule = getValidationRuleForField(
+          {
+            controlLists: this.legacyControlLists,
+          } as MetabolightsFieldControls,
+          this.defaultControlListName,
+          selectionInput
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+
+    // Handle all ontology types like table component
+    let renderAsDropdown = false;
+    if (rule) {
+      if (rule.validationType === "selected-ontology-term") {
+        renderAsDropdown = true;
+        // Populate values with rule.terms for dropdown
+        if (rule.terms && rule.terms.length > 0) {
+          const ontologiesValues = rule.terms.map((t: any) => {
+            const o = new Ontology();
+            o.annotationValue = t.term;
+            o.termAccession = t.termAccessionNumber || "";
+            o.termSource = new OntologySourceReference();
+            o.termSource.name = t.termSourceRef || "";
+            o.termSource.description = "";
+            o.termSource.file = "";
+            o.termSource.version = "";
+            o.termSource.provenance_name = "";
+            return o;
+          });
+          this.defaultControlList.values = ontologiesValues; // Override with rule terms
+        }
+      }
+    }
+
+    return {
+      ...this.defaultControlList,
+      rule,
+      defaultOntologies,
+      renderAsDropdown,
+    };
+  }
 }

@@ -9,7 +9,7 @@ import {
   ViewChild,
 } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
-import { COMMA, ENTER } from "@angular/cdk/keycodes";
+import { COMMA, ENTER, R } from "@angular/cdk/keycodes";
 import { UntypedFormControl } from "@angular/forms";
 import {
   MatAutocompleteSelectedEvent,
@@ -284,6 +284,8 @@ export class OntologyComponent implements OnInit, OnChanges {
       this.termsLoading = true;
 
       this.allvalues = [];
+      const ruleName = this.rule?.ruleName || null;
+      const fieldName = this.rule?.fieldName || null;
 
       if (
         this.rule &&
@@ -300,6 +302,8 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.editorService
           .searchOntologyTermsWithRuleV2(
             term,
+            ruleName,
+            fieldName,
             validationType,
             ontologies,
             allowedParentOntologyTerms
@@ -349,6 +353,8 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.editorService
           .searchOntologyTermsWithRuleV2(
             term,
+            ruleName,
+            fieldName,
             "any-ontology-term",
             this.defaultOntologies,
             null

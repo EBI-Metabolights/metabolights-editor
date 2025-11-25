@@ -17,7 +17,7 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
-import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 
 @Component({
   selector: "mtbls-protocol",
@@ -41,7 +41,18 @@ export class ProtocolComponent implements OnInit, OnChanges {
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
-
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
 
   private studyId: string =  null;
   private toastrSettings: Record<string, any> = {};
@@ -79,6 +90,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   private studyCategory: string = null;
   private sampleTemplate: string = null;
   private templateVersion: string = null;
+  studyCreatedAt: any;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -107,6 +119,18 @@ export class ProtocolComponent implements OnInit, OnChanges {
     this.studyId$.subscribe((id) => {
       this.studyId = id;
     })
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
     // subscribe to controlLists stored in application state (legacy flat payload)
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
      this.legacyControlLists = lists || {};

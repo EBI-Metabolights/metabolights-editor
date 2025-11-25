@@ -3,6 +3,7 @@
 
 export type IsaTabFileType = "assay" | "sample" | "investigation";
 export type StudyCategoryStr = "other" | "ms-mhd-enabled" | "ms-imaging" | "ms-other" | "nmr" | "ms-mhd-legacy";
+export type EnforcementLevel = "required" | "recommended" | "optional";
 /**
  * Validation rule type
  */
@@ -116,6 +117,8 @@ export interface FieldValueValidation {
   fieldName: string;
   selectionCriteria: SelectionCriteria;
   validationType: ValidationType;
+  termEnforcementLevel: EnforcementLevel;
+  unexpectedTermEnforcementLevel: EnforcementLevel;
   /**
    * Default ontology term
    */
@@ -204,29 +207,44 @@ function selectValidationRule(
     for (const rule of rules) {
         const selectionCriteria = rule.selectionCriteria;
         
-        // Combine all conditions with AND operator
+       // Normalize possible date inputs (string | Date | null) to 'YYYY-MM-DD' strings for safe lexical comparison.
+        const normalizeToISODate = (d: string | Date | null | undefined): string | null => {
+            if (!d) return null;
+            const dt = typeof d === "string" ? new Date(d) : d;
+            if (!dt || isNaN((dt as Date).getTime())) return null;
+            return (dt as Date).toISOString().slice(0, 10); // YYYY-MM-DD
+        };
+
+        const studyCreatedAtStr = normalizeToISODate(ruleSelectionInput.studyCreatedAt as any);
+        const afterStr = normalizeToISODate(selectionCriteria.studyCreatedAtOrAfter as any);
+        const beforeStr = normalizeToISODate(selectionCriteria.studyCreatedBefore as any);
+
+        const afterMatches =
+            !selectionCriteria.studyCreatedAtOrAfter ||
+            (studyCreatedAtStr !== null && afterStr !== null && studyCreatedAtStr >= afterStr);
+        const beforeMatches =
+            !selectionCriteria.studyCreatedBefore ||
+            (studyCreatedAtStr !== null && beforeStr !== null && studyCreatedAtStr < beforeStr);
         // If a criteria is null/undefined, consider it as matching (true)
         const matches = [
             // Study category check
             !selectionCriteria.studyCategoryFilter || 
             selectionCriteria.studyCategoryFilter.includes(ruleSelectionInput.studyCategory),
 
-            // // Creation date range check
-            // (!selectionCriteria.studyCreatedAtOrAfter || 
-            //     ruleSelectionInput.studyCreatedAt >= new Date(selectionCriteria.studyCreatedAtOrAfter)),
-            // (!selectionCriteria.studyCreatedBefore || 
-            //     ruleSelectionInput.studyCreatedAt < new Date(selectionCriteria.studyCreatedBefore)),
+            // Creation date range checks (use afterMatches/beforeMatches)
+            afterMatches,
+            beforeMatches,
 
             // // Template version check
-            // !selectionCriteria.templateVersionFilter ||
-            // selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
+            !selectionCriteria.templateVersionFilter ||
+            selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
 
             // // ISA file type check
-            // selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
+            selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
 
             // // ISA file template check
-            // !selectionCriteria.isaFileTemplateNameFilter ||
-            // selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
+            !selectionCriteria.isaFileTemplateNameFilter ||
+            selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
 
             // Linked fields check (if provided)
             // !selectionCriteria.linkedFieldAndValueFilter ||

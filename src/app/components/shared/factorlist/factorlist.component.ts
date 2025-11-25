@@ -2,7 +2,7 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } fro
 import * as toastr from "toastr";
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Store } from '@ngxs/store';
-import { Observable, take, withLatestFrom } from 'rxjs';
+import { filter, Observable, take, withLatestFrom } from 'rxjs';
 import { MTBLSFactor } from 'src/app/models/mtbl/mtbls/mtbls-factor';
 import { ApplicationState } from 'src/app/ngxs-store/non-study/application/application.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
@@ -14,7 +14,7 @@ import { JsonConvert } from 'json2typescript';
 import { Ontology } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology';
 import { Router } from '@angular/router';
 import { SampleState } from 'src/app/ngxs-store/study/samples/samples.state';
-import { getValidationRuleForField, MetabolightsFieldControls } from 'src/app/models/mtbl/mtbls/control-list';
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from 'src/app/models/mtbl/mtbls/control-list';
 
 
 @Component({
@@ -38,7 +38,17 @@ export class FactorlistComponent implements OnInit {
     toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
     studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
     studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
-  
+    sampleTemplate$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.sampleTemplate);
+    studyCreatedAt$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.studyCreatedAt
+    );
+    studyCategory$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.studyCategory
+    );
+    templateVersion$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.templateVersion
+    );
   
     private toastrSettings: Record<string, any> = {};
     private studyId: string = null;
@@ -75,6 +85,7 @@ export class FactorlistComponent implements OnInit {
     studyCategory: any;
     templateVersion: any;
     sampleTemplate: any;
+  studyCreatedAt: any;
   
     constructor(
       private fb: UntypedFormBuilder,
@@ -104,22 +115,21 @@ export class FactorlistComponent implements OnInit {
   
   
     setUpSubscriptionsNgxs() {
-      this.studyIdentifier$.subscribe(
-        (id) => {
-          this.studyId = id;
-          const cat = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.studyCategory
-          );
-          this.studyCategory = cat || null;
-          const ver = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.templateVersion
-          );
-          this.templateVersion = ver || null;
-          const sampTemp = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.sampleTemplate
-          );
-          this.sampleTemplate = sampTemp || null;
-      })
+      this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+          this.studyId = value;
+      });
+      this.sampleTemplate$.subscribe((value) => {
+        this.sampleTemplate = value;
+      });
+      this.studyCategory$.subscribe((value) => {
+        this.studyCategory = value as StudyCategoryStr;
+      });
+      this.templateVersion$.subscribe((value) => {
+        this.templateVersion = value;
+      });
+      this.studyCreatedAt$.subscribe((value) => {
+        this.studyCreatedAt = value;
+      });
       this.toastrSettings$.subscribe((value) => {
         this.toastrSettings;
       });
@@ -348,7 +358,7 @@ export class FactorlistComponent implements OnInit {
 
       const selectionInput = {
         studyCategory: this.studyCategory,
-        studyCreatedAt: new Date(),
+        studyCreatedAt: this.studyCreatedAt,
         isaFileType: "investigation" as any,
         isaFileTemplateName: this.sampleTemplate,
         templateVersion: this.templateVersion,
