@@ -31,6 +31,7 @@ export interface IMtblsStudySummaryInformation {
   sampleTemplate: string;
   templateVersion: string;
   studyCategory: string;
+  createdAt: string;
 }
 
 export class IStudyRevision {

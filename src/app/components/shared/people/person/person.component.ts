@@ -12,7 +12,7 @@ import { trigger, style, animate, transition } from "@angular/animations";
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import * as toastr from "toastr";
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
@@ -24,7 +24,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { AppMessage, GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
-import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 
 
 @Component({
@@ -53,7 +53,18 @@ export class PersonComponent implements OnInit {
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
-
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
 
   isReadOnly = false;
   validations: any = {};
@@ -87,6 +98,7 @@ export class PersonComponent implements OnInit {
   studyCategory: any;
   templateVersion: any;
   sampleTemplate: any;
+  studyCreatedAt: any;
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
@@ -114,23 +126,22 @@ export class PersonComponent implements OnInit {
         }
       }
     });
-    this.studyIdentifier$.subscribe((value) => {
-      if (value !== null) {
-        this.requestedStudy = value;
-        const cat = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.studyCategory
-          );
-          this.studyCategory = cat || null;
-          const ver = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.templateVersion
-          );
-          this.templateVersion = ver || null;
-          const sampTemp = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.sampleTemplate
-          );
-          this.sampleTemplate = sampTemp || null;
-      }
-    });
+   
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+            this.requestedStudy = value;
+        });
+        this.sampleTemplate$.subscribe((value) => {
+          this.sampleTemplate = value;
+        });
+        this.studyCategory$.subscribe((value) => {
+          this.studyCategory = value as StudyCategoryStr;
+        });
+        this.templateVersion$.subscribe((value) => {
+          this.templateVersion = value;
+        });
+        this.studyCreatedAt$.subscribe((value) => {
+          this.studyCreatedAt = value;
+        });
   }
 
   ngOnInit() {
@@ -571,7 +582,7 @@ private updatePiValidators(isPi: boolean): void {
 
     const selectionInput = {
       studyCategory: this.studyCategory,
-      studyCreatedAt: new Date(),
+      studyCreatedAt: this.studyCreatedAt,
       isaFileType: "investigation" as any,
       isaFileTemplateName: this.sampleTemplate,
       templateVersion: this.templateVersion,

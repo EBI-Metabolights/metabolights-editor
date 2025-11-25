@@ -22,7 +22,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
-import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 @Component({
   selector: "mtbls-design-descriptor",
   templateUrl: "./design-descriptor.component.html",
@@ -38,7 +38,18 @@ export class DesignDescriptorComponent implements OnInit {
 
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   descriptors$: Observable<Ontology[]> = inject(Store).select(DescriptorsState.studyDesignDescriptors);
-
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;
 
@@ -74,6 +85,7 @@ export class DesignDescriptorComponent implements OnInit {
   templateVersion: any;
   sampleTemplate: any;
   defaultControlListName = "Study Design Type";
+  studyCreatedAt: any;
   
   constructor(
     private fb: UntypedFormBuilder,
@@ -102,7 +114,18 @@ export class DesignDescriptorComponent implements OnInit {
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
     });
-
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
     this.studyReadonly$.subscribe((value) => {
       if (value != null) {
         this.isStudyReadOnly = value;
@@ -365,7 +388,7 @@ export class DesignDescriptorComponent implements OnInit {
   
       const selectionInput = {
         studyCategory: this.studyCategory,
-        studyCreatedAt: new Date(),
+        studyCreatedAt: this.studyCreatedAt,
         isaFileType: "investigation" as any,
         isaFileTemplateName: this.sampleTemplate,
         templateVersion: this.templateVersion,

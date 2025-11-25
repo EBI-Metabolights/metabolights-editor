@@ -17,13 +17,13 @@ import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { MTBLSFactor } from "./../../../../models/mtbl/mtbls/mtbls-factor";
 import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { Observable } from "rxjs";
+import { filter, Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Factors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Router } from "@angular/router";
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
-import { getValidationRuleForField, MetabolightsFieldControls } from "src/app/models/mtbl/mtbls/control-list";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 
 @Component({
   selector: "mtbls-factor",
@@ -45,7 +45,18 @@ export class FactorComponent implements OnInit {
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
 
   private toastrSettings: Record<string, any> = {};
   private studyId: string = null;
@@ -82,6 +93,7 @@ export class FactorComponent implements OnInit {
   studyCategory: any;
   templateVersion: any;
   sampleTemplate: any;
+  studyCreatedAt: any;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -111,22 +123,21 @@ export class FactorComponent implements OnInit {
 
 
   setUpSubscriptionsNgxs() {
-    this.studyIdentifier$.subscribe(
-      (id) => {
-        this.studyId = id;
-        const cat = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.studyCategory
-          );
-          this.studyCategory = cat || null;
-          const ver = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.templateVersion
-          );
-          this.templateVersion = ver || null;
-          const sampTemp = this.store.selectSnapshot(
-            (state: any) => state.study?.generalMetadata?.sampleTemplate
-          );
-          this.sampleTemplate = sampTemp || null;
-      })
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+        this.studyId = value;
+    });
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
     this.toastrSettings$.subscribe((value) => {
       this.toastrSettings;
     });
@@ -337,7 +348,7 @@ export class FactorComponent implements OnInit {
   
         const selectionInput = {
           studyCategory: this.studyCategory,
-          studyCreatedAt: new Date(),
+          studyCreatedAt: this.studyCreatedAt,
           isaFileType: "investigation" as any,
           isaFileTemplateName: this.sampleTemplate,
           templateVersion: this.templateVersion,

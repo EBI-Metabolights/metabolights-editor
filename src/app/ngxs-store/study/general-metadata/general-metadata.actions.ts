@@ -152,6 +152,12 @@ export namespace SampleTemplate {
   }
 }
 
+export namespace StudyCreatedAt {
+  export class Set{
+      static readonly type = '[general] Set Study Created At'
+      constructor(public studyCreatedAt: string) {}
+  }
+}
 export namespace StudyCategory {
   export class Set{
       static readonly type = '[general] Set Study Category'
