@@ -38,9 +38,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   descriptors$: Observable<Ontology[]> = inject(Store).select(DescriptorsState.studyDesignDescriptors);
-  sampleTemplate$: Observable<string> = inject(Store).select(
-    GeneralMetadataState.sampleTemplate
-  );
+  
   studyCreatedAt$: Observable<string> = inject(Store).select(
     GeneralMetadataState.studyCreatedAt
   );
@@ -83,7 +81,6 @@ export class DesignDescriptorComponent implements OnInit {
   private legacyControlLists: Record<string, any[]> | null = null;
   studyCategory: any;
   templateVersion: any;
-  sampleTemplate: any;
   defaultControlListName = "Study Design Type";
   studyCreatedAt: any;
   
@@ -114,9 +111,7 @@ export class DesignDescriptorComponent implements OnInit {
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
     });
-    this.sampleTemplate$.subscribe((value) => {
-      this.sampleTemplate = value;
-    });
+    
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
     });
@@ -390,7 +385,7 @@ export class DesignDescriptorComponent implements OnInit {
         studyCategory: this.studyCategory,
         studyCreatedAt: this.studyCreatedAt,
         isaFileType: "investigation" as any,
-        isaFileTemplateName: this.sampleTemplate,
+        isaFileTemplateName: null,
         templateVersion: this.templateVersion,
       };
   

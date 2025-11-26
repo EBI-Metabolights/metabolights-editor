@@ -52,9 +52,6 @@ export class PublicationComponent implements OnInit {
     GeneralMetadataState.description
   );
   
-  sampleTemplate$: Observable<string> = inject(Store).select(
-    GeneralMetadataState.sampleTemplate
-  );
   studyCreatedAt$: Observable<string> = inject(Store).select(
     GeneralMetadataState.studyCreatedAt
   );
@@ -96,7 +93,6 @@ export class PublicationComponent implements OnInit {
   private legacyControlLists: Record<string, any[]> | null = null;
   studyCategory: any;
   templateVersion: any;
-  sampleTemplate: any;
   studyCreatedAt: any;
 
   constructor(
@@ -130,9 +126,7 @@ export class PublicationComponent implements OnInit {
     });
     this.title$.subscribe((value) => {});
     this.description$.subscribe((value) => {});
-    this.sampleTemplate$.subscribe((value) => {
-      this.sampleTemplate = value;
-    });
+    
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
     });
@@ -390,8 +384,7 @@ export class PublicationComponent implements OnInit {
               this.statusComponent.values.length
             ) {
               // keep statusVals in sync with component
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              // (we still update form below to keep validators in sync)
+             
             }
           } catch (e) {
             // ignore component update failure
@@ -433,7 +426,6 @@ export class PublicationComponent implements OnInit {
         return [{ annotationValue: str }];
       }
 
-      // Not a dropdown: expect object(s) - normalize to array
       return Array.isArray(v) ? v : [v];
     } catch {
       return this.publication && this.publication.status ? [this.publication.status] : [];
@@ -451,7 +443,6 @@ export class PublicationComponent implements OnInit {
           this.setFieldValue("authorList", article.authorList.trim());
           this.setFieldValue("doi", article.doi.trim());
 
-          // update component if present, otherwise update form control
           if (
             this.statusComponent &&
             typeof this.statusComponent.setValue === "function"
@@ -709,7 +700,6 @@ export class PublicationComponent implements OnInit {
     if (!statusRaw) {
       mtblPublication.status = null;
     } else {
-      // If already an instance of Ontology, use it; otherwise deserialize/construct an object
       if (statusRaw instanceof Ontology) {
         mtblPublication.status = statusRaw;
       } else if (typeof statusRaw === "object") {
@@ -719,7 +709,6 @@ export class PublicationComponent implements OnInit {
             Ontology
           );
         } catch {
-          // best-effort fallback: map common fields
           const tmp = new Ontology();
           tmp.annotationValue =
             statusRaw.annotationValue ||
@@ -775,21 +764,6 @@ export class PublicationComponent implements OnInit {
       toastr.success(message, "Success", this.toastrSettings);
     }
   }
-
-  // compileBody() {
-  //   const mtblPublication = new MTBLSPublication();
-  //   mtblPublication.title = this.getFieldValue("title");
-  //   mtblPublication.authorList = this.getFieldValue("authorList");
-  //   mtblPublication.doi = this.getFieldValue("doi");
-  //   mtblPublication.pubMedID = this.getFieldValue("pubMedID");
-  //   mtblPublication.comments = [];
-  //   const jsonConvert: JsonConvert = new JsonConvert();
-  //   mtblPublication.status = jsonConvert.deserializeObject(
-  //     this.statusComponent.values[0],
-  //     Ontology
-  //   );
-  //   return { publication: mtblPublication.toJSON() };
-  // }
 
   closeModal() {
     this.isModalOpen = false;
@@ -861,7 +835,7 @@ export class PublicationComponent implements OnInit {
       studyCategory: this.studyCategory,
       studyCreatedAt: this.studyCreatedAt,
       isaFileType: "investigation" as any,
-      isaFileTemplateName: this.sampleTemplate,
+      isaFileTemplateName: null,
       templateVersion: this.templateVersion,
     };
 
@@ -883,12 +857,11 @@ export class PublicationComponent implements OnInit {
       rule = null;
     }
 
-    // Handle all ontology types like table component
     let renderAsDropdown = false;
+    
     if (rule) {
-      if (rule.validationType === "selected-ontology-term") {
+      if (rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required") {
         renderAsDropdown = true;
-        // Populate values with rule.terms for dropdown
         if (rule.terms && rule.terms.length > 0) {
           const ontologiesValues = rule.terms.map((t: any) => {
             const o = new Ontology();
