@@ -81,10 +81,10 @@ export interface ApplicationStateModel {
             tapToDismiss: false,
           },
         transferStatus: {
-            private_ftp: {
+            privateFtp: {
                 online: null
             },
-            public_ftp: {
+            publicFtp: {
                 online: null
             },
             aspera: {

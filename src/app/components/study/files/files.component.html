@@ -77,11 +77,11 @@
         <span
           class="tag"
           [ngClass]="{
-            'is-danger': !ts[ isReadOnly ? 'private_ftp' : 'public_ftp' ].online,
-            'is-success': ts[ isReadOnly ? 'private_ftp' : 'public_ftp' ].online
+            'is-danger': !ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online,
+            'is-success': ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online
           }"
         >
-          {{ ts[ isReadOnly ? 'private_ftp' : 'public_ftp' ].online ? 'ONLINE' : 'OFFLINE' }}
+          {{ ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online ? 'ONLINE' : 'OFFLINE' }}
         </span>
       </div>
     </ng-container>
@@ -305,7 +305,7 @@
     </ng-template>
   </nav>
    <!--ISA Metadata upload area -->
-  <div style="margin-bottom: 1rem;">
+  <div *ngIf="!isReadOnly"  style="margin-bottom: 1rem;">
       <app-drag-and-drop
         (uploadComplete)="onUploadComplete($event)"
         [iscloseable]="false"
@@ -314,8 +314,8 @@
   </div>
   <!--ISA Metadata panel end -->
   <mat-divider class="file-divider" [inset]="true"></mat-divider>
-  <div *ngIf="!isReadOnly" class="notification is-warning message">
-    <small>This section shows your indexed data files. Please click the folder icon to expand the directory.</small>
+  <div class="notification is-warning message">
+    <small>This section shows indexed data files. Please click the folder icon to expand the directory.</small>
   </div>
   <!-- RAW / DERIVED Files Panel start-->
   <nav class="panel">
@@ -544,14 +544,17 @@
 
   <mat-divider class="file-divider" [inset]="true"></mat-divider>
 
+  <div *ngIf="!isReadOnly && !privateFtpAccessible" class="notification is-warning message">
+    <small>We can not show your FTP folder content now. Please try again later.</small>
+  </div>
 
   <!-- i_Investigation.txt warning start-->
-  <div *ngIf="!isReadOnly" class="notification is-warning message">
+  <div *ngIf="!isReadOnly && privateFtpAccessible" class="notification is-warning message">
     <small>This section shows your FTP folder contents. Please start synchronization to use the updated files on FTP folder.</small>
   </div>
   <!-- i_Investigation.txt warning end-->
   <!-- FTP panel start-->
-  <nav *ngIf="!isReadOnly" class="panel">
+  <nav *ngIf="!isReadOnly && privateFtpAccessible" class="panel">
 
     <span #spacer5></span>
     <p

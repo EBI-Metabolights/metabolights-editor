@@ -130,7 +130,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The middle names or initials of the contact e.g. Anna, A.",
+                    "description": "The middle names or initials of the contact. e.g. Anna, A.",
                     "placeholder": "M.",
                     "rules": [
                         {
@@ -264,7 +264,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The (primary) address for this contact. e.g. 12 Street, Place, postcode, Country",
+                    "description": "The (primary) address for this contact. e.g. 12 Street, Place, Postcode, Country",
                     "placeholder": "12 Street, Place, postcode, Country",
                     "rules": [
                         {

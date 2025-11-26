@@ -7,6 +7,7 @@ import {
   SimpleChanges,
   EventEmitter,
   ViewChild,
+  ElementRef,
 } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER, R } from "@angular/cdk/keycodes";
@@ -64,8 +65,9 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("unitId") unitId: string;
   @Input("label") label: string;
   @Input() rule: FieldValueValidation | null = null;
-
+  @ViewChild('input', { static: false }) inputRef!: ElementRef<HTMLInputElement>;
   @Output() changed = new EventEmitter<any>();
+  @Output() emptyError = new EventEmitter<boolean>();
 
   @ViewChild("input", { read: MatAutocompleteTrigger })
   valueInput: MatAutocompleteTrigger;
@@ -440,7 +442,10 @@ export class OntologyComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    this.values = this.values.filter((val) => val !== null);
+      this.values = this.values.filter((val) => val !== null);
+
+      // Emit to parent when array becomes empty
+      this.emptyError.emit(this.values.length === 0);
   }
 
   setValues(values) {
@@ -549,6 +554,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.getDefaultTerms();
         this.valueInput.closePanel();
         this.triggerChanges();
+        // this.valueCtrl.enable();
       }
     }
   }
@@ -565,6 +571,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     }
     this.valueCtrl.setValue(null);
     this.triggerChanges();
+    // this.valueCtrl.enable();
   }
 
   setValue(value) {
@@ -598,6 +605,10 @@ export class OntologyComponent implements OnInit, OnChanges {
   reset() {
     this.values = [];
     this.valueCtrl.setValue(null);
+    if (this.inputRef?.nativeElement) {
+      this.inputRef.nativeElement.value = '';
+    }
+    // this.valueCtrl.enable();
   }
 
   triggerChanges() {

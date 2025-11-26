@@ -169,7 +169,7 @@ export class AssayDetailsComponent implements OnInit {
         ? this.assay.data.rows
         : [];
      // always copy from the first row (if present), otherwise use emptyRow
-    const sourceRow = rows.length > 0 ? rows[0] : emptyRow;
+    const sourceRow = rows.length > 0 ? rows[1] : emptyRow;
 
     // columns to clear when copying from sourceRow
     const ignoreColumns = [
