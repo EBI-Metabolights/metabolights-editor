@@ -86,7 +86,7 @@ export class PublicationComponent implements OnInit {
   isUpdateTitleModalOpen = false;
   isUpdateAbstractModalOpen = false;
   isImportAuthorsModalOpen = false;
-
+  showOntology: boolean = true;
   manuscriptAuthors: any = null;
 
   publicationAbstract = "";
@@ -94,6 +94,7 @@ export class PublicationComponent implements OnInit {
   studyCategory: any;
   templateVersion: any;
   studyCreatedAt: any;
+  showError = false;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -468,9 +469,10 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.isFormBusy = false;
 
-      if (this.publication === null) {
+      if (this.publication === null || this.publication.title === "") {
         const mtblsPublication = new MTBLSPublication();
         this.publication = mtblsPublication;
+        this.publication.status = [];
       }
 
       let statusInit = null;
@@ -508,6 +510,7 @@ export class PublicationComponent implements OnInit {
           ValidateRules("status", this.fieldValidation("status")),
         ],
       });
+      
       // ensure DOI validator runs for initial status value
       if (this.form.controls.doi) {
         this.setDoiRequiredBasedOnStatus();
@@ -767,6 +770,8 @@ export class PublicationComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    if(this.publication)
+        this.showOntology = false;
   }
 
   get validation() {
@@ -886,5 +891,9 @@ export class PublicationComponent implements OnInit {
       defaultOntologies,
       renderAsDropdown,
     };
+  }
+
+  onEmptyError(isEmpty: boolean) {
+    this.showError = isEmpty;
   }
 }

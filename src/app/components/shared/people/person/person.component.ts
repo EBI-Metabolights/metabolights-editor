@@ -88,7 +88,9 @@ export class PersonComponent implements OnInit {
   options: string[] = ["One", "Two", "Three"];
   private legacyControlLists: Record<string, any[]> | null = null;
   validationsId = "people.person";
+  showError = false;
 
+  
   private toastrSettings: Record<string, any> = {};
   isPiRole: boolean= false;
   filteredOrganizations$: Observable<any[]> = of([]);
@@ -158,6 +160,11 @@ export class PersonComponent implements OnInit {
       }
     });
   }
+  
+  onEmptyError(isEmpty: boolean) {
+    this.showError = isEmpty;
+  }
+
   private getCommentValue(label: string): string {
     return (
       this.person?.comments?.find((c) => c.name === label)?.value || ""
@@ -221,7 +228,7 @@ export class PersonComponent implements OnInit {
         ValidateRules("roles", this.fieldValidation("roles")),
       ],
       orcid: [
-        this.person?.comments?.[0]?.value || "",
+        this.getCommentValue("Study Person ORCID"),
         ValidateRules("orcid", this.fieldValidation("orcid")),
       ],
     });
@@ -445,7 +452,7 @@ private updateValidatorsBasedOnRoles() {
 }
 
 private updatePiValidators(isPi: boolean): void {
-  const piFields = ['orcid', 'affiliation', 'rorid', 'email'];
+  const piFields = ['affiliation', 'email'];
   const alwaysRequiredFields = ['firstName', 'lastName'];
 
   // Helper to normalize validators to an array
