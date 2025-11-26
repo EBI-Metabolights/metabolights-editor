@@ -33,12 +33,12 @@
         (optionSelected)="optionSelected($event)"
       >
         <!-- (optionSelected)="selected($event)" -->
-        <span *ngIf="!searchedMore">
+        <span *ngIf="!searchedMore &&  ((inputValue || '').trim().length >= 3)">
           <span *ngIf="termsLoading; else showMore">
             <mat-option>
               <img
                 style="height: 10px; margin-left: 10px"
-                src="{{ baseHref }}assets/img/loading.svg"
+               src="{{ baseHref }}assets/img/loading.svg"
               />
             </mat-option>
           </span>
@@ -144,20 +144,7 @@
               </ng-template>
             </span>
           </div>
-        </mat-option>
-        <span *ngIf="!searchedMore && (currentOptions.length > 0) ">
-          <span *ngIf="termsLoading; else showMore">
-            <mat-option>
-              <img
-                style="height: 10px; margin-left: 10px"
-                src="{{ baseHref }}assets/img/loading.svg"
-              />
-            </mat-option>
-          </span>
-          <ng-template #showMore>
-            <mat-option>Search more terms on ontology sources</mat-option>
-          </ng-template>
-        </span>
+        </mat-option> 
       </mat-autocomplete>
       <mat-hint
         >{{ validations.description }}
