@@ -38,8 +38,7 @@ export class FactorlistComponent implements OnInit {
     toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
     studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
     studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
-    sampleTemplate$: Observable<string> = inject(Store).select(
-      GeneralMetadataState.sampleTemplate);
+    
     studyCreatedAt$: Observable<string> = inject(Store).select(
       GeneralMetadataState.studyCreatedAt
     );
@@ -84,8 +83,7 @@ export class FactorlistComponent implements OnInit {
     private legacyControlLists: Record<string, any[]> | null = null;
     studyCategory: any;
     templateVersion: any;
-    sampleTemplate: any;
-  studyCreatedAt: any;
+    studyCreatedAt: any;
   
     constructor(
       private fb: UntypedFormBuilder,
@@ -118,9 +116,7 @@ export class FactorlistComponent implements OnInit {
       this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
           this.studyId = value;
       });
-      this.sampleTemplate$.subscribe((value) => {
-        this.sampleTemplate = value;
-      });
+      
       this.studyCategory$.subscribe((value) => {
         this.studyCategory = value as StudyCategoryStr;
       });
@@ -360,7 +356,7 @@ export class FactorlistComponent implements OnInit {
         studyCategory: this.studyCategory,
         studyCreatedAt: this.studyCreatedAt,
         isaFileType: "investigation" as any,
-        isaFileTemplateName: this.sampleTemplate,
+        isaFileTemplateName: null,
         templateVersion: this.templateVersion,
       };
 

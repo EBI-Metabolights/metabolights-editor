@@ -654,11 +654,24 @@ export class TableComponent
 
       // Overlay new rule-based logic for search/API first
       const isaFileType = this.getIsaFileType(this.data.file);
+      let isaFileTemplateName: string | null = null;
+      if (isaFileType === "sample") {
+        isaFileTemplateName = this.sampleTemplate || null;
+      } else if (isaFileType === "assay") {
+        const filename = this.data?.file || "";
+        const parts = filename.split("_");
+        isaFileTemplateName = parts.length >= 3 ? parts[2] : null;
+      } else if (isaFileType === "investigation") {
+        isaFileTemplateName = null;
+      } else {
+        isaFileTemplateName = this.sampleTemplate || null;
+      }
+
       const selectionInput: ValidationRuleSelectionInput = {
         studyCategory: this.studyCategory,
         studyCreatedAt: this.studyCreatedAt,
         isaFileType,
-        isaFileTemplateName: this.sampleTemplate,
+        isaFileTemplateName,
         templateVersion: this.templateVersion,
       };
 

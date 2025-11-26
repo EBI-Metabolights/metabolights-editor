@@ -41,9 +41,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
-  sampleTemplate$: Observable<string> = inject(Store).select(
-    GeneralMetadataState.sampleTemplate
-  );
+  
   studyCreatedAt$: Observable<string> = inject(Store).select(
     GeneralMetadataState.studyCreatedAt
   );
@@ -88,7 +86,6 @@ export class ProtocolComponent implements OnInit, OnChanges {
   private defaultControlListName: string = "Study Protocol Parameter Name";
   defaultControlList: { name: string; values: any[] } = { name: "", values: [] };
   private studyCategory: string = null;
-  private sampleTemplate: string = null;
   private templateVersion: string = null;
   studyCreatedAt: any;
 
@@ -119,9 +116,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
     this.studyId$.subscribe((id) => {
       this.studyId = id;
     })
-    this.sampleTemplate$.subscribe((value) => {
-      this.sampleTemplate = value;
-    });
+    
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
     });
@@ -588,7 +583,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
       studyCategory: this.studyCategory,
       studyCreatedAt: this.protocol && this.protocol.created ? new Date(this.protocol.created) : new Date(),
       isaFileType: "investigation" as any,
-      isaFileTemplateName:this.sampleTemplate,
+      isaFileTemplateName: null,
       templateVersion: this.templateVersion,
     };
 
