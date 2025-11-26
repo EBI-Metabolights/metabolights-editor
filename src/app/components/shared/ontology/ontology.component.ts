@@ -69,7 +69,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   @ViewChild("input", { read: MatAutocompleteTrigger })
   valueInput: MatAutocompleteTrigger;
-
+  
   baseURL = "";
   loading = false;
   termsLoading = false;
