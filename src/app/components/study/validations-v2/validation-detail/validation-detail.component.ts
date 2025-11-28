@@ -43,6 +43,12 @@ export class ValidationV2DetailComponent implements OnInit {
     this.typeIcon = this.getViolationTypeIcon();
   }
 
+  getViolationSource(violation): string {
+    if (violation.sourceColumnHeader && violation.sourceColumnHeader.length > 0) {
+      return  violation.sourceColumnHeader + " column in " +  violation.sourceFile
+    }
+    return violation.sourceFile
+  }
   getViolationTypeIcon(): string {
     if (this.violation.type === 'ERROR') return 'error'
     if (this.violation.type === 'WARNING') return 'warning'
