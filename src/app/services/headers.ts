@@ -7,6 +7,13 @@ export const httpOptions = {
     "user-token": "dummy",
     Authorization: "Bearer dummy"
   }),
+  emptyHeader: new HttpHeaders({
+    Accept: "application/json"
+  }),
+  jwtTokenOnlyHeader: new HttpHeaders({
+    Accept: "application/json",
+    Authorization: "Bearer dummy"
+  }),
 };
 
 export interface MtblsJwtPayload {

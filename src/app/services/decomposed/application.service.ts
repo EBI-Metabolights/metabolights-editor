@@ -86,9 +86,9 @@ export class ApplicationService extends BaseConfigDependentService {
   getDefaultControlLists(): Observable<Record<string, any>> {
     return this.http
         .get<any>(
-          this.url.baseURL + "/ebi-internal/control-lists",
+          `${this.configService.config.ws3URL}/public/v2/validations/configuration`,
           {
-            headers: httpOptions.headers,
+            headers: httpOptions.emptyHeader,
             observe: "body",
           }
         )
