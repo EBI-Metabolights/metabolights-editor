@@ -90,14 +90,26 @@
                       <small>{{ formatTitle(col.name) }}</small>
                       <div class="columns is-gapless">
                         <div class="column is-11">
-                          <mtbls-ontology
+                          <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else comboField">
+                             <mtbls-ontology
                             [validations]="fieldValidation('parameterName')"
-                            [controlList]="controlList()"
-                            [rule]="controlList().rule"
+                            [controlList]="_controlList"
+                            [rule]="_controlList?.rule"
                             (changed)="col.values[0] = $event"
-                            [defaultOntologies]="controlList().defaultOntologies"
+                            [defaultOntologies]="_controlList?.defaultOntologies"
                             [inline]="true"
+                            [label]="'Parameter Name'"
                           ></mtbls-ontology>
+                          </ng-container>
+                         <ng-template #comboField>
+    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+      <mat-select formControlName="parameterName" placeholder="Parameter Name" (selectionChange)="onDropdownChange($event)">
+        <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+          {{ option.annotationValue }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-template>
                         </div>
                         <div class="column is-1">
                           <a
@@ -504,15 +516,27 @@
   <div class="modal-background"></div>
   <div class="modal-card">
     <section class="modal-card-body">
-      <mtbls-ontology
+      <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
+        <mtbls-ontology
         #parameterName
         [validations]="fieldValidation('parameterName')"
-        [controlList]="controlList()"
+        [controlList]="_controlList"
         [values]="[]"
         [inline]="true"
-        [rule]="controlList().rule"
-        [defaultOntologies]="controlList().defaultOntologies"
+        [rule]="_controlList?.rule"
+        [defaultOntologies]="_controlList?.defaultOntologies"
+        [label]="'Parameter Name'"
       ></mtbls-ontology>
+      </ng-container>
+      <ng-template #dropdownField>
+    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+      <mat-select formControlName="parameterName" placeholder="Parameter Name"(selectionChange)="onDropdownChange($event)">
+        <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+          {{ option.annotationValue }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-template>
     </section>
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
@@ -523,7 +547,11 @@
         </div>
         <div class="column is-half has-text-right">
           <button
-            [disabled]="!(parameterName.values.length > 0)"
+            [disabled]="
+    _controlList?.renderAsDropdown
+      ? !selectedParameterValue
+      : !(parameterName?.values?.length > 0)
+  "
             (click)="addParameter()"
             class="button is-success"
           >

@@ -313,3 +313,10 @@ a.dropdown-item {
   transform: rotate(45deg);
 }
 
+.no-structure-message {
+  display: flex;
+  color: #888;
+  font-style: italic;
+  text-align: center;
+}
+

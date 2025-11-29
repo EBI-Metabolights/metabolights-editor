@@ -34,7 +34,7 @@
       >
         <!-- (optionSelected)="selected($event)" -->
         <span *ngIf="!searchedMore &&  ((inputValue || '').trim().length >= 3)">
-          <span *ngIf="termsLoading; else showMore">
+          <span *ngIf="termsLoading">
             <mat-option>
               <img
                 style="height: 10px; margin-left: 10px"
@@ -42,9 +42,9 @@
               />
             </mat-option>
           </span>
-          <ng-template #showMore>
+          <!-- <ng-template #showMore>
             <mat-option>Search more terms on ontology sources</mat-option>
-          </ng-template>
+          </ng-template> -->
         </span>
         <mat-option
           class="bb"
