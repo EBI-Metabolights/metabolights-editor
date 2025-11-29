@@ -1,11 +1,9 @@
+import { Component, OnInit, Input, ViewChild, inject } from "@angular/core";
 import {
-  Component,
-  OnInit,
-  Input,
-  ViewChild,
-  inject,
-} from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
+  UntypedFormBuilder,
+  UntypedFormGroup,
+  Validators,
+} from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
@@ -22,23 +20,36 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
-import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import {
+  getValidationRuleForField,
+  MetabolightsFieldControls,
+  StudyCategoryStr,
+} from "src/app/models/mtbl/mtbls/control-list";
+
 @Component({
   selector: "mtbls-design-descriptor",
   templateUrl: "./design-descriptor.component.html",
   styleUrls: ["./design-descriptor.component.css"],
 })
 export class DesignDescriptorComponent implements OnInit {
-
-  studyReadonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
-  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
-
-  studyPublications$: Observable<IPublication[]> = inject(Store).select(GeneralMetadataState.publications);
-  identifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
-  descriptors$: Observable<Ontology[]> = inject(Store).select(DescriptorsState.studyDesignDescriptors);
-  
+  studyReadonly$: Observable<boolean> = inject(Store).select(
+    ApplicationState.readonly
+  );
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(
+    ApplicationState.toastrSettings
+  );
+  studyPublications$: Observable<IPublication[]> = inject(Store).select(
+    GeneralMetadataState.publications
+  );
+  identifier$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.id
+  );
+  editorValidationRules$: Observable<Record<string, any>> = inject(
+    Store
+  ).select(ValidationState.rules);
+  descriptors$: Observable<Ontology[]> = inject(Store).select(
+    DescriptorsState.studyDesignDescriptors
+  );
   studyCreatedAt$: Observable<string> = inject(Store).select(
     GeneralMetadataState.studyCreatedAt
   );
@@ -48,34 +59,32 @@ export class DesignDescriptorComponent implements OnInit {
   templateVersion$: Observable<string> = inject(Store).select(
     GeneralMetadataState.templateVersion
   );
+
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;
-
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
-  private studyId: string = ""
+  private studyId: string = "";
   private toastrSettings: Record<string, any> = {};
-
   isStudyReadOnly = false;
-  defaultControlList: {name: string; values: any[]} = {name: "", values: []};
+  defaultControlList: { name: string; values: any[] } = {
+    name: "",
+    values: [],
+  };
   validations: any = {};
-
   validationsId = "studyDesignDescriptors";
   selectedPublication = new UntypedFormControl("", [Validators.required]);
-
   isModalOpen = false;
   isImportModalOpen = false;
   isDeleteModalOpen = false;
   publications: any = null;
   descriptors: any = null;
-
   form: UntypedFormGroup;
   isFormBusy = false;
   addNewDescriptor = false;
   keywords: any = [];
   selectedkeywords: any = [];
   status = "";
-
   loading = false;
   baseHref: string;
   private legacyControlLists: Record<string, any[]> | null = null;
@@ -83,7 +92,9 @@ export class DesignDescriptorComponent implements OnInit {
   templateVersion: any;
   defaultControlListName = "Study Design Type";
   studyCreatedAt: any;
-  
+  private _controlList: any = null;
+  isDescriptorValid = false;
+
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
@@ -91,27 +102,25 @@ export class DesignDescriptorComponent implements OnInit {
     private europePMCService: EuropePMCService
   ) {
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
-        this.legacyControlLists = lists || {};
+      this.legacyControlLists = lists || {};
     });
     this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
 
-
   setUpSubscriptionsNgxs() {
     this.identifier$.subscribe((id) => {
-      if(id !== null) this.studyId = id
+      if (id !== null) this.studyId = id;
     });
     this.toastrSettings$.subscribe((settings) => {
-      this.toastrSettings = settings
-    })
+      this.toastrSettings = settings;
+    });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
     });
-    
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
     });
@@ -152,9 +161,6 @@ export class DesignDescriptorComponent implements OnInit {
     return false;
   }
 
-
- 
-
   toggleSelection(keyword) {
     const index = this.selectedkeywords.indexOf(keyword);
     if (index > -1) {
@@ -178,13 +184,10 @@ export class DesignDescriptorComponent implements OnInit {
             this.status = "Adding keyword to the study design descriptors list";
             this.isFormBusy = true;
             this.loading = true;
-            // needs changing to dispatch
             this.store.dispatch(new Descriptors.New(descriptor, this.studyId));
-            
-
           } else {
             this.status =
-              "Exact ontology match not found. Create new MetaboLights Onotology term";
+              "Exact ontology match not found. Create new MetaboLights Ontology term";
             const newOntology = new Ontology();
             newOntology.annotationValue = keyword;
             newOntology.termAccession = "";
@@ -204,11 +207,7 @@ export class DesignDescriptorComponent implements OnInit {
             this.status = "Adding keyword to the study design descriptors list";
             this.loading = true;
             this.isFormBusy = true;
-
-            // needs changing to dispatch
             this.store.dispatch(new Descriptors.New(descriptor, this.studyId));
-
-
           }
         });
     }
@@ -221,9 +220,26 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   onChanges(e) {
-    if (this.descriptorComponent.values && this.descriptorComponent.values[0]) {
-      this.form.markAsDirty();
-    }
+    try {
+      const controlList = this._controlList || this.controlList();
+      const descriptorControl = this.form?.get("descriptor");
+
+      if (controlList && !controlList.renderAsDropdown) {
+        if (Array.isArray(e)) {
+          descriptorControl?.setValue(e, { emitEvent: false });
+
+          this.form?.markAsDirty();
+
+          this.isDescriptorValid = e.length > 0;
+        }
+      } else {
+        const val = descriptorControl?.value;
+
+        this.form?.markAsDirty();
+
+        this.isDescriptorValid = !!val; // true if not null/empty
+      }
+    } catch {}
   }
 
   openImportModal() {
@@ -233,6 +249,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   openModal() {
     if (!this.readOnly && !this.isStudyReadOnly) {
+      this._controlList = this.controlList();
       this.isModalOpen = true;
       this.initialiseForm();
       if (this.addNewDescriptor) {
@@ -240,20 +257,36 @@ export class DesignDescriptorComponent implements OnInit {
         if (this.descriptorComponent) {
           this.descriptorComponent.reset();
         }
-      }
-      const jsonConvert: JsonConvert = new JsonConvert();
-      if (this.descriptorComponent) {
-        this.descriptorComponent.values[0] = jsonConvert.deserializeObject(
-          this.descriptor,
-          Ontology
-        );
+      } else {
+        if (this.descriptor) {
+          if (this.descriptorComponent) {
+            this.descriptorComponent.values = [this.descriptor];
+          }
+          if (this.form && this.form.get("descriptor")) {
+            const controlList = this._controlList || this.controlList();
+            if (controlList && controlList.renderAsDropdown) {
+              this.form
+                .get("descriptor")
+                .setValue(this.descriptor.annotationValue || "", {
+                  emitEvent: false,
+                });
+            } else {
+              this.form
+                .get("descriptor")
+                .setValue([this.descriptor], { emitEvent: false });
+            }
+          }
+        }
       }
     }
   }
 
   initialiseForm() {
     this.isFormBusy = false;
-    this.form = this.fb.group({});
+    const controlList = this._controlList || this.controlList();
+    this.form = this.fb.group({
+      descriptor: [null],
+    });
   }
 
   confirmDelete() {
@@ -268,62 +301,67 @@ export class DesignDescriptorComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
-    this.descriptorComponent.reset();
   }
 
   closeImportModal() {
     this.isImportModalOpen = false;
   }
 
-
   saveNgxs() {
-    if (!this.isStudyReadOnly && this.descriptorComponent.values[0]) {
+    const descriptorValues = this.descriptorValuesForComponent();
+    if (!this.isStudyReadOnly && descriptorValues.length > 0) {
       this.isFormBusy = true;
-      if (!this.addNewDescriptor){ // If we are updating an exisiting descriptor
+      if (!this.addNewDescriptor) {
         this.store.dispatch(
           new Descriptors.Update(
-            this.descriptor.annotationValue, this.compileBody(), this.studyId)
-            )
-          // After this point, the change will be fed through to the selector - we must do any callback stuff in there
-      } else { // If we are saving a  new descriptor
+            this.descriptor.annotationValue,
+            this.compileBody(),
+            this.studyId
+          )
+        );
+      } else {
         this.loading = true;
         this.isFormBusy = true;
         this.store.dispatch(
-          new Descriptors.New(
-            this.compileBody(), this.studyId
-          )
-        )
-        // this is a quick fix - a large scale refactor to move away from inline modals is required.
+          new Descriptors.New(this.compileBody(), this.studyId)
+        );
         const oneSecondTimer = timer(1000);
         oneSecondTimer.subscribe(() => {
           this.closeModal();
         });
-
       }
     }
   }
 
+  updateAndCloseNgxs() {
+    this.store.dispatch(
+      new Descriptors.Update(
+        this.form?.get("descriptor")?.value,
+        this.compileBody(),
+        this.studyId
+      )
+    );
+    this.closeImportModal();
+  }
 
   refreshDesignDescriptors(message) {
     this.isFormBusy = true;
-
-    // MAY NEED REVISITING
     this.isFormBusy = false;
     if (message !== "Design descriptor updated.") {
       if (this.form !== undefined) {
         this.form.markAsPristine();
       }
     }
-    if (!["Design descriptor updated.", "Design descriptor deleted."].includes(message)) {
+    if (
+      !["Design descriptor updated.", "Design descriptor deleted."].includes(
+        message
+      )
+    ) {
       this.initialiseForm();
       this.descriptorComponent.reset();
       this.isModalOpen = true;
     }
-    //toastr.success(message, "Success", this.toastrSettings);
-
   }
-
-
 
   deleteNgxs(value) {
     if (!this.isStudyReadOnly) {
@@ -337,11 +375,52 @@ export class DesignDescriptorComponent implements OnInit {
 
   compileBody() {
     const jsonConvert: JsonConvert = new JsonConvert();
+    const descriptorValues = this.descriptorValuesForComponent();
+    const descriptorRaw =
+      descriptorValues.length > 0 ? descriptorValues[0] : null;
+
+    let studyDesignDescriptor: Ontology | null = null;
+    if (!descriptorRaw) {
+      studyDesignDescriptor = null;
+    } else {
+      if (descriptorRaw instanceof Ontology) {
+        studyDesignDescriptor = descriptorRaw;
+      } else if (typeof descriptorRaw === "object") {
+        try {
+          studyDesignDescriptor = jsonConvert.deserializeObject(
+            descriptorRaw,
+            Ontology
+          );
+        } catch {
+          const tmp = new Ontology();
+          tmp.annotationValue =
+            descriptorRaw.annotationValue ||
+            descriptorRaw.termName ||
+            descriptorRaw.label ||
+            "";
+          tmp.termAccession =
+            descriptorRaw.termAccession ||
+            descriptorRaw.termAccessionNumber ||
+            descriptorRaw.iri ||
+            "";
+          tmp.termSource = new OntologySourceReference();
+          tmp.termSource.name =
+            descriptorRaw.termSourceRef || descriptorRaw.termSource?.name || "";
+          studyDesignDescriptor = tmp;
+        }
+      } else if (typeof descriptorRaw === "string") {
+        const tmp = new Ontology();
+        tmp.annotationValue = descriptorRaw;
+        tmp.termSource = new OntologySourceReference();
+        tmp.termAccession = "";
+        studyDesignDescriptor = tmp;
+      } else {
+        studyDesignDescriptor = null;
+      }
+    }
+
     const body = {
-      studyDesignDescriptor: jsonConvert.deserialize(
-        this.descriptorComponent.values[0],
-        Ontology
-      ),
+      studyDesignDescriptor: studyDesignDescriptor,
     };
     return body;
   }
@@ -369,50 +448,127 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   controlList() {
-      if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
-        this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
-        this.defaultControlList.name = this.defaultControlListName;
-      }
-  
-      
-      let defaultOntologies = [];
-        if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
-        const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
-        defaultOntologies =  defaultRule?.ontologies;
-      }
-  
-      const selectionInput = {
-        studyCategory: this.studyCategory,
-        studyCreatedAt: this.studyCreatedAt,
-        isaFileType: "investigation" as any,
-        isaFileTemplateName: null,
-        templateVersion: this.templateVersion,
-      };
-  
-      let rule = null;
-      try {
-        if (
-          this.legacyControlLists &&
-          Object.keys(this.legacyControlLists).length > 0
-        ) {
-          rule = getValidationRuleForField(
-            {
-              controlLists: this.legacyControlLists,
-            } as MetabolightsFieldControls,
-            this.defaultControlListName,  
-            selectionInput
-          );
-        }
-      } catch (e) {
-        rule = null;
-      }
-  
-      return {
-        ...this.defaultControlList,
-        rule,
-        defaultOntologies
-      };
+    if (
+      !(this.defaultControlList && this.defaultControlList.name.length > 0) &&
+      this.editorService.defaultControlLists &&
+      this.defaultControlListName in this.editorService.defaultControlLists
+    ) {
+      this.defaultControlList.values =
+        this.editorService.defaultControlLists[this.defaultControlListName]
+          .OntologyTerm || [];
+      this.defaultControlList.name = this.defaultControlListName;
     }
 
+    let defaultOntologies = [];
+    if (
+      this.legacyControlLists &&
+      this.legacyControlLists.controls &&
+      this.legacyControlLists.controls["investigationFileControls"] &&
+      this.legacyControlLists.controls["investigationFileControls"].__default__
+    ) {
+      const defaultRule =
+        this.legacyControlLists.controls["investigationFileControls"]
+          .__default__[0];
+      defaultOntologies = defaultRule?.ontologies;
+    }
+
+    const selectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      isaFileType: "investigation" as any,
+      isaFileTemplateName: null,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule = null;
+    try {
+      if (
+        this.legacyControlLists &&
+        Object.keys(this.legacyControlLists).length > 0
+      ) {
+        rule = getValidationRuleForField(
+          {
+            controlLists: this.legacyControlLists,
+          } as MetabolightsFieldControls,
+          this.defaultControlListName,
+          selectionInput
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+
+    let renderAsDropdown = false;
+    if (
+      rule &&
+      rule.validationType === "selected-ontology-term" &&
+      rule.termEnforcementLevel === "required"
+    ) {
+      renderAsDropdown = true;
+      if (Array.isArray(rule.terms) && rule.terms.length > 0) {
+        const mapped = rule.terms.map((t: any) => {
+          const o = new Ontology();
+          o.annotationValue = t.term || t.label || "";
+          o.termAccession = t.termAccessionNumber || t.termAccession || "";
+          o.termSource = new OntologySourceReference();
+          o.termSource.name =
+            t.termSourceRef || (t.termSource && t.termSource.name) || "";
+          o.termSource.description = t.termSource?.description || "";
+          o.termSource.file = t.provenance_uri || "";
+          o.termSource.version = t.version || "";
+          o.termSource.provenance_name = t.provenance_name || "";
+          return o;
+        });
+        this.defaultControlList.values = mapped;
+      }
+    }
+
+    const valuesArray = Array.isArray(this.defaultControlList.values)
+      ? this.defaultControlList.values
+      : [];
+
+    const result = {
+      ...this.defaultControlList,
+      values: valuesArray,
+      rule,
+      defaultOntologies,
+      renderAsDropdown,
+    };
+    this._controlList = result;
+    return result;
+  }
+  descriptorValuesForComponent(): any[] {
+    try {
+      const v =
+        this.descriptorComponent &&
+        Array.isArray(this.descriptorComponent.values)
+          ? this.descriptorComponent.values
+          : this.form?.get("descriptor")?.value || [];
+
+      if (this.form && this.form.get("descriptor")) {
+        return Array.isArray(v) ? v : [v];
+      }
+
+      // Fallback for when form is not initialized (e.g., initial load)
+      if (v === null || v === undefined || v === "") {
+        return this.descriptor ? [this.descriptor] : [];
+      }
+      const controlList = this._controlList || this.controlList();
+
+      if (controlList && controlList.renderAsDropdown) {
+        const str = Array.isArray(v) ? v[0] || "" : v;
+        if (!str) return [];
+        const candidates = controlList?.values || [];
+        const match = candidates.find(
+          (c: any) => (c.annotationValue || c.value || c.label) === str
+        );
+        if (match) return [match]; 
+        return [{ annotationValue: str }]; 
+      }
+
+      return Array.isArray(v) ? v : [v];
+    } catch {
+      return this.descriptor ? [this.descriptor] : [];
+    }
+  }
 }

@@ -625,7 +625,6 @@ export class PublicationComponent implements OnInit {
   }
 
   private getStatusValue(): any | null {
-    // Prefer ontology component values if present
     try {
       if (
         this.statusComponent &&

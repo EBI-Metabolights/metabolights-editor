@@ -24,6 +24,7 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { Router } from "@angular/router";
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 
 @Component({
   selector: "mtbls-factor",
@@ -94,7 +95,12 @@ export class FactorComponent implements OnInit {
   templateVersion: any;
   sampleTemplate: any;
   studyCreatedAt: any;
-
+  selectedFactorValue: any = null;
+  selectedFactorUnitValue: any = null;
+  _controlList: any = null;
+  _controlListFactor: any = null;
+  selectedFactorUnitOntoValue: Ontology[];
+  selectedFactorOntoValue: Ontology[];
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
@@ -169,7 +175,7 @@ export class FactorComponent implements OnInit {
   }
 
   onChanges() {
-    this.form.markAsDirty();
+    this.form?.markAsDirty();
   }
 
   showHistory() {
@@ -184,12 +190,22 @@ export class FactorComponent implements OnInit {
 
   openModal(editing: boolean = false) {
     if (!this.isStudyReadOnly) {
+      
       if (this.addNewFactor) {
         this.factor = new MTBLSFactor();
         if (this.factorTypeComponent) {
           this.factorTypeComponent.reset();
         }
       }
+      
+      try {
+        this._controlList = this.controlList();
+        this._controlListFactor = this.factorColumnControlList();
+      } catch (e) {
+        this._controlList = null;
+        this._controlListFactor = null;
+      }
+      
       this.initialiseForm();
       this.isModalOpen = true;
 
@@ -198,8 +214,13 @@ export class FactorComponent implements OnInit {
 
   initialiseForm() {
     this.isFormBusy = false;
+    if(this._controlList.renderAsDropdown) {
+        this.selectedFactorValue = this.factor?.factorType?.annotationValue || '';
+        this.selectedFactorOntoValue = this.factor?.factorType ? [this.factor.factorType] : [];
+    }
     this.form = this.fb.group({
       factorName: [this.factor.factorName],
+      factorType: [],
     });
     this.form.valueChanges.subscribe((values) => {
       for (const key in values) {
@@ -240,7 +261,9 @@ export class FactorComponent implements OnInit {
         const newFactor =  this.compileBody()
         this.store.dispatch(new Factors.Add(this.studyId, newFactor)).subscribe(
           (completed) => {
-            this.refreshFactors(null, "Factor saved.");
+           setTimeout(() => {
+              this.refreshFactors(null, "Factor saved.");
+            }, 0);
             this.isModalOpen = false;
             //
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: newFactor.factor, unitId: this.resolvedName})
@@ -294,7 +317,7 @@ export class FactorComponent implements OnInit {
     mtblsFactor.comments = [];
     const jsonConvert: JsonConvert = new JsonConvert();
     mtblsFactor.factorType = jsonConvert.deserializeObject(
-      this.factorTypeComponent.values[0],
+      this.factorTypeComponent?.values[0] || this.selectedFactorOntoValue[0],
       Ontology
     );
     return { factor: mtblsFactor.toJSON() };
@@ -350,7 +373,7 @@ export class FactorComponent implements OnInit {
           studyCategory: this.studyCategory,
           studyCreatedAt: this.studyCreatedAt,
           isaFileType: "investigation" as any,
-          isaFileTemplateName: this.sampleTemplate,
+          isaFileTemplateName: null,
           templateVersion: this.templateVersion,
         };
   
@@ -372,11 +395,38 @@ export class FactorComponent implements OnInit {
           rule = null;
         }
   
-        return {
+        let renderAsDropdown = false;
+        
+        if (rule) {
+          //  if (rule.validationType === "ontology-term-in-selected-ontologies" && rule.termEnforcementLevel === "recommended") {
+          if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+            renderAsDropdown = true;
+            if (rule.terms && rule.terms.length > 0) {
+              const ontologiesValues = rule.terms.map((t: any) => {
+                const o = new Ontology();
+                o.annotationValue = t.term;
+                o.termAccession = t.termAccessionNumber || "";
+                o.termSource = new OntologySourceReference();
+                o.termSource.name = t.termSourceRef || "";
+                o.termSource.description = "";
+                o.termSource.file = "";
+                o.termSource.version = "";
+                o.termSource.provenance_name = "";
+                return o;
+              });
+              this.defaultControlList.values = ontologiesValues; // Override with rule terms
+            }
+          }
+        }
+        
+        const result = {
           ...this.defaultControlList,
           rule,
-          defaultOntologies
+          defaultOntologies,
+          renderAsDropdown,
         };
+        this._controlList = result;
+        return result;
       }
     
       factorColumnControlList() {
@@ -420,13 +470,50 @@ export class FactorComponent implements OnInit {
         } catch (e) {
           rule = null;
         }
-  
-        // Return the controlList with added properties
-        return {
-          ...controlList,
+         let renderAsDropdown = false;
+                 
+        if (rule) {
+          if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+            renderAsDropdown = true;
+            if (rule.terms && rule.terms.length > 0) {
+              const ontologiesValues = rule.terms.map((t: any) => {
+                const o = new Ontology();
+                o.annotationValue = t.term;
+                o.termAccession = t.termAccessionNumber || "";
+                o.termSource = new OntologySourceReference();
+                o.termSource.name = t.termSourceRef || "";
+                o.termSource.description = "";
+                o.termSource.file = "";
+                o.termSource.version = "";
+                o.termSource.provenance_name = "";
+                return o;
+              });
+              this.defaultUnitControlList.values = ontologiesValues; // Override with rule terms
+            }
+          }
+        }
+        
+        const result = {
+          ...this.defaultUnitControlList,
           rule,
-          defaultOntologies
+          defaultOntologies,
+          renderAsDropdown,
         };
+        this._controlListFactor = result;
+        return result;
       }
-
+ onDropdownChange(event: any) {
+    const ont = new Ontology();
+    ont.annotationValue = event.value;
+    ont.termSource = new OntologySourceReference();
+    this.selectedFactorOntoValue = [ont];
+    this.selectedFactorValue = event.value;
+  }
+  onDropdownChangeFactor(event: any) {
+    const ont = new Ontology();
+    ont.annotationValue = event.value;
+     ont.termSource = new OntologySourceReference();
+    this.selectedFactorUnitOntoValue = [ont];
+    this.selectedFactorUnitValue = event.value;
+  }
 }

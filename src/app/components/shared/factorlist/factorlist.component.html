@@ -76,17 +76,29 @@
             {{ form.get("factorName").errors.factorName.error }}
           </mat-error>
         </mat-form-field>
-        <mtbls-ontology
-          #factorType
-          [id]="'factorType'"
-          [validations]="factorTypeValidations"
-          [controlList]="controlList()"
-          (changed)="onChanges($event)"
-          [values]="[factor.factorType]"
-          [inline]="true"
-          [rule]="controlList().rule"
-          [defaultOntologies]="controlList().defaultOntologies"
-        ></mtbls-ontology>
+         <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
+          <mtbls-ontology
+            #factorType
+            [id]="'factorType'"
+            [validations]="factorTypeValidations"
+            [controlList]="_controlList"
+            (changed)="onChanges($event)"
+            [values]="[factor.factorType]"
+            [inline]="true"
+            [rule]="_controlList?.rule"
+            [label]="'Factor Type'"
+            [defaultOntologies]="_controlList?.defaultOntologies"
+          ></mtbls-ontology>
+        </ng-container>
+        <ng-template #dropdownField>
+    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+        <mat-select formControlName="factorType" placeholder="Factor Type" (selectionChange)="onDropdownChange($event)">
+          <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+            {{ option.annotationValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-template>
         <!-- <label
         [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
         >
@@ -135,7 +147,7 @@
           <div class="column is-half has-text-right">
             <button
               *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
+              [disabled]="!form.valid || isFormBusy || (_controlList?.renderAsDropdown ? !selectedFactorValue : (factorTypeComponent?.values?.length === 0))"
               (click)="saveNgxs()"
               class="button is-info"
             >

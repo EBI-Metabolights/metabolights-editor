@@ -721,7 +721,6 @@ private updatePiValidators(isPi: boolean): void {
     }
 
     let renderAsDropdown = false;
-    // If rule enforces a selected-ontology-term required, render as dropdown and populate values from rule.terms
     if (rule) {
       if (rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required") {
         renderAsDropdown = true;

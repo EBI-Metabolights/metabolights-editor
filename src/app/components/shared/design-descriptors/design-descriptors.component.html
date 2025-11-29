@@ -2,10 +2,7 @@
   <div *ngIf="(descriptors$ | async)?.length > 0; else emptyMessage">
     <div id="meta" class="field is-grouped is-grouped-multiline">
       <div *ngFor="let descriptor of descriptors$ | async">
-        <mtbls-design-descriptor
-          [readOnly]="readOnly"
-          [value]="descriptor"
-        ></mtbls-design-descriptor>
+        <mtbls-design-descriptor [readOnly]="readOnly" [value]="descriptor"></mtbls-design-descriptor>
       </div>
     </div>
   </div>
@@ -16,14 +13,11 @@
       <span>
         <p class="is-pulled-left">
           Design Descriptors (Keywords)
-          <span *ngIf="!isReadOnly"><mat-icon [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'" >help</mat-icon></span>
+          <span *ngIf="!isReadOnly"><mat-icon
+              [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'">help</mat-icon></span>
 
         </p>
-        <mtbls-design-descriptor
-          *ngIf="!isReadOnly"
-          [readOnly]="readOnly"
-          [value]="null"
-        ></mtbls-design-descriptor>
+        <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"></mtbls-design-descriptor>
       </span>
     </header>
     <div class="card-content">
@@ -31,19 +25,18 @@
         <div *ngIf="(descriptors$ | async)?.length > 0; else emptyMessage">
           <div id="meta" class="field is-grouped is-grouped-multiline">
             <div *ngFor="let descriptor of descriptors$ | async">
-              <mtbls-design-descriptor
-                [readOnly]="readOnly"
-                [value]="descriptor"
-              ></mtbls-design-descriptor>
+              <mtbls-design-descriptor [readOnly]="readOnly" [value]="descriptor"></mtbls-design-descriptor>
             </div>
           </div>
         </div>
         <ng-template #emptyMessage>
           <span *ngIf="!isReadOnly; else emptyReadOnlyMessage">
             <p class="placeholder-text">
-              <small
-                >Include terms that define your study. These should cover concepts related to your research field (e.g., Lipidomics, Exposomics, etc.), the techniques and analytical scope used (e.g., ultra-performance liquid chromatography-mass spectrometry, tandem mass spectrometry, targeted or untargeted metabolite analysis, etc.), and any other relevant keywords commonly found in scientific publications (e.g., specific diseases, specific compounds, etc.). </small
-              ><br />
+              <small>Include terms that define your study. These should cover concepts related to your research field
+                (e.g., Lipidomics, Exposomics, etc.), the techniques and analytical scope used (e.g., ultra-performance
+                liquid chromatography-mass spectrometry, tandem mass spectrometry, targeted or untargeted metabolite
+                analysis, etc.), and any other relevant keywords commonly found in scientific publications (e.g.,
+                specific diseases, specific compounds, etc.). </small><br />
             </p>
           </span>
           <ng-template #emptyReadOnlyMessage>

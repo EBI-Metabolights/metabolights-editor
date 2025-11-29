@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject, ElementRef } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject, ElementRef, ChangeDetectorRef } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
@@ -6,7 +6,6 @@ import {
   ProtocolParameter,
 } from "./../../../../models/mtbl/mtbls/mtbls-protocol";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
-
 import { ValidateRules } from "./protocol.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import * as toastr from "toastr";
@@ -18,6 +17,7 @@ import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
 import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 
 @Component({
   selector: "mtbls-protocol",
@@ -68,6 +68,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   editor: any;
 
   selectedProtocol: any = null;
+  selectedParameterValue: any = null;
 
   addNewProtocol = false;
   caretPos = 0;
@@ -77,6 +78,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   form: UntypedFormGroup;
 
   validationsId = "protocols.protocol";
+  _controlList: any = null;
 
   protocolInGuides: boolean = false;
   guideText: string = "";
@@ -88,18 +90,21 @@ export class ProtocolComponent implements OnInit, OnChanges {
   private studyCategory: string = null;
   private templateVersion: string = null;
   studyCreatedAt: any;
+  selectedParameter: Ontology[];
 
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private store: Store
+    private store: Store,
+    private cdr: ChangeDetectorRef
   ) {
    // this.setUpSubscriptionsNgxs();
   }
 
   ngOnInit() {
-    this.setUpSubscriptionsNgxs();
 
+    this.setUpSubscriptionsNgxs();
+    
     if (this.protocol == null) {
       this.addNewProtocol = true;
     } else {
@@ -325,19 +330,9 @@ export class ProtocolComponent implements OnInit, OnChanges {
   }
 
   openParameterModal() {
-    this.parameterName.values = [];
+    if (this.parameterName)
+      this.parameterName.values = [];
     this.isParameterModalOpen = true;
-    // ensure ontology child has rule/defaults forwarded before opening modal
-    try {
-      if (this.parameterName) {
-       (this.parameterName as any).rule = this.rule || (this.parameterName as any).rule;
-        (this.parameterName as any).defaultOntologies = this.defaultOntologies || (this.parameterName as any).defaultOntologies;
-        this.parameterName.values = this.parameterName.values || [];
-      }
-    } catch (e) {
-      // ignore if child not yet available
-    }
-   this.isParameterModalOpen = true;
   }
 
   closeParameterModal() {
@@ -360,7 +355,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   addParameter() {
     const parameter = new ProtocolParameter();
-    parameter.parameterName = this.parameterName.values[0];
+    parameter.parameterName =  this.parameterName?.values[0] || this.selectedParameter[0];
     if (
       this.form.get("parameters").value.length === 1 &&
       this.form.get("parameters").value[0].parameterName.annotationValue === ""
@@ -402,9 +397,12 @@ export class ProtocolComponent implements OnInit, OnChanges {
         } else {
           this.store.dispatch(new Protocols.Add(this.protocol.name, this.compileBody())).subscribe(
             (completed) => {
-              this.refreshProtocols( "Protocol saved.");
+              setTimeout(() => {
+                this.refreshProtocols( "Protocol saved.");
+              }, 0);
               this.form.removeControl("description");
               this.isModalOpen = false;
+              this.cdr.detectChanges();
             },
             (error) => {
               this.isFormBusy = false;
@@ -461,8 +459,15 @@ export class ProtocolComponent implements OnInit, OnChanges {
   }
 
   openModal(protocol) {
+    
     if (!this.isStudyReadOnly) {
+       try {
+      this._controlList = this.controlList();
+    } catch (e) {
+      this._controlList = null;
+    }
       this.initialiseForm();
+    
       if (this.protocol.parameters.length > 0) {
         this.form.get("parameters").setValue(this.protocol.parameters);
       } else {
@@ -581,7 +586,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
     const selectionInput = {
       studyCategory: this.studyCategory,
-      studyCreatedAt: this.protocol && this.protocol.created ? new Date(this.protocol.created) : new Date(),
+      studyCreatedAt: this.studyCreatedAt,
       isaFileType: "investigation" as any,
       isaFileTemplateName: null,
       templateVersion: this.templateVersion,
@@ -599,10 +604,45 @@ export class ProtocolComponent implements OnInit, OnChanges {
     } catch (e) {
       rule = null;
     }
-    return {
-      ...this.defaultControlList,
-      rule,
-      defaultOntologies,
-    };
-  }
+
+    let renderAsDropdown = false;
+        
+        if (rule) {
+          if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+            renderAsDropdown = true;
+            if (rule.terms && rule.terms.length > 0) {
+              const ontologiesValues = rule.terms.map((t: any) => {
+                const o = new Ontology();
+                o.annotationValue = t.term;
+                o.termAccession = t.termAccessionNumber || "";
+                o.termSource = new OntologySourceReference();
+                o.termSource.name = t.termSourceRef || "";
+                o.termSource.description = "";
+                o.termSource.file = "";
+                o.termSource.version = "";
+                o.termSource.provenance_name = "";
+                return o;
+              });
+              this.defaultControlList.values = ontologiesValues; // Override with rule terms
+            }
+          }
+        }
+        
+        const result = {
+          ...this.defaultControlList,
+          rule,
+          defaultOntologies,
+          renderAsDropdown,
+        };
+        this._controlList = result;
+        return result;
+      }
+
+      onDropdownChange(event: any) {
+        const ont = new Ontology();
+        ont.annotationValue = event.value;
+        this.selectedParameter = [ont];
+        this.selectedParameterValue = event.value;
+      }
+
 }
