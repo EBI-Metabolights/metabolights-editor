@@ -37,6 +37,7 @@ export interface ApplicationStateModel {
     bannerMessage: string,
     maintenanceMode: boolean,
     controlLists: Record<string, any[]>,
+    applicationTemplates: Record<string, any[]>,
     investigationFailed: boolean,
     readonly: boolean
     isProtocolsExpanded: boolean,
@@ -70,6 +71,7 @@ export interface ApplicationStateModel {
         bannerMessage: null,
         maintenanceMode: false,
         controlLists: {},              // legacy map
+        applicationTemplates: {},
         investigationFailed: null,
         readonly: null,
         isProtocolsExpanded: true,
@@ -347,14 +349,15 @@ export class ApplicationState {
 
     @Action(DefaultControlLists.Get) //enable thsis when production
     GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Get) {
-        this.applicationService.getDefaultControlLists().subscribe(
-            (response) => {
-                ctx.dispatch(new DefaultControlLists.Set(response.controlLists));
+        this.applicationService.getDefaultControlLists().subscribe({
+            next: (response) => {
+                ctx.dispatch(new DefaultControlLists.Set(response.content));
             },
-            (error) => {
+            error: (error) => {
                 console.error(`Unable to get default control lists: ${error}`)
                 ctx.dispatch(new DefaultControlLists.Set({}));
             }
+          }
         )
     }
 
@@ -363,18 +366,19 @@ export class ApplicationState {
     const payload = action.lists || {};
     const state = ctx.getState();
 
-    const incomingFlat: Record<string, any[]> = (payload && (payload as any).controlLists)
-      ? (payload as any).controlLists
-      : payload;
+    const incomingFlat: Record<string, any[]> = {controls:  payload.controls}
 
-   const merged = {
-      ...(state.controlLists || {}),
-      ...(incomingFlat || {})
-    };
+  //  const merged = {
+  //     ...(state.controlLists || {}),
+  //     ...(payload.controls || {})
+  //   };
 
-   ctx.patchState({
-      controlLists: merged
+    ctx.setState({
+        ...state,
+        applicationTemplates: payload.templates,
+        controlLists: incomingFlat
     });
+
   }
 
     // @Action(DefaultControlLists.Set)
@@ -391,6 +395,29 @@ export class ApplicationState {
         return state.controlLists
     }
 
+    @Selector()
+    static assayFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.assayFileHeaderTemplates
+    }
+    @Selector()
+    static sampleFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.sampleFileHeaderTemplates
+    }
+   @Selector()
+    static assignmentFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.assignmentFileHeaderTemplates
+    }
+   @Selector()    static investigationFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.investigationFileTemplates
+    }
+   @Selector()
+    static protocolTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.protocolTemplates
+    }
+   @Selector()
+    static templateConfiguration(state: ApplicationStateModel) {
+        return state.applicationTemplates.configuration
+    }
     @Action(SetProtocolExpand)
     SetProtocolsExpanded(ctx: StateContext<ApplicationStateModel>, action: SetProtocolExpand) {
         const state = ctx.getState();
