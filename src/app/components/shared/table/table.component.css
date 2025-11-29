@@ -283,7 +283,6 @@ a.dropdown-item {
 #wrapper2 {
   height: auto !important;
 }
-<<<<<<< HEAD
 .radio-tick {
   display: inline-block;
   width: 18px;
@@ -314,11 +313,10 @@ a.dropdown-item {
   transform: rotate(45deg);
 }
 
-=======
 .no-structure-message {
   display: flex;
   color: #888;
   font-style: italic;
   text-align: center;
 }
->>>>>>> origin/staging
+
