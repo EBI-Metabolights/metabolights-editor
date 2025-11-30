@@ -104,8 +104,7 @@ export class FactorComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private store: Store,
-    private router: Router,
+    private store: Store
   ) {
     if (!this.defaultControlList) {
       this.defaultControlList = {name: "", values: []};
@@ -125,8 +124,6 @@ export class FactorComponent implements OnInit {
   toggleUnit() {
     this.addFactorColumnVisible = !this.addFactorColumnVisible;
   }
-
-
 
   setUpSubscriptionsNgxs() {
     this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
@@ -163,6 +160,7 @@ export class FactorComponent implements OnInit {
 
   ngOnInit() {
     this.editorService.loadValidations();
+    
     this.unitSampleValidations = this.fieldValidation('unit', true);
     this.factorTypeValidations = this.fieldValidation('factorType');
     this.factorNameValidations = this.fieldValidation('factorName');
@@ -316,8 +314,13 @@ export class FactorComponent implements OnInit {
     mtblsFactor.factorName = this.getFieldValue("factorName");
     mtblsFactor.comments = [];
     const jsonConvert: JsonConvert = new JsonConvert();
+    const factorTypeValue =
+      this.factorTypeComponent?.id === "factorType" &&
+      this.factorTypeComponent?.values?.[0]
+        ? this.factorTypeComponent.values[0]
+        : this.selectedFactorOntoValue?.[0];
     mtblsFactor.factorType = jsonConvert.deserializeObject(
-      this.factorTypeComponent?.values[0] || this.selectedFactorOntoValue[0],
+      factorTypeValue,
       Ontology
     );
     return { factor: mtblsFactor.toJSON() };
@@ -398,7 +401,6 @@ export class FactorComponent implements OnInit {
         let renderAsDropdown = false;
         
         if (rule) {
-          //  if (rule.validationType === "ontology-term-in-selected-ontologies" && rule.termEnforcementLevel === "recommended") {
           if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
             renderAsDropdown = true;
             if (rule.terms && rule.terms.length > 0) {
