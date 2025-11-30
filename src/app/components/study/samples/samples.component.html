@@ -46,7 +46,6 @@
             {{ factor.factorName }}
           </a>
         </span>
-        <hr class="dropdown-divider" />
         <mtbls-factor *ngIf="showFactorComponent"
           (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
           (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"

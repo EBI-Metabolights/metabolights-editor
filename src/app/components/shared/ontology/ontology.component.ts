@@ -195,6 +195,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     };
 
     subscribeToValueChanges();
+    this.ontTrackerService.register(this);
   }
 
   async getReadonly() {

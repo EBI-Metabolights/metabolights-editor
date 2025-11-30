@@ -16,7 +16,6 @@ import { Router } from '@angular/router';
 import { SampleState } from 'src/app/ngxs-store/study/samples/samples.state';
 import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from 'src/app/models/mtbl/mtbls/control-list';
 import { OntologySourceReference } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology-reference';
-import { X } from '@angular/cdk/keycodes';
 
 
 @Component({
@@ -396,7 +395,6 @@ export class FactorlistComponent implements OnInit {
            let renderAsDropdown = false;
            
            if (rule) {
-              // if (rule.validationType === "ontology-term-in-selected-ontologies" && rule.termEnforcementLevel === "recommended") {
              if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
                renderAsDropdown = true;
                if (rule.terms && rule.terms.length > 0) {

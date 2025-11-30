@@ -705,10 +705,8 @@ export class TableComponent
         rule = null;
       }
 
-      // Modified condition: Skip only if the column is already set AND no rule is present
       if (this.controlListColumns.has(col) && !rule) return;
 
-      // Keep old logic: Set controlListColumns from validation.json for display
       const definition = this.getValidationDefinition(formattedColumnName);
       if (
         definition &&
@@ -731,7 +729,6 @@ export class TableComponent
       }
 
       if (rule) {
-        // For rule-based columns, merge rule into existing controlListColumns for search
         const existing = this.controlListColumns.get(col) || {};
         const isOntologyType = [
           "selected-ontology-term",
@@ -742,13 +739,12 @@ export class TableComponent
           col,
           Object.freeze({
             ...existing, // Keep old validations for display
-            rule, // Add rule for search
+            rule, 
             "data-type": isOntologyType ? "ontology" : rule.validationType,
             renderAsDropdown: rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required"
           })
         );
 
-        // Set controlLists for initial terms
         if (rule.terms && rule.terms.length > 0) {
           const ontologiesValues: Ontology[] = rule.terms.map((t: any) => {
             const o = new Ontology();
@@ -2130,14 +2126,31 @@ export class TableComponent
     // handle uploaded files
     this.refreshTableData.emit();
   }
-  getDefaultOntologies(): string[] {
-    const fileType = this.getIsaFileType(this.data.file); 
-    const fileTypeKey = `${fileType}FileControls`; 
-    
-    if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls[fileTypeKey] && this.legacyControlLists.controls[fileTypeKey].__default__) {
-      const defaultRule = this.legacyControlLists.controls[fileTypeKey].__default__[0];
-      return defaultRule?.ontologies || [];
+ getDefaultOntologies(header: string): string[] {
+  const fileType = this.getIsaFileType(this.data.file); 
+  const fileTypeKey = `${fileType}FileControls`; 
+
+  if (
+    this.legacyControlLists &&
+    this.legacyControlLists.controls &&
+    this.legacyControlLists.controls[fileTypeKey] &&
+    this.legacyControlLists.controls[fileTypeKey].__default__
+  ) {
+    let defaultRule = this.legacyControlLists.controls[fileTypeKey].__default__[0];
+   
+    if (header.includes("Factor Value[") && fileType === "sample") {
+      defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_factor_value__
+?.[0];
     }
-    return [];
+
+    if (header.includes("Characteristics[") && fileType === "sample") {
+      defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_characteristic__?.[0];
+    }
+    const ontologies = defaultRule?.ontologies || [];
+    return ontologies;
   }
+
+  return [];
+}
+
 }

@@ -304,7 +304,7 @@ export class SamplesComponent  {
         newFactorIndex
       );
       let factorUnitValue
-      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit', unitId).values[0];
+      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit', unitId)?.values[0];
       else {
         if (this.getOntologyComponentValue("factorUnit") !== undefined) {
           factorUnitValue = this.getOntologyComponentValue("factorUnit").values[0];
