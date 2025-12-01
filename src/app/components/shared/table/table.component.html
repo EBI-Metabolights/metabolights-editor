@@ -287,7 +287,7 @@
                       [validations]="columnValidations(selectedColumn['header'])"
                       [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
                       [values]="[]" [inline]="true" [rule]="columnControlList(selectedCell['column']['header']).rule"
-                      [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])"></mtbls-ontology>
+                      [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])" (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <ng-template #dropdownField>
                     <mat-form-field class="full-width"
@@ -310,7 +310,7 @@
           </div>
         </section>
         <footer class="modal-card-foot buttons is-right">
-          <button *ngIf="!editColumnform.pristine" [disabled]="!editColumnform.valid || isFormBusy"
+          <button *ngIf="!editColumnform.pristine" [disabled]="!editColumnform.valid || isFormBusy || (isEmptyOntology && isRequiredField) "
             (click)="saveColumnSelectedRowsValues()" class="button is-info">
             <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
             Save
@@ -350,7 +350,7 @@
                       [controlList]="columnControlList(selectedCell['column']['header'])"
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
                       [rule]="columnControlList(selectedCell['column']['header']).rule"
-                      [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"></mtbls-ontology>
+                      [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])" (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="isCellTypeFile">
                     <mat-form-field class="full-width">
@@ -370,7 +370,8 @@
                       [controlList]="columnControlList(selectedCell['column']['header'])"
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
                       [rule]="columnControlList(selectedCell['column']['header']).rule"
-                      [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"></mtbls-ontology>
+                      [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])" 
+                      (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
@@ -403,7 +404,7 @@
           </div>
         </section>
         <footer class="modal-card-foot buttons is-right">
-          <button *ngIf="!editCellform.pristine" [disabled]="!editCellform.valid || isFormBusy" (click)="saveCell()"
+          <button *ngIf="!editCellform.pristine" [disabled]="!editCellform.valid || isFormBusy || (isEmptyOntology && isRequiredField) " (click)="saveCell()"
             class="button is-info">
             <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
             Save
@@ -455,14 +456,14 @@
                 [controlList]="columnControlList(selectedMissingKey)" (changed)="onChanges($event)"
                 [values]="[selectedMissingVal]" [initialSearchKeyword]="selectedMissingVal" [inline]="true"
                 [rule]="columnControlList(selectedMissingKey).rule"
-                [defaultOntologies]="getDefaultOntologies(selectedMissingKey)"></mtbls-ontology>
+                [defaultOntologies]="getDefaultOntologies(selectedMissingKey)" (emptyError)="onEmptyError($event)"></mtbls-ontology>
             </div>
           </div>
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
         <button (click)="saveColumnSelectedMissingRowsValues()" class="button is-info"
-          [disabled]="selectedMissingOntology?.termSource?.name?.length === 0 || isFormBusy">
+          [disabled]="selectedMissingOntology?.termSource?.name?.length === 0 || isFormBusy || (isEmptyOntology && isRequiredField) ">
           <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
           Save
         </button>

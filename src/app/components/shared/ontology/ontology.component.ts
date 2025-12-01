@@ -145,14 +145,11 @@ export class OntologyComponent implements OnInit, OnChanges {
     
     // ensure defaults are visible immediately
     this.setCurrentOptions(this.allvalues);
-    // Safe subscription helper: valueCtrl may be undefined during some init flows,
     // retry a few times (short delay) until available.
     const subscribeToValueChanges = () => {
       if (!this.valueCtrl || !this.valueCtrl.valueChanges) {
-        // retry once after short delay
         setTimeout(() => {
           if (!this.valueCtrl || !this.valueCtrl.valueChanges) {
-            // nothing to subscribe to — leave defaults populated
             return;
           }
           subscribeToValueChanges();
@@ -181,7 +178,7 @@ export class OntologyComponent implements OnInit, OnChanges {
                 this.getDefaultTerms();
                 this.setCurrentOptions(this.allvalues);
               } else {
-                this.searchTerm(v, false);
+                // this.searchTerm(v, false);
               }
               return;
             }
@@ -263,7 +260,6 @@ export class OntologyComponent implements OnInit, OnChanges {
         console.log(err);
       }
 
-      // New: Check if the term is present in initial terms (controlList.values)
       const initialTerms = this.controlList?.values || [];
       const matchingTerms = initialTerms.filter(t => 
         t.annotationValue.toLowerCase().includes(term.toLowerCase()) ||
@@ -271,7 +267,6 @@ export class OntologyComponent implements OnInit, OnChanges {
       );
 
       if (matchingTerms.length > 0) {
-        // Found matches in initial terms, no API call needed
         this.allvalues = matchingTerms;
         this.searchedMore = remoteSearch;
         this.isFormBusy = false;
@@ -279,7 +274,6 @@ export class OntologyComponent implements OnInit, OnChanges {
         return;
       }
 
-      // No matches in initial terms, proceed with API call
       this.termsLoading = true;
       this.loading = true;
       this.isFormBusy = true;
@@ -514,16 +508,11 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.values.splice(index, 1);
   }
   if (
-    this.values.length === 0 &&
-    !(this.inputValue && this.inputValue.length > 0)
+    this.values.length === 0 
   ) {
-    // restore defaults for all relevant validation types (including any-ontology-term)
     this.getDefaultTerms();
     this.valueCtrl.setValue("");
-    this.setCurrentOptions(this.allvalues); // explicitly show initial terms (from rule.terms or controlList.values)
-    if (this.rule && (this.rule.validationType === "child-ontology-term" || this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")) {
-      // no-op: handled by setCurrentOptions(this.allvalues) above, kept for clarity
-    }
+    this.setCurrentOptions(this.allvalues); 
   }
   this.triggerChanges();
 }

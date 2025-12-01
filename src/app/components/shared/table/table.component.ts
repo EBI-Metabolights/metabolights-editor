@@ -152,7 +152,8 @@ export class TableComponent
   lastColSelection = null;
 
   displayedTableColumns: any = [];
-
+  isRequiredField:boolean = false;
+  isEmptyOntology:boolean = false;
   ontologyCols: any = {};
   fileColumns: any = [];
   controlListColumns: Map<string, any> = new Map<string, any>();
@@ -798,6 +799,7 @@ export class TableComponent
       this.controlListColumns.has(header)
     ) {
       const colData = this.controlListColumns.get(header)["ontology-details"];
+      this.isRequiredField = this.controlListColumns.get(header)["ontology-details"]["is-required"] == "true";
       return colData;
     }
     if (this.enableControlList) {
@@ -1494,6 +1496,10 @@ export class TableComponent
         ];
       } else {
         // Handle autocomplete for other ontology types
+        if(this.isRequiredField && this.getOntologyComponentValue("editOntologyCell")?.values.length === 0) {
+          toastr.error("This is a required field.", "Error", this.toastrSettings);
+          return;
+        }
         const selectedOntology = this.getOntologyComponentValue("editOntologyCell").values[0];
         const value = selectedOntology ? selectedOntology.annotationValue : "";
         const termSource = selectedOntology ? selectedOntology.termSource.name : "";
@@ -2146,5 +2152,7 @@ export class TableComponent
 
   return [];
 }
-
+onEmptyError(isEmpty: boolean) {
+    this.isEmptyOntology = isEmpty;
+  }
 }
