@@ -2146,8 +2146,7 @@ export class TableComponent
     if (header.includes("Characteristics[") && fileType === "sample") {
       defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_characteristic__?.[0];
     }
-    const ontologies = defaultRule?.ontologies || [];
-    return ontologies;
+    return defaultRule;
   }
 
   return [];

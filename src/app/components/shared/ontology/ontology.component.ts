@@ -56,7 +56,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input("inline") isInline: boolean;
   @Input("sourceValueType") sourceValueType = "ontology";
   @Input("initialSearchKeyword") initialSearchKeyword = "";
-  @Input() defaultOntologies: string[] = [];
+  @Input() defaultOntologies: any;
   @Input("controlList") controlList: { name: string; values: Ontology[] } = {
     name: "",
     values: [],
@@ -287,8 +287,8 @@ export class OntologyComponent implements OnInit, OnChanges {
       this.termsLoading = true;
 
       this.allvalues = [];
-      const ruleName = this.rule?.ruleName || null;
-      const fieldName = this.rule?.fieldName || null;
+      const ruleName = this.rule?.ruleName || this.defaultOntologies?.ruleName || "";
+      const fieldName = this.rule?.fieldName || this.defaultOntologies?.fieldName || "";
 
       if (
         this.rule &&
@@ -359,7 +359,7 @@ export class OntologyComponent implements OnInit, OnChanges {
             ruleName,
             fieldName,
             "any-ontology-term",
-            this.defaultOntologies,
+            this.defaultOntologies?.ontologies || [],
             null
           )
           .subscribe(

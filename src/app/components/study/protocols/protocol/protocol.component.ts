@@ -573,7 +573,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
     }
 
     // defaultOntologies extracted from legacy structured payload if present
-    let defaultOntologies: string[] = [];
+    let defaultOntologies = {};
     if (
       this.legacyControlLists &&
       this.legacyControlLists.controls &&
@@ -581,7 +581,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
       this.legacyControlLists.controls["investigationFileControls"].__default__
     ) {
       const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
-      defaultOntologies = defaultRule?.ontologies || [];
+      defaultOntologies = defaultRule;
     }
 
     const selectionInput = {

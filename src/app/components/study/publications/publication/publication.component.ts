@@ -822,7 +822,7 @@ export class PublicationComponent implements OnInit {
       this.defaultControlList.name = this.defaultControlListName;
     }
 
-    let defaultOntologies = [];
+    let defaultOntologies = {};
     if (
       this.legacyControlLists &&
       this.legacyControlLists.controls &&
@@ -832,7 +832,7 @@ export class PublicationComponent implements OnInit {
       const defaultRule =
         this.legacyControlLists.controls["investigationFileControls"]
           .__default__[0];
-      defaultOntologies = defaultRule?.ontologies;
+      defaultOntologies = defaultRule;
     }
 
     const selectionInput = {

@@ -688,10 +688,10 @@ private updatePiValidators(isPi: boolean): void {
     }
 
     
-    let defaultOntologies = [];
+    let defaultOntologies = {};
       if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
       const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
-      defaultOntologies =  defaultRule?.ontologies;
+      defaultOntologies =  defaultRule;
     }
 
     const selectionInput = {
