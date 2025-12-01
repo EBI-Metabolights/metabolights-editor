@@ -760,11 +760,6 @@ export class TableComponent
           });
           this.controlLists.set(col, { name: col, values: ontologiesValues });
         }
-
-        // Ensure ontology columns are recognized for rule-based types
-        if (isOntologyType && this.ontologyColumns.indexOf(col) === -1) {
-          this.ontologyColumns.push(col);
-        }
       }
     });
   }
