@@ -366,10 +366,10 @@ export class FactorComponent implements OnInit {
         }
   
         
-        let defaultOntologies = [];
+        let defaultOntologies = {};
           if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
           const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
-          defaultOntologies =  defaultRule?.ontologies;
+          defaultOntologies =  defaultRule;
         }
   
         const selectionInput = {
@@ -441,10 +441,10 @@ export class FactorComponent implements OnInit {
           controlList.name = controlListName;
         }
   
-        let defaultOntologies = [];
+        let defaultOntologies = {};
         if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["sampleFileControls"] && this.legacyControlLists.controls["sampleFileControls"].__default__) {
           const defaultRule = this.legacyControlLists.controls["sampleFileControls"].__default__[0];
-          defaultOntologies = defaultRule?.ontologies || [];
+          defaultOntologies = defaultRule;
         }
   
         const selectionInput = {

@@ -481,10 +481,10 @@ export class SamplesComponent  {
       controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
       controlList.name = controlListName;
     }
-     let defaultOntologies = [];
+     let defaultOntologies = {};
     if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["sampleFileControls"] && this.legacyControlLists.controls["sampleFileControls"].__default__) {
         const defaultRule = this.legacyControlLists.controls["sampleFileControls"].__default__[0];
-        defaultOntologies = defaultRule?.ontologies || [];
+        defaultOntologies = defaultRule;
       }
     // Get rule using the same logic as table component
     const selectionInput: ValidationRuleSelectionInput = {
