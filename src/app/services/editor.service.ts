@@ -341,9 +341,9 @@ export class EditorService {
     getDefaultControlLists(): Observable<any> {
       return this.dataService.http
         .get<any>(
-          this.dataService.url.baseURL + "/ebi-internal/control-lists",
+          `${this.configService.config.ws3URL}/public/v2/validations/configuration`,
           {
-            headers: httpOptions.headers,
+            headers: httpOptions.emptyHeader,
             observe: "body",
           }
         )
@@ -443,24 +443,25 @@ export class EditorService {
       this.store.dispatch(new DefaultControlLists.Get());
 
      } else {
-      this.getDefaultControlLists().subscribe(
-        (response) => {
-          const controlLists = response.controlLists;
-          this.store.dispatch(new DefaultControlLists.Set(controlLists));
+      this.getDefaultControlLists().subscribe({
+        next: (response) => {
+          this.store.dispatch(new DefaultControlLists.Set(response.content));
           },
-          (error) => {
+          error: (error) => {
             this.store.dispatch(new DefaultControlLists.Set({}));
 
           }
+        }
       );
-      this.getBannerHeader().subscribe(
-        (response) => {
+      this.getBannerHeader().subscribe({
+        next: (response) => {
           const message = response.content;
           this.store.dispatch(new BannerMessage.Set(message))
           },
-          (error) => {
+        error: (error) => {
             this.store.dispatch(new BannerMessage.Set(null))
           }
+        }
       );
       this.checkMaintenanceMode().subscribe(
         (response) => {
@@ -959,7 +960,7 @@ export class EditorService {
     allowedParentOntologyTerms?: any
   ): Observable<any> {
     const body: any = {
-      ontologyValidationType: validationType,
+      validationType: validationType,
       ontologies: ontologies,
       ruleName: ruleName,
       fieldName: fieldName

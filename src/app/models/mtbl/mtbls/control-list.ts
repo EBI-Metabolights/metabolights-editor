@@ -174,6 +174,9 @@ export interface MetabolightsFieldControls {
       investigationFileControls?: {
         [k: string]: FieldValueValidation[];
       };
+      assignmentFileControls?: {
+        [k: string]: FieldValueValidation[];
+      };
     };
     // Legacy flat control lists (key -> array of ControlListTerm) for fallback
     [k: string]: ControlListTerm[] | any;
@@ -206,7 +209,7 @@ function selectValidationRule(
 
     for (const rule of rules) {
         const selectionCriteria = rule.selectionCriteria;
-        
+
        // Normalize possible date inputs (string | Date | null) to 'YYYY-MM-DD' strings for safe lexical comparison.
         const normalizeToISODate = (d: string | Date | null | undefined): string | null => {
             if (!d) return null;
@@ -228,7 +231,7 @@ function selectValidationRule(
         // If a criteria is null/undefined, consider it as matching (true)
         const matches = [
             // Study category check
-            !selectionCriteria.studyCategoryFilter || 
+            !selectionCriteria.studyCategoryFilter ||
             selectionCriteria.studyCategoryFilter.includes(ruleSelectionInput.studyCategory),
 
             // Creation date range checks (use afterMatches/beforeMatches)
@@ -272,7 +275,7 @@ export function getValidationRuleForField(
     fieldName: string,
     ruleSelectionInput: ValidationRuleSelectionInput
 ): FieldValueValidation | null {
-    
+
     let controlsMap: { [k: string]: FieldValueValidation[] } | undefined;
     switch (ruleSelectionInput.isaFileType) {
         case "assay":
@@ -283,6 +286,9 @@ export function getValidationRuleForField(
             break;
         case "investigation":
             controlsMap = controls.controlLists.controls.investigationFileControls;
+            break;
+        case "assignment":
+            controlsMap = controls.controlLists.controls.assignmentFileControls;
             break;
         default:
             controlsMap = undefined;
