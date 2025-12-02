@@ -1403,7 +1403,7 @@ export class TableComponent
         }
         if (
           this.controlListColumns.has(column.header) &&
-          this.controlListColumns.get(column.header)["data-type"] === "string"
+          (this.controlListColumns.get(column.header)?.["data-type"] === "string" || this.controlListColumns.get(column.header)?.["data-type"] === "ontology")
         ) {
           this.isCellTypeControlList = true;
           this.cellControlListValue();
@@ -1783,7 +1783,33 @@ export class TableComponent
       this.selectedCellOntology = null;
     }
   }
+  cellOntologyValueWithoutTermSource() {
+    const data = this.data.header[this.selectedCell["column"].header];
+    let columnIndex = 0;
+    if (typeof data === "number") {
+      columnIndex = data;
+    } else {
+      columnIndex = data.index;
+    }
 
+    const cellValue =
+      this.selectedCell["row"][this.selectedCell["column"].header];
+    if (cellValue && cellValue !== "" && cellValue !== undefined) {
+      const newOntology = new Ontology();
+      newOntology.annotationValue =
+        this.selectedCell["row"][this.selectedCell["column"].header];
+      newOntology.termAccession = "";
+      newOntology.termSource = new OntologySourceReference();
+      newOntology.termSource.description = "";
+      newOntology.termSource.file = "";
+      newOntology.termSource.name = "";
+      newOntology.termSource.provenance_name = "";
+      newOntology.termSource.version = "";
+      this.selectedCellOntology = newOntology;
+    }else {
+      this.selectedCellOntology = null;
+    }
+  }
   cellOntologyValue() {
     const data = this.data.header[this.selectedCell["column"].header];
     let columnIndex = 0;
