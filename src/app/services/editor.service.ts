@@ -938,19 +938,25 @@ export class EditorService {
         toastr.error("Failed to copy content: " + error, "Error", this.toastrSettings);
       });
     }
-
-    getRorOrganizations(query: string): Observable<any> {
-      if (!query || query.trim().length < 3) {
-        // Avoid unnecessary API calls
-        return of({ items: [] });
-      }
-
-      const encodedQuery = encodeURIComponent(query);
-      const url = `https://api.ror.org/organizations?affiliation=${encodedQuery}`;
-
-      return this.dataService.getRorid(url);
+    
+  getRorOrganizations(query: string): Observable<any> {
+    if (!query || query.trim().length < 3) {
+      // Avoid unnecessary API calls
+      return of({ items: [] });
     }
-    // New method for ontology term search with rule-based validation
+
+    const encodedQuery = encodeURIComponent(query);
+
+    const url = `https://www.ebi.ac.uk/ols4/api/search` +
+      `?q=${encodedQuery}` +
+      `&ontology=ror` +
+      `&fieldList=ontology_prefix,iri,label,synonym,description` +
+      `&queryFields=label,iri,synonym`;
+
+    return this.dataService.getRorid(url);
+  }
+    
+  // New method for ontology term search with rule-based validation
   searchOntologyTermsWithRuleV2(
     keyword: string,
     ruleName: string,

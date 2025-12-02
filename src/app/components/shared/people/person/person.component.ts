@@ -243,20 +243,17 @@ export class PersonComponent implements OnInit {
 
       return this.editorService.getRorOrganizations(query).pipe(
         switchMap((res: any) => {
-          const items =
-            res.items?.map((item: any) => {
-              const org = item.organization;
-              const nameObj = org.names.find((n: any) => n.lang === 'en');
-              const name =
-                nameObj?.value || org.names[0]?.value || '(Unknown name)';
-              const countryName =
-                org.locations?.[0]?.geonames_details?.country_name || '(Unknown country)';
-              return {
-                id: org.id,
-                name,
-                countryName,
-              };
-            }) || [];
+          const docs = res?.response?.docs || [];
+
+          const items = docs.map((doc: any) => {
+            return {
+              id: doc.iri,
+              name: doc.label || '(Unknown name)',
+              synonyms: doc.synonym || [],
+              description: doc.description?.[0] || '',
+              ontology_prefix: doc.ontology_prefix
+            };
+          });
 
           return of(items);
         })
