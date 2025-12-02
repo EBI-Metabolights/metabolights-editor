@@ -1403,7 +1403,7 @@ export class TableComponent
         }
         if (
           this.controlListColumns.has(column.header) &&
-          this.controlListColumns.get(column.header)["data-type"] === "string"
+          (this.controlListColumns.get(column.header)?.["data-type"] === "string" || this.controlListColumns.get(column.header)?.["data-type"] === "ontology")
         ) {
           this.isCellTypeControlList = true;
           this.cellControlListValue();
@@ -1783,7 +1783,7 @@ export class TableComponent
       this.selectedCellOntology = null;
     }
   }
-
+ 
   cellOntologyValue() {
     const data = this.data.header[this.selectedCell["column"].header];
     let columnIndex = 0;

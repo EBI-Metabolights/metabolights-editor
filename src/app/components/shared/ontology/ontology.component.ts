@@ -287,7 +287,7 @@ export class OntologyComponent implements OnInit, OnChanges {
       if (
         this.rule &&
         (this.rule.validationType === "child-ontology-term" ||
-          this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term")
+          this.rule.validationType === "ontology-term-in-selected-ontologies" || this.rule.validationType === "any-ontology-term" || this.rule.validationType === "selected-ontology-term")
       ) {
         const validationType = this.rule.validationType;
         const ontologies = this.rule.ontologies || [];
