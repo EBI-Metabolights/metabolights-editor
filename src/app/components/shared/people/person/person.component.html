@@ -296,7 +296,12 @@
           <input type="text" matInput formControlName="affiliation" [matAutocomplete]="auto" [readonly]="isReadOnly" />
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAffiliationSelected($event)">
             <mat-option *ngFor="let org of filteredOrganizations$ | async" [value]="org">
-              {{ org.name }} ({{ org.countryName }}) - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
+              <div>
+                {{ org.name }} - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
+              </div>
+              <div style="font-size: 12px; color: #666;">
+                {{ org.description || '(No description available)' }}
+              </div>
             </mat-option>
           </mat-autocomplete>
           <mat-hint>
