@@ -741,7 +741,7 @@ export class TableComponent
           Object.freeze({
             ...existing, // Keep old validations for display
             rule, 
-            "data-type": isOntologyType ? "ontology" : rule.validationType,
+            // "data-type": isOntologyType ? "ontology" : rule.validationType,
             renderAsDropdown: rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required"
           })
         );
@@ -1403,7 +1403,7 @@ export class TableComponent
         }
         if (
           this.controlListColumns.has(column.header) &&
-          (this.controlListColumns.get(column.header)?.["data-type"] === "string" || this.controlListColumns.get(column.header)?.["data-type"] === "ontology")
+          (this.controlListColumns.get(column.header)?.["data-type"] === "string")
         ) {
           this.isCellTypeControlList = true;
           this.cellControlListValue();
