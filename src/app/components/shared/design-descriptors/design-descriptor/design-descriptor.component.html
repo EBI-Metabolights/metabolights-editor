@@ -76,13 +76,13 @@
             <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <!-- <button
+            <button
               *ngIf="addNewDescriptor"
               class="button is-primary is-pulled-left"
               (click)="openImportModal()"
             >
               <mat-icon>label</mat-icon> Import
-            </button> -->
+            </button>
           </div>
           <div class="column is-half has-text-right">
             <button *ngIf="!form.pristine" [disabled]="!isDescriptorValid || isFormBusy" (click)="saveNgxs()"
@@ -124,7 +124,7 @@
               publication.title }}</mat-option>
           </mat-select>
         </mat-form-field>
-        <div class="field is-grouped is-grouped-multiline">
+        <div *ngIf="keywords.length>0; else noKeywords" class="field is-grouped is-grouped-multiline">
           <span (click)="toggleSelection(keyword)" style="margin-bottom: 10px" *ngFor="let keyword of keywords">
             <div class="tags has-addons pointer">
               <span [class]="
@@ -133,6 +133,9 @@
             </div>
           </span>
         </div>
+        <ng-template #noKeywords>
+          <small *ngIf="!loading && keywords.length==0">No keywords found for the publication.</small>
+        </ng-template>
         <span *ngIf="!loading; else showStatus">
           <small *ngIf="keywords.length > 0">Click to select the keywords</small>
         </span>
