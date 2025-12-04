@@ -130,7 +130,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The middle names or initials of the contact e.g. Anna, A.",
+                    "description": "The middle names or initials of the contact. e.g. Anna, A.",
                     "placeholder": "M.",
                     "rules": [
                         {
@@ -264,7 +264,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The (primary) address for this contact. e.g. 12 Street, Place, postcode, Country",
+                    "description": "The (primary) address for this contact. e.g. 12 Street, Place, Postcode, Country",
                     "placeholder": "12 Street, Place, postcode, Country",
                     "rules": [
                         {
@@ -377,7 +377,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The title of the publication.",
+                    "description": "The title of the publication",
                     "placeholder": "The multifunctional enzyme ....",
                     "rules": [
                         {
@@ -396,7 +396,7 @@
                     "is-read-only": "false",
                     "is-hidden": "false",
                     "technique": "mass spectrometry|NMR spectroscopy",
-                    "description": "The status of this publication, e.g. published, in preparation, etc.",
+                    "description": "The status of this publication (e.g. published, in preparation)",
                     "placeholder": "in preparation, published, etc",
                     "rules": [
                         {

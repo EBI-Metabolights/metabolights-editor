@@ -63,10 +63,11 @@ export class PublicationComponent implements OnInit {
   isUpdateTitleModalOpen = false;
   isUpdateAbstractModalOpen = false;
   isImportAuthorsModalOpen = false;
-
+  showOntology: boolean = true;
   manuscriptAuthors: any = null;
 
   publicationAbstract = "";
+  showError = false;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -196,6 +197,7 @@ export class PublicationComponent implements OnInit {
         this.setDoiRequiredBasedOnStatus();
         this.form.controls.doi.updateValueAndValidity();
       }
+      
   }
 
   showHistory() {
@@ -212,6 +214,7 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.initialiseForm();
       this.isModalOpen = true;
+      this.showOntology = true;
       this.publicationAbstract = "";
       this.getAbstract();
     }
@@ -302,6 +305,18 @@ export class PublicationComponent implements OnInit {
         this.setFieldValue("title", article.title.trim());
         this.setFieldValue("authorList", article.authorList.trim());
         this.statusComponent.setValue("Published");
+
+        const statusVals = Array.isArray(this.statusComponent.values) && this.statusComponent.values.length
+          ? this.statusComponent.values
+          : ["Published"];
+        if (this.form && this.form.controls && this.form.controls.status) {
+          this.form.controls.status.setValue(statusVals);
+          this.setDoiRequiredBasedOnStatus();
+          if (this.form.controls.doi) {
+            this.form.controls.doi.updateValueAndValidity();
+          }
+          this.form.updateValueAndValidity();
+        }
       });
       this.europePMCService
         .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
@@ -324,6 +339,20 @@ export class PublicationComponent implements OnInit {
           this.setFieldValue("title", article.title.trim());
           this.setFieldValue("authorList", article.authorList.trim());
           this.setFieldValue("doi", article.doi.trim());
+          this.statusComponent.setValue("Published");
+
+        const statusVals = Array.isArray(this.statusComponent.values) && this.statusComponent.values.length
+          ? this.statusComponent.values
+          : ["Published"];
+        if (this.form && this.form.controls && this.form.controls.status) {
+          this.form.controls.status.setValue(statusVals);
+          this.setDoiRequiredBasedOnStatus();
+          if (this.form.controls.doi) {
+            this.form.controls.doi.updateValueAndValidity();
+          }
+          this.form.updateValueAndValidity();
+        }
+
           this.publicationAbstract = article.abstract;
         });
     }
@@ -333,9 +362,10 @@ export class PublicationComponent implements OnInit {
     if (!this.isReadOnly) {
       this.isFormBusy = false;
 
-      if (this.publication === null) {
+      if (this.publication === null || this.publication.title === "") {
         const mtblsPublication = new MTBLSPublication();
         this.publication = mtblsPublication;
+        this.publication.status = [];
       }
 
       this.form = this.fb.group({
@@ -359,10 +389,11 @@ export class PublicationComponent implements OnInit {
           ValidateRules("title", this.fieldValidation("title")),
         ],
         status: [
-          this.publication.status,
+          this.publication?.status,
           ValidateRules("status", this.fieldValidation("status")),
         ],
       });
+      
       // ensure DOI validator runs for initial status value
       if (this.form.controls.doi) {
         this.setDoiRequiredBasedOnStatus();
@@ -523,6 +554,8 @@ export class PublicationComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    if(this.publication)
+        this.showOntology = false;
   }
 
   get validation() {
@@ -566,5 +599,9 @@ export class PublicationComponent implements OnInit {
       this.defaultControlList.name = this.defaultControlListName;
     }
     return this.defaultControlList;
+  }
+
+  onEmptyError(isEmpty: boolean) {
+    this.showError = isEmpty;
   }
 }

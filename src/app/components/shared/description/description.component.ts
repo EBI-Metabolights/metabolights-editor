@@ -47,6 +47,12 @@ export class DescriptionComponent implements OnChanges, OnInit {
 
   isModalOpen = false;
   hasChanges = false;
+  private initialPlaceholders = [
+    "Please update the study abstract/description",
+    "Please add your study description here"
+  ];
+  private guidanceText =
+    "Similar to a manuscript, the study abstract or description of your study should be updated with a concise summary that outlines the scientific context, main objectives, experimental approach, and key results or conclusions. It should provide enough information for others to understand the scope and significance of the study without needing to consult the full publication.";
 
   private toastrSettings: Record<string, any> = {};
 
@@ -192,5 +198,22 @@ export class DescriptionComponent implements OnChanges, OnInit {
   copyDescription() {
     const text = this.descriptionToCopy.nativeElement.innerText;
     this.editorService.copyContent(text);
+  }
+
+
+  get displayDescription(): string {
+    const d = (this.description || "").toString().trim();
+    if (d.length === 0) {
+      return this.guidanceText;
+    }
+    if (this.initialPlaceholders.includes(d)) {
+      return this.guidanceText;
+    }
+    return this.description;
+  }
+
+  isPlaceholder(): boolean {
+    const d = (this.description || "").toString().trim();
+    return d.length === 0 || this.initialPlaceholders.includes(d);
   }
 }

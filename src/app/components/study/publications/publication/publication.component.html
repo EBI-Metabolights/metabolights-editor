@@ -71,7 +71,7 @@
   <div class="modal-background"></div>
   <div class="modal-card vw80">
     <section class="modal-card-body">
-      <p>Please select the authors you would like to import</p>
+      <p>Please select the authors you would like to import:</p>
       <br />
       <div *ngIf="manuscriptAuthors">
         <span *ngFor="let author of manuscriptAuthors">
@@ -110,7 +110,7 @@
     <section class="modal-card-body">
       <p>
         Your MetaboLights study title will be updated to match your publication
-        title
+        title.
       </p>
     </section>
     <footer class="modal-card-foot">
@@ -136,7 +136,7 @@
     <section class="modal-card-body">
       <p>
         Your MetaboLights study abstract will be updated to match your
-        publication abstract
+        publication abstract.
       </p>
     </section>
     <footer class="modal-card-foot">
@@ -176,6 +176,7 @@
             cdkAutosizeMinRows="3"
             cdkAutosizeMaxRows="3"
             cdkTextareaAutosize
+            required
           >
           </textarea>
           <mat-hint>{{ fieldValidation("title").description }}
@@ -213,7 +214,7 @@
               form.get('authorList').errors.authorList
             "
           >
-            {{ form.get("authorList").authorList.title.error }}
+            {{ form.get("authorList").errors.authorList.error }}
           </mat-error>
         </mat-form-field>
         <mat-form-field class="full-width">
@@ -223,6 +224,7 @@
             formControlName="doi"
             [tabIndex]="3"
             (blur)="getArticleFromDOI()"
+            (keydown.enter)="getArticleFromDOI()"
             matInput
           />
           <mat-hint>{{ fieldValidation("doi").description }}
@@ -247,6 +249,7 @@
             [tabIndex]="4"
             formControlName="pubMedID"
             (blur)="getArticleFromPubMedID()"
+            (keydown.enter)="getArticleFromDOI()"
             matInput
           />
           <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
@@ -261,15 +264,22 @@
           </mat-error>
         </mat-form-field>
         <mtbls-ontology
+          *ngIf="showOntology"
           class="mt-20"
           #publicationStatus
           [validations]="fieldValidation('status')"
           [controlList]="controlList()"
           (changed)="onChanges($event)"
-          [values]="[publication.status]"
+          [values]="[publication?.status]"
           [inline]="true"
-          [label]="'Status'"
+          [label]="'Status*'"
+          (emptyError)="onEmptyError($event)"
         ></mtbls-ontology>
+        <mat-error
+              *ngIf="showError"
+            >
+              <small>{{ form?.get("status")?.errors?.status?.error }}</small>
+        </mat-error>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />
           <label
@@ -318,8 +328,7 @@
           </div>
           <div class="column is-one-third has-text-right">
             <button
-              *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
+              [disabled]="!form.valid || isFormBusy || form.pristine"
               (click)="saveNgxs()"
               class="button is-info"
             >
@@ -330,14 +339,14 @@
               ></mat-spinner>
               Save
             </button>
-            <button
+            <!-- <button
               *ngIf="form.pristine"
               (click)="closeModal()"
               [tabIndex]="6"
               class="button is-info"
             >
               OK
-            </button>
+            </button> -->
             <button
               class="button"
               [disabled]="isFormBusy"

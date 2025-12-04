@@ -15,3 +15,8 @@
   padding-top: 50px;
   padding-bottom: 50px;
 }
+.placeholder-text {
+  color: #b5b5b5;
+  font-size: .875em;
+  font-style: italic;
+}

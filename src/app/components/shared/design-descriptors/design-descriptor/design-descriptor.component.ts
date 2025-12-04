@@ -243,6 +243,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    this.descriptorComponent.reset();
   }
 
   closeImportModal() {
