@@ -6,7 +6,8 @@ import { MatCardModule } from '@angular/material/card';
     selector: 'app-confirmation-dialog',
     imports: [MatCardModule, NgIf],
     templateUrl: './confirmation-dialog.component.html',
-    styleUrl: './confirmation-dialog.component.css'
+    styleUrl: './confirmation-dialog.component.css',
+    standalone: true
 })
 export class ConfirmationDialogComponent{
   @Input() title: string = 'Confirm';

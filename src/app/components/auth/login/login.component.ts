@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, effect, inject } from "@angular/core";
 import { AuthService } from "./../../../services/metabolights/auth.service";
 import { EditorService } from "./../../../services/editor.service";
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
@@ -13,6 +13,7 @@ import { Store } from "@ngxs/store";
 import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
 import Keycloak from "keycloak-js"
 import { CookieService } from 'ngx-cookie-service';
+import { KEYCLOAK_EVENT_SIGNAL, KeycloakEventType, ReadyArgs, typeEventArgs } from "keycloak-angular";
 @Component({
     selector: "app-login",
     templateUrl: "./login.component.html",
@@ -32,56 +33,74 @@ export class LoginComponent implements OnInit {
     private store: Store,
     public router: Router,
     private editorService: EditorService,
-    private cookieService: CookieService
+    private cookieService: CookieService,
     // private configService: ConfigurationService,
     // private platformLocation: PlatformLocation
+    private readonly keycloak: Keycloak
   ) {
     // this.baseHref = this.configService.baseHref;
     // this.environmentName = this.platformLocation.getBaseHrefFromDOM();
     // this.environmentName = this.environmentName.replace("/metabolights", "");
     // this.environmentName = this.environmentName.replace("/editor", "");
     // this.environmentName = this.environmentName.replace("/", "");
+    effect(() => {
+      const keycloakEvent = this.keycloakSignal();
+
+      this.keycloakStatus = keycloakEvent.type;
+
+      if (keycloakEvent.type === KeycloakEventType.Ready) {
+        this.authenticated = typeEventArgs<ReadyArgs>(keycloakEvent.args);
+
+      }
+
+      if (keycloakEvent.type === KeycloakEventType.AuthLogout) {
+        this.authenticated = false;
+      }
+    });
   }
 
-  private readonly keycloak = inject(Keycloak);
+  authenticated = false;
+  keycloakStatus: string | undefined;
+  // private readonly keycloak = inject(Keycloak);
+  private readonly keycloakSignal = inject(KEYCLOAK_EVENT_SIGNAL);
 
-  public isLoggedIn = false;
-  public userProfile = null;
+  // public isLoggedIn = false;
+  // public userProfile = null;
 
   public async ngOnInit() {
     this.store.dispatch(new Loading.Disable())
 
     // this.isLoggedIn = !this.keycloak.loginRequired
     // const token = await this.keycloak.token
-    if (this.keycloak.authenticated) {
+    if (!this.keycloak.authenticated) {
       // await this.logout()
       await this.login();
     } else {
-      this.userProfile = await this.keycloak.loadUserProfile();
-      localStorage.setItem("jwt", this.keycloak.token);
-      const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
-      const expiration = decoded.exp;
-      const user = decoded.sub;
-      localStorage.setItem("jwtExpirationTime", expiration.toString());
+      // this.userProfile = await this.keycloak.loadUserProfile();
+      // localStorage.setItem("jwt", this.keycloak.token);
+      // const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
+      // const expiration = decoded.exp;
+      // const user = decoded.sub;
+      // localStorage.setItem("jwtExpirationTime", expiration.toString());
       this.router.navigate([this.editorService.redirectUrl]);
     }
   }
 
   public async login() {
       await this.keycloak.login();
-      toastr.success(this.userProfile + " logged in successfully.", "Successful login", {
-        timeOut: "5000",
-        positionClass: "toast-top-center",
-        preventDuplicates: true,
-        extendedTimeOut: 0,
-        tapToDismiss: false,
-      });
-      this.userProfile = await this.keycloak.loadUserProfile();
-      localStorage.setItem("jwt", this.keycloak.token);
-      const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
-      const expiration = decoded.exp;
-      const user = decoded.sub;
-      localStorage.setItem("jwtExpirationTime", expiration.toString());
+      // toastr.success(this.userProfile + " logged in successfully.", "Successful login", {
+      //   timeOut: "5000",
+      //   positionClass: "toast-top-center",
+      //   preventDuplicates: true,
+      //   extendedTimeOut: 0,
+      //   tapToDismiss: false,
+      // });
+      // this.userProfile = await this.keycloak.loadUserProfile();
+      // localStorage.setItem("jwt", this.keycloak.token);
+      // const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
+      // const expiration = decoded.exp;
+      // const user = decoded.sub;
+      // localStorage.setItem("jwtExpirationTime", expiration.toString());
       if (this.editorService.redirectUrl != "login") {
         this.router.navigate([this.editorService.redirectUrl]);
       }

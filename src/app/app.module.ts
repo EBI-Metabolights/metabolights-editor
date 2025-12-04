@@ -1,5 +1,5 @@
 
-import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
+import {APP_BASE_HREF, PlatformLocation } from '@angular/common';
 
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule, isDevMode, Injector, inject, provideAppInitializer, APP_INITIALIZER, provideZoneChangeDetection } from "@angular/core";
@@ -72,10 +72,18 @@ import {
   createInterceptorCondition,
   IncludeBearerTokenCondition,
   INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-  includeBearerTokenInterceptor
+  includeBearerTokenInterceptor,
+  withAutoRefreshToken,
+  AutoRefreshTokenService,
+  UserActivityService
 } from 'keycloak-angular';
+
 const urlCondition = createInterceptorCondition<IncludeBearerTokenCondition>({
-  urlPattern: /^(http:\/\/localhost:8080)(\/.*)?$/i,
+  urlPattern: /^(https?:\/\/www.*\.ebi\.ac\.uk)(\/metabolights\/.*)$/i,
+  bearerPrefix: 'Bearer'
+});
+const urlCondition2 = createInterceptorCondition<IncludeBearerTokenCondition>({
+  urlPattern: /^(http:\/\/localhost:\d+)(\/.*)?$/i,
   bearerPrefix: 'Bearer'
 });
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
@@ -146,46 +154,58 @@ export function configLoader(injector: Injector): () => Promise<any> {
         const initializerFn = (configLoader)(inject(Injector));
         return initializerFn();
         }),
-        provideKeycloak({
-            config: {
-              url: 'https://wwwdev.ebi.ac.uk/metabolights/test/iam',
-              realm: 'metabolights',
-              clientId: 'metabolights-editor-test'
-            },
-            initOptions: {
-              onLoad: 'check-sso',
-              silentCheckSsoRedirectUri: `https://wwwdev.ebi.ac.uk/metabolights/keycloak/editor/assets/silent-check-sso.html`
-            }
-          }),
-    {
-      provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
-      useValue: [urlCondition] // <-- Note that multiple conditions might be added.
-    },
+        provideKeycloak({ // TODO: hardcoded configurations will be updated
+      config: {
+        url: 'https://wwwdev.ebi.ac.uk/metabolights/test/iam',
+        realm: 'metabolights',
+        clientId: 'metabolights-editor-test'
+      },
+      initOptions: {
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: `https://wwwdev.ebi.ac.uk/metabolights/keycloak/editor/assets/silent-check-sso.html`,
+        redirectUri: 'https://wwwdev.ebi.ac.uk/metabolights/keycloak/editor/'
+      },
+      features: [
+        withAutoRefreshToken({
+          onInactivityTimeout: 'logout',
+          sessionTimeout: 300000
+        })
+      ],
+      providers: [
+        AutoRefreshTokenService,
+        UserActivityService,
+        {
+          provide: INCLUDE_BEARER_TOKEN_INTERCEPTOR_CONFIG,
+          useValue: [urlCondition, urlCondition2]
+        }
+      ]
+    }),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([includeBearerTokenInterceptor])),
-        EditorService,
-        MetabolightsService,
-        EuropePMCService,
-        DOIService,
-        AuthService,
-        LabsWorkspaceService,
-        {
-            provide: NGXS_PLUGINS,
-            useClass: LoggingMiddleware,
-            multi: true,
-        },
-        { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
-        {
-            provide: APP_BASE_HREF,
-            useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
-            deps: [PlatformLocation]
-        },
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
+    EditorService,
+    MetabolightsService,
+    EuropePMCService,
+    DOIService,
+    AuthService,
+    LabsWorkspaceService,
+    {
+      provide: NGXS_PLUGINS,
+      useClass: LoggingMiddleware,
+      multi: true,
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    {
+      provide: APP_BASE_HREF,
+      useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
+      deps: [PlatformLocation]
+    },
+    // provideHttpClient(withInterceptorsFromDi())
+  ]
+})
 export class AppModule {
   constructor(
   ) {

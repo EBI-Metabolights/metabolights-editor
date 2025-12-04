@@ -14,6 +14,7 @@ import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
 import Keycloak from "keycloak-js";
+import { User } from "./ngxs-store/non-study/user/user.actions";
 @Injectable({
   providedIn: "root",
 })
@@ -46,11 +47,11 @@ export class AuthGuard  implements OnInit {
       studyIdentifier = url.split("/")[2];
       isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
     }
-    const continueProcess = await this.checkAuthenticationRequest(state);
-    if (continueProcess === false) {
-      if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
-      return false;
-    }
+    // const continueProcess = await this.checkAuthenticationRequest(state);
+    // if (continueProcess === false) {
+    //   if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
+    //   return false;
+    // }
 
     if (url.startsWith("/login")) {
       if (this.keycloak.authenticated) {
@@ -59,8 +60,8 @@ export class AuthGuard  implements OnInit {
       }
       return true;
     }
-    // const result= await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
-    // return result
+    const result= await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
+    return result
   }
 
   async handlePrivate(studyIdentifier): Promise<boolean> {
@@ -77,38 +78,38 @@ export class AuthGuard  implements OnInit {
   async checkAuthenticationRequest(state: RouterStateSnapshot) {
     try {
 
-      let loginOneTimeToken = null;
-      if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
-        return true;
-      }
+      // let loginOneTimeToken = null;
+      // if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
+      //   return true;
+      // }
 
-      loginOneTimeToken = state.root.queryParamMap.get("loginOneTimeToken");
-      this.editorService.updateHistory(state.root);
-      if (loginOneTimeToken === "") {
-        this.editorService.redirectUrl = state.url;
-        this.router.navigate(["/login"]);
-        return false;
-      }
+      // loginOneTimeToken = state.root.queryParamMap.get("loginOneTimeToken");
+      // this.editorService.updateHistory(state.root);
+      // if (loginOneTimeToken === "") {
+      //   this.editorService.redirectUrl = state.url;
+      //   this.router.navigate(["/login"]);
+      //   return false;
+      // }
 
-      const localLoginOneTimeToken = localStorage.getItem("loginOneTimeToken");
+      // const localLoginOneTimeToken = localStorage.getItem("loginOneTimeToken");
 
-      if (localLoginOneTimeToken === loginOneTimeToken) {
-        return true;
-      }
-      const jwt = await this.editorService.getJwtWithOneTimeToken(loginOneTimeToken);
-      let decoded = null;
-      try {
-        decoded = jwtDecode<MtblsJwtPayload>(jwt);
-      } catch (err) {
-      }
-      if (decoded === null) {
-        this.editorService.redirectUrl = state.url;
-        this.router.navigate(["/login"]);
-        return false;
-      }
-      if (!this.keycloak.authenticated) {
-        return true
-      }
+      // if (localLoginOneTimeToken === loginOneTimeToken) {
+      //   return true;
+      // }
+      // const jwt = await this.editorService.getJwtWithOneTimeToken(loginOneTimeToken);
+      // let decoded = null;
+      // try {
+      //   decoded = jwtDecode<MtblsJwtPayload>(jwt);
+      // } catch (err) {
+      // }
+      // if (decoded === null) {
+      //   this.editorService.redirectUrl = state.url;
+      //   this.router.navigate(["/login"]);
+      //   return false;
+      // }
+      // if (this.keycloak.authenticated) {
+      //   return true
+      // }
 
       // const localJwt = localStorage.getItem("jwt");
 
@@ -177,11 +178,6 @@ export class AuthGuard  implements OnInit {
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
     if (url.startsWith("/login")) {
       if (this.keycloak.authenticated) {
-        if (this.keycloak.authenticated && this.keycloak.token) {
-                const user = await this.keycloak.loadUserProfile()
-                this.editorService.loginWithJwt(this.keycloak.token, user.email)
-                return false
-            }
         this.router.navigate(["/console"]);
         return false;
       }
@@ -213,37 +209,37 @@ export class AuthGuard  implements OnInit {
       return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
     }
 
-    if (this.keycloak.authenticated && this.keycloak.token) {
-        const user = await this.keycloak.loadUserProfile()
-        this.editorService.loginWithJwt(this.keycloak.token, user.email)
-        return false
-    }
+    // if (this.keycloak.authenticated) {
+    //     const user = await this.keycloak.loadUserProfile()
+    //     // this.editorService.loginWithJwt(this.keycloak.token, user.email)
+    //     return false
+    // }
 
-    switch (this.evaluateSession(null)) {
-      case SessionStatus.Active:
-        return true;
+    // switch (this.evaluateSession(null)) {
+    //   case SessionStatus.Active:
+    //     return true;
 
-      case SessionStatus.Expired:
-        this.editorService.redirectUrl = url;
-        this.editorService.logout(false);
-        return false;
+    //   case SessionStatus.Expired:
+    //     this.editorService.redirectUrl = url;
+    //     this.editorService.logout(false);
+    //     return false;
 
-      case SessionStatus.NotInit:
-        this.editorService.redirectUrl = url;
-        await this.editorService.updateSession();
-        break;
+    //   case SessionStatus.NotInit:
+    //     this.editorService.redirectUrl = url;
+    //     await this.editorService.updateSession();
+    //     break;
 
-      case SessionStatus.NoRecord:
-        this.editorService.redirectUrl = url;
-        this.router.navigate(["/login"]);
-        return false;
+    //   case SessionStatus.NoRecord:
+    //     this.editorService.redirectUrl = url;
+    //     this.router.navigate(["/login"]);
+    //     return false;
 
-      default:
-        console.log("hit default case in checkLogin");
-        this.editorService.redirectUrl = url;
-        this.router.navigate(["/login"]);
-        return false;
-    }
+    //   default:
+    //     console.log("hit default case in checkLogin");
+    //     this.editorService.redirectUrl = url;
+    //     this.router.navigate(["/login"]);
+    //     return false;
+    // }
   }
   async checkStudyObfuscationCode(url: string, obfuscationCode: string, state: RouterStateSnapshot, studyId: string) {
     const studyPermission = await this.editorService.getStudyPermissionByObfuscationCode(obfuscationCode);
@@ -311,10 +307,22 @@ export class AuthGuard  implements OnInit {
     }
 
     const isPublic = studyPermission.studyStatus.toUpperCase() === "PUBLIC";
-    if (url.startsWith("/MTBLS")) {
-      const isCurator = localStorage.getItem("isCurator");
+    const isCurator = ["curator", "super_user"].some(x => x.toLowerCase().includes(studyPermission.userRole.toLowerCase()))
+    if (studyPermission && studyPermission.userName) {
+        const user = {
+          apiToken: 'token',
+          role: studyPermission.userRole,
+          email: studyPermission.userName,
+          status: studyPermission.studyStatus,
+          partner: studyPermission.partner
+      }
+      this.store.dispatch(new User.Set(user));
+    }
 
-      if (isPublic || studyPermission.submitterOfStudy || (isCurator && isCurator.toLowerCase() === "true")) {
+    if (url.startsWith("/MTBLS")) {
+      // const isCurator = localStorage.getItem("isCurator");
+
+      if (isPublic || studyPermission.submitterOfStudy || isCurator) {
         const permissions = studyPermission;
         this.store.dispatch(new StudyPermissionNS.Set(permissions))
         return true;
@@ -385,33 +393,33 @@ export class AuthGuard  implements OnInit {
     //   return SessionStatus.NoRecord;
     // }
 
-    if (localStorage.getItem("jwt") === null) {
-      return SessionStatus.NoRecord;
-    }
+    // if (localStorage.getItem("jwt") === null) {
+    //   return SessionStatus.NoRecord;
+    // }
 
-    if (localStorage.getItem("user") === null) {
-      return SessionStatus.NotInit;
-    }
+    // if (localStorage.getItem("user") === null) {
+    //   return SessionStatus.NotInit;
+    // }
 
-    const now = new Date();
-    const jwtExpirationTime = localStorage.getItem("jwtExpirationTime");
-    let then;
+    // const now = new Date();
+    // const jwtExpirationTime = localStorage.getItem("jwtExpirationTime");
+    // let then;
 
-    if (jwtExpirationTime == null) {
-      const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem("jwt"));
-      const expiration = decoded.exp;
-      localStorage.setItem("jwtExpirationTime", expiration.toString());
-      then = new Date(expiration * 1000);
-    } else {
-      then = new Date(Number(jwtExpirationTime) * 1000);
-    }
-    const nowTime = now.getTime();
-    const thenTime = then.getTime();
-    if (nowTime > thenTime) {
-      return SessionStatus.Expired;
-    } else {
-      return SessionStatus.Active;
-    }
+    // if (jwtExpirationTime == null) {
+    //   const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem("jwt"));
+    //   const expiration = decoded.exp;
+    //   localStorage.setItem("jwtExpirationTime", expiration.toString());
+    //   then = new Date(expiration * 1000);
+    // } else {
+    //   then = new Date(Number(jwtExpirationTime) * 1000);
+    // }
+    // const nowTime = now.getTime();
+    // const thenTime = then.getTime();
+    // if (nowTime > thenTime) {
+    //   return SessionStatus.Expired;
+    // } else {
+    //   return SessionStatus.Active;
+    // }
 
     return SessionStatus.Active;
   }

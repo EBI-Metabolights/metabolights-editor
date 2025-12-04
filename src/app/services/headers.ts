@@ -4,7 +4,7 @@ export const httpOptions = {
   headers: new HttpHeaders({
     //'Content-Type':  'application/json',
     Accept: "application/json",
-    "user-token": "dummy",
+    // "user-token": "dummy",
     Authorization: "Bearer dummy"
   }),
 };

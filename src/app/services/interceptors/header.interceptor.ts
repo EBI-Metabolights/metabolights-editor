@@ -52,38 +52,39 @@ export class HeaderInterceptor implements HttpInterceptor {
               "Obfuscation-Code": reviewCode,
             },
           });
-      } else
-      {
-        let userToken = localStorage.getItem("userToken");
-        const user = this.getUserObject();
-        if (userToken === null) {
-          if (user !== null) {
-            userToken = disambiguateUserObj(this.getUserObject());
-            localStorage.setItem("userToken", userToken);
-          }
-        }
-        if (userToken !== null) {
-          request = request.clone({
-            setHeaders: {
-              "user-token": userToken,
-            },
-          });
-        } else {
-          request = request.clone({
-            setHeaders: {
-              "user-token": "",
-            },
-          });
-        }
-        const jwt = localStorage.getItem("jwt");
-        if (jwt !== null) {
-          request = request.clone({
-            setHeaders: {
-              Authorization: "Bearer " + jwt,
-            },
-          });
-        }
       }
+      // else
+      // {
+        // let userToken = localStorage.getItem("userToken");
+        // const user = this.getUserObject();
+        // if (userToken === null) {
+        //   if (user !== null) {
+        //     userToken = disambiguateUserObj(this.getUserObject());
+        //     localStorage.setItem("userToken", userToken);
+        //   }
+        // }
+        // if (userToken !== null) {
+        //   request = request.clone({
+        //     setHeaders: {
+        //       "user-token": userToken,
+        //     },
+        //   });
+        // } else {
+        //   request = request.clone({
+        //     setHeaders: {
+        //       "user-token": "",
+        //     },
+        //   });
+        // }
+        // const jwt = localStorage.getItem("jwt");
+        // if (jwt !== null) {
+        //   request = request.clone({
+        //     setHeaders: {
+        //       Authorization: "Bearer " + jwt,
+        //     },
+        //   });
+        // }
+      // }
 
     }
     return next.handle(request);

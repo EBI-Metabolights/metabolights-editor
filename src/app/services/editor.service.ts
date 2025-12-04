@@ -152,21 +152,21 @@ export class EditorService {
 
   }
 
-  login(body) {
-    return this.authService.login(body);
-  }
+  // login(body) {
+  //   return this.authService.login(body);
+  // }
 
   logout(redirect) {
     this.clearSessionData();
     this.keycloak.logout();
 
     this.resetStudyStates();
-    this.router.navigate(["/login"]);
-    // if (redirect) {
-    //   this.router.navigate(["/login"]);
-    // } else {
-    //   this.router.navigate(["/login"]);
-    // }
+    // this.router.navigate(["/login"]);
+    if (redirect) {
+      this.router.navigate([redirect]);
+    } else {
+      this.router.navigate(["/login"]);
+    }
   }
 
   resetStudyStates() {
@@ -329,16 +329,16 @@ export class EditorService {
    */
   async updateSession(){
     // const activeJwt = localStorage.getItem("jwt");
-    let  localUser = localStorage.getItem("user");
+    // let  localUser = localStorage.getItem("user");
 
 
-    if (!localUser && this.keycloak.authenticated && this.keycloak.token) {
-        const user = await this.keycloak.loadUserProfile()
-        await this.loginWithJwt(this.keycloak.token, user.email)
-        localUser = localStorage.getItem("user");
-    }
+    // if (!localUser && this.keycloak.authenticated && this.keycloak.token) {
+    //     const user = await this.keycloak.loadUserProfile()
+    //     await this.loginWithJwt(this.keycloak.token, user.email)
+    //     localUser = localStorage.getItem("user");
+    // }
 
-    const user: MetabolightsUser = JSON.parse(localUser);
+    // const user: MetabolightsUser = JSON.parse(localUser);
 
     if (environment.useNewState) {
       this.store.dispatch(new BannerMessage.Get());
@@ -376,12 +376,15 @@ export class EditorService {
       );
      }
 
-
+     this.loadValidations();
 
     if(this.keycloak.authenticated){
-      const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
-      const username = decoded.email;
-      this.initialise(localUser, false);
+      // const decoded = jwtDecode<MtblsJwtPayload>(this.keycloak.token);
+      // const username = decoded.email;
+      // this.initialise(null, false);
+      this.store.dispatch(new User.Studies.Set(null))
+
+
       // if (user === null || user.email !== username){
       //   this.clearSessionData();
       //   // await this.loginWithJwt(activeJwt, username);
@@ -447,58 +450,58 @@ export class EditorService {
     // localStorage.removeItem("loginOneTimeToken");
   }
 
-  async loginWithJwt(jwtToken: string, userName: string) {
-    const body = { jwt: jwtToken, user: userName };
-    const url = this.configService.config.metabolightsWSURL.baseURL + this.configService.config.authenticationURL.initialise;
-    const response = await firstValueFrom(this.authService.http.post(url, body, httpOptions));
-    const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
-    return this.initialise(response, true);
-  }
+  // async loginWithJwt(jwtToken: string, userName: string) {
+  //   const body = { jwt: jwtToken, user: userName };
+  //   const url = this.configService.config.metabolightsWSURL.baseURL + this.configService.config.authenticationURL.initialise;
+  //   const response = await firstValueFrom(this.authService.http.post(url, body, httpOptions));
+  //   const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
+  //   return this.initialise(response, true);
+  // }
 
   // many new state pivots to remove in here
-  initialise(data, signInRequest) {
-    interface User {
-      updatedAt: number;
-      owner: { apiToken: string; role: string; email: string; status: string; partner: boolean; };
-      message: string;
-      err: string;
-    }
-    if (signInRequest) {
-      const userstr = data.content;
-      const user: User = JSON.parse(userstr);
-      localStorage.setItem("user", JSON.stringify(user.owner));
-      const isCurator = user.owner.role === "ROLE_SUPER_USER" ? "true" : "false";
-      localStorage.setItem("isCurator", isCurator);
-      httpOptions.headers = httpOptions.headers.set(
-        "user-token",
-        user.owner.apiToken
-      );
+  // initialise(data, signInRequest) {
+  //   interface User {
+  //     updatedAt: number;
+  //     owner: { apiToken: string; role: string; email: string; status: string; partner: boolean; };
+  //     message: string;
+  //     err: string;
+  //   }
+  //   if (signInRequest) {
+  //     // const userstr = data.content;
+  //     // const user: User = JSON.parse(userstr);
+  //     // localStorage.setItem("user", JSON.stringify(user.owner));
+  //     // const isCurator = user.owner.role === "ROLE_SUPER_USER" ? "true" : "false";
+  //     // localStorage.setItem("isCurator", isCurator);
+  //     // httpOptions.headers = httpOptions.headers.set(
+  //     //   "user-token",
+  //     //   user.owner.apiToken
+  //     // );
 
-      this.store.dispatch(new User.Set(user.owner));
+  //     // this.store.dispatch(new User.Set(user.owner));
 
-      this.store.dispatch(new User.Studies.Set(null))
-
-
-      this.loadValidations();
-      return true;
-    } else {
-      const user = JSON.parse(data);
-      httpOptions.headers = httpOptions.headers.set(
-        "user-token",
-        disambiguateUserObj(user)
-      );
-      const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
-      localStorage.setItem("isCurator", isCurator);
-
-      this.store.dispatch(new User.Set(user));
+  //     this.store.dispatch(new User.Studies.Set(null))
 
 
-      this.store.dispatch(new User.Studies.Set(null))
+  //     this.loadValidations();
+  //     return true;
+  //   } else {
+  //     // const user = JSON.parse(data);
+  //     // httpOptions.headers = httpOptions.headers.set(
+  //     //   "user-token",
+  //     //   disambiguateUserObj(user)
+  //     // );
+  //     // const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+  //     // localStorage.setItem("isCurator", isCurator);
 
-      this.loadValidations();
-      return true;
-    }
-  }
+  //     // this.store.dispatch(new User.Set(user));
+
+
+  //     this.store.dispatch(new User.Studies.Set(null))
+
+  //     this.loadValidations();
+  //     return true;
+  //   }
+  // }
 
   /**
    * This method circumvents the state, but it is wired closely to app init and didn't want
@@ -510,14 +513,14 @@ export class EditorService {
       return;
     }
 
-    this.validationService.getValidationRules().subscribe(
-      (validations) => {
+    this.validationService.getValidationRules().subscribe({
+      next: (validations) => {
         this.store.dispatch(new SetLoadingInfo("Loading study validations"))
         this.store.dispatch(new EditorValidationRules.Set(validations))
       },
-      (err) => {
+      error: (err) => {
         console.log(err);
-      }
+      }}
     );
   }
 

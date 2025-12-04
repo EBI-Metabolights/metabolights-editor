@@ -33,15 +33,15 @@ export class AppComponent implements OnInit {
     });
   }
   async ngOnInit() {
-    const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
-    const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
+    // const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
+    // const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
 
-    const isOwner = this.elementRef.nativeElement.getAttribute("isOwner");
-    const isCurator = this.elementRef.nativeElement.getAttribute("isCurator");
+    // const isOwner = this.elementRef.nativeElement.getAttribute("isOwner");
+    // const isCurator = this.elementRef.nativeElement.getAttribute("isCurator");
 
-    const mtblsid = this.elementRef.nativeElement.getAttribute("mtblsid");
-    const obfuscationcode =
-      this.elementRef.nativeElement.getAttribute("obfuscationcode");
+    // const mtblsid = this.elementRef.nativeElement.getAttribute("mtblsid");
+    // const obfuscationcode =
+    //   this.elementRef.nativeElement.getAttribute("obfuscationcode");
     const result = await this.editorService.updateSession();
     if (result === true){
       const redirectUrl = this.editorService.redirectUrl;
@@ -55,21 +55,21 @@ export class AppComponent implements OnInit {
       }
       return;
     }
-    if (jwt && jwt !== "" && user && user !== "") {
-      localStorage.setItem("mtblsuser", user);
-      localStorage.setItem("mtblsjwt", jwt);
-    } else if (
-      mtblsid &&
-      mtblsid !== "" &&
-      obfuscationcode &&
-      obfuscationcode !== ""
-    ) {
-      localStorage.setItem("mtblsid", mtblsid);
-      localStorage.setItem("obfuscationcode", obfuscationcode);
-    } else {
-      localStorage.removeItem("mtblsjwt");
-      localStorage.removeItem("mtblsuser");
-    }
+    // if (jwt && jwt !== "" && user && user !== "") {
+    //   localStorage.setItem("mtblsuser", user);
+    //   localStorage.setItem("mtblsjwt", jwt);
+    // } else if (
+    //   mtblsid &&
+    //   mtblsid !== "" &&
+    //   obfuscationcode &&
+    //   obfuscationcode !== ""
+    // ) {
+    //   localStorage.setItem("mtblsid", mtblsid);
+    //   localStorage.setItem("obfuscationcode", obfuscationcode);
+    // } else {
+    //   localStorage.removeItem("mtblsjwt");
+    //   localStorage.removeItem("mtblsuser");
+    // }
     //  this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
      this.store.dispatch(new BackendVersion.Get());
      this.store.dispatch(new EditorVersion.Get());
