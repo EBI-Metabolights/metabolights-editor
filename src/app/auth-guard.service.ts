@@ -28,7 +28,7 @@ export class AuthGuard  implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private store: Store,
+    private store: Store
   ) { }
 
 
@@ -307,7 +307,11 @@ export class AuthGuard  implements OnInit {
     }
 
     const isPublic = studyPermission.studyStatus.toUpperCase() === "PUBLIC";
-    const isCurator = ["curator", "super_user"].some(x => x.toLowerCase().includes(studyPermission.userRole.toLowerCase()))
+    let isCurator = false;
+    if (studyPermission.userRole !== null){
+        isCurator = ["curator", "super_user"].some(x => x.toLowerCase().includes(studyPermission.userRole.toLowerCase()))
+    }
+
     if (studyPermission && studyPermission.userName) {
         const user = {
           apiToken: 'token',

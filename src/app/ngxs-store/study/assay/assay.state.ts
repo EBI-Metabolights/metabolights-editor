@@ -330,7 +330,7 @@ export class AssayState {
     SetTemplateRow(ctx: StateContext<AssayStateModel>, action: TemplateRow.SetTemplateRow) {
         const state = ctx.getState();
         let newTemplateRows = null;
-        newTemplateRows = state.templateRows;
+        newTemplateRows = { ...state.templateRows };
         if (newTemplateRows === null) newTemplateRows = {}
         newTemplateRows[action.attr] = action.templateRow
 

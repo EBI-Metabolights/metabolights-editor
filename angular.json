@@ -103,7 +103,7 @@
                   "with": "src/environments/environment.local.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": false,
               "outputHashing": "all",
               "sourceMap": true,
               "namedChunks": false,
@@ -165,6 +165,7 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "buildTarget": "metabolights-editor:build:local"
+
           },
           "configurations": {
             "production": {
@@ -172,6 +173,7 @@
             },
             "development": {
               "buildTarget": "metabolights-editor:build:local"
+
             },
             "staging": {
               "buildTarget": "metabolights-editor:build:staging"

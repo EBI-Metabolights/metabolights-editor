@@ -308,8 +308,7 @@ export class ValidationState {
     @Selector()
     static reportV2ViolationsAll(state: ValidationStateModel) {
         if (state.reportV2 === null) { return [] }
-        let violations = state.reportV2.messages.violations;
-        violations = sortViolations(violations);
+        const violations = sortViolations([...state.reportV2.messages.violations]);
         return violations;
     }
 

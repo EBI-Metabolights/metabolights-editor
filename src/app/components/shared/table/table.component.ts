@@ -26,7 +26,8 @@ import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { Ontology } from "./../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { EditorService } from "../../../services/editor.service";
 import { OntologyComponent } from "../ontology/ontology.component";
-import { ClipboardService } from "ngx-clipboard";
+// import { ClipboardService } from "ngx-clipboard";
+import { Clipboard } from '@angular/cdk/clipboard';
 import * as toastr from "toastr";
 import { tassign } from "tassign";
 import { filter, Observable } from "rxjs";
@@ -167,10 +168,11 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   tableTypeValue: string = "";
   openUploadArea: boolean = false;
   filePatternString: string = "^([asi]_.+\.txt|m_.+\.tsv)$";
-  imageErrorMap = new Map<string, boolean>(); 
+  imageErrorMap = new Map<string, boolean>();
 
   constructor(
-    private clipboardService: ClipboardService,
+    // private clipboardService: ClipboardService,
+    private clipboard: Clipboard,
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private assayService: AssaysService,
@@ -181,14 +183,14 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
   }
 
   ngOnInit() {
-    
+
     this.setUpSubscriptionsNgxs();
     if (this.tableData?.data) {
       this.data = this.tableData.data;
-     
+
     }
     if (this.data) {
-     
+
       this.columnHidden = this.data.columns_hidden;
       this.sampleAbundance = this.data.sample_abundance;
       if (localStorage.getItem(this.data.file) !== null) {
@@ -198,14 +200,14 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
       }
     } else {
       localStorage.setItem(this.data.file, 'compact');
-       
+
     }
     this.tableTypeValue = this.getTableTypeVal(this.data.file);
     }
 
   }
-  
-  
+
+
   setupPaginator() {
     if (!this.paginator || !this.dataSource) return;
     const length = this.dataSource.filteredData?.length;
@@ -231,7 +233,7 @@ export class TableComponent implements OnInit, AfterViewInit,AfterViewChecked, O
     })
 
     this.editorValidationRules$.subscribe((value) => {
-      
+
       this.validations = value;
     });
     this.studyFiles$.subscribe((value) => {
@@ -313,7 +315,7 @@ compare(a: any, b: any, isAsc: boolean) {
       this.displayedTableColumns = this.data.displayedColumns;
       this.fullRows = this.data.rows;
       this.dataSource = new MatTableDataSource(this.fullRows);
-      
+
       // Important: reattach paginator & sort every time dataSource is recreated
       if (this.paginator) {
         this.dataSource.paginator = this.paginator;
@@ -626,7 +628,7 @@ compare(a: any, b: any, isAsc: boolean) {
       this.view = "compact";
       localStorage.setItem(this.data.file, 'compact')
     }
-      
+
   // After toggling, check if scroll is really needed
   setTimeout(() => this.updateScrollBehavior());
 
@@ -1118,7 +1120,7 @@ compare(a: any, b: any, isAsc: boolean) {
   }
 
   editCell(row: any, column: any, event) {
-    
+
     if (!this.isReadOnly) {
       this.isCellTypeFile = false;
       this.isCellTypeOntology = false;
@@ -1145,7 +1147,7 @@ compare(a: any, b: any, isAsc: boolean) {
       }
       const isTermAccessionColumn = (this.selectedCell["column"]["columnDef"]).indexOf("Term Accession Number") > -1 ;
       const isTermSourceColumn = (this.selectedCell["column"]["columnDef"]).indexOf("Term Source REF") > -1 ;
-      
+
       // Setup validators dynamically
       const cellValidators = [];
       if (isTermAccessionColumn) {
@@ -1162,7 +1164,7 @@ compare(a: any, b: any, isAsc: boolean) {
         ]
       });
     }
-    
+
   }
 
   getOntologyComponentValue(id) {
@@ -1591,7 +1593,8 @@ compare(a: any, b: any, isAsc: boolean) {
   }
 
   copy(text: string) {
-    this.clipboardService.copyFromContent(text);
+    // this.clipboardService.copyFromContent(text);
+    this.clipboard.copy(text)
     toastr.success("", "Copied to clipboard", {
       timeOut: "1000",
       positionClass: "toast-top-center",
