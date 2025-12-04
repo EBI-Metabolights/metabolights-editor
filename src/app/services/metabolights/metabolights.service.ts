@@ -622,11 +622,12 @@ export class MetabolightsService extends DataService {
     return this.http.get<any>(url).pipe(catchError(this.handleError));
     }
 
-  getOntologyTermsV2(keyword: string, body: any): Observable<any> {
+  getOntologyTermsV2(keyword: string, isExactMatchRequired: boolean,body: any): Observable<any> {
     const url = `${this.configService.config.ws3URL}/public/v2/ontology-terms/search`;
-
-    const params = new HttpParams().set('q', keyword);
-
+    let params = new HttpParams().set('q', keyword);
+    if (isExactMatchRequired) {
+       params = new HttpParams().set('q', keyword).set('exact_match', 'true');
+    }  
     return this.http
       .post<any>(url, body, { params, ...httpOptions })
       .pipe(catchError(this.handleError));

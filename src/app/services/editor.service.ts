@@ -959,6 +959,7 @@ export class EditorService {
   // New method for ontology term search with rule-based validation
   searchOntologyTermsWithRuleV2(
     keyword: string,
+    isExactMatchRequired: boolean,
     ruleName: string,
     fieldName: string,
     validationType: string,
@@ -974,6 +975,6 @@ export class EditorService {
     if (allowedParentOntologyTerms) {
       body.allowedParentOntologyTerms = allowedParentOntologyTerms;
     }
-    return this.dataService.getOntologyTermsV2(keyword, body);
+    return this.dataService.getOntologyTermsV2(keyword,isExactMatchRequired,  body);
   }
 }

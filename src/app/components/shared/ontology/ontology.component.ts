@@ -283,7 +283,7 @@ export class OntologyComponent implements OnInit, OnChanges {
       this.allvalues = [];
       const ruleName = this.rule?.ruleName || this.defaultOntologies?.ruleName || "";
       const fieldName = this.rule?.fieldName || this.defaultOntologies?.fieldName || "";
-
+      const isExactMatchRequired = false;
       if (
         this.rule &&
         (this.rule.validationType === "child-ontology-term" ||
@@ -299,6 +299,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.editorService
           .searchOntologyTermsWithRuleV2(
             term,
+            isExactMatchRequired,
             ruleName,
             fieldName,
             validationType,
@@ -350,6 +351,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.editorService
           .searchOntologyTermsWithRuleV2(
             term,
+            isExactMatchRequired,
             ruleName,
             fieldName,
             "any-ontology-term",

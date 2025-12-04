@@ -130,6 +130,9 @@ export class DesignDescriptorComponent implements OnInit {
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
     });
+    this.descriptors$.subscribe((value) => {
+      this.descriptors = value;
+    });
     this.studyReadonly$.subscribe((value) => {
       if (value != null) {
         this.isStudyReadOnly = value;
@@ -138,6 +141,8 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   getKeyWords() {
+    this.status = "";
+    this.keywords = [];
     const doi = this.selectedPublication.value;
     this.europePMCService
       .getArticleKeyWords("DOI:" + doi.replace("http://dx.doi.org/", ""))
@@ -150,7 +155,9 @@ export class DesignDescriptorComponent implements OnInit {
             }
           });
         },
-        (error) => {}
+        (error) => {
+          console.error("Could not retrieve keywords for the publication");
+        }
       );
   }
 
@@ -170,46 +177,94 @@ export class DesignDescriptorComponent implements OnInit {
       this.loading = true;
       this.status = "";
       this.status = "Mapping keyword to an ontology term";
-      this.editorService
-        .getExactMatchOntologyTerm(keyword, "Study%20Design%20Type")
-        .subscribe((terms) => {
-          if (terms.OntologyTerm.length > 0) {
-            const jsonConvert: JsonConvert = new JsonConvert();
-            const descriptor = {
-              studyDesignDescriptor: jsonConvert.deserialize(
-                terms.OntologyTerm[0],
-                Ontology
-              ),
-            };
-            this.status = "Adding keyword to the study design descriptors list";
-            this.isFormBusy = true;
-            this.loading = true;
-            this.store.dispatch(new Descriptors.New(descriptor, this.studyId));
-          } else {
-            this.status =
-              "Exact ontology match not found. Create new MetaboLights Ontology term";
-            const newOntology = new Ontology();
-            newOntology.annotationValue = keyword;
-            newOntology.termAccession = "";
-            newOntology.termSource = new OntologySourceReference();
-            newOntology.termSource.description = "User defined terms";
-            newOntology.termSource.file = "";
-            newOntology.termSource.name = "";
-            newOntology.termSource.provenance_name = "";
-            newOntology.termSource.version = "";
-            const jsonConvert: JsonConvert = new JsonConvert();
-            const descriptor = {
-              studyDesignDescriptor: jsonConvert.deserialize(
-                newOntology,
-                Ontology
-              ),
-            };
-            this.status = "Adding keyword to the study design descriptors list";
-            this.loading = true;
-            this.isFormBusy = true;
-            this.store.dispatch(new Descriptors.New(descriptor, this.studyId));
-          }
-        });
+        const validationType = this._controlList?.rule.validationType;
+        const ontologies = this._controlList?.rule?.ontologies || [];
+        const term = keyword;
+        const allowedParentOntologyTerms =
+          validationType === "child-ontology-term"
+            ? this._controlList.rule.allowedParentOntologyTerms
+            : undefined;
+        const ruleName = this._controlList?.rule?.ruleName || this._controlList?.defaultOntologies?.ruleName || "";
+        const fieldName = this._controlList?.rule?.fieldName || this._controlList?.defaultOntologies?.fieldName || "";
+        const isExactMatchRequired = true;
+        this.editorService
+          .searchOntologyTermsWithRuleV2(
+            term,
+            isExactMatchRequired,
+            ruleName,
+            fieldName,
+            validationType,
+            ontologies,
+            allowedParentOntologyTerms
+          )
+          .subscribe(
+            (response) => {
+            if (response.content && response.content.result && response.content.result.length > 0) {
+              const jsonConvert: JsonConvert = new JsonConvert();
+              const tempOntTerm = new Ontology();
+              const t = response.content.result[0];
+                  tempOntTerm.annotationValue = t.term;
+                  tempOntTerm.termAccession = t.termAccessionNumber;
+                  tempOntTerm.annotationDefinition = t.description || "";
+                  tempOntTerm.termSource = new OntologySourceReference();
+                  tempOntTerm.termSource.name = t.termSourceRef;
+                  tempOntTerm.termSource.description = t.description || "";
+                  tempOntTerm.termSource.file = "";
+                  tempOntTerm.termSource.version = "";
+                  tempOntTerm.termSource.provenance_name = "";
+                  tempOntTerm.comments = []; // Keep empty
+              const descriptor = {
+                studyDesignDescriptor: jsonConvert.deserialize(
+                  tempOntTerm,
+                  Ontology
+                ),
+              };
+              this.status = "Adding keyword to the study design descriptors list";
+               this.loading = true;
+                this.isFormBusy = true;
+              setTimeout(() => {
+                this.store.dispatch(
+                  new Descriptors.New(descriptor, this.studyId)
+                );
+                  this.loading = false;
+                  this.isFormBusy = false;
+                  this.status = "Added keyword successfully";
+              }
+              , 100);
+            } else {
+              this.status =
+                "Exact ontology match not found. Create new MetaboLights Ontology term";
+              const newOntology = new Ontology();
+              newOntology.annotationValue = keyword;
+              newOntology.termAccession = "";
+              newOntology.termSource = new OntologySourceReference();
+              newOntology.termSource.description = "User defined terms";
+              newOntology.termSource.file = "";
+              newOntology.termSource.name = "";
+              newOntology.termSource.provenance_name = "";
+              newOntology.termSource.version = "";
+              newOntology.comments = []; // Keep empty
+              const jsonConvert: JsonConvert = new JsonConvert();
+              const descriptor = {
+                studyDesignDescriptor: jsonConvert.deserialize(
+                  newOntology,
+                  Ontology
+                ),
+              };
+              this.status = "Adding keyword to the study design descriptors list";
+              this.loading = true;
+              this.isFormBusy = true;
+              setTimeout(() => {
+                this.store.dispatch(
+                  new Descriptors.New(descriptor, this.studyId)
+                );
+                  this.loading = false;
+                  this.isFormBusy = false;
+                  this.status = "Added keyword successfully";
+              }
+              , 100);
+            }
+          });
     }
   }
 
@@ -336,9 +391,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   updateAndCloseNgxs() {
     this.store.dispatch(
-      new Descriptors.Update(
-        this.form?.get("descriptor")?.value,
-        this.compileBody(),
+      new Descriptors.Get(
         this.studyId
       )
     );
