@@ -241,13 +241,14 @@ export class TableComponent
     if (this.data) {
       this.columnHidden = this.data.columns_hidden;
       this.sampleAbundance = this.data.sample_abundance;
-      if (localStorage.getItem(this.data.file) !== null) {
-        this.view = localStorage.getItem(this.data.file);
+      const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
+      if (localStorage.getItem(fileKey) !== null) {
+        this.view = localStorage.getItem(fileKey);
         if (this.view === "expanded") {
           this.displayedTableColumns = Object.keys(this.data.header);
         }
       } else {
-        localStorage.setItem(this.data.file, "compact");
+        localStorage.setItem(fileKey, "compact");
       }
       this.tableTypeValue = this.getTableTypeVal(this.data.file);
     }
@@ -809,15 +810,16 @@ export class TableComponent
   }
 
   toggleView() {
+    const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
     if (this.view === "compact") {
       this.displayedTableColumns = Object.keys(this.data.header);
       this.displayedTableColumns.unshift("Select");
       this.view = "expanded";
-      localStorage.setItem(this.data.file, "expanded");
+      localStorage.setItem(fileKey, "expanded");
     } else {
       this.displayedTableColumns = this.data.displayedColumns;
       this.view = "compact";
-      localStorage.setItem(this.data.file, "compact");
+      localStorage.setItem(fileKey, "compact");
     }
 
     // After toggling, check if scroll is really needed

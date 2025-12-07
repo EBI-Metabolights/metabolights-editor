@@ -77,8 +77,8 @@ export class AuthGuard  implements OnInit {
         this.router.navigate(["/login"]);
         return false;
       }
-
-      const localLoginOneTimeToken = localStorage.getItem("loginOneTimeToken");
+      const loginOneTimeTokenKey = this.configService.config.endpoint + "/loginOneTimeToken"
+      const localLoginOneTimeToken = localStorage.getItem(loginOneTimeTokenKey);
 
       if (localLoginOneTimeToken === loginOneTimeToken) {
         return true;
@@ -94,19 +94,20 @@ export class AuthGuard  implements OnInit {
         this.router.navigate(["/login"]);
         return false;
       }
-
-      const localJwt = localStorage.getItem("jwt");
+      const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      const localJwt = localStorage.getItem(jwtTokenKey);
 
       if (localJwt !== null && jwt === localJwt) {
         return true;
       }
 
-      const userName = decoded.sub;
+      const userName = decoded.email;
 
       if (localJwt === null) {
         this.editorService.redirectUrl = state.url;
         await this.editorService.loginWithJwt(jwt, userName);
-        localStorage.setItem("loginOneTimeToken", loginOneTimeToken);
+        const loginOneTimeToken = this.configService.config.endpoint + "/loginOneTimeToken"
+        localStorage.setItem(loginOneTimeTokenKey, loginOneTimeToken);
         toastr.success(userName + "is logged in successfully.", "Metabolights Editor session is activated.", {
           timeOut: "5000",
           positionClass: "toast-top-center",
@@ -120,7 +121,7 @@ export class AuthGuard  implements OnInit {
           localDecoded = jwtDecode<MtblsJwtPayload>(localJwt);
         } catch (err) {
         }
-        const currentUser = localDecoded.sub;
+        const currentUser = localDecoded.email;
         if (currentUser !== userName) {
           this.editorService.clearSessionData();
           await this.editorService.loginWithJwt(jwt, userName);
@@ -160,7 +161,9 @@ export class AuthGuard  implements OnInit {
    * @returns boolean indicating whether the user is logged in.
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
-    const localJwt = localStorage.getItem("jwt");
+    const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    
+    const localJwt = localStorage.getItem(jwtTokenKey);
     if (url.startsWith("/login")) {
       if (localJwt !== null) {
         this.router.navigate(["/console"]);
@@ -286,10 +289,11 @@ export class AuthGuard  implements OnInit {
     }
 
     const isPublic = studyPermission.studyStatus.toUpperCase() === "PUBLIC";
+    const isCurator = studyPermission.userRole == "ROLE_SUPER_USER";
     if (url.startsWith("/MTBLS")) {
-      const isCurator = localStorage.getItem("isCurator");
+      const isCuratorKey = this.configService.config.endpoint + "/isCurator"
 
-      if (isPublic || studyPermission.submitterOfStudy || (isCurator && isCurator.toLowerCase() === "true")) {
+      if (isPublic || studyPermission.submitterOfStudy || isCurator) {
         const permissions = studyPermission;
         this.store.dispatch(new StudyPermissionNS.Set(permissions))
         return true;
@@ -309,7 +313,7 @@ export class AuthGuard  implements OnInit {
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
     } else {
-      if (studyPermission.edit) {
+      if (studyPermission.submitterOfStudy || isCurator) {
         const permissions = studyPermission;
         this.store.dispatch(new StudyPermissionNS.Set(permissions))
         return true;
@@ -355,27 +359,30 @@ export class AuthGuard  implements OnInit {
     // if (
     //   isInitialisedObj.ready === false &&
     //   typeof isInitialisedObj.time === "string" &&
-    //   localStorage.getItem("user") === null
+    //   localStorage.getItem(userKey) === null
     // ) {
     //   return SessionStatus.NoRecord;
     // }
-
-    if (localStorage.getItem("jwt") === null) {
+    const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    const userKey = this.configService.config.endpoint + "/user"
+    const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+    if (localStorage.getItem(jwtTokenKey) === null) {
       return SessionStatus.NoRecord;
     }
 
-    if (localStorage.getItem("user") === null) {
+    if (localStorage.getItem(userKey) === null) {
       return SessionStatus.NotInit;
     }
 
     const now = new Date();
-    const jwtExpirationTime = localStorage.getItem("jwtExpirationTime");
+    const jwtExpirationTime = localStorage.getItem(jwtExpirationTimeKey);
     let then;
 
     if (jwtExpirationTime == null) {
-      const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem("jwt"));
+      const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem(jwtTokenKey));
       const expiration = decoded.exp;
-      localStorage.setItem("jwtExpirationTime", expiration.toString());
+      
+      localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
       then = new Date(expiration * 1000);
     } else {
       then = new Date(Number(jwtExpirationTime) * 1000);

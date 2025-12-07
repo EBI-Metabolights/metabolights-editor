@@ -81,9 +81,11 @@ export class PublicStudyComponent implements OnInit {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
 
     this.permissions = this.store.snapshot().application.studyPermission
+    const isCuratorKey = this.configService.config.endpoint + "/loginOneTimeToken"
+    const usernameKey = this.configService.config.endpoint + "/username"
 
-    const curatorStatus = localStorage.getItem("isCurator");
-    const userName = localStorage.getItem("username");
+    const curatorStatus = localStorage.getItem(isCuratorKey);
+    const userName = localStorage.getItem(usernameKey);
     if (curatorStatus !== null && curatorStatus.toLowerCase() === "true"){
       this.isCurator = true;
     }
@@ -131,7 +133,8 @@ export class PublicStudyComponent implements OnInit {
       if (value !== null) {
         this.requestedStudy = value;
         this.isOwner = false;
-        const userName = localStorage.getItem("username");
+        const usernameKey = this.configService.config.endpoint + "/username"
+        const userName = localStorage.getItem(usernameKey);
         if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
           if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
             this.isOwner = true;

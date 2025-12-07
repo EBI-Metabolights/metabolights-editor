@@ -1,12 +1,11 @@
 <span *ngIf="type == 'icon'; else ButtonDownload">
-  <a target="_blank" [attr.href]="getDownloadLink()">
+  <a (click)="getDownloadLink()">
     <mat-icon>cloud_download</mat-icon>
   </a>
 </span>
 <ng-template #ButtonDownload>
   <a
-    target="_blank"
-    [attr.href]="getDownloadLink()"
+    (click)="getDownloadLink()"
     class="button is-small is-light"
   >
     <mat-icon>cloud_download</mat-icon> Download

@@ -1,96 +1,114 @@
-import { inject, Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
 import {
+  HttpInterceptor,
   HttpRequest,
   HttpHandler,
   HttpEvent,
-  HttpInterceptor,
-} from "@angular/common/http";
-import { Observable } from "rxjs";
-import { disambiguateUserObj } from "../editor.service";
-import { ConfigurationService } from "src/app/configuration.service";
-import { Store } from "@ngxs/store";
-import { StudyPermission } from "../headers";
-import { ActivatedRoute} from '@angular/router';
+  HttpErrorResponse
+} from '@angular/common/http';
+import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { AuthService } from '../auth.service';
+import { ConfigurationService } from 'src/app/configuration.service';
+import { ActivatedRoute } from '@angular/router';
 
-/* eslint-disable @typescript-eslint/naming-convention */
+
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
 
-  studyPermission: StudyPermission = null;
-  constructor(
+  private isRefreshing = false;
+  private refreshTokenSubject = new BehaviorSubject<string | null>(null);
+
+  constructor(private auth: AuthService,
     private configService: ConfigurationService,
-    private activatedRoute: ActivatedRoute,
-    private store: Store
-  ) {
-  }
+    private activatedRoute: ActivatedRoute
+  ) { }
 
-  intercept(
-    request: HttpRequest<unknown>,
-    next: HttpHandler
-  ): Observable<HttpEvent<unknown>> {
-    const endpoint = this.configService?.config?.endpoint;
+  intercept(req: HttpRequest<any>, next: HttpHandler) {
+    const endpointWs = this.configService?.config?.metabolightsWSURL.baseURL;
     const origin = this.configService.config?.origin;
-    const targetUrl = origin + request.url;
+    const targetUrl = origin + req.url;
     const endpointWs3 = this.configService?.config?.ws3URL;
-    if (request.url.startsWith(endpointWs3) || targetUrl.startsWith(endpointWs3)) {
-      const jwt = localStorage.getItem("jwt");
-        if (jwt !== null) {
-          request = request.clone({
-            setHeaders: {
-              Authorization: "Bearer " + jwt,
-            },
-          });
-        }
-    }
-    if (request.url.startsWith(endpoint) || targetUrl.startsWith(endpoint)) {
-      const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
-      if ( reviewCode ) {
+    let modifiedReq = req;
+    if (endpointWs && (req.url.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3))) {
+      const accessToken = this.auth.getAccessToken();
 
-          request = request.clone({
-            setHeaders: {
-              "Obfuscation-Code": reviewCode,
-            },
-          });
-      } else
-      {
-        let userToken = localStorage.getItem("userToken");
-        const user = this.getUserObject();
-        if (userToken === null) {
-          if (user !== null) {
-            userToken = disambiguateUserObj(this.getUserObject());
-            localStorage.setItem("userToken", userToken);
-          }
-        }
-        if (userToken !== null) {
-          request = request.clone({
-            setHeaders: {
-              "user-token": userToken,
-            },
-          });
-        } else {
-          request = request.clone({
-            setHeaders: {
-              "user-token": "",
-            },
-          });
-        }
-        const jwt = localStorage.getItem("jwt");
-        if (jwt !== null) {
-          request = request.clone({
-            setHeaders: {
-              Authorization: "Bearer " + jwt,
-            },
-          });
-        }
+      if (accessToken) {
+        modifiedReq = req.clone({
+          setHeaders: { Authorization: `Bearer ${accessToken}` }
+        });
+
+        return next.handle(modifiedReq).pipe(
+          catchError(error => {
+            if (error instanceof HttpErrorResponse && error.status === 401) {
+              return this.handle401Error(modifiedReq, next);
+            }
+            return throwError(() => error);
+          })
+        );
+      }
+      const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
+      if (reviewCode) {
+        modifiedReq = req.clone({
+          setHeaders: {
+            "Obfuscation-Code": reviewCode,
+          },
+        });
       }
 
+      const userToken = this.auth.getApiToken();
+      if (userToken !== null && userToken.length > 0) {
+        modifiedReq = req.clone({
+          setHeaders: {
+            "User-Token": userToken,
+          },
+        });
+      }
     }
-    return next.handle(request);
+
+    return next.handle(modifiedReq);
   }
 
-  getUserObject() {
-    const user = localStorage.getItem("user");
-    if (user !== null) return JSON.parse(user);
-    return null;
+  private handle401Error(req: HttpRequest<any>, next: HttpHandler) {
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshTokenSubject.next(null); // reset
+
+      return this.auth.refreshToken().pipe(
+        switchMap((tokens: any) => {
+          this.isRefreshing = false;
+
+          this.auth.storeTokens(tokens);
+          this.refreshTokenSubject.next(tokens.access_token);
+
+          const newReq = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${tokens.access_token}`
+            }
+          });
+
+          return next.handle(newReq);
+        }),
+        catchError(err => {
+          this.isRefreshing = false;
+          this.auth.logout(); // optional
+          return throwError(() => err);
+        })
+      );
+    }
+
+    // Wait until refresh completes, then retry failed request
+    return this.refreshTokenSubject.pipe(
+      filter(token => token !== null),
+      take(1),
+      switchMap(token => {
+        const newReq = req.clone({
+          setHeaders: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        return next.handle(newReq);
+      })
+    );
   }
 }

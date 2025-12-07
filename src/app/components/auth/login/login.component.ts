@@ -84,12 +84,21 @@ export class LoginComponent implements OnInit {
     this.editorService.login(body).subscribe(
       (response) => {
         this.editorService.getValidatedJWTUser(response).subscribe((data) => {
-          const jwt = response.headers.get("jwt");
+          const jwt = response.headers.get("Jwt");
+          const refreshToken = response.headers.get("Refresh-Token");
           const decoded = jwtDecode<MtblsJwtPayload>(jwt);
           const expiration = decoded.exp;
-          const user = decoded.sub;
-          localStorage.setItem("jwt", jwt);
-          localStorage.setItem("jwtExpirationTime", expiration.toString());
+          const user = decoded.email;
+          const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+          const refreshTokenKey = this.configService.config.endpoint + "/refreshToken"          
+
+          const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+          if (refreshTokenKey) {
+              localStorage.setItem(refreshTokenKey, refreshToken);
+          }
+          localStorage.setItem(jwtTokenKey, jwt);
+          
+          localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
           this.editorService.initialise(data, true);
           toastr.success(user + " logged in successfully.", "Successful login", {
             timeOut: "5000",

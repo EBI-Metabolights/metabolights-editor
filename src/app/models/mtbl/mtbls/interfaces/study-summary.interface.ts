@@ -32,6 +32,8 @@ export interface IMtblsStudySummaryInformation {
   templateVersion: string;
   studyCategory: string;
   createdAt: string;
+  datasetLicense: string;
+  datasetLicenseUrl: string;
 }
 
 export class IStudyRevision {

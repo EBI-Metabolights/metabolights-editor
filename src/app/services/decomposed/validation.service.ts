@@ -37,7 +37,6 @@ export class ValidationService extends BaseConfigDependentService {
 
     createStudyValidationTask(proxy: boolean = false, studyId: string): Observable<Ws3ValidationTaskResponse> {
       // remove once new auth service implemented
-      // const token = localStorage.getItem('jwt');
       // console.log(token)
       let headers = null;
       // write new headers impl this is annoying me
@@ -61,7 +60,8 @@ export class ValidationService extends BaseConfigDependentService {
     getValidationV2Report(proxy: boolean = false, taskId: string = null, studyId: string): Observable<Ws3ValidationTaskResponse> {
 
       // remove once new auth service implemented
-      const token = localStorage.getItem('jwt');
+      const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      const token = localStorage.getItem(jwtTokenKey);
       let headers = null;
       let headersObj = {
         //'Content-Type':  'application/json',
@@ -85,7 +85,8 @@ export class ValidationService extends BaseConfigDependentService {
 
     getValidationHistory(studyId: string): Observable<Ws3HistoryResponse> {
       let headers = null;
-      const token = localStorage.getItem('jwt');
+      const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      const token = localStorage.getItem(jwtTokenKey);
       // write new headers impl this is annoying me
       headers = new HttpHeaders({
         //'Content-Type':  'application/json',

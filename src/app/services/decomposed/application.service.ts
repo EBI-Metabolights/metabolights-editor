@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import { ConfigurationService } from 'src/app/configuration.service';
@@ -88,7 +88,9 @@ export class ApplicationService extends BaseConfigDependentService {
         .get<any>(
           `${this.configService.config.ws3URL}/public/v2/validations/configuration`,
           {
-            headers: httpOptions.emptyHeader,
+            headers: new HttpHeaders({
+                Accept: "application/json"
+            }),
             observe: "body",
           }
         )
