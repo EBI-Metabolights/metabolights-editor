@@ -9,7 +9,7 @@ variables:
   CONFIG_DIR: "config-files"
 workflow:
   rules:
-  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging"
+  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "keycloak"
 stages:
 - build
 - deploy
@@ -47,7 +47,7 @@ deploy_editor:
   variables:
     CHART_NAME: metabolights-editor
   rules:
-  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "new-workflow" || $CI_COMMIT_BRANCH == "main-new-workflow"
+  - if: $CI_COMMIT_BRANCH == "test" || $CI_COMMIT_BRANCH == "staging" || $CI_COMMIT_BRANCH == "development" || $CI_COMMIT_BRANCH == "keycloak" || $CI_COMMIT_BRANCH == "main-new-workflow"
     when: on_success
   - if: $CI_COMMIT_BRANCH == "main"
     when: manual
