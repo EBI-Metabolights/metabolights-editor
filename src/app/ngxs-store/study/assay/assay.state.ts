@@ -15,6 +15,7 @@ import { GeneralMetadataService } from "src/app/services/decomposed/general-meta
 import { TemplateRowCollection } from "src/app/models/row-template-collection";
 import { RowTemplateService } from "src/app/services/row-template/row-template.service";
 import { filter, map, take } from "rxjs/operators";
+import { StatusNS } from "../../non-study/application/application.actions";
 
 export interface AssayStateModel {
     assayList: IAssay[],
@@ -273,11 +274,11 @@ export class AssayState {
     UpdateCells(ctx: StateContext<AssayStateModel>, action: Assay.UpdateCells) {
         this.assaysService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
             (response) => {
-                // do some commitCellsToNgxs Processing
-                // or
+                ctx.dispatch(new StatusNS.SetMessage("Cells updated successfully", "success"));
                 ctx.dispatch(new Assay.OrganiseAndPersist(action.filename, action.studyId));
             },
             (error) => {
+                ctx.dispatch(new StatusNS.SetMessage(error.error.message, "error"));
                 console.log('Unable to update cells in assay sheet.')
                 console.log(error)
             }

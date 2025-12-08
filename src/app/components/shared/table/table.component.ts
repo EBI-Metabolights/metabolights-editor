@@ -116,6 +116,13 @@ export class TableComponent
   templateVersion$: Observable<string> = inject(Store).select(
     GeneralMetadataState.templateVersion
   );
+  statusMessage$: Observable<string | null> = inject(Store).select(
+    ApplicationState.message
+  );
+  statusType$: Observable<'success' | 'error' | null> = inject(Store).select(
+    ApplicationState.messageType
+  );
+
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -215,6 +222,8 @@ export class TableComponent
   private templateVersion: string = null;
   private sampleTemplate: string = null;
   private studyCreatedAt: any;
+  statusMessage: string;
+  statusType: string;
 
   constructor(
     private clipboardService: ClipboardService,
@@ -289,7 +298,12 @@ export class TableComponent
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
     });
-
+    this.statusMessage$.subscribe((message) => {
+      this.statusMessage = message;
+    });
+    this.statusType$.subscribe((type) => {
+      this.statusType = type;
+    });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
     });
@@ -633,11 +647,6 @@ export class TableComponent
         )
         .subscribe(
           (completed) => {
-            toastr.success(
-              "Cells updated successfully",
-              "Success",
-              this.toastrSettings
-            );
             this.isEditModalOpen = false;
             this.isFormBusy = false;
           },
@@ -1546,7 +1555,9 @@ export class TableComponent
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
     this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe({
       next: (completed) => {
-        toastr.success("Cells updated successfully", "Success", this.toastrSettings);
+        if (this.statusType == 'success') {
+          toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+        }
         this.isEditModalOpen = false;
         this.isFormBusy = false;
       },
@@ -1622,11 +1633,9 @@ export class TableComponent
       )
       .subscribe({
         next: (completed) => {
-          toastr.success(
-            "Cells updated successfully",
-            "Success",
-            this.toastrSettings
-          );
+           if (this.statusType == 'success') {
+            toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+          }
           this.closeEditMissingColValModal();
           if (
             this.selectedMissingCol.missingTerms.has(
@@ -1725,11 +1734,9 @@ export class TableComponent
       )
       .subscribe(
         (completed) => {
-          toastr.success(
-            "Cells updated successfully.",
-            "Success",
-            this.toastrSettings
-          );
+          if (this.statusType == 'success') {
+            toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+          }
           this.isEditColumnModalOpen = false;
           this.isFormBusy = false;
         },
@@ -1949,11 +1956,9 @@ export class TableComponent
       )
       .subscribe(
         (completed) => {
-          toastr.success(
-            "Cells updated successfully.",
-            "Success",
-            this.toastrSettings
-          );
+          if (this.statusType == 'success') {
+            toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+          }
           this.isEditColumnModalOpen = false;
           this.isFormBusy = false;
           if (col.missingTerms.has(val)) {

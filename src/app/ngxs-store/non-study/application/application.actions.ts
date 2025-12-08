@@ -116,5 +116,15 @@ export class SetTransferStatus {
     static readonly type = '[application] Set Transfer Status'
     constructor(public status: TransferStatus) {}
 }
+export namespace StatusNS {
 
+    export class SetMessage {
+        static readonly type = '[status] Set Message';
+        constructor(public message: string, public messageType: 'success' | 'error') {}
+    }
+
+    export class ClearMessage {
+        static readonly type = '[status] Clear Message';
+    }
+}
 
