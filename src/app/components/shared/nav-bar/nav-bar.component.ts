@@ -9,9 +9,10 @@ import { Store } from "@ngxs/store";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 @Component({
-  selector: "nav-bar",
-  templateUrl: "./nav-bar.component.html",
-  styleUrls: ["./nav-bar.component.css"],
+    selector: "nav-bar",
+    templateUrl: "./nav-bar.component.html",
+    styleUrls: ["./nav-bar.component.css"],
+    standalone: false
 })
 export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
@@ -33,6 +34,7 @@ export class NavBarComponent implements OnInit {
   studyId: string;
   obfuscationCode: string;
   reviewerLink: string = null;
+  versionShown = false;
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -88,7 +90,9 @@ export class NavBarComponent implements OnInit {
       }
     });
   }
-
+  showVersion() {
+    this.versionShown = true
+  }
   logOut() {
     this.editorService.logout(true);
   }
@@ -100,6 +104,10 @@ export class NavBarComponent implements OnInit {
   redirectToConsole() {
     this.router.navigate(["/console"]);
   }
+  redirectToProfile() {
+    window.location.href = this.configService.config.auth.profileUrl
+  }
+
   updatePreviewEnabled() {
     this.previewEnabled = this.mode != 'light' && this.studyStatus != 'Provisional';
   }
@@ -112,8 +120,8 @@ export class NavBarComponent implements OnInit {
         }
       } if (this.studyStatus == "Public") {
         this.reviewerLink = this.baseHref + this.studyId;
-      } 
-    } 
+      }
+    }
 
   }
 }

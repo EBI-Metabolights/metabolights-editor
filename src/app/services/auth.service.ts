@@ -5,6 +5,7 @@ import { tap } from 'rxjs/operators';
 import { AuthTokens } from '../models/mtbl/mtbls/auth.model';
 import { ConfigurationService } from '../configuration.service';
 import init from 'multicast-dns';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private configService: ConfigurationService,
+    private readonly keycloak: KeycloakService
   ) {
     configService.configLoaded$.subscribe((value) => {
       if (value) {

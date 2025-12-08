@@ -1,8 +1,6 @@
 import { Component, inject, OnInit } from "@angular/core";
 import { EditorService } from "../../../services/editor.service";
-import { Router } from "@angular/router";
 import { ActivatedRoute } from "@angular/router";
-import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
 import { ConfigurationService } from "src/app/configuration.service";
 import {AuthGuard} from '../../../auth-guard.service';
 import { StudyPermission } from "src/app/services/headers";
@@ -41,6 +39,8 @@ export class PublicStudyComponent implements OnInit {
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
   studyReviewerLink$: Observable<string> = inject(Store).select(GeneralMetadataState.reviewerLink);
   investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
+  studyPermission$: Observable<StudyPermission> = inject(Store).select(GeneralMetadataState.studyPermission);
+
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.reportV2);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
@@ -64,7 +64,7 @@ export class PublicStudyComponent implements OnInit {
   endpoint = "";
   baseHref: any = "";
   reviewerLink: string = null;
-  permissions: StudyPermission = null;
+  studyPermission: StudyPermission = null;
   notReadyValidationMessage: string = null;
   validationStatus: ViolationType = null;
   obfuscationCode: string = null;
@@ -80,37 +80,40 @@ export class PublicStudyComponent implements OnInit {
 
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
 
-    this.permissions = this.store.snapshot().application.studyPermission
-    const isCuratorKey = this.configService.config.endpoint + "/loginOneTimeToken"
-    const usernameKey = this.configService.config.endpoint + "/username"
+  }
 
-    const curatorStatus = localStorage.getItem(isCuratorKey);
-    const userName = localStorage.getItem(usernameKey);
-    if (curatorStatus !== null && curatorStatus.toLowerCase() === "true"){
-      this.isCurator = true;
-    }
-    let reviewMode = false;
-    const studyId = this.route.snapshot.paramMap.get("study");
-    this.obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
-
-    if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
-      if (this.obfuscationCode === this.permissions.obfuscationCode && ["INREVIEW", "INCURATION"].includes(this.permissions.studyStatus.toUpperCase())){
-
-        reviewMode = true;
+  studyPermissionUpdated() {
+      let reviewMode = false
+      
+      if (this.studyPermission.studyId.length > 0 && this.studyPermission.studyId === this.requestedStudy){
+        if (this.obfuscationCode === this.studyPermission.obfuscationCode 
+          && ["INREVIEW", "INCURATION"].includes(this.studyPermission.studyStatus.toUpperCase())){
+          reviewMode = true;
+        }
       }
-      if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
+      if (this.studyPermission.submitterOfStudy){
         this.isOwner = true;
+      } else {
+        this.isOwner = false;
       }
-    }
+      if (this.studyPermission.userRole 
+        && ["ROLE_SUPER_USER", "SYSTEM_ADMIN", "CURATOR"].includes(this.studyPermission.userRole.toUpperCase())){
+          this.isCurator = true;
+      } else {
+        this.isCurator = false;
+      }
+      
+
+      this.isCurator = true;
 
     if (reviewMode === true) {
-      this.loadStudyNgxs(studyId);
+      this.loadStudyNgxs(this.studyPermission.studyId);
     } else {
       this.loadStudyNgxs(null);
     }
     this.calculateNotReadyValidationMessage();
-  }
 
+  }
   ngOnInit() {
     if (this.configService.config.endpoint.endsWith("/")){
       this.endpoint = this.configService.config.endpoint;
@@ -132,14 +135,6 @@ export class PublicStudyComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
-        this.isOwner = false;
-        const usernameKey = this.configService.config.endpoint + "/username"
-        const userName = localStorage.getItem(usernameKey);
-        if (this.permissions && this.permissions.studyId.length > 0 && this.permissions.studyId === this.requestedStudy){
-          if (userName !== null && this.permissions.userName === userName && this.permissions.submitterOfStudy){
-            this.isOwner = true;
-          }
-        }
       }
     });
 
@@ -147,7 +142,10 @@ export class PublicStudyComponent implements OnInit {
       this.validation = value;
       this.calculateNotReadyValidationMessage();
     });
-
+    this.studyPermission$.subscribe((value) => {
+      this.studyPermission = value;
+      this.studyPermissionUpdated()
+    });
     this.revisionNumber$.subscribe((value) => {
       if (value) {
         this.revisionNumber = value;

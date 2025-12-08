@@ -1,3 +1,4 @@
+import { StudyPermission } from "src/app/services/headers";
 import { IsaInvestigation } from "./isa-investigation.interface";
 /* eslint-disable @typescript-eslint/naming-convention */
 /*Interface to represent a study summary*/
@@ -13,9 +14,6 @@ export interface IMtblsStudySummaryInformation {
   curationRequest: string;
   modifiedTime: string;
   statusUpdateTime: string;
-  read_access: boolean;
-  is_curator: boolean;
-  write_access: boolean;
   reviewerLink: string;
   revisionNumber: number;
   revisionDatetime: string;
@@ -34,6 +32,7 @@ export interface IMtblsStudySummaryInformation {
   createdAt: string;
   datasetLicense: string;
   datasetLicenseUrl: string;
+  studyPermission: StudyPermission;
 }
 
 export class IStudyRevision {

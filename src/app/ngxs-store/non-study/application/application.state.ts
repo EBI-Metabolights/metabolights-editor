@@ -127,44 +127,6 @@ export class ApplicationState {
         return state.readonly
     }
 
-    // @Action(GuidesMappings.Get)
-    // GetGuidesMapping(ctx: StateContext<ApplicationStateModel>, action: GuidesMappings.Get) {
-    //     this.applicationService.getLanguageMappings().subscribe(
-    //         (mappings) => {
-    //             ctx.dispatch(new GuidesMappings.Set(mappings));
-    //             const selected_language = localStorage.getItem("selected_language");
-    //             mappings["languages"].forEach((language) => {
-    //               if (
-    //                 (selected_language && language.code === selected_language) ||
-    //                 (!selected_language && language.default)
-    //               ) {
-    //                 ctx.dispatch(new SetSelectedLanguage(language.code));
-    //                 ctx.dispatch(new Guides.Get(language))
-
-
-    //               }
-    //             });
-    //         },
-    //         (error) => {
-    //             console.error(`Error in retrieving language mappings: ${error}`)
-    //         }
-    //     )
-    // }
-
-    // @Action(GuidesMappings.Set)
-    // SetMapping(ctx: StateContext<ApplicationStateModel>, action: GuidesMappings.Set) {
-    //     const state = ctx.getState();
-    //     ctx.setState({
-    //         ...state,
-    //         mappings: action.mappings
-    //     });
-    // }
-
-    // @Selector()
-    // static mappings (state: ApplicationStateModel): Record<string, any> {
-    //     return state.mappings
-    // }
-
     @Action(EditorVersion.Get)
     GetEditorVersion(ctx: StateContext<ApplicationStateModel>, action: EditorVersion.Get) {
         this.applicationService.getVersionInfo().subscribe(
@@ -251,37 +213,6 @@ export class ApplicationState {
     static selectedLanguage(state: ApplicationStateModel) {
         return state.selectedLanguage
     }
-
-    // @Action(Guides.Get)
-    // GetGuides(ctx: StateContext<ApplicationStateModel>, action: Guides.Get) {
-    //     /**
-    //      * The below if block accounts for the loadLanguage method in the editor service, which replicates
-    //      * a lot of code from loadGuides. I have included a flag on the Guides.get action so we can reuse the action.
-    //      */
-    //     if (action.setLanguage == true) {
-    //         localStorage.setItem("selected_language", action.language.code);
-    //         ctx.dispatch(new SetSelectedLanguage(action.language.code));
-    //     }
-
-    //     this.applicationService.getGuides(action.language.code).subscribe(
-    //         (guides) => {
-    //             ctx.dispatch(new Guides.Set(guides["data"]))
-    //         },
-    //         (error) => {
-    //             console.error(`Error in retrieving guides: ${error}`)
-    //         }
-    //     );
-
-    // }
-
-    // @Action(Guides.Set)
-    // SetGuides(ctx: StateContext<ApplicationStateModel>, action: Guides.Set) {
-    //     const state = ctx.getState();
-    //     ctx.setState({
-    //         ...state,
-    //         guides: action.guides
-    //     });
-    // }
 
     @Selector()
     static guides(state: ApplicationStateModel) {

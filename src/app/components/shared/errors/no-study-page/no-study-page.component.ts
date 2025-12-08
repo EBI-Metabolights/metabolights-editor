@@ -26,16 +26,16 @@ export class NoStudyPageComponent implements OnInit {
     this.messageExpanded = !this.messageExpanded;
   }
   ngOnInit() {
-    
+
     this.store.dispatch(new Loading.Disable())
-     
+
       this.route.queryParams.subscribe((params) => {
         const errorCode = params.code ?? "";
 
         const message = this.errorMessageService.getErrorMessage(errorCode);
         const header = message?.header ?? "Study page not found";
         const content = message?.content ?? "Error while loading study.";
-        const url = this.editorService.redirectUrl ?? "";
+        const url = this.editorService.getRedirectUrl() ?? "";
         if (url !== "") {
           const path = url.split("?")[0];
           this.messageContent = "URL: " + path + " . " + content;

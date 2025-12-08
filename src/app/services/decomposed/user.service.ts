@@ -13,7 +13,7 @@ import { Store } from '@ngxs/store';
 })
 export class UserService extends BaseConfigDependentService{
 
-  constructor(http: HttpClient, configService: ConfigurationService, store: Store) { 
+  constructor(http: HttpClient, configService: ConfigurationService, store: Store) {
     super(http, configService, store)
   }
 
