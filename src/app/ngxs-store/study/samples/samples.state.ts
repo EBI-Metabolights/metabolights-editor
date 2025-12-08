@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";
 import { take } from "rxjs/operators";
+import { StatusNS } from "../../non-study/application/application.actions";
 
 // we should type the below properly once we get a better handle on what the data looks like
 export interface SamplesStateModel {
@@ -213,11 +214,11 @@ export class SampleState {
     UpdateCells(ctx: StateContext<SamplesStateModel>, action: Samples.UpdateCells) {
       this.samplesService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
         (response) => {
-          // maybe do some processing and setting here akin to commitUpdatedTableCells
-          //or
+          ctx.dispatch(new StatusNS.SetMessage("Cells updated successfully", "success"));
           ctx.dispatch(new Samples.OrganiseAndPersist(action.filename, action.studyId));
         },
         (error) => {
+          ctx.dispatch(new StatusNS.SetMessage(error.error.message, "error"));
           console.log('Unable to edit cells in sample sheet.');
           console.log(error)
         }

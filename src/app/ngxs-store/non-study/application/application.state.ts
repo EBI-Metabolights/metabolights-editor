@@ -3,6 +3,7 @@ import { StudyPermission } from "../../../services/headers";
 import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand,
   SetReadonly, SetSelectedLanguage, SetStudyError,
   SetTransferStatus,
+  StatusNS,
   StudyPermissionNS} from "./application.actions";
 import { Injectable } from "@angular/core";
 import { ApplicationService } from "src/app/services/decomposed/application.service";
@@ -42,8 +43,9 @@ export interface ApplicationStateModel {
     readonly: boolean
     isProtocolsExpanded: boolean,
     toastrSettings: Record<string, any>,
-    transferStatus: TransferStatus
-
+    transferStatus: TransferStatus,
+    statusMessage: string | null,
+    statusType: 'success' | 'error' | null
 }
 @Injectable()
 @State<ApplicationStateModel>({
@@ -92,7 +94,9 @@ export interface ApplicationStateModel {
             aspera: {
                 online: null
             }
-        }
+        },
+        statusMessage: null,
+        statusType: null
     }
 })
 export class ApplicationState {
@@ -464,5 +468,29 @@ export class ApplicationState {
     static transferStatus(state: ApplicationStateModel) {
         return state.transferStatus
     }
+    
+    @Selector()
+    static message(state: ApplicationStateModel) {
+        return state.statusMessage;
+    }
 
+    @Selector()
+    static messageType(state: ApplicationStateModel) {
+        return state.statusType;
+    }
+    @Action(StatusNS.SetMessage)
+    setMessage(ctx: StateContext<ApplicationStateModel>, action: StatusNS.SetMessage) {
+        ctx.patchState({
+            statusMessage: action.message,
+            statusType: action.messageType
+        });
+    }
+
+    @Action(StatusNS.ClearMessage)
+    clearMessage(ctx: StateContext<ApplicationStateModel>) {
+        ctx.patchState({
+            statusMessage: null,
+            statusType: null
+        });
+    }
 }
