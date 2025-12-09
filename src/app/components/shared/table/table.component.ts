@@ -647,6 +647,9 @@ export class TableComponent
         )
         .subscribe(
           (completed) => {
+            if (this.statusType == 'success') {
+              toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+            }
             this.isEditModalOpen = false;
             this.isFormBusy = false;
           },
