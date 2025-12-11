@@ -5,6 +5,8 @@ import { tap } from 'rxjs/operators';
 import { AuthTokens } from '../models/mtbl/mtbls/auth.model';
 import { ConfigurationService } from '../configuration.service';
 import init from 'multicast-dns';
+import jwtDecode from 'jwt-decode';
+import { MtblsJwtPayload } from './headers';
 
 @Injectable({
   providedIn: 'root'
@@ -101,7 +103,24 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    return localStorage.getItem(this.accessTokenKey);
+     const accessToken = localStorage.getItem(this.accessTokenKey);
+      if (!accessToken) {
+        return null
+      }
+      const decoded = jwtDecode<MtblsJwtPayload>(accessToken);
+      const expiration = decoded.exp;
+
+      const then = new Date(expiration * 1000);
+      const now = new Date();
+      const nowTime = now.getTime();
+      const thenTime = then.getTime();
+
+      if (nowTime >= thenTime) {
+        localStorage.removeItem(this.accessTokenKey);
+        return null
+      } else {
+        return accessToken
+      }
   }
 
   getApiToken(): string | null {

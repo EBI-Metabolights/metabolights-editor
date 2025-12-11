@@ -13,6 +13,7 @@ import { ErrorMessageService } from "./services/error-message.service";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
+import { AuthService } from "./services/auth.service";
 @Injectable({
   providedIn: "root",
 })
@@ -25,7 +26,8 @@ export class AuthGuard  implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private store: Store
+    private store: Store,
+    private authService: AuthService
   ) { }
 
 
@@ -162,7 +164,7 @@ export class AuthGuard  implements OnInit {
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
     const jwtTokenKey = this.configService.config.endpoint + "/jwt"
-    
+
     const localJwt = localStorage.getItem(jwtTokenKey);
     if (url.startsWith("/login")) {
       if (localJwt !== null) {
@@ -366,35 +368,39 @@ export class AuthGuard  implements OnInit {
     const jwtTokenKey = this.configService.config.endpoint + "/jwt"
     const userKey = this.configService.config.endpoint + "/user"
     const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
-    if (localStorage.getItem(jwtTokenKey) === null) {
+    // if (localStorage.getItem(jwtTokenKey) === null) {
+    //   return SessionStatus.NoRecord;
+    // }
+    const accessToken = this.authService.getAccessToken()
+    if (accessToken === null) {
       return SessionStatus.NoRecord;
     }
 
     if (localStorage.getItem(userKey) === null) {
       return SessionStatus.NotInit;
     }
+    return SessionStatus.Active
+    
+    // const now = new Date();
+    // const jwtExpirationTime = localStorage.getItem(jwtExpirationTimeKey);
+    // let then;
 
-    const now = new Date();
-    const jwtExpirationTime = localStorage.getItem(jwtExpirationTimeKey);
-    let then;
+    // if (jwtExpirationTime == null) {
+    //   const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem(jwtTokenKey));
+    //   const expiration = decoded.exp;
 
-    if (jwtExpirationTime == null) {
-      const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem(jwtTokenKey));
-      const expiration = decoded.exp;
-      
-      localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
-      then = new Date(expiration * 1000);
-    } else {
-      then = new Date(Number(jwtExpirationTime) * 1000);
-    }
-    const nowTime = now.getTime();
-    const thenTime = then.getTime();
-    if (nowTime > thenTime) {
-      return SessionStatus.Expired;
-    } else {
-      return SessionStatus.Active;
-    }
-
-    return SessionStatus.Active;
+    //   localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
+    //   then = new Date(expiration * 1000);
+    // } else {
+    //   then = new Date(Number(jwtExpirationTime) * 1000);
+    // }
+    // const nowTime = now.getTime();
+    // const thenTime = then.getTime();
+    // if (nowTime > thenTime) {
+    //   localStorage.removeItem(jwtTokenKey)
+    //   return SessionStatus.Expired;
+    // } else {
+    //   return SessionStatus.Active;
+    // }
   }
 }
