@@ -17,7 +17,7 @@ export interface MtblsJwtPayload {
 
 export interface MetabolightsUser {
   apiToken: string;
-  role: string;
+  role: number;
   email: string;
   status: string;
 }
