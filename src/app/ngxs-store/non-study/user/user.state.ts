@@ -45,7 +45,7 @@ export class UserState {
     @Action(User.Set)
     SetUser(ctx: StateContext<UserStateModel>, action: User.Set) {
         const state = ctx.getState();
-        const isCurator = action.user.role === "ROLE_SUPER_USER" ? true : false;
+        const isCurator = action.user.role === 1? true : false;
         ctx.dispatch(new Curator.Set(isCurator));
         ctx.setState({
             ...state,

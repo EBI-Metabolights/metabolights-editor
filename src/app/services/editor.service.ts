@@ -495,7 +495,7 @@ export class EditorService {
         const apiTokenKey = this.configService.config.endpoint + "/apiToken"
         const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
 
-        const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+        const isCurator = user.role === 1 ? "true" : "false";
         localStorage.setItem(isCuratorKey, isCurator);
         const apiToken = user.apiToken ?? "";
         localStorage.setItem(apiTokenKey, apiToken);
@@ -588,7 +588,7 @@ export class EditorService {
 
 
         localStorage.setItem(userKey, JSON.stringify(user));
-        const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+        const isCurator = user.role === 1 ? "true" : "false";
         localStorage.setItem(isCuratorKey, isCurator);
         httpOptions.headers = httpOptions.headers.set(
           "user-token",
@@ -610,7 +610,7 @@ export class EditorService {
         "user-token",
         disambiguateUserObj(user)
       );
-      const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
+      const isCurator = user.role === 1 ? "true" : "false";
 
       localStorage.setItem(isCuratorKey, isCurator);
 
