@@ -196,18 +196,31 @@ export class AssayState {
      * @returns assay object.
      */
     prepareTemplateRow(templateRows: TemplateRowCollection, assay: any) {
-        const templ = this.rowTemplateService.getTemplateByAssayFilename(assay["name"]);
-        if (templ === null) return assay
+        const templ = this.rowTemplateService.getTemplateByAssayFilename(assay?.name);
+        if (!templ) return assay;
+
         const attr = stripHyphensAndLowercase(templ);
-        if (Object.keys(templateRows[attr]).length !== 0) {
-            if (assay["data"]["rows"][0].index !== -1) {
-                assay["data"]["rows"].unshift(templateRows[attr]);
-            }
-        } else {
-            console.warn(`Template row not found for ${attr}`)
+        const templateRow = templateRows?.[attr];
+
+        if (!templateRow || Object.keys(templateRow).length === 0) {
+            console.warn(`Template row not found for ${attr}`);
+            return assay;
         }
+
+        const rows = assay?.data?.rows;
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            assay.data.rows = [templateRow];
+            return assay;
+        }
+
+        if (rows[0]?.index !== -1) {
+            rows.unshift(templateRow);
+        }
+
         return assay;
     }
+
 
     @Action(Assay.Set)
     SetStudyAssay(ctx: StateContext<AssayStateModel>, action: Assay.Set) {
