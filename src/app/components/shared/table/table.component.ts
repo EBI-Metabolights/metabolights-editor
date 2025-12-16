@@ -1263,26 +1263,10 @@ export class TableComponent
     );
   }
 
-  isSelected(row: any, column?: any): boolean {
-    if (!row) return false;
-
-    if (column && this.selectedCells.length > 0) {
-      return (
-        this.selectedCells.filter(
-          (cell) => cell[0] === column.columnDef && cell[1] === row.index
-        ).length > 0
-      );
-    } else if (this.selectedColumns.length === 0) {
-      if (this.selectedRows.indexOf(row.index) > -1) {
-        return true;
-      }
-    } else if (this.selectedRows.length === 0 && column) {
-      if (this.selectedColumns.indexOf(column.columnDef) > -1) {
-        return true;
-      }
-    }
-    return false;
+  isSelected(row: any): boolean {
+    return this.selectedRows.includes(row.index);
   }
+
 
   deSelect() {
     this.selectedRows = [];
@@ -1338,51 +1322,59 @@ export class TableComponent
     this.lastColSelection = column;
   }
 
-  rowClick(row: any, event) {
+  rowClick(row: any, event: MouseEvent) {
+    const entryIndex = row.index;
+    const rowNamesArray: number[] = this.tableData.data.rows.map((e) => e.index);
+    const rowIndex = this.selectedRows.indexOf(entryIndex);
+
     this.selectedCells = [];
     this.selectedColumns = [];
-    const entryIndex = row.index;
-    const rowIndex = this.selectedRows.indexOf(entryIndex);
-    if (event && event.altKey) {
+
+    // ALT key toggle 
+    if (event.altKey) {
       if (rowIndex > -1) {
         this.selectedRows.splice(rowIndex, 1);
       } else {
         this.selectedRows.push(entryIndex);
       }
-    } else if (event && event.shiftKey) {
-      let lastSelectionIndex = null;
+      this.lastRowSelection = row;
+      return;
+    }
+
+    // SHIFT key still works
+    if (event.shiftKey) {
       let lastRowIndex = -1;
-      const rowNamesArray: any[] = this.tableData.data.rows.map((e) => e.index);
+
       if (this.lastRowSelection) {
-        lastSelectionIndex = this.lastRowSelection.index;
-        lastRowIndex = rowNamesArray.indexOf(lastSelectionIndex);
+        const last = this.lastRowSelection.index;
+        lastRowIndex = rowNamesArray.indexOf(last);
       } else {
         lastRowIndex = 0;
       }
-      const currentRowIndex = rowNamesArray.indexOf(entryIndex);
-      let currentSelection = [];
 
-      if (lastRowIndex > currentRowIndex) {
-        currentSelection = rowNamesArray.slice(
-          currentRowIndex,
-          lastRowIndex + 1
-        );
-      } else {
-        currentSelection = rowNamesArray.slice(
-          lastRowIndex,
-          currentRowIndex + 1
-        );
-      }
-      this.selectedRows = this.selectedRows.concat(currentSelection);
-    } else {
-      if (rowIndex < 0) {
-        this.selectedRows = [entryIndex];
-      } else {
-        this.selectedRows = [];
-      }
+      const currentRowIndex = rowNamesArray.indexOf(entryIndex);
+
+      const range =
+        lastRowIndex > currentRowIndex
+          ? rowNamesArray.slice(currentRowIndex, lastRowIndex + 1)
+          : rowNamesArray.slice(lastRowIndex, currentRowIndex + 1);
+
+      this.selectedRows = Array.from(new Set([...this.selectedRows, ...range]));
+
+      this.lastRowSelection = row;
+      return;
     }
+
+    // NORMAL CLICK → toggle row (MULTI SELECT)
+    if (rowIndex === -1) {
+      this.selectedRows.push(entryIndex);
+    } else {
+      this.selectedRows.splice(rowIndex, 1);
+    }
+
     this.lastRowSelection = row;
   }
+
 
   cellClick(row: any, column: any, event) {
     if (event.altKey) {
@@ -2165,4 +2157,49 @@ export class TableComponent
 onEmptyError(isEmpty: boolean) {
     this.isEmptyOntology = isEmpty;
   }
+
+private getSelectableRowIndexes(): number[] {
+  if (!this.tableData?.data?.rows) return [];
+
+  const allIndexes = this.tableData.data.rows.map(r => r.index);
+
+  if (this.getTableType(this.data.file) === 'assay') {
+    const firstRowObj = this.tableData.data.rows.find(r => this.isFirstRow(r));
+    if (firstRowObj) {
+      return allIndexes.filter(idx => idx !== firstRowObj.index);
+    }
+  }
+
+  return allIndexes;
+}
+
+isAllSelected(): boolean {
+  const selectable = this.getSelectableRowIndexes();
+  if (selectable.length === 0) return false;
+  return selectable.every(idx => this.selectedRows.includes(idx));
+}
+
+toggleSelectAll(): void {
+  const selectable = this.getSelectableRowIndexes();
+
+  if (this.isAllSelected()) {
+    this.selectedRows = this.selectedRows.filter(idx => !selectable.includes(idx));
+  } else {
+    this.selectedRows = Array.from(new Set([ ...this.selectedRows, ...selectable ]));
+  }
+}
+  get hasRows(): boolean {
+    const rows = this.tableData?.data?.rows;
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return false;
+    }
+
+    if (this.getTableType(this.data.file) === 'assay') {
+      return rows.some(row => row?.index !== -1);
+    }
+
+    return rows.length > 0;
+  }
+
 }

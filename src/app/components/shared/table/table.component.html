@@ -194,14 +194,21 @@
       <table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)"
         class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
         <ng-container matColumnDef="Select" sticky>
-          <th (click)="deSelect()" class="clickable table-selector" mat-header-cell *matHeaderCellDef></th>
+          <ng-container *ngIf="!isReadOnly">
+            <th (click)="toggleSelectAll()" class="clickable table-selector" mat-header-cell *matHeaderCellDef>
+            <span *ngIf="hasRows" class="radio-tick" [class.selected]="isAllSelected()"></span>
+            </th>
+          </ng-container>
           <td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell
             *matCellDef="let row">
-            <span *ngIf="!(getTableType(data.file) === 'assay' && isFirstRow(row))&& !isReadOnly" class="radio-tick"
-              [class.selected]="isSelected(row, null)"></span>
+      
+            <span *ngIf="!(getTableType(data.file) === 'assay' && isFirstRow(row)) && !isReadOnly" class="radio-tick"
+              [class.selected]="isSelected(row, null)">
+            </span>
           </td>
+      
         </ng-container>
-
+      
         <ng-container *ngFor="let column of data.columns" [sticky]="column.sticky" [matColumnDef]="column.columnDef">
           <th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)"
             class="headercell clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -221,7 +228,7 @@
                   <img appLazyLoad width="200" height="200" [src]="getStructureUrl(row)" alt="Chemical structure"
                     (error)="onImageError(row)" />
                 </ng-container>
-
+      
                 <ng-template #noStructure>
                   <div class="no-structure-message">
                     <small>Structure unavailable</small>
@@ -235,12 +242,12 @@
           </ng-template>
         </ng-container>
         <tr class="header-row" mat-header-row *matHeaderRowDef="displayedTableColumns"></tr>
-
+      
         <tr mat-row *matRowDef="let row; columns: displayedTableColumns" [ngClass]="{
-        'first-row': isFirstRow(row) && templateRowPresent,
-        'unclickable': isFirstRow(row) && templateRowPresent,
-        'watermark': isFirstRow(row) && templateRowPresent
-      }"></tr>
+              'first-row': isFirstRow(row) && templateRowPresent,
+              'unclickable': isFirstRow(row) && templateRowPresent,
+              'watermark': isFirstRow(row) && templateRowPresent
+            }"></tr>
       </table>
       <!--table end-->
     </div>
