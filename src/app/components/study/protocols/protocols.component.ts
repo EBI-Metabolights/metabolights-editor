@@ -9,6 +9,7 @@ import {
   effect,
   signal,
 } from "@angular/core";
+import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
@@ -18,6 +19,8 @@ import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.sta
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
 import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/application.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
+import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
+import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 
 @Component({
   selector: "mtbls-protocols",
@@ -32,6 +35,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
   studyProtocols$: Observable<MTBLSProtocol[]> = inject(Store).select(ProtocolsState.protocols);
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
   actionStack$ = computed(() => {
@@ -57,6 +61,9 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
   validationsId = "protocols";
   expand = true;
+  protocolUri: string = '';
+  protocolVersion: string = '';
+  private toastrSettings: Record<string, any> = {};
 
   constructor(private editorService: EditorService, private store: Store) {
     this.customProtocols = [];
@@ -110,6 +117,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       this.protocolGuides = value;
     });
 
+    this.toastrSettings$.subscribe((settings) => {
+      this.toastrSettings = settings;
+    })
+
     effect(() => {
       const intermediateList = this.actionStack$();
       if (this.debounceTimeout) clearTimeout(this.debounceTimeout);
@@ -138,6 +149,15 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       else this.protocols = []
       
     }
+    const targetName = "sample collection";
+    const found =
+      this.protocols.find((p) => p?.name?.toLowerCase() === targetName) ||
+      (value || []).find((p) => p?.name?.toLowerCase() === targetName);
+
+    if (found) {
+      this.protocolUri = found.uri || "";
+      this.protocolVersion = found.version || "";
+    }
   }
 
   toggleExpand() {
@@ -163,5 +183,49 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     if (changes.assay) {
       this.initialiseProtocols(this.allProtocols);
     }
+  }
+   openProtocolUri(): void {
+    if (!this.protocolUri) {
+      return;
+    }
+    const url = /^(https?:\/\/)/i.test(this.protocolUri)
+      ? this.protocolUri
+      : `https://${this.protocolUri}`;
+    window.open(url, '_blank', 'noopener');
+  }
+  saveProtocolMeta(): void {
+    if (this.isStudyReadOnly) return;
+
+    const targetName = "sample collection";
+    const protocol =
+      this.protocols.find((p) => p?.name?.toLowerCase() === targetName) ||
+      this.allProtocols.find((p) => p?.name?.toLowerCase() === targetName);
+
+    if (!protocol) {
+      console.warn(`Protocol "${targetName}" not found. Aborting save.`);
+      return;
+    }
+
+    const mtblProtocol = new MTBLSProtocol();
+    mtblProtocol.name = protocol.name || "";
+    mtblProtocol.description = protocol.description || "";
+    mtblProtocol.uri = this.protocolUri || "";
+    mtblProtocol.version = this.protocolVersion || "";
+    mtblProtocol.protocolType = protocol.protocolType ? (protocol.protocolType as Ontology) : null;
+    mtblProtocol.parameters = protocol.parameters || [];
+    mtblProtocol.components = protocol.components || [];
+
+    this.store
+      .dispatch(new Protocols.Update(mtblProtocol.name, { protocol: mtblProtocol.toJSON() }))
+      .subscribe(
+        () => {
+          this.store.dispatch(new Protocols.Get());
+          try { toastr.success('Protocol metadata saved', 'Success', this.toastrSettings); } catch (e) {}
+        },
+        (err) => {
+          console.error("Failed to save protocol meta", err);
+          try { toastr.error('Failed to save protocol metadata', 'Error', this.toastrSettings); } catch (e) {}
+        }
+      );
   }
 }
