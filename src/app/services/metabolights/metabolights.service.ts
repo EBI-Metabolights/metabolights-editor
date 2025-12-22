@@ -609,6 +609,16 @@ export class MetabolightsService extends DataService {
       .pipe(catchError(this.handleError));
   }
 
+  createStudyWithMetadata(body: any): Observable<{ new_study: string }> {
+    return this.http
+      .post<{ new_study: string }>(
+        this.url.baseURL + "/studies" + "/create",
+        body,
+        httpOptions
+      )
+      .pipe(catchError(this.handleError));
+  }
+
   decompressFiles(body) {
     return this.http
       .post(

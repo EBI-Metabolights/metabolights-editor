@@ -339,8 +339,9 @@ export class DesignDescriptorComponent implements OnInit {
   initialiseForm() {
     this.isFormBusy = false;
     const controlList = this._controlList || this.controlList();
+    const isRequired = controlList?.rule?.termEnforcementLevel === 'required';
     this.form = this.fb.group({
-      descriptor: [null],
+      descriptor: [null, isRequired ? [Validators.required] : []],
     });
   }
 
@@ -498,7 +499,7 @@ export class DesignDescriptorComponent implements OnInit {
       while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
-    return this.validations[this.validationsId];
+    return this.validations ? this.validations[this.validationsId] : {};
   }
 
   controlList() {

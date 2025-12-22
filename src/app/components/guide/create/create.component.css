@@ -1,77 +1,107 @@
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-group-vertical {
-  flex-direction: column !important;
-  width: 100%;
+.gray-box {
+  background-color: #f7f7f7;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-group,
-.mat-button-toggle-standalone {
-  box-shadow: none !important;
+.border-right {
+  border-right: 1px solid #dbdbdb;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-label-content {
-  width: 100% !important;
-  text-align: left;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle {
-  border: 1px solid rgba(0, 0, 0, 0.38) !important;
-  border-radius: 4px;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-button {
-  width: 100% !important;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-checked {
-  background-color: #5193fb;
-  color: white;
-}
-
-/deep/ .mat-mdc-checkbox {
+.db {
   display: block;
 }
 
-.no-pointer {
-  cursor: inherit !important;
+.mb-2 {
+  margin-bottom: 0.5rem !important;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-.mat-button-toggle-checked.mat-button-toggle-appearance-standard {
-  color: white;
+.mb-3 {
+  margin-bottom: 0.75rem !important;
 }
 
-.cborder {
-  border: 1px solid #f1f1f4;
+.teal-input {
+  background-color: #26a69a !important;
+  color: white !important;
+  font-weight: bold;
 }
 
-.cborder-radius {
-  border-radius: 4px;
+.teal-input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
 }
 
-.create-radio-group {
-  display: inline-flex;
-  flex-direction: column;
+.pr-5 {
+  padding-right: 1.5rem !important;
 }
 
-.create-radio-button {
-  margin: 5px;
+hr {
+  background-color: #dbdbdb;
+  height: 1px;
+  margin: 1.5rem 0;
 }
 
-.mb5 {
-  margin-bottom: 5px !important;
+.field-label.is-small {
+  text-align: left;
+  margin-right: 1rem;
 }
 
-.create-selected-value {
-  margin: 15px 0;
+.label {
+  font-weight: 600;
 }
 
-.central-text {
-  text-align: center;
+/* Beautified Checkbox */
+.beautified-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.beautified-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  height: 16px;
+  width: 16px;
+  background-color: #eee;
+  border-radius: 3px;
+  border: 1px solid #dbdbdb;
+}
+
+.beautified-checkbox:hover input~.checkmark {
+  background-color: #ccc;
+}
+
+.beautified-checkbox input:checked~.checkmark {
+  background-color: #26a69a;
+  border-color: #26a69a;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.beautified-checkbox input:checked~.checkmark:after {
+  display: block;
+}
+
+.beautified-checkbox .checkmark:after {
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }

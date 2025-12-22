@@ -355,7 +355,7 @@ export class PersonComponent implements OnInit {
       while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
-    return this.validations[this.validationsId];
+    return this.validations ? this.validations[this.validationsId] : {};
   }
 
   fieldValidation(fieldId) {

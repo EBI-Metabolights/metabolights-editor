@@ -6,10 +6,10 @@ import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
   template: "",
 })
 export class MockOntologyComponent {
-  @Input("validations") validations: any;
-  @Input("values") values: Ontology[] = [];
-  @Input("inline") isInline: boolean;
-  @Input("id") id: string;
+  @Input() validations: any;
+  @Input() values: Ontology[] = [];
+  @Input() inline: boolean;
+  @Input() id: string;
 
   @Output() changed = new EventEmitter<any>();
 }

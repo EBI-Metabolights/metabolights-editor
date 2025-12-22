@@ -57,6 +57,7 @@ import { SampleState } from "./ngxs-store/study/samples/samples.state";
 import { ProtocolsState } from "./ngxs-store/study/protocols/protocols.state";
 import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.state";
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
+import { StudyCreationState } from "./ngxs-store/non-study/study-creation/study-creation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -64,6 +65,7 @@ import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -118,8 +120,13 @@ export function configLoader(injector: Injector): () => Promise<any> {
             SampleState,
             ProtocolsState,
             DescriptorsState,
-            ValidationState
+            ValidationState,
+            StudyCreationState
         ], { developmentMode: true }),
+        NgxsReduxDevtoolsPluginModule.forRoot({
+                disabled: false,
+                maxAge: 25
+                }),
         QuillModule.forRoot({
             modules: {
                 clipboard: {

@@ -190,7 +190,7 @@ export class MAFState {
 
     @Selector()
     static mafs(state: MAFStateModel): Record<string, any> {
-        return state.mafs
+        return state?.mafs
     }
 
 }

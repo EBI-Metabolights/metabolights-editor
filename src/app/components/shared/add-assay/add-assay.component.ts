@@ -4,7 +4,7 @@ import {
   OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { UntypedFormBuilder } from "@angular/forms";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import Swal from "sweetalert2";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
@@ -46,6 +46,8 @@ export class AddAssayComponent implements OnInit {
 
     this.setUpSubscriptionsNgxs();
   }
+  ngOnInit(): void {
+  }
 
 
   setUpSubscriptionsNgxs() {
@@ -62,7 +64,62 @@ export class AddAssayComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+ assayForm = this.fb.group({
+  assayType: ['LC-MS'],
+  measurementType: ['Untargeted Metabolite Profiling'],
+  omics: ['Lipidomics'],
+  chromInstrument: ['', Validators.required],
+  columnType: ['reverse phase'],
+  msInstrument: ['', Validators.required],
+  polarity: ['positive'],
+  ionSource: ['electrospray ionization'],
+  analyzer: ['quadrupole time-of-flight'],
+  assayId: ['01', Validators.required]
+});
+
+keywords: string[] = [
+  'Tandem Mass Spectrometry',
+  'Waters raw format',
+  'Data-Independent acquisition'
+  ];
+
+  addKeyword() {
+    const v = prompt('Enter keyword');
+    if (v && v.trim() !== '') {
+      this.keywords.push(v.trim());
+    }
+  }
+
+  editKeyword(i: number) {
+    const v = prompt('Edit keyword', this.keywords[i]);
+    if (v !== null && v.trim() !== '') {
+      this.keywords[i] = v.trim();
+    }
+  }
+
+  removeKeyword(i: number) {
+    this.keywords.splice(i, 1);
+  }
+
+get assayFileName() {
+  const id = this.requestedStudy || 'MTBLSxxx';
+  return `a_${id}-${this.assayForm.value.assayId}_LC-MS_untargeted_metabolite_profiling.txt`;
+}
+
+get resultFileName() {
+  const id = this.requestedStudy || 'MTBLSxxx';
+  return `m_${id}-${this.assayForm.value.assayId}_LC-MS.maf.tsv`;
+}
+
+saveAssay() {
+  const payload = {
+    ...this.assayForm.value,
+    keywords: this.keywords
+  };
+
+  console.log('Create assay payload', payload);
+}
+
 
   openAddAssayModal() {
     this.isAddAssayModalOpen = true;

@@ -41,7 +41,8 @@
     "tassign": "^1.0.0",
     "toastr": "^2.1.4",
     "tslib": "^2.0.0",
-    "zone.js": "~0.14.10"
+    "zone.js": "~0.14.10",
+    "@ngxs/devtools-plugin": "^20.1.0"
   },
   "devDependencies": {
     "@angular-eslint/builder": "^18.0.0-alpha.16",

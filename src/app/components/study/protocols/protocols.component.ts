@@ -136,7 +136,12 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   initialiseProtocols(value) {
     this.protocols = [];
     this.customProtocols = [];
-    if (this.assay !== null && this.assay !== undefined) {
+
+    if (
+      this.assay &&
+      Array.isArray(this.assay.protocols) &&
+      Array.isArray(value)
+    ) {
       this.assay.protocols.forEach((protocol) => {
         value.forEach((p) => {
           if (p.name === protocol) {
@@ -144,10 +149,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
           }
         });
       });
+    } else if (Array.isArray(value)) {
+      this.protocols = value;
     } else {
-      if (value !== null) this.protocols = value;
-      else this.protocols = []
-      
+      this.protocols = [];
     }
     const targetName = "sample collection";
     const found =

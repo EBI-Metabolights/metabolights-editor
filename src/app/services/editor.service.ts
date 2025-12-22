@@ -77,7 +77,6 @@ export class EditorService {
 
   study: MTBLSStudy;
   baseHref: string;
-  redirectUrl = "";
   currentStudyIdentifier: string = null;
   validations: any = {};
   defaultControlLists: any = {};
@@ -110,9 +109,21 @@ export class EditorService {
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.setUpSubscriptionsNgxs();
-    this.redirectUrl = this.configService.config.redirectURL;
     // load dev control-lists (asset) and merge into NGXS without overwriting existing controlLists
     // this.loadAndMergeDevControlLists();
+  }
+
+  private _redirectUrl: string = null;
+
+  get redirectUrl(): string {
+    if (this._redirectUrl) {
+      return this._redirectUrl;
+    }
+    return this.configService.config ? this.configService.config.redirectURL : null;
+  }
+
+  set redirectUrl(value: string) {
+    this._redirectUrl = value;
   }
 
   setUpSubscriptionsNgxs() {
@@ -652,7 +663,10 @@ export class EditorService {
     this.store.dispatch(new Identifier.Set(id))
   }
 
-  createStudy() {
+  createStudy(payload: any = null) {
+    if (payload) {
+      return this.dataService.createStudyWithMetadata(payload);
+    }
     return this.dataService.createStudy();
   }
 

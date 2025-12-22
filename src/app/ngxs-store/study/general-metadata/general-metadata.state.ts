@@ -732,116 +732,115 @@ export class GeneralMetadataState {
 
     @Selector()
     static id(state: GeneralMetadataStateModel): string {
-        if (state === undefined) return null
-        return state.id
+        return state?.id
     }
 
     @Selector()
     static title(state: GeneralMetadataStateModel): string {
-        return state.title
+        return state?.title
     }
 
     @Selector()
     static description(state: GeneralMetadataStateModel): string {
-        return state.description
+        return state?.description
     }
 
     @Selector()
     static releaseDate(state: GeneralMetadataStateModel): string {
-        return state.releaseDate
+        return state?.releaseDate
     }
 
     @Selector()
     static status(state: GeneralMetadataStateModel): string {
-        return state.status
+        return state?.status
     }
 
     @Selector()
     static curationRequest(state: GeneralMetadataStateModel): string {
-        return state.curationRequest
+        return state?.curationRequest
     }
     @Selector()
     static revisionNumber(state: GeneralMetadataStateModel): number {
-        return state.revisionNumber
+        return state?.revisionNumber
     }
 
     @Selector()
     static revisionDatetime(state: GeneralMetadataStateModel): string {
-        return state.revisionDatetime
+        return state?.revisionDatetime
     }
 
     @Selector()
     static revisionStatus(state: GeneralMetadataStateModel): number {
-        return state.revisionStatus
+        return state?.revisionStatus
     }
 
     @Selector()
     static revisionComment(state: GeneralMetadataStateModel): string {
-        return state.revisionComment
+        return state?.revisionComment
     }
     @Selector()
     static revisionTaskMessage(state: GeneralMetadataStateModel): string {
-        return state.revisionTaskMessage
+        return state?.revisionTaskMessage
     }
     @Selector()
     static reviewerLink(state: GeneralMetadataStateModel): string {
-        return state.reviewerLink
+        return state?.reviewerLink
     }
 
     @Selector()
     static publications(state: GeneralMetadataStateModel): IPublication[] {
-        return state.publications
+        return state?.publications
     }
 
     @Selector()
     static people(state: GeneralMetadataStateModel): IPerson[] {
-        return state.people
+        return state?.people
     }
 
     @Selector()
     static datasetLicense(state: GeneralMetadataStateModel): DatasetLicense {
-        return state.datasetLicense
+        return state?.datasetLicense
     }
 
     @Selector()
     static publicHttpUrl(state: GeneralMetadataStateModel): string {
-        return state.publicHttpUrl
+        return state?.publicHttpUrl
     }
     @Selector()
     static publicFtpUrl(state: GeneralMetadataStateModel): string {
-        return state.publicFtpUrl
+        return state?.publicFtpUrl
     }
     @Selector()
     static publicGlobusUrl(state: GeneralMetadataStateModel): string {
-        return state.publicGlobusUrl
+        return state?.publicGlobusUrl
     }
     @Selector()
     static publicAsperaPath(state: GeneralMetadataStateModel): string {
-        return state.publicAsperaPath
+        return state?.publicAsperaPath
     }
     @Selector()
     static firstPrivateDate(state: GeneralMetadataStateModel): string {
-        return state.firstPrivateDate
+        return state?.firstPrivateDate
     }
     @Selector()
     static firstPublicDate(state: GeneralMetadataStateModel): string {
-        return state.firstPublicDate
+        return state?.firstPublicDate
     }
     @Selector()
     static sampleTemplate(state: GeneralMetadataStateModel): string {
-        return state.sampleTemplate
+        return state?.sampleTemplate
     }
     @Selector()
     static templateVersion(state: GeneralMetadataStateModel): string {
-        return state.templateVersion
+        return state?.templateVersion
     }
     @Selector()
     static studyCategory(state: GeneralMetadataStateModel): string {
-        return state.studyCategory
+        return state?.studyCategory
     }
     @Selector()
     static studyCreatedAt(state: GeneralMetadataStateModel): string {
-        return state.studyCreatedAt
+        return state?.studyCreatedAt
     }
     
 }

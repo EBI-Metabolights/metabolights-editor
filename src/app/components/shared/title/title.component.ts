@@ -109,6 +109,16 @@ export class TitleComponent implements OnInit {
 
   initialiseForm() {
     this.isFormBusy = false;
+    // Enforce 50 character minimum if not set or lower in validation rules
+    if (this.validation && this.validation.rules) {
+      let minRule = this.validation.rules.find(r => r.condition === 'min');
+      if (!minRule) {
+        this.validation.rules.push({ condition: 'min', value: 50, error: 'Title must be at least 50 characters.' });
+      } else if (minRule.value < 50) {
+        minRule.value = 50;
+        minRule.error = 'Title must be at least 50 characters.';
+      }
+    }
     this.form = this.fb.group({
       title: [this.title, ValidateStudyTitle(this.validation)],
     });

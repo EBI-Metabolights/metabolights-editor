@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SharedModule } from "../shared/shared.module";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
 import { InfoComponent } from "./info/info.component";
@@ -54,5 +55,6 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         MatCheckboxModule,
         MatTooltipModule,
         MatInputModule,
+        MatAutocompleteModule,
         RouterModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class GuideModule {}
