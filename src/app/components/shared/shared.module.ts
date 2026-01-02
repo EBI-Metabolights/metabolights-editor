@@ -149,6 +149,7 @@ import { BrowserModule } from "@angular/platform-browser";
   exports: [
     AddAssayComponent,
     ContentComponent,
+    ConfirmationDialogComponent,
     DeleteFileComponent,
     DirectoryComponent,
     DownloadComponent,

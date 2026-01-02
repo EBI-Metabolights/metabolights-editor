@@ -1,18 +1,15 @@
 <nav-bar mode="light"></nav-bar>
-
 <div class="container fixed-navbar-offset">
   <mat-horizontal-stepper [linear]="true" labelPosition="bottom" #stepper [selectedIndex]="currentSubStep - 1"
-    (selectionChange)="currentSubStep = $event.selectedIndex + 1" animationDuration="0ms">
-
+    (selectionChange)="currentSubStep = $event.selectedIndex + 1" animationDuration="0ms"
+    [class.allow-back-to-step-1]="currentSubStep === 2">
     <!-- Step 1: Submission Details -->
     <mat-step [completed]="isStep1Valid">
       <ng-template matStepLabel>Submission Details</ng-template>
-
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
             <h4 class="title is-5 mb-4">New Submission - Submission Details</h4>
-
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
               <h4 class="title is-6 mb-2">MetaboLights Study Categories <span class="has-text-danger">*</span></h4>
@@ -20,26 +17,26 @@
                 Which type of techniques have you used in your study?
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
-
               <div class="columns is-multiline mb-4">
                 <div class="column is-3 category-column" *ngFor="let cat of activeCategories">
                   <h5 class="is-size-7 has-text-weight-bold mb-3">{{cat.label}}</h5>
                   <div class="mt-1">
                     <div *ngFor="let assayType of cat.assayTypes" class="mb-2">
-
                       <label class="checkbox is-size-7 beautified-checkbox">
                         <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
                           [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
                         <span class="checkmark"></span>
                         {{assayType}}
                       </label>
+
                     </div>
+
                   </div>
+
                 </div>
+
               </div>
-
               <hr class="mt-4 mb-4">
-
               <div class="columns">
                 <div class="column is-4">
                   <h4 class="title is-6 mb-2">Sample File Template</h4>
@@ -50,16 +47,20 @@
                           [value]="selectedSampleFileTemplate">
                           <option *ngFor="let t of sampleFileTemplates" [value]="t">{{t}}</option>
                         </select>
+
                       </div>
+
                     </div>
+
                   </div>
+
                 </div>
+
               </div>
+
             </div>
-
-
-            <div class="section-header-line"></div>
-
+            <div class="section-header-line">
+            </div>
             <!-- Roles, Status, DOI -->
             <div class="columns is-multiline">
               <div class="column is-6">
@@ -84,10 +85,12 @@
                         </mat-select>
                       </mat-form-field>
                     </ng-template>
-                  </div>
-                </div>
-              </div>
 
+                  </div>
+
+                </div>
+
+              </div>
               <div class="column is-6">
                 <div class="field">
                   <label class="label is-small">Publication Status*</label>
@@ -112,29 +115,35 @@
                         </mat-select>
                       </mat-form-field>
                     </ng-template>
-                  </div>
-                </div>
-              </div>
 
+                  </div>
+
+                </div>
+
+              </div>
               <div class="column is-12">
                 <div class="field">
                   <label class="label is-small">DOI</label>
                   <div class="control">
                     <input class="input is-small" type="text" [(ngModel)]="publicationDoi" placeholder="DOI">
-                  </div>
-                </div>
-              </div>
-            </div>
 
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
             <div class="section-header-line">
               <span>Funding</span>
-            </div>
 
+            </div>
             <!-- Funding -->
             <div [formGroup]="studyCreationForm">
               <div class="field is-horizontal mb-3">
                 <div class="field-label is-small">
                   <label class="label">Funder Organization</label>
+
                 </div>
                 <div class="field-body">
                   <div class="field">
@@ -145,18 +154,24 @@
                         (optionSelected)="onFunderSelected($event)">
                         <mat-option *ngFor="let org of filteredFunderOrganizations$ | async" [value]="org">
                           <div class="is-size-7"><b>{{ org.name }}</b> - {{ org.id?.split('/').pop() || '(Unknown ID)'
-                            }}</div>
+                            }}
+                          </div>
                           <div style="font-size: 11px; color: #666; line-height: 1.2;">{{ org.description || '(No
-                            description available)' }}</div>
+                            description available)' }}
+                          </div>
                         </mat-option>
                       </mat-autocomplete>
                     </mat-form-field>
+
                   </div>
+
                 </div>
+
               </div>
               <div class="field is-horizontal mb-3">
                 <div class="field-label is-small">
                   <label class="label">Funder ID</label>
+
                 </div>
                 <div class="field-body">
                   <div class="field">
@@ -167,25 +182,33 @@
                         <small>Search ROR ID</small>
                       </a>
                     </mat-form-field>
+
                   </div>
+
                 </div>
+
               </div>
               <div class="field is-horizontal mb-3">
                 <div class="field-label is-small">
                   <label class="label">Grant Identifier</label>
+
                 </div>
                 <div class="field-body">
                   <div class="field">
                     <input class="input is-small" type="text" formControlName="grantIdentifier"
                       placeholder="e.g. Grant #12345">
-                  </div>
-                </div>
-              </div>
-            </div>
 
+                  </div>
+
+                </div>
+
+              </div>
+
+            </div>
             <!-- Related Datasets Section -->
             <div class="section-header-line">
               <span>Related Datasets</span>
+
             </div>
             <div class="mb-4">
               <div *ngFor="let ds of relatedDatasets; let i = index"
@@ -195,17 +218,22 @@
                     <label class="label is-small" *ngIf="i === 0">Identifier</label>
                     <div class="control">
                       <input type="text" class="input is-small" [(ngModel)]="ds.identifier" placeholder="PXD122233">
+
                     </div>
 
                   </div>
+
                 </div>
                 <div class="column is-5">
                   <div class="field">
                     <label class="label is-small" *ngIf="i === 0">URL</label>
                     <div class="control">
                       <input type="text" class="input is-small" [(ngModel)]="ds.url" placeholder="http://">
+
                     </div>
+
                   </div>
+
                 </div>
                 <div class="column is-2">
                   <div [class]="i === 0 ? 'row-actions' : 'subsequent-row-actions'">
@@ -217,37 +245,44 @@
                       (click)="removeRelatedDataset(i)" *ngIf="i > 0" title="Remove row">
                       remove_circle
                     </span>
+
                   </div>
+
                 </div>
+
               </div>
 
             </div>
-
-
             <!-- Sample Characteristics Section -->
-            <div class="section-header-line">
-              <span>Sample Characteristics</span>
-            </div>
-            <div class="mb-4">
-              <div class="columns is-multiline">
-                <div *ngFor="let header of dynamicHeaders" class="column is-6 characteristic-column">
-                  <div class="field">
-                    <label class="label is-small">{{ header.replace('Characteristics[', '').replace(']', '') }}</label>
-                    <div class="control">
-                      <mtbls-ontology [controlList]="getCharacteristicControlList(header)"
-                        [values]="sampleCharacteristicsValues[header] || []"
-                        (changed)="onCharacteristicChange(header, $event)" [inline]="true">
-                      </mtbls-ontology>
-                    </div>
-                  </div>
-                </div>
+            <ng-container *ngIf="dynamicHeaders && dynamicHeaders.length > 0">
+              <div class="section-header-line">
+                <span>Sample Characteristics</span>
+
               </div>
+              <div class="mb-4">
+                <div class="columns is-multiline">
+                  <div *ngFor="let header of dynamicHeaders" class="column is-6 characteristic-column">
+                    <div class="field">
+                      <label class="label is-small">{{ header.replace('Characteristics[', '').replace(']', '')
+                        }}</label>
+                      <div class="control">
+                        <mtbls-ontology [controlList]="getCharacteristicControlList(header)"
+                          [values]="sampleCharacteristicsValues[header] || []"
+                          (changed)="onCharacteristicChange(header, $event)" [inline]="true">
+                        </mtbls-ontology>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            </ng-container>
+            <div class="section-header-line">
             </div>
-
-
-            <div class="section-header-line"></div>
-
-
             <!-- Agreements -->
             <div class="field">
               <label class="checkbox is-size-7 db mb-2">
@@ -263,52 +298,55 @@
                 <input type="checkbox" [(ngModel)]="agreements.emailCommunicationAgreement"> I agree to receive email
                 communications from MetaboLights.
               </label>
+
             </div>
-
-
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
                 <button class="button is-primary" (click)="createStudy()" [disabled]="!isStep1Valid">Let's get
                   started</button>
+
               </div>
+
             </div>
-            <div class="is-clearfix"></div>
+            <div class="is-clearfix">
+            </div>
+
           </div>
+
         </div>
+
       </div>
     </mat-step>
-
     <!-- Step 2: Study Description -->
     <mat-step [completed]="isStep2Valid">
       <ng-template matStepLabel>Study Description</ng-template>
-
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
             <h4 class="title is-5 mb-4">Study Description</h4>
-
             <div class="field mb-4">
               <label class="label is-small">Study Title (min 10 chars)*</label>
               <div class="control">
                 <input class="input is-small" type="text" [(ngModel)]="studyTitle"
                   placeholder="Enter a descriptive title for your study">
+
               </div>
               <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 10">Title must be at least 10
                 characters.</p>
-            </div>
 
+            </div>
             <div class="field mb-4">
               <label class="label is-small">Study Description (min 10 chars)*</label>
               <div class="control">
                 <textarea class="textarea is-small" [(ngModel)]="studyDescription"
                   placeholder="Enter a detailed description of your study"></textarea>
+
               </div>
               <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 10">Description must
                 be at least 10 characters.</p>
+
             </div>
-
             <hr>
-
             <!-- Factors, Descriptors, Contacts -->
             <div class="columns is-multiline">
               <div class="column is-12">
@@ -319,11 +357,13 @@
                       {{factor.factorName}} ({{factor.factorType?.annotationValue}})
                       <button class="delete is-small" (click)="removeFactorCompat(factor, i)"></button>
                     </span>
+
                   </div>
                   <mtbls-factor [mode]="'local'" (saved)="addFactorCompat($event)"></mtbls-factor>
-                </div>
-              </div>
 
+                </div>
+
+              </div>
               <div class="column is-12">
                 <h5 class="title is-6 mb-3">Design Descriptors (Optional)</h5>
                 <div class="box p-3 is-clearfix">
@@ -333,12 +373,14 @@
                       {{desc.annotationValue}}
                       <button class="delete is-small" (click)="removeDescriptorCompat(desc, i)"></button>
                     </span>
+
                   </div>
                   <mtbls-design-descriptor [mode]="'local'" [controlListKey]="descriptorControlListKey"
                     (saved)="addDescriptorCompat($event)"></mtbls-design-descriptor>
-                </div>
-              </div>
 
+                </div>
+
+              </div>
               <div class="column is-12">
                 <h5 class="title is-6 mb-3">Contacts (at least 1 PI)*</h5>
                 <div class="box p-3 is-clearfix">
@@ -351,7 +393,6 @@
                           <p class="is-size-7 has-text-weight-bold">{{contact.firstName}} {{contact.lastName}}</p>
                           <p class="is-size-7">{{contact.affiliation}}</p>
                           <p class="is-size-7 has-text-grey">{{contact.roles?.[0]?.annotationValue}}</p>
-
                           <div style="position: absolute; top: 5px; right: 5px; display: flex;">
                             <span class="material-symbols-outlined is-size-6 has-text-grey clickable mr-1"
                               (click)="editContact(contact, i)" title="Edit contact">
@@ -359,43 +400,54 @@
                             </span>
                             <button class="delete is-small" (click)="removeContactCompat(contact, i)"
                               title="Remove contact"></button>
+
                           </div>
+
                         </div>
+
                       </div>
+
                     </div>
+
                   </div>
                   <mtbls-person #personEditor class="is-modal-only-person" [mode]="'local'"
                     (saved)="saveContactCompat($event)"></mtbls-person>
+
                 </div>
+
               </div>
+
             </div>
-
             <hr>
-
             <button class="button is-success is-fullwidth" (click)="submitStudy(false)"
               [disabled]="isLoading || !isStep2Valid">
               <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
             </button>
+
           </div>
+
         </div>
+
       </div>
     </mat-step>
-
     <!-- Step 3: Sample & Assays -->
     <mat-step>
       <ng-template matStepLabel>Sample & Assays</ng-template>
       <div class="mt-4" *ngIf="newStudy">
         <guide-assays></guide-assays>
+
       </div>
     </mat-step>
-
     <!-- Step 4: Upload -->
     <mat-step>
       <ng-template matStepLabel>Upload Files</ng-template>
       <div class="mt-4" *ngIf="newStudy">
         <raw-upload></raw-upload>
+
       </div>
     </mat-step>
-
   </mat-horizontal-stepper>
+
+  <app-confirmation-dialog *ngIf="showConfirmationModal" [title]="confirmationTitle" [message]="confirmationMessage"
+    [moreinfo]="''" (confirm)="onConfirmSelection($event)"></app-confirmation-dialog>
 </div>

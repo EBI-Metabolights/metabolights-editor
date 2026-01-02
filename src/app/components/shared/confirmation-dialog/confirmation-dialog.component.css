@@ -1,3 +1,7 @@
+.modal-background {
+    background-color: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(4px);
+}
 .material-modal-card {
     width: 100%;
     max-width: 900px;

@@ -57,6 +57,10 @@ export class CreateComponent implements OnInit {
   sampleCharacteristicsValues: any = {};
   licenseUrl: string = "";
   licenseName: string = "";
+  
+  showConfirmationModal = false;
+  confirmationTitle = "Confirmation";
+  confirmationMessage = "";
 
   
   agreements: any = {
@@ -482,11 +486,20 @@ export class CreateComponent implements OnInit {
         this.setUpWizardStep(selectedCategoryKeys[0]);
         return;
     }
-    // Multiple Category -> Immediate Creation
-    if (this.contacts.length === 0) {
-        this.initializePrimaryContact();
+    // Multiple Category -> Show Confirmation Modal
+    this.confirmationTitle = "Confirmation";
+    this.confirmationMessage = `We created the following ${selectedCategoryKeys.length} MetaboLights submissions for your study. You can select and update your MetaboLights submissions.`;
+    this.showConfirmationModal = true;
+  }
+
+  onConfirmSelection(confirmed: boolean) {
+    this.showConfirmationModal = false;
+    if (confirmed) {
+        if (this.contacts.length === 0) {
+            this.initializePrimaryContact();
+        }
+        this.submitStudy(true); 
     }
-    this.submitStudy(true); 
   }
   // Agreements and Wizard Configuration
   descriptorControlListKey: string = null;
