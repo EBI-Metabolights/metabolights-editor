@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from "@angular/core";
+import { Component, OnInit, inject, ViewChild } from "@angular/core";
 import { Observable } from "rxjs";
 import { Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
@@ -23,12 +23,14 @@ import { StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
+import { PersonComponent } from "../../shared/people/person/person.component";
 @Component({
   selector: "app-create",
   templateUrl: "./create.component.html",
   styleUrls: ["./create.component.css"],
 })
 export class CreateComponent implements OnInit {
+  @ViewChild('personEditor') personEditor: PersonComponent;
   requestedStudy: string = null;
   title$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
   description$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
@@ -52,6 +54,10 @@ export class CreateComponent implements OnInit {
   sampleFileTemplates: string[] = [];
   selectedSampleFileTemplate: string = '';
   dynamicHeaders: string[] = [];
+  sampleCharacteristicsValues: any = {};
+  licenseUrl: string = "";
+  licenseName: string = "";
+
   
   agreements: any = {
     datasetLicenseAgreement: true,
@@ -78,6 +84,7 @@ export class CreateComponent implements OnInit {
   factors: any[] = [];
   designDescriptors: any[] = [];
   contacts: any[] = [];
+  editingContactIndex: number = -1;
   descriptorControlLists: any = {};
   
   studyCreationForm: UntypedFormGroup;
@@ -271,7 +278,17 @@ export class CreateComponent implements OnInit {
           this.studyCreationForm.controls['sampleFileTemplate']?.setValue(defaultSampleTemplate);
           this.onSampleTemplateChange(defaultSampleTemplate);
       }
+
+      // License Information
+      this.licenseName = versionConfig.defaultDatasetLicense || "";
+      if (this.licenseName && this.templateConfiguration.datasetLicenses) {
+          const licenseInfo = this.templateConfiguration.datasetLicenses[this.licenseName];
+          if (licenseInfo) {
+              this.licenseUrl = licenseInfo.url || "";
+          }
+      }
   }
+
   onSampleTemplateChange(templateName: string) {
       this.selectedSampleFileTemplate = templateName;
       this.loadDynamicHeaders(templateName);
@@ -320,6 +337,21 @@ export class CreateComponent implements OnInit {
         });
       }
   }
+
+  getCharacteristicControlList(header: string) {
+      const sampleFileControls = this.legacyControlLists?.controls?.sampleFileControls || {};
+      const control = sampleFileControls[header];
+      const listName = (control && control.name) ? control.name : "__default_characteristics__";
+      return this.getProcessedControlList(listName);
+  }
+
+
+  onCharacteristicChange(header: string, value: any) {
+      const selectedValue = Array.isArray(value) ? value : [value];
+      this.sampleCharacteristicsValues[header] = selectedValue;
+      this.studyCreationForm.controls[header]?.setValue(selectedValue);
+  }
+
   
   toggleCategory(category: string, event: any) {
       if (event.target.checked) {
@@ -412,7 +444,8 @@ export class CreateComponent implements OnInit {
   }
   
   get isStep1Valid(): boolean {
-    return !!(this.selectedSubmitterRole && 
+    return !!(this.isAnyAssaySelected &&
+           this.selectedSubmitterRole && 
            this.publicationStatus && this.publicationStatus.length > 0 &&
            this.agreements?.datasetLicenseAgreement &&
            this.agreements?.datasetPolicyAgreement &&
@@ -450,6 +483,9 @@ export class CreateComponent implements OnInit {
         return;
     }
     // Multiple Category -> Immediate Creation
+    if (this.contacts.length === 0) {
+        this.initializePrimaryContact();
+    }
     this.submitStudy(true); 
   }
   // Agreements and Wizard Configuration
@@ -465,8 +501,8 @@ export class CreateComponent implements OnInit {
   initializePrimaryContact() {
       // Create primary contact from Current User + Submitter Role
       let role = null;
-      if (this.submitterRole && this.submitterRole.length > 0) {
-          role = this.submitterRole[0];
+      if (this.selectedSubmitterRole) {
+          role = this.selectedSubmitterRole;
       }
       
       const newContact = {
@@ -506,8 +542,31 @@ export class CreateComponent implements OnInit {
       this.store.dispatch(new StudyCreation.RemoveDesignDescriptor(index));
   }
   // Contacts
-  addContactCompat(contact: any) {
-      this.store.dispatch(new StudyCreation.AddContact(contact));
+  addNewContact() {
+      this.editingContactIndex = -1;
+      if (this.personEditor) {
+          this.personEditor.person = null;
+          this.personEditor.addNewPerson = true;
+          this.personEditor.openModal();
+      }
+  }
+
+  editContact(contact: any, index: number) {
+      this.editingContactIndex = index;
+      if (this.personEditor) {
+          this.personEditor.person = contact;
+          this.personEditor.addNewPerson = false;
+          this.personEditor.openModal();
+      }
+  }
+
+  saveContactCompat(contact: any) {
+      if (this.editingContactIndex > -1) {
+          this.store.dispatch(new StudyCreation.UpdateContact(contact, this.editingContactIndex));
+          this.editingContactIndex = -1;
+      } else {
+          this.store.dispatch(new StudyCreation.AddContact(contact));
+      }
   }
   
   updateContact(contact: any, index: number) {
@@ -523,11 +582,15 @@ export class CreateComponent implements OnInit {
           const selectedValue = Array.isArray(value) ? value[0] : value;
           if (!selectedValue) return;
           this.selectedSubmitterRole = selectedValue;
-          this.submitterRoleControlList.values.forEach(role => {
-              if (role.annotationValue === selectedValue.annotationValue) {
-                  this.selectedSubmitterRole = role;
-              }
-          });
+          this.submitterRole = [selectedValue]; // Keep track of the selected role
+          if (this.submitterRoleControlList && this.submitterRoleControlList.values) {
+              this.submitterRoleControlList.values.forEach(role => {
+                  if (role.annotationValue === selectedValue.annotationValue) {
+                      this.selectedSubmitterRole = role;
+                      this.submitterRole = [role];
+                  }
+              });
+          }
       }
   }
   onPublicationStatusChange(value) {
@@ -536,11 +599,13 @@ export class CreateComponent implements OnInit {
           const selectedValue = Array.isArray(value) ? value[0] : value;
           if (!selectedValue) return;
           this.publicationStatus = [selectedValue]; 
-          this.publicationStatusControlList.values.forEach(status => {
-              if (status.annotationValue === selectedValue.annotationValue) {
-                  this.publicationStatus = [status];
-              }
-          });
+          if (this.publicationStatusControlList && this.publicationStatusControlList.values) {
+            this.publicationStatusControlList.values.forEach(status => {
+                if (status.annotationValue === selectedValue.annotationValue) {
+                    this.publicationStatus = [status];
+                }
+            });
+          }
       }
   }
   submitStudy(isMultipleCategories: boolean = false) {
@@ -592,59 +657,33 @@ export class CreateComponent implements OnInit {
     }
     // Contacts
     let contacts = [];
-    if (isMultipleCategories) {
-        // Use dummy for multiple
-        contacts = [
-            {
-                comments: [
-                    { name: "Study Person ORCID", value: "0000-0001-8604-1732" },
-                    { name: "Study Person Affiliation ROR ID", value: "https://ror.org/02catss52" },
-                    { name: "Study Person Alternative Email", value: "ozgur.yurekten@gmail.com" }
-                ],
-                firstName: "Ozgur",
-                lastName: "Yurekten",
-                email: "ozgur.yurekten@gmail.com",
-                affiliation: "European Bioinformatics Institute",
-                address: "EMBL-EBI",
-                fax: "",
-                midInitials: "",
-                phone: "",
-                contactIndex: 0,
-                roles: [
-                    {
-                        comments: [],
-                        termAccession: "http://purl.obolibrary.org/obo/NCIT_C19924",
-                        annotationValue: "Principal Investigator",
-                        termSource: {
-                            comments: [],
-                            description: "National Cancer Institute Thesaurus",
-                            file: "http://purl.obolibrary.org/obo/ncit.owl",
-                            name: "NCIT",
-                            version: ""
-                        }
-                    }
-                ]
-            }
-        ];
-    } else {
-        // Use Wizard Contacts (Step 2)
-        // Transform internal contact structure to payload structure if needed
-        contacts = this.contacts.map((c, index) => ({
-             comments: [
-                { name: "Study Person ORCID", value: c.orcid || "" },
-             ],
+    // Unified mapping for both single and multiple category flows
+    contacts = this.contacts.map((c, index) => {
+        const comments = [];
+        
+        // Handle metadata from various potential formats (c.orcid vs c.comments subset)
+        const orcid = c.orcid || c.comments?.find(com => com.name === "Study Person ORCID")?.value;
+        const rorid = c.rorid || c.comments?.find(com => com.name === "Study Person Affiliation ROR ID")?.value;
+        const altEmail = c.alternativeEmail || c.comments?.find(com => com.name === "Study Person Alternative Email")?.value;
+
+        if (orcid) comments.push({ name: "Study Person ORCID", value: orcid });
+        if (rorid) comments.push({ name: "Study Person Affiliation ROR ID", value: rorid });
+        if (altEmail) comments.push({ name: "Study Person Alternative Email", value: altEmail });
+
+        return {
+             comments: comments,
              firstName: c.firstName,
              lastName: c.lastName,
              email: c.email,
              affiliation: c.affiliation,
              address: c.address || "",
-             fax: "",
-             midInitials: "",
-             phone: "",
+             fax: c.fax || "",
+             midInitials: c.midInitials || "",
+             phone: c.phone || "",
              contactIndex: index,
              roles: c.roles || []
-        }));
-    }
+        };
+    });
     // Factors (Mapped from Wizard Step 2 if single, else dummy)
     let factors = [];
     if (isMultipleCategories) {
@@ -708,9 +747,11 @@ export class CreateComponent implements OnInit {
         contacts: contacts,
         publicationDoi: (this as any).publicationDoi || "", 
         designDescriptors: designDescriptors,
-        factors: factors
+        factors: factors,
+        sampleCharacteristics: this.sampleCharacteristicsValues
     };
-    console.log('Creating study with payload:', payload);
+
+    console.log('Creating study with payload:', JSON.stringify(payload, null, 2));
     this.editorService.createStudy(payload).subscribe({
       next: (res) => {
         if (isMultipleCategories) {

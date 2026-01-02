@@ -20,15 +20,13 @@
   margin-bottom: 0.75rem !important;
 }
 
-.teal-input {
-  background-color: #26a69a !important;
-  color: white !important;
-  font-weight: bold;
+
+.teal-input-label {
+  min-width: 80px;
+  font-size: 0.75rem;
+  font-weight: 600;
 }
 
-.teal-input::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
 
 .pr-5 {
   padding-right: 1.5rem !important;
@@ -62,6 +60,7 @@ hr {
   padding-left: 25px;
   cursor: pointer;
   user-select: none;
+  margin-bottom: 0.75rem;
 }
 
 .beautified-checkbox input {
@@ -114,4 +113,86 @@ hr {
 
 .stepper-container-offset {
   margin-top: 5rem !important;
+}
+
+.section-header-line {
+  border-bottom: 3px solid black;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.section-header-line .icon-button {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.ml-checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.ml-checkbox-item {
+  min-width: 150px;
+}
+
+.grid-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.full-width-hr {
+  border: 0;
+  border-top: 2px solid #ccc;
+  margin: 20px 0;
+}
+
+.icon-action-button {
+  cursor: pointer;
+  vertical-align: middle;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.icon-action-button:hover {
+  color: #00897b !important;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  padding-top: 24px;
+  /* Aligns icons with the input field by offsetting for the label height */
+  height: 100%;
+}
+
+.subsequent-row-actions {
+  padding-top: 0;
+  /* No offset needed when there are no labels */
+  height: 32px;
+  /* Matches teal-input height */
+  display: flex;
+  align-items: center;
+}
+
+.dataset-row {
+  margin-bottom: 1.5rem !important;
+}
+
+.characteristic-column {
+  margin-bottom: 1rem !important;
+}
+
+.category-column {
+  padding-right: 2rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+::ng-deep .is-modal-only-person>span,
+::ng-deep .is-modal-only-person>a {
+  display: none !important;
 }
