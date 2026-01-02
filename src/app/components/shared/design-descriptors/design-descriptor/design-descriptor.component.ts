@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, inject } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, inject, Output, EventEmitter } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -62,6 +62,11 @@ export class DesignDescriptorComponent implements OnInit {
 
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;
+  @Input("mode") mode: 'store' | 'local' = 'store';
+  @Input() controlListKey: string = null;
+  @Output() saved = new EventEmitter<Ontology>();
+  @Output() deleted = new EventEmitter<Ontology>();
+
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
   private studyId: string = "";
@@ -223,9 +228,18 @@ export class DesignDescriptorComponent implements OnInit {
                this.loading = true;
                 this.isFormBusy = true;
               setTimeout(() => {
-                this.store.dispatch(
-                  new Descriptors.New(descriptor, this.studyId)
-                );
+                if (this.mode === 'local') {
+                    // Not supported in local mode via keyword selection yet unless refactored
+                    // But assume this flow is mostly for existing studies
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                } else {
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                }
+
                   this.loading = false;
                   this.isFormBusy = false;
                   this.status = "Added keyword successfully";
@@ -255,9 +269,16 @@ export class DesignDescriptorComponent implements OnInit {
               this.loading = true;
               this.isFormBusy = true;
               setTimeout(() => {
-                this.store.dispatch(
-                  new Descriptors.New(descriptor, this.studyId)
-                );
+                if(this.mode === 'local') {
+                     // Not supported yet
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                } else {
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                }
                   this.loading = false;
                   this.isFormBusy = false;
                   this.status = "Added keyword successfully";
@@ -357,7 +378,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
-    this.descriptorComponent.reset();
+    this.descriptorComponent?.reset();
   }
 
   closeImportModal() {
@@ -366,6 +387,18 @@ export class DesignDescriptorComponent implements OnInit {
 
   saveNgxs() {
     const descriptorValues = this.descriptorValuesForComponent();
+    
+    if (this.mode === 'local') {
+         if (descriptorValues && descriptorValues.length > 0) {
+             const body = this.compileBody(descriptorValues[0]);
+             // Extract Ontology from body.studyDesignDescriptor
+             const ontology = body.studyDesignDescriptor;
+             this.saved.emit(ontology);
+             this.closeModal();
+         }
+         return;
+    }
+    
     if (!this.isStudyReadOnly && descriptorValues.length > 0) {
       this.isFormBusy = true;
       if (!this.addNewDescriptor) {
@@ -419,6 +452,12 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   deleteNgxs(value) {
+    if(this.mode === 'local') {
+          this.deleted.emit(this.descriptor);
+          this.isDeleteModalOpen = false;
+          return;
+    }
+    
     if (!this.isStudyReadOnly) {
       if (!value) {
         value = this.descriptor.annotationValue;
@@ -428,9 +467,9 @@ export class DesignDescriptorComponent implements OnInit {
     }
   }
 
-  compileBody() {
+  compileBody(val: any = null) {
     const jsonConvert: JsonConvert = new JsonConvert();
-    const descriptorValues = this.descriptorValuesForComponent();
+    const descriptorValues = val ? [val] : this.descriptorValuesForComponent();
     const descriptorRaw =
       descriptorValues.length > 0 ? descriptorValues[0] : null;
 
@@ -503,15 +542,17 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   controlList() {
+    const listName = this.controlListKey || this.defaultControlListName;
+    
     if (
       !(this.defaultControlList && this.defaultControlList.name.length > 0) &&
       this.editorService.defaultControlLists &&
-      this.defaultControlListName in this.editorService.defaultControlLists
+      listName in this.editorService.defaultControlLists
     ) {
       this.defaultControlList.values =
-        this.editorService.defaultControlLists[this.defaultControlListName]
+        this.editorService.defaultControlLists[listName]
           .OntologyTerm || [];
-      this.defaultControlList.name = this.defaultControlListName;
+      this.defaultControlList.name = listName;
     }
 
     let defaultOntologies = {};
@@ -545,7 +586,7 @@ export class DesignDescriptorComponent implements OnInit {
           {
             controlLists: this.legacyControlLists,
           } as MetabolightsFieldControls,
-          this.defaultControlListName,
+          listName,
           selectionInput
         );
       }

@@ -37,7 +37,9 @@ export class RawUploadComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private store: Store
   ) {
-    this.editorService.initialiseStudy(this.route);
+    if(this.route.snapshot.paramMap.get('id')) {
+      this.editorService.initialiseStudy(this.route);
+    }
 
     this.setUpSubscriptionsNgxs();
     
@@ -64,7 +66,9 @@ export class RawUploadComponent implements OnInit {
   }
 
   refreshFiles() {
-    this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
+    if (this.requestedStudy) {
+      this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
+    }
   }
 
   copyFilesAndProceed() {

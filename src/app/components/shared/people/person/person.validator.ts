@@ -11,7 +11,7 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
       switch (rule.condition) {
         case "min": {
           if (
-            value.toString().length < rule.value && value !== "" 
+            value && value.toString().length < rule.value && value !== "" 
           ) {
             invalid = true;
             errorMessage = errorMessage + rule.error;
@@ -20,7 +20,7 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
         }
         case "pattern": {
           const re = new RegExp(rule.value, "i");
-          if (value !== "" && !re.test(value)) {
+          if (value && value !== "" && !re.test(value)) {
             invalid = true;
             errorMessage = errorMessage + rule.error;
           }
@@ -28,6 +28,7 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
         }
         case "array_min": {
           if (
+            value &&
             value.length < rule.value &&
             value !== "" 
           ) {

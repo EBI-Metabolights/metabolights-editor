@@ -1,59 +1,36 @@
 <nav-bar :mode="light"></nav-bar>
 <mtbls-progress [study]="requestedStudy" [step]="1"></mtbls-progress>
-<quick-link
-  path="study"
-  icon="chrome_reader_mode"
-  text="Study overview"
-></quick-link>
+<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
 <div class="columns">
   <div class="column is-half is-offset-one-quarter mb-5">
     <div>&nbsp;</div>
     <nav class="panel has-background-white">
       <div class="panel-heading">
-        <img
-          style="height: 32px"
-          class="is-pulled-left"
-          src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-        />
-        <span style="margin-left: 10px"
-          >MetaboLights Submission - {{ requestedStudy }}</span
-        >
+        <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
+        <span style="margin-left: 10px">MetaboLights Submission - {{ requestedStudy }}</span>
       </div>
       <div class="panel-block">
         <div class="column">
           <h3><b>Your MetaboLights submission</b></h3>
           <p>
             Your submission has been assigned the unique identifier
-            <span class="has-text-link"
-              ><b>{{ requestedStudy }}</b></span
-            >
+            <span class="has-text-link"><b>{{ requestedStudy }}</b></span>
             <br />
             Please refer to this identifier in any communication with the
             MetaboLights team.
           </p>
           <br />
           <span class="has-text-grey">
-            <small
-              ><mat-icon>info</mat-icon>&emsp;<i
-                >Provisional studies must pass validation to be promoted to 'Private' and get assigned a full MetaboLights Study accession number (MTBLSxxx)</i
-              ></small
-            >
+            <small><mat-icon>info</mat-icon>&emsp;<i>Provisional studies must pass validation to be promoted to
+                'Private' and get assigned a full MetaboLights Study accession number (MTBLSxxx)</i></small>
           </span>
 
         </div>
       </div>
       <div class="panel-block">
         <div class="column">
-          <button
-            (click)="proceedToNextStep()"
-            class="button is-success is-fullwidth"
-          >
-            <mat-spinner
-              [diameter]="20"
-              [strokeWidth]="3"
-              *ngIf="isLoading"
-            ></mat-spinner
-            >&nbsp;Next
+          <button (click)="proceedToNextStep()" class="button is-success is-fullwidth">
+            <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
           </button>
         </div>
       </div>

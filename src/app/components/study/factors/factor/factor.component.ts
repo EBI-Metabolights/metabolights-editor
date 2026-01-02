@@ -34,13 +34,14 @@ import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-
 export class FactorComponent implements OnInit {
   @Input("value") factor: MTBLSFactor;
   @Input("isDropdown") isDropdown = false;
-
+  @Input("mode") mode: 'store' | 'local' = 'store';
 
   @ViewChild(OntologyComponent) factorTypeComponent: OntologyComponent;
 
   @Output() addFactorToSampleSheet = new EventEmitter<any>();
-
   @Output() addFactorToSampleSheetUnitInclusive = new EventEmitter<any>();
+  @Output() saved = new EventEmitter<MTBLSFactor>();
+  @Output() deleted = new EventEmitter<MTBLSFactor>();
 
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
@@ -242,6 +243,29 @@ export class FactorComponent implements OnInit {
   }
 
   saveNgxs() {
+      if (this.mode === 'local') {
+          if (this.getFieldValue("factorName") !== "") {
+              if (!this.factor) { this.factor = new MTBLSFactor(); }
+              this.factor.factorName = this.getFieldValue("factorName");
+               // factorType logic
+               const jsonConvert: JsonConvert = new JsonConvert();
+               const factorTypeValue =
+                  this.factorTypeComponent?.id === "factorType" &&
+                  this.factorTypeComponent?.values?.[0]
+                    ? this.factorTypeComponent.values[0]
+                    : this.selectedFactorOntoValue?.[0];
+                this.factor.factorType = jsonConvert.deserializeObject(
+                  factorTypeValue,
+                  Ontology
+                );
+              
+              this.saved.emit(this.factor);
+              this.isModalOpen = false;
+              this.addFactorColumnVisible = false;
+          }
+          return;
+      }
+      
     if(!this.isStudyReadOnly && this.getFieldValue("factorName") !== "") {
       this.isFormBusy = true;
       if (!this.addNewFactor) { // if we are updating an existing factor
@@ -281,6 +305,14 @@ export class FactorComponent implements OnInit {
 
 
   delete() {
+      if (this.mode === 'local') {
+          this.deleted.emit(this.factor);
+          this.isDeleteModalOpen = false;
+          this.isModalOpen = false;
+          this.isDeleting = false;
+          return;
+      }
+      
     if (!this.isStudyReadOnly) {
       this.store.dispatch(new Factors.Delete(this.studyId, this.factor.factorName)).subscribe(
         (completed) => {

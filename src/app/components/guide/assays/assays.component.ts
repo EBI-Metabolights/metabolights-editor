@@ -27,7 +27,7 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 })
 export class GuidedAssaysComponent implements OnInit {
 
-  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
@@ -59,7 +59,9 @@ export class GuidedAssaysComponent implements OnInit {
     private router: Router,
     private store: Store
   ) {
-    this.editorService.initialiseStudy(this.route);
+    if(this.route.snapshot.paramMap.get('id')) {
+      this.editorService.initialiseStudy(this.route);
+    }
     this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
@@ -78,7 +80,7 @@ export class GuidedAssaysComponent implements OnInit {
     this.studyFiles$.pipe(withLatestFrom(this.studyIdentifier$)).subscribe(([value, studyIdentifierValue]) => {
       if (value != null) {
         this.files = value;
-      } else if (value === null && this.files.length === 0) {
+      } else if (value === null && this.files.length === 0 && studyIdentifierValue) {
         this.store.dispatch(new Operations.GetFreshFilesList(false, false, studyIdentifierValue));
       }
     });

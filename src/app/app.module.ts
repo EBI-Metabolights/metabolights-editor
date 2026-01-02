@@ -22,6 +22,7 @@ import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatStepperModule } from "@angular/material/stepper";
 
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule } from "@angular/material/paginator";
@@ -107,7 +108,9 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatButtonToggleModule,
         MatCheckboxModule,
         MatTableModule,
+
         MatDividerModule,
+        MatStepperModule,
         DragDropModule,
         NgxsModule.forRoot([
             GeneralMetadataState,

@@ -40,6 +40,12 @@ hr {
   margin: 1.5rem 0;
 }
 
+.contact-card {
+  height: 100%;
+  position: relative;
+  border: 1px solid #e0e0e0;
+}
+
 .field-label.is-small {
   text-align: left;
   margin-right: 1rem;
@@ -104,4 +110,8 @@ hr {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+
+.stepper-container-offset {
+  margin-top: 5rem !important;
 }

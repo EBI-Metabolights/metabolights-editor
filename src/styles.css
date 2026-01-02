@@ -2,7 +2,7 @@
 @import "https://ebi.emblstatic.net/web_guidelines/EBI-Icon-fonts/v1.3/fonts.css";
 @import "bulma-extensions/bulma-steps/dist/css/bulma-steps.min.css";
 
-/*@import "@angular/material/prebuilt-themes/deeppurple-amber.css";*/
+@import "@angular/material/prebuilt-themes/deeppurple-amber.css";
 
 @import "toastr/build/toastr.css";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
@@ -15,7 +15,8 @@
   font-family: "Material Icons";
   font-style: normal;
   font-weight: 400;
-  src: url(assets/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: url(assets/fonts/MaterialIcons-Regular.eot);
+  /* For IE6-8 */
   src: local("Material Icons"), local("MaterialIcons-Regular"),
     url(assets/fonts/MaterialIcons-Regular.woff2) format("woff2"),
     url(assets/fonts/MaterialIcons-Regular.woff) format("woff"),
@@ -26,7 +27,8 @@
   font-family: "Material Icons";
   font-weight: normal;
   font-style: normal;
-  font-size: 24px; /* Preferred icon size */
+  font-size: 24px;
+  /* Preferred icon size */
   display: inline-block;
   line-height: 1;
   text-transform: none;
@@ -557,6 +559,10 @@ element.style {
   margin-right: 10px;
 }
 
+.fixed-navbar-offset {
+  padding-top: 52px;
+}
+
 .material-icons {
   margin-top: 0 !important;
 }
@@ -644,7 +650,7 @@ element.style {
   color: #636363;
 }
 
-#toast-container > div {
+#toast-container>div {
   opacity: 1;
   -ms-filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   filter: alpha(opacity=100);
@@ -817,11 +823,13 @@ element.style {
     width: 0;
     z-index: 100;
   }
+
   33.3333% {
     left: 0;
     width: 100%;
     z-index: 10;
   }
+
   to {
     left: 0;
     width: 100%;
@@ -842,7 +850,8 @@ element.style {
   border-left: 1px solid #dbdbdb;
   border-right: 1px solid #dbdbdb;
 }
-.copy-btn{
-    float: right;
-    cursor: pointer;
+
+.copy-btn {
+  float: right;
+  cursor: pointer;
 }
