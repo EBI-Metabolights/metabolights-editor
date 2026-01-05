@@ -166,21 +166,21 @@
 
         <hr>
 
-        <!-- Identifiers and File Names -->
-        <div class="columns is-variable is-4 identifiers-row">
-          <div class="column assay-id-field">
+
+        <div class="identifiers-container">
+          <div class="field">
             <label class="label">Assay Identifier</label>
             <div class="control">
-              <input class="input" type="text" formControlName="assayId">
+              <input class="input small-input" type="number" formControlName="assayId">
             </div>
           </div>
-          <div class="column">
+          <div class="field">
             <label class="label">Assay File Name</label>
             <div class="control">
               <input class="input" type="text" [value]="assayFileName" disabled>
             </div>
           </div>
-          <div class="column">
+          <div class="field">
             <label class="label">Result File Name</label>
             <div class="control">
               <input class="input" type="text" [value]="resultFileName" disabled>
@@ -192,6 +192,29 @@
     <footer class="modal-card-foot buttons is-right">
       <button class="button is-primary" (click)="saveAssay()" [disabled]="assayForm.invalid">Create Study</button>
       <button class="button" (click)="closeAddAssayModal()">Cancel</button>
+    </footer>
+  </div>
+</div>
+
+<div class="modal" [ngClass]="{ 'is-active': isKeywordModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">{{ keywordEditMode ? 'Edit' : 'Add' }} Keyword</p>
+      <button class="delete" aria-label="close" (click)="closeKeywordModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="field">
+        <label class="label">Keyword</label>
+        <div class="control">
+          <input class="input" type="text" [(ngModel)]="currentKeyword" placeholder="Enter keyword"
+            (keyup.enter)="saveKeyword()">
+        </div>
+      </div>
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <button class="button is-success" (click)="saveKeyword()">Save</button>
+      <button class="button" (click)="closeKeywordModal()">Cancel</button>
     </footer>
   </div>
 </div>

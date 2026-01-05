@@ -83,18 +83,40 @@ keywords: string[] = [
   'Data-Independent acquisition'
   ];
 
+  /* Keyword Modal States */
+  isKeywordModalOpen = false;
+  currentKeyword = '';
+  keywordEditMode = false;
+  editingKeywordIndex = -1;
+
   addKeyword() {
-    const v = prompt('Enter keyword');
-    if (v && v.trim() !== '') {
-      this.keywords.push(v.trim());
-    }
+    this.keywordEditMode = false;
+    this.currentKeyword = '';
+    this.isKeywordModalOpen = true;
   }
 
   editKeyword(i: number) {
-    const v = prompt('Edit keyword', this.keywords[i]);
-    if (v !== null && v.trim() !== '') {
-      this.keywords[i] = v.trim();
+    this.keywordEditMode = true;
+    this.editingKeywordIndex = i;
+    this.currentKeyword = this.keywords[i];
+    this.isKeywordModalOpen = true;
+  }
+
+  saveKeyword() {
+    if (this.currentKeyword && this.currentKeyword.trim() !== '') {
+      if (this.keywordEditMode) {
+        this.keywords[this.editingKeywordIndex] = this.currentKeyword.trim();
+      } else {
+        this.keywords.push(this.currentKeyword.trim());
+      }
+      this.closeKeywordModal();
     }
+  }
+
+  closeKeywordModal() {
+    this.isKeywordModalOpen = false;
+    this.currentKeyword = '';
+    this.editingKeywordIndex = -1;
   }
 
   removeKeyword(i: number) {
