@@ -20,7 +20,7 @@
     "Protocol REF.2": "Mass spectrometry",
     "Parameter Value[Scan polarity]": "positive",
     "Parameter Value[Scan m/z range]": "100-1000",
-    "Parameter Value[Instrument]": "Thermo Scientific Q Exactive HF",
+    "Parameter Value[Instrument]": "Orbitrap Exploris 120",
     "Term Source REF.2": "MTBLS",
     "Term Accession Number.2": "http://www.ebi.ac.uk/metabolights/ontology/MTBLS_000660",
     "Parameter Value[Ion source]": "electron ionization",
