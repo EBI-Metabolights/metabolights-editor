@@ -189,7 +189,12 @@ export class TableComponent
   isDeleteModalOpen = false;
   editCellform: UntypedFormGroup;
   editColumnform: UntypedFormGroup;
-  defaultControlList = Object.freeze({ name: "", values: Object.freeze([]) });
+  defaultControlList = Object.freeze({
+    name: "",
+    values: Object.freeze([]),
+    renderAsDropdown: false,
+    rule: null,
+  });
   selectedMissingCol = null;
   selectedMissingKey = null;
   selectedMissingVal = null;
@@ -1263,8 +1268,23 @@ export class TableComponent
     );
   }
 
-  isSelected(row: any): boolean {
-    return this.selectedRows.includes(row.index);
+   isSelected(row, column) {
+    if (row && column && this.selectedCells.length > 0) {
+      return (
+        this.selectedCells.filter(
+          (cell) => cell[0] === column.columnDef && cell[1] === row.index
+        ).length > 0
+      );
+    } else if (this.selectedColumns.length === 0) {
+      if (this.selectedRows.indexOf(row.index) > -1) {
+        return true;
+      }
+    } else if (this.selectedRows.length === 0) {
+      if (this.selectedColumns.indexOf(column.columnDef) > -1) {
+        return true;
+      }
+    }
+    return false;
   }
 
 
@@ -1465,24 +1485,34 @@ export class TableComponent
 
     const controlList = this.columnControlList(this.selectedCell["column"].header);
 
+    // CONTROL-LIST cell (could be ontology widget or dropdown)
     if (this.enableControlList && this.isCellTypeControlList) {
-      const selectedOntology = this.getOntologyComponentValue("editControlListCell").values[0];
-      const value = selectedOntology ? selectedOntology.annotationValue : "";
+      const editControlComp = this.getOntologyComponentValue("editControlListCell");
+      const selectedControlOntology = editControlComp?.values?.[0];
+      const controlValueFromForm = this.editCellform?.get("cell")?.value;
+      const value =
+        selectedControlOntology?.annotationValue ??
+        (typeof controlValueFromForm === "string" ? controlValueFromForm : "");
+
       cellsToUpdate = [
         {
           row: this.selectedCell["row"].index,
           column: columnIndex,
           value,
-        }
+        },
       ];
+
+    // ONTOLOGY cell (either dropdown or autocomplete)
     } else if (this.enableControlList && this.isCellTypeOntology) {
-      if (controlList && 'renderAsDropdown' in controlList && controlList.renderAsDropdown) {
-        // Handle dropdown for "selected-ontology-term"
-        const selectedValue = this.editCellform.get("cell").value;
-        const selectedOption = ((controlList as any).values || []).find(option => option.annotationValue === selectedValue);
+      // Dropdown flow for selected-ontology-term
+      if (controlList && controlList.renderAsDropdown) {
+        const selectedValue = this.editCellform?.get("cell")?.value ?? "";
+        const selectedOption = (controlList.values || []).find(
+          (option: any) => option.annotationValue === selectedValue
+        );
         const value = selectedValue || "";
-        const termSource = selectedOption ? selectedOption.termSource.name : "";
-        const termAccession = selectedOption ? selectedOption.termAccession : "";
+        const termSource = selectedOption?.termSource?.name ?? "";
+        const termAccession = selectedOption?.termAccession ?? "";
         cellsToUpdate = [
           {
             row: this.selectedCell["row"].index,
@@ -1501,15 +1531,26 @@ export class TableComponent
           },
         ];
       } else {
-        // Handle autocomplete for other ontology types
-        if(this.isRequiredField && this.getOntologyComponentValue("editOntologyCell")?.values.length === 0) {
+        // Autocomplete / ontology component flow - prefer component value, fallback to form string
+        const editOntComp = this.getOntologyComponentValue("editOntologyCell");
+        const selectedOntology =
+          editOntComp?.values?.[0] ??
+          (this.editCellform?.get("cell")?.value
+            ? {
+                annotationValue: this.editCellform.get("cell").value,
+                termAccession: "",
+                termSource: { name: "" },
+              }
+            : null);
+
+        if (this.isRequiredField && (!selectedOntology || !selectedOntology.annotationValue)) {
           toastr.error("This is a required field.", "Error", this.toastrSettings);
           return;
         }
-        const selectedOntology = this.getOntologyComponentValue("editOntologyCell").values[0];
-        const value = selectedOntology ? selectedOntology.annotationValue : "";
-        const termSource = selectedOntology ? selectedOntology.termSource.name : "";
-        const termAccession = selectedOntology ? selectedOntology.termAccession : "";
+
+        const value = selectedOntology?.annotationValue ?? "";
+        const termSource = selectedOntology?.termSource?.name ?? "";
+        const termAccession = selectedOntology?.termAccession ?? "";
         cellsToUpdate = [
           {
             row: this.selectedCell["row"].index,
@@ -1528,12 +1569,14 @@ export class TableComponent
           },
         ];
       }
+
+    // FILE or plain cell
     } else if (this.enableControlList && this.isCellTypeFile) {
       cellsToUpdate = [
         {
           row: this.selectedCell["row"].index,
           column: columnIndex,
-          value: this.editCellform.get("cell").value,
+          value: this.editCellform?.get("cell")?.value,
         },
       ];
     } else {
@@ -1541,7 +1584,7 @@ export class TableComponent
         {
           row: this.selectedCell["row"].index,
           column: columnIndex,
-          value: this.editCellform.get("cell").value,
+          value: this.editCellform?.get("cell")?.value,
         },
       ];
     }
