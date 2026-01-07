@@ -60,7 +60,8 @@ export class ValidationService extends BaseConfigDependentService {
     getValidationV2Report(proxy: boolean = false, taskId: string = null, studyId: string): Observable<Ws3ValidationTaskResponse> {
 
       // remove once new auth service implemented
-      const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      const jwtTokenKey = "jwt"
       const token = localStorage.getItem(jwtTokenKey);
       let headers = null;
       let headersObj = {
@@ -85,7 +86,8 @@ export class ValidationService extends BaseConfigDependentService {
 
     getValidationHistory(studyId: string): Observable<Ws3HistoryResponse> {
       let headers = null;
-      const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      const jwtTokenKey ="jwt"
       const token = localStorage.getItem(jwtTokenKey);
       // write new headers impl this is annoying me
       headers = new HttpHeaders({
