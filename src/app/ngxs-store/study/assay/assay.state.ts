@@ -239,6 +239,7 @@ export class AssayState {
         this.assaysService.deleteAssay(action.assay, action.studyId).subscribe(
             (deleted) => {
                 ctx.dispatch(new AssayList.Get(action.studyId))
+                this.store.dispatch(new Protocols.Get());
             }
         )
     }

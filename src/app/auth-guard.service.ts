@@ -94,7 +94,8 @@ export class AuthGuard  implements OnInit {
         this.router.navigate(["/login"]);
         return false;
       }
-      const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+      const jwtTokenKey = "jwt"
       const localJwt = localStorage.getItem(jwtTokenKey);
 
       if (localJwt !== null && jwt === localJwt) {
@@ -161,7 +162,8 @@ export class AuthGuard  implements OnInit {
    * @returns boolean indicating whether the user is logged in.
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
-    const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    const jwtTokenKey = "jwt"
     
     const localJwt = localStorage.getItem(jwtTokenKey);
     if (url.startsWith("/login")) {
@@ -363,7 +365,8 @@ export class AuthGuard  implements OnInit {
     // ) {
     //   return SessionStatus.NoRecord;
     // }
-    const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    const jwtTokenKey = "jwt"
     const userKey = this.configService.config.endpoint + "/user"
     const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
     if (localStorage.getItem(jwtTokenKey) === null) {
