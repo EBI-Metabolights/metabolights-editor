@@ -89,7 +89,9 @@ export class LoginComponent implements OnInit {
           const decoded = jwtDecode<MtblsJwtPayload>(jwt);
           const expiration = decoded.exp;
           const user = decoded.email;
-          const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+          // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+          const jwtTokenKey = "jwt"
+
           const refreshTokenKey = this.configService.config.endpoint + "/refreshToken"          
 
           const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"

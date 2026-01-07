@@ -447,7 +447,8 @@ export class EditorService {
    */
   async updateSession() {
 
-    const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    const jwtTokenKey = "jwt"
+    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
     const userKey = this.configService.config.endpoint + "/user"
 
     const activeJwt = localStorage.getItem(jwtTokenKey);
@@ -552,7 +553,8 @@ export class EditorService {
 
   clearSessionData() {
     if (this.configService.config.endpoint) {
-      localStorage.removeItem(this.configService.config.endpoint + "/jwt");
+      // localStorage.removeItem(this.configService.config.endpoint + "/jwt");
+      localStorage.removeItem("jwt");
       localStorage.removeItem(this.configService.config.endpoint + "/username");
       localStorage.removeItem(this.configService.config.endpoint + "/jwtExpirationTime");
       localStorage.removeItem(this.configService.config.endpoint + "/user");
@@ -571,7 +573,8 @@ export class EditorService {
     const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
     const expiration = decoded.exp;
 
-    const jwtKey = this.configService.config.endpoint + "/jwt"
+    // const jwtKey = this.configService.config.endpoint + "/jwt"
+    const jwtKey = "jwt"
     const usernameKey = this.configService.config.endpoint + "/username"
     const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
 
