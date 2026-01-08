@@ -33,6 +33,7 @@ build_docker:
   - docker build -t $IMAGE_NAME .
   - echo "docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CICD_GITLAB_REGISTRY -t $LATEST_IMAGE_NAME ."
   - docker build --build-arg CONTAINER_REGISTRY_PREFIX=$CICD_GITLAB_REGISTRY -t $LATEST_IMAGE_NAME .
+  - echo "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
   - docker push $IMAGE_NAME
   - docker push $LATEST_IMAGE_NAME
 
