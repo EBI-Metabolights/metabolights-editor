@@ -11,7 +11,7 @@ import { Loading } from 'src/app/ngxs-store/non-study/transitions/transitions.ac
 export class DataPolicyModalComponent {
 
   @Output() confirm = new EventEmitter<boolean>();
-  
+
   scrolledToBottom = false;
 
   constructor(private store: Store) {

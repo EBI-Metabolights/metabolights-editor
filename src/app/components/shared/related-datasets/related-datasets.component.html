@@ -1,0 +1,72 @@
+<!-- Add New Dataset Form -->
+<div class="box is-relative mb-4">
+    <form [formGroup]="form">
+        <div class="columns is-multiline">
+            <!-- Identifier Source -->
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Identifier Source</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input type="text" matInput formControlName="identifierSource"
+                                [matAutocomplete]="sourceAuto" placeholder="e.g. MetaboLights" />
+                            <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
+                                <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
+                                    <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dataset Identifier -->
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Dataset Identifier</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input matInput type="text" formControlName="identifier"
+                                [placeholder]="identifierPlaceholder">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add Button Area -->
+        <div class="field is-grouped is-justify-content-flex-end mt-2">
+            <div class="control">
+                <button class="button is-small is-primary" (click)="addDataset()" [disabled]="form.invalid">
+                    <span class="icon is-small">
+                        <i class="material-icons">add</i>
+                    </span>
+                    <span>Add Dataset</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- List of Existing Datasets -->
+<div class="mb-4" *ngIf="(relatedDatasets$ | async)?.length > 0">
+    <div class="funding-list">
+        <div class="box p-3 mb-2 funding-item" *ngFor="let ds of relatedDatasets$ | async; let i = index">
+            <div class="columns is-vcentered is-mobile">
+                <div class="column">
+                    <div class="is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.5rem;">
+                        <span class="has-text-weight-bold has-text-grey-dark">{{ ds.identifier }}</span>
+
+                        <span class="tag is-light" style="white-space: normal; height: auto; text-align: left;"
+                            *ngIf="ds.url">
+                            <a [href]="ds.url" target="_blank" class="has-text-grey" style="word-break: break-all;">{{
+                                ds.url }}</a>
+                        </span>
+                    </div>
+                </div>
+                <div class="column is-narrow">
+                    <button class="delete" (click)="removeDataset(i)" title="Remove Dataset"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

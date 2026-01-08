@@ -52,9 +52,10 @@ export class CreateComponent implements OnInit {
   studyAssaySelection: any = {};
   isAnyAssaySelected = false;
   sampleFileTemplates: string[] = [];
+  investigationFileTemplates: string[] = [];
   selectedSampleFileTemplate: string = '';
-  dynamicHeaders: string[] = [];
-  sampleCharacteristicsValues: any = {};
+  selectedInvestigationFileTemplate: string = '';
+
   licenseUrl: string = "";
   licenseName: string = "";
   
@@ -64,22 +65,19 @@ export class CreateComponent implements OnInit {
 
   
   agreements: any = {
-    datasetLicenseAgreement: true,
-    datasetPolicyAgreement: true,
+    datasetLicenseAgreement: false,
+    datasetPolicyAgreement: false,
     emailCommunicationAgreement: true,
-    privacyPolicyAgreement: true
+    privacyPolicyAgreement: false
   };
   // Ontology Fields
   selectedSubmitterRole: Ontology = null;
   submitterRole: Ontology[] = []; 
   publicationStatus: Ontology[] = [];
   publicationDoi: string = "";
-  fundingFunder: Ontology[] = [];
-  fundingGrant: string = "";
-  funderOrganization: string = "";
-  funderId: string = "";
+  funders: any[] = [];
   filteredFunderOrganizations$: Observable<any>;
-  relatedDatasets: { identifier: string; url: string }[] = [{identifier: '', url: ''}];
+  relatedDatasets: any[] = [];
   submitterRoleControlList: any = null;
   publicationStatusControlList: any = null;
   funderControlList: any = null;
@@ -127,9 +125,6 @@ export class CreateComponent implements OnInit {
       submitterRole: [[]],
       publicationStatus: [[]],
       fundingFunder: [[]], // Keep legacy for now or remove if unused later
-      funderOrganization: [''],
-      funderId: [''],
-      grantIdentifier: [''],
     });
   }
   private legacyControlLists: any = null;
@@ -142,39 +137,13 @@ export class CreateComponent implements OnInit {
         this.validations = value;
       }
     });
-    // Debounced autocomplete logic for Funder Organization
-    this.filteredFunderOrganizations$ = this.studyCreationForm.get('funderOrganization')!.valueChanges.pipe(
-      debounceTime(600),
-      distinctUntilChanged(),
-      switchMap((query: string) => {
-        if (!query || query.length < 3) {
-          return of([]);
-        }
-        return this.editorService.getRorOrganizations(query).pipe(
-          switchMap((res: any) => {
-            const docs = res?.response?.docs || [];
-            const items = docs.map((doc: any) => ({
-                id: doc.iri,
-                name: doc.label || '(Unknown name)',
-                synonyms: doc.synonym || [],
-                description: doc.description?.[0] || '',
-                ontology_prefix: doc.ontology_prefix
-            }));
-            return of(items);
-          })
-        );
-      })
-    );
+
     
     // Subscribe to sampleFileHeaderTemplates BEFORE templateConfiguration
     // to ensure it's available when initConfiguration calls loadDynamicHeaders
     this.sampleFileHeaderTemplates$.subscribe(templates => {
         if(templates) {
             this.sampleFileHeaderTemplates = templates;
-            // If we already have a selected template, reload the headers
-            if (this.selectedSampleFileTemplate) {
-                this.loadDynamicHeaders(this.selectedSampleFileTemplate);
-            }
         }
     });
     this.templateConfiguration$.subscribe(config => {
@@ -195,6 +164,8 @@ export class CreateComponent implements OnInit {
     this.store.select(StudyCreationState.factors).subscribe(factors => this.factors = factors);
     this.store.select(StudyCreationState.designDescriptors).subscribe(descriptors => this.designDescriptors = descriptors);
     this.store.select(StudyCreationState.contacts).subscribe(contacts => this.contacts = contacts);
+    this.store.select(StudyCreationState.funders).subscribe(funders => this.funders = funders);
+    this.store.select(StudyCreationState.relatedDatasets).subscribe(ds => this.relatedDatasets = ds);
   }
   getProcessedControlList(listName: string) {
     const defaultList = { name: listName, values: [] };
@@ -212,7 +183,7 @@ export class CreateComponent implements OnInit {
     }
     const selectionInput = {
       studyCategory: null,
-      studyCreatedAt: null,
+      studyCreatedAt: listName === 'Study Publication Status' ? new Date() : null,
       isaFileType: "investigation" as any,
       isaFileTemplateName: null,
       templateVersion: this.templateConfiguration?.defaultTemplateVersion,
@@ -275,6 +246,7 @@ export class CreateComponent implements OnInit {
           };
       });
       this.sampleFileTemplates = versionConfig.activeSampleFileTemplates || [];
+      this.investigationFileTemplates = versionConfig.activeInvestigationFileTemplates || [];
       
       const defaultSampleTemplate = versionConfig.defaultSampleFileTemplate;
       if (defaultSampleTemplate) {
@@ -282,6 +254,14 @@ export class CreateComponent implements OnInit {
           this.studyCreationForm.controls['sampleFileTemplate']?.setValue(defaultSampleTemplate);
           this.onSampleTemplateChange(defaultSampleTemplate);
       }
+
+      const defaultInvestigationTemplate = versionConfig.defaultInvestigationFileTemplate 
+        || (versionConfig.activeInvestigationFileTemplates && versionConfig.activeInvestigationFileTemplates.length > 0 ? versionConfig.activeInvestigationFileTemplates[0] : null)
+        || 'minimum';
+      
+      console.log('Default Investigation Template:', defaultInvestigationTemplate);
+      
+      this.selectedInvestigationFileTemplate = defaultInvestigationTemplate;
 
       // License Information
       this.licenseName = versionConfig.defaultDatasetLicense || "";
@@ -295,65 +275,6 @@ export class CreateComponent implements OnInit {
 
   onSampleTemplateChange(templateName: string) {
       this.selectedSampleFileTemplate = templateName;
-      this.loadDynamicHeaders(templateName);
-  }
-  loadDynamicHeaders(templateName: string) {
-      if (!this.sampleFileHeaderTemplates) return;
-      
-      // Access headers from: sampleFileHeaderTemplates[templateName][0].headers
-      const templateData = this.sampleFileHeaderTemplates[templateName];
-      const allHeaders = Array.isArray(templateData) && templateData.length > 0 
-        ? templateData[0]?.headers || [] 
-        : [];
-      
-      this.dynamicHeaders = allHeaders
-        .filter((header: any) => {
-          // If header is a string, check if it starts with 'Characteristics['
-          if (typeof header === 'string') {
-            return header.startsWith('Characteristics[');
-          }
-          
-          // If header is an object, check columnCategory and required flag
-          if (typeof header === 'object' && header !== null) {
-            const columnCategory = header.columnCategory;
-            const isRequired = header.required === true;
-            return columnCategory === 'Characteristics' && isRequired;
-          }
-          
-          return false;
-        })
-        .map((header: any) => {
-          if (typeof header === 'string') {
-            return header;
-          }
-          return header.header || header.columnHeader || header.name || null;
-        })
-        .filter((headerName: string | null) => headerName != null && headerName !== ''); // Remove any null/undefined/empty values
-      
-      console.log('Dynamic Headers:', this.dynamicHeaders);
-      
-      // Only add form controls if the form has been initialized
-      if (this.studyCreationForm) {
-        this.dynamicHeaders.forEach(header => {
-           if (!this.studyCreationForm.contains(header)) {
-               this.studyCreationForm.addControl(header, this.fb.control(null));
-           }
-        });
-      }
-  }
-
-  getCharacteristicControlList(header: string) {
-      const sampleFileControls = this.legacyControlLists?.controls?.sampleFileControls || {};
-      const control = sampleFileControls[header];
-      const listName = (control && control.name) ? control.name : "__default_characteristics__";
-      return this.getProcessedControlList(listName);
-  }
-
-
-  onCharacteristicChange(header: string, value: any) {
-      const selectedValue = Array.isArray(value) ? value : [value];
-      this.sampleCharacteristicsValues[header] = selectedValue;
-      this.studyCreationForm.controls[header]?.setValue(selectedValue);
   }
 
   
@@ -408,28 +329,7 @@ export class CreateComponent implements OnInit {
     if (fieldName === 'fundingFunder') return this.funderControlList;
     return null;
   }
-  onFunderSelected(event: MatAutocompleteSelectedEvent): void {
-    const org = event.option.value as { name: string; id: string };
-    if (org) {
-      this.studyCreationForm.patchValue({
-        funderOrganization: org.name,
-        funderId: org.id
-      });
-    }
-  }
-  displayFunderName(org?: any): string {
-    return org ? (typeof org === 'string' ? org : org.name) : "";
-  }
-  getFunderRorIdUrl(): string {
-    const org = this.studyCreationForm.get("funderOrganization")?.value?.trim();
-    return org ? `https://ror.org/search?query=${encodeURIComponent(org)}` : 'https://ror.org/';
-  }
-  addRelatedDataset() {
-      this.relatedDatasets.push({identifier: '', url: ''});
-  }
-  removeRelatedDataset(index: number) {
-      this.relatedDatasets.splice(index, 1);
-  }
+
   ngOnInit() {
     this.store.dispatch(new Loading.Disable());
     this.store.dispatch(new StudyCreation.Reset());
@@ -440,11 +340,11 @@ export class CreateComponent implements OnInit {
   
   // Validation Getters
   get isTitleValid(): boolean {
-      return this.studyTitle && this.studyTitle.trim().length >= 10;
+      return this.studyTitle && this.studyTitle.trim().length >= 8;
   }
   
   get isDescriptionValid(): boolean {
-      return this.studyDescription && this.studyDescription.trim().length >= 10;
+      return this.studyDescription && this.studyDescription.trim().length >= 60;
   }
   
   get isStep1Valid(): boolean {
@@ -452,8 +352,9 @@ export class CreateComponent implements OnInit {
            this.selectedSubmitterRole && 
            this.publicationStatus && this.publicationStatus.length > 0 &&
            this.agreements?.datasetLicenseAgreement &&
+           this.agreements?.datasetLicenseAgreement &&
            this.agreements?.datasetPolicyAgreement &&
-           this.agreements?.emailCommunicationAgreement);
+           this.agreements?.privacyPolicyAgreement);
   }
   get isStep2Valid(): boolean {
       return this.isTitleValid && 
@@ -480,16 +381,13 @@ export class CreateComponent implements OnInit {
     const distinctCategoriesType = new Set(selectedCategoryKeys); // e.g. 'ms', 'nmr' are keys in studyAssaySelection? 
     // Wait, studyAssaySelection keys ARE the category identifiers e.g. 'ms-mhd-legacy', 'nmr'.
     
-    if (selectedCategoryKeys.length === 1) {
-        // Single Category -> Go to Wizard Step 2
-        this.currentSubStep = 2;
-        this.setUpWizardStep(selectedCategoryKeys[0]);
-        return;
-    }
-    // Multiple Category -> Show Confirmation Modal
-    this.confirmationTitle = "Confirmation";
-    this.confirmationMessage = `We created the following ${selectedCategoryKeys.length} MetaboLights submissions for your study. You can select and update your MetaboLights submissions.`;
-    this.showConfirmationModal = true;
+    // Always proceed to Step 2, regardless of number of categories selected
+    this.currentSubStep = 2;
+    // Use the first selected category for setup configuration, or null if none (though validation prevents 0)
+    // If multiple categories are selected, we simply use the first one to determine the descriptor list.
+    // This aligns with the requirement to treat multiple categories same as single.
+    const primaryCategory = selectedCategoryKeys.length > 0 ? selectedCategoryKeys[0] : null;
+    this.setUpWizardStep(primaryCategory);
   }
 
   onConfirmSelection(confirmed: boolean) {
@@ -500,6 +398,23 @@ export class CreateComponent implements OnInit {
         }
         this.submitStudy(true); 
     }
+  }
+
+  // Data Policy Modal
+  showDataPolicyModal = false;
+
+  openDataPolicyModal(event?: Event) {
+      if (event) {
+          event.preventDefault();
+      }
+      this.showDataPolicyModal = true;
+  }
+
+  onDataPolicyModalResult(agreed: boolean) {
+      this.showDataPolicyModal = false;
+      if (agreed) {
+          this.agreements.privacyPolicyAgreement = true;
+      }
   }
   // Agreements and Wizard Configuration
   descriptorControlListKey: string = null;
@@ -591,33 +506,40 @@ export class CreateComponent implements OnInit {
   }
   onRoleChange(value) {
       if (value) {
-          // mtbls-ontology emits an array of values
           const selectedValue = Array.isArray(value) ? value[0] : value;
           if (!selectedValue) return;
-          this.selectedSubmitterRole = selectedValue;
-          this.submitterRole = [selectedValue]; // Keep track of the selected role
-          if (this.submitterRoleControlList && this.submitterRoleControlList.values) {
-              this.submitterRoleControlList.values.forEach(role => {
-                  if (role.annotationValue === selectedValue.annotationValue) {
-                      this.selectedSubmitterRole = role;
-                      this.submitterRole = [role];
-                  }
-              });
+
+          let matchedRole = null;
+          if (typeof selectedValue === 'string') {
+              if (this.submitterRoleControlList && this.submitterRoleControlList.values) {
+                  matchedRole = this.submitterRoleControlList.values.find(role => role.annotationValue === selectedValue);
+              }
+          } else {
+              matchedRole = selectedValue;
+          }
+
+          if (matchedRole) {
+              this.selectedSubmitterRole = matchedRole;
+              this.submitterRole = [matchedRole];
           }
       }
   }
   onPublicationStatusChange(value) {
       if (value) {
-          // mtbls-ontology emits an array of values
           const selectedValue = Array.isArray(value) ? value[0] : value;
           if (!selectedValue) return;
-          this.publicationStatus = [selectedValue]; 
-          if (this.publicationStatusControlList && this.publicationStatusControlList.values) {
-            this.publicationStatusControlList.values.forEach(status => {
-                if (status.annotationValue === selectedValue.annotationValue) {
-                    this.publicationStatus = [status];
-                }
-            });
+
+          let matchedStatus = null;
+          if (typeof selectedValue === 'string') {
+              if (this.publicationStatusControlList && this.publicationStatusControlList.values) {
+                  matchedStatus = this.publicationStatusControlList.values.find(status => status.annotationValue === selectedValue);
+              }
+          } else {
+              matchedStatus = selectedValue;
+          }
+
+          if (matchedStatus) {
+              this.publicationStatus = [matchedStatus];
           }
       }
   }
@@ -649,25 +571,10 @@ export class CreateComponent implements OnInit {
         };
     }
     // Get Funding
-    const funding = [];
-    const funderOrgName = formValue.funderOrganization;
-    if (funderOrgName) {
-        funding.push({
-            fundingOrganization: {
-                comments: [],
-                annotationValue: funderOrgName,
-                termSource: {
-                    comments: [],
-                    name: "ROR",
-                    file: "",
-                    version: "",
-                    description: ""
-                },
-                termAccession: formValue.funderId || ""
-            },
-            grantIdentifier: formValue.grantIdentifier || ""
-        });
-    }
+    const funding = this.funders.map(f => ({
+        fundingOrganization: f.fundingOrganization,
+        grantIdentifier: f.grantIdentifier
+    }));
     // Contacts
     let contacts = [];
     // Unified mapping for both single and multiple category flows
@@ -761,7 +668,7 @@ export class CreateComponent implements OnInit {
         publicationDoi: (this as any).publicationDoi || "", 
         designDescriptors: designDescriptors,
         factors: factors,
-        sampleCharacteristics: this.sampleCharacteristicsValues
+
     };
 
     console.log('Creating study with payload:', JSON.stringify(payload, null, 2));

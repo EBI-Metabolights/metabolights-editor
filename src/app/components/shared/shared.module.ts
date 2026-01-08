@@ -70,6 +70,9 @@ import { FactorlistComponent } from "./factorlist/factorlist.component";
 import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.component";
 import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
 import { BrowserModule } from "@angular/platform-browser";
+import { FundingComponent } from './funding/funding.component';
+import { RelatedDatasetsComponent } from './related-datasets/related-datasets.component';
+
 
 
 /**
@@ -118,7 +121,9 @@ import { BrowserModule } from "@angular/platform-browser";
     CurationStatusStarTransformPipe,
     FactorlistComponent,
     DataPolicyModalComponent,
-    DragAndDropComponent
+    DragAndDropComponent,
+    FundingComponent,
+    RelatedDatasetsComponent
   ],
   imports: [
     CommonModule,
@@ -184,8 +189,9 @@ import { BrowserModule } from "@angular/platform-browser";
     CurationStatusStarTransformPipe,
     FactorlistComponent,
     DataPolicyModalComponent,
-    DragAndDropComponent
-
+    DragAndDropComponent,
+    FundingComponent,
+    RelatedDatasetsComponent
   ],
   providers: [
     AuthGuard,

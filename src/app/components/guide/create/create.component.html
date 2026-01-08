@@ -38,23 +38,9 @@
               </div>
               <hr class="mt-4 mb-4">
               <div class="columns">
-                <div class="column is-4">
-                  <h4 class="title is-6 mb-2">Sample File Template</h4>
-                  <div class="field">
-                    <div class="control">
-                      <div class="select is-fullwidth is-small">
-                        <select (change)="onSampleTemplateChange($event.target.value)"
-                          [value]="selectedSampleFileTemplate">
-                          <option *ngFor="let t of sampleFileTemplates" [value]="t">{{t}}</option>
-                        </select>
 
-                      </div>
 
-                    </div>
 
-                  </div>
-
-                </div>
 
               </div>
 
@@ -62,11 +48,15 @@
             <div class="section-header-line">
             </div>
             <!-- Roles, Status, DOI -->
-            <div class="columns is-multiline">
-              <div class="column is-6">
-                <div class="field">
-                  <label class="label is-small">Submitter Role*</label>
-                  <div class="control">
+            <!-- Roles, Status, DOI Refactored to Horizontal Fields -->
+            <div>
+              <!-- Submitter Role -->
+              <div class="field is-horizontal mb-3">
+                <div class="field-label is-small">
+                  <label class="label">Submitter Role*</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
                     <ng-container
                       *ngIf="submitterRoleControlList && !submitterRoleControlList.renderAsDropdown; else submitterRoleDropdown">
                       <mtbls-ontology [controlList]="submitterRoleControlList" [values]="submitterRole"
@@ -75,26 +65,29 @@
                       </mtbls-ontology>
                     </ng-container>
                     <ng-template #submitterRoleDropdown>
-                      <mat-form-field class="full-width is-small" *ngIf="submitterRoleControlList?.values?.length">
-                        <mat-select [value]="submitterRole[0]?.annotationValue"
-                          (selectionChange)="onRoleChange($event.value)">
-                          <mat-option *ngFor="let option of submitterRoleControlList.values"
-                            [value]="option.annotationValue">
-                            {{ option.annotationValue }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
+                      <div *ngIf="submitterRoleControlList?.values?.length">
+                        <mat-form-field class="full-width is-small">
+                          <mat-select [value]="submitterRole[0]?.annotationValue"
+                            (selectionChange)="onRoleChange($event.value)">
+                            <mat-option *ngFor="let option of submitterRoleControlList.values"
+                              [value]="option.annotationValue">
+                              {{ option.annotationValue }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
                     </ng-template>
-
                   </div>
-
                 </div>
-
               </div>
-              <div class="column is-6">
-                <div class="field">
-                  <label class="label is-small">Publication Status*</label>
-                  <div class="control">
+
+              <!-- Publication Status -->
+              <div class="field is-horizontal mb-3">
+                <div class="field-label is-small">
+                  <label class="label">Publication Status*</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
                     <ng-container
                       *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
                       <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
@@ -105,182 +98,51 @@
                       </mtbls-ontology>
                     </ng-container>
                     <ng-template #publicationStatusDropdown>
-                      <mat-form-field class="full-width is-small" *ngIf="publicationStatusControlList?.values?.length">
-                        <mat-select [value]="publicationStatus[0]?.annotationValue"
-                          (selectionChange)="onPublicationStatusChange($event.value)">
-                          <mat-option *ngFor="let option of publicationStatusControlList.values"
-                            [value]="option.annotationValue">
-                            {{ option.annotationValue }}
-                          </mat-option>
-                        </mat-select>
-                      </mat-form-field>
+                      <div *ngIf="publicationStatusControlList?.values?.length">
+                        <mat-form-field class="full-width is-small">
+                          <mat-select [value]="publicationStatus[0]?.annotationValue"
+                            (selectionChange)="onPublicationStatusChange($event.value)">
+                            <mat-option *ngFor="let option of publicationStatusControlList.values"
+                              [value]="option.annotationValue">
+                              {{ option.annotationValue }}
+                            </mat-option>
+                          </mat-select>
+                        </mat-form-field>
+                      </div>
                     </ng-template>
-
                   </div>
-
                 </div>
-
-              </div>
-              <div class="column is-12">
-                <div class="field">
-                  <label class="label is-small">DOI</label>
-                  <div class="control">
-                    <input class="input is-small" type="text" [(ngModel)]="publicationDoi" placeholder="DOI">
-
-                  </div>
-
-                </div>
-
               </div>
 
+              <!-- DOI -->
+              <div class="field is-horizontal mb-3">
+                <div class="field-label is-small">
+                  <label class="label">DOI</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <mat-form-field class="full-width is-small">
+                        <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI">
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="section-header-line">
               <span>Funding</span>
 
             </div>
             <!-- Funding -->
-            <div [formGroup]="studyCreationForm">
-              <div class="field is-horizontal mb-3">
-                <div class="field-label is-small">
-                  <label class="label">Funder Organization</label>
-
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <mat-form-field class="full-width is-small">
-                      <input type="text" matInput formControlName="funderOrganization" [matAutocomplete]="funderAuto"
-                        placeholder="e.g. European Bioinformatics Institute" />
-                      <mat-autocomplete #funderAuto="matAutocomplete" [displayWith]="displayFunderName"
-                        (optionSelected)="onFunderSelected($event)">
-                        <mat-option *ngFor="let org of filteredFunderOrganizations$ | async" [value]="org">
-                          <div class="is-size-7"><b>{{ org.name }}</b> - {{ org.id?.split('/').pop() || '(Unknown ID)'
-                            }}
-                          </div>
-                          <div style="font-size: 11px; color: #666; line-height: 1.2;">{{ org.description || '(No
-                            description available)' }}
-                          </div>
-                        </mat-option>
-                      </mat-autocomplete>
-                    </mat-form-field>
-
-                  </div>
-
-                </div>
-
-              </div>
-              <div class="field is-horizontal mb-3">
-                <div class="field-label is-small">
-                  <label class="label">Funder ID</label>
-
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <mat-form-field class="full-width is-small">
-                      <input matInput formControlName="funderId" placeholder="e.g. https://ror.org/02catss52" />
-                      <a matSuffix target="_blank" [href]="getFunderRorIdUrl()" class="search-link"
-                        style="margin-left: 8px;">
-                        <small>Search ROR ID</small>
-                      </a>
-                    </mat-form-field>
-
-                  </div>
-
-                </div>
-
-              </div>
-              <div class="field is-horizontal mb-3">
-                <div class="field-label is-small">
-                  <label class="label">Grant Identifier</label>
-
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <input class="input is-small" type="text" formControlName="grantIdentifier"
-                      placeholder="e.g. Grant #12345">
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
+            <mtbls-funding [controlList]="funderControlList"></mtbls-funding>
             <!-- Related Datasets Section -->
             <div class="section-header-line">
               <span>Related Datasets</span>
-
             </div>
-            <div class="mb-4">
-              <div *ngFor="let ds of relatedDatasets; let i = index"
-                class="columns is-multiline is-vcentered dataset-row">
-                <div class="column is-5">
-                  <div class="field">
-                    <label class="label is-small" *ngIf="i === 0">Identifier</label>
-                    <div class="control">
-                      <input type="text" class="input is-small" [(ngModel)]="ds.identifier" placeholder="PXD122233">
+            <mtbls-related-datasets></mtbls-related-datasets>
 
-                    </div>
 
-                  </div>
-
-                </div>
-                <div class="column is-5">
-                  <div class="field">
-                    <label class="label is-small" *ngIf="i === 0">URL</label>
-                    <div class="control">
-                      <input type="text" class="input is-small" [(ngModel)]="ds.url" placeholder="http://">
-
-                    </div>
-
-                  </div>
-
-                </div>
-                <div class="column is-2">
-                  <div [class]="i === 0 ? 'row-actions' : 'subsequent-row-actions'">
-                    <span class="material-symbols-outlined icon-action-button has-text-primary mr-2"
-                      (click)="addRelatedDataset()" title="Add row">
-                      add_circle
-                    </span>
-                    <span class="material-symbols-outlined icon-action-button has-text-danger"
-                      (click)="removeRelatedDataset(i)" *ngIf="i > 0" title="Remove row">
-                      remove_circle
-                    </span>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-            <!-- Sample Characteristics Section -->
-            <ng-container *ngIf="dynamicHeaders && dynamicHeaders.length > 0">
-              <div class="section-header-line">
-                <span>Sample Characteristics</span>
-
-              </div>
-              <div class="mb-4">
-                <div class="columns is-multiline">
-                  <div *ngFor="let header of dynamicHeaders" class="column is-6 characteristic-column">
-                    <div class="field">
-                      <label class="label is-small">{{ header.replace('Characteristics[', '').replace(']', '')
-                        }}</label>
-                      <div class="control">
-                        <mtbls-ontology [controlList]="getCharacteristicControlList(header)"
-                          [values]="sampleCharacteristicsValues[header] || []"
-                          (changed)="onCharacteristicChange(header, $event)" [inline]="true">
-                        </mtbls-ontology>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-            </ng-container>
             <div class="section-header-line">
             </div>
             <!-- Agreements -->
@@ -291,8 +153,15 @@
                 <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">(View License)</a>
               </label>
               <label class="checkbox is-size-7 db mb-2">
+                <input type="checkbox" [checked]="agreements.privacyPolicyAgreement"
+                  (click)="openDataPolicyModal($event)"> I confirm that I have read and
+                agree to adhere to the MetaboLights privacy policy.
+              </label>
+              <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.datasetPolicyAgreement"> I confirm that I have read and
                 agree to adhere to the MetaboLights data policy.
+                <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
+                  Policy)</a>
               </label>
               <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.emailCommunicationAgreement"> I agree to receive email
@@ -302,8 +171,7 @@
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
-                <button class="button is-primary" (click)="createStudy()" [disabled]="!isStep1Valid">Let's get
-                  started</button>
+                <button class="button is-primary" (click)="createStudy()" [disabled]="!isStep1Valid">Continue</button>
 
               </div>
 
@@ -325,25 +193,25 @@
           <div class="box">
             <h4 class="title is-5 mb-4">Study Description</h4>
             <div class="field mb-4">
-              <label class="label is-small">Study Title (min 10 chars)*</label>
+              <label class="label is-small">Study Title (min 8 chars)*</label>
               <div class="control">
                 <input class="input is-small" type="text" [(ngModel)]="studyTitle"
                   placeholder="Enter a descriptive title for your study">
 
               </div>
-              <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 10">Title must be at least 10
+              <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 8">Title must be at least 8
                 characters.</p>
 
             </div>
             <div class="field mb-4">
-              <label class="label is-small">Study Description (min 10 chars)*</label>
+              <label class="label is-small">Study Description (min 60 chars)*</label>
               <div class="control">
                 <textarea class="textarea is-small" [(ngModel)]="studyDescription"
                   placeholder="Enter a detailed description of your study"></textarea>
 
               </div>
-              <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 10">Description must
-                be at least 10 characters.</p>
+              <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 60">Description must
+                be at least 60 characters.</p>
 
             </div>
             <hr>
@@ -450,4 +318,6 @@
 
   <app-confirmation-dialog *ngIf="showConfirmationModal" [title]="confirmationTitle" [message]="confirmationMessage"
     [moreinfo]="''" (confirm)="onConfirmSelection($event)"></app-confirmation-dialog>
+
+  <data-policy-modal *ngIf="showDataPolicyModal" (confirm)="onDataPolicyModalResult($event)"></data-policy-modal>
 </div>

@@ -11,8 +11,8 @@
           </mat-chip-row>
           <mat-chip [@fadeInOut]="fadeState"> term copied! </mat-chip>
         </span>
-        <input [placeholder]="validations?.label" #input id="test" [formControl]="valueCtrl" [matAutocomplete]="auto"
-          [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+        <input matInput [placeholder]="validations?.label" #input id="test" [formControl]="valueCtrl"
+          [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
           (matChipInputTokenEnd)="add($event)" />
       </mat-chip-grid>
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected($event)">

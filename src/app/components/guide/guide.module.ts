@@ -11,6 +11,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { SharedModule } from "../shared/shared.module";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
 import { InfoComponent } from "./info/info.component";
@@ -53,6 +54,7 @@ import { MatStepperModule } from "@angular/material/stepper";
         MatTooltipModule,
         MatInputModule,
         MatAutocompleteModule,
+        MatSelectModule,
         MatStepperModule,
         RouterModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class GuideModule {}

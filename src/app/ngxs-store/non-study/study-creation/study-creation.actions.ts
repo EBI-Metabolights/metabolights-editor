@@ -63,4 +63,36 @@ export namespace StudyCreation {
     static readonly type = '[StudyCreation] Remove Contact';
     constructor(public index: number) {}
   }
+
+  // Funders
+  export class SetFunders {
+    static readonly type = '[StudyCreation] Set Funders';
+    constructor(public funders: any[]) {}
+  }
+  export class AddFunder {
+    static readonly type = '[StudyCreation] Add Funder';
+    constructor(public funder: any) {}
+  }
+  export class UpdateFunder {
+    static readonly type = '[StudyCreation] Update Funder';
+    constructor(public funder: any, public index: number) {}
+  }
+  export class RemoveFunder {
+    static readonly type = '[StudyCreation] Remove Funder';
+    constructor(public index: number) {}
+  }
+
+  // Related Datasets
+  export class SetRelatedDatasets {
+    static readonly type = '[StudyCreation] Set Related Datasets';
+    constructor(public datasets: any[]) {}
+  }
+  export class AddRelatedDataset {
+    static readonly type = '[StudyCreation] Add Related Dataset';
+    constructor(public dataset: any) {}
+  }
+  export class RemoveRelatedDataset {
+    static readonly type = '[StudyCreation] Remove Related Dataset';
+    constructor(public index: number) {}
+  }
 }

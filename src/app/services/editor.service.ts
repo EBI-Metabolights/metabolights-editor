@@ -1018,4 +1018,52 @@ export class EditorService {
     }
     return this.dataService.getOntologyTermsV2(keyword, isExactMatchRequired, body);
   }
+
+  // Cache for identifier sources
+  private identifierSourcesCache: any[] = null;
+
+  getIdentifierSources(query: string): Observable<any> {
+    if (!query || query.trim().length < 2) {
+      return of([]);
+    }
+
+    return this.fetchIdentifierSources().pipe(
+        map(sources => {
+             const lowerQuery = query.toLowerCase();
+             return sources.filter(s =>
+                 (s.name && s.name.toLowerCase().indexOf(lowerQuery) !== -1) ||
+                 (s.prefix && s.prefix.toLowerCase().indexOf(lowerQuery) !== -1)
+             ).slice(0, 50); 
+        })
+    );
+  }
+
+  private fetchIdentifierSources(): Observable<any[]> {
+      if (this.identifierSourcesCache) {
+          return of(this.identifierSourcesCache);
+      }
+
+      // Public endpoint returns full dataset (~2MB)
+      const url = 'https://registry.api.identifiers.org/resolutionApi/getResolverDataset';
+      return this.http.get<any>(url).pipe(
+          map(response => {
+              const namespaces = response.payload?.namespaces || [];
+              return namespaces.map(ns => ({
+                  prefix: ns.prefix,
+                  name: ns.name,
+                  description: ns.description,
+                  sampleId: ns.sampleId, 
+                  urlPattern: ns.resources?.[0]?.urlPattern || '' 
+              })).filter(ns => ns.urlPattern); 
+          }),
+          map(sources => {
+              this.identifierSourcesCache = sources;
+              return sources;
+          }),
+          catchError(err => {
+              console.error('Error fetching identifier sources', err);
+              return of([]);
+          })
+      );
+  }
 }

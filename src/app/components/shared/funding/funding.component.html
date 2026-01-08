@@ -1,0 +1,94 @@
+<!-- Add New Funder Form -->
+<div class="box is-relative">
+    <form [formGroup]="form">
+        <div class="columns is-multiline">
+            <!-- Funder Organization and ID Row -->
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Funder Organization</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input type="text" matInput formControlName="funderOrganization"
+                                [matAutocomplete]="funderAuto" placeholder="e.g. European Bioinformatics Institute" />
+                            <mat-autocomplete #funderAuto="matAutocomplete" [displayWith]="displayFunderName"
+                                (optionSelected)="onFunderSelected($event)">
+                                <mat-option *ngFor="let org of filteredFunderOrganizations$ | async" [value]="org">
+                                    <div class="is-size-7"><b>{{ org.name }}</b> - {{ org.id?.split('/').pop() ||
+                                        '(Unknown ID)' }}</div>
+                                    <div style="font-size: 11px; color: #666; line-height: 1.2;">{{ org.description ||
+                                        '(No description available)' }}</div>
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Funder ID</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input matInput formControlName="funderId" placeholder="e.g. https://ror.org/02catss52" />
+                            <a matSuffix target="_blank" [href]="getFunderRorIdUrl()" class="search-link"
+                                title="Search ROR ID">
+                                <mat-icon>search</mat-icon>
+                            </a>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <!-- Grant Identifier Row (Full Width) -->
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Grant Identifier</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input matInput type="text" formControlName="grantIdentifier"
+                                placeholder="e.g. Grant #12345">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add Button Area -->
+        <div class="field is-grouped is-justify-content-flex-end mt-2">
+            <div class="control">
+                <button class="button is-small is-primary" (click)="addFunder()" [disabled]="form.invalid">
+                    <span class="icon is-small">
+                        <i class="material-icons">add</i>
+                    </span>
+                    <span>Add Funding</span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- List of Existing Funders -->
+<div class="mb-4" *ngIf="(funders$ | async)?.length > 0">
+    <div class="funding-list">
+        <div class="box p-3 mb-2 funding-item" *ngFor="let funder of funders$ | async; let i = index">
+            <div class="columns is-vcentered is-mobile">
+                <div class="column">
+                    <div class="is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.5rem;">
+                        <span class="has-text-weight-bold has-text-grey-dark">{{
+                            funder.fundingOrganization.annotationValue }}</span>
+
+                        <span class="tag is-light" *ngIf="funder.fundingOrganization.termAccession">
+                            <span class="mr-1">ID:</span>
+                            <a [href]="funder.fundingOrganization.termAccession" target="_blank"
+                                class="has-text-grey">{{ funder.fundingOrganization.termAccession }}</a>
+                        </span>
+
+                        <span class="tag is-info is-light" *ngIf="funder.grantIdentifier">
+                            Grant: {{ funder.grantIdentifier }}
+                        </span>
+                    </div>
+                </div>
+                <div class="column is-narrow">
+                    <button class="delete" (click)="removeFunder(i)" title="Remove Funding"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

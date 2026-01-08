@@ -1,0 +1,16 @@
+.gray-box {
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    padding: 1.25rem;
+}
+
+.mat-mdc-form-field {
+    width: 100%;
+}
+
+.text-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+}

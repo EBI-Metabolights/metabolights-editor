@@ -10,6 +10,8 @@ export interface StudyCreationStateModel {
   factors: any[];
   designDescriptors: any[];
   contacts: any[];
+  funders: any[];
+  relatedDatasets: any[];
 }
 
 @State<StudyCreationStateModel>({
@@ -18,7 +20,9 @@ export interface StudyCreationStateModel {
     isCreating: false,
     factors: [],
     designDescriptors: [],
-    contacts: []
+    contacts: [],
+    funders: [],
+    relatedDatasets: []
   },
 })
 @Injectable()
@@ -46,7 +50,9 @@ export class StudyCreationState {
           isCreating: false,
           factors: [],
           designDescriptors: [],
-          contacts: []
+          contacts: [],
+          funders: [],
+          relatedDatasets: []
       });
   }
 
@@ -154,5 +160,63 @@ export class StudyCreationState {
       const state = ctx.getState();
       const contacts = state.contacts.filter((_, i) => i !== action.index);
       ctx.patchState({ contacts });
+  }
+
+  // Funders
+  @Selector()
+  static funders(state: StudyCreationStateModel) {
+    return state.funders;
+  }
+
+  @Action(StudyCreation.SetFunders)
+  setFunders(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.SetFunders) {
+      ctx.patchState({ funders: action.funders });
+  }
+
+  @Action(StudyCreation.AddFunder)
+  addFunder(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.AddFunder) {
+      const state = ctx.getState();
+      ctx.patchState({ funders: [...state.funders, action.funder] });
+  }
+
+  @Action(StudyCreation.UpdateFunder)
+  updateFunder(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.UpdateFunder) {
+      const state = ctx.getState();
+      const funders = [...state.funders];
+      if (action.index >= 0 && action.index < funders.length) {
+          funders[action.index] = action.funder;
+          ctx.patchState({ funders });
+      }
+  }
+
+  @Action(StudyCreation.RemoveFunder)
+  removeFunder(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.RemoveFunder) {
+      const state = ctx.getState();
+      const funders = state.funders.filter((_, i) => i !== action.index);
+      ctx.patchState({ funders });
+  }
+
+  // Related Datasets
+  @Selector()
+  static relatedDatasets(state: StudyCreationStateModel) {
+    return state.relatedDatasets;
+  }
+
+  @Action(StudyCreation.SetRelatedDatasets)
+  setRelatedDatasets(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.SetRelatedDatasets) {
+      ctx.patchState({ relatedDatasets: action.datasets });
+  }
+
+  @Action(StudyCreation.AddRelatedDataset)
+  addRelatedDataset(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.AddRelatedDataset) {
+      const state = ctx.getState();
+      ctx.patchState({ relatedDatasets: [...state.relatedDatasets, action.dataset] });
+  }
+
+  @Action(StudyCreation.RemoveRelatedDataset)
+  removeRelatedDataset(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.RemoveRelatedDataset) {
+      const state = ctx.getState();
+      const relatedDatasets = state.relatedDatasets.filter((_, i) => i !== action.index);
+      ctx.patchState({ relatedDatasets });
   }
 }
