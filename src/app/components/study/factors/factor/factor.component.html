@@ -9,12 +9,12 @@
       <a (click)="openModal()" class="dropdown-item"> Add new factor </a>
     </ng-template>
   </span>
-  <span *ngIf="mode == 'local'">
+  <span *ngIf="mode == 'local' && false">
     <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
   </span>
 </div>
 <ng-template #showFactorDetails>
-  <div class="control">
+  <div class="control" *ngIf="mode !== 'local'">
     <div class="tags has-addons">
       <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal(true)">
         <mat-icon> edit </mat-icon>
@@ -103,7 +103,9 @@
         </ng-template>
         <label [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''">
           Add factor unit (if necessary)
-          <mat-checkbox [disabled]="form.get('factorName')?.pristine" (change)="toggleUnit()"></mat-checkbox>
+          <mat-checkbox [checked]="addFactorColumnVisible" [disabled]="form.get('factorName')?.pristine"
+            (change)="toggleUnit()">
+          </mat-checkbox>
         </label>
       </section>
       <!-- <section class="modal-card-body">

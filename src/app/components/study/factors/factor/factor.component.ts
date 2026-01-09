@@ -15,6 +15,7 @@ import * as toastr from "toastr";
 import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { MTBLSFactor } from "./../../../../models/mtbl/mtbls/mtbls-factor";
+import { MTBLSComment } from "./../../../../models/mtbl/mtbls/common/mtbls-comment";
 import { Store } from "@ngxs/store";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { filter, Observable } from "rxjs";
@@ -36,7 +37,8 @@ export class FactorComponent implements OnInit {
   @Input("isDropdown") isDropdown = false;
   @Input("mode") mode: 'store' | 'local' = 'store';
 
-  @ViewChild(OntologyComponent) factorTypeComponent: OntologyComponent;
+  @ViewChild('factorType') factorTypeComponent: OntologyComponent;
+  @ViewChild('factorUnit') factorUnitComponent: OntologyComponent;
 
   @Output() addFactorToSampleSheet = new EventEmitter<any>();
   @Output() addFactorToSampleSheetUnitInclusive = new EventEmitter<any>();
@@ -196,6 +198,7 @@ export class FactorComponent implements OnInit {
           this.factorTypeComponent.reset();
         }
       }
+      this.addFactorColumnVisible = false;
       
       try {
         this._controlList = this.controlList();
@@ -240,24 +243,15 @@ export class FactorComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
+    this.addFactorColumnVisible = false;
   }
 
   saveNgxs() {
       if (this.mode === 'local') {
           if (this.getFieldValue("factorName") !== "") {
-              if (!this.factor) { this.factor = new MTBLSFactor(); }
-              this.factor.factorName = this.getFieldValue("factorName");
-               // factorType logic
-               const jsonConvert: JsonConvert = new JsonConvert();
-               const factorTypeValue =
-                  this.factorTypeComponent?.id === "factorType" &&
-                  this.factorTypeComponent?.values?.[0]
-                    ? this.factorTypeComponent.values[0]
-                    : this.selectedFactorOntoValue?.[0];
-                this.factor.factorType = jsonConvert.deserializeObject(
-                  factorTypeValue,
-                  Ontology
-                );
+              const body = this.compileBody();
+              const jsonConvert: JsonConvert = new JsonConvert();
+              this.factor = jsonConvert.deserializeObject(body.factor, MTBLSFactor);
               
               this.saved.emit(this.factor);
               this.isModalOpen = false;
@@ -345,6 +339,26 @@ export class FactorComponent implements OnInit {
     const mtblsFactor = new MTBLSFactor();
     mtblsFactor.factorName = this.getFieldValue("factorName");
     mtblsFactor.comments = [];
+    
+    // Add value format comments
+    if (this.addFactorColumnVisible) {
+      mtblsFactor.comments.push(new MTBLSComment("Study Factor Value Format", "Numeric"));
+      
+      const factorUnitValue =
+        this.factorUnitComponent?.id === "factorUnit" &&
+        this.factorUnitComponent?.values?.[0]
+          ? this.factorUnitComponent.values[0]
+          : this.selectedFactorUnitOntoValue?.[0];
+      
+      if (factorUnitValue) {
+        mtblsFactor.comments.push(new MTBLSComment("Unit Term", factorUnitValue.annotationValue || ""));
+        mtblsFactor.comments.push(new MTBLSComment("Unit Term Source REF", factorUnitValue.termSource?.name || ""));
+        mtblsFactor.comments.push(new MTBLSComment("Unit Term Accession Number", factorUnitValue.termAccession || ""));
+      }
+    } else {
+      mtblsFactor.comments.push(new MTBLSComment("Study Factor Value Format", "Ontology"));
+    }
+
     const jsonConvert: JsonConvert = new JsonConvert();
     const factorTypeValue =
       this.factorTypeComponent?.id === "factorType" &&

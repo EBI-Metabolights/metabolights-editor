@@ -1,8 +1,8 @@
-<div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
+<div *ngIf="(addNewDescriptor || descriptor == null) && mode !== 'local'; else showDescriptorDetails">
   <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
 </div>
 <ng-template #showDescriptorDetails>
-  <div class="control">
+  <div class="control" *ngIf="mode !== 'local'">
     <div class="tags has-addons" style="margin-bottom: 5px">
       <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()">
         <i class="material-icons"> edit </i>
@@ -76,11 +76,7 @@
             <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <button
-              *ngIf="addNewDescriptor"
-              class="button is-primary is-pulled-left"
-              (click)="openImportModal()"
-            >
+            <button *ngIf="addNewDescriptor" class="button is-primary is-pulled-left" (click)="openImportModal()">
               <mat-icon>label</mat-icon> Import
             </button>
           </div>

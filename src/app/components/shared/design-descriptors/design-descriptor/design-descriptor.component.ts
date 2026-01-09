@@ -586,7 +586,7 @@ export class DesignDescriptorComponent implements OnInit {
           {
             controlLists: this.legacyControlLists,
           } as MetabolightsFieldControls,
-          listName,
+          this.defaultControlListName, // Use "Study Design Type"
           selectionInput
         );
       }

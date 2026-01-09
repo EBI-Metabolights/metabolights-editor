@@ -15,6 +15,7 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 import { StudyCreation } from "src/app/ngxs-store/non-study/study-creation/study-creation.actions";
 import { StudyCreationState } from "src/app/ngxs-store/non-study/study-creation/study-creation.state";
 import { Operations } from "src/app/ngxs-store/study/files/files.actions";
+import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
@@ -85,6 +86,7 @@ export class CreateComponent implements OnInit {
   // Wizard Data (Step 2)
   factors: any[] = [];
   designDescriptors: any[] = [];
+  activeDesignDescriptorCategories: any[] = [];
   contacts: any[] = [];
   editingContactIndex: number = -1;
   descriptorControlLists: any = {};
@@ -271,6 +273,18 @@ export class CreateComponent implements OnInit {
               this.licenseUrl = licenseInfo.url || "";
           }
       }
+
+      // Design Descriptor Categories
+      const activeDescriptorCategoryIds = versionConfig.activeStudyDesignDescriptorCategories || [];
+      const descriptorMetadata = this.templateConfiguration.descriptorConfiguration?.defaultDescriptorCategories || {};
+      this.activeDesignDescriptorCategories = activeDescriptorCategoryIds.map(id => {
+          const meta = descriptorMetadata[id];
+          return {
+              id: id,
+              label: meta?.label || id,
+              controlListKey: meta?.controlListKey || null
+          };
+      });
   }
 
   onSampleTemplateChange(templateName: string) {
@@ -278,24 +292,24 @@ export class CreateComponent implements OnInit {
   }
 
   
-  toggleCategory(category: string, event: any) {
-      if (event.target.checked) {
-          this.selectedCategories.push(category);
-          this.studyAssaySelection[category] = [];
-      } else {
-          this.selectedCategories = this.selectedCategories.filter(c => c !== category);
-          delete this.studyAssaySelection[category];
-      }
-  }
-  
   toggleAssay(category: string, assayType: string, event: any) {
-       if (!this.studyAssaySelection[category]) this.studyAssaySelection[category] = [];
-       if (event.target.checked) {
-           this.studyAssaySelection[category].push(assayType);
-       } else {
-           this.studyAssaySelection[category] = this.studyAssaySelection[category].filter(a => a !== assayType);
-       }
-       this.updateSelectionStatus();
+    if (!this.studyAssaySelection[category]) this.studyAssaySelection[category] = [];
+    if (event.target.checked) {
+      this.studyAssaySelection[category].push(assayType);
+    } else {
+      this.studyAssaySelection[category] = this.studyAssaySelection[category].filter(a => a !== assayType);
+    }
+
+    // Sync selectedCategories for consistency in submitStudy filter
+    if (this.studyAssaySelection[category].length > 0) {
+      if (!this.selectedCategories.includes(category)) {
+        this.selectedCategories.push(category);
+      }
+    } else {
+      this.selectedCategories = this.selectedCategories.filter(c => c !== category);
+    }
+    
+    this.updateSelectionStatus();
   }
   updateSelectionStatus() {
       this.isAnyAssaySelected = Object.values(this.studyAssaySelection).some((assays: string[]) => assays.length > 0);
@@ -356,11 +370,70 @@ export class CreateComponent implements OnInit {
            this.agreements?.datasetPolicyAgreement &&
            this.agreements?.privacyPolicyAgreement);
   }
+  get hasPrincipalInvestigator(): boolean {
+      return this.contacts.some(c => 
+          c.roles && c.roles.some(r => r.annotationValue === 'Principal Investigator')
+      );
+  }
+
+  isContactValid(contact: any): boolean {
+    return this.getContactErrors(contact).length === 0;
+  }
+
+  getContactErrors(contact: any): string[] {
+    const errors: string[] = [];
+    const isPI = contact.roles?.some(r => r.annotationValue === 'Principal Investigator');
+
+    const orcid = contact.orcid || contact.comments?.find(c => c.name === "Study Person ORCID")?.value || "";
+    const rorid = contact.rorid || contact.comments?.find(c => c.name === "Study Person Affiliation ROR ID")?.value || "";
+    const email = contact.email || "";
+    const affiliation = contact.affiliation || "";
+    const firstName = contact.firstName || "";
+    const lastName = contact.lastName || "";
+
+    // Always Mandatory
+    if (!firstName.trim()) errors.push("First name is required");
+    if (!lastName.trim()) errors.push("Last name is required");
+    if (!contact.roles || contact.roles.length === 0) errors.push("At least one role is required");
+
+    // Mandatory for PI
+    if (isPI) {
+        if (!email.trim()) errors.push("Email is required");
+        if (!affiliation.trim()) errors.push("Affiliation is required");
+        if (!orcid.trim()) errors.push("ORCID is required");
+        if (!rorid.trim()) errors.push("ROR ID is required");
+    }
+
+    // Pattern/Min Length Validation (only if field has value)
+    if (email.trim()) {
+        const emailRe = /^(([^<>()\[\]\\.,;:\s@\"]+(\.[^<>()\[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!emailRe.test(email)) errors.push("Email format is invalid");
+    }
+
+    if (orcid.trim()) {
+        const orcidRe = /^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[X0-9]$/;
+        if (!orcidRe.test(orcid)) errors.push("ORCID format is invalid");
+    }
+
+    if (rorid.trim()) {
+        const rorRe = /^(https:\/\/ror\.org\/[0-9a-z]{9}|https:\/\/www\.wikidata\.org\/wiki\/Q[1-9][0-9]{0,19})$/;
+        if (!rorRe.test(rorid)) errors.push("ROR ID format is invalid");
+    }
+
+    if (affiliation.trim() && affiliation.trim().length < 10) {
+        errors.push("Affiliation must be at least 10 characters");
+    }
+
+    return errors;
+  }
+
   get isStep2Valid(): boolean {
+      const allContactsValid = this.contacts.length > 0 && this.contacts.every(c => this.isContactValid(c));
       return this.isTitleValid && 
              this.isDescriptionValid && 
              this.factors.length > 0 &&
-             this.contacts.length > 0;
+             this.hasPrincipalInvestigator &&
+             allContactsValid;
   }
   canProceedToNextStep(): boolean {
       if (this.currentSubStep === 1) {
@@ -422,10 +495,30 @@ export class CreateComponent implements OnInit {
       // Initialize Contacts if empty
       if (this.contacts.length === 0) {
           this.initializePrimaryContact();
+      } else {
+          this.updatePrimaryContactFromRole();
       }
       
       this.descriptorControlListKey = this.templateConfiguration?.descriptorConfiguration?.defaultDescriptorCategories?.[category]?.controlListKey || null;
   }
+
+  updatePrimaryContactFromRole() {
+      if (this.contacts.length > 0 && this.selectedSubmitterRole) {
+          // Find the contact that matches the current user's email
+          // This assumes the first contact or the one matching the email is the "primary"
+          const index = this.contacts.findIndex(c => c.email === (this.currentUser?.email || ''));
+          if (index > -1) {
+              const contact = { ...this.contacts[index] };
+              // Only update if the role is actually different to avoid redundant store dispatches
+              const currentRole = contact.roles?.[0]?.annotationValue;
+              if (currentRole !== this.selectedSubmitterRole.annotationValue) {
+                  contact.roles = [this.selectedSubmitterRole];
+                  this.store.dispatch(new StudyCreation.UpdateContact(contact, index));
+              }
+          }
+      }
+  }
+
   initializePrimaryContact() {
       // Create primary contact from Current User + Submitter Role
       let role = null;
@@ -459,15 +552,37 @@ export class CreateComponent implements OnInit {
       this.store.dispatch(new StudyCreation.RemoveFactor(index));
   }
   // Descriptors
-  addDescriptorCompat(descriptor: any) {
+  addDescriptorWithCategory(descriptor: any, categoryId: string) {
+      if (!descriptor.comments) descriptor.comments = [];
+      descriptor.comments.push(new MTBLSComment("Study Design Type Category", categoryId));
+      descriptor.comments.push(new MTBLSComment("Study Design Type Source", "submitter"));
+      this.store.dispatch(new StudyCreation.AddDesignDescriptor(descriptor));
+  }
+
+  addKeyword(descriptor: any) {
+      if (!descriptor.comments) descriptor.comments = [];
+      // Ensure comments are empty for keywords
+      descriptor.comments = [];
       this.store.dispatch(new StudyCreation.AddDesignDescriptor(descriptor));
   }
   
-  updateDescriptor(descriptor: any, index: number) {
-      this.store.dispatch(new StudyCreation.UpdateDesignDescriptor(descriptor, index));
+  getDescriptorsByCategory(categoryId: string) {
+      return this.designDescriptors.filter(d => 
+          d.comments && d.comments.some(c => c.name === "Study Design Type Category" && c.value === categoryId)
+      );
   }
-  removeDescriptorCompat(descriptor: any, index: number) {
-      this.store.dispatch(new StudyCreation.RemoveDesignDescriptor(index));
+
+  getKeywords() {
+      return this.designDescriptors.filter(d => 
+          !d.comments || !d.comments.some(c => c.name === "Study Design Type Category")
+      );
+  }
+
+  removeDescriptorCompat(descriptor: any) {
+      const index = this.designDescriptors.indexOf(descriptor);
+      if (index > -1) {
+          this.store.dispatch(new StudyCreation.RemoveDesignDescriptor(index));
+      }
   }
   // Contacts
   addNewContact() {
@@ -549,14 +664,12 @@ export class CreateComponent implements OnInit {
     // Construct the payload
     const formValue = this.studyCreationForm.value;
     
-    // Filter studyAssaySelection to only include selected categories
+    // Construct selectedStudyCategories from studyAssaySelection
     const selectedStudyCategories: any = {};
-    const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key => 
-        this.selectedCategories.includes(key) && this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
-    );
-    
-    selectedCategoryKeys.forEach(key => {
-        selectedStudyCategories[key] = this.studyAssaySelection[key];
+    Object.keys(this.studyAssaySelection).forEach(key => {
+        if (this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0) {
+            selectedStudyCategories[key] = this.studyAssaySelection[key];
+        }
     });
     // Get Publication Status (first selected value)
     let publicationStatus = null;
@@ -621,10 +734,10 @@ export class CreateComponent implements OnInit {
         ];
     } else {
         factors = this.factors.map(f => ({
-            comments: [],
+            comments: f.comments || [],
             factorName: f.factorName,
             factorType: {
-                 comments: [],
+                 comments: f.factorType?.comments || [],
                  termAccession: f.factorType?.termAccession || '',
                  annotationValue: f.factorType?.annotationValue || '',
                  termSource: f.factorType?.termSource || { comments: [], description: "", file: "", name: "EFO", version: "" }
@@ -644,7 +757,7 @@ export class CreateComponent implements OnInit {
         ];
     } else {
         designDescriptors = this.designDescriptors.map(d => ({
-            comments: [], // Need to handle category/source mapping?
+            comments: d.comments || [], 
             annotationValue: d.annotationValue || '',
             termAccession: d.termAccession || '',
             termSource: d.termSource || { comments: [], name: '', file: '', version: '', description: '' }

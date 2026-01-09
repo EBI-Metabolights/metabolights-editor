@@ -3,8 +3,8 @@
 </span>
 <ng-template #showPersonDetails>
   <span class="clickable" (click)="openModal()">
-  {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
-    <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
+    {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
+  <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
 </ng-template>
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
@@ -159,27 +159,23 @@
               <span>
                 <mtbls-ontology *ngIf="showOntology" class="mt-20" #personRoles [validations]="fieldValidation('roles')"
                   [controlList]="_controlList" (changed)="onChanges($event)" [values]="person.roles" [inline]="true"
-                  [label]="'Role'" [rule]="_controlList?.rule"
-                  [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Role*'"
-                (emptyError)="onEmptyError($event)"
-              ></mtbls-ontology>
-            </span>
-            <mat-error
-              *ngIf="showError"
-            >
-              <small>{{ form?.get("roles")?.errors?.roles?.error }}</small>
-            </mat-error>
-          </div>
+                  [label]="'Role'" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                  [label]="'Role*'" (emptyError)="onEmptyError($event)"></mtbls-ontology>
+              </span>
+              <mat-error *ngIf="showError">
+                <small>{{ form?.get("roles")?.errors?.roles?.error }}</small>
+              </mat-error>
+            </div>
           </ng-container>
 
           <ng-template #dropdownField>
             <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('roles')">
-            <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
-              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-                {{ option.annotationValue }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+              <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
+                <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                  {{ option.annotationValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </ng-template>
           <mat-form-field class="half-width">
             <mat-label>ORCID</mat-label>
@@ -352,16 +348,9 @@
             </button>
           </div>
           <div class="column is-half has-text-right">
-            <button type="submit"
-              [disabled]="!form.valid || isFormBusy || form.pristine"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button type="submit" [disabled]="!form.valid || isFormBusy || form.pristine" (click)="saveNgxs()"
+              class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
             <!-- <button type="submit"
@@ -371,11 +360,7 @@
             >
               OK
             </button> -->
-            <button type="button"  
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button type="button" class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>

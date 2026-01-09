@@ -219,48 +219,77 @@
             <div class="columns is-multiline">
               <div class="column is-12">
                 <h5 class="title is-6 mb-3">Study Factors (at least 1)*</h5>
-                <div class="box p-3 is-clearfix">
-                  <div class="tags mb-2">
+                <div class="box p-3 is-clearfix" style="position: relative;">
+                  <button class="button is-primary is-small"
+                    style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="factorRef.openModal()">+
+                    Add</button>
+                  <div class="tags mb-2" style="margin-right: 60px;">
                     <span *ngFor="let factor of factors; let i = index" class="tag is-primary is-light is-medium">
                       {{factor.factorName}} ({{factor.factorType?.annotationValue}})
                       <button class="delete is-small" (click)="removeFactorCompat(factor, i)"></button>
                     </span>
-
                   </div>
-                  <mtbls-factor [mode]="'local'" (saved)="addFactorCompat($event)"></mtbls-factor>
-
+                  <mtbls-factor #factorRef [mode]="'local'" (saved)="addFactorCompat($event)"></mtbls-factor>
                 </div>
 
               </div>
               <div class="column is-12">
-                <h5 class="title is-6 mb-3">Design Descriptors (Optional)</h5>
-                <div class="box p-3 is-clearfix">
-                  <div class="tags mb-2">
-                    <span *ngFor="let desc of designDescriptors; let i = index"
-                      class="tag is-primary is-light is-medium">
-                      {{desc.annotationValue}}
-                      <button class="delete is-small" (click)="removeDescriptorCompat(desc, i)"></button>
-                    </span>
-
+                <h5 class="title is-6 mb-3">Design Descriptor (optional)</h5>
+                <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
+                  <div class="box p-3 is-clearfix" style="position: relative;">
+                    <button class="button is-primary is-small"
+                      style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="descRef.openModal()">+
+                      Add</button>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}}</h6>
+                    <div class="tags mb-2" style="margin-right: 60px;">
+                      <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
+                        class="tag is-primary is-light is-medium">
+                        {{desc.annotationValue}}
+                        <button class="delete is-small" (click)="removeDescriptorCompat(desc)"></button>
+                      </span>
+                    </div>
+                    <mtbls-design-descriptor #descRef [mode]="'local'" [controlListKey]="category.controlListKey"
+                      (saved)="addDescriptorWithCategory($event, category.id)"></mtbls-design-descriptor>
                   </div>
-                  <mtbls-design-descriptor [mode]="'local'" [controlListKey]="descriptorControlListKey"
-                    (saved)="addDescriptorCompat($event)"></mtbls-design-descriptor>
-
                 </div>
 
+                <div class="mb-2">
+                  <div class="box p-3 is-clearfix" style="position: relative;">
+                    <button class="button is-primary is-small"
+                      style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="kwRef.openModal()">+
+                      Add</button>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">Additional Keywords</h6>
+                    <div class="tags mb-2" style="margin-right: 60px;">
+                      <span *ngFor="let desc of getKeywords(); let i = index" class="tag is-primary is-light is-medium">
+                        {{desc.annotationValue}}
+                        <button class="delete is-small" (click)="removeDescriptorCompat(desc)"></button>
+                      </span>
+                    </div>
+                    <mtbls-design-descriptor #kwRef [mode]="'local'" [controlListKey]="'Design descriptor'"
+                      (saved)="addKeyword($event)"></mtbls-design-descriptor>
+                  </div>
+                </div>
               </div>
               <div class="column is-12">
-                <h5 class="title is-6 mb-3">Contacts (at least 1 PI)*</h5>
-                <div class="box p-3 is-clearfix">
-                  <button class="button is-primary is-pulled-right is-small mb-3" (click)="addNewContact()">+ Add
+                <h5 class="title is-6 mb-3">Contacts*</h5>
+                <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
+                  • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
+                </p>
+                <div class="box p-3 is-clearfix" style="position: relative;">
+                  <button class="button is-primary is-small"
+                    style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="addNewContact()">+ Add
                     Contact</button>
                   <div class="columns is-multiline">
                     <div class="column is-4" *ngFor="let contact of contacts; let i = index">
-                      <div class="card contact-card">
+                      <div class="card contact-card" [class.invalid-card]="!isContactValid(contact)">
                         <div class="card-content p-3">
                           <p class="is-size-7 has-text-weight-bold">{{contact.firstName}} {{contact.lastName}}</p>
                           <p class="is-size-7">{{contact.affiliation}}</p>
                           <p class="is-size-7 has-text-grey">{{contact.roles?.[0]?.annotationValue}}</p>
+                          <div *ngIf="!isContactValid(contact)" class="has-text-danger is-size-7 mt-2 pt-1"
+                            style="border-top: 1px dashed #ff3860;">
+                            <div *ngFor="let error of getContactErrors(contact)">• {{error}}</div>
+                          </div>
                           <div style="position: absolute; top: 5px; right: 5px; display: flex;">
                             <span class="material-symbols-outlined is-size-6 has-text-grey clickable mr-1"
                               (click)="editContact(contact, i)" title="Edit contact">

@@ -202,6 +202,11 @@ hr {
   margin-bottom: 1.5rem !important;
 }
 
+.invalid-card {
+  border: 1px solid #ff3860 !important;
+  background-color: #fffafb;
+}
+
 ::ng-deep .is-modal-only-person>span,
 ::ng-deep .is-modal-only-person>a {
   display: none !important;
