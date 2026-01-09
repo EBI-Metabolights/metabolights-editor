@@ -2,17 +2,10 @@
   <div>
     <div class="mtbls-section">
       <h6 class="mb10">
-        <span style="font-size: 0.8em"
-          ><mtbls-help
-            *ngIf="!isStudyReadOnly"
-            target="protocols"
-          ></mtbls-help></span
-        >&nbsp;
-        <a
-          (click)="toggleExpand()"
-          style="margin-right: 10px; margin-left: 10px"
-          class="button is-default is-pulled-right is-small"
-        >
+        <span style="font-size: 0.8em"><mtbls-help *ngIf="!isStudyReadOnly"
+            target="protocols"></mtbls-help></span>&nbsp;
+        <a (click)="toggleExpand()" style="margin-right: 10px; margin-left: 10px"
+          class="button is-default is-pulled-right is-small">
           <div *ngIf="!expand; else expandSections">
             <i class="material-icons"> list </i> Expand all
           </div>
@@ -20,103 +13,24 @@
             <i class="material-icons"> list </i> Collapse all
           </ng-template>
         </a>
-        <mtbls-protocol
-          *ngIf="!isStudyReadOnly"
-          [value]="null"
-          [validations]="validations"
-        ></mtbls-protocol
-        >&nbsp;
+        <mtbls-protocol *ngIf="!isStudyReadOnly" [value]="null" [validations]="validations"></mtbls-protocol>&nbsp;
       </h6>
     </div>
   </div>
   <app-prompt-refresh *ngIf="!isStudyReadOnly && actionStack.length > 0" [context]="'protocols'"></app-prompt-refresh>
-  
-<div class="mtbls-section" style="padding-top: 0;padding-bottom: 1.5rem;">
-  <div class="box">
-    <div class="columns is-vcentered">
-      <div class="column is-8">
-        <div class="field">
-          <label class="label is-small">Protocol URI</label>
-          <div class="control has-icons-right">
-            <input
-              #uriInput
-              class="input is-small"
-              type="url"
-              placeholder="https://protocols.io/"
-              [(ngModel)]="protocolUri"
-              name="protocolUri"
-              [disabled]="isStudyReadOnly"
-            />
-            <a
-              class="icon is-small is-right protocol-uri-action"
-              style="cursor: pointer; margin-left: 6px; pointer-events: auto;"
-              (click)="protocolUri && openProtocolUri()"
-              (keydown.enter)="protocolUri && openProtocolUri()"
-              [attr.tabindex]="protocolUri ? 0 : -1"
-              title="Open URI in new tab"
-              aria-label="Open protocol URI in new tab"
-            >
-              <i class="material-icons">open_in_new</i>
-            </a>
-          </div>
-        </div>
-      </div>
 
-      <div class="column is-2">
-        <div class="field">
-          <label class="label is-small">Protocol Version</label>
-          <div class="control">
-            <input
-              #versionInput
-              class="input is-small"
-              type="text"
-              placeholder="e.g. v1.0"
-              [(ngModel)]="protocolVersion"
-              name="protocolVersion"
-              [disabled]="isStudyReadOnly"
-            />
-          </div>
-        </div>
-      </div>
 
-      <div class="column is-2">
-        <div class="field">
-          <label class="label is-small">&nbsp;</label>
-          <div class="control">
-            <button
-              *ngIf="!isStudyReadOnly"
-              class="button is-primary is-small"
-              (click)="saveProtocolMeta()"
-              title="Save protocol URI & version"
-              [disabled]="!(protocolUri || protocolVersion)"
-            >
-              <i class="material-icons" style="font-size:16px;line-height:1;">save</i>
-              <span style="margin-left:6px;">Save</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-  
+
   <div *ngFor="let protocol of defaultProtocols">
     <span *ngIf="getProtocol(protocol) != null">
-      <mtbls-protocol
-        [value]="getProtocol(protocol)"
-        [required]="true"
-        [validations]="validations"
-        [guides]="protocolGuides"
-      ></mtbls-protocol>
+      <mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"
+        [guides]="protocolGuides"></mtbls-protocol>
     </span>
   </div>
 
   <div *ngFor="let protocol of customProtocols">
     <span *ngIf="getProtocol(protocol) != null">
-      <mtbls-protocol
-        [value]="getProtocol(protocol)"
-        [validations]="validations"
-      ></mtbls-protocol>
+      <mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>
     </span>
   </div>
 </span>

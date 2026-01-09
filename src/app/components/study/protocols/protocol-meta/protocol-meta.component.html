@@ -1,0 +1,29 @@
+<div [formGroup]="parentForm">
+    <div class="columns is-vcentered">
+        <div class="column is-8">
+            <div class="field">
+                <label class="label is-small">Protocol URI</label>
+                <div class="control has-icons-right">
+                    <input class="input is-small" type="url" placeholder="https://protocols.io/" formControlName="uri"
+                        [disabled]="readonly" />
+                    <a class="icon is-small is-right protocol-uri-action"
+                        style="cursor: pointer; margin-left: 6px; pointer-events: auto;" (click)="openProtocolUri()"
+                        (keydown.enter)="openProtocolUri()" [attr.tabindex]="parentForm.get('uri').value ? 0 : -1"
+                        title="Open URI in new tab" aria-label="Open protocol URI in new tab">
+                        <i class="material-icons">open_in_new</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="column is-4">
+            <div class="field">
+                <label class="label is-small">Protocol Version</label>
+                <div class="control">
+                    <input class="input is-small" type="text" placeholder="e.g. v1.0" formControlName="version"
+                        [disabled]="readonly" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

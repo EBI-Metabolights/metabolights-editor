@@ -61,8 +61,6 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
   validationsId = "protocols";
   expand = true;
-  protocolUri: string = '';
-  protocolVersion: string = '';
   private toastrSettings: Record<string, any> = {};
 
   constructor(private editorService: EditorService, private store: Store) {
@@ -154,15 +152,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     } else {
       this.protocols = [];
     }
-    const targetName = "sample collection";
-    const found =
-      this.protocols.find((p) => p?.name?.toLowerCase() === targetName) ||
-      (value || []).find((p) => p?.name?.toLowerCase() === targetName);
 
-    if (found) {
-      this.protocolUri = found.uri || "";
-      this.protocolVersion = found.version || "";
-    }
   }
 
   toggleExpand() {
@@ -189,48 +179,5 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       this.initialiseProtocols(this.allProtocols);
     }
   }
-   openProtocolUri(): void {
-    if (!this.protocolUri) {
-      return;
-    }
-    const url = /^(https?:\/\/)/i.test(this.protocolUri)
-      ? this.protocolUri
-      : `https://${this.protocolUri}`;
-    window.open(url, '_blank', 'noopener');
-  }
-  saveProtocolMeta(): void {
-    if (this.isStudyReadOnly) return;
 
-    const targetName = "sample collection";
-    const protocol =
-      this.protocols.find((p) => p?.name?.toLowerCase() === targetName) ||
-      this.allProtocols.find((p) => p?.name?.toLowerCase() === targetName);
-
-    if (!protocol) {
-      console.warn(`Protocol "${targetName}" not found. Aborting save.`);
-      return;
-    }
-
-    const mtblProtocol = new MTBLSProtocol();
-    mtblProtocol.name = protocol.name || "";
-    mtblProtocol.description = protocol.description || "";
-    mtblProtocol.uri = this.protocolUri || "";
-    mtblProtocol.version = this.protocolVersion || "";
-    mtblProtocol.protocolType = protocol.protocolType ? (protocol.protocolType as Ontology) : null;
-    mtblProtocol.parameters = protocol.parameters || [];
-    mtblProtocol.components = protocol.components || [];
-
-    this.store
-      .dispatch(new Protocols.Update(mtblProtocol.name, { protocol: mtblProtocol.toJSON() }))
-      .subscribe(
-        () => {
-          this.store.dispatch(new Protocols.Get());
-          try { toastr.success('Protocol metadata saved', 'Success', this.toastrSettings); } catch (e) {}
-        },
-        (err) => {
-          console.error("Failed to save protocol meta", err);
-          try { toastr.error('Failed to save protocol metadata', 'Error', this.toastrSettings); } catch (e) {}
-        }
-      );
-  }
 }

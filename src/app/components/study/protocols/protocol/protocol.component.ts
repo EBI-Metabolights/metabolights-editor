@@ -455,6 +455,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
         this.protocol.description,
         ValidateRules("description", this.fieldValidation("description")),
       ],
+      uri: [this.protocol.uri],
+      version: [this.protocol.version],
     });
   }
 
@@ -515,6 +517,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
     mtblProtocol.protocolType = new Ontology();
     mtblProtocol.protocolType.annotationValue = this.getFieldValue("name");
     mtblProtocol.parameters = this.getFieldValue("parameters");
+    mtblProtocol.uri = this.getFieldValue("uri");
+    mtblProtocol.version = this.getFieldValue("version");
     return { protocol: mtblProtocol.toJSON() };
   }
 
@@ -643,6 +647,12 @@ export class ProtocolComponent implements OnInit, OnChanges {
         ont.annotationValue = event.value;
         this.selectedParameter = [ont];
         this.selectedParameterValue = event.value;
+      }
+
+      openUri(uri: string) {
+        if (!uri) return;
+        const url = /^(https?:\/\/)/i.test(uri) ? uri : `https://${uri}`;
+        window.open(url, '_blank', 'noopener');
       }
 
 }

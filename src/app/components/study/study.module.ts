@@ -12,6 +12,7 @@ import { OrganismsComponent } from "./organisms/organisms.component";
 import { OrganismComponent } from "./organisms/organism/organism.component";
 import { ProtocolsComponent } from "./protocols/protocols.component";
 import { ProtocolComponent } from "./protocols/protocol/protocol.component";
+import { ProtocolMetaComponent } from "./protocols/protocol-meta/protocol-meta.component";
 import { PublicationsComponent } from "./publications/publications.component";
 import { PublicationComponent } from "./publications/publication/publication.component";
 import { ReleaseDateComponent } from "./release-date/release-date.component";
@@ -92,6 +93,7 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     OrganismComponent,
     ProtocolsComponent,
     ProtocolComponent,
+    ProtocolMetaComponent,
     PublicationsComponent,
     PublicationComponent,
     ReleaseDateComponent,
@@ -169,6 +171,7 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     OrganismComponent,
     ProtocolsComponent,
     ProtocolComponent,
+    ProtocolMetaComponent,
     PublicationsComponent,
     PublicationComponent,
     ReleaseDateComponent,
