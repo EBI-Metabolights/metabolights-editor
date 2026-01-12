@@ -184,9 +184,6 @@
               <small>Search ORCID</small>
             </a>
             <mat-hint>{{ fieldValidation("orcid").description }}
-              <span *ngIf="getIsRequired('orcid')">
-                <b>(required)</b>
-              </span>
             </mat-hint>
             <mat-error *ngIf="
                 form.get('orcid').errors &&
@@ -322,9 +319,6 @@
             <small>Search ROR ID</small>
           </a>
           <mat-hint>{{ fieldValidation("rorid").description }}
-            <span *ngIf="getIsRequired('rorid')">
-              <b>(required)</b>
-            </span>
           </mat-hint>
           <mat-error *ngIf="
               form.get('rorid').errors &&
