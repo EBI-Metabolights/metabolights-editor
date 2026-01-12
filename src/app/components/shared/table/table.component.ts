@@ -1269,24 +1269,29 @@ export class TableComponent
   }
 
    isSelected(row, column) {
-    if (row && column && this.selectedCells.length > 0) {
-      return (
-        this.selectedCells.filter(
-          (cell) => cell[0] === column.columnDef && cell[1] === row.index
-        ).length > 0
-      );
-    } else if (this.selectedColumns.length === 0) {
-      if (this.selectedRows.indexOf(row.index) > -1) {
-        return true;
-      }
-    } else if (this.selectedRows.length === 0) {
-      if (this.selectedColumns.indexOf(column.columnDef) > -1) {
-        return true;
-      }
+
+    if (!row) return false;
+
+    if (Array.isArray(this.selectedRows) && this.selectedRows.indexOf(row.index) > -1) {
+      return true;
     }
+
+    if (!column) {
+      return false;
+    }
+
+    if (Array.isArray(this.selectedCells) && this.selectedCells.length > 0) {
+      return this.selectedCells.some(
+        (cell) => cell[0] === column.columnDef && cell[1] === row.index
+      );
+    }
+
+    if (Array.isArray(this.selectedColumns) && this.selectedColumns.indexOf(column.columnDef) > -1) {
+      return true;
+    }
+
     return false;
   }
-
 
   deSelect() {
     this.selectedRows = [];
