@@ -895,8 +895,4 @@ export class PublicationComponent implements OnInit {
   onEmptyError(isEmpty: boolean) {
     this.showError = isEmpty;
   }
-
-  onEmptyError(isEmpty: boolean) {
-    this.showError = isEmpty;
-  }
 }
