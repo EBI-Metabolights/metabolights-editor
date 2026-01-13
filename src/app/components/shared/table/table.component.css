@@ -283,9 +283,40 @@ a.dropdown-item {
 #wrapper2 {
   height: auto !important;
 }
+.radio-tick {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #999;
+  border-radius: 50%;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  background-color: #fff;
+}
+
+.radio-tick.selected {
+  border-color: #1976d2;
+  background-color: #1976d2;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+}
+
+.radio-tick.selected::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
 .no-structure-message {
   display: flex;
   color: #888;
   font-style: italic;
   text-align: center;
 }
+

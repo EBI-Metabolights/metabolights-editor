@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError } from 'rxjs/operators';
 import { ConfigurationService } from 'src/app/configuration.service';
@@ -86,9 +86,11 @@ export class ApplicationService extends BaseConfigDependentService {
   getDefaultControlLists(): Observable<Record<string, any>> {
     return this.http
         .get<any>(
-          this.url.baseURL + "/ebi-internal/control-lists",
+          `${this.configService.config.ws3URL}/public/v2/validations/configuration`,
           {
-            headers: httpOptions.headers,
+            headers: new HttpHeaders({
+                Accept: "application/json"
+            }),
             observe: "body",
           }
         )

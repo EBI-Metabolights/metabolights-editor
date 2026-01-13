@@ -145,6 +145,33 @@ export namespace FirstPrivateDate {
   }
 }
 
+export namespace SampleTemplate {
+  export class Set{
+      static readonly type = '[general] Set Sample Template'
+      constructor(public sampleTemplate: string) {}
+  }
+}
+
+export namespace StudyCreatedAt {
+  export class Set{
+      static readonly type = '[general] Set Study Created At'
+      constructor(public studyCreatedAt: string) {}
+  }
+}
+export namespace StudyCategory {
+  export class Set{
+      static readonly type = '[general] Set Study Category'
+      constructor(public studyCategory: string) {}
+  }
+}
+
+export namespace TemplateVersion {
+  export class Set{
+      static readonly type = '[general] Set Template Version'
+      constructor(public templateVersion: string) {}
+  }
+}
+
 export namespace FirstPublicDate {
   export class Set{
       static readonly type = '[general] Set First Public Date'

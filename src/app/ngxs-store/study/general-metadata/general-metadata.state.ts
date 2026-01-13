@@ -2,7 +2,7 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -43,6 +43,10 @@ export interface GeneralMetadataStateModel {
     publicAsperaPath: string;
     firstPrivateDate: string;
     firstPublicDate: string;
+    sampleTemplate: string;
+    templateVersion: string;
+    studyCategory: string;
+    studyCreatedAt: string;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -67,6 +71,10 @@ const defaultState: GeneralMetadataStateModel = {
     publicAsperaPath: null,
     firstPrivateDate: null,
     firstPublicDate: null,
+    sampleTemplate: null,
+    templateVersion: null,
+    studyCategory: null,
+    studyCreatedAt: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -84,8 +92,8 @@ export class GeneralMetadataState {
 
     @Action(GetGeneralMetadata)
     GetStudyGeneralMetadata(ctx: StateContext<GeneralMetadataStateModel>, action: GetGeneralMetadata) {
-        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe(
-            (gm_response) => {
+        this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe({
+            next: (gm_response) => {
                 const state = ctx.getState();
                 if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
                 if (state.id !== action.studyId) ctx.dispatch(new Identifier.Set(action.studyId));
@@ -98,7 +106,7 @@ export class GeneralMetadataState {
                 this.store.dispatch(new Factors.Set(gm_response.isaInvestigation.studies[0].factors))
                 //this.store.dispatch(new SetConfiguration());
                 this.store.dispatch(new EditorValidationRules.Get());
-                this.store.dispatch(new DatasetLicenseNS.GetDatasetLicense(action.studyId))
+                // this.store.dispatch(new DatasetLicenseNS.GetDatasetLicense(action.studyId))
 
                 // TODO fix, commenting this out for demo purpose
                 //this.store.dispatch(new NewValidationReport.Get());
@@ -121,9 +129,23 @@ export class GeneralMetadataState {
 
                 ctx.dispatch(new FirstPrivateDate.Set(gm_response.mtblsStudy.firstPrivateDate));
                 ctx.dispatch(new FirstPublicDate.Set(gm_response.mtblsStudy.firstPublicDate));
+                ctx.dispatch(new SampleTemplate.Set(gm_response.mtblsStudy.sampleTemplate));
+                ctx.dispatch(new StudyCreatedAt.Set(gm_response.mtblsStudy.createdAt));
+                ctx.dispatch(new StudyCategory.Set(gm_response.mtblsStudy.studyCategory));
+                ctx.dispatch(new TemplateVersion.Set(gm_response.mtblsStudy.templateVersion));
+                ctx.dispatch(new DatasetLicenseNS.SetDatasetLicense(
+                  {
+                    name: gm_response.mtblsStudy.datasetLicense,
+                    version: "",
+                    agreed: gm_response.mtblsStudy.datasetLicense ? true : false,
+                    agreeingUser: "",
+                    licenseUrl: gm_response.mtblsStudy.datasetLicenseUrl
+                  } ));
+                
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
+                
 
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
 
@@ -135,7 +157,7 @@ export class GeneralMetadataState {
                     this.store.dispatch(new SetReadonly(false));
                 }
             },
-            (error) => {
+            error: (error) => {
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new Loading.Disable());
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
@@ -144,7 +166,7 @@ export class GeneralMetadataState {
                 }
 
 
-            })
+            }})
     }
 
     @Action(Identifier.Set)
@@ -330,6 +352,42 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             firstPublicDate: action.firstPublicDate
+      });
+    }
+
+    @Action(SampleTemplate.Set)
+    SetSampleTemplate(ctx: StateContext<GeneralMetadataStateModel>, action: SampleTemplate.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            sampleTemplate: action.sampleTemplate
+      });
+    }
+
+    @Action(StudyCreatedAt.Set)
+    SetStudyCreatedAt(ctx: StateContext<GeneralMetadataStateModel>, action: StudyCreatedAt.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            studyCreatedAt: action.studyCreatedAt
+      });
+    }
+
+    @Action(StudyCategory.Set)
+    SetStudyCategory(ctx: StateContext<GeneralMetadataStateModel>, action: StudyCategory.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            studyCategory: action.studyCategory
+      });
+    }
+
+    @Action(TemplateVersion.Set)
+    SetTemplateVersion(ctx: StateContext<GeneralMetadataStateModel>, action: TemplateVersion.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            templateVersion: action.templateVersion
       });
     }
 
@@ -761,12 +819,29 @@ export class GeneralMetadataState {
     static publicAsperaPath(state: GeneralMetadataStateModel): string {
         return state.publicAsperaPath
     }
-     @Selector()
+    @Selector()
     static firstPrivateDate(state: GeneralMetadataStateModel): string {
         return state.firstPrivateDate
     }
-     @Selector()
+    @Selector()
     static firstPublicDate(state: GeneralMetadataStateModel): string {
         return state.firstPublicDate
     }
+    @Selector()
+    static sampleTemplate(state: GeneralMetadataStateModel): string {
+        return state.sampleTemplate
+    }
+    @Selector()
+    static templateVersion(state: GeneralMetadataStateModel): string {
+        return state.templateVersion
+    }
+    @Selector()
+    static studyCategory(state: GeneralMetadataStateModel): string {
+        return state.studyCategory
+    }
+    @Selector()
+    static studyCreatedAt(state: GeneralMetadataStateModel): string {
+        return state.studyCreatedAt
+    }
+    
 }

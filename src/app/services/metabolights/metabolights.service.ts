@@ -4,7 +4,7 @@ import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
 import { inject, Injectable } from "@angular/core";
 import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { IStudySummary } from "src/app/models/mtbl/mtbls/interfaces/study-summary.interface";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { IOntologyWrapper } from "src/app/models/mtbl/mtbls/interfaces/ontology-wrapper.interface";
@@ -621,4 +621,16 @@ export class MetabolightsService extends DataService {
   getRorid(url: string): Observable<any> {
     return this.http.get<any>(url).pipe(catchError(this.handleError));
     }
+
+  getOntologyTermsV2(keyword: string, isExactMatchRequired: boolean,body: any): Observable<any> {
+    const url = `${this.configService.config.ws3URL}/public/v2/ontology-terms/search`;
+    let params = new HttpParams().set('q', keyword);
+    if (isExactMatchRequired) {
+       params = new HttpParams().set('q', keyword).set('exact_match', 'true');
+    }  
+    return this.http
+      .post<any>(url, body, { params, ...httpOptions })
+      .pipe(catchError(this.handleError));
+  }
+
 }

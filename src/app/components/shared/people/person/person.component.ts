@@ -12,7 +12,7 @@ import { trigger, style, animate, transition } from "@angular/animations";
 import { AbstractControl, UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { ValidateRules } from "./person.validator";
 import * as toastr from "toastr";
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, switchMap } from 'rxjs/operators';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { JsonConvert } from "json2typescript";
 import { OntologyComponent } from "../../ontology/ontology.component";
@@ -24,6 +24,8 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { AppMessage, GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 
 
 @Component({
@@ -52,12 +54,21 @@ export class PersonComponent implements OnInit {
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
-
+  
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
 
   isReadOnly = false;
   validations: any = {};
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
-  defaultControlListName = "Study Person Role";
+  defaultControlListName = "Study Person Roles";
   requestedStudy: string = null;
 
   form: UntypedFormGroup;
@@ -74,7 +85,7 @@ export class PersonComponent implements OnInit {
   roleError = false;
 
   options: string[] = ["One", "Two", "Three"];
-
+  private legacyControlLists: Record<string, any[]> | null = null;
   validationsId = "people.person";
   showError = false;
 
@@ -85,12 +96,19 @@ export class PersonComponent implements OnInit {
   private subscription: Subscription;  // For unsubscribing
   message: AppMessage | null = null;
   showOntology: boolean = true;
+  studyCategory: any;
+  templateVersion: any;
+  studyCreatedAt: any;
+  _controlList: any = null;
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private generalMetadataService: GeneralMetadataService,
     private store: Store
   ) {
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+        this.legacyControlLists = lists || {};
+    });
     this.setUpSubscriptionsNgxs();
   }
 
@@ -109,11 +127,20 @@ export class PersonComponent implements OnInit {
         }
       }
     });
-    this.studyIdentifier$.subscribe((value) => {
-      if (value !== null) {
-        this.requestedStudy = value;
-      }
-    });
+   
+    this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+            this.requestedStudy = value;
+        });
+       
+        this.studyCategory$.subscribe((value) => {
+          this.studyCategory = value as StudyCategoryStr;
+        });
+        this.templateVersion$.subscribe((value) => {
+          this.templateVersion = value;
+        });
+        this.studyCreatedAt$.subscribe((value) => {
+          this.studyCreatedAt = value;
+        });
   }
 
   ngOnInit() {
@@ -129,6 +156,8 @@ export class PersonComponent implements OnInit {
         this.isApproveSubmitterModalOpen = false;
       }
     });
+    this._controlList = this.controlList();
+    
   }
   
   onEmptyError(isEmpty: boolean) {
@@ -214,20 +243,17 @@ export class PersonComponent implements OnInit {
 
       return this.editorService.getRorOrganizations(query).pipe(
         switchMap((res: any) => {
-          const items =
-            res.items?.map((item: any) => {
-              const org = item.organization;
-              const nameObj = org.names.find((n: any) => n.lang === 'en');
-              const name =
-                nameObj?.value || org.names[0]?.value || '(Unknown name)';
-              const countryName =
-                org.locations?.[0]?.geonames_details?.country_name || '(Unknown country)';
-              return {
-                id: org.id,
-                name,
-                countryName,
-              };
-            }) || [];
+          const docs = res?.response?.docs || [];
+
+          const items = docs.map((doc: any) => {
+            return {
+              id: doc.iri,
+              name: doc.label || '(Unknown name)',
+              synonyms: doc.synonym || [],
+              description: doc.description?.[0] || '',
+              ontology_prefix: doc.ontology_prefix
+            };
+          });
 
           return of(items);
         })
@@ -248,7 +274,38 @@ export class PersonComponent implements OnInit {
   }
 
   openModal() {
+    // ensure controlList is computed before initialising form so roles control has correct shape
+    try {
+      this._controlList = this.controlList();
+    } catch (e) {
+      this._controlList = null;
+    }
+
     this.initialiseForm();
+
+    // ensure roles control / ontology child are initialised with the current value
+    try {
+      const rolesControl = this.form?.get("roles");
+      if (rolesControl) {
+        if (this._controlList && this._controlList.renderAsDropdown) {
+          // dropdown expects strings (annotationValue)
+          const initStr = this.person?.roles?.[0]?.annotationValue || (Array.isArray(rolesControl.value) ? rolesControl.value[0] : rolesControl.value) || "";
+          rolesControl.setValue(initStr, { emitEvent: false });
+        } else {
+          const initObj = this.person?.roles && this.person.roles.length ? this.person.roles : (Array.isArray(rolesControl.value) ? rolesControl.value : null);
+          rolesControl.setValue(initObj, { emitEvent: false });
+          if (this.rolesComponent && typeof (this.rolesComponent as any).setValues === "function") {
+            try {
+              const vals = Array.isArray(initObj) ? initObj : initObj ? [initObj] : [];
+              (this.rolesComponent as any).setValues(vals);
+            } catch (e) {}
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to set roles control initial value", e);
+    }
+
     this.isModalOpen = true;
     this.showOntology = true;
     this.updateValidatorsBasedOnRoles();
@@ -338,6 +395,21 @@ export class PersonComponent implements OnInit {
 
  saveNgxs() {
   if (this.isReadOnly) return;
+  try {
+    let rolesToSet: any[] = [];
+    if (this.rolesComponent && Array.isArray((this.rolesComponent as any).values) && (this.rolesComponent as any).values.length > 0) {
+      rolesToSet = (this.rolesComponent as any).values;
+    } else {
+      const ctrlVal = this.form?.get("roles")?.value;
+      if (Array.isArray(ctrlVal)) rolesToSet = ctrlVal;
+      else if (ctrlVal) rolesToSet = [ctrlVal];
+    }
+    if (this.form && this.form.get("roles")) {
+      this.form.get("roles").setValue(rolesToSet, { emitEvent: false });
+    }
+  } catch (e) {
+    // ignore sync errors
+  }
 
   this.isFormBusy = true;
   const body = this.compileBody();
@@ -399,27 +471,44 @@ private updateValidatorsBasedOnRoles() {
     }
 
     const rolesValue = this.form.get('roles')?.value || this.person?.roles || [];
-
     // Dynamically detect PI role
-    this.isPiRole = rolesValue.some((role: any) =>
-      role.annotationValue?.includes('Principal Investigator')
-    );
-
+    if (this._controlList?.renderAsDropdown) {
+      this.isPiRole = rolesValue === 'Principal Investigator';
+    }else{
+      this.isPiRole = rolesValue.some((role: any) =>
+        role.annotationValue?.includes('Principal Investigator')
+      );
+  }
     this.updatePiValidators(this.isPiRole);
   }
 
- onChanges() {
-  const prevRoles = this.form.controls.roles.value;
-  const newRoles = this.rolesComponent.values;
+  onChanges(event?: any) {
+    if (!this.form) return;
 
-  if (JSON.stringify(prevRoles) !== JSON.stringify(newRoles)) {
-    this.form.controls.roles.setValue(newRoles);
-    if (newRoles.length !== 0) {
-      this.form.controls.roles.markAsDirty();
+    const isDropdown = !!(this._controlList && this._controlList.renderAsDropdown);
+
+    try {
+      if (!isDropdown) {
+        const newRoles =
+          this.rolesComponent && Array.isArray((this.rolesComponent as any).values)
+            ? (this.rolesComponent as any).values
+            : [];
+        const prevRoles = this.form.get('roles')?.value;
+        if (JSON.stringify(prevRoles) !== JSON.stringify(newRoles)) {
+          this.form.get('roles')?.setValue(newRoles);
+        }
+      } else {
+        const selected = event?.value !== undefined ? event.value : this.form.get('roles')?.value;
+        if (this.form.get('roles')?.value !== selected) {
+          this.form.get('roles')?.setValue(selected);
+        }
+      }
+    } catch (e) {
+      // ignore sync errors
     }
+
     this.updateValidatorsBasedOnRoles();
   }
-}
 
 private updatePiValidators(isPi: boolean): void {
   const piFields = ['affiliation', 'email'];
@@ -506,8 +595,37 @@ private updatePiValidators(isPi: boolean): void {
     // mtblPerson.fax = this.getFieldValue("fax");
     mtblPerson.address = this.getFieldValue("address");
     mtblPerson.affiliation = this.getFieldValue("affiliation");
-    this.rolesComponent.values.forEach((role) => {
-      mtblPerson.roles.push(jsonConvert.deserializeObject(role, Ontology));
+    const sourceRoles: any[] = (() => {
+      try {
+        if (this.rolesComponent && Array.isArray((this.rolesComponent as any).values) && (this.rolesComponent as any).values.length > 0) {
+          return (this.rolesComponent as any).values;
+        }
+      } catch (_) {}
+      const ctrlVal = this.form?.get("roles")?.value;
+      if (!ctrlVal) return [];
+      if (Array.isArray(ctrlVal)) return ctrlVal;
+      return [ctrlVal];
+    })();
+
+    sourceRoles.forEach((role) => {
+      let ont: Ontology | null = null;
+      try {
+        if (typeof role === "string") {
+          ont = new Ontology();
+          ont.annotationValue = role;
+        } else {
+          ont = jsonConvert.deserializeObject(role, Ontology);
+        }
+      } catch {
+        ont = (role as Ontology) || null;
+      }
+
+      if (!ont) return;
+
+      if (!ont.termSource) ont.termSource = new OntologySourceReference();
+      if (!ont.termSource.name) ont.termSource.name = "";
+
+      mtblPerson.roles.push(ont);
     });
 
     const comments: MTBLSComment[] = [];
@@ -543,13 +661,95 @@ private updatePiValidators(isPi: boolean): void {
     const firstName = this.getFieldValue("firstName")?.trim();
     return lastName || firstName ? `https://orcid.org/orcid-search/search?firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}&otherFields=true` : 'https://orcid.org/';
   }
+
+  private getRolesValue(): any | null {
+    try {
+      if (this.rolesComponent && Array.isArray((this.rolesComponent as any).values) && (this.rolesComponent as any).values.length > 0) {
+        return (this.rolesComponent as any).values[0];
+      }
+    } catch (_) {}
+
+    const controlVal = this.form?.get("roles")?.value;
+    if (controlVal === null || controlVal === undefined) return null;
+    if (Array.isArray(controlVal)) {
+      return controlVal.length > 0 ? controlVal[0] : null;
+    }
+    return controlVal;
+  }
+
   controlList() {
     if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
+      && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
       this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
       this.defaultControlList.name = this.defaultControlListName;
     }
-    return this.defaultControlList;
+
+    
+    let defaultOntologies = {};
+      if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
+      const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+      defaultOntologies =  defaultRule;
+    }
+
+    const selectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      isaFileType: "investigation" as any,
+      isaFileTemplateName: null,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule = null;
+    try {
+      if (
+        this.legacyControlLists &&
+        Object.keys(this.legacyControlLists).length > 0
+      ) {
+        rule = getValidationRuleForField(
+          {
+            controlLists: this.legacyControlLists,
+          } as MetabolightsFieldControls,
+          this.defaultControlListName,  
+          selectionInput
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+
+    let renderAsDropdown = false;
+    if (rule) {
+      if (rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required") {
+        renderAsDropdown = true;
+        if (Array.isArray(rule.terms) && rule.terms.length > 0) {
+          const ontologiesValues = rule.terms.map((t: any) => {
+            const o = new Ontology();
+            o.annotationValue = t.term || t.label || "";
+            o.termAccession = t.termAccessionNumber || t.termAccession || "";
+            o.termSource = new OntologySourceReference();
+            o.termSource.name = t.termSourceRef || (t.termSource && t.termSource.name) || "";
+            o.termSource.file = t.provenance_uri || "";
+            o.termSource.provenance_name = t.provenance_name || "";
+            o.comments = [];
+            return o;
+          });
+          this.defaultControlList.values = ontologiesValues;
+        }
+      }
+    }
+
+    // ensure values always present
+    const valuesArray = Array.isArray(this.defaultControlList.values) ? this.defaultControlList.values : [];
+
+    const result = {
+      ...this.defaultControlList,
+      values: valuesArray,
+      rule,
+      defaultOntologies,
+      renderAsDropdown
+    };
+    this._controlList = result;
+    return result;
   }
   
 }

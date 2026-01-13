@@ -63,6 +63,7 @@ export class StatusComponent implements OnInit {
   baseHref: string;
   validationStatus: ViolationType = null;
   revisionStatus = ""
+  statusInitiated = false;
   private toastrSettings: Record<string, any> = {}
   isPopupOpen = false;
   userAgreed = false;
@@ -154,11 +155,11 @@ export class StatusComponent implements OnInit {
         const prevStatus = this.status
         this.status = value;
         this.toStatus = value;
-        if (prevStatus !== null && this.requestedStudy && this.status !== prevStatus) {
-          // TODO: work out why we are unexpectedly seeing this.
+        if (this.statusInitiated && this.status !== prevStatus) {
           toastr.success("Study status updated.", "Success", this.toastrSettings);
           this.router.navigate(["/study", this.requestedStudy]);
         }
+        this.statusInitiated = true
       }
     });
     this.isCurator$.subscribe((value) => {
@@ -174,6 +175,7 @@ export class StatusComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
+        this.statusInitiated = false
       }
     });
     this.readonly$.subscribe((value) => {

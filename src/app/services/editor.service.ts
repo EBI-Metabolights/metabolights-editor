@@ -10,13 +10,13 @@ import { ConfigurationService } from "../configuration.service";
 import jwtDecode from "jwt-decode";
 import { MTBLSStudy } from "../models/mtbl/mtbls/mtbls-study";
 import * as toastr from "toastr";
-import { HttpHeaders } from "@angular/common/http";
-import { Observable, of, asapScheduler } from "rxjs";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { Observable, of, asapScheduler, firstValueFrom } from "rxjs";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
 import { Store } from "@ngxs/store";
 import { Loading, SetLoadingInfo } from "../ngxs-store/non-study/transitions/transitions.actions";
-import { User } from "../ngxs-store/non-study/user/user.actions";
+import { Owner, User } from "../ngxs-store/non-study/user/user.actions";
 import { GetGeneralMetadata, Identifier, ResetGeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.actions";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
 import { AssayState } from "../ngxs-store/study/assay/assay.state";
@@ -35,6 +35,7 @@ import { ValidationService } from "./decomposed/validation.service";
 import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
 import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
+import { MetabolightsFieldControls } from "../models/mtbl/mtbls/control-list";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -91,7 +92,12 @@ export class EditorService {
     "Source Name": 7,
   };
   ontologyDetails: any = {};
-
+  // keep raw control-lists payload (may include assayFileControls/sampleFileControls/etc)
+  controlListControls: MetabolightsFieldControls | null = null;
+  // convenience references to specific parts (if present)
+  controlListAssayRules: any = null;
+  controlListSampleRules: any = null;
+  controlListInvestigationRules: any = null;
   constructor(
     public store: Store,
     private router: Router,
@@ -99,16 +105,18 @@ export class EditorService {
     private dataService: MetabolightsService,
     private validationService: ValidationService, // this is an antipattern, dont repeat
     public configService: ConfigurationService,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    private http: HttpClient,
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.setUpSubscriptionsNgxs();
     this.redirectUrl = this.configService.config.redirectURL;
-
+    // load dev control-lists (asset) and merge into NGXS without overwriting existing controlLists
+    // this.loadAndMergeDevControlLists();
   }
 
   setUpSubscriptionsNgxs() {
-    this.toastrSettings$.subscribe((settings) => {this.toastrSettings = settings});
+    this.toastrSettings$.subscribe((settings) => { this.toastrSettings = settings });
     this.studyIdentifier$.subscribe((value) => {
       this.currentStudyIdentifier = value;
     });
@@ -120,34 +128,136 @@ export class EditorService {
     });
 
     this.controlLists$.subscribe((value) => {
-      if (value) {
-        Object.keys(value).forEach((label: string)=>{
-          this.defaultControlLists[label] = {OntologyTerm: []};
-          value[label].forEach(term => {
-            this.defaultControlLists[label].OntologyTerm.push({
-              annotationDefinition: term.definition,
-              annotationValue: term.name,
-              termAccession: term.iri,
+      // if (value) {
+      //   Object.keys(value).forEach((label: string)=>{
+      //     this.defaultControlLists[label] = {OntologyTerm: []};
+      //     value[label].forEach(term => {
+      //       this.defaultControlLists[label].OntologyTerm.push({
+      //         annotationDefinition: term.definition,
+      //         annotationValue: term.name,
+      //         termAccession: term.iri,
+      //         comments: [],
+      //         termSource: {
+      //           comments: [],
+      //           name: term.onto_name,
+      //           description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
+      //           file: term.provenance_name,
+      //           provenance_name: term.provenance_name,
+      //           version: ""
+      //         },
+      //         wormsID: ""
+      //       });
+      //     });
+      //   });
+      // }
+      if (!value) return;
+
+      let controlListsPayload: Record<string, any> = value;
+      if ((value as any).controlLists) {
+        // store raw controls for other components to use
+        this.controlListControls = value as MetabolightsFieldControls;
+        this.controlListAssayRules = (value as any).assayFileControls || null;
+        this.controlListSampleRules = (value as any).sampleFileControls || null;
+        this.controlListInvestigationRules = (value as any).investigationFileControls || null;
+        controlListsPayload = (value as any).controlLists || {};
+      } else {
+        this.controlListControls = null;
+        this.controlListAssayRules = null;
+        this.controlListSampleRules = null;
+        this.controlListInvestigationRules = null;
+      }
+      // reset before rebuild to avoid accumulated entries on repeated emissions
+      this.defaultControlLists = {};
+      Object.keys(controlListsPayload).forEach((label: string) => {
+        const entry: any = controlListsPayload[label];
+        // support either: direct array of terms OR wrapper { OntologyTerm: [...] }
+        const termsArray = Array.isArray(entry)
+          ? entry
+          : entry && Array.isArray(entry.OntologyTerm)
+            ? entry.OntologyTerm
+            : null;
+
+        if (!termsArray) {
+          // skip non-array entries
+          return;
+        }
+
+        this.defaultControlLists[label] = { OntologyTerm: [] };
+        termsArray.forEach((term: any) => {
+          this.defaultControlLists[label].OntologyTerm.push({
+            annotationDefinition: term.definition,
+            annotationValue: term.name || term.annotationValue || "",
+            termAccession: term.iri || term.termAccession || "",
+            comments: [],
+            termSource: {
               comments: [],
-              termSource: {
-                comments: [],
-                name: term.onto_name,
-                description: term.onto_name === "MTBLS" ? "Metabolights Ontology" : "",
-                file: term.provenance_name,
-                provenance_name: term.provenance_name,
-                version: ""
-              },
-              wormsID: ""
-            });
+              name: term.onto_name || term.termSourceRef || "",
+              description: (term.onto_name || term.termSourceRef) === "MTBLS" ? "Metabolights Ontology" : "",
+              file: term.provenance_name || "",
+              provenance_name: term.provenance_name || "",
+              version: "",
+            },
+            wormsID: "",
           });
         });
-      }
+      });
     });
     this.assays$.subscribe((assays) => this.assays = assays);
     this.samples$.subscribe((samples) => this.samples = samples);
     this.mafs$.subscribe((mafs) => this.mafs = mafs)
 
   }
+
+//   private loadAndMergeDevControlLists(): void {
+//   this.http.get<any>("/assets/control-lists.json").subscribe(
+//     (assetLists) => {
+//       try {
+//         // Get the existing state snapshot safely
+//         const existingState = this.store.selectSnapshot(ApplicationState.controlLists) || {};
+
+//         // Normalize the incoming asset payload (in case some fields are missing)
+//         const assetFull = assetLists?.controlLists
+//           ? assetLists
+//           : {
+//               controlLists: assetLists?.controlLists || assetLists || {},
+//               assayFileControls: assetLists?.assayFileControls || {},
+//               sampleFileControls: assetLists?.sampleFileControls || {},
+//               investigationFileControls: assetLists?.investigationFileControls || {},
+//               defaultOntologies: assetLists?.defaultOntologies || [],
+//               defaultOtherSources: assetLists?.defaultOtherSources || [],
+//             };
+
+//         // Create a new shallow-merged flat control list (immutable)
+//         const mergedFlat = {
+//           ...existingState.controlLists,
+//           ...assetFull.controlLists,
+//         };
+
+//         // Create a new merged full payload (immutable)
+//         const mergedFull = {
+//           ...existingState,
+//           ...assetFull,
+//           controlLists: mergedFlat,
+//         };
+
+//         // Dispatch new immutable object → NGXS detects reference change
+//         this.store.dispatch(new DefaultControlLists.Set(structuredClone(mergedFull)));
+
+//       } catch (e) {
+//         console.error("Error merging control lists:", e);
+//         // Fallback: dispatch a minimal payload
+//         const fallbackFull =
+//           assetLists?.controlLists ? assetLists : { controlLists: assetLists || {} };
+//         this.store.dispatch(new DefaultControlLists.Set(structuredClone(fallbackFull)));
+//       }
+//     },
+//     (error) => {
+//       console.warn("Dev control list file not found — skipping", error);
+//       // Optional: handle gracefully
+//     }
+//   );
+// }
+
 
   login(body) {
     return this.authService.login(body);
@@ -174,7 +284,7 @@ export class EditorService {
       new ResetDescriptorsState(),
       new ResetValidationState(),
       new ResetFilesState()
-     ])
+    ])
   }
 
   authenticateAPIToken(body) {
@@ -223,22 +333,24 @@ export class EditorService {
 
 
 
-    /**
-   * Retrieves publication information for a given study.
-   *
-   * @returns A Publication wrapper object via the Observable
-   */
-    getDefaultControlLists(): Observable<any> {
-      return this.dataService.http
-        .get<any>(
-          this.dataService.url.baseURL + "/ebi-internal/control-lists",
-          {
-            headers: httpOptions.headers,
+  /**
+ * Retrieves publication information for a given study.
+ *
+ * @returns A Publication wrapper object via the Observable
+ */
+  getDefaultControlLists(): Observable<any> {
+    return this.dataService.http
+      .get<any>(
+        `${this.configService.config.ws3URL}/public/v2/validations/configuration`,
+        {
+          headers: new HttpHeaders({
+              Accept: "application/json"
+            }),
             observe: "body",
           }
-        )
-        .pipe(catchError(this.dataService.handleError));
-    }
+      )
+      .pipe(catchError(this.dataService.handleError));
+  }
 
   checkMaintenanceMode(): Observable<any> {
     return this.dataService.http
@@ -304,8 +416,8 @@ export class EditorService {
     } catch (err) {
       console.log(err);
       const errorMessage = err.error.message
-      ? err.error.message
-      : err.message ? err.message : "Study permission check error.";
+        ? err.error.message
+        : err.message ? err.message : "Study permission check error.";
       toastr.error(err.error.message, "Error", {
         timeOut: "2500",
         positionClass: "toast-top-center",
@@ -322,9 +434,14 @@ export class EditorService {
    * functionality as this has been a pain point in the past.
    * @returns
    */
-  async updateSession(){
-    const activeJwt = localStorage.getItem("jwt");
-    const localUser = localStorage.getItem("user");
+  async updateSession() {
+
+    const jwtTokenKey = "jwt"
+    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
+    const userKey = this.configService.config.endpoint + "/user"
+
+    const activeJwt = localStorage.getItem(jwtTokenKey);
+    const localUser = localStorage.getItem(userKey);
     const user: MetabolightsUser = JSON.parse(localUser);
 
     if (environment.useNewState) {
@@ -332,53 +449,60 @@ export class EditorService {
       this.store.dispatch(new MaintenanceMode.Get());
       this.store.dispatch(new DefaultControlLists.Get());
 
-     } else {
-      this.getDefaultControlLists().subscribe(
-        (response) => {
-          const controlLists = response.controlLists;
-          this.store.dispatch(new DefaultControlLists.Set(controlLists));
-          },
-          (error) => {
-            this.store.dispatch(new DefaultControlLists.Set({}));
+    } else {
+      this.getDefaultControlLists().subscribe({
+        next: (response) => {
+          this.store.dispatch(new DefaultControlLists.Set(response.content));
+        },
+        error: (error) => {
+          this.store.dispatch(new DefaultControlLists.Set({}));
 
-          }
+        }
+      }
       );
-      this.getBannerHeader().subscribe(
-        (response) => {
+      this.getBannerHeader().subscribe({
+        next: (response) => {
           const message = response.content;
           this.store.dispatch(new BannerMessage.Set(message))
-          },
-          (error) => {
-            this.store.dispatch(new BannerMessage.Set(null))
-          }
+        },
+        error: (error) => {
+          this.store.dispatch(new BannerMessage.Set(null))
+        }
+      }
       );
-      this.checkMaintenanceMode().subscribe(
-        (response) => {
+      this.checkMaintenanceMode().subscribe({
+        next: (response) => {
           const result = response.content;
           this.store.dispatch(new MaintenanceMode.Set(result));
-          },
-          (error) => {
-            this.store.dispatch(new MaintenanceMode.Set(false));
-          }
-      );
-     }
+        },
+        error: (error) => {
+          this.store.dispatch(new MaintenanceMode.Set(false));
+        }
+      });
+    }
 
 
 
-    if(activeJwt !== null){
+    if (activeJwt !== null) {
       const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
-      const username = decoded.sub;
-      if (user === null || user.email !== username){
+      const username = decoded.email;
+      if (user === null || user.email !== username) {
         this.clearSessionData();
         await this.loginWithJwt(activeJwt, username);
         return true;
       } else {
-        const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
-        localStorage.setItem("isCurator", isCurator);
+        const isCuratorKey = this.configService.config.endpoint + "/isCurator"
+        const usernameKey = this.configService.config.endpoint + "/username"
+        const apiTokenKey = this.configService.config.endpoint + "/apiToken"
+        const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+
+        const isCurator = user.role === 1 ? "true" : "false";
+        localStorage.setItem(isCuratorKey, isCurator);
         const apiToken = user.apiToken ?? "";
-        localStorage.setItem("apiToken", apiToken);
-        localStorage.setItem("username", user.email);
-        localStorage.setItem("jwtExpirationTime", decoded.exp.toString());
+        localStorage.setItem(apiTokenKey, apiToken);
+
+        localStorage.setItem(usernameKey, user.email);
+        localStorage.setItem(jwtExpirationTimeKey, decoded.exp.toString());
         this.initialise(localUser, false);
       }
       return false;
@@ -392,7 +516,7 @@ export class EditorService {
     const queryParams = state.queryParamMap;
 
     let location = window.location.origin;
-    if  (window.location.pathname.startsWith("/")){
+    if (window.location.pathname.startsWith("/")) {
       location = location + window.location.pathname;
     } else {
       location = location + "/" + window.location.pathname;
@@ -416,27 +540,37 @@ export class EditorService {
     );
   }
 
-  clearSessionData(){
-    localStorage.removeItem("jwt");
-    localStorage.removeItem("username");
-    localStorage.removeItem("jwtExpirationTime");
-    localStorage.removeItem("user");
-    localStorage.removeItem("isCurator");
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("apiToken");
-    localStorage.removeItem("loginOneTimeToken");
+  clearSessionData() {
+    if (this.configService.config.endpoint) {
+      // localStorage.removeItem(this.configService.config.endpoint + "/jwt");
+      localStorage.removeItem("jwt");
+      localStorage.removeItem(this.configService.config.endpoint + "/username");
+      localStorage.removeItem(this.configService.config.endpoint + "/jwtExpirationTime");
+      localStorage.removeItem(this.configService.config.endpoint + "/user");
+      localStorage.removeItem(this.configService.config.endpoint + "/isCurator");
+      localStorage.removeItem(this.configService.config.endpoint + "/userToken");
+      localStorage.removeItem(this.configService.config.endpoint + "/apiToken");
+      localStorage.removeItem(this.configService.config.endpoint + "/loginOneTimeToken");
+    }
+
   }
 
   async loginWithJwt(jwtToken: string, userName: string) {
     const body = { jwt: jwtToken, user: userName };
     const url = this.configService.config.metabolightsWSURL.baseURL + this.configService.config.authenticationURL.initialise;
-    const response = await this.authService.http.post(url, body, httpOptions).toPromise();
+    const response = await firstValueFrom(this.authService.http.post(url, body, httpOptions));
     const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
     const expiration = decoded.exp;
-    localStorage.setItem("jwt", jwtToken);
 
-    localStorage.setItem("username", userName);
-    localStorage.setItem("jwtExpirationTime", expiration.toString());
+    // const jwtKey = this.configService.config.endpoint + "/jwt"
+    const jwtKey = "jwt"
+    const usernameKey = this.configService.config.endpoint + "/username"
+    const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+
+    localStorage.setItem(jwtKey, jwtToken);
+
+    localStorage.setItem(usernameKey, userName);
+    localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
     return this.initialise(response, true);
   }
 
@@ -449,32 +583,39 @@ export class EditorService {
       err: string;
     }
 
+    const userKey = this.configService.config.endpoint + "/user"
+    const isCuratorKey = this.configService.config.endpoint + "/isCurator"
     if (signInRequest) {
-      const userstr = data.content;
-      const user: User = JSON.parse(userstr);
-      localStorage.setItem("user", JSON.stringify(user.owner));
-      const isCurator = user.owner.role === "ROLE_SUPER_USER" ? "true" : "false";
-      localStorage.setItem("isCurator", isCurator);
-      httpOptions.headers = httpOptions.headers.set(
-        "user-token",
-        user.owner.apiToken
-      );
+      const user: Owner = data.content;
+      if (user) {
 
-      this.store.dispatch(new User.Set(user.owner));
 
+        localStorage.setItem(userKey, JSON.stringify(user));
+        const isCurator = user.role === 1 ? "true" : "false";
+        localStorage.setItem(isCuratorKey, isCurator);
+        httpOptions.headers = httpOptions.headers.set(
+          "user-token",
+          user.apiToken
+        );
+
+        this.store.dispatch(new User.Set(user));
+      } else {
+        this.clearSessionData()
+      }
       this.store.dispatch(new User.Studies.Set(null))
 
 
       this.loadValidations();
       return true;
     } else {
-      const user = JSON.parse(data);
+      const user: Owner = JSON.parse(data);
       httpOptions.headers = httpOptions.headers.set(
         "user-token",
         disambiguateUserObj(user)
       );
-      const isCurator = user.role === "ROLE_SUPER_USER" ? "true" : "false";
-      localStorage.setItem("isCurator", isCurator);
+      const isCurator = user.role === 1 ? "true" : "false";
+
+      localStorage.setItem(isCuratorKey, isCurator);
 
       this.store.dispatch(new User.Set(user));
 
@@ -519,9 +660,9 @@ export class EditorService {
   }
 
   toggleLoading(status) {
-      status !== null ? (
-        status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
-        ) : this.store.dispatch(new Loading.Toggle())
+    status !== null ? (
+      status ? this.store.dispatch(new Loading.Enable()) : this.store.dispatch(new Loading.Disable())
+    ) : this.store.dispatch(new Loading.Toggle())
 
   }
 
@@ -683,15 +824,15 @@ export class EditorService {
       if (queryFieldsParam.length > 1) {
         queryFields = decodeURI(queryFieldsParam[1].split("&")[0]);
       }
-      if (queryFields.length === 0){
-        if (term.length === 0 ) {
+      if (queryFields.length === 0) {
+        if (term.length === 0) {
           if (branch.length > 0 && branch in this.defaultControlLists) {
             return of(this.defaultControlLists[branch]).pipe(
               observeOn(asapScheduler)
             );
           } else {
             console.log("Empty branch search and term search returns empty list.");
-            return of({OntologyTerm: []}).pipe(
+            return of({ OntologyTerm: [] }).pipe(
               observeOn(asapScheduler)
             );
           }
@@ -709,25 +850,25 @@ export class EditorService {
           const matchMap: Map<string, any> = new Map<string, any>();
           const filtereValues = [];
           exactMatches.forEach(element => {
-            if (!matchMap.has(element.termAccession)){
+            if (!matchMap.has(element.termAccession)) {
               matchMap.set(element.termAccession, element);
               filtereValues.push(element);
             }
           });
           startsWithMatches.forEach(element => {
-            if (!matchMap.has(element.termAccession)){
+            if (!matchMap.has(element.termAccession)) {
               matchMap.set(element.termAccession, element);
               filtereValues.push(element);
             }
           });
           containsMatches.forEach(element => {
-            if (!matchMap.has(element.termAccession)){
+            if (!matchMap.has(element.termAccession)) {
               matchMap.set(element.termAccession, element);
               filtereValues.push(element);
             }
           });
-          if (filtereValues && filtereValues.length > 0){
-            return of({OntologyTerm: filtereValues}).pipe(
+          if (filtereValues && filtereValues.length > 0) {
+            return of({ OntologyTerm: filtereValues }).pipe(
               observeOn(asapScheduler)
             );
           }
@@ -739,14 +880,14 @@ export class EditorService {
   }
 
   filterDefaultControlList(filter_method: CallableFunction, branch: string, term: string) {
-      if (branch && branch.length > 0 && branch in this.defaultControlLists) {
-          if (term && term.length > 0 ){
-            return this.defaultControlLists[branch].OntologyTerm.filter(filter_method);
-          } else {
-            return this.defaultControlLists[branch].OntologyTerm;
-          }
+    if (branch && branch.length > 0 && branch in this.defaultControlLists) {
+      if (term && term.length > 0) {
+        return this.defaultControlLists[branch].OntologyTerm.filter(filter_method);
+      } else {
+        return this.defaultControlLists[branch].OntologyTerm;
       }
-      return [];
+    }
+    return [];
   }
 
   getOntologyDetails(value) {
@@ -789,12 +930,12 @@ export class EditorService {
       fileExist = filename in source;
       sourceFile = fileExist ? source[filename] : "";
     }
-    if ( result.success && result.updates && result.updates.length > 0) {
+    if (result.success && result.updates && result.updates.length > 0) {
       const table = sourceFile.data;
       const deepCopiedData = JSON.parse(JSON.stringify(table));
 
       const headerIndices: Map<number, string> = new Map<number, string>();
-      table.columns.forEach((val, idx)=> {
+      table.columns.forEach((val, idx) => {
         headerIndices.set(val.header, idx);
       });
       result.updates.forEach((update) => {
@@ -804,7 +945,7 @@ export class EditorService {
         if (currentHeader === remoteHeader) {
           table.rows[update["row"]][currentHeader] = update["value"];
         } else {
-          console.log("Value '" + update["value"] + "' at row "+ update["row"]
+          console.log("Value '" + update["value"] + "' at row " + update["row"]
             + ". Update column names do not match. Remote header: "
             + remoteHeader + " current header: " + currentHeader);
         }
@@ -820,24 +961,50 @@ export class EditorService {
   toggleFolderAccess() {
     return this.dataService.toggleFolderAccess();
   }
-    copyContent(content: string) {
-      navigator.clipboard.writeText(content).then(() => {
-        toastr.success("Content copied to clipboard", "Success", this.toastrSettings);
-      }).catch((error) => {
-        toastr.error("Failed to copy content: " + error, "Error", this.toastrSettings);
-      });
+  copyContent(content: string) {
+    navigator.clipboard.writeText(content).then(() => {
+      toastr.success("Content copied to clipboard", "Success", this.toastrSettings);
+    }).catch((error) => {
+      toastr.error("Failed to copy content: " + error, "Error", this.toastrSettings);
+    });
+  }
+
+  getRorOrganizations(query: string): Observable<any> {
+    if (!query || query.trim().length < 3) {
+      // Avoid unnecessary API calls
+      return of({ items: [] });
     }
 
-    getRorOrganizations(query: string): Observable<any> {
-      if (!query || query.trim().length < 3) {
-        // Avoid unnecessary API calls
-        return of({ items: [] });
-      }
+    const encodedQuery = encodeURIComponent(query);
 
-      const encodedQuery = encodeURIComponent(query);
-      const url = `https://api.ror.org/organizations?affiliation=${encodedQuery}`;
+    const url = `https://www.ebi.ac.uk/ols4/api/search` +
+      `?q=${encodedQuery}` +
+      `&ontology=ror` +
+      `&fieldList=ontology_prefix,iri,label,synonym,description` +
+      `&queryFields=label,iri,synonym`;
 
-      return this.dataService.getRorid(url);
+    return this.dataService.getRorid(url);
+  }
+
+  // New method for ontology term search with rule-based validation
+  searchOntologyTermsWithRuleV2(
+    keyword: string,
+    isExactMatchRequired: boolean,
+    ruleName: string,
+    fieldName: string,
+    validationType: string,
+    ontologies: string[],
+    allowedParentOntologyTerms?: any
+  ): Observable<any> {
+    const body: any = {
+      validationType: validationType,
+      ontologies: ontologies,
+      ruleName: ruleName,
+      fieldName: fieldName
+    };
+    if (allowedParentOntologyTerms) {
+      body.allowedParentOntologyTerms = allowedParentOntologyTerms;
     }
-
+    return this.dataService.getOntologyTermsV2(keyword, isExactMatchRequired, body);
+  }
 }

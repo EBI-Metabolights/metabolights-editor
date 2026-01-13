@@ -21,6 +21,7 @@ import { FilesLists } from "src/app/ngxs-store/study/files/files.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
 import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
 import { animate, style, transition, trigger } from "@angular/animations";
+import { FieldValueValidation, getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr, ValidationRuleSelectionInput } from "src/app/models/mtbl/mtbls/control-list";
 
 @Component({
   selector: "mtbls-samples",
@@ -48,7 +49,18 @@ export class SamplesComponent  {
   studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-
+   sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
   actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
   actionStack$ = computed(() => {
     const filterFn = this.actionStackFn();
@@ -97,6 +109,11 @@ export class SamplesComponent  {
   actionStack = signal<string[]>([]);
   showRefreshPrompt = computed(() => this.actionStack().length > 0)
   debounceTimeout: any;
+  studyCategory: any;
+  templateVersion: any;
+  sampleTemplate: any;
+  private legacyControlLists: Record<string, any[]> | null = null;
+  studyCreatedAt: any;
 
 
   constructor(
@@ -125,8 +142,20 @@ export class SamplesComponent  {
     this.studyFactors$.subscribe((value) => {
       this.factors = value;
     });
-    this.studyIdentifier$.pipe(filter(val => val !== null)).subscribe(val => {
-      //
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+      this.legacyControlLists = lists || {};
     });
     this.studyFiles$.pipe(withLatestFrom(this.studyIdentifier$)).subscribe(([f, studyIdentifierValue]) => {
       if (f) {
@@ -275,7 +304,7 @@ export class SamplesComponent  {
         newFactorIndex
       );
       let factorUnitValue
-      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit', unitId).values[0];
+      if (deepUnit) factorUnitValue = this.ontTrackerService.getById('factorUnit', unitId)?.values[0];
       else {
         if (this.getOntologyComponentValue("factorUnit") !== undefined) {
           factorUnitValue = this.getOntologyComponentValue("factorUnit").values[0];
@@ -423,7 +452,6 @@ export class SamplesComponent  {
       (component) => component.id === id
     )[0];
   }
-
   get validation() {
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
@@ -437,20 +465,60 @@ export class SamplesComponent  {
   fieldValidation(fieldId) {
     return this.validation[fieldId];
   }
-  controlList(name: string) {
+  controlList(name) {
     let controlList = this.defaultCharacteristicControlList;
     let controlListName = this.defaultCharacteristicControlListName;
-    if(name === "unit") {
+    
+    
+    if (name === "unit") {
       controlList = this.defaultUnitControlList;
       controlListName = this.defaultUnitControlListName;
+
+      
     }
     if (!(controlList && controlList.name.length > 0)
-      && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists){
-        controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
-        controlList.name = controlListName;
+      && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists) {
+      controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+      controlList.name = controlListName;
     }
-    return controlList;
+     let defaultOntologies = {};
+    if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["sampleFileControls"] && this.legacyControlLists.controls["sampleFileControls"].__default__) {
+        const defaultRule = this.legacyControlLists.controls["sampleFileControls"].__default__[0];
+        defaultOntologies = defaultRule;
+      }
+    // Get rule using the same logic as table component
+    const selectionInput: ValidationRuleSelectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      isaFileType: "sample" as any,
+      isaFileTemplateName: this.sampleTemplate,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule: FieldValueValidation | null = null;
+    try {
+      if (
+        this.legacyControlLists &&
+        Object.keys(this.legacyControlLists).length > 0
+      ) {
+        rule = getValidationRuleForField(
+          {
+            controlLists: this.legacyControlLists,
+          } as MetabolightsFieldControls,
+          controlListName, 
+          selectionInput
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+    return {
+      ...controlList,
+      rule,
+      defaultOntologies
+    };
   }
+
   refreshSamplesTableWithoutPopup() {
     this.studySamples$
       .pipe(withLatestFrom(this.studyIdentifier$), take(1))

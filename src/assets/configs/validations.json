@@ -1874,7 +1874,7 @@
                     ],
                     "ontology-details": {
                         "data-type": "string",
-                        "is-required": "false",
+                        "is-required": "true",
                         "is-read-only": "false",
                         "is-hidden": "false",
                         "technique": "mass spectrometry",
@@ -1980,7 +1980,7 @@
                         "is-read-only": "false",
                         "is-hidden": "false",
                         "technique": "mass spectrometry",
-                        "description": "Please specify the chromatography column type e.g. reverse phase.",
+                        "description": "Please specify the mass spectrometry instrument e.g. Orbitrap Exploris 120.",
                         "placeholder": "",
                         "rules": [],
                         "recommended-ontologies": {

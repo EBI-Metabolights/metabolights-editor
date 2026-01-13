@@ -1,6 +1,6 @@
 export interface Owner {
     apiToken: string;
-    role: string;
+    role: number;
     email: string;
     status: string;
     partner: boolean;

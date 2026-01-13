@@ -1,16 +1,10 @@
 <div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
-  <a class="button is-primary is-pulled-right is-small" (click)="openModal()"
-    >+ Add</a
-  >
+  <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
 </div>
 <ng-template #showDescriptorDetails>
   <div class="control">
     <div class="tags has-addons" style="margin-bottom: 5px">
-      <span
-        *ngIf="!isStudyReadOnly"
-        class="tag is-primary clickable"
-        (click)="openModal()"
-      >
+      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()">
         <i class="material-icons"> edit </i>
       </span>
       <span class="tag is-default is-small">
@@ -53,35 +47,33 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <span *ngIf="descriptor != null; else noDescriptor">
-          <mtbls-ontology
-            #descriptorComponent
-            [validations]="validation"
-            [controlList]="controlList()"
-            (changed)="onChanges($event)"
-            [values]="[descriptor]"
-            [inline]="true"
-          ></mtbls-ontology>
-        </span>
-        <ng-template #noDescriptor>
-          <mtbls-ontology
-            #descriptorComponent
-            [validations]="validation"
-            [controlList]="controlList()"
-            (changed)="onChanges($event)"
-            [values]="[]"
-            [inline]="true"
-          ></mtbls-ontology>
+        <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
+          <mtbls-ontology #descriptorComponent [validations]="validation" [controlList]="controlList()"
+            (changed)="onChanges($event)" [values]="descriptorValuesForComponent()" [inline]="true"
+            [rule]="controlList().rule" [defaultOntologies]="controlList().defaultOntologies"
+            [label]="'Descriptor'"></mtbls-ontology>
+          <mat-error *ngIf="showError">
+            <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
+          </mat-error>
+        </ng-container>
+
+        <ng-template #dropdownField>
+          <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('descriptor')">
+            <mat-select formControlName="descriptor" placeholder="Descriptor" (selectionChange)="onChanges($event)">
+              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                {{ option.annotationValue }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="showError">
+              <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
+            </mat-error>
+          </mat-form-field>
         </ng-template>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
-            <button
-              *ngIf="!addNewDescriptor"
-              class="button is-danger is-pulled-left"
-              (click)="confirmDelete()"
-            >
+            <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
             <button
@@ -93,31 +85,17 @@
             </button>
           </div>
           <div class="column is-half has-text-right">
-            <button
-              *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button *ngIf="!form.pristine" [disabled]="!isDescriptorValid || isFormBusy" (click)="saveNgxs()"
+              class="button is-info">
+
+
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
-            <button
-              *ngIf="form.pristine"
-              (click)="closeModal()"
-              class="button is-info"
-            >
+            <button *ngIf="form.pristine" (click)="closeModal()" class="button is-info">
               OK
             </button>
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>
@@ -140,46 +118,29 @@
       <section class="modal-card-body">
         <mat-form-field class="full-width">
           <mat-label>Select Publication</mat-label>
-          <mat-select
-            (selectionChange)="getKeyWords()"
-            [formControl]="selectedPublication"
-            required
-          >
+          <mat-select (selectionChange)="getKeyWords()" [formControl]="selectedPublication" required>
             <mat-option> Please select </mat-option>
-            <mat-option
-              ngDefaultControl
-              *ngFor="let publication of publications"
-              [value]="publication.doi"
-              >{{ publication.title }}</mat-option
-            >
+            <mat-option ngDefaultControl *ngFor="let publication of publications" [value]="publication.doi">{{
+              publication.title }}</mat-option>
           </mat-select>
         </mat-form-field>
-        <div class="field is-grouped is-grouped-multiline">
-          <span
-            (click)="toggleSelection(keyword)"
-            style="margin-bottom: 10px"
-            *ngFor="let keyword of keywords"
-          >
+        <div *ngIf="keywords.length>0; else noKeywords" class="field is-grouped is-grouped-multiline">
+          <span (click)="toggleSelection(keyword)" style="margin-bottom: 10px" *ngFor="let keyword of keywords">
             <div class="tags has-addons pointer">
-              <span
-                [class]="
+              <span [class]="
                   isSelected(keyword) ? 'tag is-primary pointer' : 'tag pointer'
-                "
-                >{{ keyword }}</span
-              >
+                ">{{ keyword }}</span>
             </div>
           </span>
         </div>
+        <ng-template #noKeywords>
+          <small *ngIf="!loading && keywords.length==0">No keywords found for the publication.</small>
+        </ng-template>
         <span *ngIf="!loading; else showStatus">
-          <small *ngIf="keywords.length > 0"
-            >Click to select the keywords</small
-          >
+          <small *ngIf="keywords.length > 0">Click to select the keywords</small>
         </span>
         <ng-template #showStatus>
-          <img
-            style="height: 10px; margin-left: 10px"
-            src="{{ baseHref }}assets/img/loading.svg"
-          />
+          <img style="height: 10px; margin-left: 10px" src="{{ baseHref }}assets/img/loading.svg" />
           {{ status }}
         </ng-template>
       </section>
@@ -187,11 +148,7 @@
         <div class="columns is-gapless full-width">
           <div class="column is-half"></div>
           <div class="column is-half has-text-right">
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="updateAndCloseNgxs()"
-            >
+            <button class="button" [disabled]="isFormBusy" (click)="updateAndCloseNgxs()">
               OK
             </button>
           </div>
