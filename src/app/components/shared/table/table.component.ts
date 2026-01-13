@@ -320,6 +320,7 @@ export class TableComponent
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        this.refreshDisplayedColumns();
       }
     });
   }
@@ -382,8 +383,8 @@ export class TableComponent
     this.data = this.tableData.data;
     if (this.data) {
       this.hit = true;
-      this.displayedTableColumns = this.data.displayedColumns;
       this.fullRows = this.data.rows;
+      this.refreshDisplayedColumns();
       this.dataSource = new MatTableDataSource(this.fullRows);
 
       // Important: reattach paginator & sort every time dataSource is recreated
@@ -429,9 +430,7 @@ export class TableComponent
       this.setupPaginator();
       this.detectFileColumns();
       this.validateTableOntologyColumns();
-      if (this.view === "expanded") {
-        this.displayedTableColumns = Object.keys(this.data.header);
-      }
+      this.refreshDisplayedColumns();
     }
   }
 
@@ -829,18 +828,34 @@ export class TableComponent
   toggleView() {
     const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
     if (this.view === "compact") {
-      this.displayedTableColumns = Object.keys(this.data.header);
-      this.displayedTableColumns.unshift("Select");
       this.view = "expanded";
       localStorage.setItem(fileKey, "expanded");
     } else {
-      this.displayedTableColumns = this.data.displayedColumns;
       this.view = "compact";
       localStorage.setItem(fileKey, "compact");
     }
+    this.refreshDisplayedColumns();
 
     // After toggling, check if scroll is really needed
     setTimeout(() => this.updateScrollBehavior());
+  }
+
+  refreshDisplayedColumns() {
+    if (this.data) {
+      if (this.view === 'compact') {
+        this.displayedTableColumns = Array.from(this.data.displayedColumns || []);
+      } else {
+        this.displayedTableColumns = Object.keys(this.data.header || {});
+      }
+
+      if (this.isReadOnly) {
+        this.displayedTableColumns = this.displayedTableColumns.filter(c => c !== 'Select');
+      } else {
+        if (this.displayedTableColumns.indexOf('Select') === -1) {
+          this.displayedTableColumns.unshift('Select');
+        }
+      }
+    }
   }
 
   validateTableOntologyColumns() {
@@ -2241,6 +2256,10 @@ toggleSelectAll(): void {
 
     if (!Array.isArray(rows) || rows.length === 0) {
       return false;
+    }
+
+    if (this.templateRowPresent) {
+      return rows.length > 1;
     }
 
     if (this.getTableType(this.data.file) === 'assay') {
