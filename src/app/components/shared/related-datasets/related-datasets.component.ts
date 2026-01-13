@@ -16,6 +16,7 @@ export class RelatedDatasetsComponent implements OnInit {
   
   relatedDatasets$: Observable<any[]> = inject(Store).select(StudyCreationState.relatedDatasets);
   
+  isModalOpen = false;
   form: UntypedFormGroup;
   filteredIdentifierSources$: Observable<any[]>;
   identifierPlaceholder: string = 'e.g. MTBLS1';
@@ -51,6 +52,15 @@ export class RelatedDatasetsComponent implements OnInit {
     });
   }
 
+  openModal() {
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.form.reset();
+  }
+
   displayIdentifierSource(source?: any): string {
     return source ? source.name : '';
   }
@@ -63,27 +73,19 @@ export class RelatedDatasetsComponent implements OnInit {
       
       let url = '';
       if (typeof source === 'object' && source.urlPattern) {
-          // Replace pattern with identifier
-          // Usually {$id} or similar placeholder. identifers.org uses {$id} typically.
-          // The API returns urlPattern like "https://...id={$id}"
           url = source.urlPattern.replace('{$id}', identifier);
       } else {
-          // Fallback if user typed manually or logic fails, though we enforce selection via object
-          // For now, if string, we can't build URL accurately without the pattern.
-          // We might assume they know what they are doing if we allowed manual entry, 
-          // but better to enforce selection or just store what we have.
-          // Given the requirement "store Identifier source as url" implies we need the resolved URL.
-          // If the user typed manually, we might not have a URL.
           url = ''; 
       }
       
       const newDataset = {
-          identifier: identifier,
+          repository: typeof source === 'object' ? source.name : source,
+          accession: identifier,
           url: url 
       };
 
       this.store.dispatch(new StudyCreation.AddRelatedDataset(newDataset));
-      this.form.reset();
+      this.closeModal();
     }
   }
 

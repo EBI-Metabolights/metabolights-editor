@@ -72,6 +72,7 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { FundingComponent } from './funding/funding.component';
 import { RelatedDatasetsComponent } from './related-datasets/related-datasets.component';
+import { ModalComponent } from './modal/modal.component';
 
 
 
@@ -123,7 +124,8 @@ import { RelatedDatasetsComponent } from './related-datasets/related-datasets.co
     DataPolicyModalComponent,
     DragAndDropComponent,
     FundingComponent,
-    RelatedDatasetsComponent
+    RelatedDatasetsComponent,
+    ModalComponent
   ],
   imports: [
     CommonModule,
@@ -191,7 +193,8 @@ import { RelatedDatasetsComponent } from './related-datasets/related-datasets.co
     DataPolicyModalComponent,
     DragAndDropComponent,
     FundingComponent,
-    RelatedDatasetsComponent
+    RelatedDatasetsComponent,
+    ModalComponent
   ],
   providers: [
     AuthGuard,

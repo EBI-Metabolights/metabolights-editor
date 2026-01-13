@@ -1,11 +1,35 @@
-<!-- Add New Dataset Form -->
-<div class="box is-relative mb-4">
-    <form [formGroup]="form">
+<div class="level mb-2">
+    <div class="level-left"></div>
+    <div class="level-right">
+        <a class="button is-primary is-small" (click)="openModal()">+ Add</a>
+    </div>
+</div>
+
+<div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0">
+    <div class="box p-3 mb-4" *ngFor="let ds of relatedDatasets$ | async; let i = index">
+        <div class="columns is-vcentered is-mobile">
+            <div class="column">
+                <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                    <span class="has-text-weight-bold is-size-6 has-text-grey-dark">{{ ds.accession }}</span>
+                    <div class="is-size-6" *ngIf="ds.url">
+                        <span class="has-text-weight-semibold has-text-grey">URL:</span>
+                        <a class="ml-1" [href]="ds.url" target="_blank" style="word-break: break-all;">{{ ds.url }}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-narrow">
+                <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<mtbls-modal [title]="'Add Related Dataset'" [isModalOpen]="isModalOpen" (closed)="closeModal()">
+    <div body [formGroup]="form">
         <div class="columns is-multiline">
-            <!-- Identifier Source -->
             <div class="column is-6">
                 <div class="field">
-                    <label class="label is-small">Identifier Source</label>
+                    <label class="label is-small">Related Dataset Repository</label>
                     <div class="control">
                         <mat-form-field class="full-width is-small">
                             <input type="text" matInput formControlName="identifierSource"
@@ -19,11 +43,9 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Dataset Identifier -->
             <div class="column is-6">
                 <div class="field">
-                    <label class="label is-small">Dataset Identifier</label>
+                    <label class="label is-small">Related Dataset Accession Number</label>
                     <div class="control">
                         <mat-form-field class="full-width is-small">
                             <input matInput type="text" formControlName="identifier"
@@ -33,40 +55,9 @@
                 </div>
             </div>
         </div>
-        <!-- Add Button Area -->
-        <div class="field is-grouped is-justify-content-flex-end mt-2">
-            <div class="control">
-                <button class="button is-small is-primary" (click)="addDataset()" [disabled]="form.invalid">
-                    <span class="icon is-small">
-                        <i class="material-icons">add</i>
-                    </span>
-                    <span>Add Dataset</span>
-                </button>
-            </div>
-        </div>
-    </form>
-</div>
-
-<!-- List of Existing Datasets -->
-<div class="mb-4" *ngIf="(relatedDatasets$ | async)?.length > 0">
-    <div class="funding-list">
-        <div class="box p-3 mb-2 funding-item" *ngFor="let ds of relatedDatasets$ | async; let i = index">
-            <div class="columns is-vcentered is-mobile">
-                <div class="column">
-                    <div class="is-flex is-flex-wrap-wrap is-align-items-center" style="gap: 0.5rem;">
-                        <span class="has-text-weight-bold has-text-grey-dark">{{ ds.identifier }}</span>
-
-                        <span class="tag is-light" style="white-space: normal; height: auto; text-align: left;"
-                            *ngIf="ds.url">
-                            <a [href]="ds.url" target="_blank" class="has-text-grey" style="word-break: break-all;">{{
-                                ds.url }}</a>
-                        </span>
-                    </div>
-                </div>
-                <div class="column is-narrow">
-                    <button class="delete" (click)="removeDataset(i)" title="Remove Dataset"></button>
-                </div>
-            </div>
-        </div>
     </div>
-</div>
+    <div footer>
+        <button class="button is-info" (click)="addDataset()" [disabled]="form.invalid">Add Dataset</button>
+        <button class="button" style="margin-left:10px" (click)="closeModal()">Cancel</button>
+    </div>
+</mtbls-modal>

@@ -602,7 +602,7 @@ export class MetabolightsService extends DataService {
   createStudy(): Observable<{ new_study: string }> {
     return this.http
       .get<{ new_study: string }>(
-        this.url.baseURL + "/studies" + "/create",
+        this.url.baseURL + "/provisional-studies",
         httpOptions
       )
       .pipe(catchError(this.handleError));
@@ -611,7 +611,7 @@ export class MetabolightsService extends DataService {
   createStudyWithMetadata(body: any): Observable<{ new_study: string }> {
     return this.http
       .post<{ new_study: string }>(
-        this.url.baseURL + "/studies" + "/create",
+        this.url.baseURL + "/provisional-studies",
         body,
         httpOptions
       )

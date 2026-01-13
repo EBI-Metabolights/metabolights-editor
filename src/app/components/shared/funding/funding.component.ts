@@ -20,7 +20,7 @@ export class FundingComponent implements OnInit {
   
   form: UntypedFormGroup;
   filteredFunderOrganizations$: Observable<any[]>;
-  isFormBusy = false;
+  isModalOpen = false;
 
   constructor(private fb: UntypedFormBuilder, private editorService: EditorService, private store: Store) { }
 
@@ -56,7 +56,14 @@ export class FundingComponent implements OnInit {
     );
   }
 
+  openModal() {
+    this.isModalOpen = true;
+  }
 
+  closeModal() {
+    this.isModalOpen = false;
+    this.form.reset();
+  }
 
   displayFunderName(org?: any): string {
     return org ? (org.name || org.annotationValue) : '';
@@ -100,7 +107,7 @@ export class FundingComponent implements OnInit {
       };
 
       this.store.dispatch(new StudyCreation.AddFunder(newFunder));
-      this.form.reset();
+      this.closeModal();
     }
   }
 

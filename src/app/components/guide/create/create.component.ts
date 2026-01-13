@@ -68,7 +68,7 @@ export class CreateComponent implements OnInit {
   agreements: any = {
     datasetLicenseAgreement: false,
     datasetPolicyAgreement: false,
-    emailCommunicationAgreement: true,
+    emailCommunicationAgreement: false,
     privacyPolicyAgreement: false
   };
   // Ontology Fields

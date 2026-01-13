@@ -150,7 +150,7 @@
               <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.datasetLicenseAgreement"> I accept the terms of the
                 MetaboLights dataset license.
-                <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">(View License)</a>
+                <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
               </label>
               <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [checked]="agreements.privacyPolicyAgreement"
@@ -234,7 +234,7 @@
 
               </div>
               <div class="column is-12">
-                <h5 class="title is-6 mb-3">Design Descriptor (optional)</h5>
+                <h5 class="title is-6 mb-3">Design Descriptors (Keywords)</h5>
                 <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
                   <div class="box p-3 is-clearfix" style="position: relative;">
                     <button class="button is-primary is-small"
@@ -258,7 +258,7 @@
                     <button class="button is-primary is-small"
                       style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="kwRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">Additional Keywords</h6>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">Others</h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getKeywords(); let i = index" class="tag is-primary is-light is-medium">
                         {{desc.annotationValue}}
