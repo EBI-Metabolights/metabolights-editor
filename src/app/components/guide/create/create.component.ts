@@ -69,7 +69,7 @@ export class CreateComponent implements OnInit {
     datasetLicenseAgreement: false,
     datasetPolicyAgreement: false,
     emailCommunicationAgreement: false,
-    privacyPolicyAgreement: false
+    privacyPolicyAgreement: true
   };
   // Ontology Fields
   selectedSubmitterRole: Ontology = null;
@@ -124,6 +124,7 @@ export class CreateComponent implements OnInit {
   createForm() {
     this.studyCreationForm = this.fb.group({
       sampleFileTemplate: ['', Validators.required],
+      investigationFileTemplate: ['', Validators.required],
       submitterRole: [[]],
       publicationStatus: [[]],
       fundingFunder: [[]], // Keep legacy for now or remove if unused later
@@ -264,6 +265,7 @@ export class CreateComponent implements OnInit {
       console.log('Default Investigation Template:', defaultInvestigationTemplate);
       
       this.selectedInvestigationFileTemplate = defaultInvestigationTemplate;
+      this.studyCreationForm.controls['investigationFileTemplate']?.setValue(defaultInvestigationTemplate);
 
       // License Information
       this.licenseName = versionConfig.defaultDatasetLicense || "";
@@ -289,6 +291,10 @@ export class CreateComponent implements OnInit {
 
   onSampleTemplateChange(templateName: string) {
       this.selectedSampleFileTemplate = templateName;
+  }
+  
+  onInvestigationTemplateChange(templateName: string) {
+      this.selectedInvestigationFileTemplate = templateName;
   }
 
   
@@ -366,9 +372,7 @@ export class CreateComponent implements OnInit {
            this.selectedSubmitterRole && 
            this.publicationStatus && this.publicationStatus.length > 0 &&
            this.agreements?.datasetLicenseAgreement &&
-           this.agreements?.datasetLicenseAgreement &&
-           this.agreements?.datasetPolicyAgreement &&
-           this.agreements?.privacyPolicyAgreement);
+           this.agreements?.datasetPolicyAgreement);
   }
   get hasPrincipalInvestigator(): boolean {
       return this.contacts.some(c => 
@@ -400,8 +404,6 @@ export class CreateComponent implements OnInit {
     if (isPI) {
         if (!email.trim()) errors.push("Email is required");
         if (!affiliation.trim()) errors.push("Affiliation is required");
-        if (!orcid.trim()) errors.push("ORCID is required");
-        if (!rorid.trim()) errors.push("ROR ID is required");
     }
 
     // Pattern/Min Length Validation (only if field has value)
@@ -766,7 +768,7 @@ export class CreateComponent implements OnInit {
     const payload = {
         selectedTemplateVersion: this.templateConfiguration?.defaultTemplateVersion || "1.0",
         selectedStudyCategories: selectedStudyCategories,
-        selectedInvestigationFileTemplate: "minimum", 
+        selectedInvestigationFileTemplate: this.selectedInvestigationFileTemplate || "minimum",
         selectedSampleFileTemplate: formValue.sampleFileTemplate || "minimum",
         datasetLicenseAgreement: this.agreements.datasetLicenseAgreement,
         datasetPolicyAgreement: this.agreements.datasetPolicyAgreement,

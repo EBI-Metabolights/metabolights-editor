@@ -14,3 +14,6 @@
     text-overflow: ellipsis;
     display: inline-block;
 }
+.dataset-list {
+    margin-bottom: 20px;
+}

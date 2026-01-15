@@ -7,6 +7,10 @@ export function ValidateRules(field: string, validation: any): ValidatorFn {
     let invalid = false;
     let errorMessage = "";
 
+    if (!validation || !validation.rules) {
+        return null;
+    }
+
     validation.rules.forEach((rule) => {
       switch (rule.condition) {
         case "min": {

@@ -257,7 +257,7 @@
                         }
                     ]
                 },
-                "orcid": {
+                "address": {
                     "data-type": "string",
                     "sort-order": "8",
                     "is-required": "false",
@@ -275,7 +275,7 @@
                         }
                     ]
                 },
-                "address": {
+                "affiliation": {
                     "data-type": "string",
                     "sort-order": "9",
                     "is-required": "false",

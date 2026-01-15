@@ -114,7 +114,7 @@
             ">
             <mat-label>Last name</mat-label>
             <input matInput formControlName="lastName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("lastName").description }}
+            <mat-hint>{{ fieldValidation("lastName")?.description }}
               <span *ngIf="isFieldRequired('firstName')">
                 <b>(required)</b>
               </span>
@@ -128,7 +128,7 @@
             <mat-label>Middle name(s)</mat-label>
             <input matInput formControlName="midInitials" [readonly]="isReadOnly" />
             <mat-hint>{{
-              fieldValidation("midInitials").description
+              fieldValidation("midInitials")?.description
               }}</mat-hint>
             <mat-error *ngIf="form.get('midInitials')?.errors?.midInitials">
               {{ form.get("midInitials").errors.midInitials.error }}
@@ -143,7 +143,7 @@
             ">
             <mat-label>First name</mat-label>
             <input matInput formControlName="firstName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("firstName").description }}
+            <mat-hint>{{ fieldValidation("firstName")?.description }}
               <span *ngIf="isFieldRequired('firstName')">
                 <b>(required)</b>
               </span>
@@ -183,7 +183,7 @@
             <a matSuffix target="_blank" [href]="getOrcidUrl()" class="search-link">
               <small>Search ORCID</small>
             </a>
-            <mat-hint>{{ fieldValidation("orcid").description }}
+            <mat-hint>{{ fieldValidation("orcid")?.description }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('orcid').errors &&
@@ -199,7 +199,7 @@
             <mat-label>Email</mat-label>
             <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput />
             <mat-hint>
-              {{ fieldValidation("email").description }}
+              {{ fieldValidation("email")?.description }}
               <span *ngIf="getIsRequired('email')"><b>(required)</b></span>
             </mat-hint>
             <mat-error *ngIf="
@@ -215,7 +215,7 @@
             <mat-label>Alternative Email</mat-label>
             <input class="no-scroll" formControlName="alternativeEmail" [readonly]="isReadOnly" matInput />
             <mat-hint>{{
-              fieldValidation("alternativeEmail").description
+              fieldValidation("alternativeEmail")?.description
               }}</mat-hint>
             <mat-error *ngIf="
                 form.get('alternativeEmail').errors &&
@@ -237,7 +237,7 @@
                   [readonly]="isReadOnly"
                   matInput
                 />
-                <mat-hint>{{ fieldValidation("phone").description }}</mat-hint>
+                <mat-hint>{{ fieldValidation("phone")?.description }}</mat-hint>
                 <mat-error
                   *ngIf="
                     form.get('phone').errors &&
@@ -257,7 +257,7 @@
                   [readonly]="isReadOnly"
                   matInput
                 />
-                <mat-hint>{{ fieldValidation("fax").description }}</mat-hint>
+                <mat-hint>{{ fieldValidation("fax")?.description }}</mat-hint>
                 <mat-error
                   *ngIf="
                     form.get('fax').errors &&
@@ -275,7 +275,7 @@
           <mat-label>Address</mat-label>
           <textarea class="no-scroll" formControlName="address" [readonly]="isReadOnly" matInput cdkAutosizeMinRows="1"
             cdkAutosizeMaxRows="4" cdkTextareaAutosize></textarea>
-          <mat-hint>{{ fieldValidation("address").description }}</mat-hint>
+          <mat-hint>{{ fieldValidation("address")?.description }}</mat-hint>
           <mat-error *ngIf="
               form.get('address').errors &&
               form.get('address').dirty &&
@@ -293,12 +293,12 @@
                 {{ org.name }} - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
               </div>
               <div style="font-size: 12px; color: #666;">
-                {{ org.description || '(No description available)' }}
+                {{ org?.description || '(No description available)' }}
               </div>
             </mat-option>
           </mat-autocomplete>
           <mat-hint>
-            {{ fieldValidation("affiliation").description }}
+            {{ fieldValidation("affiliation")?.description }}
             <span *ngIf="getIsRequired('affiliation')">
               <b>(required)</b>
             </span>
@@ -318,7 +318,7 @@
           <a matSuffix target="_blank" [href]="getRoridUrl()" class="search-link">
             <small>Search ROR ID</small>
           </a>
-          <mat-hint>{{ fieldValidation("rorid").description }}
+          <mat-hint>{{ fieldValidation("rorid")?.description }}
           </mat-hint>
           <mat-error *ngIf="
               form.get('rorid').errors &&

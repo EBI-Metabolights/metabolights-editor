@@ -32,3 +32,6 @@
 .search-link:hover {
     text-decoration: underline;
 }
+.funding-list {
+    margin-bottom: 20px;
+}

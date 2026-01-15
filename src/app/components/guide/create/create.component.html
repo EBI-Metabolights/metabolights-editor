@@ -12,13 +12,13 @@
             <h4 class="title is-5 mb-4">New Submission - Submission Details</h4>
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
-              <h4 class="title is-6 mb-2">MetaboLights Study Categories <span class="has-text-danger">*</span></h4>
+              <h4 class="title is-6 mb-2">MetaboLights Study Categories</h4>
               <p class="is-size-7 mb-4" [class.has-text-danger]="!isAnyAssaySelected">
                 Which type of techniques have you used in your study?
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
               <div class="columns is-multiline mb-4">
-                <div class="column is-3 category-column" *ngFor="let cat of activeCategories">
+                <div class="column is-2 category-column" *ngFor="let cat of activeCategories">
                   <h5 class="is-size-7 has-text-weight-bold mb-3">{{cat.label}}</h5>
                   <div class="mt-1">
                     <div *ngFor="let assayType of cat.assayTypes" class="mb-2">
@@ -37,13 +37,40 @@
 
               </div>
               <hr class="mt-4 mb-4">
-              <div class="columns">
+              <div class="columns" [formGroup]="studyCreationForm">
 
 
 
+
+                <div class="column">
+                  <div class="field">
+                    <label class="label is-small">Sample File Template</label>
+                    <div class="control">
+                      <div class="select is-small is-fullwidth">
+                        <select formControlName="sampleFileTemplate" [ngModel]="selectedSampleFileTemplate"
+                          (ngModelChange)="onSampleTemplateChange($event)">
+                          <option *ngFor="let temp of sampleFileTemplates" [value]="temp">{{temp}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="column">
+                  <div class="field">
+                    <label class="label is-small">Investigation File Template</label>
+                    <div class="control">
+                      <div class="select is-small is-fullwidth">
+                        <select formControlName="investigationFileTemplate"
+                          [ngModel]="selectedInvestigationFileTemplate"
+                          (ngModelChange)="onInvestigationTemplateChange($event)">
+                          <option *ngFor="let temp of investigationFileTemplates" [value]="temp" disabled>{{temp}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
               </div>
-
             </div>
             <div class="section-header-line">
             </div>
@@ -152,21 +179,21 @@
                 MetaboLights dataset license.
                 <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
               </label>
-              <label class="checkbox is-size-7 db mb-2">
+              <!-- <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [checked]="agreements.privacyPolicyAgreement"
                   (click)="openDataPolicyModal($event)"> I confirm that I have read and
                 agree to adhere to the MetaboLights privacy policy.
-              </label>
+              </label> -->
               <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.datasetPolicyAgreement"> I confirm that I have read and
                 agree to adhere to the MetaboLights data policy.
                 <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
                   Policy)</a>
               </label>
-              <label class="checkbox is-size-7 db mb-2">
+              <!-- <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.emailCommunicationAgreement"> I agree to receive email
                 communications from MetaboLights.
-              </label>
+              </label> -->
 
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
@@ -316,7 +343,7 @@
 
             </div>
             <hr>
-            <button class="button is-success is-fullwidth" (click)="submitStudy(false)"
+            <button class="button is-success" (click)="submitStudy(false)"
               [disabled]="isLoading || !isStep2Valid">
               <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
             </button>
