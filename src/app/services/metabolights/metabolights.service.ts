@@ -605,7 +605,19 @@ export class MetabolightsService extends DataService {
         this.url.baseURL + "/provisional-studies",
         httpOptions
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        map((response: any) => {
+          const studies = response.studies;
+          if (studies) {
+             const ids = Object.keys(studies);
+             if (ids.length > 0) {
+               ids.sort().reverse();
+               return { new_study: ids[0] };
+             }
+          }
+          return response;
+        }),
+        catchError(this.handleError));
   }
 
   createStudyWithMetadata(body: any): Observable<{ new_study: string }> {
@@ -615,7 +627,19 @@ export class MetabolightsService extends DataService {
         body,
         httpOptions
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        map((response: any) => {
+          const studies = response.studies;
+          if (studies) {
+             const ids = Object.keys(studies);
+             if (ids.length > 0) {
+               ids.sort().reverse();
+               return { new_study: ids[0] };
+             }
+          }
+          return response;
+        }),
+        catchError(this.handleError));
   }
 
   decompressFiles(body) {

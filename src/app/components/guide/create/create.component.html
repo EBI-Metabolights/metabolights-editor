@@ -18,7 +18,7 @@
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
               <div class="columns is-multiline mb-4">
-                <div class="column is-2 category-column" *ngFor="let cat of activeCategories">
+                <div class="column is-3 category-column" *ngFor="let cat of activeCategories">
                   <h5 class="is-size-7 has-text-weight-bold mb-3">{{cat.label}}</h5>
                   <div class="mt-1">
                     <div *ngFor="let assayType of cat.assayTypes" class="mb-2">
@@ -63,7 +63,8 @@
                         <select formControlName="investigationFileTemplate"
                           [ngModel]="selectedInvestigationFileTemplate"
                           (ngModelChange)="onInvestigationTemplateChange($event)">
-                          <option *ngFor="let temp of investigationFileTemplates" [value]="temp" disabled>{{temp}}</option>
+                          <option *ngFor="let temp of investigationFileTemplates" [value]="temp" disabled>{{temp}}
+                          </option>
                         </select>
                       </div>
                     </div>
@@ -179,21 +180,12 @@
                 MetaboLights dataset license.
                 <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
               </label>
-              <!-- <label class="checkbox is-size-7 db mb-2">
-                <input type="checkbox" [checked]="agreements.privacyPolicyAgreement"
-                  (click)="openDataPolicyModal($event)"> I confirm that I have read and
-                agree to adhere to the MetaboLights privacy policy.
-              </label> -->
               <label class="checkbox is-size-7 db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.datasetPolicyAgreement"> I confirm that I have read and
                 agree to adhere to the MetaboLights data policy.
                 <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
                   Policy)</a>
               </label>
-              <!-- <label class="checkbox is-size-7 db mb-2">
-                <input type="checkbox" [(ngModel)]="agreements.emailCommunicationAgreement"> I agree to receive email
-                communications from MetaboLights.
-              </label> -->
 
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
@@ -267,7 +259,8 @@
                     <button class="button is-primary is-small"
                       style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="descRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}}</h6>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}} <span
+                        *ngIf="category.min > 0">*</span></h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
                         class="tag is-primary is-light is-medium">
@@ -276,6 +269,10 @@
                       </span>
                     </div>
                     <mtbls-design-descriptor #descRef [mode]="'local'" [controlListKey]="category.controlListKey"
+                      [isaFileType]="category.isaFileType"
+                      [templateVersion]="templateConfiguration?.defaultTemplateVersion"
+                      [isaFileTemplateName]="selectedInvestigationFileTemplate"
+                      [selectedStudyCategories]="selectedStudyCategoryIds"
                       (saved)="addDescriptorWithCategory($event, category.id)"></mtbls-design-descriptor>
                   </div>
                 </div>
@@ -285,14 +282,18 @@
                     <button class="button is-primary is-small"
                       style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="kwRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">Others</h6>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;"
+                      *ngIf="activeDesignDescriptorCategories.length > 0">Others</h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getKeywords(); let i = index" class="tag is-primary is-light is-medium">
                         {{desc.annotationValue}}
                         <button class="delete is-small" (click)="removeDescriptorCompat(desc)"></button>
                       </span>
                     </div>
-                    <mtbls-design-descriptor #kwRef [mode]="'local'" [controlListKey]="'Design descriptor'"
+                    <mtbls-design-descriptor #kwRef [mode]="'local'" [controlListKey]="'Study Design Type'"
+                      [templateVersion]="templateConfiguration?.defaultTemplateVersion"
+                      [isaFileTemplateName]="selectedInvestigationFileTemplate"
+                      [selectedStudyCategories]="selectedStudyCategoryIds"
                       (saved)="addKeyword($event)"></mtbls-design-descriptor>
                   </div>
                 </div>
@@ -343,8 +344,7 @@
 
             </div>
             <hr>
-            <button class="button is-success" (click)="submitStudy(false)"
-              [disabled]="isLoading || !isStep2Valid">
+            <button class="button is-success" (click)="triggerSubmit()" [disabled]="isLoading || !isStep2Valid">
               <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
             </button>
 
@@ -375,5 +375,4 @@
   <app-confirmation-dialog *ngIf="showConfirmationModal" [title]="confirmationTitle" [message]="confirmationMessage"
     [moreinfo]="''" (confirm)="onConfirmSelection($event)"></app-confirmation-dialog>
 
-  <data-policy-modal *ngIf="showDataPolicyModal" (confirm)="onDataPolicyModalResult($event)"></data-policy-modal>
 </div>

@@ -25,6 +25,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PersonComponent } from "../../shared/people/person/person.component";
+import Swal from "sweetalert2";
 @Component({
   selector: "app-create",
   templateUrl: "./create.component.html",
@@ -161,6 +162,9 @@ export class CreateComponent implements OnInit {
             this.submitterRoleControlList = this.getProcessedControlList("Study Person Roles");
             this.publicationStatusControlList = this.getProcessedControlList("Study Publication Status");
             this.funderControlList = this.getProcessedControlList("Funder Organization");
+            if(this.templateConfiguration){
+                this.initConfiguration();
+            }
         }
     });
     // Validations - Study Creation State
@@ -238,10 +242,21 @@ export class CreateComponent implements OnInit {
       
       const versionConfig = this.templateConfiguration.versions[defaultVersion];
       if (!versionConfig) return;
-      const activeCategoryIds = versionConfig.activeStudyCategories || [];
+      const activeCategoryIdsConfig = versionConfig.activeStudyCategories || [];
       const studyCategoriesMetadata = this.templateConfiguration.studyCategories || {};
       this.assayFileTypeMappings = versionConfig.assayFileTypeMappings || {};
-      this.activeCategories = activeCategoryIds.map(id => {
+
+      let sortedCategoryIds: string[] = [];
+      if (Array.isArray(activeCategoryIdsConfig)) {
+          sortedCategoryIds = activeCategoryIdsConfig;
+      } else if (typeof activeCategoryIdsConfig === 'object') {
+          // Handle new object structure: { 'id': { visible: boolean, order: number } }
+          sortedCategoryIds = Object.keys(activeCategoryIdsConfig)
+            .filter(key => activeCategoryIdsConfig[key].visible)
+            .sort((a, b) => activeCategoryIdsConfig[a].order - activeCategoryIdsConfig[b].order);
+      }
+
+      this.activeCategories = sortedCategoryIds.map(id => {
           return {
               id: id,
               label: studyCategoriesMetadata[id]?.label || id,
@@ -277,16 +292,61 @@ export class CreateComponent implements OnInit {
       }
 
       // Design Descriptor Categories
-      const activeDescriptorCategoryIds = versionConfig.activeStudyDesignDescriptorCategories || [];
+      const activeDescriptorCategoryIdsConfig = versionConfig.activeStudyDesignDescriptorCategories || [];
       const descriptorMetadata = this.templateConfiguration.descriptorConfiguration?.defaultDescriptorCategories || {};
-      this.activeDesignDescriptorCategories = activeDescriptorCategoryIds.map(id => {
-          const meta = descriptorMetadata[id];
+      
+      let descriptorSource: any[] = [];
+      if (Array.isArray(activeDescriptorCategoryIdsConfig)) {
+          descriptorSource = activeDescriptorCategoryIdsConfig.map(id => ({ id, min: 0 })); 
+      } else if (typeof activeDescriptorCategoryIdsConfig === 'object') {
+          descriptorSource = Object.keys(activeDescriptorCategoryIdsConfig)
+            .filter(key => activeDescriptorCategoryIdsConfig[key].visible)
+            .sort((a, b) => activeDescriptorCategoryIdsConfig[a].order - activeDescriptorCategoryIdsConfig[b].order)
+            .map(key => ({ id: key, min: activeDescriptorCategoryIdsConfig[key].min || 0 }));
+      }
+
+      this.activeDesignDescriptorCategories = descriptorSource.map(item => {
+          const meta = descriptorMetadata[item.id];
+          let controlListKey = meta?.controlListKey || null;
+          const isaFileType = meta?.isaFileType || 'investigation';
+
+          if (controlListKey && this.legacyControlLists) {
+              const selectionInput = {
+                  isaFileType: isaFileType,
+                  studyCategory: null,
+                  studyCreatedAt: new Date(),
+                  templateVersion: this.templateConfiguration?.defaultTemplateVersion
+              };
+              let rule = null;
+              try {
+                  rule = getValidationRuleForField(
+                    { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
+                    controlListKey,
+                    selectionInput as any
+                  );
+              } catch(e) { rule = null; }
+              
+              if (!rule) {
+                   controlListKey = "Study Design Type";
+              }
+          } else if (!controlListKey) {
+              controlListKey = "Study Design Type";
+          }
+
+
           return {
-              id: id,
-              label: meta?.label || id,
-              controlListKey: meta?.controlListKey || null
+              id: item.id,
+              label: meta?.label || item.id,
+              controlListKey: controlListKey,
+              min: item.min,
+              isaFileType: isaFileType
           };
       });
+  }
+
+  get selectedStudyCategoryIds(): string[] {
+      if (!this.studyAssaySelection) return [];
+      return Object.keys(this.studyAssaySelection).filter(key => this.studyAssaySelection[key]);
   }
 
   onSampleTemplateChange(templateName: string) {
@@ -465,32 +525,28 @@ export class CreateComponent implements OnInit {
     this.setUpWizardStep(primaryCategory);
   }
 
+  triggerSubmit() {
+    this.confirmationTitle = "Confirm Submission";
+    this.confirmationMessage = "Are you sure you would like to create this study?";
+    this.showConfirmationModal = true;
+  }
+
   onConfirmSelection(confirmed: boolean) {
     this.showConfirmationModal = false;
     if (confirmed) {
         if (this.contacts.length === 0) {
             this.initializePrimaryContact();
         }
-        this.submitStudy(true); 
+        
+        const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key => 
+            this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
+        );
+        const isMultiple = selectedCategoryKeys.length > 1;
+
+        this.submitStudy(isMultiple); 
     }
   }
 
-  // Data Policy Modal
-  showDataPolicyModal = false;
-
-  openDataPolicyModal(event?: Event) {
-      if (event) {
-          event.preventDefault();
-      }
-      this.showDataPolicyModal = true;
-  }
-
-  onDataPolicyModalResult(agreed: boolean) {
-      this.showDataPolicyModal = false;
-      if (agreed) {
-          this.agreements.privacyPolicyAgreement = true;
-      }
-  }
   // Agreements and Wizard Configuration
   descriptorControlListKey: string = null;
   setUpWizardStep(category: string) {
@@ -772,10 +828,8 @@ export class CreateComponent implements OnInit {
         selectedSampleFileTemplate: formValue.sampleFileTemplate || "minimum",
         datasetLicenseAgreement: this.agreements.datasetLicenseAgreement,
         datasetPolicyAgreement: this.agreements.datasetPolicyAgreement,
-        emailCommunicationAgreement: this.agreements.emailCommunicationAgreement,
-        privacyPolicyAgreement: this.agreements.privacyPolicyAgreement,
         publicationStatus: publicationStatus,
-        title: this.studyTitle,
+        study_title: this.studyTitle,
         description: this.studyDescription,
         relatedDatasets: this.relatedDatasets,
         funding: funding,
@@ -789,37 +843,23 @@ export class CreateComponent implements OnInit {
     console.log('Creating study with payload:', JSON.stringify(payload, null, 2));
     this.editorService.createStudy(payload).subscribe({
       next: (res) => {
+        // Dispatch common actions
+        this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
+        this.newStudy = res.new_study;
+        this.isLoading = false;
+
         if (isMultipleCategories) {
-             toastr.success("We created the following MetaboLights submissions for your study. You can select and update your MetaboLights submissions.", "Success", {
-                timeOut: "5000",
-                positionClass: "toast-top-center",
-                preventDuplicates: true,
-                extendedTimeOut: 0,
-                tapToDismiss: true,
+            const count = Object.keys(selectedStudyCategories).length;
+            Swal.fire({
+              title: "Success",
+              text: `We created the following ${count} MetaboLights submissions for your study. You can select and update your MetaboLights submissions.`,
+              type: "success",
+              confirmButtonText: "OK"
+            }).then(() => {
+              this.router.navigate(['/console']);
             });
-            this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
-            this.newStudy = res.new_study;
-            this.isLoading = false;
-            this.router.navigate(["/guide/meta", this.newStudy]);
         } else {
-            // Standard flow success -> Go to Step 1 (Upload) or Finish? 
-            // In original flow `currentSubStep = 3` seemed to be next.
-            // But if we have Step 2 as metadata, maybe Step 3 is upload?
-            this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
-            this.currentSubStep = 1; // Or wherever Upload is?
-            // Wait, existing Upload is currentSubStep == 1. 
-            // So if we just finished Step 2 (Metadata), we go to Step 3?
-            // No, user requirement implies the Metadata is a new intermediate step.
-            // Let's assume on success of metadata we go to the "Created" state or Upload.
-            // Given "redirect to created study page with a popup showing below details", 
-            // maybe we just redirect for Single too?
-            // "if it is single categrory study selection ... then it should go to next page ... and then we need to create request json"
-            // So after creation, we probably redirect?
-            this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
-            this.newStudy = res.new_study;
-            this.isLoading = false;
-            
-            // Load the new study data into the store for Step 3 and 4 components
+            // Single Category Flow: Proceed to wizard Step 3
             this.store.dispatch(new GetGeneralMetadata(this.newStudy, false));
             this.store.dispatch(new Operations.GetFreshFilesList(false, false, this.newStudy));
             this.currentSubStep = 3;

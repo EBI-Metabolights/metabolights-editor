@@ -64,6 +64,10 @@ export class DesignDescriptorComponent implements OnInit {
   @Input("readOnly") readOnly: boolean;
   @Input("mode") mode: 'store' | 'local' = 'store';
   @Input() controlListKey: string = null;
+  @Input() isaFileType: string = 'investigation';
+  @Input() templateVersion: string = null;
+  @Input() isaFileTemplateName: string = null;
+  @Input() selectedStudyCategories: string[] = null;
   @Output() saved = new EventEmitter<Ontology>();
   @Output() deleted = new EventEmitter<Ontology>();
 
@@ -94,7 +98,7 @@ export class DesignDescriptorComponent implements OnInit {
   baseHref: string;
   private legacyControlLists: Record<string, any[]> | null = null;
   studyCategory: any;
-  templateVersion: any;
+  storeTemplateVersion: any;
   defaultControlListName = "Study Design Type";
   studyCreatedAt: any;
   private _controlList: any = null;
@@ -130,7 +134,7 @@ export class DesignDescriptorComponent implements OnInit {
       this.studyCategory = value as StudyCategoryStr;
     });
     this.templateVersion$.subscribe((value) => {
-      this.templateVersion = value;
+      this.storeTemplateVersion = value;
     });
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
@@ -569,11 +573,11 @@ export class DesignDescriptorComponent implements OnInit {
     }
 
     const selectionInput = {
-      studyCategory: this.studyCategory,
+      studyCategory: this.selectedStudyCategories ? this.selectedStudyCategories : this.studyCategory,
       studyCreatedAt: this.studyCreatedAt,
-      isaFileType: "investigation" as any,
-      isaFileTemplateName: null,
-      templateVersion: this.templateVersion,
+      isaFileType: this.isaFileType ? this.isaFileType : "investigation",
+      isaFileTemplateName: this.isaFileTemplateName,
+      templateVersion: this.templateVersion ? this.templateVersion : (this.store.selectSnapshot(GeneralMetadataState.templateVersion)),
     };
 
     let rule = null;
@@ -586,7 +590,7 @@ export class DesignDescriptorComponent implements OnInit {
           {
             controlLists: this.legacyControlLists,
           } as MetabolightsFieldControls,
-          this.defaultControlListName, // Use "Study Design Type"
+          listName,
           selectionInput
         );
       }
