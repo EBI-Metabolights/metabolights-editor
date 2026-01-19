@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, inject } from "@angular/core";
+import { Component, ViewChild, OnInit, inject, Input } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
@@ -26,6 +26,8 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
   styleUrls: ["./assays.component.css"],
 })
 export class GuidedAssaysComponent implements OnInit {
+  @Input() hideNav = false;
+
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);

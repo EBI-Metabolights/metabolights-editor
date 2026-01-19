@@ -1,5 +1,5 @@
-<nav-bar mode="light"></nav-bar>
-<mtbls-progress [study]="requestedStudy" [step]="4"></mtbls-progress>
+<nav-bar mode="light" *ngIf="!hideNav"></nav-bar>
+<mtbls-progress [study]="requestedStudy" [step]="3" *ngIf="!hideNav"></mtbls-progress>
 <quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
 <div class="columns fixed-navbar-offset">
   <div class="column is-8 is-offset-2 mb-5">

@@ -95,7 +95,7 @@ export class CreateComponent implements OnInit {
   studyCreationForm: UntypedFormGroup;
   selectedCreateOption = 2;
   currentSubStep = 1;
-  newStudy = "MTBLS1";
+  newStudy = null;
   options: any[] = [
     {
       text: "Yes, I would like to upload files now",
@@ -427,10 +427,53 @@ export class CreateComponent implements OnInit {
       return this.studyDescription && this.studyDescription.trim().length >= 60;
   }
   
+  get isDoiRequired(): boolean {
+    if (!this.publicationStatus || this.publicationStatus.length === 0) return false;
+    const status = this.publicationStatus[0].annotationValue?.toLowerCase();
+    return status === "published" || status === "preprint";
+  }
+
+  get isValidDoi(): boolean {
+    const doi = this.publicationDoi ? this.publicationDoi.trim() : "";
+    if (doi === "") return true;
+    
+    // Attempt to use pattern from server-side validations
+    const validation = this.fieldValidation('publications.publication.doi');
+    const patternRule = (validation?.rules || []).find(r => r.condition === 'pattern');
+    if (patternRule) {
+        const re = new RegExp(patternRule.value, 'i');
+        return re.test(doi);
+    }
+
+    const doiRegex = /^10\.\d{4,9}\/[-._;()/:a-zA-Z0-9]+$/;
+    return doiRegex.test(doi);
+  }
+
+  get doiErrorMessage(): string {
+    const doiValue = this.publicationDoi ? this.publicationDoi.trim() : "";
+    
+    if (this.isDoiRequired && doiValue === "") {
+        return ""; // User prefers no text message for requirement, just the highlight
+    }
+    
+    if (doiValue !== "" && !this.isValidDoi) {
+        const validation = this.fieldValidation('publications.publication.doi');
+        const patternRule = (validation?.rules || []).find(r => r.condition === 'pattern');
+        if (patternRule && patternRule.error) {
+            return patternRule.error.replace('{input}', doiValue).replace('{field}', 'DOI');
+        }
+        return "Invalid DOI format (e.g. 10.xxxx/yyyy)";
+    }
+    return "";
+  }
+
   get isStep1Valid(): boolean {
     return !!(this.isAnyAssaySelected &&
            this.selectedSubmitterRole && 
            this.publicationStatus && this.publicationStatus.length > 0 &&
+           this.doiErrorMessage === "" &&
+           this.selectedSampleFileTemplate &&
+           this.selectedInvestigationFileTemplate &&
            this.agreements?.datasetLicenseAgreement &&
            this.agreements?.datasetPolicyAgreement);
   }

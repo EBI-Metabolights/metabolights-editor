@@ -1,11 +1,10 @@
 <nav-bar mode="light"></nav-bar>
 <div class="container fixed-navbar-offset">
-  <mat-horizontal-stepper [linear]="true" labelPosition="bottom" #stepper [selectedIndex]="currentSubStep - 1"
-    (selectionChange)="currentSubStep = $event.selectedIndex + 1" animationDuration="0ms"
-    [class.allow-back-to-step-1]="currentSubStep === 2">
+  <mtbls-progress [study]="newStudy" [step]="currentSubStep"></mtbls-progress>
+
+  <div [ngSwitch]="currentSubStep">
     <!-- Step 1: Submission Details -->
-    <mat-step [completed]="isStep1Valid">
-      <ng-template matStepLabel>Submission Details</ng-template>
+    <div *ngSwitchCase="1">
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
@@ -102,6 +101,7 @@
                               {{ option.annotationValue }}
                             </mat-option>
                           </mat-select>
+                          <mat-hint>{{ fieldValidation('people.person.roles').description }}</mat-hint>
                         </mat-form-field>
                       </div>
                     </ng-template>
@@ -135,6 +135,7 @@
                               {{ option.annotationValue }}
                             </mat-option>
                           </mat-select>
+                          <mat-hint>{{ fieldValidation('publications.publication.status').description }}</mat-hint>
                         </mat-form-field>
                       </div>
                     </ng-template>
@@ -145,14 +146,21 @@
               <!-- DOI -->
               <div class="field is-horizontal mb-3">
                 <div class="field-label is-small">
-                  <label class="label">DOI</label>
+                  <label class="label">DOI<span *ngIf="isDoiRequired">*</span></label>
                 </div>
                 <div class="field-body">
                   <div class="field">
                     <div class="control">
-                      <mat-form-field class="full-width is-small">
-                        <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI">
+                      <mat-form-field class="full-width is-small"
+                        [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
+                        <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
+                          [required]="isDoiRequired">
+                        <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
+                          <span *ngIf="isDoiRequired"><b>(required)</b></span>
+                        </mat-hint>
                       </mat-form-field>
+                      <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -203,10 +211,10 @@
         </div>
 
       </div>
-    </mat-step>
+    </div>
+
     <!-- Step 2: Study Description -->
-    <mat-step [completed]="isStep2Valid">
-      <ng-template matStepLabel>Study Description</ng-template>
+    <div *ngSwitchCase="2">
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
@@ -344,33 +352,42 @@
 
             </div>
             <hr>
-            <button class="button is-success" (click)="triggerSubmit()" [disabled]="isLoading || !isStep2Valid">
-              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
-            </button>
+            <div class="field is-grouped is-pulled-right">
+              <div class="control">
+                <button class="button is-light" (click)="currentSubStep = 1">Back</button>
+              </div>
+              <div class="control">
+                <button class="button is-primary" (click)="triggerSubmit()" [disabled]="isLoading || !isStep2Valid">
+                  <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
+                </button>
+              </div>
+            </div>
+            <div class="is-clearfix"></div>
 
           </div>
 
         </div>
 
       </div>
-    </mat-step>
+    </div>
+
     <!-- Step 3: Sample & Assays -->
-    <mat-step>
-      <ng-template matStepLabel>Sample & Assays</ng-template>
+    <div *ngSwitchCase="3">
       <div class="mt-4" *ngIf="newStudy">
-        <guide-assays></guide-assays>
+        <guide-assays [hideNav]="true"></guide-assays>
 
       </div>
-    </mat-step>
+    </div>
+
     <!-- Step 4: Upload -->
-    <mat-step>
-      <ng-template matStepLabel>Upload Files</ng-template>
+    <div *ngSwitchCase="4">
       <div class="mt-4" *ngIf="newStudy">
-        <raw-upload></raw-upload>
+        <raw-upload [hideNav]="true"></raw-upload>
 
       </div>
-    </mat-step>
-  </mat-horizontal-stepper>
+    </div>
+  </div>
+
 
   <app-confirmation-dialog *ngIf="showConfirmationModal" [title]="confirmationTitle" [message]="confirmationMessage"
     [moreinfo]="''" (confirm)="onConfirmSelection($event)"></app-confirmation-dialog>

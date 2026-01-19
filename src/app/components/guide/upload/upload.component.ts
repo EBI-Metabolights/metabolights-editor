@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, Input } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
@@ -18,6 +18,8 @@ import { Operations } from "src/app/ngxs-store/study/files/files.actions";
   styleUrls: ["./upload.component.css"],
 })
 export class RawUploadComponent implements OnInit {
+  @Input() hideNav = false;
+
 
   user$: Observable<Owner> = inject(Store).select(UserState.user);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
