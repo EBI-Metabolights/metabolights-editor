@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, inject, Input } from "@angular/core";
+import { Component, ViewChild, OnInit, inject, Input, Output, EventEmitter } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
@@ -27,6 +27,7 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
 })
 export class GuidedAssaysComponent implements OnInit {
   @Input() hideNav = false;
+  @Output() next = new EventEmitter<void>();
 
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
@@ -319,18 +320,11 @@ export class GuidedAssaysComponent implements OnInit {
   }
 
   openFullStudyView() {
-    Swal.fire({
-      title: "Switch to study overview?",
-      text: "",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Continue",
-      cancelButtonText: "Cancel",
-    }).then((willDelete) => {
-      if (willDelete.value) {
-        this.router.navigate(["/study", this.requestedStudy]);
-      }
-    });
+    if (this.hideNav) {
+      this.next.emit();
+    } else {
+      this.router.navigate(["/guide/upload", this.requestedStudy]);
+    }
   }
 
   extractAssayInfo(reloadFiles) {

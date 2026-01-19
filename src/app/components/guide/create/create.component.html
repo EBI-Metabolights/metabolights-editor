@@ -374,7 +374,7 @@
     <!-- Step 3: Sample & Assays -->
     <div *ngSwitchCase="3">
       <div class="mt-4" *ngIf="newStudy">
-        <guide-assays [hideNav]="true"></guide-assays>
+        <guide-assays [hideNav]="true" (next)="currentSubStep = 4"></guide-assays>
 
       </div>
     </div>
@@ -382,7 +382,7 @@
     <!-- Step 4: Upload -->
     <div *ngSwitchCase="4">
       <div class="mt-4" *ngIf="newStudy">
-        <raw-upload [hideNav]="true"></raw-upload>
+        <raw-upload [hideNav]="true" (next)="onFinishWizard()"></raw-upload>
 
       </div>
     </div>

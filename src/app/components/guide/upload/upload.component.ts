@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Input } from "@angular/core";
+import { Component, inject, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
@@ -19,6 +19,7 @@ import { Operations } from "src/app/ngxs-store/study/files/files.actions";
 })
 export class RawUploadComponent implements OnInit {
   @Input() hideNav = false;
+  @Output() next = new EventEmitter<void>();
 
 
   user$: Observable<Owner> = inject(Store).select(UserState.user);
@@ -74,10 +75,10 @@ export class RawUploadComponent implements OnInit {
   }
 
   copyFilesAndProceed() {
-    // this.isLoading = true;
-    // this.editorService.syncStudyFiles({ files: [] }).subscribe((resp) => {
-      // this.isLoading = false;
-      this.router.navigate(["/guide/meta", this.requestedStudy]);
-    // });
+    if (this.hideNav) {
+      this.next.emit();
+    } else {
+      this.router.navigate(["/study", this.requestedStudy]);
+    }
   }
 }
