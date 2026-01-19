@@ -50,9 +50,13 @@
 }
 
 .card-heading {
-  min-height: 3em;
   padding: 10px 20px;
+  min-height: 3em;
   box-shadow: 0 1px 2px rgba(10, 10, 10, 0.1);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
 }
 
 .ql-container {
@@ -94,6 +98,10 @@
   margin-bottom: 0.5rem !important;
 }
 
+.label {
+  font-weight: 700 !important;
+}
+
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -107,6 +115,15 @@ input:-webkit-autofill:active {
 
 .smt {
   margin-top: 10px !important;
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
 }
 
 html,
@@ -240,11 +257,6 @@ body {
   padding-bottom: 16px;
 }
 
-.card-heading {
-  padding: 10px 20px;
-  min-height: 3em;
-  box-shadow: 0 1px 2px rgba(10, 10, 10, 0.1);
-}
 
 .hover-highlight:hover {
   -webkit-animation-duration: 1s;

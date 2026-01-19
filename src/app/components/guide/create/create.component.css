@@ -20,12 +20,15 @@
 }
 
 
+.label {
+  font-weight: 700;
+}
+
 .teal-input-label {
   min-width: 80px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
 }
-
 
 .pr-5 {
   padding-right: 1.5rem !important;
@@ -46,10 +49,6 @@ hr {
 .field-label.is-small {
   text-align: left;
   margin-right: 1rem;
-}
-
-.label {
-  font-weight: 600;
 }
 
 /* Beautified Checkbox */

@@ -8,17 +8,15 @@
   </div>
 </span>
 <ng-template #showCard>
-  <div class="card mb-6">
+  <div class="card mb-6" style="position: relative;">
+    <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"
+      style="position: absolute; top: 12px; right: 12px; z-index: 10;"></mtbls-design-descriptor>
     <header class="card-heading" [ngClass]="{ 'hover-highlight': isReadOnly }">
-      <span>
-        <p class="is-pulled-left">
-          Design Descriptors (Keywords)
-          <span *ngIf="!isReadOnly"><mat-icon
-              [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'">help</mat-icon></span>
-
-        </p>
-        <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"></mtbls-design-descriptor>
-      </span>
+      <p>
+        Design Descriptors (Keywords)
+        <span *ngIf="!isReadOnly"><mat-icon
+            [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'">help</mat-icon></span>
+      </p>
     </header>
     <div class="card-content">
       <div class="content">

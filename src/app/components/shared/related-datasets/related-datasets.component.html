@@ -1,11 +1,8 @@
-<div class="card mb-6">
+<div class="card mb-6" style="position: relative;">
+    <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; z-index: 10;"
+        (click)="openModal()">+ Add</button>
     <header class="card-heading">
-        <span>
-            <p class="is-pulled-left">
-                Related datasets
-            </p>
-            <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
-        </span>
+        <p>Related datasets</p>
     </header>
     <div class="card-content">
         <div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0; else emptyMessage">

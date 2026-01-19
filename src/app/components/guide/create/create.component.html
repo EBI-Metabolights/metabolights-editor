@@ -8,10 +8,10 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h4 class="title is-5 mb-4">New Submission - Submission Details</h4>
+            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission - Submission Details</h2>
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
-              <h4 class="title is-6 mb-2">MetaboLights Study Categories</h4>
+              <h3 class="title is-6 has-text-weight-bold mb-4">MetaboLights Study Categories</h3>
               <p class="is-size-7 mb-4" [class.has-text-danger]="!isAnyAssaySelected">
                 Which type of techniques have you used in your study?
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
@@ -72,7 +72,7 @@
 
               </div>
             </div>
-            <hr/>
+            <hr />
             <!-- Roles, Status, DOI -->
             <!-- Roles, Status, DOI Refactored to Horizontal Fields -->
             <div>
@@ -165,7 +165,7 @@
                 </div>
               </div>
             </div>
-            <hr/>
+            <hr />
             <!-- Funding -->
             <mtbls-funding [controlList]="funderControlList" class="db mb-6"></mtbls-funding>
             <br />
@@ -173,7 +173,7 @@
             <mtbls-related-datasets class="db mb-6"></mtbls-related-datasets>
 
             <br />
-            <hr/>
+            <hr />
             <!-- Agreements -->
             <div class="field">
               <label class="checkbox is-size-7 db mb-2">
@@ -211,7 +211,7 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h4 class="title is-5 mb-4">Study Description</h4>
+            <h2 class="title is-4 has-text-weight-bold mb-5">Study Description</h2>
             <div class="field mb-4">
               <label class="label is-small">Study Title (min 8 chars)*</label>
               <div class="control">
@@ -238,7 +238,7 @@
             <!-- Factors, Descriptors, Contacts -->
             <div class="columns is-multiline">
               <div class="column is-12">
-                <h5 class="title is-6 mb-3">Study Factors (at least 1)*</h5>
+                <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors (at least 1)*</h3>
                 <div class="box p-3 is-clearfix" style="position: relative;">
                   <button class="button is-primary is-small"
                     style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="factorRef.openModal()">+
@@ -254,14 +254,14 @@
 
               </div>
               <div class="column is-12">
-                <h5 class="title is-6 mb-3">Design Descriptors (Keywords)</h5>
+                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)</h3>
                 <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
                   <div class="box p-3 is-clearfix" style="position: relative;">
                     <button class="button is-primary is-small"
                       style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="descRef.openModal()">+
                       Add</button>
                     <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}} <span
-                        *ngIf="category.min > 0">*</span></h6>
+                        *ngIf="category.min > 0">(at least {{category.min}})*</span></h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
                         class="tag is-primary is-light is-medium">
@@ -300,7 +300,7 @@
                 </div>
               </div>
               <div class="column is-12">
-                <h5 class="title is-6 mb-3">Contacts*</h5>
+                <h3 class="title is-5 has-text-weight-bold mb-4">Contacts*</h3>
                 <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
                   • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
                 </p>
