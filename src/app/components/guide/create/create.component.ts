@@ -829,7 +829,7 @@ export class CreateComponent implements OnInit {
         datasetLicenseAgreement: this.agreements.datasetLicenseAgreement,
         datasetPolicyAgreement: this.agreements.datasetPolicyAgreement,
         publicationStatus: publicationStatus,
-        study_title: this.studyTitle,
+        title: this.studyTitle,
         description: this.studyDescription,
         relatedDatasets: this.relatedDatasets,
         funding: funding,
