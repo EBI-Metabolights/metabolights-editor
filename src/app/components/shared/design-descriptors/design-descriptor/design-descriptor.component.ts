@@ -12,6 +12,7 @@ import { OntologyComponent } from "../../ontology/ontology.component";
 import { EuropePMCService } from "../../../../services/publications/europePMC.service";
 import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
+import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable, timer } from "rxjs";
@@ -59,6 +60,12 @@ export class DesignDescriptorComponent implements OnInit {
   templateVersion$: Observable<string> = inject(Store).select(
     GeneralMetadataState.templateVersion
   );
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  templateConfiguration$: Observable<any> = inject(Store).select(
+    ApplicationState.templateConfiguration
+  );
 
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;
@@ -98,9 +105,13 @@ export class DesignDescriptorComponent implements OnInit {
   baseHref: string;
   private legacyControlLists: Record<string, any[]> | null = null;
   studyCategory: any;
+  templateConfiguration: any = null;
+  descriptorCategories: any[] = [];
+  selectedCategory: any = null;
   storeTemplateVersion: any;
   defaultControlListName = "Study Design Type";
   studyCreatedAt: any;
+  sampleTemplate: any = null;
   private _controlList: any = null;
   isDescriptorValid = false;
 
@@ -135,6 +146,15 @@ export class DesignDescriptorComponent implements OnInit {
     });
     this.templateVersion$.subscribe((value) => {
       this.storeTemplateVersion = value;
+      this.initDescriptorCategories();
+    });
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+      this.initDescriptorCategories();
+    });
+    this.templateConfiguration$.subscribe((v) => {
+      this.templateConfiguration = v;
+      this.initDescriptorCategories();
     });
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
@@ -327,18 +347,158 @@ export class DesignDescriptorComponent implements OnInit {
     this.isImportModalOpen = true;
   }
 
+  initDescriptorCategories() {
+    if (!this.templateConfiguration) return;
+
+    let version = this.sampleTemplate || this.storeTemplateVersion || this.templateVersion || this.templateConfiguration.defaultTemplateVersion;
+    if (!version) return;
+
+    let versionConfig = this.templateConfiguration.versions[version];
+    if (!versionConfig && this.templateConfiguration.defaultTemplateVersion) {
+        versionConfig = this.templateConfiguration.versions[this.templateConfiguration.defaultTemplateVersion];
+    }
+
+    if (!versionConfig) return;
+
+    const activeDescriptorCategoryIdsConfig =
+      versionConfig.activeStudyDesignDescriptorCategories || [];
+    const descriptorMetadata =
+      this.templateConfiguration.descriptorConfiguration
+        ?.defaultDescriptorCategories || {};
+
+    let descriptorSource: any[] = [];
+    if (Array.isArray(activeDescriptorCategoryIdsConfig)) {
+      descriptorSource = activeDescriptorCategoryIdsConfig.map((id) => ({
+        id,
+        min: 0,
+      }));
+    } else if (typeof activeDescriptorCategoryIdsConfig === "object") {
+      descriptorSource = Object.keys(activeDescriptorCategoryIdsConfig)
+        .filter((key) => activeDescriptorCategoryIdsConfig[key].visible)
+        .sort(
+          (a, b) =>
+            activeDescriptorCategoryIdsConfig[a].order -
+            activeDescriptorCategoryIdsConfig[b].order
+        )
+        .map((key) => ({
+          id: key,
+          min: activeDescriptorCategoryIdsConfig[key].min || 0,
+        }));
+    }
+
+    this.descriptorCategories = descriptorSource.map((item) => {
+      const meta = descriptorMetadata[item.id];
+      let controlListKey = meta?.controlListKey || null;
+      const isaFileType = meta?.isaFileType || "investigation";
+
+      if (controlListKey && this.legacyControlLists) {
+        const selectionInput = {
+          isaFileType: isaFileType,
+          studyCategory: this.studyCategory,
+          studyCreatedAt: this.studyCreatedAt || new Date(),
+          templateVersion: version,
+        };
+        let rule = null;
+        try {
+          rule = getValidationRuleForField(
+            { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
+            controlListKey,
+            selectionInput as any
+          );
+        } catch (e) {
+          rule = null;
+        }
+
+        if (!rule) {
+          controlListKey = "Study Design Type";
+        }
+      } else if (!controlListKey) {
+        controlListKey = "Study Design Type";
+      }
+
+      return {
+        id: item.id,
+        label: meta?.label || item.id,
+        controlListKey: controlListKey,
+        isaFileType: isaFileType,
+      };
+    });
+
+    this.descriptorCategories.push({
+      id: "other",
+      label: "Other",
+      controlListKey: "Study Design Type",
+      isaFileType: "investigation",
+    });
+  }
+
+  onCategoryChange(categoryId) {
+    const category = this.descriptorCategories.find((c) => c.id === categoryId);
+    if (category) {
+      this.selectedCategory = category;
+      this.controlListKey = category.controlListKey;
+      this.isaFileType = category.isaFileType;
+      this._controlList = this.controlList();
+    }
+  }
+
+  initialiseForm() {
+    this.isFormBusy = false;
+    const controlList = this._controlList || this.controlList();
+    const isRequired = controlList?.rule?.termEnforcementLevel === "required";
+    const group: any = {
+      descriptor: [null, isRequired ? [Validators.required] : []],
+    };
+    if (this.mode !== 'local') {
+      group.descriptorCategory = [this.selectedCategory?.id || null, Validators.required];
+    }
+    this.form = this.fb.group(group);
+  }
+
   openModal() {
     if (!this.readOnly && !this.isStudyReadOnly) {
+      // Resolve category if editing
+      if (!this.addNewDescriptor && this.descriptor && this.descriptor.comments) {
+        const categoryComment = this.descriptor.comments.find(
+          (c) => c.name === "Study Design Type Category"
+        );
+        if (categoryComment) {
+          const catId = categoryComment.value;
+          const category = this.descriptorCategories.find((c) => c.id === catId);
+          if (category) {
+            this.selectedCategory = category;
+            this.controlListKey = category.controlListKey;
+            this.isaFileType = category.isaFileType;
+          }
+        }
+      } else if (this.mode === 'local' && this.controlListKey) {
+        // Respect provided controlListKey in local mode (creation wizard)
+        const matchingCat = this.descriptorCategories.find(c => c.controlListKey === this.controlListKey);
+        if (matchingCat) {
+          this.selectedCategory = matchingCat;
+        }
+      } else {
+        // Standard flow: Default to first category if adding new
+        if (this.descriptorCategories.length > 0) {
+          const firstCat = this.descriptorCategories[0];
+          this.selectedCategory = firstCat;
+          this.controlListKey = firstCat.controlListKey;
+          this.isaFileType = firstCat.isaFileType;
+        }
+      }
+
       this._controlList = this.controlList();
       this.isModalOpen = true;
       this.initialiseForm();
-      if (this.addNewDescriptor) {
-        this.descriptor = null;
-        if (this.descriptorComponent) {
-          this.descriptorComponent.reset();
-        }
-      } else {
-        if (this.descriptor) {
+
+      setTimeout(() => {
+        if (this.addNewDescriptor) {
+          this.descriptor = null;
+          if (this.descriptorComponent) {
+            this.descriptorComponent.reset();
+          }
+          this.isDescriptorValid = false;
+        } else if (this.descriptor) {
           if (this.descriptorComponent) {
             this.descriptorComponent.values = [this.descriptor];
           }
@@ -355,19 +515,11 @@ export class DesignDescriptorComponent implements OnInit {
                 .get("descriptor")
                 .setValue([this.descriptor], { emitEvent: false });
             }
+            this.isDescriptorValid = true;
           }
         }
-      }
+      }, 100);
     }
-  }
-
-  initialiseForm() {
-    this.isFormBusy = false;
-    const controlList = this._controlList || this.controlList();
-    const isRequired = controlList?.rule?.termEnforcementLevel === 'required';
-    this.form = this.fb.group({
-      descriptor: [null, isRequired ? [Validators.required] : []],
-    });
   }
 
   confirmDelete() {
@@ -517,10 +669,43 @@ export class DesignDescriptorComponent implements OnInit {
       }
     }
 
+    if (studyDesignDescriptor && this.form && this.form.get("descriptorCategory")) {
+      const categoryId = this.form.get("descriptorCategory").value;
+      if (categoryId) {
+        if (!studyDesignDescriptor.comments) {
+          studyDesignDescriptor.comments = [];
+        }
+        // Remove existing category comment if any
+        studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
+          (c) => c.name !== "Study Design Type Category"
+        );
+        studyDesignDescriptor.comments.push(new MTBLSComment("Study Design Type Category", categoryId));
+      }
+    }
+
     const body = {
       studyDesignDescriptor: studyDesignDescriptor,
     };
     return body;
+  }
+
+  getCategoryLabel(descriptor: Ontology): string {
+    if (descriptor && descriptor.comments && this.templateConfiguration) {
+      const categoryComment = descriptor.comments.find(
+        (c) => c.name === "Study Design Type Category"
+      );
+      if (categoryComment) {
+        const categoryId = categoryComment.value;
+        if (categoryId === "other") {
+          return "Other";
+        }
+        const descriptorMetadata =
+          this.templateConfiguration.descriptorConfiguration
+            ?.defaultDescriptorCategories || {};
+        return descriptorMetadata[categoryId]?.label || categoryId;
+      }
+    }
+    return null;
   }
 
   fieldValidation(fieldId) {

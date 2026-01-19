@@ -17,6 +17,7 @@ export class RelatedDatasetsComponent implements OnInit {
   relatedDatasets$: Observable<any[]> = inject(Store).select(StudyCreationState.relatedDatasets);
   
   isModalOpen = false;
+  editingIndex = -1;
   form: UntypedFormGroup;
   filteredIdentifierSources$: Observable<any[]>;
   identifierPlaceholder: string = 'e.g. MTBLS1';
@@ -53,11 +54,24 @@ export class RelatedDatasetsComponent implements OnInit {
   }
 
   openModal() {
+    this.editingIndex = -1;
     this.isModalOpen = true;
+  }
+
+  editDataset(index: number, dataset: any) {
+      this.editingIndex = index;
+      this.isModalOpen = true;
+      // Note: identifierSource might need to be an object for the autocomplete to work perfectly, 
+      // but if matched as string it will still show.
+      this.form.patchValue({
+          identifierSource: dataset.repository,
+          identifier: dataset.accession
+      });
   }
 
   closeModal() {
     this.isModalOpen = false;
+    this.editingIndex = -1;
     this.form.reset();
   }
 
@@ -84,7 +98,11 @@ export class RelatedDatasetsComponent implements OnInit {
           url: url 
       };
 
-      this.store.dispatch(new StudyCreation.AddRelatedDataset(newDataset));
+      if (this.editingIndex > -1) {
+          this.store.dispatch(new StudyCreation.UpdateRelatedDataset(newDataset, this.editingIndex));
+      } else {
+          this.store.dispatch(new StudyCreation.AddRelatedDataset(newDataset));
+      }
       this.closeModal();
     }
   }

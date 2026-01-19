@@ -569,8 +569,17 @@ export class CreateComponent implements OnInit {
   }
 
   triggerSubmit() {
+    const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key => 
+        this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
+    );
+    const count = selectedCategoryKeys.length;
+    
     this.confirmationTitle = "Confirm Submission";
-    this.confirmationMessage = "Are you sure you would like to create this study?";
+    if (count > 0) {
+        this.confirmationMessage = `We created the following ${count} MetaboLights submissions for your study. Are you sure to continue?`;
+    } else {
+        this.confirmationMessage = "Are you sure you would like to create this study?";
+    }
     this.showConfirmationModal = true;
   }
 
@@ -632,7 +641,7 @@ export class CreateComponent implements OnInit {
           lastName: this.currentUser?.lastName || '',
           email: this.currentUser?.email || '',
           affiliation: this.currentUser?.affiliation || '',
-          address: this.currentUser?.address || '',
+          address: '',
           orcid: this.currentUser?.orcid || '',
           roles: role ? [role] : [],
           comments: []

@@ -21,6 +21,7 @@ export class FundingComponent implements OnInit {
   form: UntypedFormGroup;
   filteredFunderOrganizations$: Observable<any[]>;
   isModalOpen = false;
+  editingIndex = -1;
 
   constructor(private fb: UntypedFormBuilder, private editorService: EditorService, private store: Store) { }
 
@@ -57,11 +58,23 @@ export class FundingComponent implements OnInit {
   }
 
   openModal() {
+    this.editingIndex = -1;
     this.isModalOpen = true;
+  }
+
+  editFunder(index: number, funder: any) {
+      this.editingIndex = index;
+      this.isModalOpen = true;
+      this.form.patchValue({
+          funderOrganization: funder.fundingOrganization.annotationValue,
+          funderId: funder.fundingOrganization.termAccession,
+          grantIdentifier: funder.grantIdentifier
+      });
   }
 
   closeModal() {
     this.isModalOpen = false;
+    this.editingIndex = -1;
     this.form.reset();
   }
 
@@ -106,7 +119,11 @@ export class FundingComponent implements OnInit {
           grantIdentifier: formValue.grantIdentifier || ""
       };
 
-      this.store.dispatch(new StudyCreation.AddFunder(newFunder));
+      if (this.editingIndex > -1) {
+          this.store.dispatch(new StudyCreation.UpdateFunder(newFunder, this.editingIndex));
+      } else {
+          this.store.dispatch(new StudyCreation.AddFunder(newFunder));
+      }
       this.closeModal();
     }
   }

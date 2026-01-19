@@ -1,30 +1,45 @@
-<div class="level mb-2">
-    <div class="level-left"></div>
-    <div class="level-right">
-        <a class="button is-primary is-small" (click)="openModal()">+ Add</a>
-    </div>
-</div>
-
-<div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0">
-    <div class="box p-3 mb-4" *ngFor="let ds of relatedDatasets$ | async; let i = index">
-        <div class="columns is-vcentered is-mobile">
-            <div class="column">
-                <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                    <span class="has-text-weight-bold is-size-6 has-text-grey-dark">{{ ds.accession }}</span>
-                    <div class="is-size-6" *ngIf="ds.url">
-                        <span class="has-text-weight-semibold has-text-grey">URL:</span>
-                        <a class="ml-1" [href]="ds.url" target="_blank" style="word-break: break-all;">{{ ds.url }}</a>
+<div class="card mb-6">
+    <header class="card-heading">
+        <span>
+            <p class="is-pulled-left">
+                Related datasets
+            </p>
+            <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
+        </span>
+    </header>
+    <div class="card-content">
+        <div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0; else emptyMessage">
+            <div class="box p-3 mb-4" *ngFor="let ds of relatedDatasets$ | async; let i = index">
+                <div class="columns is-vcentered is-mobile">
+                    <div class="column">
+                        <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                            <span class="has-text-weight-bold is-size-6 has-text-grey-dark">{{ ds.accession }}</span>
+                            <div class="is-size-6" *ngIf="ds.url">
+                                <span class="has-text-weight-semibold has-text-grey">URL:</span>
+                                <a class="ml-1" [href]="ds.url" target="_blank" style="word-break: break-all;">{{ ds.url
+                                    }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-narrow">
+                        <button class="edit-icon-button" (click)="editDataset(i, ds)" title="Edit Dataset">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
                     </div>
                 </div>
             </div>
-            <div class="column is-narrow">
-                <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
-            </div>
         </div>
+        <ng-template #emptyMessage>
+            <p class="placeholder-text has-text-centered p-4">
+                <small>No related datasets defined.</small>
+            </p>
+        </ng-template>
     </div>
 </div>
 
-<mtbls-modal [title]="'Add Related Dataset'" [isModalOpen]="isModalOpen" (closed)="closeModal()">
+<mtbls-modal [title]="editingIndex > -1 ? 'Edit Related Dataset' : 'Add Related Dataset'" [isModalOpen]="isModalOpen"
+    (closed)="closeModal()">
     <div body [formGroup]="form">
         <div class="columns is-multiline">
             <div class="column is-6">
@@ -57,7 +72,9 @@
         </div>
     </div>
     <div footer>
-        <button class="button is-info" (click)="addDataset()" [disabled]="form.invalid">Add Dataset</button>
+        <button class="button is-info" (click)="addDataset()" [disabled]="form.invalid">
+            {{ editingIndex > -1 ? 'Update Dataset' : 'Add Dataset' }}
+        </button>
         <button class="button" style="margin-left:10px" (click)="closeModal()">Cancel</button>
     </div>
 </mtbls-modal>

@@ -10,6 +10,8 @@ export interface IStudyDetail {
   revisionStatus: number;
   revisionNumber: number;
   revisionDatetime: string;
+  studyCategory?: string;
+  sampleTemplate?: string;
 }
 
 export interface IStudyDetailWrapper {

@@ -1,40 +1,54 @@
-<div class="level mb-2">
-    <div class="level-left"></div>
-    <div class="level-right">
-        <a class="button is-primary is-small" (click)="openModal()">+ Add</a>
-    </div>
-</div>
-
-<div class="funding-list" *ngIf="(funders$ | async)?.length > 0">
-    <div class="box p-3 mb-4" *ngFor="let funder of funders$ | async; let i = index">
-        <div class="columns is-vcentered is-mobile">
-            <div class="column">
-                <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                    <span class="has-text-weight-bold is-size-6 has-text-grey-dark">
-                        {{ funder.fundingOrganization.annotationValue }}
-                    </span>
-                    <div class="is-flex is-align-items-center" style="gap: 1rem;">
-                        <div *ngIf="funder.fundingOrganization.termAccession" class="is-size-6">
-                            <span class="has-text-weight-semibold has-text-grey">ROR ID:</span>
-                            <a class="ml-1" [href]="funder.fundingOrganization.termAccession" target="_blank">
-                                {{ funder.fundingOrganization.termAccession }}
-                            </a>
+<div class="card mb-6">
+    <header class="card-heading">
+        <span>
+            <p class="is-pulled-left">
+                Funding
+            </p>
+            <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
+        </span>
+    </header>
+    <div class="card-content">
+        <div class="funding-list" *ngIf="(funders$ | async)?.length > 0; else emptyMessage">
+            <div class="box p-3 mb-4" *ngFor="let funder of funders$ | async; let i = index">
+                <div class="columns is-vcentered is-mobile">
+                    <div class="column">
+                        <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                            <span class="has-text-weight-bold is-size-6 has-text-grey-dark">
+                                {{ funder.fundingOrganization.annotationValue }}
+                            </span>
+                            <div class="is-flex is-align-items-center" style="gap: 1rem;">
+                                <div *ngIf="funder.fundingOrganization.termAccession" class="is-size-6">
+                                    <span class="has-text-weight-semibold has-text-grey">ROR ID:</span>
+                                    <a class="ml-1" [href]="funder.fundingOrganization.termAccession" target="_blank">
+                                        {{ funder.fundingOrganization.termAccession }}
+                                    </a>
+                                </div>
+                                <div *ngIf="funder.grantIdentifier" class="is-size-6">
+                                    <span class="has-text-weight-semibold has-text-grey">Grant Identifier:</span>
+                                    <span class="ml-1">{{ funder.grantIdentifier }}</span>
+                                </div>
+                            </div>
                         </div>
-                        <div *ngIf="funder.grantIdentifier" class="is-size-6">
-                            <span class="has-text-weight-semibold has-text-grey">Grant Identifier:</span>
-                            <span class="ml-1">{{ funder.grantIdentifier }}</span>
-                        </div>
+                    </div>
+                    <div class="column is-narrow">
+                        <button class="edit-icon-button" (click)="editFunder(i, funder)" title="Edit Funding">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="delete is-medium" (click)="removeFunder(i)" title="Remove Funding"></button>
                     </div>
                 </div>
             </div>
-            <div class="column is-narrow">
-                <button class="delete is-medium" (click)="removeFunder(i)" title="Remove Funding"></button>
-            </div>
         </div>
+        <ng-template #emptyMessage>
+            <p class="placeholder-text has-text-centered p-4">
+                <small>No funding information defined.</small>
+            </p>
+        </ng-template>
     </div>
 </div>
 
-<mtbls-modal [title]="'Add Funding Details'" [isModalOpen]="isModalOpen" (closed)="closeModal()">
+<mtbls-modal [title]="editingIndex > -1 ? 'Edit Funding Details' : 'Add Funding Details'" [isModalOpen]="isModalOpen"
+    (closed)="closeModal()">
     <div body>
         <form [formGroup]="form">
             <div class="columns is-multiline">
@@ -90,7 +104,9 @@
         </form>
     </div>
     <div footer>
-        <button class="button is-info" (click)="addFunder()" [disabled]="form.invalid">Add Funding</button>
+        <button class="button is-info" (click)="addFunder()" [disabled]="form.invalid">
+            {{ editingIndex > -1 ? 'Update Funding' : 'Add Funding' }}
+        </button>
         <button class="button" style="margin-left:10px" (click)="closeModal()">Cancel</button>
     </div>
 </mtbls-modal>

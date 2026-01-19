@@ -29,6 +29,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   isCurator$: Observable<boolean> = inject(Store).select(UserState.isCurator);
   bannerMessage$: Observable<string> = inject(Store).select(ApplicationState.bannerMessage);
   maintenanceMode$: Observable<boolean> = inject(Store).select(ApplicationState.maintenanceMode);
+  templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
+  studyCategoriesMetadata: any = {};
   revisionStatusTransform = new RevisionStatusTransformPipe()
   curationStatusTransform = new CurationStatusTransformPipe()
   curationStatusStarTransform = new CurationStatusStarTransformPipe()
@@ -132,6 +134,11 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
         this.loadingStudies = false;
       }
     });
+    this.templateConfiguration$.subscribe(config => {
+      if(config) {
+          this.studyCategoriesMetadata = config.studyCategories || {};
+      }
+    });
   }
 
   ngAfterContentInit() {
@@ -169,7 +176,24 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   getString(s) {
-    return s.accession + " " + s.title + " " + s.description;
+    return s.accession + " " + s.title + " " + s.description + " " + s.studyCategory + " " + s.sampleTemplate;
+  }
+
+  getStudyCategoryLabel(category: string) {
+    if (category) {
+      if (this.studyCategoriesMetadata[category]) {
+        return this.studyCategoriesMetadata[category].label;
+      }
+      return category.charAt(0).toUpperCase() + category.slice(1);
+    }
+    return 'Other';
+  }
+
+  getSampleTypeLabel(sampleType: string) {
+    if (sampleType) {
+      return sampleType.charAt(0).toUpperCase() + sampleType.slice(1);
+    }
+    return 'Other';
   }
 
   studyClick(study: IStudyDetail, view: string) {

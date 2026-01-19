@@ -14,6 +14,41 @@
     text-overflow: ellipsis;
     display: inline-block;
 }
+
 .dataset-list {
     margin-bottom: 20px;
+}
+
+.edit-icon-button {
+    background-color: rgba(10, 10, 10, 0.1);
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    width: 24px;
+    min-height: 24px;
+    min-width: 24px;
+    padding: 0;
+    outline: none;
+    color: #4a4a4a;
+    transition: background-color 0.2s;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.edit-icon-button:hover {
+    background-color: rgba(10, 10, 10, 0.2);
+}
+
+.edit-icon-button mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

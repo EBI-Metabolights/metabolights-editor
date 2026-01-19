@@ -40,13 +40,16 @@ export class StudyComponent implements OnInit, OnDestroy {
   revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
   revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
+  studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
+  sampleTemplate$: Observable<string> = inject(Store).select(GeneralMetadataState.sampleTemplate);
+  templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
 
   revisionNumber = null;
   revisionDatetime = null;
   revisionStatus = null;
   studyError = false;
   requestedTab = 0;
-  tab = "descriptors";
+  tab = "overview";
   requestedStudy: string = null;
   status = "";
   curationRequest = "";
@@ -65,6 +68,9 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationNeeded: boolean = false;
   permissions: StudyPermission = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
+  studyCategory = "";
+  sampleTemplate = "";
+  templateConfiguration: any = null;
 
   constructor(
     private store: Store,
@@ -73,11 +79,14 @@ export class StudyComponent implements OnInit, OnDestroy {
     private editorService: EditorService,
     private configService: ConfigurationService
   ) {
-     this.setUpSubscriptionsNgxs()
+    this.setUpSubscriptionsNgxs()
   }
 
 
   setUpSubscriptionsNgxs() {
+    this.templateConfiguration$.subscribe((value) => {
+      this.templateConfiguration = value;
+    });
     this.permissions = this.store.snapshot().application.studyPermission
     this.obfuscationCode = this.permissions.obfuscationCode
     this.baseHref = this.configService.baseHref;
@@ -135,7 +144,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     }
     this.investigationFailed$.subscribe((value) => {
       this.studyError = value;
-      if (this.studyError) this.selectCurrentTab(5, "files");
+      if (this.studyError) this.selectCurrentTab(6, "files");
     });
 
     this.studyStatus$.subscribe((value) => {
@@ -167,33 +176,40 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.validationNeeded = value;
     })
 
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value;
+    });
+
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+
     this.route.params.subscribe((params) => {
       this.requestedStudy = params.id;
       if (params.tab === "files") {
-        this.requestedTab = 5;
+        this.requestedTab = 6;
         this.tab = "files";
       } else if (params.tab === "metabolites") {
-        this.requestedTab = 4;
+        this.requestedTab = 5;
         this.tab = "metabolites";
       } else if (params.tab === "assays") {
-        this.requestedTab = 3;
+        this.requestedTab = 4;
         this.tab = "assays";
       } else if (params.tab === "samples") {
-        this.requestedTab = 2;
+        this.requestedTab = 3;
         this.tab = "samples";
       } else if (params.tab === "protocols") {
-        this.requestedTab = 1;
+        this.requestedTab = 2;
         this.tab = "protocols";
-      } /*else if (params.tab === "validations") {
-        this.requestedTab = 6;
-        this.tab = "validations";
-      }*/ else if (params.tab === "validations") {
-        this.requestedTab = 7;
-        this.tab = "validations"
-      }
-      else {
-        this.requestedTab = 0;
+      } else if (params.tab === "descriptors") {
+        this.requestedTab = 1;
         this.tab = "descriptors";
+      } else if (params.tab === "validations") {
+        this.requestedTab = 8;
+        this.tab = "validations";
+      } else {
+        this.requestedTab = 0;
+        this.tab = "overview";
       }
       this.selectCurrentTab(this.requestedTab, this.tab);
     });
@@ -251,6 +267,14 @@ export class StudyComponent implements OnInit, OnDestroy {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   }
+
+  getCategoryLabel(id: string): string {
+    if (this.templateConfiguration && this.templateConfiguration.studyCategories) {
+      return this.templateConfiguration.studyCategories[id]?.label || id;
+    }
+    return id;
+  }
+
   updateCurationStatus() {
     if (this.curationRequest === "NO_CURATION") {
       this.curationStatus = "Minimum";

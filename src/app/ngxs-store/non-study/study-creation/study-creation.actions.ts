@@ -91,6 +91,10 @@ export namespace StudyCreation {
     static readonly type = '[StudyCreation] Add Related Dataset';
     constructor(public dataset: any) {}
   }
+  export class UpdateRelatedDataset {
+    static readonly type = '[StudyCreation] Update Related Dataset';
+    constructor(public dataset: any, public index: number) {}
+  }
   export class RemoveRelatedDataset {
     static readonly type = '[StudyCreation] Remove Related Dataset';
     constructor(public index: number) {}

@@ -213,6 +213,16 @@ export class StudyCreationState {
       ctx.patchState({ relatedDatasets: [...state.relatedDatasets, action.dataset] });
   }
 
+  @Action(StudyCreation.UpdateRelatedDataset)
+  updateRelatedDataset(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.UpdateRelatedDataset) {
+      const state = ctx.getState();
+      const datasets = [...state.relatedDatasets];
+      if (action.index >= 0 && action.index < datasets.length) {
+          datasets[action.index] = action.dataset;
+          ctx.patchState({ relatedDatasets: datasets });
+      }
+  }
+
   @Action(StudyCreation.RemoveRelatedDataset)
   removeRelatedDataset(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.RemoveRelatedDataset) {
       const state = ctx.getState();

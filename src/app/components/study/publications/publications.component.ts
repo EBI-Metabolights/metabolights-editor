@@ -25,6 +25,7 @@ export class PublicationsComponent implements OnInit {
 
   isReadOnly = false;
   publications: any = null;
+  expandedIndex = -1;
 
   constructor() {
     this.setUpSubscriptionsNgxs();
@@ -41,6 +42,14 @@ export class PublicationsComponent implements OnInit {
       }
     });
 
+  }
+
+  toggleExpand(index: number) {
+    if (this.expandedIndex === index) {
+      this.expandedIndex = -1;
+    } else {
+      this.expandedIndex = index;
+    }
   }
 
   ngOnInit() {}
