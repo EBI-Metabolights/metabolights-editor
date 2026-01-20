@@ -2276,5 +2276,38 @@ toggleSelectAll(): void {
 
     return rows.length > 0;
   }
+  onModalEnter(event: KeyboardEvent) {
+    // prevent accidental form submission navigation
+    if (!event) return;
 
+    // Column modal path
+    if (this.isEditColumnModalOpen && this.editColumnform) {
+      const saveVisible = !this.editColumnform.pristine;
+      const formValid = this.editColumnform.valid;
+      const notBusy = !this.isFormBusy;
+      const ontologyOk = !this.isEmptyOntology || !this.isRequiredField;
+      const canSave = saveVisible && formValid && notBusy && ontologyOk;
+
+      if (canSave) {
+        event.preventDefault();
+        this.saveColumnSelectedRowsValues();
+      }
+      return;
+    }
+
+    // Cell modal path
+    if (this.isEditModalOpen && this.editCellform) {
+      const saveVisible = !this.editCellform.pristine;
+      const formValid = this.editCellform.valid;
+      const notBusy = !this.isFormBusy;
+      const ontologyOk = !this.isEmptyOntology || !this.isRequiredField;
+      const canSave = saveVisible && formValid && notBusy && ontologyOk;
+
+      if (canSave) {
+        event.preventDefault();
+        this.saveCell();
+      }
+      return;
+    }
+  }
 }
