@@ -66,7 +66,7 @@ import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
-import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+// import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -126,10 +126,10 @@ export function configLoader(injector: Injector): () => Promise<any> {
             ValidationState,
             StudyCreationState
         ], { developmentMode: true }),
-        NgxsReduxDevtoolsPluginModule.forRoot({
-                disabled: false,
-                maxAge: 25
-                }),
+        // NgxsReduxDevtoolsPluginModule.forRoot({
+        //         disabled: false,
+        //         maxAge: 25
+        //         }),
         QuillModule.forRoot({
             modules: {
                 clipboard: {
