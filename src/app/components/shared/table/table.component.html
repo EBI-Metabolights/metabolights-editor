@@ -290,7 +290,7 @@
                     <mtbls-ontology [id]="'editOntologyColumn'"
                       [validations]="columnValidations(selectedColumn['header'])"
                       [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
-                      [values]="[]" [inline]="true" [rule]="columnControlList(selectedCell['column']['header']).rule"
+                      [values]="[]" [inline]="true" [rule]="columnControlList(selectedColumn['header'])?.rule"
                       [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
@@ -298,7 +298,7 @@
                     <mat-form-field class="full-width"
                       *ngIf="columnControlList(selectedColumn['header']).renderAsDropdown">
                       <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedColumn.header) }}">
-                        <mat-option *ngFor="let option of columnControlList(selectedColumn['header']).values"
+                        <mat-option *ngFor="let option of columnControlList(selectedColumn['header'])?.values"
                           [value]="option.annotationValue">
                           {{ option.annotationValue }}
                         </mat-option>
