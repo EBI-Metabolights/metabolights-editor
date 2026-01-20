@@ -783,6 +783,14 @@ export class TableComponent
   }
 
   columnControlList(header) {
+    if (
+      this.enableControlList &&
+      this.controlListColumns.size === 0 &&
+      this.data &&
+      this.data.header
+    ) {
+      this.detectControlListColumns();
+    }
   if (this.enableControlList && header && this.controlListNames.has(header)) {
     const controlList = this.controlLists.get(header);
     const colData = this.controlListColumns.get(header);
