@@ -122,7 +122,16 @@ export class DescriptionComponent implements OnChanges, OnInit {
 
   initialiseForm() {
     if (!this.isReadOnly) {
-      // this.description = this.description.replace(new RegExp("<br />", 'g'), '\n')
+      // Enforce 200 character minimum if not set or lower in validation rules
+      if (this.validation && this.validation.rules) {
+        let minRule = this.validation.rules.find(r => r.condition === 'min');
+        if (!minRule) {
+          this.validation.rules.push({ condition: 'min', value: 200, error: 'Description must be at least 200 characters.' });
+        } else if (minRule.value < 200) {
+          minRule.value = 200;
+          minRule.error = 'Description must be at least 200 characters.';
+        }
+      }
       this.isFormBusy = false;
       this.form = this.fb.group({
         description: [

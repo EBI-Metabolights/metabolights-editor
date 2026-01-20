@@ -51,18 +51,18 @@ import { FieldValueValidation } from "src/app/models/mtbl/mtbls/control-list";
   ],
 })
 export class OntologyComponent implements OnInit, OnChanges {
-  @Input("validations") validations: any;
-  @Input("values") values: Ontology[] = [];
-  @Input("inline") isInline: boolean;
-  @Input("sourceValueType") sourceValueType = "ontology";
-  @Input("initialSearchKeyword") initialSearchKeyword = "";
+  @Input() validations: any;
+  @Input() values: Ontology[] = [];
+  @Input() inline: boolean;
+  @Input() sourceValueType = "ontology";
+  @Input() initialSearchKeyword = "";
   @Input() defaultOntologies: any;
-  @Input("controlList") controlList: { name: string; values: Ontology[] } = {
+  @Input() controlList: { name: string; values: Ontology[] } = {
     name: "",
     values: [],
   };
-  @Input("id") id: string;
-  @Input("unitId") unitId: string;
+  @Input() id: string;
+  @Input() unitId: string;
   @Input("label") label: string;
   @Input() rule: FieldValueValidation | null = null;
   @ViewChild('input', { static: false }) inputRef!: ElementRef<HTMLInputElement>;
@@ -127,6 +127,7 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.readonly = await this.getReadonly();
     if (
       this.readonly === false &&
+      this.validations &&
       "recommended-ontologies" in this.validations
     ) {
       if (this.validations["recommended-ontologies"]) {
@@ -138,7 +139,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
       }
     }
-    this.isRequired = this.validations["is-required"] == "true";
+    this.isRequired = this.validations?.["is-required"] === "true";
     this.isFormBusy = false;
     this.searchedMore = false;
     this.getDefaultTerms();

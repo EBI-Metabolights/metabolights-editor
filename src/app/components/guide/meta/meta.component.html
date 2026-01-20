@@ -1,22 +1,13 @@
 <nav-bar :mode="light"></nav-bar>
-<mtbls-progress [study]="requestedStudy" [step]="3"></mtbls-progress>
-<quick-link
-  path="study"
-  icon="chrome_reader_mode"
-  text="Study overview"
-></quick-link>
+<mtbls-progress [study]="requestedStudy" [step]="2"></mtbls-progress>
+<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
 <div class="columns">
   <div class="column is-8 is-offset-2 mb-5">
     <div>&nbsp;</div>
     <nav class="panel has-background-white">
       <div class="panel-heading">
-        <img
-          style="height: 32px"
-          class="is-pulled-left"
-          src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-        />
-        <span style="margin-left: 10px">{{ requestedStudy }}</span
-        >: Please tell us about your study
+        <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
+        <span style="margin-left: 10px">{{ requestedStudy }}</span>: Please tell us about your study
       </div>
       <div class="panel-block has-background-white">
         <span style="flex: 0 0 100%">
@@ -24,28 +15,19 @@
         </span>
       </div>
     </nav>
-    <div
-      *ngIf="
+    <div *ngIf="
         (currentTitle && currentTitle != '') ||
         (currentDescription && currentDescription != '')
-      "
-      class="panel-block has-background-white"
-    >
+      " class="panel-block has-background-white">
       <span class="column">
-        <small class="has-text-grey-lighter"
-          >Please click to edit or use the options below to import details. You
-          may skip this step and proceed to the next.</small
-        >
+        <small class="has-text-grey-lighter">Please click to edit or use the options below to import details. You
+          may skip this step and proceed to the next.</small>
         <div class="notification no-margin-bottom">
-          <span class="is-text-grey"
-            ><label><small>TITLE</small></label></span
-          >
+          <span class="is-text-grey"><label><small>TITLE</small></label></span>
           <br />
           <mtbls-title></mtbls-title>
           <div>&nbsp;</div>
-          <span class="is-text-grey"
-            ><label><small>SUMMARY</small></label></span
-          ><br />
+          <span class="is-text-grey"><label><small>SUMMARY</small></label></span><br />
           <mtbls-description></mtbls-description>
           <div>&nbsp;</div>
           <mtbls-people></mtbls-people>
@@ -56,20 +38,13 @@
 
     <div class="panel-block">
       <button (click)="skipMetaData()" class="button is-success is-fullwidth">
-        <mat-spinner
-          [diameter]="20"
-          [strokeWidth]="3"
-          *ngIf="isLoading"
-        ></mat-spinner
-        >&nbsp;Next
+        <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
       </button>
     </div>
-    <div
-      *ngIf="
+    <div *ngIf="
         (currentTitle && currentTitle != '') ||
         (currentDescription && currentDescription != '')
-      "
-    >
+      ">
       <br />
       <p class="has-text-centered">
         <a (click)="skipMetaData()">Skip ></a>

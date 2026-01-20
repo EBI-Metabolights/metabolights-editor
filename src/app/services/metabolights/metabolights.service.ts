@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { catchError, map, take } from "rxjs/operators";
+import { catchError, map, take, filter } from "rxjs/operators";
 import { httpOptions } from "./../headers";
 import { DataService } from "./../data.service";
 import { inject, Injectable } from "@angular/core";
@@ -60,11 +60,10 @@ export class MetabolightsService extends DataService {
         // Create a promise to wait for configLoaded to become true
         const configLoadedPromise = new Promise<void>((resolve, reject) => {
           this.configService.configLoaded$.pipe(
-              take(1) // Automatically complete after the first emission
-          ).subscribe(loaded => {
-              if (loaded === true) {
-                  resolve(); // Resolve the promise when configLoaded becomes true
-              }
+              filter(loaded => loaded === true),
+              take(1)
+          ).subscribe(() => {
+              resolve();
           });
       });
 
@@ -603,10 +602,44 @@ export class MetabolightsService extends DataService {
   createStudy(): Observable<{ new_study: string }> {
     return this.http
       .get<{ new_study: string }>(
-        this.url.baseURL + "/studies" + "/create",
+        this.url.baseURL + "/provisional-studies",
         httpOptions
       )
-      .pipe(catchError(this.handleError));
+      .pipe(
+        map((response: any) => {
+          const studies = response.studies;
+          if (studies) {
+             const ids = Object.keys(studies);
+             if (ids.length > 0) {
+               ids.sort().reverse();
+               return { new_study: ids[0] };
+             }
+          }
+          return response;
+        }),
+        catchError(this.handleError));
+  }
+
+  createStudyWithMetadata(body: any): Observable<{ new_study: string }> {
+    return this.http
+      .post<{ new_study: string }>(
+        this.url.baseURL + "/provisional-studies",
+        body,
+        httpOptions
+      )
+      .pipe(
+        map((response: any) => {
+          const studies = response.studies;
+          if (studies) {
+             const ids = Object.keys(studies);
+             if (ids.length > 0) {
+               ids.sort().reverse();
+               return { new_study: ids[0] };
+             }
+          }
+          return response;
+        }),
+        catchError(this.handleError));
   }
 
   decompressFiles(body) {

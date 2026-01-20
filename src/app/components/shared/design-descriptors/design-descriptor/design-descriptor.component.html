@@ -1,13 +1,14 @@
-<div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
+<div *ngIf="(addNewDescriptor || descriptor == null) && mode !== 'local'; else showDescriptorDetails">
   <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
 </div>
 <ng-template #showDescriptorDetails>
-  <div class="control">
+  <div class="control" *ngIf="mode !== 'local'">
     <div class="tags has-addons" style="margin-bottom: 5px">
       <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()">
         <i class="material-icons"> edit </i>
       </span>
       <span class="tag is-default is-small">
+        <span *ngIf="getCategoryLabel(descriptor) as category"><b>{{ category }}:</b>&nbsp;</span>
         <ontology-details [value]="descriptor"></ontology-details>
       </span>
     </div>
@@ -47,28 +48,47 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
-          <mtbls-ontology #descriptorComponent [validations]="validation" [controlList]="controlList()"
-            (changed)="onChanges($event)" [values]="descriptorValuesForComponent()" [inline]="true"
-            [rule]="controlList().rule" [defaultOntologies]="controlList().defaultOntologies"
-            [label]="'Descriptor'"></mtbls-ontology>
-          <mat-error *ngIf="showError">
-            <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
-          </mat-error>
-        </ng-container>
+        <div [formGroup]="form">
+          <div class="field" *ngIf="mode !== 'local'">
+            <label class="label is-small">Descriptor Category</label>
+            <div class="control">
+              <mat-form-field class="full-width is-small">
+                <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
+                  placeholder="Select Category">
+                  <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
+                    {{ cat.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
 
-        <ng-template #dropdownField>
-          <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('descriptor')">
-            <mat-select formControlName="descriptor" placeholder="Descriptor" (selectionChange)="onChanges($event)">
-              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-                {{ option.annotationValue }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="showError">
-              <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
-            </mat-error>
-          </mat-form-field>
-        </ng-template>
+          <div class="field pt-0">
+            <label class="label is-small">Descriptor</label>
+            <div class="control">
+              <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
+                <mat-form-field class="full-width is-small">
+                  <mat-select formControlName="descriptor" placeholder="Select Descriptor"
+                    (selectionChange)="onChanges($event.value)">
+                    <mat-option *ngFor="let val of _controlList.values" [value]="val.annotationValue">
+                      {{ val.annotationValue }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </span>
+              <ng-template #ontologyField>
+                <mtbls-ontology #descriptorComponent (changed)="onChanges($event)"
+                  [controlList]="{ name: controlListKey, values: _controlList?.values || [] }"
+                  [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                  [validations]="validation" [isRorSearch]="false" [isModal]="true" [inline]="true" [label]="''">
+                </mtbls-ontology>
+              </ng-template>
+              <mat-error *ngIf="false"> <!-- showError logic if needed -->
+                <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
+              </mat-error>
+            </div>
+          </div>
+        </div>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -76,11 +96,7 @@
             <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <button
-              *ngIf="addNewDescriptor"
-              class="button is-primary is-pulled-left"
-              (click)="openImportModal()"
-            >
+            <button *ngIf="addNewDescriptor" class="button is-primary is-pulled-left" (click)="openImportModal()">
               <mat-icon>label</mat-icon> Import
             </button>
           </div>

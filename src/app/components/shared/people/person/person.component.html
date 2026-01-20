@@ -3,8 +3,8 @@
 </span>
 <ng-template #showPersonDetails>
   <span class="clickable" (click)="openModal()">
-  {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
-    <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
+    {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
+  <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
 </ng-template>
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
@@ -114,7 +114,7 @@
             ">
             <mat-label>Last name</mat-label>
             <input matInput formControlName="lastName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("lastName").description }}
+            <mat-hint>{{ fieldValidation("lastName")?.description }}
               <span *ngIf="isFieldRequired('firstName')">
                 <b>(required)</b>
               </span>
@@ -128,7 +128,7 @@
             <mat-label>Middle name(s)</mat-label>
             <input matInput formControlName="midInitials" [readonly]="isReadOnly" />
             <mat-hint>{{
-              fieldValidation("midInitials").description
+              fieldValidation("midInitials")?.description
               }}</mat-hint>
             <mat-error *ngIf="form.get('midInitials')?.errors?.midInitials">
               {{ form.get("midInitials").errors.midInitials.error }}
@@ -143,7 +143,7 @@
             ">
             <mat-label>First name</mat-label>
             <input matInput formControlName="firstName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("firstName").description }}
+            <mat-hint>{{ fieldValidation("firstName")?.description }}
               <span *ngIf="isFieldRequired('firstName')">
                 <b>(required)</b>
               </span>
@@ -159,27 +159,23 @@
               <span>
                 <mtbls-ontology *ngIf="showOntology" class="mt-20" #personRoles [validations]="fieldValidation('roles')"
                   [controlList]="_controlList" (changed)="onChanges($event)" [values]="person.roles" [inline]="true"
-                  [label]="'Role'" [rule]="_controlList?.rule"
-                  [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Role*'"
-                (emptyError)="onEmptyError($event)"
-              ></mtbls-ontology>
-            </span>
-            <mat-error
-              *ngIf="showError"
-            >
-              <small>{{ form?.get("roles")?.errors?.roles?.error }}</small>
-            </mat-error>
-          </div>
+                  [label]="'Role'" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                  [label]="'Role*'" (emptyError)="onEmptyError($event)"></mtbls-ontology>
+              </span>
+              <mat-error *ngIf="showError">
+                <small>{{ form?.get("roles")?.errors?.roles?.error }}</small>
+              </mat-error>
+            </div>
           </ng-container>
 
           <ng-template #dropdownField>
             <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('roles')">
-            <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
-              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-                {{ option.annotationValue }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+              <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
+                <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                  {{ option.annotationValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </ng-template>
           <mat-form-field class="half-width">
             <mat-label>ORCID</mat-label>
@@ -187,7 +183,7 @@
             <a matSuffix target="_blank" [href]="getOrcidUrl()" class="search-link">
               <small>Search ORCID</small>
             </a>
-            <mat-hint>{{ fieldValidation("orcid").description }}
+            <mat-hint>{{ fieldValidation("orcid")?.description }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('orcid').errors &&
@@ -203,7 +199,7 @@
             <mat-label>Email</mat-label>
             <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput />
             <mat-hint>
-              {{ fieldValidation("email").description }}
+              {{ fieldValidation("email")?.description }}
               <span *ngIf="getIsRequired('email')"><b>(required)</b></span>
             </mat-hint>
             <mat-error *ngIf="
@@ -219,7 +215,7 @@
             <mat-label>Alternative Email</mat-label>
             <input class="no-scroll" formControlName="alternativeEmail" [readonly]="isReadOnly" matInput />
             <mat-hint>{{
-              fieldValidation("alternativeEmail").description
+              fieldValidation("alternativeEmail")?.description
               }}</mat-hint>
             <mat-error *ngIf="
                 form.get('alternativeEmail').errors &&
@@ -241,7 +237,7 @@
                   [readonly]="isReadOnly"
                   matInput
                 />
-                <mat-hint>{{ fieldValidation("phone").description }}</mat-hint>
+                <mat-hint>{{ fieldValidation("phone")?.description }}</mat-hint>
                 <mat-error
                   *ngIf="
                     form.get('phone').errors &&
@@ -261,7 +257,7 @@
                   [readonly]="isReadOnly"
                   matInput
                 />
-                <mat-hint>{{ fieldValidation("fax").description }}</mat-hint>
+                <mat-hint>{{ fieldValidation("fax")?.description }}</mat-hint>
                 <mat-error
                   *ngIf="
                     form.get('fax').errors &&
@@ -279,7 +275,7 @@
           <mat-label>Address</mat-label>
           <textarea class="no-scroll" formControlName="address" [readonly]="isReadOnly" matInput cdkAutosizeMinRows="1"
             cdkAutosizeMaxRows="4" cdkTextareaAutosize></textarea>
-          <mat-hint>{{ fieldValidation("address").description }}</mat-hint>
+          <mat-hint>{{ fieldValidation("address")?.description }}</mat-hint>
           <mat-error *ngIf="
               form.get('address').errors &&
               form.get('address').dirty &&
@@ -297,12 +293,12 @@
                 {{ org.name }} - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
               </div>
               <div style="font-size: 12px; color: #666;">
-                {{ org.description || '(No description available)' }}
+                {{ org?.description || '(No description available)' }}
               </div>
             </mat-option>
           </mat-autocomplete>
           <mat-hint>
-            {{ fieldValidation("affiliation").description }}
+            {{ fieldValidation("affiliation")?.description }}
             <span *ngIf="getIsRequired('affiliation')">
               <b>(required)</b>
             </span>
@@ -322,7 +318,7 @@
           <a matSuffix target="_blank" [href]="getRoridUrl()" class="search-link">
             <small>Search ROR ID</small>
           </a>
-          <mat-hint>{{ fieldValidation("rorid").description }}
+          <mat-hint>{{ fieldValidation("rorid")?.description }}
           </mat-hint>
           <mat-error *ngIf="
               form.get('rorid').errors &&
@@ -346,16 +342,9 @@
             </button>
           </div>
           <div class="column is-half has-text-right">
-            <button type="submit"
-              [disabled]="!form.valid || isFormBusy || form.pristine"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button type="submit" [disabled]="!form.valid || isFormBusy || form.pristine" (click)="saveNgxs()"
+              class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
             <!-- <button type="submit"
@@ -365,11 +354,7 @@
             >
               OK
             </button> -->
-            <button type="button"  
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button type="button" class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>

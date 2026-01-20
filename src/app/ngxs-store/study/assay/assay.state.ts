@@ -362,12 +362,12 @@ export class AssayState {
 
     @Selector()
     static assayList(state: AssayStateModel): IAssay[] {
-        return state.assayList
+        return state?.assayList
     }
 
     @Selector()
     static assays(state: AssayStateModel): Record<string, any> {
-        return state.assays
+        return state?.assays
     }
 
 }

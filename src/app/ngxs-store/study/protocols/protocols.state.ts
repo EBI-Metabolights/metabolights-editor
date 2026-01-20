@@ -129,24 +129,24 @@ export class ProtocolsState {
 
     @Selector()
     static protocols(state: ProtocolsStateModel): MTBLSProtocol[] {
-        return state.protocols
+        return state?.protocols
     }
 
     @Selector()
     static protocolGuides(state: ProtocolsStateModel): Record<string, string> {
-        return state.guides
+        return state?.guides
     }
 
     static specificProtocol(protocolName: string) {
         return createSelector([ProtocolsState], (state: ProtocolsStateModel) => {
             // returning static ref [0] as there will never be duplicate names
-            return state.protocols.filter(prot => prot.name === protocolName)[0]
+            return state?.protocols?.filter(prot => prot.name === protocolName)[0]
         })
     }
 
     static specificGuide(guideName: string) {
         return createSelector([ProtocolsState], (state: ProtocolsStateModel) => {
-            if (Object.keys(state.guides).includes(guideName)) return state.guides[guideName]
+            if (state?.guides && Object.keys(state.guides).includes(guideName)) return state.guides[guideName]
             else return ""
         })
     }

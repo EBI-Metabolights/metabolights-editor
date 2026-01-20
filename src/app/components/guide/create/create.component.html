@@ -1,147 +1,388 @@
-<nav-bar :mode="light"></nav-bar>
-<mtbls-progress [step]="1"></mtbls-progress>
-<div class="columns" style="min-height: 100vh; margin: 40px 0">
-  <div class="column is-half is-offset-one-quarter">
-    <div *ngIf="currentSubStep == 0">
-      <nav class="panel has-background-white">
-        <div class="panel-heading">
-          <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
-          <span style="margin-left: 10px">New Submission - Get started</span>
-        </div>
-        <div class="panel-block">
-          <div class="column">
-            <h3>
-              The following steps will guide you through creating your
-              MetaboLights submission (study). Once created you can view and edit your
-              submission through the MetaboLights website.
-            </h3>
-            <br />
-            <br />
-            <div class="columns is-centered">
-              <div class="column is-four-fifths cborder cborder-radius has-text-grey">
+<nav-bar mode="light"></nav-bar>
+<div class="container fixed-navbar-offset">
+  <mtbls-progress [study]="newStudy" [step]="currentSubStep"></mtbls-progress>
+
+  <div [ngSwitch]="currentSubStep">
+    <!-- Step 1: Submission Details -->
+    <div *ngSwitchCase="1">
+      <div class="columns is-centered mt-4">
+        <div class="column is-10">
+          <div class="box">
+            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission - Submission Details</h2>
+            <!-- Categories & Assays -->
+            <div class="box gray-box mb-4">
+              <h3 class="title is-6 has-text-weight-bold mb-4">MetaboLights Study Categories</h3>
+              <p class="is-size-7 mb-4" [class.has-text-danger]="!isAnyAssaySelected">
+                Which type of techniques have you used in your study?
+                <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
+              </p>
+              <div class="columns is-multiline mb-4">
+                <div class="column is-3 category-column" *ngFor="let cat of activeCategories">
+                  <h5 class="is-size-7 has-text-weight-bold mb-3">{{cat.label}}</h5>
+                  <div class="mt-1">
+                    <div *ngFor="let assayType of cat.assayTypes" class="mb-2">
+                      <label class="checkbox is-size-7 beautified-checkbox">
+                        <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
+                          [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
+                        <span class="checkmark"></span>
+                        {{assayType}}
+                      </label>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+              <hr class="mt-4 mb-4">
+              <div class="columns" [formGroup]="studyCreationForm">
+
+
+
+
                 <div class="column">
-                  <p class="has-text-centered">
-                    <mat-icon>info</mat-icon> Once you create a submission, you
-                    can switch between the guided and full view
-                    where you see these buttons.
-                  </p>
+                  <div class="field">
+                    <label class="label is-small">Sample File Template</label>
+                    <div class="control">
+                      <div class="select is-small is-fullwidth">
+                        <select formControlName="sampleFileTemplate" [ngModel]="selectedSampleFileTemplate"
+                          (ngModelChange)="onSampleTemplateChange($event)">
+                          <option *ngFor="let temp of sampleFileTemplates" [value]="temp">{{temp}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div class="column">
-                  <div class="has-text-centered">
-                    <button [disabled]="true" class="button is-rounded no-pointer has-text-grey">
-                      <small>
-                        <mat-icon>view_carousel</mat-icon> Guided submission
-                      </small></button>&nbsp;
-                    <button [disabled]="true" class="button is-rounded no-pointer has-text-grey">
-                      <small>
-                        <mat-icon>chrome_reader_mode</mat-icon> Switch to
-                        overview
-                      </small>
-                    </button>
+                  <div class="field">
+                    <label class="label is-small">Investigation File Template</label>
+                    <div class="control">
+                      <div class="select is-small is-fullwidth">
+                        <select formControlName="investigationFileTemplate"
+                          [ngModel]="selectedInvestigationFileTemplate"
+                          (ngModelChange)="onInvestigationTemplateChange($event)">
+                          <option *ngFor="let temp of investigationFileTemplates" [value]="temp" disabled>{{temp}}
+                          </option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <hr />
+            <!-- Roles, Status, DOI -->
+            <!-- Roles, Status, DOI Refactored to Horizontal Fields -->
+            <div>
+              <!-- Submitter Role -->
+              <div class="field is-horizontal mb-3">
+                <div class="field-label is-small">
+                  <label class="label">Submitter Role*</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <ng-container
+                      *ngIf="submitterRoleControlList && !submitterRoleControlList.renderAsDropdown; else submitterRoleDropdown">
+                      <mtbls-ontology [controlList]="submitterRoleControlList" [values]="submitterRole"
+                        (changed)="onRoleChange($event)" [validations]="fieldValidation('people.person.roles')"
+                        [inline]="true" [rule]="submitterRoleControlList?.rule">
+                      </mtbls-ontology>
+                    </ng-container>
+                    <ng-template #submitterRoleDropdown>
+                      <div *ngIf="submitterRoleControlList?.values?.length">
+                        <mat-form-field class="full-width is-small">
+                          <mat-select [value]="submitterRole[0]?.annotationValue"
+                            (selectionChange)="onRoleChange($event.value)">
+                            <mat-option *ngFor="let option of submitterRoleControlList.values"
+                              [value]="option.annotationValue">
+                              {{ option.annotationValue }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-hint>{{ fieldValidation('people.person.roles').description }}</mat-hint>
+                        </mat-form-field>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Publication Status -->
+              <div class="field is-horizontal mb-3">
+                <div class="field-label is-small">
+                  <label class="label">Publication Status*</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <ng-container
+                      *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
+                      <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
+                        (changed)="onPublicationStatusChange($event)"
+                        [validations]="fieldValidation('publications.publication.status')" [inline]="true"
+                        [rule]="publicationStatusControlList?.rule"
+                        [defaultOntologies]="publicationStatusControlList?.defaultOntologies">
+                      </mtbls-ontology>
+                    </ng-container>
+                    <ng-template #publicationStatusDropdown>
+                      <div *ngIf="publicationStatusControlList?.values?.length">
+                        <mat-form-field class="full-width is-small">
+                          <mat-select [value]="publicationStatus[0]?.annotationValue"
+                            (selectionChange)="onPublicationStatusChange($event.value)">
+                            <mat-option *ngFor="let option of publicationStatusControlList.values"
+                              [value]="option.annotationValue">
+                              {{ option.annotationValue }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-hint>{{ fieldValidation('publications.publication.status').description }}</mat-hint>
+                        </mat-form-field>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- DOI -->
+              <div class="field is-horizontal mb-3">
+                <div class="field-label is-small">
+                  <label class="label">DOI<span *ngIf="isDoiRequired">*</span></label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <div class="control">
+                      <mat-form-field class="full-width is-small"
+                        [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
+                        <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
+                          [required]="isDoiRequired">
+                        <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
+                          <span *ngIf="isDoiRequired"><b>(required)</b></span>
+                        </mat-hint>
+                      </mat-form-field>
+                      <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+            <hr />
+            <!-- Funding -->
+            <mtbls-funding [controlList]="funderControlList" class="db mb-6"></mtbls-funding>
             <br />
-          </div>
-        </div>
-        <div class="panel-block">
-          <div class="column central-text">
-            Please tick to indicate you agree with our
-            <a href="https://creativecommons.org/public-domain/cc0/" target="_blank" rel="noopener noreferrer">
-              dataset license
-            </a>
-            and
-            <a [routerLink]="['/datapolicy']" target="_blank" rel="noopener noreferrer">
-              data policy
-            </a><mat-checkbox class="example-margin" [(ngModel)]="checked"></mat-checkbox>
+            <!-- Related Datasets -->
+            <mtbls-related-datasets class="db mb-6"></mtbls-related-datasets>
 
-          </div>
-        </div>
-        <div class="panel-block"
-          [matTooltip]="checked() === false ? 'You must agree to the dataset license in order to create a study' : ''">
-          <div class="column">
-            <button (click)="nextSubStep()" class="button is-success is-fullwidth" [disabled]="checked() == false">
-              <mat-icon>chevron_right</mat-icon> Let's get started
-            </button>
-
-          </div>
-        </div>
-
-      </nav>
-    </div>
-    <div *ngIf="currentSubStep == 1">
-      <nav class="panel has-background-white">
-        <div class="panel-heading">
-          <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
-          <span style="margin-left: 10px">Raw / Derived data files</span>
-        </div>
-        <div class="panel-block">
-          <div class="column">
-            <h3>
-              MetaboLights studies require raw data files. These can be added at
-              any stage to the RAW_FILES folder within the study during the
-              submission process. Additionally, including mzML / nmrML processed
-              files to the DERIVED_FILES folder enables automatic extraction of
-              some required information into your study.
-            </h3>
             <br />
-            <small><mat-icon>info</mat-icon> RAW_FILES and DERIVED_FILES folders
-              will be automatically added to your ftp upload folder upon creation. For more information please consult
-              our <a [routerLink]="['/guides']">guides</a></small>.
-            <div style="padding-top: 10px">
-              <small class="has-text-grey-lighter">Please select</small>
-              <mat-button-toggle-group class="mat-button-toggle-group-vertical is-fullwidth"
-                [(ngModel)]="selectedCreateOption" #group="matButtonToggleGroup">
-                <mat-button-toggle [disabled]="option.disabled" class="is-fullwidth mb5" *ngFor="let option of options"
-                  [value]="option.value">
-                  {{ option.text }}
-                </mat-button-toggle>
-              </mat-button-toggle-group>
+            <hr />
+            <!-- Agreements -->
+            <div class="field">
+              <label class="checkbox is-size-7 db mb-2">
+                <input type="checkbox" [(ngModel)]="agreements.datasetLicenseAgreement"> I accept the terms of the
+                MetaboLights dataset license.
+                <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
+              </label>
+              <label class="checkbox is-size-7 db mb-2">
+                <input type="checkbox" [(ngModel)]="agreements.datasetPolicyAgreement"> I confirm that I have read and
+                agree to adhere to the MetaboLights data policy.
+                <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
+                  Policy)</a>
+              </label>
+
             </div>
+            <div class="field is-grouped is-pulled-right mt-4">
+              <div class="control">
+                <button class="button is-primary" (click)="createStudy()" [disabled]="!isStep1Valid">Continue</button>
+
+              </div>
+
+            </div>
+            <div class="is-clearfix">
+            </div>
+
           </div>
+
         </div>
-        <div class="panel-block">
-          <div class="column">
-            <button [disabled]="!selectedCreateOption || isLoading" (click)="createStudy()"
-              class="button is-success is-fullwidth">
-              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-            </button>
-          </div>
-        </div>
-      </nav>
+
+      </div>
     </div>
-    <div *ngIf="currentSubStep == 3">
-      <nav class="panel has-background-white">
-        <div class="panel-heading">
-          <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
-          <span style="margin-left: 10px">New Submission</span>
-        </div>
-        <div class="panel-block">
-          <div class="column">
-            <p>
-              Your temporary submission request is referenced by MetaboLights as
-              <span class="has-text-link"><b>{{ newStudy }}</b></span>
-              <br />
-              Please refer to this identifier in any communication with the
-              MetaboLights team.
-            </p>
-            <br />
-            <p>
-              A MetaboLights accession number will be assigned to your study after you complete the submission. Please
-              upload your dataset and complete the study metadata.
-              <br /><br />
-            </p>
+
+    <!-- Step 2: Study Description -->
+    <div *ngSwitchCase="2">
+      <div class="columns is-centered mt-4">
+        <div class="column is-10">
+          <div class="box">
+            <h2 class="title is-4 has-text-weight-bold mb-5">Study Description</h2>
+            <div class="field mb-4">
+              <label class="label is-small">Study Title (min 8 chars)*</label>
+              <div class="control">
+                <input class="input is-small" type="text" [(ngModel)]="studyTitle"
+                  placeholder="Enter a descriptive title for your study">
+
+              </div>
+              <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 8">Title must be at least 8
+                characters.</p>
+
+            </div>
+            <div class="field mb-4">
+              <label class="label is-small">Study Description (min 60 chars)*</label>
+              <div class="control">
+                <textarea class="textarea is-small" [(ngModel)]="studyDescription"
+                  placeholder="Enter a detailed description of your study"></textarea>
+
+              </div>
+              <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 60">Description must
+                be at least 60 characters.</p>
+
+            </div>
+            <hr>
+            <!-- Factors, Descriptors, Contacts -->
+            <div class="columns is-multiline">
+              <div class="column is-12">
+                <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors (at least 1)*</h3>
+                <div class="box p-3 is-clearfix" style="position: relative;">
+                  <button class="button is-primary is-small"
+                    style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="factorRef.openModal()">+
+                    Add</button>
+                  <div class="tags mb-2" style="margin-right: 60px;">
+                    <span *ngFor="let factor of factors; let i = index" class="tag is-primary is-light is-medium">
+                      {{factor.factorName}} ({{factor.factorType?.annotationValue}})
+                      <button class="delete is-small" (click)="removeFactorCompat(factor, i)"></button>
+                    </span>
+                  </div>
+                  <mtbls-factor #factorRef [mode]="'local'" (saved)="addFactorCompat($event)"></mtbls-factor>
+                </div>
+
+              </div>
+              <div class="column is-12">
+                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)</h3>
+                <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
+                  <div class="box p-3 is-clearfix" style="position: relative;">
+                    <button class="button is-primary is-small"
+                      style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="descRef.openModal()">+
+                      Add</button>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}} <span
+                        *ngIf="category.min > 0">(at least {{category.min}})*</span></h6>
+                    <div class="tags mb-2" style="margin-right: 60px;">
+                      <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
+                        class="tag is-primary is-light is-medium">
+                        {{desc.annotationValue}}
+                        <button class="delete is-small" (click)="removeDescriptorCompat(desc)"></button>
+                      </span>
+                    </div>
+                    <mtbls-design-descriptor #descRef [mode]="'local'" [controlListKey]="category.controlListKey"
+                      [isaFileType]="category.isaFileType"
+                      [templateVersion]="templateConfiguration?.defaultTemplateVersion"
+                      [isaFileTemplateName]="selectedInvestigationFileTemplate"
+                      [selectedStudyCategories]="selectedStudyCategoryIds"
+                      (saved)="addDescriptorWithCategory($event, category.id)"></mtbls-design-descriptor>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <div class="box p-3 is-clearfix" style="position: relative;">
+                    <button class="button is-primary is-small"
+                      style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="kwRef.openModal()">+
+                      Add</button>
+                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;"
+                      *ngIf="activeDesignDescriptorCategories.length > 0">Others</h6>
+                    <div class="tags mb-2" style="margin-right: 60px;">
+                      <span *ngFor="let desc of getKeywords(); let i = index" class="tag is-primary is-light is-medium">
+                        {{desc.annotationValue}}
+                        <button class="delete is-small" (click)="removeDescriptorCompat(desc)"></button>
+                      </span>
+                    </div>
+                    <mtbls-design-descriptor #kwRef [mode]="'local'" [controlListKey]="'Study Design Type'"
+                      [templateVersion]="templateConfiguration?.defaultTemplateVersion"
+                      [isaFileTemplateName]="selectedInvestigationFileTemplate"
+                      [selectedStudyCategories]="selectedStudyCategoryIds"
+                      (saved)="addKeyword($event)"></mtbls-design-descriptor>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-12">
+                <h3 class="title is-5 has-text-weight-bold mb-4">Contacts*</h3>
+                <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
+                  • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
+                </p>
+                <div class="box p-3 is-clearfix" style="position: relative;">
+                  <button class="button is-primary is-small"
+                    style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="addNewContact()">+ Add
+                    Contact</button>
+                  <div class="columns is-multiline">
+                    <div class="column is-4" *ngFor="let contact of contacts; let i = index">
+                      <div class="card contact-card" [class.invalid-card]="!isContactValid(contact)">
+                        <div class="card-content p-3">
+                          <p class="is-size-7 has-text-weight-bold">{{contact.firstName}} {{contact.lastName}}</p>
+                          <p class="is-size-7">{{contact.affiliation}}</p>
+                          <p class="is-size-7 has-text-grey">{{contact.roles?.[0]?.annotationValue}}</p>
+                          <div *ngIf="!isContactValid(contact)" class="has-text-danger is-size-7 mt-2 pt-1"
+                            style="border-top: 1px dashed #ff3860;">
+                            <div *ngFor="let error of getContactErrors(contact)">• {{error}}</div>
+                          </div>
+                          <div style="position: absolute; top: 5px; right: 5px; display: flex;">
+                            <span class="material-symbols-outlined is-size-6 has-text-grey clickable mr-1"
+                              (click)="editContact(contact, i)" title="Edit contact">
+                              edit
+                            </span>
+                            <button class="delete is-small" (click)="removeContactCompat(contact, i)"
+                              title="Remove contact"></button>
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>
+                  <mtbls-person #personEditor class="is-modal-only-person" [mode]="'local'"
+                    (saved)="saveContactCompat($event)"></mtbls-person>
+
+                </div>
+
+              </div>
+
+            </div>
+            <hr>
+            <div class="field is-grouped is-pulled-right">
+              <div class="control">
+                <button class="button is-light" (click)="currentSubStep = 1">Back</button>
+              </div>
+              <div class="control">
+                <button class="button is-primary" (click)="triggerSubmit()" [disabled]="isLoading || !isStep2Valid">
+                  <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
+                </button>
+              </div>
+            </div>
+            <div class="is-clearfix"></div>
+
           </div>
+
         </div>
-        <div class="panel-block">
-          <div class="column">
-            <button [disabled]="isLoading" (click)="proceedToNextStep()" class="button is-success is-fullwidth">
-              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
-            </button>
-          </div>
-        </div>
-      </nav>
+
+      </div>
+    </div>
+
+    <!-- Step 3: Sample & Assays -->
+    <div *ngSwitchCase="3">
+      <div class="mt-4" *ngIf="newStudy">
+        <guide-assays [hideNav]="true" (next)="currentSubStep = 4"></guide-assays>
+
+      </div>
+    </div>
+
+    <!-- Step 4: Upload -->
+    <div *ngSwitchCase="4">
+      <div class="mt-4" *ngIf="newStudy">
+        <raw-upload [hideNav]="true" (next)="onFinishWizard()"></raw-upload>
+
+      </div>
     </div>
   </div>
+
+
+  <app-confirmation-dialog *ngIf="showConfirmationModal" [title]="confirmationTitle" [message]="confirmationMessage"
+    [moreinfo]="''" (confirm)="onConfirmSelection($event)"></app-confirmation-dialog>
+
 </div>

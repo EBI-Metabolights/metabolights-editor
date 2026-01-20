@@ -55,7 +55,6 @@ import { QuillModule } from "ngx-quill";
 import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
 import { AsyncTaskComponent } from './async-task/async-task.component';
 import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transform.pipe";
-import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
 import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh.component";
@@ -66,10 +65,15 @@ import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.p
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { MatCardModule } from "@angular/material/card";
-import { MatDivider } from "@angular/material/divider";
+import { MatDividerModule } from "@angular/material/divider";
 import { FactorlistComponent } from "./factorlist/factorlist.component";
 import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.component";
 import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
+import { BrowserModule } from "@angular/platform-browser";
+import { FundingComponent } from './funding/funding.component';
+import { RelatedDatasetsComponent } from './related-datasets/related-datasets.component';
+import { ModalComponent } from './modal/modal.component';
+
 
 
 /**
@@ -118,7 +122,10 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     CurationStatusStarTransformPipe,
     FactorlistComponent,
     DataPolicyModalComponent,
-    DragAndDropComponent
+    DragAndDropComponent,
+    FundingComponent,
+    RelatedDatasetsComponent,
+    ModalComponent
   ],
   imports: [
     CommonModule,
@@ -144,11 +151,12 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     PromptRefreshComponent,
     MatCardModule,
     ConfirmationDialogComponent,
-    MatDivider
+    MatDividerModule
   ],
   exports: [
     AddAssayComponent,
     ContentComponent,
+    ConfirmationDialogComponent,
     DeleteFileComponent,
     DirectoryComponent,
     DownloadComponent,
@@ -183,8 +191,10 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     CurationStatusStarTransformPipe,
     FactorlistComponent,
     DataPolicyModalComponent,
-    DragAndDropComponent
-
+    DragAndDropComponent,
+    FundingComponent,
+    RelatedDatasetsComponent,
+    ModalComponent
   ],
   providers: [
     AuthGuard,

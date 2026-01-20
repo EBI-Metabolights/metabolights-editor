@@ -68,7 +68,7 @@ export class SampleState {
                   const fn = "element['" + key + "']";
                   columns.push({
                     columnDef: key,
-                    sticky: "false",
+                    sticky: false,
                     header: key,
                     cell: (element) => eval(fn),
                   });
@@ -241,12 +241,12 @@ export class SampleState {
 
     @Selector()
     static samples(state: SamplesStateModel): Record<string, any> {
-        return state.samples
+        return state?.samples
     }
 
     @Selector()
     static organisms(state: SamplesStateModel): Record<string, any> {
-        return state.organisms
+        return state?.organisms
     }
 
 }

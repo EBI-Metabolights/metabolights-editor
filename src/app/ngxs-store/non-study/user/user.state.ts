@@ -64,16 +64,16 @@ export class UserState {
 
     @Selector()
     static user(state: UserStateModel): Owner {
-        return state.user
+        return state?.user
     }
 
     @Selector()
     static userStudies(state: UserStateModel): IStudyDetail[] {
-        return state.userStudies
+        return state?.userStudies
     }
 
     @Selector()
     static isCurator(state: UserStateModel): boolean {
-        return state.isCurator
+        return state?.isCurator
     }
 }

@@ -42,6 +42,6 @@ export class InfoComponent implements OnInit {
   ngOnInit() {}
 
   proceedToNextStep() {
-    this.router.navigate(["/guide/upload", this.requestedStudy]);
+    this.router.navigate(["/guide/meta", this.requestedStudy]);
   }
 }

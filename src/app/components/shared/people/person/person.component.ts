@@ -5,6 +5,8 @@ import {
   Input,
   ViewChild,
   inject,
+  Output,
+  EventEmitter
 } from "@angular/core";
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
@@ -47,6 +49,9 @@ import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-
 })
 export class PersonComponent implements OnInit {
   @Input("value") person: MTBLSPerson;
+  @Input("mode") mode: 'store' | 'local' = 'store';
+  @Output() saved = new EventEmitter<any>();
+  @Output() deleted = new EventEmitter<any>();
 
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
   
@@ -332,6 +337,16 @@ export class PersonComponent implements OnInit {
   }
 
   deleteNgxs() {
+    // Local mode: emit event instead of dispatching NGXS action
+    if (this.mode === 'local') {
+      this.deleted.emit(this.person);
+      this.isDeleteModalOpen = false;
+      this.isFormBusy = false;
+      this.closeModal();
+      return;
+    }
+
+    // Store mode: dispatch NGXS action
     const identifier = this.person.email !== "" ? this.person.email : null;
     const name = this.person.email === "" ? `${this.person.firstName}${this.person.lastName}` : null;
     const contactIndex = this.person.contactIndex || 0;
@@ -355,7 +370,7 @@ export class PersonComponent implements OnInit {
       while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
-    return this.validations[this.validationsId];
+    return this.validations ? this.validations[this.validationsId] : {};
   }
 
   fieldValidation(fieldId) {
@@ -414,6 +429,16 @@ export class PersonComponent implements OnInit {
   this.isFormBusy = true;
   const body = this.compileBody();
 
+  // Local mode: emit event instead of dispatching NGXS action
+  if (this.mode === 'local') {
+    const contactData = body.contacts[0];
+    this.saved.emit(contactData);
+    this.isFormBusy = false;
+    this.closeModal();
+    return;
+  }
+
+  // Store mode: dispatch NGXS actions
   if (!this.addNewPerson) {
     const { email, firstName, lastName, contactIndex } = this.person;
     const name = `${firstName}${lastName}`;
@@ -545,6 +570,7 @@ private updatePiValidators(isPi: boolean): void {
         ...existingValidators.filter(v => v !== Validators.required),
         Validators.required
       ];
+      fieldControl.markAsTouched();
     } else {
       updatedValidators = existingValidators.filter(v => v !== Validators.required);
     }

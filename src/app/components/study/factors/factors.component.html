@@ -1,13 +1,11 @@
-<div class="card">
-  <header class="card-heading" >
-    <span>
-      <p class="is-pulled-left">Factors 
-        <span *ngIf="!isReadOnly"><mat-icon [matTooltip]="'Factors are key parameters within a study that differentiate samples into groups'" >help</mat-icon></span>
-      </p>
-      <span *ngIf="!isReadOnly">
-        <mtbls-factor [value]="null"></mtbls-factor>
-      </span>
-    </span>
+<div class="card mb-6" style="position: relative;">
+  <mtbls-factor *ngIf="!isReadOnly" [value]="null"
+    style="position: absolute; top: 12px; right: 12px; z-index: 10;"></mtbls-factor>
+  <header class="card-heading">
+    <p>Factors
+      <span *ngIf="!isReadOnly"><mat-icon
+          [matTooltip]="'Factors are key parameters within a study that differentiate samples into groups'">help</mat-icon></span>
+    </p>
   </header>
   <div class="card-content">
     <div class="content">
@@ -20,7 +18,9 @@
       </div>
       <ng-template #emptyMessage>
         <p class="placeholder-text">
-          <small>Factors represent the conditions, treatments, or groupings that differentiate one set of samples from another, defining the basis for comparisons within the study (e.g., Treatment, Genotype, Timepoint, etc.).</small>
+          <small>Factors represent the conditions, treatments, or groupings that differentiate one set of samples from
+            another, defining the basis for comparisons within the study (e.g., Treatment, Genotype, Timepoint,
+            etc.).</small>
         </p>
       </ng-template>
     </div>

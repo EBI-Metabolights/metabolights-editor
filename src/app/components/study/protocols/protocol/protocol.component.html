@@ -1,87 +1,52 @@
 <span *ngIf="protocol == null || addNewProtocol; else showProtocolDetails">
-  <a
-    class="button is-primary is-pulled-right is-small"
-    (click)="openModal(protocol)"
-    >+ Add New Protocol</a
-  >
+  <a class="button is-primary is-pulled-right is-small" (click)="openModal(protocol)">+ Add New Protocol</a>
 </span>
 <br />
 <ng-template #showProtocolDetails>
   <div class="card">
-    <header
-      class="card-heading"
-      [ngClass]="{ 'hover-highlight': !isStudyReadOnly }"
-    >
+    <header class="card-heading" [ngClass]="{ 'hover-highlight': !isStudyReadOnly }">
       <span>
-        <p
-          (dblclick)="toggleExpand()"
-          class="is-pulled-left"
-          style="user-select: none"
-          [ngClass]="{'bold-text': isCoreProtocol(protocol.name)}"
-        >
-          {{ protocol.name }} 
+        <p (dblclick)="toggleExpand()" class="is-pulled-left" style="user-select: none"
+          [ngClass]="{'bold-text': isCoreProtocol(protocol.name)}">
+          {{ protocol.name }}
         </p>
-        <span
-          *ngIf="getAssaysWithProtocol().length > 0 && !hasAllSectionsEmpty()"
-        >
+        <span *ngIf="getAssaysWithProtocol().length > 0 && !hasAllSectionsEmpty()">
           <span *ngIf="!isBulkEditModalOpen; else hideSection">
-            <a
-              (click)="toggleBulkEditSection()"
-              class="button is-light is-pulled-right is-small"
-              ><mat-icon>toggle_off</mat-icon> Show Specifications</a
-            >
+            <a (click)="toggleBulkEditSection()"
+              class="button is-light is-pulled-right is-small"><mat-icon>toggle_off</mat-icon> Show Specifications</a>
           </span>
           <ng-template #hideSection>
-            <a
-              (click)="toggleBulkEditSection()"
-              class="button is-light is-pulled-right is-small"
-              ><mat-icon>toggle_on</mat-icon> Hide Specifications</a
-            >
+            <a (click)="toggleBulkEditSection()"
+              class="button is-light is-pulled-right is-small"><mat-icon>toggle_on</mat-icon> Hide Specifications</a>
           </ng-template>
         </span>
-        <a
-          *ngIf="!isStudyReadOnly"
-          style="margin-right: 10px"
-          (click)="openModal(protocol)"
-          class="button is-light is-pulled-right is-small"
-          ><mat-icon>edit</mat-icon> Edit Description</a
-        >
-        <span class="copy-btn mtbls-button" (click)="copyContent()"><mat-icon matTooltip="Copy content">content_copy</mat-icon></span>
+        <a *ngIf="!isStudyReadOnly" style="margin-right: 10px" (click)="openModal(protocol)"
+          class="button is-light is-pulled-right is-small"><mat-icon>edit</mat-icon> Edit Description</a>
+        <span class="copy-btn mtbls-button" (click)="copyContent()"><mat-icon
+            matTooltip="Copy content">content_copy</mat-icon></span>
         <div *ngIf="protocolInGuides">
           <br>
           <small class="guide-text"> <i> {{ guideText}} </i></small>
         </div>
       </span>
-      
+
     </header>
     <div *ngIf="expand" class="card-content">
       <div #contentToCopy class="content">
-        <mtbls-content
-          (editContent)="openModal(protocol)"
-          [count]="500"
-          [message]="'Protocol description not found.'"
-          [value]="protocol.description"
-        ></mtbls-content>
+        <mtbls-content (editContent)="openModal(protocol)" [count]="500" [message]="'Protocol description not found.'"
+          [value]="protocol.description"></mtbls-content>
       </div>
     </div>
-    <div
-      *ngIf="isBulkEditModalOpen && getAssaysWithProtocol().length > 0"
-      class="card-content bt"
-    >
+    <div *ngIf="isBulkEditModalOpen && getAssaysWithProtocol().length > 0" class="card-content bt">
       <div class="content">
         <div class="columns is-multiline">
-          <span
-            class="column is-half"
-            *ngFor="let assay of getAssaysWithProtocol()"
-          >
+          <span class="column is-half" *ngFor="let assay of getAssaysWithProtocol()">
             <div *ngIf="!hasAssaySectionsEmpty(assay)">
               <div class="has-background-light p1">
-                <p
-                  style="
+                <p style="
                     border-bottom: 1px dotted #d0d0d0;
                     padding-bottom: 10px;
-                  "
-                >
+                  ">
                   Assay: <b>{{ assay }}</b>
                 </p>
                 <div *ngFor="let col of protocol.meta[assay]">
@@ -91,31 +56,24 @@
                       <div class="columns is-gapless">
                         <div class="column is-11">
                           <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else comboField">
-                             <mtbls-ontology
-                            [validations]="fieldValidation('parameterName')"
-                            [controlList]="_controlList"
-                            [rule]="_controlList?.rule"
-                            (changed)="col.values[0] = $event"
-                            [defaultOntologies]="_controlList?.defaultOntologies"
-                            [inline]="true"
-                            [label]="'Parameter Name'"
-                          ></mtbls-ontology>
+                            <mtbls-ontology [validations]="fieldValidation('parameterName')"
+                              [controlList]="_controlList" [rule]="_controlList?.rule"
+                              (changed)="col.values[0] = $event" [defaultOntologies]="_controlList?.defaultOntologies"
+                              [inline]="true" [label]="'Parameter Name'"></mtbls-ontology>
                           </ng-container>
-                         <ng-template #comboField>
-    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
-      <mat-select formControlName="parameterName" placeholder="Parameter Name" (selectionChange)="onDropdownChange($event)">
-        <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-          {{ option.annotationValue }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </ng-template>
+                          <ng-template #comboField>
+                            <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+                              <mat-select formControlName="parameterName" placeholder="Parameter Name"
+                                (selectionChange)="onDropdownChange($event)">
+                                <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                                  {{ option.annotationValue }}
+                                </mat-option>
+                              </mat-select>
+                            </mat-form-field>
+                          </ng-template>
                         </div>
                         <div class="column is-1">
-                          <a
-                            (click)="saveColumnValue(col, assay)"
-                            class="clickable"
-                          >
+                          <a (click)="saveColumnValue(col, assay)" class="clickable">
                             <mat-icon>save</mat-icon>
                           </a>
                         </div>
@@ -125,15 +83,8 @@
                       <small>{{ formatTitle(col.name) }}</small>
                       <div class="control">
                         <mat-form-field class="full-width">
-                          <input
-                            class="no-scroll"
-                            [(ngModel)]="col.values[0]"
-                            matInput
-                          />
-                          <a
-                            (click)="saveColumnValue(col, assay)"
-                            class="clickable is-pulled-right"
-                          >
+                          <input class="no-scroll" [(ngModel)]="col.values[0]" matInput />
+                          <a (click)="saveColumnValue(col, assay)" class="clickable is-pulled-right">
                             <mat-icon>save</mat-icon>
                           </a>
                         </mat-form-field>
@@ -147,31 +98,53 @@
         </div>
       </div>
     </div>
-    <footer
-      *ngIf="
+    <footer *ngIf="
         expand &&
-        protocol.parameters.length > 0 &&
-        protocol.parameters[0].parameterName.annotationValue != ''
-      "
-      class="card-footer"
-    >
-      <span>
-        <div id="meta" class="field is-grouped is-grouped-multiline">
-          <div class="tags is-info has-addons">
+        (protocol.uri || protocol.version || (protocol.parameters.length > 0 &&
+        protocol.parameters[0].parameterName.annotationValue != ''))
+      " class="card-footer">
+      <div class="full-width py-3 px-5">
+        <!-- Parameters Section -->
+        <div id="meta-parameters"
+          *ngIf="protocol.parameters && protocol.parameters.length > 0 && protocol.parameters[0].parameterName.annotationValue != ''">
+          <div class="field is-grouped is-grouped-multiline" style="margin-bottom: 0;">
             <div *ngFor="let parameter of protocol.parameters">
-              <div
-                *ngIf="parameter.parameterName.annotationValue != ''"
-                class="control"
-              >
-                <span class="tag">{{
+              <div *ngIf="parameter.parameterName.annotationValue != ''" class="control">
+                <span class="tag" style="background-color: rgb(245, 245, 245);">{{
                   parameter.parameterName.annotationValue
-                }}</span>
+                  }}</span>
               </div>
             </div>
           </div>
         </div>
-      </span>
-      <br />
+
+        <!-- Separator -->
+        <hr
+          *ngIf="(protocol.parameters && protocol.parameters.length > 0 && protocol.parameters[0].parameterName.annotationValue != '') && (protocol.uri || protocol.version)"
+          style="margin: 0.75rem 0; background-color: #dbdbdb; border: none; height: 1px;">
+
+        <!-- URI and Version Section -->
+        <div id="meta-protocol" class="field is-grouped is-grouped-multiline" style="margin-bottom: 0;"
+          *ngIf="protocol.uri || protocol.version">
+          <div class="control" *ngIf="protocol.uri">
+            <div class="tags has-addons">
+              <span class="tag is-light" style="border: 1px solid #dbdbdb; border-right: none;">Protocol URI</span>
+              <a class="tag is-white" (click)="openUri(protocol.uri)"
+                style="cursor: pointer; text-decoration: underline; border: 1px solid #dbdbdb;">
+                {{ protocol.uri }}
+                <mat-icon style="font-size: 14px; height: 14px; width: 14px; margin-left: 4px;">open_in_new</mat-icon>
+              </a>
+            </div>
+          </div>
+
+          <div class="control" *ngIf="protocol.version">
+            <div class="tags has-addons">
+              <span class="tag is-light" style="border: 1px solid #dbdbdb; border-right: none;">Protocol Version</span>
+              <span class="tag is-white" style="border: 1px solid #dbdbdb;">{{ protocol.version }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </footer>
   </div>
 </ng-template>
@@ -212,24 +185,15 @@
             <div class="field">
               <div class="control">
                 <mat-form-field class="full-width">
-                  <textarea
-                    class="no-scroll"
-                    formControlName="name"
-                    [placeholder]="fieldValidation('name').placeholder"
-                    matInput
-                    cdkAutosizeMinRows="1"
-                    cdkAutosizeMaxRows="4"
-                    cdkTextareaAutosize
-                  >
+                  <textarea class="no-scroll" formControlName="name" [placeholder]="fieldValidation('name').placeholder"
+                    matInput cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" cdkTextareaAutosize>
                   </textarea>
                   <mat-hint>{{ fieldValidation("name").description }}</mat-hint>
-                  <mat-error
-                    *ngIf="
+                  <mat-error *ngIf="
                       form.get('name').errors &&
                       form.get('name').dirty &&
                       form.get('name').errors.name
-                    "
-                  >
+                    ">
                     {{ form.get("name").errors.name.error }}
                   </mat-error>
                 </mat-form-field>
@@ -242,12 +206,8 @@
                 <span *ngIf="form.get('description')">
                   <!-- <div *ngIf="form.get('description').value != ''" class="is-clearfix">
                     </div>  -->
-                  <quill-editor
-                    (onEditorCreated)="setEditor($event)"
-                    style="height: 250px"
-                    formControlName="description"
-                    [placeholder]="fieldValidation('description').placeholder"
-                  >
+                  <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px"
+                    formControlName="description" [placeholder]="fieldValidation('description').placeholder">
                     <div quill-editor-toolbar>
                       <span class="ql-formats">
                         <button class="ql-bold"></button>
@@ -274,15 +234,9 @@
                         </button>
                       </span>
                       <span class="ql-formats">
-                        <div
-                          class="dropdown is-right"
-                          [ngClass]="{ 'is-active': isSymbolDropdownActive }"
-                        >
+                        <div class="dropdown is-right" [ngClass]="{ 'is-active': isSymbolDropdownActive }">
                           <div class="dropdown-trigger">
-                            <button
-                              (click)="toggleSymbolDropdown()"
-                              class="button is-light is-small"
-                            >
+                            <button (click)="toggleSymbolDropdown()" class="button is-light is-small">
                               <span>
                                 <i class="material-icons"> gesture </i>
                               </span>
@@ -290,94 +244,49 @@
                           </div>
                           <div class="dropdown-menu has-text-left" role="menu">
                             <div class="dropdown-content">
-                              <a
-                                (click)="addSymbol('°')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('°')" class="dropdown-item dd-element">
                                 °
                               </a>
-                              <a
-                                (click)="addSymbol('α')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('α')" class="dropdown-item dd-element">
                                 α
                               </a>
-                              <a
-                                (click)="addSymbol('β')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('β')" class="dropdown-item dd-element">
                                 β
                               </a>
-                              <a
-                                (click)="addSymbol('γ')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('γ')" class="dropdown-item dd-element">
                                 γ
                               </a>
-                              <a
-                                (click)="addSymbol('←')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('←')" class="dropdown-item dd-element">
                                 ←
                               </a>
-                              <a
-                                (click)="addSymbol('→')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('→')" class="dropdown-item dd-element">
                                 →
                               </a>
-                              <a
-                                (click)="addSymbol('↔')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('↔')" class="dropdown-item dd-element">
                                 ↔
                               </a>
-                              <a
-                                (click)="addSymbol('↑')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('↑')" class="dropdown-item dd-element">
                                 ↑
                               </a>
-                              <a
-                                (click)="addSymbol('↓')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('↓')" class="dropdown-item dd-element">
                                 ↓
                               </a>
-                              <a
-                                (click)="addSymbol('≥')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('≥')" class="dropdown-item dd-element">
                                 ≥
                               </a>
-                              <a
-                                (click)="addSymbol('≤')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('≤')" class="dropdown-item dd-element">
                                 ≤
                               </a>
-                              <a
-                                (click)="addSymbol('≠')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('≠')" class="dropdown-item dd-element">
                                 ≠
                               </a>
-                              <a
-                                (click)="addSymbol('±')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('±')" class="dropdown-item dd-element">
                                 ±
                               </a>
-                              <a
-                                (click)="addSymbol('µ')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('µ')" class="dropdown-item dd-element">
                                 µ
                               </a>
-                              <a
-                                (click)="addSymbol('Å')"
-                                class="dropdown-item dd-element"
-                              >
+                              <a (click)="addSymbol('Å')" class="dropdown-item dd-element">
                                 Å
                               </a>
                             </div>
@@ -386,66 +295,53 @@
                       </span>
                     </div>
                   </quill-editor>
-                  <mat-hint
-                    ><small>{{
+                  <mat-hint><small>{{
                       fieldValidation("description").description
-                    }}</small></mat-hint
-                  >
-                  <mat-error
-                    *ngIf="
+                      }}</small></mat-hint>
+                  <mat-error *ngIf="
                       form.get('description').errors &&
                       form.get('description').dirty &&
                       form.get('description').errors.description
-                    "
-                  >
+                    ">
                     {{ form.get("description").errors.description.error }}
                   </mat-error>
                 </span>
+
+                <div class="mt-4">
+                  <mtbls-protocol-meta [parentForm]="form" [readonly]="isStudyReadOnly"></mtbls-protocol-meta>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <span *ngIf="!required">
-          <div
-            *ngIf="
+          <div *ngIf="
               form &&
                 form.get('parameters').value &&
                 form.get('parameters').value.length > 0 &&
                 form.get('parameters').value[0].parameterName.annotationValue !=
                   '';
               else newParameter
-            "
-          >
+            ">
             <span>
               <div>
                 <label>Protocol parameters</label>
               </div>
               <div class="field is-grouped is-grouped-multiline">
                 <div *ngFor="let parameter of form.get('parameters').value">
-                  <div
-                    *ngIf="parameter.parameterName.annotationValue != ''"
-                    class="control"
-                  >
+                  <div *ngIf="parameter.parameterName.annotationValue != ''" class="control">
                     <div class="tags is-info has-addons">
                       <span class="tag is-link">{{
                         parameter.parameterName.annotationValue
-                      }}</span>
-                      <a
-                        (click)="deleteParameter(parameter)"
-                        class="tag delete"
-                      ></a>
+                        }}</span>
+                      <a (click)="deleteParameter(parameter)" class="tag delete"></a>
                     </div>
                   </div>
                 </div>
                 <div class="tags is-info has-addons">
                   <span class="tag">Add parameter</span>
                   <a (click)="openParameterModal()" class="tag is-success">
-                    <mat-icon
-                      class="mat-icon material-icons"
-                      role="img"
-                      aria-hidden="true"
-                      >library_add</mat-icon
-                    >
+                    <mat-icon class="mat-icon material-icons" role="img" aria-hidden="true">library_add</mat-icon>
                   </a>
                 </div>
               </div>
@@ -455,12 +351,7 @@
             <div class="tags is-info has-addons">
               <span class="tag">Add parameter</span>
               <a (click)="openParameterModal()" class="tag is-success">
-                <mat-icon
-                  class="mat-icon material-icons"
-                  role="img"
-                  aria-hidden="true"
-                  >library_add</mat-icon
-                >
+                <mat-icon class="mat-icon material-icons" role="img" aria-hidden="true">library_add</mat-icon>
               </a>
             </div>
           </ng-template>
@@ -469,40 +360,21 @@
       <footer class="modal-card-foot buttons is-right">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
-            <button
-              *ngIf="!addNewProtocol && !required"
-              class="button is-danger is-pulled-left"
-              (click)="confirmDelete()"
-            >
+            <button *ngIf="!addNewProtocol && !required" class="button is-danger is-pulled-left"
+              (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
           <div class="column is-half has-text-right">
-            <button
-              *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)="saveNgxs()"
+              class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
-            <button
-              *ngIf="form.pristine"
-              (click)="closeModal()"
-              class="button is-info"
-            >
+            <button *ngIf="form.pristine" (click)="closeModal()" class="button is-info">
               OK
             </button>
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>
@@ -517,26 +389,20 @@
   <div class="modal-card">
     <section class="modal-card-body">
       <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
-        <mtbls-ontology
-        #parameterName
-        [validations]="fieldValidation('parameterName')"
-        [controlList]="_controlList"
-        [values]="[]"
-        [inline]="true"
-        [rule]="_controlList?.rule"
-        [defaultOntologies]="_controlList?.defaultOntologies"
-        [label]="'Parameter Name'"
-      ></mtbls-ontology>
+        <mtbls-ontology #parameterName [validations]="fieldValidation('parameterName')" [controlList]="_controlList"
+          [values]="[]" [inline]="true" [rule]="_controlList?.rule"
+          [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Parameter Name'"></mtbls-ontology>
       </ng-container>
       <ng-template #dropdownField>
-    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
-      <mat-select formControlName="parameterName" placeholder="Parameter Name"(selectionChange)="onDropdownChange($event)">
-        <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-          {{ option.annotationValue }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </ng-template>
+        <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+          <mat-select formControlName="parameterName" placeholder="Parameter Name"
+            (selectionChange)="onDropdownChange($event)">
+            <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+              {{ option.annotationValue }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </ng-template>
     </section>
     <footer class="modal-card-foot">
       <div class="columns is-gapless full-width">
@@ -546,15 +412,11 @@
           </button>
         </div>
         <div class="column is-half has-text-right">
-          <button
-            [disabled]="
+          <button [disabled]="
     _controlList?.renderAsDropdown
       ? !selectedParameterValue
       : !(parameterName?.values?.length > 0)
-  "
-            (click)="addParameter()"
-            class="button is-success"
-          >
+  " (click)="addParameter()" class="button is-success">
             Add parameter
           </button>
         </div>

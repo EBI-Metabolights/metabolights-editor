@@ -77,7 +77,6 @@ export class EditorService {
 
   study: MTBLSStudy;
   baseHref: string;
-  redirectUrl = "";
   currentStudyIdentifier: string = null;
   validations: any = {};
   defaultControlLists: any = {};
@@ -110,9 +109,21 @@ export class EditorService {
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.setUpSubscriptionsNgxs();
-    this.redirectUrl = this.configService.config.redirectURL;
     // load dev control-lists (asset) and merge into NGXS without overwriting existing controlLists
     // this.loadAndMergeDevControlLists();
+  }
+
+  private _redirectUrl: string = null;
+
+  get redirectUrl(): string {
+    if (this._redirectUrl) {
+      return this._redirectUrl;
+    }
+    return this.configService.config ? this.configService.config.redirectURL : null;
+  }
+
+  set redirectUrl(value: string) {
+    this._redirectUrl = value;
   }
 
   setUpSubscriptionsNgxs() {
@@ -655,7 +666,10 @@ export class EditorService {
     this.store.dispatch(new Identifier.Set(id))
   }
 
-  createStudy() {
+  createStudy(payload: any = null) {
+    if (payload) {
+      return this.dataService.createStudyWithMetadata(payload);
+    }
     return this.dataService.createStudy();
   }
 
@@ -1006,5 +1020,53 @@ export class EditorService {
       body.allowedParentOntologyTerms = allowedParentOntologyTerms;
     }
     return this.dataService.getOntologyTermsV2(keyword, isExactMatchRequired, body);
+  }
+
+  // Cache for identifier sources
+  private identifierSourcesCache: any[] = null;
+
+  getIdentifierSources(query: string): Observable<any> {
+    if (!query || query.trim().length < 2) {
+      return of([]);
+    }
+
+    return this.fetchIdentifierSources().pipe(
+        map(sources => {
+             const lowerQuery = query.toLowerCase();
+             return sources.filter(s =>
+                 (s.name && s.name.toLowerCase().indexOf(lowerQuery) !== -1) ||
+                 (s.prefix && s.prefix.toLowerCase().indexOf(lowerQuery) !== -1)
+             ).slice(0, 50); 
+        })
+    );
+  }
+
+  private fetchIdentifierSources(): Observable<any[]> {
+      if (this.identifierSourcesCache) {
+          return of(this.identifierSourcesCache);
+      }
+
+      // Public endpoint returns full dataset (~2MB)
+      const url = 'https://registry.api.identifiers.org/resolutionApi/getResolverDataset';
+      return this.http.get<any>(url).pipe(
+          map(response => {
+              const namespaces = response.payload?.namespaces || [];
+              return namespaces.map(ns => ({
+                  prefix: ns.prefix,
+                  name: ns.name,
+                  description: ns.description,
+                  sampleId: ns.sampleId, 
+                  urlPattern: ns.resources?.[0]?.urlPattern || '' 
+              })).filter(ns => ns.urlPattern); 
+          }),
+          map(sources => {
+              this.identifierSourcesCache = sources;
+              return sources;
+          }),
+          catchError(err => {
+              console.error('Error fetching identifier sources', err);
+              return of([]);
+          })
+      );
   }
 }

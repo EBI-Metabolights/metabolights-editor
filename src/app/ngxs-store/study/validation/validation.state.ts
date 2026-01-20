@@ -296,18 +296,17 @@ export class ValidationState {
 
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
-        if (state === undefined) { return null }
-        return state.rules;
+        return state?.rules;
     }
 
     @Selector()
     static reportV2(state: ValidationStateModel): Ws3ValidationReport {
-        return state.reportV2;
+        return state?.reportV2;
     }
 
     @Selector()
     static reportV2ViolationsAll(state: ValidationStateModel) {
-        if (state.reportV2 === null) { return [] }
+        if (!state?.reportV2) { return [] }
         let violations = state.reportV2.messages.violations;
         violations = sortViolations(violations);
         return violations;
@@ -315,7 +314,7 @@ export class ValidationState {
 
     static reportV2Violations(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            if (state.reportV2 === null) { return [] }
+            if (!state?.reportV2) { return [] }
             return sortViolations(
                 filterViolationsBySection(
                     state.reportV2.messages.violations, section
@@ -326,7 +325,7 @@ export class ValidationState {
 
     static reportV2ViolationsByRuleId(ruleId) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            if (state.reportV2 === null) { return [] }
+            if (!state?.reportV2) { return [] }
             return sortViolations(
                 filterViolationsByRuleId(
                     state.reportV2.messages.violations, ruleId
@@ -337,65 +336,70 @@ export class ValidationState {
 
     @Selector()
     static reportV2SummariesAll(state: ValidationStateModel) {
-        return state.reportV2.messages.summary;
+        return state?.reportV2?.messages?.summary || [];
     }
 
     static reportV2Summaries(section: string) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
+            if (!state?.reportV2) { return [] }
             return filterViolationsBySection(state.reportV2.messages.summary, section)
         });
     }
 
     @Selector()
     static history(state: ValidationStateModel) {
-        return state.history;
+        return state?.history || [];
     }
 
     @Selector()
     static initialLoadMade(state: ValidationStateModel) {
-        return state.initialLoadMade;
+        return state?.initialLoadMade;
     }
 
     @Selector()
     static taskId(state: ValidationStateModel) {
-        return state.taskId;
+        return state?.taskId;
     }
 
     @Selector()
     static validationStatus(state: ValidationStateModel) {
-        return state.status;
+        return state?.status;
     }
 
     @Selector()
     static lastValidationRunTime(state: ValidationStateModel) {
-        return state.lastRunTime;
+        return state?.lastRunTime;
     }
 
     @Selector()
     static currentValidationTask(state: ValidationStateModel) {
-        return state.currentValidationTask;
+        return state?.currentValidationTask;
     }
 
     @Selector()
     static breakdown(state: ValidationStateModel): Breakdown {
+        if (!state?.reportV2?.messages?.violations) {
+            return { warnings: 0, errors: 0 };
+        }
         return {
             warnings: state.reportV2.messages.violations.filter(val => val.type === 'ERROR').length,
-            errors: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length}
+            errors: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length
+        }
     }
 
     @Selector()
     static overrides(state: ValidationStateModel): Array<FullOverride> {
-        return state.overrides;
+        return state?.overrides || [];
     }
 
     @Selector()
     static validationNeeded(state: ValidationStateModel) {
-        return state.newValidationRunNeeded;
+        return state?.newValidationRunNeeded;
     }
 
     static specificOverride(ruleId) {
         return createSelector([ValidationState], (state: ValidationStateModel) => {
-            const overrideList = state.overrides.filter(val => val.ruleId === ruleId);
+            const overrideList = state?.overrides?.filter(val => val.ruleId === ruleId) || [];
             const val = overrideList[0] || null
             return val
         });

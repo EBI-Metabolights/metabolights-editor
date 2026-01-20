@@ -299,3 +299,527 @@ export function getValidationRuleForField(
 
     return selectValidationRule(rules, ruleSelectionInput);
 }
+
+/* template configuration interfaces */
+export interface FileTemplates {
+  /**
+   * ISA-TAB assay file templates
+   */
+  assayFileHeaderTemplates: {
+    [k: string]: IsaTableFileTemplate[];
+  };
+  /**
+   * ISA-TAB assay file templates
+   */
+  sampleFileHeaderTemplates: {
+    [k: string]: IsaTableFileTemplate[];
+  };
+  /**
+   * maf file templates
+   */
+  assignmentFileHeaderTemplates: {
+    [k: string]: IsaTableFileTemplate[];
+  };
+  /**
+   * investigation file templates
+   */
+  investigationFileTemplates: {
+    [k: string]: InvestigationFileTemplate[];
+  };
+  /**
+   * Study protocol templates
+   */
+  protocolTemplates: {
+    [k: string]: StudyProtocolTemplate[];
+  };
+  /**
+   * Ontology source reference templates
+   */
+  ontologySourceReferenceTemplates: {
+    [k: string]: OntologySourceReferenceTemplate;
+  };
+  configuration: TemplateSettings;
+}
+export interface IsaTableFileTemplate {
+  /**
+   * Fixed column count.
+   */
+  fixedColumnCount: number;
+  /**
+   * Template name
+   */
+  description: string;
+  /**
+   * Template version
+   */
+  version: string;
+  /**
+   * ISA-TAB table column definitions
+   */
+  headers: ColumnDescription[];
+}
+export interface InvestigationFileTemplate {
+  /**
+   * Template version
+   */
+  version: string;
+  /**
+   * Template name
+   */
+  description: string;
+  /**
+   * Investigation file sections
+   */
+  sections: InvestigationFileSection[];
+}
+export interface StudyProtocolTemplate {
+  /**
+   * Template version
+   */
+  version: string;
+  /**
+   * Template description
+   */
+  description: string;
+  /**
+   * Ordered protocol names
+   */
+  protocols: string[];
+  /**
+   * Definition of protocol listed in the `protocols` field
+   */
+  protocolDefinitions: {
+    [k: string]: ProtocolDefinition;
+  };
+}
+export interface OntologySourceReferenceTemplate {
+  /**
+   * Source name
+   */
+  sourceName: string;
+  /**
+   * Source file
+   */
+  sourceFile: string;
+  /**
+   * Source version
+   */
+  sourceVersion: string;
+  /**
+   * Source full name
+   */
+  sourceDescription: string;
+  /**
+   * Source details
+   */
+  sourceDetails: string;
+}
+export interface TemplateSettings {
+  /**
+   * active template versions
+   */
+  activeTemplateVersions: string[];
+  /**
+   * default study template version
+   */
+  defaultTemplateVersion: string;
+  /**
+   * MetaboLights template versions
+   */
+  datasetLicenses: {
+    [k: string]: LicenseInfo;
+  };
+  descriptorConfiguration: DescriptorConfiguration;
+  /**
+   * result file formats
+   */
+  resultFileFormats: {
+    [k: string]: OntologyTerm;
+  };
+  /**
+   * default control lists
+   */
+  defaultFileControls: {
+    [k: string]: DefaultControl[];
+  };
+  defaultComments: DefaultCommentConfiguration;
+  /**
+   * study categories
+   */
+  studyCategories: {
+    [k: string]: StudyCategoryDefinition;
+  };
+  /**
+   * MHD profiles and versions
+   */
+  mhdProfiles: {
+    [k: string]: {
+      [k: string]: MhdProfileInfo;
+    };
+  };
+  /**
+   * MetaboLights template versions
+   */
+  versions: {
+    [k: string]: TemplateConfiguration;
+  };
+}
+export interface ColumnDescription {
+  /**
+   * column structure
+   */
+  columnStructure: "SINGLE_COLUMN" | "ONTOLOGY_COLUMN" | "SINGLE_COLUMN_AND_UNIT_ONTOLOGY";
+  /**
+   * column category
+   */
+  columnCategory: ("" | "Basic" | "Protocol" | "Parameter" | "Characteristics" | "File" | "Label") | null;
+  /**
+   * column header
+   */
+  columnHeader: string;
+  /**
+   * column prefix
+   */
+  columnPrefix: string | null;
+  /**
+   * column prefix
+   */
+  defaultValue: string | null;
+  /**
+   * default column index
+   */
+  defaultColumnIndex: number;
+  /**
+   * column value minimum length
+   */
+  minLength: number | null;
+  /**
+   * column value maximum length
+   */
+  maxLength: number | null;
+  /**
+   * column value is required
+   */
+  required: boolean;
+  /**
+   * column description
+   */
+  description: string | null;
+  /**
+   * column value examples
+   */
+  examples: string[] | null;
+}
+export interface InvestigationFileSection {
+  /**
+   * Section name
+   */
+  name: string;
+  /**
+   * Section row prefixes
+   */
+  fields: string[];
+  /**
+   * Default comments for the section
+   */
+  defaultComments: string[];
+  /**
+   * Default field values
+   */
+  defaultFieldValues: {
+    [k: string]: string | string[] | string[][];
+  };
+  /**
+   * Default comment values
+   */
+  defaultCommentValues: {
+    [k: string]: string | string[] | string[][];
+  };
+}
+export interface ProtocolDefinition {
+  /**
+   * Name of protocol
+   */
+  name: string;
+  /**
+   * Description of protocol
+   */
+  description: string;
+  type: OntologyTerm;
+  /**
+   * Compact URI presentation (obo_id) of protocol type
+   */
+  typeCurie: string;
+  /**
+   * Parameters of protocol
+   */
+  parameters: string[];
+  /**
+   * Definition of protocol parameter listed in the `parameters` field
+   */
+  parameterDefinitions: {
+    [k: string]: ProtocolParameterDefinition;
+  };
+}
+export interface LicenseInfo {
+  /**
+   * license name
+   */
+  name: string;
+  /**
+   * license version
+   */
+  version: string;
+  /**
+   * license URL
+   */
+  url: string;
+}
+export interface DescriptorConfiguration {
+  /**
+   * default descriptor category
+   */
+  defaultDescriptorCategory: string;
+  /**
+   * default submitter source
+   */
+  defaultSubmitterSource: string;
+  /**
+   * default data curation source
+   */
+  defaultDataCurationSource: string;
+  /**
+   * default workflow source
+   */
+  defaultWorkflowSource: string;
+  /**
+   * default descriptor sources
+   */
+  defaultDescriptorCategories: {
+    [k: string]: DescriptorCategoryDefinition;
+  };
+  /**
+   * default descriptor sources
+   */
+  defaultDescriptorSources: {
+    [k: string]: OntologyTerm;
+  };
+}
+export interface DefaultControl {
+  /**
+   * pattern of column or field
+   */
+  keyPattern: string;
+  /**
+   * default key name
+   */
+  defaultKey: string;
+}
+export interface DefaultCommentConfiguration {
+  studyComments: SectionDefaultComments;
+  assayComments: SectionDefaultComments;
+  studyDesignDescriptorComments: SectionDefaultComments;
+  studyFactorComments: SectionDefaultComments;
+  studyProtocolComments: SectionDefaultComments;
+  studyPublicationComments: SectionDefaultComments;
+  studyContactComments: SectionDefaultComments;
+}
+export interface StudyCategoryDefinition {
+  /**
+   * study category index
+   */
+  index: number;
+  /**
+   * study category name
+   */
+  name: string;
+  /**
+   * study category label
+   */
+  label: string;
+  /**
+   * study category description
+   */
+  description: string;
+}
+export interface MhdProfileInfo {
+  /**
+   * File schema URL
+   */
+  fileSchema: string;
+  /**
+   * MHD file profile URL
+   */
+  mhdFileProfile: string;
+  /**
+   * announcement file profile URL
+   */
+  announcementFileProfile: string;
+}
+export interface TemplateConfiguration {
+  /**
+   * active investigation file templates
+   */
+  activeInvestigationFileTemplates: string[];
+  /**
+   * active assignment file templates
+   */
+  activeAssignmentFileTemplates: string[];
+  /**
+   * active sample file templates
+   */
+  activeSampleFileTemplates: string[];
+  /**
+   * active assay file templates
+   */
+  activeAssayFileTemplates: string[];
+  /**
+   * active study categories
+   */
+  activeStudyCategories: string[];
+  /**
+   * active dataset licenses
+   */
+  activeDatasetLicenses: string[];
+  /**
+   * active dataset licenses
+   */
+  activeMhdProfiles: {
+    [k: string]: ActiveMhdProfile;
+  };
+  /**
+   * active study design descriptor categories
+   * We will update it to later: ActiveDesignDescriptorCategory
+   */
+  activeStudyDesignDescriptorCategories: string[];
+  /**
+   * active assay design descriptor categories
+   * We will update it to later: ActiveDesignDescriptorCategory
+   */
+  activeAssayDesignDescriptorCategories: string[];
+  /**
+   * default sample file name
+   */
+  defaultSampleFileTemplate: string;
+  /**
+   * default study file name
+   */
+  defaultInvestigationFileTemplate: string;
+  /**
+   * default study category
+   */
+  defaultStudyCategory: string;
+  /**
+   * default dataset license name
+   */
+  defaultDatasetLicense: string;
+  /**
+   * investigation file name
+   */
+  investigationFileName: string;
+  /**
+   * derived file extensions
+   */
+  derivedFileExtensions: string[];
+  /**
+   * raw file extensions
+   */
+  rawFileExtensions: string[];
+  /**
+   * Study category assay file type mappings
+   */
+  assayFileTypeMappings: {
+    [k: string]: string[];
+  };
+}
+export interface ProtocolParameterDefinition {
+  /**
+   * Definition of protocol parameter.
+   */
+  definition: string;
+  type: OntologyTerm;
+  /**
+   * Compact URI presentation (obo_id) of protocol parameter type. e.g. MS:1000831, OBI:0001139
+   */
+  typeCurie: string;
+  /**
+   * value representation format
+   */
+  format: "Text" | "Ontology" | "Numeric";
+  /**
+   * Example protocol parameter values.
+   */
+  examples: string[];
+}
+export interface DescriptorCategoryDefinition {
+  /**
+   * study category name
+   */
+  name: string;
+  /**
+   * study category label
+   */
+  label: string;
+  /**
+   * study category description
+   */
+  controlListKey: string | null;
+}
+export interface SectionDefaultComments {
+  /**
+   * comment groups in section
+   */
+  groups: string[];
+  /**
+   * section comment group definitions
+   */
+  groupDefinitions: {
+    [k: string]: CommentGroupDefinition;
+  };
+}
+export interface ActiveMhdProfile {
+  /**
+   * profile name
+   */
+  profileName: string;
+  /**
+   * default profile version
+   */
+  defaultVersion: string;
+  /**
+   * active profile versions
+   */
+  activeVersions: string[];
+}
+export interface CommentGroupDefinition {
+  /**
+   * comment group can be defined multiple
+   */
+  allowMultiple: boolean;
+  /**
+   * join operator if group has multiple values
+   */
+  joinOperator: string | null;
+  /**
+   * comments in group
+   */
+  comments: boolean & CommentDescription[];
+}
+export interface CommentDescription {
+  /**
+   * Comment name
+   */
+  name: string;
+  /**
+   * Comment label
+   */
+  label: string;
+  /**
+   * Is the comment an ontology term
+   */
+  isOntology: boolean;
+  /**
+   * Comment control list key
+   */
+  controlListKey: string | null;
+}

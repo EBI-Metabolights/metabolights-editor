@@ -1,0 +1,77 @@
+<div class="card mb-6" style="position: relative;">
+    <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; z-index: 10;"
+        (click)="openModal()">+ Add</button>
+    <header class="card-heading">
+        <p>Related datasets</p>
+    </header>
+    <div class="card-content">
+        <div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0; else emptyMessage">
+            <div class="box p-3 mb-4" *ngFor="let ds of relatedDatasets$ | async; let i = index">
+                <div class="columns is-vcentered is-mobile">
+                    <div class="column">
+                        <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                            <span class="has-text-weight-bold is-size-6 has-text-grey-dark">{{ ds.accession }}</span>
+                            <div class="is-size-6" *ngIf="ds.url">
+                                <span class="has-text-weight-semibold has-text-grey">URL:</span>
+                                <a class="ml-1" [href]="ds.url" target="_blank" style="word-break: break-all;">{{ ds.url
+                                    }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-narrow">
+                        <button class="edit-icon-button" (click)="editDataset(i, ds)" title="Edit Dataset">
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ng-template #emptyMessage>
+            <p class="placeholder-text has-text-centered p-4">
+                <small>No related datasets defined.</small>
+            </p>
+        </ng-template>
+    </div>
+</div>
+
+<mtbls-modal [title]="editingIndex > -1 ? 'Edit Related Dataset' : 'Add Related Dataset'" [isModalOpen]="isModalOpen"
+    (closed)="closeModal()">
+    <div body [formGroup]="form">
+        <div class="columns is-multiline">
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Related Dataset Repository</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input type="text" matInput formControlName="identifierSource"
+                                [matAutocomplete]="sourceAuto" placeholder="e.g. MetaboLights" />
+                            <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
+                                <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
+                                    <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="field">
+                    <label class="label is-small">Related Dataset Accession Number</label>
+                    <div class="control">
+                        <mat-form-field class="full-width is-small">
+                            <input matInput type="text" formControlName="identifier"
+                                [placeholder]="identifierPlaceholder">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div footer>
+        <button class="button is-info" (click)="addDataset()" [disabled]="form.invalid">
+            {{ editingIndex > -1 ? 'Update Dataset' : 'Add Dataset' }}
+        </button>
+        <button class="button" style="margin-left:10px" (click)="closeModal()">Cancel</button>
+    </div>
+</mtbls-modal>

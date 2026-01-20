@@ -1,100 +1,64 @@
-<span *ngIf="isInline">
+<span *ngIf="inline">
   <div>
     <mat-form-field class="full-width custom-padding">
       <mat-label *ngIf="label">{{label}}</mat-label>
       <mat-chip-grid #chipList class="custom-chip-list">
         <span *ngFor="let value of values">
-          <mat-chip-row
-            *ngIf="value && value.annotationValue"
-            [selectable]="selectable"
-            [removable]="removable"
-            (removed)="remove(value)"
-            class="selectable-chip-content"
-            (click)="copyText(value)"
-          >
+          <mat-chip-row *ngIf="value && value.annotationValue" [selectable]="selectable" [removable]="removable"
+            (removed)="remove(value)" class="selectable-chip-content" (click)="copyText(value)">
             {{ value.annotationValue }}
             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
           </mat-chip-row>
           <mat-chip [@fadeInOut]="fadeState"> term copied! </mat-chip>
         </span>
-        <input
-          [placeholder]="validations.label"
-          #input
-          id="test"
-          [formControl]="valueCtrl"
-          [matAutocomplete]="auto"
-          [matChipInputFor]="chipList"
-          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-          (matChipInputTokenEnd)="add($event)"
-        />
+        <input matInput [placeholder]="validations?.label" #input id="test" [formControl]="valueCtrl"
+          [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          (matChipInputTokenEnd)="add($event)" />
       </mat-chip-grid>
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        (optionSelected)="optionSelected($event)"
-      >
+      <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected($event)">
         <!-- (optionSelected)="selected($event)" -->
         <span *ngIf="!searchedMore &&  ((inputValue || '').trim().length >= 3)">
           <span *ngIf="termsLoading">
             <mat-option>
-              <img
-                style="height: 10px; margin-left: 10px"
-               src="{{ baseHref }}assets/img/loading.svg"
-              />
+              <img style="height: 10px; margin-left: 10px" src="{{ baseHref }}assets/img/loading.svg" />
             </mat-option>
           </span>
           <!-- <ng-template #showMore>
             <mat-option>Search more terms on ontology sources</mat-option>
           </ng-template> -->
         </span>
-        <mat-option
-          class="bb"
-          *ngFor="let value of currentOptions"
-          [value]="value"
-        >
+        <mat-option class="bb" *ngFor="let value of currentOptions" [value]="value">
           <div class="columns np">
             <span class="is-pulled-left column np">
               <b>{{ value.annotationValue }}</b>
             </span>
             <span class="is-pulled-right column np has-text-right">
-              <span
-                *ngIf="value.termSource.provenance_name"
-                class="tag is-info"
-                >{{ value.termSource.provenance_name }}</span
-              >&nbsp;
+              <span *ngIf="value.termSource.provenance_name" class="tag is-info">{{ value.termSource.provenance_name
+                }}</span>&nbsp;
               <span *ngIf="value.termSource.name" class="tag is-success">{{
                 value.termSource.name
-              }}</span>
+                }}</span>
             </span>
           </div>
           <div class="columns">
             <small class="tiny">{{ value.termAccession }}</small>
           </div>
-          <div
-            *ngIf="
+          <div *ngIf="
               value.termSource.description && value.termSource.description != ''
-            "
-            class="columns"
-          >
-            <small class="tiny"
-              >SOURCE: {{ value.termSource.description }}
+            " class="columns">
+            <small class="tiny">SOURCE: {{ value.termSource.description }}
             </small>
           </div>
-          <div
-            *ngIf="value.termSource.file && value.termSource.file != ''"
-            class="columns"
-          >
-            <small class="tiny"
-              >FILE: {{ value.termSource.file }} <span></span>
+          <div *ngIf="value.termSource.file && value.termSource.file != ''" class="columns">
+            <small class="tiny">FILE: {{ value.termSource.file }} <span></span>
             </small>
           </div>
           <div class="columns">
-            <span
-              *ngIf="
+            <span *ngIf="
                 value.annotationDefinition != null &&
                 value.annotationDefinition != '' &&
                 value.annotationDefinition != '-'
-              "
-            >
+              ">
               <div class="ont-description">
                 <b>Description</b>: {{ value.annotationDefinition }}
               </div>
@@ -106,53 +70,38 @@
                 <a (mouseenter)="showMore($event, value)"> more info... </a>
               </div>
               <ng-template #displayInfo>
-                <div
-                  *ngIf="value.info != '-'; else detailsNotFound"
-                  class="ont-description"
-                >
-                  <p
-                    *ngIf="
+                <div *ngIf="value.info != '-'; else detailsNotFound" class="ont-description">
+                  <p *ngIf="
                       value.info.description &&
                       (value.annotationDefinition == null ||
                         value.annotationDefinition == '')
-                    "
-                  >
-                    <small
-                      >Definition: <br />{{
-                        value.info.description.join(" ")
-                      }}</small
-                    ><br />
+                    ">
+                    <small>Definition: <br />{{
+                      value.info.description.join(" ")
+                      }}</small><br />
                   </p>
                   <p>
-                    <span
-                      *ngFor="let key of getObjectKeys(value.info.annotation)"
-                    >
+                    <span *ngFor="let key of getObjectKeys(value.info.annotation)">
                       <small>
                         <b>{{
                           key.replace("_", " ")
-                        }}</b>
+                          }}</b>
                         : {{ value.info.annotation[key].join(" ") }} <br />
                       </small>
                     </span>
                   </p>
                 </div>
                 <ng-template #detailsNotFound>
-                  <small
-                    ><span><i>Details not found</i></span></small
-                  >
+                  <small><span><i>Details not found</i></span></small>
                 </ng-template>
               </ng-template>
             </span>
           </div>
-        </mat-option> 
+        </mat-option>
       </mat-autocomplete>
-      <mat-hint
-        >{{ validations.description }}
+      <mat-hint>{{ validations?.description }}
         <span *ngIf="loading">
-          <img
-            style="height: 10px; margin-left: 10px"
-            src="{{ baseHref }}assets/img/loading.svg"
-          />
+          <img style="height: 10px; margin-left: 10px" src="{{ baseHref }}assets/img/loading.svg" />
         </span>
         <span *ngIf="isRequired">
           <b>(required)</b>
@@ -161,11 +110,9 @@
     </mat-form-field>
   </div>
 </span>
-<span *ngIf="!isInline">
+<span *ngIf="!inline">
   <div class="field mt-10">
-    <label class="bulma-label has-text-grey"
-      ><small>{{ validations.description }}</small></label
-    >
+    <label class="bulma-label has-text-grey"><small>{{ validations?.description }}</small></label>
     <div class="control">
       <a class="button is-success"> <mat-icon>playlist_add</mat-icon> Add </a>
     </div>

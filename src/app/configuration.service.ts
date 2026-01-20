@@ -1,5 +1,5 @@
 import { PlatformLocation } from "@angular/common";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpBackend } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Environment } from "src/environment.interface";
 import { environment } from "src/environments/environment";
@@ -14,10 +14,12 @@ export class ConfigurationService {
   private configPath: string;
   private configLoadedSubject = new BehaviorSubject<boolean>(false)
   public configLoaded$ = this.configLoadedSubject.asObservable();
+  private http: HttpClient;
 
-  constructor(private http: HttpClient,
+  constructor(private handler: HttpBackend,
     private platformLocation: PlatformLocation
     ) {
+      this.http = new HttpClient(handler);
       this.baseHref = this.platformLocation.getBaseHrefFromDOM();
       this.configPath = this.baseHref + "assets/configs/";
     }

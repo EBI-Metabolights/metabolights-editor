@@ -4,7 +4,7 @@ import {
   OnInit,
 } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
-import { UntypedFormBuilder } from "@angular/forms";
+import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import Swal from "sweetalert2";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
@@ -46,6 +46,8 @@ export class AddAssayComponent implements OnInit {
 
     this.setUpSubscriptionsNgxs();
   }
+  ngOnInit(): void {
+  }
 
 
   setUpSubscriptionsNgxs() {
@@ -62,7 +64,84 @@ export class AddAssayComponent implements OnInit {
     });
   }
 
-  ngOnInit() {}
+ assayForm = this.fb.group({
+  assayType: ['LC-MS'],
+  measurementType: ['Untargeted Metabolite Profiling'],
+  omics: ['Lipidomics'],
+  chromInstrument: ['', Validators.required],
+  columnType: ['reverse phase'],
+  msInstrument: ['', Validators.required],
+  polarity: ['positive'],
+  ionSource: ['electrospray ionization'],
+  analyzer: ['quadrupole time-of-flight'],
+  assayId: ['01', Validators.required]
+});
+
+keywords: string[] = [
+  'Tandem Mass Spectrometry',
+  'Waters raw format',
+  'Data-Independent acquisition'
+  ];
+
+  /* Keyword Modal States */
+  isKeywordModalOpen = false;
+  currentKeyword = '';
+  keywordEditMode = false;
+  editingKeywordIndex = -1;
+
+  addKeyword() {
+    this.keywordEditMode = false;
+    this.currentKeyword = '';
+    this.isKeywordModalOpen = true;
+  }
+
+  editKeyword(i: number) {
+    this.keywordEditMode = true;
+    this.editingKeywordIndex = i;
+    this.currentKeyword = this.keywords[i];
+    this.isKeywordModalOpen = true;
+  }
+
+  saveKeyword() {
+    if (this.currentKeyword && this.currentKeyword.trim() !== '') {
+      if (this.keywordEditMode) {
+        this.keywords[this.editingKeywordIndex] = this.currentKeyword.trim();
+      } else {
+        this.keywords.push(this.currentKeyword.trim());
+      }
+      this.closeKeywordModal();
+    }
+  }
+
+  closeKeywordModal() {
+    this.isKeywordModalOpen = false;
+    this.currentKeyword = '';
+    this.editingKeywordIndex = -1;
+  }
+
+  removeKeyword(i: number) {
+    this.keywords.splice(i, 1);
+  }
+
+get assayFileName() {
+  const id = this.requestedStudy || 'MTBLSxxx';
+  return `a_${id}-${this.assayForm.value.assayId}_LC-MS_untargeted_metabolite_profiling.txt`;
+}
+
+get resultFileName() {
+  const id = this.requestedStudy || 'MTBLSxxx';
+  return `m_${id}-${this.assayForm.value.assayId}_LC-MS.maf.tsv`;
+}
+
+saveAssay() {
+  const payload = {
+    ...this.assayForm.value,
+    keywords: this.keywords
+  };
+
+  console.log('Create assay payload', payload);
+}
+
 
   openAddAssayModal() {
     this.isAddAssayModalOpen = true;
