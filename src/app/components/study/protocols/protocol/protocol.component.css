@@ -37,3 +37,6 @@ label {
 .bold-text {
   font-weight: bold;
 }
+.card-heading span {
+ font-weight: normal;
+}

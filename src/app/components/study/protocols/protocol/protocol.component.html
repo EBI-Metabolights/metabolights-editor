@@ -5,7 +5,7 @@
 <ng-template #showProtocolDetails>
   <div class="card">
     <header class="card-heading" [ngClass]="{ 'hover-highlight': !isStudyReadOnly }">
-      <span>
+      <span style="width: 100%;">
         <p (dblclick)="toggleExpand()" class="is-pulled-left" style="user-select: none"
           [ngClass]="{'bold-text': isCoreProtocol(protocol.name)}">
           {{ protocol.name }}
