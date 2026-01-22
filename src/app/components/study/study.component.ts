@@ -79,7 +79,7 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   setUpSubscriptionsNgxs() {
     this.permissions = this.store.snapshot().application.studyPermission
-
+    this.obfuscationCode = this.permissions.obfuscationCode
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
     this.revisionNumber$.subscribe((value) => {
@@ -109,6 +109,10 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.studyObfuscationCode$.subscribe((value) => {
       this.obfuscationCode = value;
+      if(!this.obfuscationCode || this.obfuscationCode.length == 0) {
+        this.permissions = this.store.snapshot().application.studyPermission
+        this.obfuscationCode = this.permissions.obfuscationCode
+      }
     });
     this.bannerMessage$.subscribe((value) => {
       this.banner = value;

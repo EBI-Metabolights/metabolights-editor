@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject, ElementRef } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, OnChanges, SimpleChanges, inject, ElementRef, ChangeDetectorRef } from "@angular/core";
 import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import {
@@ -6,7 +6,6 @@ import {
   ProtocolParameter,
 } from "./../../../../models/mtbl/mtbls/mtbls-protocol";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
-
 import { ValidateRules } from "./protocol.validator";
 import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import * as toastr from "toastr";
@@ -17,6 +16,8 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 
 @Component({
   selector: "mtbls-protocol",
@@ -28,7 +29,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
   @Input("required") required = false;
   @Input("validations") validations: any;
   @Input("guides") guides: Record<string, any> = {};
-
+  @Input("rule") rule: any = null;
+  @Input("defaultOntologies") defaultOntologies: string[] = [];
 
   @ViewChild(OntologyComponent) parameterName: OntologyComponent;
   @ViewChild("contentToCopy") contentToCopy!: ElementRef;
@@ -39,7 +41,16 @@ export class ProtocolComponent implements OnInit, OnChanges {
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
-
+  
+  studyCreatedAt$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCreatedAt
+  );
+  studyCategory$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.studyCategory
+  );
+  templateVersion$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.templateVersion
+  );
 
   private studyId: string =  null;
   private toastrSettings: Record<string, any> = {};
@@ -57,6 +68,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   editor: any;
 
   selectedProtocol: any = null;
+  selectedParameterValue: any = null;
 
   addNewProtocol = false;
   caretPos = 0;
@@ -66,22 +78,33 @@ export class ProtocolComponent implements OnInit, OnChanges {
   form: UntypedFormGroup;
 
   validationsId = "protocols.protocol";
+  _controlList: any = null;
 
   protocolInGuides: boolean = false;
   guideText: string = "";
   coreProtocols: string[] = ['sample collection', 'extraction', 'chromatography', 'mass spectrometry', 'data transformation', 'metabolite identification']
+  // store-backed legacy control lists (flat shape) and helper fields
+  private legacyControlLists: Record<string, any> | null = null;
+  private defaultControlListName: string = "Study Protocol Parameter Name";
+  defaultControlList: { name: string; values: any[] } = { name: "", values: [] };
+  private studyCategory: string = null;
+  private templateVersion: string = null;
+  studyCreatedAt: any;
+  selectedParameter: Ontology[];
 
   constructor(
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
-    private store: Store
+    private store: Store,
+    private cdr: ChangeDetectorRef
   ) {
    // this.setUpSubscriptionsNgxs();
   }
 
   ngOnInit() {
-    this.setUpSubscriptionsNgxs();
 
+    this.setUpSubscriptionsNgxs();
+    
     if (this.protocol == null) {
       this.addNewProtocol = true;
     } else {
@@ -98,6 +121,20 @@ export class ProtocolComponent implements OnInit, OnChanges {
     this.studyId$.subscribe((id) => {
       this.studyId = id;
     })
+    
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value as StudyCategoryStr;
+    });
+    this.templateVersion$.subscribe((value) => {
+      this.templateVersion = value;
+    });
+    this.studyCreatedAt$.subscribe((value) => {
+      this.studyCreatedAt = value;
+    });
+    // subscribe to controlLists stored in application state (legacy flat payload)
+    this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+     this.legacyControlLists = lists || {};
+    });
     this.isProtocolsExpanded$.subscribe((value) => {
       this.expand = value;
     });
@@ -275,12 +312,26 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   closeModal() {
     this.isModalOpen = false;
-    this.protocolSubscription.unsubscribe();
-    this.form.removeControl("description");
+    try {
+      if (this.protocolSubscription && typeof this.protocolSubscription.unsubscribe === "function") {
+        this.protocolSubscription.unsubscribe();
+      }
+    } catch (e) {
+      console.warn("Failed to unsubscribe protocolSubscription:", e);
+    }
+
+    try {
+      if (this.form && this.form.contains && this.form.contains("description")) {
+        this.form.removeControl("description");
+      }
+    } catch (e) {
+      console.warn("Failed to remove 'description' control:", e);
+    }
   }
 
   openParameterModal() {
-    this.parameterName.values = [];
+    if (this.parameterName)
+      this.parameterName.values = [];
     this.isParameterModalOpen = true;
   }
 
@@ -304,7 +355,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   addParameter() {
     const parameter = new ProtocolParameter();
-    parameter.parameterName = this.parameterName.values[0];
+    parameter.parameterName =  this.parameterName?.values[0] || this.selectedParameter[0];
     if (
       this.form.get("parameters").value.length === 1 &&
       this.form.get("parameters").value[0].parameterName.annotationValue === ""
@@ -346,9 +397,12 @@ export class ProtocolComponent implements OnInit, OnChanges {
         } else {
           this.store.dispatch(new Protocols.Add(this.protocol.name, this.compileBody())).subscribe(
             (completed) => {
-              this.refreshProtocols( "Protocol saved.");
+              setTimeout(() => {
+                this.refreshProtocols( "Protocol saved.");
+              }, 0);
               this.form.removeControl("description");
               this.isModalOpen = false;
+              this.cdr.detectChanges();
             },
             (error) => {
               this.isFormBusy = false;
@@ -405,8 +459,15 @@ export class ProtocolComponent implements OnInit, OnChanges {
   }
 
   openModal(protocol) {
+    
     if (!this.isStudyReadOnly) {
+       try {
+      this._controlList = this.controlList();
+    } catch (e) {
+      this._controlList = null;
+    }
       this.initialiseForm();
+    
       if (this.protocol.parameters.length > 0) {
         this.form.get("parameters").setValue(this.protocol.parameters);
       } else {
@@ -491,4 +552,97 @@ export class ProtocolComponent implements OnInit, OnChanges {
     const text = this.contentToCopy.nativeElement.innerText;
     this.editorService.copyContent(text);
   }
+  /**
+   * Build a controlList payload for a protocol field.
+   * Prefers legacy controlLists from the store, falls back to editorService.defaultControlLists.
+   */
+  controlList() {
+    // if no explicit defaultControlListName set, try derive from protocol name (adjust to your naming convention)
+    if (!this.defaultControlListName && this.protocol && this.protocol.name) {
+      this.defaultControlListName = this.formatTitle(this.protocol.name);
+    }
+
+    // fill default from legacy editorService payload if available and not already set
+    if (
+      (!this.defaultControlList || !this.defaultControlList.name || this.defaultControlList.name.length === 0) &&
+      this.editorService.defaultControlLists &&
+      this.defaultControlListName in this.editorService.defaultControlLists
+    ) {
+      this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm || [];
+      this.defaultControlList.name = this.defaultControlListName;
+    }
+
+    // defaultOntologies extracted from legacy structured payload if present
+    let defaultOntologies = {};
+    if (
+      this.legacyControlLists &&
+      this.legacyControlLists.controls &&
+      this.legacyControlLists.controls["investigationFileControls"] &&
+      this.legacyControlLists.controls["investigationFileControls"].__default__
+    ) {
+      const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+      defaultOntologies = defaultRule;
+    }
+
+    const selectionInput = {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      isaFileType: "investigation" as any,
+      isaFileTemplateName: null,
+      templateVersion: this.templateVersion,
+    };
+
+    let rule = null;
+    try {
+      if (this.legacyControlLists && Object.keys(this.legacyControlLists).length > 0) {
+        rule = getValidationRuleForField(
+          { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
+          this.defaultControlListName,
+          selectionInput as any
+        );
+      }
+    } catch (e) {
+      rule = null;
+    }
+
+    let renderAsDropdown = false;
+        
+        if (rule) {
+          if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+            renderAsDropdown = true;
+            if (rule.terms && rule.terms.length > 0) {
+              const ontologiesValues = rule.terms.map((t: any) => {
+                const o = new Ontology();
+                o.annotationValue = t.term;
+                o.termAccession = t.termAccessionNumber || "";
+                o.termSource = new OntologySourceReference();
+                o.termSource.name = t.termSourceRef || "";
+                o.termSource.description = "";
+                o.termSource.file = "";
+                o.termSource.version = "";
+                o.termSource.provenance_name = "";
+                return o;
+              });
+              this.defaultControlList.values = ontologiesValues; // Override with rule terms
+            }
+          }
+        }
+        
+        const result = {
+          ...this.defaultControlList,
+          rule,
+          defaultOntologies,
+          renderAsDropdown,
+        };
+        this._controlList = result;
+        return result;
+      }
+
+      onDropdownChange(event: any) {
+        const ont = new Ontology();
+        ont.annotationValue = event.value;
+        this.selectedParameter = [ont];
+        this.selectedParameterValue = event.value;
+      }
+
 }

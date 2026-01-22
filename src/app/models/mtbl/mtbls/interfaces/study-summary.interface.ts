@@ -28,6 +28,12 @@ export interface IMtblsStudySummaryInformation {
   studyAsperaPath: string;
   firstPrivateDate: string;
   firstPublicDate: string;
+  sampleTemplate: string;
+  templateVersion: string;
+  studyCategory: string;
+  createdAt: string;
+  datasetLicense: string;
+  datasetLicenseUrl: string;
 }
 
 export class IStudyRevision {

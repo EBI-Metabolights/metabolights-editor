@@ -76,29 +76,43 @@
             {{ form.get("factorName").errors.factorName.error }}
           </mat-error>
         </mat-form-field>
-        <mtbls-ontology
-          #factorType
-          [id]="'factorType'"
-          [validations]="factorTypeValidations"
-          [controlList]="controlList()"
-          (changed)="onChanges($event)"
-          [values]="[factor.factorType]"
-          [inline]="true"
-        ></mtbls-ontology>
-        <label
+         <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
+          <mtbls-ontology
+            #factorType
+            [id]="'factorType'"
+            [validations]="factorTypeValidations"
+            [controlList]="_controlList"
+            (changed)="onChanges($event)"
+            [values]="[factor.factorType]"
+            [inline]="true"
+            [rule]="_controlList?.rule"
+            [label]="'Factor Type'"
+            [defaultOntologies]="_controlList?.defaultOntologies"
+          ></mtbls-ontology>
+        </ng-container>
+        <ng-template #dropdownField>
+    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+        <mat-select formControlName="factorType" placeholder="Factor Type" (selectionChange)="onDropdownChange($event)">
+          <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+            {{ option.annotationValue }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </ng-template>
+        <!-- <label
         [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
         >
           Add factor unit (if necessary)
           <mat-checkbox 
           [disabled]="form.get('factorName')?.pristine"
           (change)="toggleUnit()" ></mat-checkbox>
-        </label>
+        </label> -->
       </section>
-      <ng-container *ngIf="addFactorColumnVisible">
+     <!--<ng-container *ngIf="addFactorColumnVisible">
       <section class="modal-card-body">
         <h6 class="modal-card-title modal-form-title">
           Add factor unit to Sample sheet -
-          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName-->
+          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName
         </h6>
         <mtbls-ontology
           [id]="'factorUnit'"
@@ -110,10 +124,12 @@
           (changed)="onChanges($event)"
           [values]="[]"
           [inline]="true"
-        ></mtbls-ontology>
+          [rule]="factorColumnControlList().rule" 
+          [defaultOntologies]="factorColumnControlList().defaultOntologies"
+        ></mtbls-ontology> 
 
       </section>
-    </ng-container>
+    </ng-container> -->
       <!--Add factor column end-->
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -131,7 +147,7 @@
           <div class="column is-half has-text-right">
             <button
               *ngIf="!form.pristine"
-              [disabled]="!form.valid || isFormBusy"
+              [disabled]="!form.valid || isFormBusy || (_controlList?.renderAsDropdown ? !selectedFactorValue : (factorTypeComponent?.values?.length === 0))"
               (click)="saveNgxs()"
               class="button is-info"
             >

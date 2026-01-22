@@ -2,11 +2,8 @@ import { HttpHeaders } from "@angular/common/http";
 /* eslint-disable @typescript-eslint/naming-convention */
 export const httpOptions = {
   headers: new HttpHeaders({
-    //'Content-Type':  'application/json',
     Accept: "application/json",
-    "user-token": "dummy",
-    Authorization: "Bearer dummy"
-  }),
+  })
 };
 
 export interface MtblsJwtPayload {
@@ -15,11 +12,12 @@ export interface MtblsJwtPayload {
   aud?: string[] | string;
   exp?: number;
   role?: string;
+  email: string;
 }
 
 export interface MetabolightsUser {
   apiToken: string;
-  role: string;
+  role: number;
   email: string;
   status: string;
 }

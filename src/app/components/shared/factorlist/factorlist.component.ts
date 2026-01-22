@@ -2,7 +2,7 @@ import { Component, EventEmitter, inject, Input, OnInit, Output, ViewChild } fro
 import * as toastr from "toastr";
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Store } from '@ngxs/store';
-import { Observable, take, withLatestFrom } from 'rxjs';
+import { filter, Observable, take, withLatestFrom } from 'rxjs';
 import { MTBLSFactor } from 'src/app/models/mtbl/mtbls/mtbls-factor';
 import { ApplicationState } from 'src/app/ngxs-store/non-study/application/application.state';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
@@ -14,6 +14,8 @@ import { JsonConvert } from 'json2typescript';
 import { Ontology } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology';
 import { Router } from '@angular/router';
 import { SampleState } from 'src/app/ngxs-store/study/samples/samples.state';
+import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from 'src/app/models/mtbl/mtbls/control-list';
+import { OntologySourceReference } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology-reference';
 
 
 @Component({
@@ -37,13 +39,23 @@ export class FactorlistComponent implements OnInit {
     toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
     studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
     studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
-  
+    
+    studyCreatedAt$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.studyCreatedAt
+    );
+    studyCategory$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.studyCategory
+    );
+    templateVersion$: Observable<string> = inject(Store).select(
+      GeneralMetadataState.templateVersion
+    );
   
     private toastrSettings: Record<string, any> = {};
     private studyId: string = null;
-  
+    _controlList: any = null;
     isStudyReadOnly = false;
-  
+    selectedFactorValue: any = null;
+    selectedFactorOntoValue: Ontology[];
     validationsId = "factors.factor";
     defaultControlList: {name: string; values: any[]} = {name: "", values: []};
     defaultControlListName = "Study Factor Type";
@@ -70,6 +82,10 @@ export class FactorlistComponent implements OnInit {
     addNewFactor = false;
     baseHref: string;
     validationRules: any = null;
+    private legacyControlLists: Record<string, any[]> | null = null;
+    studyCategory: any;
+    templateVersion: any;
+    studyCreatedAt: any;
   
     constructor(
       private fb: UntypedFormBuilder,
@@ -80,6 +96,9 @@ export class FactorlistComponent implements OnInit {
       if (!this.defaultControlList) {
         this.defaultControlList = {name: "", values: []};
       }
+      this.store.select(ApplicationState.controlLists).subscribe((lists) => {
+        this.legacyControlLists = lists || {};
+    });
       this.setUpSubscriptionsNgxs();
       this.baseHref = editorService.baseHref
     }
@@ -96,10 +115,19 @@ export class FactorlistComponent implements OnInit {
   
   
     setUpSubscriptionsNgxs() {
-      this.studyIdentifier$.subscribe(
-        (id) => {
-          this.studyId = id;
-        })
+      this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
+          this.studyId = value;
+      });
+      
+      this.studyCategory$.subscribe((value) => {
+        this.studyCategory = value as StudyCategoryStr;
+      });
+      this.templateVersion$.subscribe((value) => {
+        this.templateVersion = value;
+      });
+      this.studyCreatedAt$.subscribe((value) => {
+        this.studyCreatedAt = value;
+      });
       this.toastrSettings$.subscribe((value) => {
         this.toastrSettings;
       });
@@ -133,7 +161,7 @@ export class FactorlistComponent implements OnInit {
     }
   
     onChanges() {
-      this.form.markAsDirty();
+      this.form?.markAsDirty();
     }
   
     showHistory() {
@@ -154,6 +182,13 @@ export class FactorlistComponent implements OnInit {
             this.factorTypeComponent.reset();
           }
         }
+
+        try {
+        this._controlList = this.controlList();
+      } catch (e) {
+        this._controlList = null;
+      }
+      
         this.initialiseForm();
         this.isModalOpen = true;
   
@@ -162,8 +197,13 @@ export class FactorlistComponent implements OnInit {
   
     initialiseForm() {
       this.isFormBusy = false;
+      if(this._controlList.renderAsDropdown) {
+        this.selectedFactorValue = this.factor?.factorType?.annotationValue || '';
+        this.selectedFactorOntoValue = this.factor?.factorType ? [this.factor.factorType] : [];
+      }
       this.form = this.fb.group({
         factorName: [this.factor.factorName],
+        factorType: [this.factorTypeComponent ? this.factorTypeComponent.values[0] : (this.selectedFactorValue ? this.selectedFactorValue : "")],
       });
       this.form.valueChanges.subscribe((values) => {
         for (const key in values) {
@@ -274,7 +314,7 @@ export class FactorlistComponent implements OnInit {
       mtblsFactor.comments = [];
       const jsonConvert: JsonConvert = new JsonConvert();
       mtblsFactor.factorType = jsonConvert.deserializeObject(
-        this.factorTypeComponent.values[0],
+        this.factorTypeComponent?.values[0] || this.selectedFactorOntoValue[0],
         Ontology
       );
       return { factor: mtblsFactor.toJSON() };
@@ -312,25 +352,134 @@ export class FactorlistComponent implements OnInit {
     setFieldValue(name, value) {
       return this.form.get(name).setValue(value);
     }
-    controlList() {
-      if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
-        && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists){
-        this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
-        this.defaultControlList.name = this.defaultControlListName;
-      }
-      return this.defaultControlList;
-    }
+   controlList() {
+           if (!(this.defaultControlList && this.defaultControlList.name.length > 0)
+             && this.editorService.defaultControlLists && this.defaultControlListName in this.editorService.defaultControlLists) {
+             this.defaultControlList.values = this.editorService.defaultControlLists[this.defaultControlListName].OntologyTerm;
+             this.defaultControlList.name = this.defaultControlListName;
+           }
+     
+           
+           let defaultOntologies = {};
+             if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["investigationFileControls"] && this.legacyControlLists.controls["investigationFileControls"].__default__) {
+             const defaultRule = this.legacyControlLists.controls["investigationFileControls"].__default__[0];
+             defaultOntologies =  defaultRule;
+           }
+     
+           const selectionInput = {
+             studyCategory: this.studyCategory,
+             studyCreatedAt: this.studyCreatedAt,
+             isaFileType: "investigation" as any,
+             isaFileTemplateName: null,
+             templateVersion: this.templateVersion,
+           };
+     
+           let rule = null;
+           try {
+             if (
+               this.legacyControlLists &&
+               Object.keys(this.legacyControlLists).length > 0
+             ) {
+               rule = getValidationRuleForField(
+                 {
+                   controlLists: this.legacyControlLists,
+                 } as MetabolightsFieldControls,
+                 this.defaultControlListName,  
+                 selectionInput
+               );
+             }
+           } catch (e) {
+             rule = null;
+           }
+     
+           let renderAsDropdown = false;
+           
+           if (rule) {
+             if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+               renderAsDropdown = true;
+               if (rule.terms && rule.terms.length > 0) {
+                 const ontologiesValues = rule.terms.map((t: any) => {
+                   const o = new Ontology();
+                   o.annotationValue = t.term;
+                   o.termAccession = t.termAccessionNumber || "";
+                   o.termSource = new OntologySourceReference();
+                   o.termSource.name = t.termSourceRef || "";
+                   o.termSource.description = "";
+                   o.termSource.file = "";
+                   o.termSource.version = "";
+                   o.termSource.provenance_name = "";
+                   return o;
+                 });
+                 this.defaultControlList.values = ontologiesValues; // Override with rule terms
+               }
+             }
+           }
+           
+           const result = {
+             ...this.defaultControlList,
+             rule,
+             defaultOntologies,
+             renderAsDropdown,
+           };
+           this._controlList = result;
+           return result;
+         }
+    onDropdownChange(event: any) {
+      const ont = new Ontology();
+      ont.annotationValue = event.value;
+      ont.termSource = new OntologySourceReference();
+      this.selectedFactorOntoValue = [ont];
+      this.selectedFactorValue = event.value;
+    }     
   
-    factorColumnControlList() {
-      let controlList = this.defaultUnitControlList;
-      let controlListName = this.defaultUnitControlListName;
-  
-      if (!(controlList && controlList.name.length > 0)
-        && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists){
-          controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
-          controlList.name = controlListName;
-      }
-      return controlList;
-    }
+    // factorColumnControlList() {
+    //   let controlList = this.defaultUnitControlList;
+    //   let controlListName = this.defaultUnitControlListName;
+
+    //   if (!(controlList && controlList.name.length > 0)
+    //     && this.editorService.defaultControlLists && controlListName in this.editorService.defaultControlLists) {
+    //     controlList.values = this.editorService.defaultControlLists[controlListName].OntologyTerm;
+    //     controlList.name = controlListName;
+    //   }
+
+    //   let defaultOntologies = [];
+    //   if (this.legacyControlLists && this.legacyControlLists.controls && this.legacyControlLists.controls["sampleFileControls"] && this.legacyControlLists.controls["sampleFileControls"].__default_characteristic__) {
+    //     const defaultRule = this.legacyControlLists.controls["sampleFileControls"].__default_characteristic__[0];
+    //     defaultOntologies = defaultRule?.ontologies || [];
+    //   }
+
+    //   const selectionInput = {
+    //     studyCategory: this.studyCategory,
+    //     studyCreatedAt: new Date(),
+    //     isaFileType: "sample" as any,
+    //     isaFileTemplateName: this.sampleTemplate,
+    //     templateVersion: this.templateVersion,
+    //   };
+
+    //   let rule = null;
+    //   try {
+    //     if (
+    //       this.legacyControlLists &&
+    //       Object.keys(this.legacyControlLists).length > 0
+    //     ) {
+    //       rule = getValidationRuleForField(
+    //         {
+    //           controlLists: this.legacyControlLists,
+    //         } as MetabolightsFieldControls,
+    //         controlListName,  
+    //         selectionInput
+    //       );
+    //     }
+    //   } catch (e) {
+    //     rule = null;
+    //   }
+
+    //   // Return the controlList with added properties
+    //   return {
+    //     ...controlList,
+    //     rule,
+    //     defaultOntologies
+    //   };
+    // }
   
 }

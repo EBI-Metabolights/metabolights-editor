@@ -5,55 +5,39 @@
     </span>
   </span>
   <span class="column is-6 fadeIn has-text-right nmrl">
-    <mat-paginator
-      [pageSizeOptions]="mlPageSizeOptions"
-      showFirstLastButtons
-    ></mat-paginator>
+    <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
   </span>
 </div>
 <div *ngIf="!isReadOnly" class="my-2">
   <div *ngIf="hasAnyMissingValues()" class="notification is-warning">
-    <small
-      >The terms below are provided in your table but do not have associated
+    <small>The terms below are provided in your table but do not have associated
       ontologies. If you wish to add ontology terms please use
       <i class="material-icons">edit</i> to edit or
       <i class="material-icons">compare_arrows</i> to autofill using existing
-      values.</small
-    >
+      values.</small>
     <br />
-    <span
-    (click)="validateTableOntologyColumns()"
-    class="tag is-info clickable my-2"
-  >
-    <i class="material-icons"> refresh </i> Refresh
-  </span>
+    <span (click)="validateTableOntologyColumns()" class="tag is-info clickable my-2">
+      <i class="material-icons"> refresh </i> Refresh
+    </span>
     <br />
     <span *ngFor="let key of getKeys(ontologyCols)">
       <span *ngIf="ontologyCols[key].missingTerms.size > 0">
         <p>
-          <small
-            ><b>{{ formatHeader(key) }}</b
-            >:</small
-          >
+          <small><b>{{ formatHeader(key) }}</b>:</small>
           <span class="card-content">
             <span class="content">
               <div class="field is-grouped is-grouped-multiline">
                 <span *ngFor="let val of ontologyCols[key].missingTerms">
                   <div class="missing-ontology is-grouped is-grouped-multiline">
-                    <span
-                      (click)="
+                    <span (click)="
                         openEditMissingColValModal(ontologyCols[key], key, val)
-                      "
-                      class="tag is-small is-primary clickable"
-                    >
+                      " class="tag is-small is-primary clickable">
                       <i class="material-icons "> edit </i>
                     </span>
 
                     <span
                       *ngIf="ontologyCols[key].values && ontologyCols[key].values.has(val) && ontologyCols[key].values.get(val).length > 0"
-                      (click)="autoPopulate(ontologyCols[key], key, val)"
-                      class="tag is-small is-info clickable"
-                    >
+                      (click)="autoPopulate(ontologyCols[key], key, val)" class="tag is-small is-info clickable">
                       <i class="material-icons "> compare_arrows </i>
                     </span>
                     <span class="tag is-small missing-tag">
@@ -63,7 +47,7 @@
                       {{ontologyCols[key]['values'][val][0]}}:{{ontologyCols[key]['values'][val][1]}}
                     </span> -->
                   </div>
-              </span>
+                </span>
               </div>
 
             </span>
@@ -78,19 +62,17 @@
     <div id="meta">
       <span>
         <p>
-          <small
-          ><b>Factors</b
-          >:</small>
+          <small><b>Factors</b>:</small>
           <span class="content">
-          <div *ngFor="let factor of factors">
-            <mtbls-factorlist [value]="factor" ></mtbls-factorlist>
-          </div>
-        </span>
+            <div *ngFor="let factor of factors">
+              <mtbls-factorlist [value]="factor"></mtbls-factorlist>
+            </div>
+          </span>
         </p>
       </span>
     </div>
   </div>
-  
+
 </div>
 
 <div *ngIf="!dismissed && columnHidden" class="notification is-primary">
@@ -100,30 +82,23 @@
 
 <div *ngIf="!isReadOnly && !dismissed && sampleAbundance" class="notification is-primary">
   <small><mat-icon>info</mat-icon> Per sample abundance data present, click to download.
-</small><span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
+  </small><span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
 
-<span *ngIf="!isReadOnly" #spacer></span>
-<div
-  *ngIf="!isReadOnly"
-  class="columns mb0 is-vcentered prevent-deselect"
-  style="
+
+<div class="columns mb0 is-vcentered prevent-deselect" style="
     z-index: 1000;
     background-color: white;
     padding: 10px;
     border: 1px solid rgba(0, 0, 0, 0.03);
-  "
-
-  [spacer]="spacer"
-  marginTop="50"
->
+  " marginTop="50">
   <span class="column is-12 fadeIn nmrl">
     <a class="button is-small is-light" (click)="toggleView()">
       <span *ngIf="view == 'compact'; else expandedTable"> Expand Table </span>
       <ng-template #expandedTable> Compact Table </ng-template>
     </a>
     &nbsp;
-    <div style="display: inline-flex; width: 13%" class="field has-addons">
+    <div *ngIf="!isReadOnly" style="display: inline-flex; width: 13%" class="field has-addons">
       <p class="control">
         <input [(ngModel)]="rowsToAdd" class="input is-small" type="text" />
       </p>
@@ -145,27 +120,25 @@
     &nbsp;
     <span *ngIf="data && data.file">
       <mtbls-download [value]="data.file"></mtbls-download>
-      <a style="margin-left: 0.5rem;" (click)="setFilePattern(data.file);openUploadArea = true" class="button is-small is-light" [ngClass]="size">
+      <a *ngIf="!isReadOnly" style="margin-left: 0.5rem;" (click)="setFilePattern(data.file);openUploadArea = true"
+        class="button is-small is-light" [ngClass]="size">
         <mat-icon>cloud_upload</mat-icon> Upload
       </a>
-      <div *ngIf="openUploadArea" style="margin-top: 1rem;"> <app-drag-and-drop  [iscloseable]="true" [filePatternString]="filePatternString" (uploadComplete)="onUploadComplete($event)" (closeUpload)="openUploadArea = false" ></app-drag-and-drop> </div>
+      <div *ngIf="openUploadArea" style="margin-top: 1rem;"> <app-drag-and-drop [iscloseable]="true"
+          [filePatternString]="filePatternString" (uploadComplete)="onUploadComplete($event)"
+          (closeUpload)="openUploadArea = false"></app-drag-and-drop> </div>
     </span>
     &nbsp;
-    <span
-      *ngIf="
+    <span *ngIf="!isReadOnly && (
         selectedRows.length > 0 ||
         selectedColumns.length > 0 ||
         selectedCells.length > 0
-      "
-    >
+      )">
       <span *ngIf="selectedRows.length > 0">
         <a (click)="openDeleteModal()" class="button is-small is-light">
           <mat-icon>delete</mat-icon> Delete
-        </a> </span
-      >&nbsp;
-      <small class="has-text-grey-light"
-        ><mat-icon>info</mat-icon> items selected</small
-      >
+        </a> </span>&nbsp;
+      <small class="has-text-grey-light"><mat-icon>info</mat-icon> items selected</small>
     </span>
     <!-- <span>
       <span class="button is-light is-pulled-right is-small">    
@@ -174,18 +147,13 @@
       </span>
     </span> -->
     <span *ngIf="isFormBusy">
-      <small class="has-text-grey-lighter">Saving</small
-      ><img
-        style="height: 10px; margin-left: 10px"
-        src="{{ baseHref }}assets/img/loading.svg"
-      />
+      <small class="has-text-grey-lighter">Saving</small><img style="height: 10px; margin-left: 10px"
+        src="{{ baseHref }}assets/img/loading.svg" />
     </span>
     <span *ngIf="selectedCells.length > 0 && selectedOntologyCell">
-      <span
-        *ngIf=" selectedOntologyCell.annotationValue !== ''"
-      >
-        &nbsp;<small class="tag is-normal is-default"
-          >{{ selectedOntologyCell.termSource.name }}:{{ selectedOntologyCell.annotationValue }}
+      <span *ngIf=" selectedOntologyCell.annotationValue !== ''">
+        &nbsp;<small class="tag is-normal is-default">{{ selectedOntologyCell.termSource.name }}:{{
+          selectedOntologyCell.annotationValue }}
 
         </small>
       </span>
@@ -195,31 +163,19 @@
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
     <mat-form-field class="full-width bback">
-      <input
-        autocomplete="off"
-        matInput
-        (keyup)="applyFilter($event.target.value)"
-        (keydown)="onKeydown($event, $event.target.value)"
-        placeholder="Filter"
-      />
+      <input autocomplete="off" matInput (keyup)="applyFilter($event.target.value)"
+        (keydown)="onKeydown($event, $event.target.value)" placeholder="Filter" />
     </mat-form-field>
   </span>
 </div>
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
-    <div
-      style="margin-bottom: 0.75rem"
-      *ngIf="filters.length > 0"
-      class="field is-grouped is-grouped-multiline"
-    >
+    <div style="margin-bottom: 0.75rem" *ngIf="filters.length > 0" class="field is-grouped is-grouped-multiline">
       <div *ngFor="let filter of filters" class="control">
         <div class="tags has-addons">
           <span class="tag is-link">{{ filter }}</span>
-          <a (click)="highlightFilteredRows(filter)" class="tag addon-tag"
-            ><mat-icon class="prevent-deselect"
-              >center_focus_strong</mat-icon
-            ></a
-          >
+          <a (click)="highlightFilteredRows(filter)" class="tag addon-tag"><mat-icon
+              class="prevent-deselect">center_focus_strong</mat-icon></a>
           <a (click)="removeFilter(filter)" class="tag is-delete"></a>
         </div>
       </div>
@@ -228,116 +184,71 @@
 </div>
 <span *ngIf="tableData && data">
   <!-- In your component template -->
-<div #wrapper1 id="wrapper1" class="scroll-wrapper" (scroll)="onWrapper1Scroll($event)">
-  <div id="div1" class="mat-elevation-z1 tableclass"></div>
-</div>
-
-<div #wrapper2 id="wrapper2" class="scroll-wrapper" (scroll)="onWrapper2Scroll($event)">
-  <div id="div2" class="mat-elevation-z1 prevent-deselect">
-   <!--table start-->
-    <table
-      editTable
-      (copy)="onCopy($event)"
-      (paste)="onPaste($event)"
-      (cut)="onCut($event)"
-      class="mat-elevation-z1 tableclass"
-      [dataSource]="dataSource"
-      matSort
-      mat-table
-    >
-      <ng-container matColumnDef="Select" sticky>
-        <th
-          (click)="deSelect()"
-          class="clickable table-selector"
-          mat-header-cell
-          *matHeaderCellDef
-        ></th>
-        <td
-          (dblclick)="editRow(row)"
-          (click)="rowClick(row, $event)"
-          class="clickable row-selector"
-          mat-cell
-          *matCellDef="let row"
-        ></td>
-      </ng-container>
-      <ng-container
-        *ngFor="let column of data.columns"
-        [sticky]="column.sticky"
-        [matColumnDef]="column.columnDef"
-      >
-        <th
-          (click)="headerClick(column, $event)"
-          (dblclick)="editColumn(column, $event)"
-          class="headercell clickable hover-highlight mlc-table"
-          mat-header-cell
-          *matHeaderCellDef
-          mat-sort-header
-        >
-          {{ formatHeader(column.header) }}
-        </th>
-        <span *ngIf="!column.structure; else isStructure">
-          <td
-            (keydown)="onKeyDown($event)"
-            (dblclick)="editCell(row, column, $event)"
-            (click)="cellClick(row, column, $event)"
-            class="clickable mlc-table"
-            [ngClass]="{ selected: isSelected(row, column) }"
-            mat-cell
-            *matCellDef="let row"
-          >
-            {{ row[column.header] }}
-          </td>
-        </span>
-        <ng-template #isStructure>
-          <td
-            (keydown)="onKeyDown($event)"
-            class="mlc-table"
-            mat-cell
-            *matCellDef="let row"
-          >
-            <span
-              *ngIf="isChEBIId(row['database_identifier']); else notChEBIId"
-            >
-              <ng-container *ngIf="!imageErrorMap.get(row['database_identifier']); else noStructure">
-                <img
-                  appLazyLoad
-                  width="200"
-                  height="200"
-                  [src]="getStructureUrl(row)"
-                  alt="Chemical structure"
-                  (error)="onImageError(row)"
-                />
-              </ng-container>
-
-              <ng-template #noStructure>
-                <div class="no-structure-message">
-                  <small>Structure unavailable</small>
-                </div>
-              </ng-template>
-            </span>
-            <ng-template #notChEBIId>
-              <small><i>Structure not available</i></small>
-            </ng-template>
-          </td>
-        </ng-template>
-      </ng-container>
-      <tr
-        class="header-row"
-        mat-header-row
-        *matHeaderRowDef="displayedTableColumns"
-      ></tr>
-      
-      <tr mat-row
-      *matRowDef="let row; columns: displayedTableColumns"
-      [ngClass]="{
-        'first-row': isFirstRow(row) && templateRowPresent,
-        'unclickable': isFirstRow(row) && templateRowPresent,
-        'watermark': isFirstRow(row) && templateRowPresent
-      }"></tr>
-    </table>
-        <!--table end-->
+  <div #wrapper1 id="wrapper1" class="scroll-wrapper" (scroll)="onWrapper1Scroll($event)">
+    <div id="div1" class="mat-elevation-z1 tableclass"></div>
   </div>
-</div>
+
+  <div #wrapper2 id="wrapper2" class="scroll-wrapper" (scroll)="onWrapper2Scroll($event)">
+    <div id="div2" class="mat-elevation-z1 prevent-deselect">
+      <!--table start-->
+      <table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)"
+        class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
+        <ng-container matColumnDef="Select" sticky>
+          <th (click)="toggleSelectAll()" class="clickable table-selector" mat-header-cell *matHeaderCellDef>
+            <span *ngIf="!isReadOnly && hasRows" class="radio-tick" [class.selected]="isAllSelected()"></span>
+          </th>
+          <td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell
+            *matCellDef="let row">
+
+            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && isFirstRow(row))" class="radio-tick"
+              [class.selected]="isSelected(row, null)">
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container *ngFor="let column of data.columns" [sticky]="column.sticky" [matColumnDef]="column.columnDef">
+          <th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)"
+            class="headercell clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header>
+            {{ formatHeader(column.header) }}
+          </th>
+          <ng-container *ngIf="!column.structure; else isStructure">
+            <td (keydown)="onKeyDown($event)" (dblclick)="editCell(row, column, $event)"
+              (click)="cellClick(row, column, $event)" class="clickable mlc-table"
+              [ngClass]="{ selected: isSelected(row, column) }" mat-cell *matCellDef="let row">
+              {{ row[column.header] }}
+            </td>
+          </ng-container>
+          <ng-template #isStructure>
+            <td (keydown)="onKeyDown($event)" class="mlc-table" mat-cell *matCellDef="let row">
+              <span *ngIf="isChEBIId(row['database_identifier']); else notChEBIId">
+                <ng-container *ngIf="!imageErrorMap.get(row['database_identifier']); else noStructure">
+                  <img appLazyLoad width="200" height="200" [src]="getStructureUrl(row)" alt="Chemical structure"
+                    (error)="onImageError(row)" />
+                </ng-container>
+
+                <ng-template #noStructure>
+                  <div class="no-structure-message">
+                    <small>Structure unavailable</small>
+                  </div>
+                </ng-template>
+              </span>
+              <ng-template #notChEBIId>
+                <small><i>Structure not available</i></small>
+              </ng-template>
+            </td>
+          </ng-template>
+        </ng-container>
+        <tr class="header-row" mat-header-row *matHeaderRowDef="displayedTableColumns"></tr>
+
+        <tr mat-row *matRowDef="let row; columns: displayedTableColumns" [ngClass]="{
+              'first-row': isFirstRow(row) && templateRowPresent,
+              'unclickable': isFirstRow(row) && templateRowPresent,
+              'watermark': isFirstRow(row) && templateRowPresent
+            }"></tr>
+      </table>
+      <!--table end-->
+    </div>
+  </div>
   <!-- <div class="top-scroll-wrapper wrapper mat-elevation-z1 prevent-deselect">
 
        
@@ -347,8 +258,7 @@
     <span *ngIf="dataSource && dataSource.data.length === 0">
       <div>&nbsp;</div>
       <p class="has-text-centered">
-        <small
-          >The study does not contain any {{ validationsId }} information.
+        <small>The study does not contain any {{ validationsId }} information.
           <br />
           Please use the options above to add details.
         </small>
@@ -357,275 +267,219 @@
     </span>
   </div>
   <!--empty table message end-->
-<!-- </span> -->
+  <!-- </span> -->
 
-<!--Edit column modal start-->
-<div
-  class="modal prevent-deselect"
-  [ngClass]="{ 'is-active': isEditColumnModalOpen }"
->
-  <form *ngIf="editColumnform" [formGroup]="editColumnform">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <div *ngIf="isFormBusy" class="load-bar">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
-      <section class="modal-card-body">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <div class="control">
-                <label>{{ formatHeader(selectedColumn.header) }}</label>
-                <div *ngIf="isCellTypeOntology; else cellInputField">
-                  <mtbls-ontology
-                    [id]="'editOntologyColumn'"
-                    [validations]="
-                      columnValidations(selectedColumn['header'])
-                    "
-                    [controlList]="columnControlList(selectedColumn['header'])"
-                    (changed)="onChanges($event)"
-                    [values]="[]"
-                    [inline]="true"
-                  ></mtbls-ontology>
-                </div>
-                <ng-template #cellInputField>
-                  <mat-form-field class="full-width">
-                    <input class="no-scroll" formControlName="cell" matInput />
-                  </mat-form-field>
-                </ng-template>
-              </div>
-            </div>
-          </div>
+  <!-- Edit column modal start -->
+  <div class="modal prevent-deselect" [ngClass]="{ 'is-active': isEditColumnModalOpen }">
+    <form *ngIf="editColumnform" [formGroup]="editColumnform" (keydown.enter)="onModalEnter($event)">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <div *ngIf="isFormBusy" class="load-bar">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
         </div>
-      </section>
-      <footer class="modal-card-foot buttons is-right">
-        <button
-          *ngIf="!editColumnform.pristine"
-          [disabled]="!editColumnform.valid || isFormBusy"
-          (click)="saveColumnSelectedRowsValues()"
-          class="button is-info"
-        >
-          <mat-spinner
-            [diameter]="20"
-            [strokeWidth]="3"
-            *ngIf="isFormBusy"
-          ></mat-spinner>
-          Save
-        </button>
-        <button
-          *ngIf="editColumnform.pristine"
-          (click)="closeEditColumnModal()"
-          class="button is-info"
-        >
-          OK
-        </button>
-        <button
-          class="button"
-          [disabled]="isFormBusy"
-          (click)="closeEditColumnModal()"
-        >
-          Cancel
-        </button>
-      </footer>
-    </div>
-  </form>
-</div>
-<!--edit column modal end-->
-
-<!--edit cell modal start-->
-<div
-  class="modal editModal prevent-deselect"
-  *ngIf="isEditModalOpen"
-  [ngClass]="{ 'is-active': isEditModalOpen }"
->
-  <form *ngIf="editCellform" [formGroup]="editCellform">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <div *ngIf="isFormBusy" class="load-bar">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
-      <section class="modal-card-body">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <div class="control">
-                <div *ngIf="isCellTypeOntology && !isCellTypeControlList">
-                  <label>{{
-                    formatHeader(selectedCell["column"]["columnDef"])
-                  }}</label>
-                  <mtbls-ontology
-                    [id]="'editOntologyCell'"
-                    [validations]="
-                      columnValidations(
-                        selectedCell['column']['header']
-                      )
-                    "
-                    [controlList]="columnControlList(selectedCell['column']['header'])"
-                    (changed)="onEditCellChanges($event)"
-                    [values]="[selectedCellOntology]"
-                    [inline]="true"
-                  ></mtbls-ontology>
-                </div>
-                <div *ngIf="isCellTypeFile">
-                  <mat-form-field class="full-width">
-                    <mat-select
-                      formControlName="cell"
-                      placeholder="{{
-                        formatHeader(selectedCell['column']['columnDef'])
-                      }}"
-                    >
-                      <mat-option
-                        *ngFor="
-                          let file of getFiles(selectedCell['column']['header'])
-                        "
-                        [value]="file.file"
-                      >
-                        {{ file.file }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </div>
-                <div *ngIf="isCellTypeControlList">
-                  <label>{{
-                    formatHeader(selectedCell["column"]["columnDef"])
-                  }}</label>
-                  <mtbls-ontology
-                    [id]="'editControlListCell'"
-                    [validations]="
-                      columnValidations(
-                        selectedCell['column']['header']
-                      )
-                    "
-                    [controlList]="columnControlList(selectedCell['column']['header'])"
-                    (changed)="onEditCellChanges($event)"
-                    [values]="[selectedCellOntology]"
-                    [inline]="true"
-                  ></mtbls-ontology>
-                </div>
-                <div *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList">
-                  <label>{{
-                    formatHeader(selectedCell["column"]["columnDef"])
-                  }}</label>
-                  <mat-form-field class="full-width">
-                    <input class="no-scroll" formControlName="cell" matInput required/>
-                     <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
-                      Please enter a valid URL
-                    </mat-error>
-                    <mat-error *ngIf="editCellform.get('cell')?.hasError('numberNotAllowed')">
-                      Please enter a valid text
-                    </mat-error>
-                  </mat-form-field>
+        <section class="modal-card-body">
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <label>{{ formatHeader(selectedColumn.header) }}</label>
+                  <div
+                    *ngIf="isCellTypeOntology && !columnControlList(selectedColumn['header']).renderAsDropdown; else dropdownField">
+                    <mtbls-ontology [id]="'editOntologyColumn'"
+                      [validations]="columnValidations(selectedColumn['header'])"
+                      [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
+                      [values]="[]" [inline]="true" [rule]="columnControlList(selectedColumn['header'])?.rule"
+                      [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])"
+                      (emptyError)="onEmptyError($event)"></mtbls-ontology>
+                  </div>
+                  <ng-template #dropdownField>
+                    <mat-form-field class="full-width"
+                      *ngIf="columnControlList(selectedColumn['header']).renderAsDropdown">
+                      <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedColumn.header) }}">
+                        <mat-option *ngFor="let option of columnControlList(selectedColumn['header'])?.values"
+                          [value]="option.annotationValue">
+                          {{ option.annotationValue }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field class="full-width"
+                      *ngIf="!columnControlList(selectedColumn['header']).renderAsDropdown && !isCellTypeOntology">
+                      <input class="no-scroll" formControlName="cell" matInput />
+                    </mat-form-field>
+                  </ng-template>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
-      <footer class="modal-card-foot buttons is-right">
-        <button
-          *ngIf="!editCellform.pristine"
-          [disabled]="!editCellform.valid || isFormBusy"
-          (click)="saveCell()"
-          class="button is-info"
-        >
-          <mat-spinner
-            [diameter]="20"
-            [strokeWidth]="3"
-            *ngIf="isFormBusy"
-          ></mat-spinner>
-          Save
-        </button>
-        <button
-          *ngIf="editCellform.pristine"
-          (click)="closeEditModal()"
-          class="button is-info"
-        >
-          OK
-        </button>
-        <button
-          class="button"
-          [disabled]="isFormBusy"
-          (click)="closeEditModal()"
-        >
-          Cancel
-        </button>
-      </footer>
-    </div>
-  </form>
-</div>
-<!--edit cell modal end-->
-
-<!--Delete modal start-->
-<div
-  class="modal prevent-deselect"
-  [ngClass]="{ 'is-active': isDeleteModalOpen }"
->
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
-      <p>Are you sure you want to delete the selected rows?</p>
-    </section>
-    <footer class="modal-card-foot">
-      <div class="columns is-gapless full-width">
-        <div class="column is-half">
-          <button (click)="closeDelete()" class="button is-info">Cancel</button>
-        </div>
-        <div class="column is-half has-text-right">
-          <button (click)="deleteSelectedRows()" class="button is-danger">
-            OK! Delete Permanently
+        </section>
+        <footer class="modal-card-foot buttons is-right">
+          <button *ngIf="!editColumnform.pristine"
+            [disabled]="!editColumnform.valid || isFormBusy || (isEmptyOntology && isRequiredField) "
+            (click)="saveColumnSelectedRowsValues()" class="button is-info">
+            <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
+            Save
           </button>
-        </div>
+          <button *ngIf="editColumnform.pristine" (click)="closeEditColumnModal()" class="button is-info">
+            OK
+          </button>
+          <button class="button" [disabled]="isFormBusy" (click)="closeEditColumnModal()">
+            Cancel
+          </button>
+        </footer>
       </div>
-    </footer>
+    </form>
   </div>
-</div>
-<!--Delete modal end-->
+  <!-- edit column modal end -->
 
-<!--edit column missing modal start-->
-<div class="modal" [ngClass]="{ 'is-active': isEditColumnMissingModalOpen }">
-  <div class="modal-background"></div>
-  <div
-    *ngIf="selectedMissingCol && selectedMissingKey && selectedMissingVal"
-    class="modal-card"
-  >
-    <section class="modal-card-body">
-      <div class="field is-horizontal">
-        <div class="field-body">
-          <div class="field">
-            <mtbls-ontology
-              [id]="'editMissingOntology'"
-              [validations]="columnValidations(selectedMissingKey)"
-              [controlList]="columnControlList(selectedMissingKey)"
-              (changed)="onChanges($event)"
-              [values]="[selectedMissingVal]"
-              [initialSearchKeyword]="selectedMissingVal"
-              [inline]="true"
-            ></mtbls-ontology>
+  <!-- edit cell modal start -->
+  <div class="modal editModal prevent-deselect" *ngIf="isEditModalOpen" [ngClass]="{ 'is-active': isEditModalOpen }">
+    <form *ngIf="editCellform" [formGroup]="editCellform" (keydown.enter)="onModalEnter($event)">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <div *ngIf="isFormBusy" class="load-bar">
+          <div class="bar"></div>
+          <div class="bar"></div>
+          <div class="bar"></div>
+        </div>
+        <section class="modal-card-body">
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <div
+                    *ngIf="isCellTypeOntology && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <mtbls-ontology [id]="'editOntologyCell'"
+                      [validations]="columnValidations(selectedCell['column']['header'])"
+                      [controlList]="columnControlList(selectedCell['column']['header'])"
+                      (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
+                      [rule]="columnControlList(selectedCell['column']['header']).rule"
+                      [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"
+                      (emptyError)="onEmptyError($event)"></mtbls-ontology>
+                  </div>
+                  <div *ngIf="isCellTypeFile">
+                    <mat-form-field class="full-width">
+                      <mat-select formControlName="cell"
+                        placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
+                        <mat-option *ngFor="let file of getFiles(selectedCell['column']['header'])" [value]="file.file">
+                          {{ file.file }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div
+                    *ngIf="isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <mtbls-ontology [id]="'editControlListCell'"
+                      [validations]="columnValidations(selectedCell['column']['header'])"
+                      [controlList]="columnControlList(selectedCell['column']['header'])"
+                      (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
+                      [rule]="columnControlList(selectedCell['column']['header']).rule"
+                      [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"
+                      (emptyError)="onEmptyError($event)"></mtbls-ontology>
+                  </div>
+                  <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <mat-form-field class="full-width">
+                      <mat-select formControlName="cell"
+                        placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
+                        <mat-option *ngFor="let option of columnControlList(selectedCell['column']['header']).values"
+                          [value]="option.annotationValue">
+                          {{ option.annotationValue }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div
+                    *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
+                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <mat-form-field class="full-width">
+                      <input class="no-scroll" formControlName="cell" matInput />
+                      <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
+                        Please enter a valid URL
+                      </mat-error>
+                      <mat-error *ngIf="editCellform.get('cell')?.hasError('numberNotAllowed')">
+                        Please enter a valid text
+                      </mat-error>
+                    </mat-form-field>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <footer class="modal-card-foot buttons is-right">
+          <button *ngIf="!editCellform.pristine"
+            [disabled]="!editCellform.valid || isFormBusy || (isEmptyOntology && isRequiredField) " (click)="saveCell()"
+            class="button is-info">
+            <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
+            Save
+          </button>
+          <button *ngIf="editCellform.pristine" (click)="closeEditModal()" class="button is-info">
+            OK
+          </button>
+          <button class="button" [disabled]="isFormBusy" (click)="closeEditModal()">
+            Cancel
+          </button>
+        </footer>
+      </div>
+    </form>
+  </div>
+  <!-- edit cell modal end -->
+
+  <!--Delete modal start-->
+  <div class="modal prevent-deselect" [ngClass]="{ 'is-active': isDeleteModalOpen }">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <section class="modal-card-body">
+        <p>Are you sure you want to delete the selected rows?</p>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-half">
+            <button (click)="closeDelete()" class="button is-info">Cancel</button>
+          </div>
+          <div class="column is-half has-text-right">
+            <button (click)="deleteSelectedRows()" class="button is-danger">
+              OK! Delete Permanently
+            </button>
           </div>
         </div>
-      </div>
-    </section>
-    <footer class="modal-card-foot buttons is-right">
-      <button
-        (click)="saveColumnSelectedMissingRowsValues()"
-        class="button is-info"
-        [disabled]="selectedMissingOntology?.termSource?.name?.length === 0 || isFormBusy"
-      >
-        <mat-spinner
-          [diameter]="20"
-          [strokeWidth]="3"
-          *ngIf="isFormBusy"
-        ></mat-spinner>
-        Save
-      </button>
-      <button class="button" (click)="closeEditMissingColValModal()">
-        Cancel
-      </button>
-    </footer>
+      </footer>
+    </div>
   </div>
-</div>
-<!--edit column missing modal end-->
+  <!--Delete modal end-->
+
+  <!--edit column missing modal start-->
+  <div class="modal" [ngClass]="{ 'is-active': isEditColumnMissingModalOpen }">
+    <div class="modal-background"></div>
+    <div *ngIf="selectedMissingCol && selectedMissingKey && selectedMissingVal" class="modal-card">
+      <section class="modal-card-body">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <mtbls-ontology [id]="'editMissingOntology'" [validations]="columnValidations(selectedMissingKey)"
+                [controlList]="columnControlList(selectedMissingKey)" (changed)="onChanges($event)"
+                [values]="[selectedMissingVal]" [initialSearchKeyword]="selectedMissingVal" [inline]="true"
+                [rule]="columnControlList(selectedMissingKey).rule"
+                [defaultOntologies]="getDefaultOntologies(selectedMissingKey)"
+                (emptyError)="onEmptyError($event)"></mtbls-ontology>
+            </div>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot buttons is-right">
+        <button (click)="saveColumnSelectedMissingRowsValues()" class="button is-info"
+          [disabled]="selectedMissingOntology?.termSource?.name?.length === 0 || isFormBusy || (isEmptyOntology && isRequiredField) ">
+          <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
+          Save
+        </button>
+        <button class="button" (click)="closeEditMissingColValModal()">
+          Cancel
+        </button>
+      </footer>
+    </div>
+  </div>
+  <!--edit column missing modal end-->

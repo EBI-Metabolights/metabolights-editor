@@ -68,10 +68,10 @@ export class RawUploadComponent implements OnInit {
   }
 
   copyFilesAndProceed() {
-    this.isLoading = true;
-    this.editorService.syncStudyFiles({ files: [] }).subscribe((resp) => {
-      this.isLoading = false;
+    // this.isLoading = true;
+    // this.editorService.syncStudyFiles({ files: [] }).subscribe((resp) => {
+      // this.isLoading = false;
       this.router.navigate(["/guide/meta", this.requestedStudy]);
-    });
+    // });
   }
 }

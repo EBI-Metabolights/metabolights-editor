@@ -3,6 +3,7 @@ import { StudyPermission } from "../../../services/headers";
 import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand,
   SetReadonly, SetSelectedLanguage, SetStudyError,
   SetTransferStatus,
+  StatusNS,
   StudyPermissionNS} from "./application.actions";
 import { Injectable } from "@angular/core";
 import { ApplicationService } from "src/app/services/decomposed/application.service";
@@ -37,12 +38,14 @@ export interface ApplicationStateModel {
     bannerMessage: string,
     maintenanceMode: boolean,
     controlLists: Record<string, any[]>,
+    applicationTemplates: Record<string, any[]>,
     investigationFailed: boolean,
     readonly: boolean
     isProtocolsExpanded: boolean,
     toastrSettings: Record<string, any>,
-    transferStatus: TransferStatus
-
+    transferStatus: TransferStatus,
+    statusMessage: string | null,
+    statusType: 'success' | 'error' | null
 }
 @Injectable()
 @State<ApplicationStateModel>({
@@ -69,7 +72,8 @@ export interface ApplicationStateModel {
         studyPermission: null,
         bannerMessage: null,
         maintenanceMode: false,
-        controlLists: null,
+        controlLists: {},              // legacy map
+        applicationTemplates: {},
         investigationFailed: null,
         readonly: null,
         isProtocolsExpanded: true,
@@ -90,7 +94,9 @@ export interface ApplicationStateModel {
             aspera: {
                 online: null
             }
-        }
+        },
+        statusMessage: null,
+        statusType: null
     }
 })
 export class ApplicationState {
@@ -340,33 +346,82 @@ export class ApplicationState {
         return state.maintenanceMode
     }
 
-    @Action(DefaultControlLists.Get)
+    // @Action(DefaultControlLists.Get)
+    // GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>) {
+    //     return ctx.getState().controlLists; //just for development purposes
+    // }
+
+    @Action(DefaultControlLists.Get) //enable thsis when production
     GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Get) {
-        this.applicationService.getDefaultControlLists().subscribe(
-            (response) => {
-                ctx.dispatch(new DefaultControlLists.Set(response.controlLists));
+        this.applicationService.getDefaultControlLists().subscribe({
+            next: (response) => {
+                ctx.dispatch(new DefaultControlLists.Set(response.content));
             },
-            (error) => {
+            error: (error) => {
                 console.error(`Unable to get default control lists: ${error}`)
                 ctx.dispatch(new DefaultControlLists.Set({}));
             }
+          }
         )
     }
 
-    @Action(DefaultControlLists.Set)
-    SetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
-        const state = ctx.getState();
-        ctx.setState({
-            ...state,
-            controlLists: action.lists
-        });
-    }
+@Action(DefaultControlLists.Set)
+  setDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
+    const payload = action.lists || {};
+    const state = ctx.getState();
+
+    const incomingFlat: Record<string, any[]> = {controls:  payload.controls}
+
+  //  const merged = {
+  //     ...(state.controlLists || {}),
+  //     ...(payload.controls || {})
+  //   };
+
+    ctx.setState({
+        ...state,
+        applicationTemplates: payload.templates,
+        controlLists: incomingFlat
+    });
+
+  }
+
+    // @Action(DefaultControlLists.Set)
+    // SetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
+    //     const state = ctx.getState();
+    //     ctx.setState({
+    //         ...state,
+    //         controlLists: action.lists
+    //     });
+    // }
 
     @Selector()
     static controlLists(state: ApplicationStateModel) {
         return state.controlLists
     }
 
+    @Selector()
+    static assayFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.assayFileHeaderTemplates
+    }
+    @Selector()
+    static sampleFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.sampleFileHeaderTemplates
+    }
+   @Selector()
+    static assignmentFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.assignmentFileHeaderTemplates
+    }
+   @Selector()    static investigationFileHeaderTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.investigationFileTemplates
+    }
+   @Selector()
+    static protocolTemplates(state: ApplicationStateModel) {
+        return state.applicationTemplates.protocolTemplates
+    }
+   @Selector()
+    static templateConfiguration(state: ApplicationStateModel) {
+        return state.applicationTemplates.configuration
+    }
     @Action(SetProtocolExpand)
     SetProtocolsExpanded(ctx: StateContext<ApplicationStateModel>, action: SetProtocolExpand) {
         const state = ctx.getState();
@@ -413,5 +468,29 @@ export class ApplicationState {
     static transferStatus(state: ApplicationStateModel) {
         return state.transferStatus
     }
+    
+    @Selector()
+    static message(state: ApplicationStateModel) {
+        return state.statusMessage;
+    }
 
+    @Selector()
+    static messageType(state: ApplicationStateModel) {
+        return state.statusType;
+    }
+    @Action(StatusNS.SetMessage)
+    setMessage(ctx: StateContext<ApplicationStateModel>, action: StatusNS.SetMessage) {
+        ctx.patchState({
+            statusMessage: action.message,
+            statusType: action.messageType
+        });
+    }
+
+    @Action(StatusNS.ClearMessage)
+    clearMessage(ctx: StateContext<ApplicationStateModel>) {
+        ctx.patchState({
+            statusMessage: null,
+            statusType: null
+        });
+    }
 }

@@ -61,9 +61,9 @@ export class FtpManagementService {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         Accept: "application/json",
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        "user-token": "dummy",
+        // "user-token": "dummy",
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        Authorization: "Bearer dummy",
+        // Authorization: "Bearer dummy",
         // eslint-disable-next-line @typescript-eslint/naming-convention
         "source-staging-area": sourceStagingArea,
         // eslint-disable-next-line @typescript-eslint/naming-convention
