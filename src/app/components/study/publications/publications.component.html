@@ -11,7 +11,7 @@
           <div class="accordion-header clickable" (click)="toggleExpand(i)">
             <span class="publication-index">{{ i + 1 }}</span>
             <h4 class="publication-title-compact">
-              {{ publication.title | slice: 0: 50 }}{{ publication.title.length > 50 ? '...' : '' }}
+              {{ publication.title | slice: 0: 200 }}{{ publication.title.length > 200 ? '...' : '' }}
             </h4>
             <mat-icon>{{ expandedIndex === i ? 'expand_less' : 'expand_more' }}</mat-icon>
           </div>

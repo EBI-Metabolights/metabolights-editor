@@ -2,7 +2,11 @@
     <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; z-index: 10;"
         (click)="openModal()">+ Add</button>
     <header class="card-heading">
-        <p>Related datasets</p>
+        <p>
+            Related datasets
+            <mat-icon
+                [matTooltip]="'Link to related datasets in other repositories that are associated with this study, such as genomics, proteomics, or other omics data'">help</mat-icon>
+        </p>
     </header>
     <div class="card-content">
         <div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0; else emptyMessage">

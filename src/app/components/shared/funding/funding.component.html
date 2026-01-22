@@ -2,7 +2,11 @@
     <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; z-index: 10;"
         (click)="openModal()">+ Add</button>
     <header class="card-heading">
-        <p>Funding</p>
+        <p>
+            Funding
+            <mat-icon
+                [matTooltip]="'Provide information about the funding sources that supported this study, including organization names, ROR IDs, and grant identifiers'">help</mat-icon>
+        </p>
     </header>
     <div class="card-content">
         <div class="funding-list" *ngIf="(funders$ | async)?.length > 0; else emptyMessage">

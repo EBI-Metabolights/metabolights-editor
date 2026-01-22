@@ -7,14 +7,12 @@
       <div class="content">
         <h4 class="publication-title">
           <b>
-            {{ publication.title | slice: 0:100
-            }}<span *ngIf="publication.title.length > 100">...</span>
+            {{ publication.title }}
           </b>
         </h4>
         <h6 class="publication-authors" style="margin-bottom: 0">
           <small>
-            <mat-icon>people</mat-icon> {{ publication.authorList | slice: 0:90 }}
-            <span *ngIf="publication.authorList.length > 90">...</span>
+            <mat-icon>people</mat-icon> {{ publication.authorList }}
           </small>
         </h6>
         <a *ngIf="!isReadOnly" class="button is-small custom-button" (click)="openModal()">
