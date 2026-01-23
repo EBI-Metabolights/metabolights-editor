@@ -624,25 +624,83 @@ export class PublicationComponent implements OnInit {
     }
   }
 
-  private getStatusValue(): any | null {
+  private matchControlListOntology(label: string): Ontology | null {
+    if (!label) return null;
+    if (!this._controlList) {
+      try { this._controlList = this.controlList(); } catch { this._controlList = null; }
+    }
+    const candidates = (this._controlList && Array.isArray(this._controlList.values) && this._controlList.values) ||
+      (this.defaultControlList && Array.isArray(this.defaultControlList.values) && this.defaultControlList.values) || [];
+    const found = candidates.find((c: any) => {
+      const txt = c?.annotationValue || c?.term || c?.label || c?.value || "";
+      return txt === label;
+    });
+    if (!found) return null;
+    if (found instanceof Ontology) return found;
+    const o = new Ontology();
+    o.annotationValue = found.annotationValue || found.term || found.label || found.value || label;
+    o.termAccession = found.termAccession || found.termAccessionNumber || found.iri || "";
+    o.termSource = new OntologySourceReference();
+    o.termSource.name = found.termSourceRef || (found.termSource && found.termSource.name) || "";
+    return o;
+  }
+
+  private getStatusValue(): Ontology | null {
+    // prefer ontology component first
     try {
-      if (
-        this.statusComponent &&
-        Array.isArray(this.statusComponent.values) &&
-        this.statusComponent.values.length > 0
-      ) {
-        return this.statusComponent.values[0];
+      const compVals = this.statusComponent && Array.isArray(this.statusComponent.values)
+        ? this.statusComponent.values
+        : null;
+      if (compVals && compVals.length > 0) {
+        const v: any = compVals[0];
+        if (!v && v !== "") return null;
+        if (v instanceof Ontology) return v;
+        if (typeof v === "string") {
+          const matched = this.matchControlListOntology(v);
+          return matched || (() => { const tmp = new Ontology(); tmp.annotationValue = v; tmp.termSource = new OntologySourceReference(); tmp.termAccession = ""; return tmp; })();
+        }
+        if (typeof v === "object") {
+          // object might already contain termAccession/termSource; normalize
+          if (v.annotationValue || v.term || v.label || v.value) {
+            const label = v.annotationValue || v.term || v.label || v.value;
+            const matched = this.matchControlListOntology(label);
+            if (matched) return matched;
+            const tmp = new Ontology();
+            tmp.annotationValue = label;
+            tmp.termAccession = v.termAccession || v.termAccessionNumber || v.iri || "";
+            tmp.termSource = new OntologySourceReference();
+            tmp.termSource.name = v.termSourceRef || (v.termSource && v.termSource.name) || "";
+            return tmp;
+          }
+        }
       }
     } catch (_) {}
 
-    // Fallback to form control
-    const controlVal = this.form?.get("status")?.value;
-    if (controlVal === null || controlVal === undefined) return null;
-    if (Array.isArray(controlVal)) {
-      return controlVal.length > 0 ? controlVal[0] : null;
-    }
-    // string or object
-    return controlVal;
+    // fallback to form value
+    try {
+      const controlVal = this.form?.get("status")?.value;
+      if (controlVal === null || controlVal === undefined) return null;
+      const val = Array.isArray(controlVal) ? (controlVal.length > 0 ? controlVal[0] : null) : controlVal;
+      if (!val && val !== "") return null;
+      if (val instanceof Ontology) return val;
+      if (typeof val === "string") {
+        const matched = this.matchControlListOntology(val);
+        return matched || (() => { const tmp = new Ontology(); tmp.annotationValue = val; tmp.termSource = new OntologySourceReference(); tmp.termAccession = ""; return tmp; })();
+      }
+      if (typeof val === "object") {
+        const label = val.annotationValue || val.term || val.label || val.value || "";
+        const matched = this.matchControlListOntology(label);
+        if (matched) return matched;
+        const tmp = new Ontology();
+        tmp.annotationValue = label;
+        tmp.termAccession = val.termAccession || val.termAccessionNumber || val.iri || "";
+        tmp.termSource = new OntologySourceReference();
+        tmp.termSource.name = val.termSourceRef || (val.termSource && val.termSource.name) || "";
+        return tmp;
+      }
+    } catch (_) {}
+
+    return null;
   }
   saveNgxs() {
     if (!this.isReadOnly) {
@@ -689,57 +747,19 @@ export class PublicationComponent implements OnInit {
     }
   }
 
-  compileBody() {
-    const mtblPublication = new MTBLSPublication();
-    mtblPublication.title = this.getFieldValue("title");
-    mtblPublication.authorList = this.getFieldValue("authorList");
-    mtblPublication.doi = this.getFieldValue("doi");
-    mtblPublication.pubMedID = this.getFieldValue("pubMedID");
-    mtblPublication.comments = [];
-    const jsonConvert: JsonConvert = new JsonConvert();
+    compileBody() {
+      const mtblPublication = new MTBLSPublication();
+      mtblPublication.title = this.getFieldValue("title");
+      mtblPublication.authorList = this.getFieldValue("authorList");
+      mtblPublication.doi = this.getFieldValue("doi");
+      mtblPublication.pubMedID = this.getFieldValue("pubMedID");
+      mtblPublication.comments = [];
 
-    const statusRaw = this.getStatusValue();
-    if (!statusRaw) {
-      mtblPublication.status = null;
-    } else {
-      if (statusRaw instanceof Ontology) {
-        mtblPublication.status = statusRaw;
-      } else if (typeof statusRaw === "object") {
-        try {
-          mtblPublication.status = jsonConvert.deserializeObject(
-            statusRaw,
-            Ontology
-          );
-        } catch {
-          const tmp = new Ontology();
-          tmp.annotationValue =
-            statusRaw.annotationValue ||
-            statusRaw.termName ||
-            statusRaw.label ||
-            "";
-          tmp.termAccession =
-            statusRaw.termAccession ||
-            statusRaw.termAccessionNumber ||
-            statusRaw.iri ||
-            "";
-          tmp.termSource = new OntologySourceReference();
-          tmp.termSource.name =
-            statusRaw.termSourceRef || statusRaw.termSource?.name || "";
-          mtblPublication.status = tmp;
-        }
-      } else if (typeof statusRaw === "string") {
-        const tmp = new Ontology();
-        tmp.annotationValue = statusRaw;
-        tmp.termSource = new OntologySourceReference();
-        tmp.termAccession = "";
-        mtblPublication.status = tmp;
-      } else {
-        mtblPublication.status = null;
-      }
+      const status = this.getStatusValue();
+      mtblPublication.status = status ? status : null;
+
+      return { publication: mtblPublication.toJSON() };
     }
-
-    return { publication: mtblPublication.toJSON() };
-  }
 
   deleteNgxs() {
     if (!this.isReadOnly) {
