@@ -16,7 +16,7 @@
             <div class="field">
               <label class="label">Study Category</label>
               <div class="control">
-                <input class="input" type="text" value="MS-MHD Enabled" disabled>
+                <input class="input" type="text" [value]="studyCategory" disabled>
               </div>
             </div>
 
@@ -24,8 +24,8 @@
               <label class="label">Assay Type</label>
               <div class="control">
                 <div class="select is-fullwidth">
-                  <select formControlName="assayType">
-                    <option value="LC-MS">LC-MS</option>
+                  <select formControlName="assayType" (change)="onAssayTypeChange($event.target.value)">
+                    <option *ngFor="let type of activeAssayFileTemplates" [value]="type">{{ type }}</option>
                   </select>
                 </div>
               </div>
@@ -35,129 +35,130 @@
               <label class="label">Measurement Type</label>
               <div class="control">
                 <div class="select is-fullwidth">
-                  <select formControlName="measurementType">
-                    <option value="Untargeted Metabolite Profiling">Untargeted Metabolite Profiling</option>
+                  <select formControlName="measurementType" (change)="onMeasurementTypeChange($event.target.value)">
+                    <option *ngFor="let type of activeMeasurementTypes" [value]="type.value">{{ type.label }}</option>
                   </select>
                 </div>
               </div>
             </div>
 
             <div class="field">
-              <label class="label">Related Omics</label>
+              <label class="label">Primary Omics</label>
               <div class="control">
                 <div class="select is-fullwidth">
-                  <select formControlName="omics">
-                    <option value="Lipidomics">Lipidomics</option>
+                  <select formControlName="omics" (change)="onOmicsTypeChange($event.target.value)">
+                    <option *ngFor="let type of activeOmicsTypes" [value]="type.value">{{ type.label }}</option>
                   </select>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Right Column (Keywords) -->
-          <div class="column is-6 keywords-panel">
-            <div class="keywords-header">
-              <h3 class="title is-6 mb0">Additional Keywords</h3>
-              <button type="button" class="button is-small is-success is-rounded" (click)="addKeyword()"
-                title="Add keyword">
-                <mat-icon>add</mat-icon>
-              </button>
+          <!-- Right Column (Design Descriptors) -->
+          <div class="column is-6">
+            <div class="card" style="height: 100%;">
+              <header class="card-header">
+                <p class="card-header-title">
+                  Design Descriptors
+                  <span class="icon is-small ml-2 has-text-grey-light">
+                    <mat-icon style="font-size: 18px; height: 18px; width: 18px;"
+                      matTooltip="Design Descriptors are the keywords you would use to describe the study">help</mat-icon>
+                  </span>
+                </p>
+                <a class="card-header-icon" aria-label="add" (click)="addDescriptorModal.openModal()">
+                  <span class="icon">
+                    <mat-icon>add_circle</mat-icon>
+                  </span>
+                </a>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  <div *ngIf="designDescriptors.length > 0; else noDescriptors">
+                    <div class="field is-grouped is-grouped-multiline">
+                      <div *ngFor="let descriptor of designDescriptors; let i = index">
+                        <div class="control">
+                          <div class="tags has-addons clickable" (click)="editModal.openModal()">
+                            <span class="tag is-primary">
+                              <mat-icon style="font-size: 14px; height: 14px; width: 14px;">edit</mat-icon>
+                            </span>
+                            <span class="tag is-light">{{ descriptor.annotationValue }}</span>
+                          </div>
+                        </div>
+                        <!-- Hidden Edit Modal for this item -->
+                        <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
+                          [controlListKey]="'Study Design Type'" (saved)="onDescriptorEdited($event, i)"
+                          (deleted)="removeDescriptor(i)">
+                        </mtbls-design-descriptor>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noDescriptors>
+                    <p class="has-text-grey is-size-7 is-italic">No design descriptors added.</p>
+                  </ng-template>
+                </div>
+              </div>
             </div>
 
-            <div class="keywords-scroll">
-              <div class="keyword-item" *ngFor="let keyword of keywords; let i = index">
-                <span class="keyword-text">{{ keyword }}</span>
-                <span class="keyword-actions">
-                  <button type="button" class="icon-btn" (click)="editKeyword(i)" title="Edit">
-                    <mat-icon>edit</mat-icon>
-                  </button>
-                  <button type="button" class="icon-btn" (click)="removeKeyword(i)" title="Remove">
-                    <mat-icon>close</mat-icon>
-                  </button>
+            <!-- Hidden Add Modal -->
+            <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
+              [controlListKey]="'Study Design Type'" (saved)="onDescriptorSaved($event)">
+            </mtbls-design-descriptor>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Dynamic Sections -->
+        <div *ngFor="let section of dynamicSections" class="dynamic-section mb-4">
+          <h4 class="main-heading">
+            <mat-icon class="heading-icon">play_arrow</mat-icon>
+            {{ section.header }}
+          </h4>
+          <div class="columns is-variable is-6 mt10 is-multiline">
+            <div class="column is-6" *ngFor="let field of section.fields">
+              <!-- Label logic -->
+              <label class="label is-small">
+                {{ field.label }}
+                <span *ngIf="field.required" class="has-text-danger">*</span>
+                <span *ngIf="field.description" class="icon is-small has-text-grey-light ml-1">
+                  <mat-icon style="font-size: 14px; height: 14px; width: 14px;"
+                    [matTooltip]="field.description">help</mat-icon>
                 </span>
-              </div>
-            </div>
-          </div>
-        </div>
+              </label>
 
-        <hr>
+              <!-- ONTOLOGY_COLUMN -->
+              <div class="control" *ngIf="field.type === 'ONTOLOGY'">
+                <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"
+                  [inline]="true" [rule]="field.validationRule">
+                </mtbls-ontology>
+              </div>
 
-        <!-- Chromatography Protocol -->
-        <div class="chromatography-protocol">
-          <h4 class="main-heading">
-            <mat-icon class="heading-icon">play_arrow</mat-icon>
-            Chromatography Protocol
-          </h4>
-          <div class="columns is-variable is-6 mt10">
-            <div class="column is-6">
-              <div class="field">
-                <label class="label">Chromatography Instrument</label>
-                <div class="control">
-                  <input class="input" type="text" formControlName="chromInstrument">
-                </div>
+              <!-- SINGLE_COLUMN (Text) -->
+              <div class="control" *ngIf="field.type === 'TEXT'">
+                <input class="input is-small" [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
               </div>
-            </div>
-            <div class="column is-6">
-              <div class="field">
-                <label class="label">Column Type</label>
-                <div class="control">
-                  <div class="select is-fullwidth">
-                    <select formControlName="columnType">
-                      <option value="reverse phase">reverse phase</option>
-                      <option value="HILIC">HILIC</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <!-- Mass Spectrometry Protocol -->
-        <div class="mass-spec-protocol">
-          <h4 class="main-heading">
-            <mat-icon class="heading-icon">play_arrow</mat-icon>
-            Mass Spectrometry Protocol
-          </h4>
-          <div class="columns is-variable is-6 mt10">
-            <div class="column is-6">
-              <div class="field">
-                <label class="label">Mass Spectrometry Instrument</label>
-                <div class="control">
-                  <input class="input" type="text" formControlName="msInstrument">
+              <!-- SINGLE_COLUMN_AND_UNIT_ONTOLOGY -->
+              <div class="field has-addons" *ngIf="field.type === 'TEXT_AND_ONTOLOGY'">
+                <!-- Part 1: Text or Ontology based on mainType -->
+                <div class="control is-expanded">
+                  <ng-container *ngIf="field.mainType === 'TEXT'; else mainOntology">
+                    <input class="input is-small" [formControlName]="field.key" type="text"
+                      placeholder="{{ field.label }}">
+                  </ng-container>
+                  <ng-template #mainOntology>
+                    <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"
+                      [inline]="true" [rule]="field.validationRule">
+                    </mtbls-ontology>
+                  </ng-template>
                 </div>
-              </div>
-              <div class="field">
-                <label class="label">Scan Polarity</label>
-                <div class="control">
-                  <div class="select is-fullwidth">
-                    <select formControlName="polarity">
-                      <option value="positive">positive</option>
-                      <option value="negative">negative</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="column is-6">
-              <div class="field">
-                <label class="label">Ion Source</label>
-                <div class="control">
-                  <div class="select is-fullwidth">
-                    <select formControlName="ionSource">
-                      <option value="electrospray ionization">electrospray ionization</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="field">
-                <label class="label">Mass Analyzer</label>
-                <div class="control">
-                  <div class="select is-fullwidth">
-                    <select formControlName="analyzer">
-                      <option value="quadrupole time-of-flight">quadrupole time-of-flight</option>
-                    </select>
-                  </div>
+
+                <!-- Part 2: Unit (Always Ontology with unitRule) -->
+                <div class="control" style="width: 120px;">
+                  <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')" [validations]="validations"
+                    [inline]="true" [rule]="field.unitRule" [controlListKey]="'unit'">
+                    <!-- Passing control list key just in case rule lookup failed, but we passed rule object -->
+                  </mtbls-ontology>
                 </div>
               </div>
             </div>
@@ -165,56 +166,11 @@
         </div>
 
         <hr>
-
-
-        <div class="identifiers-container">
-          <div class="field">
-            <label class="label">Assay Identifier</label>
-            <div class="control">
-              <input class="input small-input" type="number" formControlName="assayId">
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Assay File Name</label>
-            <div class="control">
-              <input class="input" type="text" [value]="assayFileName" disabled>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Result File Name</label>
-            <div class="control">
-              <input class="input" type="text" [value]="resultFileName" disabled>
-            </div>
-          </div>
-        </div>
       </form>
     </section>
     <footer class="modal-card-foot buttons is-right">
       <button class="button is-primary" (click)="saveAssay()" [disabled]="assayForm.invalid">Create Study</button>
       <button class="button" (click)="closeAddAssayModal()">Cancel</button>
-    </footer>
-  </div>
-</div>
-
-<div class="modal" [ngClass]="{ 'is-active': isKeywordModalOpen }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title">{{ keywordEditMode ? 'Edit' : 'Add' }} Keyword</p>
-      <button class="delete" aria-label="close" (click)="closeKeywordModal()"></button>
-    </header>
-    <section class="modal-card-body">
-      <div class="field">
-        <label class="label">Keyword</label>
-        <div class="control">
-          <input class="input" type="text" [(ngModel)]="currentKeyword" placeholder="Enter keyword"
-            (keyup.enter)="saveKeyword()">
-        </div>
-      </div>
-    </section>
-    <footer class="modal-card-foot buttons is-right">
-      <button class="button is-success" (click)="saveKeyword()">Save</button>
-      <button class="button" (click)="closeKeywordModal()">Cancel</button>
     </footer>
   </div>
 </div>

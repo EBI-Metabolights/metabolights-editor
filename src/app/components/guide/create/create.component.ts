@@ -420,7 +420,7 @@ export class CreateComponent implements OnInit {
   
   // Validation Getters
   get isTitleValid(): boolean {
-      return this.studyTitle && this.studyTitle.trim().length >= 8;
+      return this.studyTitle && this.studyTitle.trim().length >= 25;
   }
   
   get isDescriptionValid(): boolean {
