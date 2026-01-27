@@ -5,29 +5,23 @@
   <div *ngIf="publication">
     <article class="tile is-child box">
       <div class="content">
+        <button *ngIf="!isReadOnly" class="button is-primary is-small" style="float:right;" (click)="openModal()"> <mat-icon>edit</mat-icon> Edit </button>
         <h4 class="publication-title">
-          <b>
-            {{ publication.title | slice: 0:100
-            }}<span *ngIf="publication.title.length > 100">...</span>
-          </b>
+          <span style="width:90%;">
+            {{ publication.title }}
+          </span>
         </h4>
-        <h6 class="publication-authors" style="margin-bottom: 0">
+        <p class="publication-authors" style="margin-bottom: 0">
           <small>
-            <mat-icon>people</mat-icon> {{ publication.authorList | slice: 0:90 }}
-            <span *ngIf="publication.authorList.length > 90">...</span>
+            <ng-container *ngIf="publication?.authorList && publication.authorList.trim().length > 0; else noContact">
+              <mat-icon>people</mat-icon> {{ publication.authorList }}
+            </ng-container>
+            <ng-template #noContact>
+              <mat-icon>people</mat-icon>
+              <i class="is-small is-light">Please add publication contact</i>
+            </ng-template>
           </small>
-        </h6>
-        <a *ngIf="!isReadOnly" class="button is-small custom-button" (click)="openModal()">
-          <mat-icon>edit</mat-icon> Edit </a>&nbsp;
-        <a *ngIf="publication.doi && publication.doi.length > 0" class="button is-small custom-button"
-          [href]="'//dx.doi.org/' + publication.doi" target="_blank">
-          <mat-icon>insert_link</mat-icon>
-        </a>
-        <span *ngIf="publication?.status?.annotationValue?.length > 0"
-          class="tag is-default is-small publication-status">
-          {{publication.status.annotationValue}}
-        </span>
-
+        </p>
       </div>
     </article>
   </div>

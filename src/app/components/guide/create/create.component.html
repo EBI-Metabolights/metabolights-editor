@@ -176,12 +176,12 @@
             <hr />
             <!-- Agreements -->
             <div class="field">
-              <label class="checkbox is-size-7 db mb-2">
+              <label class="checkbox db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.datasetLicenseAgreement"> I accept the terms of the
                 MetaboLights dataset license.
                 <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
               </label>
-              <label class="checkbox is-size-7 db mb-2">
+              <label class="checkbox db mb-2">
                 <input type="checkbox" [(ngModel)]="agreements.datasetPolicyAgreement"> I confirm that I have read and
                 agree to adhere to the MetaboLights data policy.
                 <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
@@ -241,7 +241,7 @@
                 <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors (at least 1)*</h3>
                 <div class="box p-3 is-clearfix" style="position: relative;">
                   <button class="button is-primary is-small"
-                    style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="factorRef.openModal()">+
+                    style="position: absolute; top: 12px; right: 12px; " (click)="factorRef.openModal()">+
                     Add</button>
                   <div class="tags mb-2" style="margin-right: 60px;">
                     <span *ngFor="let factor of factors; let i = index" class="tag is-primary is-light is-medium">
@@ -258,7 +258,7 @@
                 <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
                   <div class="box p-3 is-clearfix" style="position: relative;">
                     <button class="button is-primary is-small"
-                      style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="descRef.openModal()">+
+                      style="position: absolute; top: 12px; right: 12px; " (click)="descRef.openModal()">+
                       Add</button>
                     <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}} <span
                         *ngIf="category.min > 0">(at least {{category.min}})*</span></h6>
@@ -281,7 +281,7 @@
                 <div class="mb-2">
                   <div class="box p-3 is-clearfix" style="position: relative;">
                     <button class="button is-primary is-small"
-                      style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="kwRef.openModal()">+
+                      style="position: absolute; top: 12px; right: 12px;" (click)="kwRef.openModal()">+
                       Add</button>
                     <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;"
                       *ngIf="activeDesignDescriptorCategories.length > 0">Others</h6>
@@ -306,7 +306,7 @@
                 </p>
                 <div class="box p-3 is-clearfix" style="position: relative;">
                   <button class="button is-primary is-small"
-                    style="position: absolute; top: 12px; right: 12px; z-index: 10;" (click)="addNewContact()">+ Add
+                    style="position: absolute; top: 12px; right: 12px;" (click)="addNewContact()">+ Add
                     Contact</button>
                   <div class="columns is-multiline">
                     <div class="column is-4" *ngFor="let contact of contacts; let i = index">

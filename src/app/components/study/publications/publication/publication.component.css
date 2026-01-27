@@ -1,8 +1,6 @@
 .publication-title {
-  min-height: 3.5em;
   font-size: 1em;
-  line-height: 1.55em;
-  margin-top: 0px;
+  font-weight: normal;
 }
 
 .publication-authors {
@@ -16,10 +14,6 @@
 .publication-status {
   margin-top: 12px;
   margin-left: 5px;
-}
-
-.box {
-  padding: 1.2rem 1.9rem 1.2rem 1.2rem;
 }
 
 .mat-icon {

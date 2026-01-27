@@ -1,8 +1,12 @@
 <div [formGroup]="parentForm">
     <div class="columns is-vcentered" style="margin-top: 0px;">
-        <div class="column is-8">
+        <div class="column is-6">
             <div class="field">
-                <label class="label is-small">Protocol URI</label>
+                <label class="label is-small">
+                    Protocol URI
+                    <mat-icon
+                        [matTooltip]="'The Uniform Resource Identifier (URI) for the protocol. Provide a persistent link to the detailed protocol, for example from protocols.io.'">help</mat-icon>
+                </label>
                 <div class="control has-icons-right">
                     <input class="input is-small" type="url" placeholder="https://protocols.io/" formControlName="uri"
                         [disabled]="readonly" />
@@ -16,7 +20,7 @@
             </div>
         </div>
 
-        <div class="column is-4">
+        <div class="column is-6">
             <div class="field">
                 <label class="label is-small">Protocol Version</label>
                 <div class="control">

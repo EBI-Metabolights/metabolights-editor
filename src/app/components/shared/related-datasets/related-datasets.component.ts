@@ -61,10 +61,12 @@ export class RelatedDatasetsComponent implements OnInit {
   editDataset(index: number, dataset: any) {
       this.editingIndex = index;
       this.isModalOpen = true;
-      // Note: identifierSource might need to be an object for the autocomplete to work perfectly, 
-      // but if matched as string it will still show.
+      // Reconstruct the source object for the autocomplete
+      const sourceObject = {
+          name: dataset.repository
+      };
       this.form.patchValue({
-          identifierSource: dataset.repository,
+          identifierSource: sourceObject,
           identifier: dataset.accession
       });
   }
@@ -76,7 +78,7 @@ export class RelatedDatasetsComponent implements OnInit {
   }
 
   displayIdentifierSource(source?: any): string {
-    return source ? source.name : '';
+    return source ? (typeof source === 'string' ? source : source.name) : '';
   }
 
   addDataset() {

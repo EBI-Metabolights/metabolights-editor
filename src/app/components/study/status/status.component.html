@@ -2,7 +2,7 @@
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
 
-    <span class="tag clickable" (click)="openModal()"
+    <span class="tag clickable"  (click)="openModal()"
     [class.is-primary]="status == 'In Review'"
     [class.is-primary]="status == 'Private'"
     [class.is-warning]="status == 'Provisional'"
@@ -11,7 +11,9 @@
       {{
         status
       }}
+      <mat-icon>edit</mat-icon>
     </span>
+    
 
   <span *ngIf="!isReadOnly && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable" (click)="openRevisionStatusModel()">
     <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />

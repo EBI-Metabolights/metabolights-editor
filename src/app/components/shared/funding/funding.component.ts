@@ -65,8 +65,14 @@ export class FundingComponent implements OnInit {
   editFunder(index: number, funder: any) {
       this.editingIndex = index;
       this.isModalOpen = true;
+      // Reconstruct the organization object for the autocomplete
+      const orgObject = {
+          name: funder.fundingOrganization.annotationValue,
+          annotationValue: funder.fundingOrganization.annotationValue,
+          id: funder.fundingOrganization.termAccession
+      };
       this.form.patchValue({
-          funderOrganization: funder.fundingOrganization.annotationValue,
+          funderOrganization: orgObject,
           funderId: funder.fundingOrganization.termAccession,
           grantIdentifier: funder.grantIdentifier
       });
@@ -79,7 +85,7 @@ export class FundingComponent implements OnInit {
   }
 
   displayFunderName(org?: any): string {
-    return org ? (org.name || org.annotationValue) : '';
+    return org ? (typeof org === 'string' ? org : (org.name || org.annotationValue)) : '';
   }
 
   onFunderSelected(event: any) {

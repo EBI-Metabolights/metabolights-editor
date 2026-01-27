@@ -21,7 +21,7 @@ export class PublicationsComponent implements OnInit {
 
   studyPublications$: Observable<IPublication[]> = inject(Store).select(GeneralMetadataState.publications);
   studyReadonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
-
+  
 
   isReadOnly = false;
   publications: any = null;
