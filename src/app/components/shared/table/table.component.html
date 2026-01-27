@@ -1,10 +1,10 @@
-<div *ngIf="data" class="columns is-vcentered">
-  <span class="column is-6 fadeIn nmrl">
+<div *ngIf="data" class="columns is-vcentered" style="padding: 10px 0 10px 0">
+  <span class="column is-4 fadeIn nmrl">
     <span class="has-text-grey">
       <small>File: {{ data.file }}</small>
     </span>
   </span>
-  <span class="column is-6 fadeIn has-text-right nmrl">
+  <span class="column is-8 fadeIn has-text-right nmrl">
     <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
   </span>
 </div>
@@ -58,20 +58,6 @@
       </span>
     </span>
   </div>
-  <div *ngIf="factors && factors.length > 0" class="notification is-primary">
-    <div id="meta">
-      <span>
-        <p>
-          <small><b>Factors</b>:</small>
-          <span class="content">
-            <div *ngFor="let factor of factors">
-              <mtbls-factorlist [value]="factor"></mtbls-factorlist>
-            </div>
-          </span>
-        </p>
-      </span>
-    </div>
-  </div>
 
 </div>
 
@@ -98,6 +84,10 @@
       <ng-template #expandedTable> Compact Table </ng-template>
     </a>
     &nbsp;
+    <a *ngIf="!isReadOnly && showAddSample" (click)="addSampleClick.emit()" class="button is-small is-light">
+      <mat-icon>add</mat-icon> Samples
+    </a>
+    &nbsp;
     <div *ngIf="!isReadOnly" style="display: inline-flex; width: 13%" class="field has-addons">
       <p class="control">
         <input [(ngModel)]="rowsToAdd" class="input is-small" type="text" />
@@ -107,6 +97,7 @@
           <mat-icon>add</mat-icon> Rows
         </a>
       </p>
+
     </div>
     &nbsp;
     <!-- <span *ngIf="data">

@@ -82,6 +82,7 @@ export class TableComponent
   @Input("validationsId") validationsId: any;
   @Input("enableControlList") enableControlList = true;
   @Input("templateRowPresent") templateRowPresent: boolean = false;
+  @Input() showAddSample = false;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -90,6 +91,7 @@ export class TableComponent
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
   @Output() refreshTableData = new EventEmitter<void>();
+  @Output() addSampleClick = new EventEmitter<void>();
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(

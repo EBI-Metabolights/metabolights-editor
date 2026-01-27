@@ -1,158 +1,176 @@
 <span>
-  <a (click)="openAddAssayModal()" class="button button-primary"
-    >Add technique</a
-  >
+  <a (click)="openAddAssayModal()" class="button button-primary is-pulled-right">Add Assay</a>
 </span>
-<span>
-  <div
-    *ngIf="assaySetup"
-    class="modal"
-    [ngClass]="{ 'is-active': isAddAssayModalOpen }"
-  >
-    <div class="modal-background"></div>
-    <div class="modal-card vw80">
-      <div *ngIf="isFormBusy" class="load-bar">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
-      </div>
-      <section class="modal-card-body">
-        <div class="field is-horizontal">
-          <div class="field-body">
+
+<div class="modal" [ngClass]="{ 'is-active': isAddAssayModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card vw80">
+    <section class="modal-card-body" style='overflow-x: hidden;'>
+      <form [formGroup]="assayForm">
+        <h1 class="title is-4 has-text-weight-semibold mb20">Add Assay</h1>
+
+        <!-- Top Grid -->
+        <div class="columns is-variable is-6">
+          <!-- Left Column -->
+          <div class="column is-6">
             <div class="field">
-              <div class="bg-white">
-                <span style="flex: 0 0 100%">
-                  <h3 class="mb5">Select technique</h3>
-                  <span>
-                    <mat-button-toggle-group
-                      [(ngModel)]="selectedAssayTechnologyOption"
-                      (ngModelChange)="assayTechnologyChange()"
-                      class="mat-button-toggle-group-vertical"
-                      #group="matButtonToggleGroup"
-                    >
-                      <mat-button-toggle
-                        [disabled]="technology.disabled"
-                        class="mb5"
-                        *ngFor="let technology of assaySetup.main_techniques"
-                        [value]="technology"
-                      >
-                        {{ technology.name }}
-                      </mat-button-toggle>
-                    </mat-button-toggle-group>
+              <label class="label">Study Category</label>
+              <div class="control">
+                <input class="input" type="text" [value]="studyCategory" disabled>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Assay Type</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select formControlName="assayType" (change)="onAssayTypeChange($event.target.value)">
+                    <option *ngFor="let type of activeAssayFileTemplates" [value]="type">{{ type }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Measurement Type</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select formControlName="measurementType" (change)="onMeasurementTypeChange($event.target.value)">
+                    <option *ngFor="let type of activeMeasurementTypes" [value]="type.value">{{ type.label }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Primary Omics</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select formControlName="omics" (change)="onOmicsTypeChange($event.target.value)">
+                    <option *ngFor="let type of activeOmicsTypes" [value]="type.value">{{ type.label }}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column (Design Descriptors) -->
+          <div class="column is-6">
+            <div class="card" style="height: 100%;">
+              <header class="card-header">
+                <p class="card-header-title">
+                  Design Descriptors
+                  <span class="icon is-small ml-2 has-text-grey-light">
+                    <mat-icon style="font-size: 18px; height: 18px; width: 18px;"
+                      matTooltip="Design Descriptors are the keywords you would use to describe the study">help</mat-icon>
                   </span>
-                  <br />
-                  <span
-                    *ngIf="
-                      selectedAssayTechnologyOption != null &&
-                      selectedAssayTechnologyOption.techniques &&
-                      selectedAssayTechnologyOption.techniques.length > 0
-                    "
-                  >
-                    <br />
-                    <h3 class="mb5">Select assay</h3>
-                    <mat-button-toggle-group
-                      [(ngModel)]="selectedAssayTypeOption"
-                      (ngModelChange)="assayTypeChange()"
-                      class="mat-button-toggle-group-vertical"
-                      #group="matButtonToggleGroup"
-                    >
-                      <mat-button-toggle
-                        [disabled]="technique.disabled"
-                        class="mb5"
-                        *ngFor="
-                          let technique of selectedAssayTechnologyOption.techniques
-                        "
-                        [value]="technique"
-                      >
-                        {{ technique.name }}
-                      </mat-button-toggle>
-                    </mat-button-toggle-group>
-                    <br />
+                </p>
+                <a class="card-header-icon" aria-label="add" (click)="addDescriptorModal.openModal()">
+                  <span class="icon">
+                    <mat-icon>add_circle</mat-icon>
                   </span>
-                  <span
-                    *ngIf="
-                      selectedAssayTypeOption != null &&
-                      selectedAssayTypeOption.sub_techniques &&
-                      selectedAssayTypeOption.sub_techniques.length > 0
-                    "
-                  >
-                    <br />
-                    <h3 class="mb5">Define assay</h3>
-                    <mat-button-toggle-group
-                      [(ngModel)]="selectedAssayVariantOption"
-                      (ngModelChange)="assayTypeVariantChange()"
-                      class="mat-button-toggle-group-vertical"
-                      #group="matButtonToggleGroup"
-                    >
-                      <mat-button-toggle
-                        [disabled]="sub_technique.disabled"
-                        class="mb5"
-                        *ngFor="
-                          let sub_technique of selectedAssayTypeOption.sub_techniques
-                        "
-                        [value]="sub_technique"
-                      >
-                        {{ sub_technique.name }}
-                      </mat-button-toggle>
-                    </mat-button-toggle-group>
-                  </span>
-                  <span
-                    *ngIf="
-                      selectedAssayVariantOption &&
-                      selectedAssayVariantOption.columns &&
-                      selectedAssayVariantOption.columns.length > 0
-                    "
-                  >
-                    <br />
-                    <!-- <h3>Column details</h3> -->
-                    <span
-                      class="mb5"
-                      *ngFor="
-                        let column of selectedAssayVariantOption.columns;
-                        index as i
-                      "
-                    >
-                      <br />
-                      <small>Select {{ column.name }}</small>
-                      <span class="mb5">
-                        <mat-button-toggle-group
-                          [(ngModel)]="selectedAssayVariantColumnOption[i]"
-                          (ngModelChange)="assayTypeVariantColumnChange()"
-                          class="mat-button-toggle-group-vertical"
-                          #group="matButtonToggleGroup"
-                        >
-                          <mat-button-toggle
-                            [disabled]="columnValue.disabled"
-                            class="mb5"
-                            *ngFor="let columnValue of column.values"
-                            [value]="columnValue"
-                          >
-                            {{ columnValue.name }}
-                          </mat-button-toggle>
-                        </mat-button-toggle-group>
-                      </span>
-                    </span>
-                  </span>
+                </a>
+              </header>
+              <div class="card-content">
+                <div class="content">
+                  <div *ngIf="designDescriptors.length > 0; else noDescriptors">
+                    <div class="field is-grouped is-grouped-multiline">
+                      <div *ngFor="let descriptor of designDescriptors; let i = index">
+                        <div class="control">
+                          <div class="tags has-addons clickable" (click)="editModal.openModal()">
+                            <span class="tag is-primary">
+                              <mat-icon style="font-size: 14px; height: 14px; width: 14px;">edit</mat-icon>
+                            </span>
+                            <span class="tag is-light">{{ descriptor.annotationValue }}</span>
+                          </div>
+                        </div>
+                        <!-- Hidden Edit Modal for this item -->
+                        <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
+                          [controlListKey]="'Study Design Type'" (saved)="onDescriptorEdited($event, i)"
+                          (deleted)="removeDescriptor(i)">
+                        </mtbls-design-descriptor>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noDescriptors>
+                    <p class="has-text-grey is-size-7 is-italic">No design descriptors added.</p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hidden Add Modal -->
+            <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
+              [controlListKey]="'Study Design Type'" (saved)="onDescriptorSaved($event)">
+            </mtbls-design-descriptor>
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Dynamic Sections -->
+        <div *ngFor="let section of dynamicSections" class="dynamic-section mb-4">
+          <h4 class="main-heading">
+            <mat-icon class="heading-icon">play_arrow</mat-icon>
+            {{ section.header }}
+          </h4>
+          <div class="columns is-variable is-6 mt10 is-multiline">
+            <div class="column is-6" *ngFor="let field of section.fields">
+              <!-- Label logic -->
+              <label class="label is-small">
+                {{ field.label }}
+                <span *ngIf="field.required" class="has-text-danger">*</span>
+                <span *ngIf="field.description" class="icon is-small has-text-grey-light ml-1">
+                  <mat-icon style="font-size: 14px; height: 14px; width: 14px;"
+                    [matTooltip]="field.description">help</mat-icon>
                 </span>
+              </label>
+
+              <!-- ONTOLOGY_COLUMN -->
+              <div class="control" *ngIf="field.type === 'ONTOLOGY'">
+                <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"
+                  [inline]="true" [rule]="field.validationRule">
+                </mtbls-ontology>
+              </div>
+
+              <!-- SINGLE_COLUMN (Text) -->
+              <div class="control" *ngIf="field.type === 'TEXT'">
+                <input class="input is-small" [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
+              </div>
+
+              <!-- SINGLE_COLUMN_AND_UNIT_ONTOLOGY -->
+              <div class="field has-addons" *ngIf="field.type === 'TEXT_AND_ONTOLOGY'">
+                <!-- Part 1: Text or Ontology based on mainType -->
+                <div class="control is-expanded">
+                  <ng-container *ngIf="field.mainType === 'TEXT'; else mainOntology">
+                    <input class="input is-small" [formControlName]="field.key" type="text"
+                      placeholder="{{ field.label }}">
+                  </ng-container>
+                  <ng-template #mainOntology>
+                    <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"
+                      [inline]="true" [rule]="field.validationRule">
+                    </mtbls-ontology>
+                  </ng-template>
+                </div>
+
+                <!-- Part 2: Unit (Always Ontology with unitRule) -->
+                <div class="control" style="width: 120px;">
+                  <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')" [validations]="validations"
+                    [inline]="true" [rule]="field.unitRule" [controlListKey]="'unit'">
+                    <!-- Passing control list key just in case rule lookup failed, but we passed rule object -->
+                  </mtbls-ontology>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      <footer class="modal-card-foot buttons is-right">
-        <span
-          *ngIf="
-            selectedAssayTechnologyOption != null &&
-            selectedAssayTypeOption != null &&
-            selectedAssayVariantOption != null
-          "
-        >
-          <button (click)="addAssay()" class="button is-primary">
-            + Add assay type
-          </button>
-        </span>
-        <button class="button" (click)="closeAddAssayModal()">Cancel</button>
-      </footer>
-    </div>
+
+        <hr>
+      </form>
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <button class="button is-primary" (click)="saveAssay()" [disabled]="assayForm.invalid">Add Assay</button>
+      <button class="button" (click)="closeAddAssayModal()">Cancel</button>
+    </footer>
   </div>
-</span>
+</div>

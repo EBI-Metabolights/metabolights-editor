@@ -11,7 +11,7 @@
   margin-left: 1rem;
   gap: 1rem;
   padding-bottom: 1rem;
-  border-bottom: solid 1px  gainsboro;
+  border-bottom: solid 1px gainsboro;
 }
 
 .study-meta-left {
@@ -42,6 +42,13 @@
     justify-content: flex-start;
   }
 }
+
 .gold {
   color: gold;
+}
+
+.tabs li.is-active a {
+  background-color: aliceblue;
+  border-bottom-color: #3273dc;
+  color: #3273dc;
 }

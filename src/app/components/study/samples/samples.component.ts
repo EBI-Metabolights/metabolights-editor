@@ -242,6 +242,7 @@ export class SamplesComponent  {
           usf.push(f);
         }
       });
+      return usf;
     }
     return [];
   }

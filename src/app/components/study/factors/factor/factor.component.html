@@ -1,12 +1,19 @@
 <div *ngIf="addNewFactor || factor == null; else showFactorDetails">
   <span *ngIf="mode == 'store'">
-    <span *ngIf="!isDropdown; else showDropdownOption">
-      <a class="button is-light is-pulled-right is-small" [routerLink]="['/study', studyId, 'samples' ]">
-        <mat-icon>info</mat-icon>
-        Add, modify or delete Factors in the Samples section</a>
+    <span *ngIf="isSampleSheet; else standardView">
+      <a (click)="openModal()" class="button is-primary is-small">
+        <span> + Add</span>
+      </a>
     </span>
-    <ng-template #showDropdownOption>
-      <a (click)="openModal()" class="dropdown-item"> Add new factor </a>
+    <ng-template #standardView>
+      <span *ngIf="!isDropdown; else showDropdownOption">
+        <a class="button is-light is-pulled-right is-small" [routerLink]="['/study', studyId, 'samples' ]">
+          <mat-icon>info</mat-icon>
+          Add, modify or delete Factors in the Samples section</a>
+      </span>
+      <ng-template #showDropdownOption>
+        <a (click)="openModal()" class="dropdown-item"> Add new factor </a>
+      </ng-template>
     </ng-template>
   </span>
   <span *ngIf="mode == 'local' && false">

@@ -35,6 +35,7 @@ import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-
 export class FactorComponent implements OnInit {
   @Input("value") factor: MTBLSFactor;
   @Input("isDropdown") isDropdown = false;
+  @Input("isSampleSheet") isSampleSheet = false;
   @Input("mode") mode: 'store' | 'local' = 'store';
 
   @ViewChild('factorType') factorTypeComponent: OntologyComponent;

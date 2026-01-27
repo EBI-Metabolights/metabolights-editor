@@ -23,15 +23,9 @@
         </p>
         <br />
         <p>
-          <a
-            class="button is-small custom-button"
-            [href]="baseHref + 'study/' + requestedStudy"
-            ><mat-icon
-              class="mat-icon notranslate material-icons mat-icon-no-color"
-              role="img"
-              aria-hidden="true"
-              >person</mat-icon
-            >
+          <a class="button is-small custom-button" [href]="baseHref + 'study/' + requestedStudy"><mat-icon
+              class="mat-icon notranslate material-icons mat-icon-no-color" role="img"
+              aria-hidden="true">person</mat-icon>
             Login
           </a>
         </p>
@@ -49,13 +43,15 @@
     </article>-->
     <article class="message is-success">
       <div class="message-body">
-        This study ({{requestedStudy}}) is now in the 'Private' stage. The link <b> {{ endpoint + requestedStudy }} </b> will be the official link for referencing this MetaboLights study in any
-          paper, website or other communication.
-          <br/>
-          <br/>
-          <p>
-            If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team (metabolights-help&#64;ebi.ac.uk).
-          </p>
+        This study ({{requestedStudy}}) is now in the 'Private' stage. The link <b> {{ endpoint + requestedStudy }} </b>
+        will be the official link for referencing this MetaboLights study in any
+        paper, website or other communication.
+        <br />
+        <br />
+        <p>
+          If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team
+          (metabolights-help&#64;ebi.ac.uk).
+        </p>
       </div>
     </article>
   </div>
@@ -69,10 +65,11 @@
 
         </p>
 
-      <br/>
-          <p>
-            If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team (metabolights-help&#64;ebi.ac.uk).
-          </p>
+        <br />
+        <p>
+          If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team
+          (metabolights-help&#64;ebi.ac.uk).
+        </p>
       </div>
     </article>
   </div>
@@ -98,13 +95,9 @@
       </div>
     </article>
   </div> -->
-  <div
-    *ngIf="requestedStudy != undefined && !studyError"
-    class="main-wrapper"
-    style="margin-top: 0; margin-bottom: 0"
-  >
+  <div *ngIf="requestedStudy != undefined && !studyError" class="main-wrapper" style="margin-top: 0; margin-bottom: 0">
     <span *ngIf="requestedStudy != undefined">
-     <!-- <div
+      <!-- <div
         *ngIf="!studyError"
         id="meta"
         class="field is-grouped is-grouped-multiline px-20 mb-10"
@@ -173,100 +166,57 @@
           </div>
         </div>
       </div>-->
-              <!-- Right Column -->
-              <div *ngIf="false" class="study-meta-right">
-                <div class="tags has-addons">
-                  <span class="tag">
-                    <i class="material-icons">edit</i>
-                  </span>
-                  <a
-                    [href]="baseHref + 'study/' + requestedStudy"
-                    class="tag is-link clickable"
-                    >Edit</a
-                  >
-                  <span *ngIf="isCurator"> &nbsp; </span>
-                  <span class="tag">
-                    <i class="material-icons">cloud_upload</i>
-                  </span>
-                  <a
-                    [href]="endpoint + 'updatestudyform?study=' + requestedStudy"
-                    class="tag is-link clickable"
-                    >ISA</a
-                  >
-                </div>
-              </div>
+      <!-- Right Column -->
+      <div *ngIf="false" class="study-meta-right">
+        <div class="tags has-addons">
+          <span class="tag">
+            <i class="material-icons">edit</i>
+          </span>
+          <a [href]="baseHref + 'study/' + requestedStudy" class="tag is-link clickable">Edit</a>
+          <span *ngIf="isCurator"> &nbsp; </span>
+          <span class="tag">
+            <i class="material-icons">cloud_upload</i>
+          </span>
+          <a [href]="endpoint + 'updatestudyform?study=' + requestedStudy" class="tag is-link clickable">ISA</a>
+        </div>
+      </div>
       <span *ngIf="!studyError">
-              <mtbls-overview-badges
-      [studyError]="studyError"
-      [revisionDatetime]="revisionDatetime"
-      [revisionNumber]="revisionNumber"
-      [curationStatus]="curationRequest | curationStatusStarTransform"
-      [isOwner]="isOwner"
-      [isCurator]="isCurator"
-      [status]="status"
-      [validationStatus]="validationStatus"
-      [validation]="validation"></mtbls-overview-badges>
+        <mtbls-overview-badges [studyError]="studyError" [revisionDatetime]="revisionDatetime"
+          [revisionNumber]="revisionNumber" [curationStatus]="curationRequest | curationStatusStarTransform"
+          [isOwner]="isOwner" [isCurator]="isCurator" [status]="status" [validationStatus]="validationStatus"
+          [validation]="validation"></mtbls-overview-badges>
         <mtbls-title></mtbls-title>
         <mtbls-people></mtbls-people>
-        <mtbls-description></mtbls-description>
-        <mtbls-organisms></mtbls-organisms>
-        <mtbls-publications></mtbls-publications>
       </span>
       <div id="tab-content-wrapper" class="px-20 mt-20">
         <div class="card">
           <div class="columns">
             <div class="column is-full tabs npt">
               <ul>
-                <li
-                  *ngIf="!studyError"
-                  (click)="selectCurrentTab(0, 'descriptors')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }"
-                >
-                  <a>Descriptors</a>
+                <li *ngIf="!studyError" color="primary" (click)="selectCurrentTab(0, 'overview')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }">
+                  <a>Overview</a>
                 </li>
-                <li
-                  *ngIf="!studyError"
-                  (click)="selectCurrentTab(1, 'protocols')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }"
-                >
-                  <a>Protocols</a>
-                </li>
-                <li
-                  *ngIf="!studyError"
-                  (click)="selectCurrentTab(2, 'samples')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }"
-                >
+                <li *ngIf="!studyError" (click)="selectCurrentTab(1, 'samples')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }">
                   <a>Samples</a>
                 </li>
-                <li
-                  *ngIf="!studyError"
-                  (click)="selectCurrentTab(3, 'assays')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }"
-                >
+                <li *ngIf="!studyError" (click)="selectCurrentTab(2, 'assays')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }">
                   <a>Assays</a>
                 </li>
-                <li
-                  *ngIf="!studyError"
-                  (click)="selectCurrentTab(4, 'metabolites')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }"
-                >
+                <li *ngIf="!studyError" (click)="selectCurrentTab(3, 'protocols')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }">
+                  <a>Protocols</a>
+                </li>
+                <li *ngIf="!studyError" (click)="selectCurrentTab(4, 'metabolites')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }">
                   <a>Metabolites</a>
                 </li>
-                <li
-                  (click)="selectCurrentTab(5, 'files')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }"
-                >
+                <li (click)="selectCurrentTab(5, 'files')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }">
                   <a>Files</a>
                 </li>
-                <!-- <li
-                  *ngIf="isCurator"
-                  (click)="selectCurrentTab(6, 'validations')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }"
-                >
-                  <a>Study Validations v1</a>
-                </li> -->
-
-                <!-- <li *ngIf="!studyError" (click)="selectCurrentTab(6, 'pathways')" [ngClass]="{'is-active': (currentTabIndex$ | async) === 6 }"><a>Pathways</a></li> -->
               </ul>
             </div>
           </div>
@@ -274,57 +224,45 @@
             <div class="columns">
               <div class="column is-full">
                 <span *ngIf="!studyError">
-                  <div
-                    class="tab-content fadeIn animated"
-                    *ngIf="(currentTabIndex$ | async) === 0"
-                  >
-                    <mtbls-design-descriptors></mtbls-design-descriptors>
-                    <br />
-                    <mtbls-factors></mtbls-factors>
+                  <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 0">
+                    <div class="columns is-multiline">
+                      <div class="column is-12 mb-6">
+                        <mtbls-description></mtbls-description>
+                      </div>
+                      <div class="column is-12 mb-6">
+                        <mtbls-organisms></mtbls-organisms>
+                      </div>
+                      <div class="column is-12 mb-6">
+                        <mtbls-publications></mtbls-publications>
+                      </div>
+                      <div class="column is-12 mb-6">
+                        <mtbls-design-descriptors></mtbls-design-descriptors>
+                      </div>
+                    </div>
                   </div>
-                  <div
-                    class="tab-content fadeIn animated"
-                    *ngIf="(currentTabIndex$ | async) === 1"
-                  >
+                </span>
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 1">
+                  <mtbls-samples></mtbls-samples>
+                </div>
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 2">
+                  <mtbls-assays></mtbls-assays>
+                </div>
+                <span *ngIf="!studyError">
+                  <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 3">
                     <mtbls-protocols></mtbls-protocols>
                   </div>
                 </span>
-                <div
-                  class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 2"
-                >
-                  <mtbls-samples></mtbls-samples>
-                </div>
-                <div
-                  class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 3"
-                >
-                  <mtbls-assays></mtbls-assays>
-                </div>
-                <div
-                  class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 4"
-                >
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 4">
                   <mtbls-mafs></mtbls-mafs>
                 </div>
                 <span *ngIf="files != null">
-                  <div
-                    class="tab-content fadeIn animated"
-                    *ngIf="(currentTabIndex$ | async) === 5"
-                  >
+                  <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 5">
                     <mtbls-files class="files-tab"></mtbls-files>
                   </div>
                 </span>
-                <div
-                  class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 7 && (isOwner || isCurator)"
-                >
+                <div class="tab-content fadeIn animated"
+                  *ngIf="(currentTabIndex$ | async) === 6 && (isOwner || isCurator)">
                   <study-validations></study-validations>
-                </div>
-                <div
-                  class="tab-content fadeIn animated"
-                  *ngIf="(currentTabIndex$ | async) === 7"
-                >
                 </div>
               </div>
             </div>

@@ -1,6 +1,9 @@
 <div class="card mb-6" style="position: relative;">
-  <mtbls-factor *ngIf="!isReadOnly" [value]="null"
-    style="position: absolute; top: 12px; right: 12px;"></mtbls-factor>
+  <div *ngIf="!isReadOnly" style="position: absolute; top: 12px; right: 12px;">
+    <mtbls-factor (addFactorToSampleSheet)="addFactorToSampleSheet.emit($event)"
+      (addFactorToSampleSheetUnitInclusive)="addFactorToSampleSheetUnitInclusive.emit($event)"
+      [isSampleSheet]="isSampleSheet" [value]="null"></mtbls-factor>
+  </div>
   <header class="card-heading">
     <p>Factors
       <span *ngIf="!isReadOnly"><mat-icon
@@ -9,20 +12,17 @@
   </header>
   <div class="card-content">
     <div class="content">
-      <div *ngIf="factors && factors.length > 0; else emptyMessage">
-        <div id="meta">
-          <div *ngFor="let factor of factors">
-            <mtbls-factor [value]="factor"></mtbls-factor>
-          </div>
+      <div class="field is-grouped is-grouped-multiline">
+        <div *ngFor="let factor of factors" class="control">
+          <mtbls-factor [value]="factor"></mtbls-factor>
         </div>
       </div>
-      <ng-template #emptyMessage>
+      <div *ngIf="!(factors && factors.length > 0)">
         <p class="placeholder-text">
           <small>Factors represent the conditions, treatments, or groupings that differentiate one set of samples from
             another, defining the basis for comparisons within the study (e.g., Treatment, Genotype, Timepoint,
             etc.).</small>
         </p>
-      </ng-template>
+      </div>
     </div>
   </div>
-</div>

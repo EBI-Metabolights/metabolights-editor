@@ -1,21 +1,16 @@
 <div *ngIf="!isReadOnly" class="notification is-primary">
-  <small><mat-icon>info</mat-icon>Please complete the table below to describe the samples (including QCs). Values for ‘Characteristics’ such as ‘Organism’ and ‘Organism Part’ must be added as well as ‘Factor’ information to describe experimental design and groups of samples, for example, ‘Disease’, ‘Treatment’ or ‘Timepoint’.
-  <br/>
-  <b>Please see the <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_BLANK">Guides</a> for more information on how to complete your Samples section.</b>
+  <small><mat-icon>info</mat-icon>Please complete the table below to describe the samples (including QCs). Values for
+    ‘Characteristics’ such as ‘Organism’ and ‘Organism Part’ must be added as well as ‘Factor’ information to describe
+    experimental design and groups of samples, for example, ‘Disease’, ‘Treatment’ or ‘Timepoint’.
+    <br />
+    <b>Please see the <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_BLANK">Guides</a> for more
+      information on how to complete your Samples section.</b>
   </small>
 </div>
-<div
-  *ngIf="duplicateSamples.length > 0 && !isReadOnly"
-  class="notification is-warning"
->
-  <small
-    ><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br />
+<div *ngIf="duplicateSamples.length > 0 && !isReadOnly" class="notification is-warning">
+  <small><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br />
     <span *ngFor="let sample of duplicateSamples">
-      <span
-        (click)="sampleTable.filterDuplicate(sample)"
-        class="pointer tag is-white"
-        >{{ sample }}</span
-      >&nbsp;
+      <span (click)="sampleTable.filterDuplicate(sample)" class="pointer tag is-white">{{ sample }}</span>&nbsp;
     </span>
   </small>
 </div>
@@ -24,63 +19,22 @@
     <small><mat-icon>info</mat-icon>Empty samples exist in the sample sheet</small>
   </div>
 -->
-<span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
-    <!--Add factor dropdown start-->
-
-  <div class="dropdown" [ngClass]="{ 'is-active': isFactorDropdownActive }">
-    <div class="dropdown-trigger">
-      <button
-        (click)="toggleDropdown()"
-        class="button is-light is-small add-factor-button"
-      >
-        <span><mat-icon>add</mat-icon>Factor</span>
-      </button>
-    </div>
-    <div class="dropdown-menu has-text-left" role="menu">
-      <div class="dropdown-content">
-        <span *ngFor="let factor of unSelectedFactors">
-          <a
-            (click)="openAddColumnModal('factor', factor)"
-            class="dropdown-item"
-          >
-            {{ factor.factorName }}
-          </a>
-        </span>
-        <mtbls-factor *ngIf="showFactorComponent"
-          (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
-          (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"
-          [isDropdown]="true"
-          [value]="null"
-        ></mtbls-factor>
-      </div>
-    </div>
-  </div>
-  <!--Add factor dropdown end-->
-
-  &nbsp;
-  <a (click)="openAddSamplesModal()" class="button is-small is-light">
-    <mat-icon>add</mat-icon> Samples
-  </a>
-</span>
+<div class="column is-12 nprl nmrl fadeIn">
+  <mtbls-factors [isSampleSheet]="true" [unSelectedFactors]="unSelectedFactors"
+    (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
+    (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"></mtbls-factors>
+</div>
 <app-prompt-refresh *ngIf="!isReadOnly && showRefreshPrompt()" [context]="'samples'"></app-prompt-refresh>
 
-<mtbls-table
-  [fileTypes]="fileTypes"
-  (updated)="refresh()"
-  [tableData]="samples"
-  validationsId="samples"
-  [factors]="factors"
-  (refreshTableData)="refreshSamplesTableWithoutPopup()"
-></mtbls-table>
+<mtbls-table [fileTypes]="fileTypes" (updated)="refresh()" [tableData]="samples" validationsId="samples"
+  [factors]="factors" [showAddSample]="true" (addSampleClick)="openAddSamplesModal()"
+  (refreshTableData)="refreshSamplesTableWithoutPopup()"></mtbls-table>
 
-  <!--Add column modal start-->
+<!--Add column modal start-->
 <div class="modal" [ngClass]="{ 'is-active': addColumnModalOpen }">
   <div class="modal-background"></div>
   <!--Add Characteristic Column Startt-->
-  <div
-    *ngIf="addColumnType && addColumnType == 'characteristic'"
-    class="modal-card"
-  >
+  <div *ngIf="addColumnType && addColumnType == 'characteristic'" class="modal-card">
     <div *ngIf="isFormBusy" class="load-bar">
       <div class="bar"></div>
       <div class="bar"></div>
@@ -89,16 +43,10 @@
     <form *ngIf="form" [formGroup]="form">
       <section class="modal-card-body">
         <div>
-          <mtbls-ontology
-            [id]="'characteristicCategory'"
-            [validations]="fieldValidation('category')"
-            [controlList]="controlList('Characteristics')"
-            (changed)="onChanges($event)"
-            [values]="[]"
-            [inline]="true"
-            [rule]="controlList('Characteristics').rule" 
-          [defaultOntologies]="controlList('Characteristics').defaultOntologies"
-          ></mtbls-ontology>
+          <mtbls-ontology [id]="'characteristicCategory'" [validations]="fieldValidation('category')"
+            [controlList]="controlList('Characteristics')" (changed)="onChanges($event)" [values]="[]" [inline]="true"
+            [rule]="controlList('Characteristics').rule"
+            [defaultOntologies]="controlList('Characteristics').defaultOntologies"></mtbls-ontology>
         </div>
       </section>
       <footer class="modal-card-foot">
@@ -108,10 +56,7 @@
             <button (click)="closeAddColumnModal()" class="button">
               Cancel
             </button>
-            <button
-              (click)="addColumn('characteristic')"
-              class="button is-info"
-            >
+            <button (click)="addColumn('characteristic')" class="button is-info">
               Add characteristic Column
             </button>
           </div>
@@ -134,18 +79,10 @@
           Add factor column to Sample sheet -
           <span class="highlight">{{ selectedFactor === null ? "" : selectedFactor.factorName }}</span>
         </h6>
-        <mtbls-ontology
-          [id]="'factorUnit'"
-          class="mt-20"
-          #factorUnit
-          [validations]="fieldValidation('unit')"
-          [controlList]="controlList('unit')"
-          (changed)="onChanges($event)"
-          [values]="[]"
-          [inline]="true"
-          [rule]="controlList('unit').rule" 
-          [defaultOntologies]="controlList('unit').defaultOntologies"
-        ></mtbls-ontology>
+        <mtbls-ontology [id]="'factorUnit'" class="mt-20" #factorUnit [validations]="fieldValidation('unit')"
+          [controlList]="controlList('unit')" (changed)="onChanges($event)" [values]="[]" [inline]="true"
+          [rule]="controlList('unit').rule"
+          [defaultOntologies]="controlList('unit').defaultOntologies"></mtbls-ontology>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -164,7 +101,7 @@
   </div>
   <!--Add factor column end-->
 </div>
-  <!--Add column modal end-->
+<!--Add column modal end-->
 
 <!--Add samples modal start-->
 <div class="modal" [ngClass]="{ 'is-active': isAddSamplesModalOpen }">
@@ -183,34 +120,24 @@
               <div class="control">
                 <mat-form-field class="full-width">
                   <mat-label>{{ validation["samples"].label }}</mat-label>
-                  <textarea
-                    class="no-scroll"
-                    formControlName="samples"
-                    matInput
-                    [placeholder]="validation['samples'].placeholder"
-                    cdkAutosizeMinRows="20"
-                    cdkAutosizeMaxRows="10"
-                    cdkTextareaAutosize
-                  >
+                  <textarea class="no-scroll" formControlName="samples" matInput
+                    [placeholder]="validation['samples'].placeholder" cdkAutosizeMinRows="20" cdkAutosizeMaxRows="10"
+                    cdkTextareaAutosize>
                   </textarea>
                   <mat-hint>{{ validation.samples.description }}</mat-hint>
-                  <mat-error
-                    *ngIf="
+                  <mat-error *ngIf="
                       form.get('samples').errors &&
                       form.get('samples').dirty &&
                       form.get('samples').errors.samples
-                    "
-                  >
+                    ">
                     {{ form.get("samples").errors.samples.error }}
                   </mat-error>
                 </mat-form-field>
               </div>
               <div *ngIf="duplicateNames && duplicateNames.length > 0">
-                <small class="tiny"
-                  ><mat-icon>info</mat-icon> Duplicates alert: Sample names
+                <small class="tiny"><mat-icon>info</mat-icon> Duplicates alert: Sample names
                   already exist in the Sample Sheet. Please proceed to add the
-                  new sample names.</small
-                >
+                  new sample names.</small>
               </div>
             </div>
           </div>
@@ -227,11 +154,7 @@
             </button> -->
           </div>
           <div class="column is-one-third has-text-right">
-            <button
-              class="button is-info"
-              [disabled]="isFormBusy"
-              (click)="closeAddSamplesModal()"
-            >
+            <button class="button is-info" [disabled]="isFormBusy" (click)="closeAddSamplesModal()">
               Cancel
             </button>
             <button (click)="addSamples()" class="button is-info">Add</button>
