@@ -144,7 +144,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     }
     this.investigationFailed$.subscribe((value) => {
       this.studyError = value;
-      if (this.studyError) this.selectCurrentTab(6, "files");
+      if (this.studyError) this.selectCurrentTab(5, "files");
     });
 
     this.studyStatus$.subscribe((value) => {
@@ -187,25 +187,22 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.route.params.subscribe((params) => {
       this.requestedStudy = params.id;
       if (params.tab === "files") {
-        this.requestedTab = 6;
+        this.requestedTab = 5;
         this.tab = "files";
       } else if (params.tab === "metabolites") {
-        this.requestedTab = 5;
+        this.requestedTab = 4;
         this.tab = "metabolites";
       } else if (params.tab === "assays") {
-        this.requestedTab = 4;
+        this.requestedTab = 2;
         this.tab = "assays";
       } else if (params.tab === "samples") {
-        this.requestedTab = 3;
+        this.requestedTab = 1;
         this.tab = "samples";
       } else if (params.tab === "protocols") {
-        this.requestedTab = 2;
+        this.requestedTab = 3;
         this.tab = "protocols";
-      } else if (params.tab === "descriptors") {
-        this.requestedTab = 1;
-        this.tab = "descriptors";
       } else if (params.tab === "validations") {
-        this.requestedTab = 8;
+        this.requestedTab = 6;
         this.tab = "validations";
       } else {
         this.requestedTab = 0;
@@ -244,7 +241,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       "",
       window.location.origin + "/" + urlSplit.join("/") + "/" + tab
     );
-    if (index === 6) {
+    if (index === 5) {
       this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
       if (document.getElementById("tab-content-wrapper")) {
         document.getElementById("tab-content-wrapper").scrollIntoView();

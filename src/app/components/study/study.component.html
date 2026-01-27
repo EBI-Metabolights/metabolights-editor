@@ -83,9 +83,9 @@
     </article>
   </div>
 
-  <div class="main-wrapper" [ngClass]="{ smt: status != 'Provisional' }">
+  <div class="main-wrapper"  style="margin-top: 0; margin-bottom: 0" [ngClass]="{ smt: status != 'Provisional' }">
     <div style="margin: 20px">
-      <article class="message is-small has-shadow">
+      <!-- <article class="message is-small has-shadow">
         <div (click)="toggleMessage()" class="message-header">
           <p>
             <span class="material-icons">info</span>&nbsp;You can make your private studies public
@@ -101,7 +101,7 @@
           We are pleased to share that, following the recent update to the MetaboLights dataset submission workflow, you
           can now make your private studies public.
         </div>
-      </article>
+      </article> -->
       <div *ngIf="banner" style="margin: 0 0 5px 0">
         <div class="col-md-12 ">
           <div class="banner" [innerHTML]="banner"></div>
@@ -153,7 +153,7 @@
 
           <div class="is-pulled-right">
             <span class="clickable" *ngIf="validationStatus == 'ERROR'">
-              <div (click)="selectCurrentTab(8, 'validations')" class="control">
+              <div (click)="selectCurrentTab(6, 'validations')" class="control">
                 <div class="tags has-addons">
                   <span class="tag is-dark">Validation</span>
                   <span class="tag is-danger"> Failed </span>
@@ -161,7 +161,7 @@
               </div>
             </span>
             <span class="clickable" *ngIf="validationStatus == null">
-              <div (click)="selectCurrentTab(8, 'validations')" class="control">
+              <div (click)="selectCurrentTab(6, 'validations')" class="control">
                 <div class="tags has-addons">
                   <span class="tag is-dark">Validation</span>
                   <span class="tag is-warning"> Required </span>
@@ -171,7 +171,7 @@
           </div>
           <div class="is-pulled-right">
             <span class="clickable" *ngIf="validationStatus == 'error'">
-              <div (click)="selectCurrentTab(8, 'validations')" class="control">
+              <div (click)="selectCurrentTab(6, 'validations')" class="control">
                 <div class="tags has-addons">
                   <span class="tag is-dark">Last Validation Time</span>
                   <span class="tag is-danger"> <small> {{ validationStatus !== null && validationRunTime !== null ?
@@ -190,9 +190,6 @@
       <span *ngIf="!studyError">
         <mtbls-title></mtbls-title>
         <mtbls-people></mtbls-people>
-        <mtbls-description></mtbls-description>
-        <mtbls-organisms></mtbls-organisms>
-        <mtbls-publications></mtbls-publications>
       </span>
       <div id="tab-content-wrapper" class="px-20 mt-20">
         <div class="card">
@@ -203,32 +200,28 @@
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }">
                   <a>Overview</a>
                 </li>
-                <li *ngIf="!studyError" (click)="selectCurrentTab(1, 'descriptors')"
+                <li *ngIf="!studyError" (click)="selectCurrentTab(1, 'samples')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }">
-                  <a>Descriptors</a>
-                </li>
-                <li *ngIf="!studyError" (click)="selectCurrentTab(2, 'protocols')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }">
-                  <a>Protocols</a>
-                </li>
-                <li *ngIf="!studyError" (click)="selectCurrentTab(3, 'samples')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }">
                   <a>Samples</a>
                 </li>
-                <li *ngIf="!studyError" (click)="selectCurrentTab(4, 'assays')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }">
+                <li *ngIf="!studyError" (click)="selectCurrentTab(2, 'assays')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }">
                   <a>Assays</a>
                 </li>
-                <li *ngIf="!studyError" (click)="selectCurrentTab(5, 'metabolites')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }">
+                <li *ngIf="!studyError" (click)="selectCurrentTab(3, 'protocols')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }">
+                  <a>Protocols</a>
+                </li>
+                <li *ngIf="!studyError" (click)="selectCurrentTab(4, 'metabolites')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }">
                   <a>Metabolites</a>
                 </li>
-                <li (click)="selectCurrentTab(6, 'files')"
-                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 6 }">
+                <li (click)="selectCurrentTab(5, 'files')"
+                  [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }">
                   <a>Files</a>
                 </li>
-                <li (click)="selectCurrentTab(8, 'validations')" [ngClass]="{
-                 'is-active': (currentTabIndex$ | async) === 8,
+                <li (click)="selectCurrentTab(6, 'validations')" [ngClass]="{
+                 'is-active': (currentTabIndex$ | async) === 6,
                  'has-warning': validationNeeded || validationStatus == 'ERROR'}">
                   <a [ngClass]="{
                   'has-glow': validationNeeded || validationStatus == 'ERROR'
@@ -246,43 +239,44 @@
                 <span *ngIf="!studyError">
                   <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 0">
                     <div class="columns is-multiline">
+                      <mtbls-description></mtbls-description>
+                      <mtbls-organisms></mtbls-organisms>
+                      <div class="column is-12 mb-6">
+                        <mtbls-publications></mtbls-publications>
+                      </div>
+                      <div class="column is-12 mb-6">
+                        <mtbls-design-descriptors></mtbls-design-descriptors>
+                      </div>
                       <div class="column is-12 mb-6">
                         <mtbls-funding></mtbls-funding>
                       </div>
-                      <div class="column is-12">
+                      <div class="column is-12 mb-6">
                         <mtbls-related-datasets></mtbls-related-datasets>
                       </div>
                     </div>
                   </div>
                 </span>
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 1">
+                  <mtbls-factors></mtbls-factors>
+                  <br />
+                  <mtbls-samples></mtbls-samples>
+                </div>
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 2">
+                  <mtbls-assays></mtbls-assays>
+                </div>
                 <span *ngIf="!studyError">
-                  <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 1">
-                    <mtbls-design-descriptors></mtbls-design-descriptors>
-                    <br />
-                    <mtbls-factors></mtbls-factors>
-                  </div>
-                </span>
-                <span *ngIf="!studyError">
-                  <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 2">
+                  <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 3">
                     <mtbls-protocols></mtbls-protocols>
                   </div>
                 </span>
-                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 3">
-                  <mtbls-samples></mtbls-samples>
-                </div>
                 <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 4">
-                  <mtbls-assays></mtbls-assays>
-                </div>
-                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 5">
                   <mtbls-mafs></mtbls-mafs>
                 </div>
-                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 6">
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 5">
                   <mtbls-files class="files-tab"></mtbls-files>
                 </div>
-                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 8">
+                <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 6">
                   <validations-v2-parent></validations-v2-parent>
-
-
                 </div>
               </div>
             </div>

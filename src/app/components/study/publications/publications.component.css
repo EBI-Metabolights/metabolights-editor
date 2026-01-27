@@ -56,3 +56,44 @@
   font-size: .875em;
   font-style: italic;
 }
+/* line up header content */
+.accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+/* title takes remaining space, truncate if long */
+.publication-title-compact {
+  flex: 1 1 auto;
+  margin: 0;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* action buttons group */
+.publication-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: 12px;
+}
+
+/* small tweak for the expand icon */
+.expand-icon {
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+/* on small screens stack actions */
+@media (max-width: 560px) {
+  .accordion-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .publication-actions { order: 2; }
+  .expand-icon { order: 3; }
+}

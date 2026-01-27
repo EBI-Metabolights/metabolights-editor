@@ -1,139 +1,317 @@
-.mb20 {
-  margin-bottom: 20px;
+
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+/deep/ .mat-button-toggle-group-vertical {
+  flex-direction: column !important;
+  width: 100%;
 }
 
-.mb0 {
-  margin-bottom: 0 !important;
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+/deep/ .mat-button-toggle-group,
+.mat-button-toggle-standalone {
+  box-shadow: none !important;
 }
 
-.mt10 {
-  margin-top: 10px;
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+/deep/ .mat-button-toggle-label-content {
+  width: 100% !important;
+  text-align: left;
 }
 
-/* Keywords Panel */
-.keywords-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-.keywords-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.keywords-scroll {
-  max-height: 200px;
-  overflow-y: auto;
-  padding-right: 5px;
-}
-
-.keyword-item {
-  background-color: #55a8af;
-  color: white;
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+/deep/ .mat-button-toggle {
+  border: 1px solid rgba(0, 0, 0, 0.38) !important;
   border-radius: 4px;
-  margin-bottom: 8px;
-  padding: 8px 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9rem;
 }
 
-.keyword-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+/deep/ .mat-button-toggle-button {
+  width: 100% !important;
 }
 
-.icon-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
+/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
+/deep/ .mat-button-toggle-checked {
+  background-color: #5193fb;
   color: white;
-  cursor: pointer;
+}
+
+/deep/ .mat-mdc-checkbox {
+  display: block;
+}
+
+.vh50 {
+  min-height: 50vh;
+}
+
+.panel-block-wrapper {
+  min-height: 40vh !important;
+}
+
+.no-margin-bottom {
+  margin-bottom: 5px !important;
+}
+
+.is-fullwidth {
+  width: 100%;
+}
+
+.p2 {
+  padding: 15px 20px;
+}
+
+.cborder {
+  border: 1px solid #f1f1f4;
+}
+
+.cborder-radius {
+  border-radius: 4px;
+}
+
+.mtbls-textarea {
+  line-height: 1.3 !important;
+}
+
+.panel-heading {
+  border-top: 1px solid #dbdbdb;
+}
+
+.mb5 {
+  margin-bottom: 5px !important;
+}
+
+.br4 {
+  border-radius: 4px;
+}
+
+.btr4 {
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.p-4 {
+  padding: 20px;
+}
+
+.vh70 {
+  min-height: 70vh;
+}
+
+table {
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+table {
+  width: 100%;
+}
+
+table td,
+table th {
+  vertical-align: middle;
+}
+
+th.mat-sort-header-sorted {
+  color: black;
+}
+
+th div {
   display: flex;
+}
+
+.mat-sort-header-arrow {
+  margin: 0 5px 0 15px !important;
+}
+
+.column-editor-card {
+  min-width: 80vw !important;
+  min-height: 80vh;
+}
+
+.columns.is-vcentered {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
   align-items: center;
+}
+
+.columns.is-hcentered {
   justify-content: center;
-  font-size: 12px;
-  transition: background 0.2s;
-  padding: 0;
+  text-align: center;
 }
 
-.icon-btn:hover {
-  background: rgba(255, 255, 255, 0.4);
-}
-
-.icon-btn mat-icon {
-  font-size: 14px;
-  line-height: 17px;
-  height: 14px;
-  width: 14px;
-}
-
-/* Protocol Blocks */
-.chromatography-protocol,
-.mass-spec-protocol {
-  margin-bottom: 25px;
-  padding: 12px 15px;
-  border-left: 4px solid #3273dc;
-  background-color: #fafafa;
-  border-radius: 6px;
-}
-
-.main-heading {
-  font-weight: 600;
-  color: #363636;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.heading-icon {
-  font-size: 0.8rem;
-  color: #3273dc;
-  margin-right: 8px;
-}
-
-/* Identifiers Container */
-.identifiers-container {
+.mt20 {
   margin-top: 20px;
 }
 
-.identifiers-container .field {
-  margin-bottom: 12px;
+.mb0 {
+  margin-bottom: 0px;
 }
 
-.small-input {
-  max-width: 100px;
+.tab-wrapper {
+  min-height: 80vh;
 }
 
-/* Modal sizing */
-.vw80 {
-  width: 80vw;
-  max-width: 1000px;
+.modal-card-title {
+  color: #979797;
+  font-size: 1.2rem;
 }
 
-/* Modal layers */
-.modal.is-active {
-  z-index: 1000;
+.modal-card-title .highlight {
+  color: #000;
 }
 
-.modal:nth-of-type(2) {
-  z-index: 1005;
+.options-wrapper {
+  border-left: 1px solid #f1f1f3;
+  min-height: 70vh;
+  padding-top: 10px !important;
 }
 
-/* Buttons */
-.button.is-primary {
-  background-color: #00d1b2;
-  /* Teal like in image */
-  border-color: transparent;
+.options-title {
+  border-bottom: 1px solid #f1f1f3;
+  padding: 15px !important;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.options {
+  padding: 15px;
+}
+
+.wrapper {
+  width: 100%;
+  overflow: auto;
+}
+
+/* TODO(mdc-migration): The following rule targets internal classes of form-field that may no longer apply for the MDC version. */
+.mat-form-field-infix {
+  border-top: none;
+}
+
+td.mat-mdc-cell,
+td.mat-mdc-footer-cell,
+th.mat-mdc-header-cell {
+  padding-left: 20px;
+  padding-right: 12px;
+  -webkit-box-shadow: 0 0 1px #dbdbdb;
+  box-shadow: 0 0 1px #dbdbdb;
+}
+
+.mat-mdc-table-sticky {
+  background-color: #fdfdfd;
+}
+
+.dropdown-divider {
+  background-color: #dbdbdb;
+  border: none;
+  display: block;
+  height: 1px;
+  margin: 0;
+}
+
+.dropdown-content {
+  padding-bottom: 0rem;
+  padding-top: 0rem;
+  border-radius: 2px;
+}
+
+a.dropdown-item {
+  padding-right: 1rem;
+}
+
+.column {
+  padding: 0;
+}
+
+.tags:not(:last-child) {
+  margin-bottom: 0rem !important;
+}
+
+.tags .tag {
+  margin-bottom: 0.5rem;
+}
+
+a .tag {
+  text-decoration: none;
+  cursor: inherit;
+}
+
+.addon-tag {
+  padding-left: 0;
+  padding-right: 0;
+  border-left: 1px dotted #eaeaea;
+}
+
+.columns {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+.row-selector {
+  width: 10px;
+}
+
+.table-selector {
+  width: 10px;
+}
+
+.selected {
+  background-color: #333;
   color: #fff;
 }
 
-.button.is-primary:hover {
-  background-color: #00c4a7;
+.row-options-wrapper {
+  position: relative;
 }
+
+.row-options {
+  position: absolute;
+  left: -23px;
+  top: 0px;
+  height: 48px;
+}
+
+.table-icon {
+  padding-right: 10px;
+  padding-top: 12px;
+}
+
+.button {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.menu-bar {
+  margin-top: 10px;
+  margin-bottom: 0 !important;
+  align-items: baseline;
+}
+
+.menu-bar:first-child {
+  margin-left: -5px;
+}
+
+.menu-bar:last-child {
+  margin-right: -5px;
+}
+
+.button.is-light {
+  border-radius: 2px;
+}
+
+.panel-tabs {
+  margin-bottom: 10px !important;
+  justify-content: flex-start;
+}
+.assay-container { max-width: 1100px; margin: auto; font-family: Arial; }
+.grid { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+label { display: block; margin-top: 12px; font-weight: 600; }
+select, input { width: 100%; padding: 6px; }
+.readonly { padding: 6px; background: #f2f2f2; }
+.tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.tag { background: #4aa3b5; color: #fff; padding: 4px 8px; border-radius: 12px; }
+.tag button { background: none; border: none; color: #fff; margin-left: 4px; }
+.add { background: #4caf50; color: #fff; border-radius: 50%; width: 28px; height: 28px; }
+hr { margin: 24px 0; }
+.actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+.primary { background: #4285f4; color: #fff; padding: 8px 16px; }

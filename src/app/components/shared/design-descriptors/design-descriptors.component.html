@@ -10,7 +10,7 @@
 <ng-template #showCard>
   <div class="card mb-6" style="position: relative;">
     <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"
-      style="position: absolute; top: 12px; right: 12px; z-index: 10;"></mtbls-design-descriptor>
+      style="position: absolute; top: 12px; right: 12px;"></mtbls-design-descriptor>
     <header class="card-heading" [ngClass]="{ 'hover-highlight': isReadOnly }">
       <p>
         Design Descriptors (Keywords)
