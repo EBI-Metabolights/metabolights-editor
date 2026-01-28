@@ -72,15 +72,12 @@ export class CreateComponent implements OnInit {
     emailCommunicationAgreement: false,
     privacyPolicyAgreement: true
   };
-  // Ontology Fields
-  selectedSubmitterRole: Ontology = null;
-  submitterRole: Ontology[] = []; 
   publicationStatus: Ontology[] = [];
   publicationDoi: string = "";
+  publicationTitle: string = "";
   funders: any[] = [];
   filteredFunderOrganizations$: Observable<any>;
   relatedDatasets: any[] = [];
-  submitterRoleControlList: any = null;
   publicationStatusControlList: any = null;
   funderControlList: any = null;
   
@@ -90,6 +87,7 @@ export class CreateComponent implements OnInit {
   activeDesignDescriptorCategories: any[] = [];
   contacts: any[] = [];
   editingContactIndex: number = -1;
+  private isManualDelete = false;
   descriptorControlLists: any = {};
   
   studyCreationForm: UntypedFormGroup;
@@ -126,7 +124,6 @@ export class CreateComponent implements OnInit {
     this.studyCreationForm = this.fb.group({
       sampleFileTemplate: ['', Validators.required],
       investigationFileTemplate: ['', Validators.required],
-      submitterRole: [[]],
       publicationStatus: [[]],
       fundingFunder: [[]], // Keep legacy for now or remove if unused later
     });
@@ -135,7 +132,12 @@ export class CreateComponent implements OnInit {
   setUpSubscriptionsNgxs() {
     this.title$.subscribe(v => this.studyTitle = v);
     this.description$.subscribe(v => this.studyDescription = v);
-    this.user$.subscribe(user => this.currentUser = user);
+    this.user$.subscribe(user => {
+      this.currentUser = user;
+      if (user && (!this.contacts || this.contacts.length === 0)) {
+        this.initializePrimaryContact();
+      }
+    });
     this.editorValidationRules$.subscribe((value) => {
       if (value) {
         this.validations = value;
@@ -159,7 +161,6 @@ export class CreateComponent implements OnInit {
     this.controlLists$.subscribe(lists => {
         if (lists) {
             this.legacyControlLists = lists;
-            this.submitterRoleControlList = this.getProcessedControlList("Study Person Roles");
             this.publicationStatusControlList = this.getProcessedControlList("Study Publication Status");
             this.funderControlList = this.getProcessedControlList("Funder Organization");
             if(this.templateConfiguration){
@@ -170,7 +171,13 @@ export class CreateComponent implements OnInit {
     // Validations - Study Creation State
     this.store.select(StudyCreationState.factors).subscribe(factors => this.factors = factors);
     this.store.select(StudyCreationState.designDescriptors).subscribe(descriptors => this.designDescriptors = descriptors);
-    this.store.select(StudyCreationState.contacts).subscribe(contacts => this.contacts = contacts);
+    this.store.select(StudyCreationState.contacts).subscribe(contacts => {
+      this.contacts = contacts;
+      if (this.currentUser && (!contacts || contacts.length === 0) && !this.isManualDelete) {
+        this.initializePrimaryContact();
+      }
+      this.isManualDelete = false; 
+    });
     this.store.select(StudyCreationState.funders).subscribe(funders => this.funders = funders);
     this.store.select(StudyCreationState.relatedDatasets).subscribe(ds => this.relatedDatasets = ds);
   }
@@ -404,7 +411,6 @@ export class CreateComponent implements OnInit {
     this.studyCreationForm.controls[controlName]?.setValue(values);
   }
   getControlListForField(fieldName: string) {
-    if (fieldName === 'submitterRole') return this.submitterRoleControlList;
     if (fieldName === 'publicationStatus') return this.publicationStatusControlList;
     if (fieldName === 'fundingFunder') return this.funderControlList;
     return null;
@@ -424,7 +430,7 @@ export class CreateComponent implements OnInit {
   }
   
   get isDescriptionValid(): boolean {
-      return this.studyDescription && this.studyDescription.trim().length >= 60;
+      return this.studyDescription && this.studyDescription.trim().length >= 200;
   }
   
   get isDoiRequired(): boolean {
@@ -453,7 +459,7 @@ export class CreateComponent implements OnInit {
     const doiValue = this.publicationDoi ? this.publicationDoi.trim() : "";
     
     if (this.isDoiRequired && doiValue === "") {
-        return ""; // User prefers no text message for requirement, just the highlight
+        return "DOI is required for the selected publication status";
     }
     
     if (doiValue !== "" && !this.isValidDoi) {
@@ -468,15 +474,41 @@ export class CreateComponent implements OnInit {
   }
 
   get isStep1Valid(): boolean {
+    const allContactsValid = this.contacts.length > 0 && this.contacts.every(c => this.isContactValid(c));
     return !!(this.isAnyAssaySelected &&
-           this.selectedSubmitterRole && 
-           this.publicationStatus && this.publicationStatus.length > 0 &&
-           this.doiErrorMessage === "" &&
            this.selectedSampleFileTemplate &&
            this.selectedInvestigationFileTemplate &&
            this.agreements?.datasetLicenseAgreement &&
-           this.agreements?.datasetPolicyAgreement);
+           this.agreements?.datasetPolicyAgreement &&
+           this.hasPrincipalInvestigator &&
+           allContactsValid);
   }
+
+  get isStep2Valid(): boolean {
+      const activeCategories = this.activeDesignDescriptorCategories || [];
+      const mandatoryCategoriesSatisfied = activeCategories.every(cat => {
+          const minRequired = Number(cat.min) || 0;
+          if (minRequired > 0) {
+              const currentCount = this.getDescriptorsByCategory(cat.id).length;
+              return currentCount >= minRequired;
+          }
+          return true;
+      });
+      
+      const isTitleOk = !!(this.studyTitle && this.studyTitle.trim().length >= 25);
+      const isDescriptionOk = !!(this.studyDescription && this.studyDescription.trim().length >= 200);
+
+      return isTitleOk && isDescriptionOk && mandatoryCategoriesSatisfied;
+  }
+
+  get isStep3Valid(): boolean {
+      const isDoiOk = this.isDoiRequired ? (this.publicationDoi && this.publicationDoi.trim() !== "") : true;
+      return !!(this.publicationStatus && this.publicationStatus.length > 0 &&
+             this.publicationTitle && this.publicationTitle.trim() !== "" &&
+             isDoiOk &&
+             this.doiErrorMessage === "");
+  }
+
   get hasPrincipalInvestigator(): boolean {
       return this.contacts.some(c => 
           c.roles && c.roles.some(r => r.annotationValue === 'Principal Investigator')
@@ -531,24 +563,6 @@ export class CreateComponent implements OnInit {
 
     return errors;
   }
-
-  get isStep2Valid(): boolean {
-      const allContactsValid = this.contacts.length > 0 && this.contacts.every(c => this.isContactValid(c));
-      return this.isTitleValid && 
-             this.isDescriptionValid && 
-             this.factors.length > 0 &&
-             this.hasPrincipalInvestigator &&
-             allContactsValid;
-  }
-  canProceedToNextStep(): boolean {
-      if (this.currentSubStep === 1) {
-          return this.isStep1Valid;
-      }
-      if (this.currentSubStep === 2) {
-          return this.isStep2Valid;
-      }
-      return true;
-  }
   createStudy() {
     // Check if Single or Multiple Category
     // We filter based on studyAssaySelection keys that have at least one selected item.
@@ -559,8 +573,11 @@ export class CreateComponent implements OnInit {
     const distinctCategoriesType = new Set(selectedCategoryKeys); // e.g. 'ms', 'nmr' are keys in studyAssaySelection? 
     // Wait, studyAssaySelection keys ARE the category identifiers e.g. 'ms-mhd-legacy', 'nmr'.
     
-    // Always proceed to Step 2, regardless of number of categories selected
-    this.currentSubStep = 2;
+    // Always proceed to Step 3, regardless of number of categories selected
+    if (!this.publicationTitle || this.publicationTitle.trim() === "") {
+        this.publicationTitle = this.studyTitle;
+    }
+    this.currentSubStep = 3;
     // Use the first selected category for setup configuration, or null if none (though validation prevents 0)
     // If multiple categories are selected, we simply use the first one to determine the descriptor list.
     // This aligns with the requirement to treat multiple categories same as single.
@@ -602,40 +619,12 @@ export class CreateComponent implements OnInit {
   // Agreements and Wizard Configuration
   descriptorControlListKey: string = null;
   setUpWizardStep(category: string) {
-      // Initialize Contacts if empty
-      if (this.contacts.length === 0) {
-          this.initializePrimaryContact();
-      } else {
-          this.updatePrimaryContactFromRole();
-      }
-      
       this.descriptorControlListKey = this.templateConfiguration?.descriptorConfiguration?.defaultDescriptorCategories?.[category]?.controlListKey || null;
   }
 
-  updatePrimaryContactFromRole() {
-      if (this.contacts.length > 0 && this.selectedSubmitterRole) {
-          // Find the contact that matches the current user's email
-          // This assumes the first contact or the one matching the email is the "primary"
-          const index = this.contacts.findIndex(c => c.email === (this.currentUser?.email || ''));
-          if (index > -1) {
-              const contact = { ...this.contacts[index] };
-              // Only update if the role is actually different to avoid redundant store dispatches
-              const currentRole = contact.roles?.[0]?.annotationValue;
-              if (currentRole !== this.selectedSubmitterRole.annotationValue) {
-                  contact.roles = [this.selectedSubmitterRole];
-                  this.store.dispatch(new StudyCreation.UpdateContact(contact, index));
-              }
-          }
-      }
-  }
 
   initializePrimaryContact() {
-      // Create primary contact from Current User + Submitter Role
-      let role = null;
-      if (this.selectedSubmitterRole) {
-          role = this.selectedSubmitterRole;
-      }
-      
+      // Create primary contact from Current User
       const newContact = {
           firstName: this.currentUser?.firstName || '',
           lastName: this.currentUser?.lastName || '',
@@ -643,7 +632,7 @@ export class CreateComponent implements OnInit {
           affiliation: this.currentUser?.affiliation || '',
           address: '',
           orcid: this.currentUser?.orcid || '',
-          roles: role ? [role] : [],
+          roles: [],
           comments: []
       };
       this.store.dispatch(new StudyCreation.AddContact(newContact));
@@ -727,27 +716,20 @@ export class CreateComponent implements OnInit {
   }
   
   removeContactCompat(contact: any, index: number) {
-      this.store.dispatch(new StudyCreation.RemoveContact(index));
-  }
-  onRoleChange(value) {
-      if (value) {
-          const selectedValue = Array.isArray(value) ? value[0] : value;
-          if (!selectedValue) return;
-
-          let matchedRole = null;
-          if (typeof selectedValue === 'string') {
-              if (this.submitterRoleControlList && this.submitterRoleControlList.values) {
-                  matchedRole = this.submitterRoleControlList.values.find(role => role.annotationValue === selectedValue);
-              }
-          } else {
-              matchedRole = selectedValue;
+      Swal.fire({
+          title: "Are you sure?",
+          text: "You are about to remove this contact.",
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, remove it!"
+      }).then((result) => {
+          if (result.value) {
+              this.isManualDelete = true;
+              this.store.dispatch(new StudyCreation.RemoveContact(index));
           }
-
-          if (matchedRole) {
-              this.selectedSubmitterRole = matchedRole;
-              this.submitterRole = [matchedRole];
-          }
-      }
+      });
   }
   onPublicationStatusChange(value) {
       if (value) {
@@ -887,6 +869,7 @@ export class CreateComponent implements OnInit {
         funding: funding,
         contacts: contacts,
         publicationDoi: (this as any).publicationDoi || "", 
+        publicationTitle: (this as any).publicationTitle || "",
         designDescriptors: designDescriptors,
         factors: factors,
 

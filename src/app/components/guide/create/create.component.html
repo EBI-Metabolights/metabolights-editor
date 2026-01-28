@@ -8,32 +8,27 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission - Submission Details</h2>
+            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission</h2>
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
-              <h3 class="title is-6 has-text-weight-bold mb-4">MetaboLights Study Categories</h3>
-              <p class="is-size-7 mb-4" [class.has-text-danger]="!isAnyAssaySelected">
+              <p [class.has-text-danger]="!isAnyAssaySelected">
                 Which type of techniques have you used in your study?
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
-              <div class="columns is-multiline mb-4">
-                <div class="column is-3 category-column" *ngFor="let cat of activeCategories">
-                  <h5 class="is-size-7 has-text-weight-bold mb-3">{{cat.label}}</h5>
-                  <div class="mt-1">
+              <div class="category-boxes-container">
+                <div class="category-box" *ngFor="let cat of activeCategories">
+                  <h5 class="category-title has-text-weight-bold">{{cat.label}}</h5>
+                  <div class="assay-types-list">
                     <div *ngFor="let assayType of cat.assayTypes" class="mb-2">
-                      <label class="checkbox is-size-7 beautified-checkbox">
+                      <label class="checkbox is-size-7 beautified-checkbox assay-type-label">
                         <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
                           [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
                         <span class="checkmark"></span>
                         {{assayType}}
                       </label>
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
               <hr class="mt-4 mb-4">
               <div class="columns" [formGroup]="studyCreationForm">
@@ -41,7 +36,7 @@
 
 
 
-                <div class="column">
+                <div class="column dropdown-col">
                   <div class="field">
                     <label class="label is-small">Sample File Template</label>
                     <div class="control">
@@ -54,7 +49,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="column">
+                <!-- <div class="column">
                   <div class="field">
                     <label class="label is-small">Investigation File Template</label>
                     <div class="control">
@@ -68,111 +63,50 @@
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
 
               </div>
             </div>
             <hr />
-            <!-- Roles, Status, DOI -->
-            <!-- Roles, Status, DOI Refactored to Horizontal Fields -->
-            <div>
-              <!-- Submitter Role -->
-              <div class="field is-horizontal mb-3">
-                <div class="field-label is-small">
-                  <label class="label">Submitter Role*</label>
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <ng-container
-                      *ngIf="submitterRoleControlList && !submitterRoleControlList.renderAsDropdown; else submitterRoleDropdown">
-                      <mtbls-ontology [controlList]="submitterRoleControlList" [values]="submitterRole"
-                        (changed)="onRoleChange($event)" [validations]="fieldValidation('people.person.roles')"
-                        [inline]="true" [rule]="submitterRoleControlList?.rule">
-                      </mtbls-ontology>
-                    </ng-container>
-                    <ng-template #submitterRoleDropdown>
-                      <div *ngIf="submitterRoleControlList?.values?.length">
-                        <mat-form-field class="full-width is-small">
-                          <mat-select [value]="submitterRole[0]?.annotationValue"
-                            (selectionChange)="onRoleChange($event.value)">
-                            <mat-option *ngFor="let option of submitterRoleControlList.values"
-                              [value]="option.annotationValue">
-                              {{ option.annotationValue }}
-                            </mat-option>
-                          </mat-select>
-                          <mat-hint>{{ fieldValidation('people.person.roles').description }}</mat-hint>
-                        </mat-form-field>
+            <hr />
+            <!-- Contacts (Moved from Step 2) -->
+            <div class="column is-12">
+              <h3 class="title is-5 has-text-weight-bold mb-4">Contacts*</h3>
+              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
+                • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
+              </p>
+              <div class="box p-3 is-clearfix" style="position: relative;">
+                <button class="button is-primary is-small" style="position: absolute; top: 7px; right: 12px;"
+                  (click)="addNewContact()">+ Add
+                  Contact</button>
+                <div class="columns is-multiline">
+                  <div class="column is-4" *ngFor="let contact of contacts; let i = index">
+                    <div class="card contact-card" [class.invalid-card]="!isContactValid(contact)">
+                      <div class="card-content p-3">
+                        <p class="is-size-7 has-text-weight-bold">{{contact.firstName}} {{contact.lastName}}</p>
+                        <p class="is-size-7">{{contact.affiliation}}</p>
+                        <p class="is-size-7 has-text-grey">{{contact.roles?.[0]?.annotationValue}}</p>
+                        <div *ngIf="!isContactValid(contact)" class="has-text-danger is-size-7 mt-2 pt-1"
+                          style="border-top: 1px dashed #ff3860;">
+                          <div *ngFor="let error of getContactErrors(contact)">• {{error}}</div>
+                        </div>
+                        <div style="position: absolute; top: 5px; right: 5px; display: flex;">
+                          <span class="material-symbols-outlined is-size-6 has-text-grey clickable mr-1"
+                            (click)="editContact(contact, i)" title="Edit contact">
+                            edit
+                          </span>
+                          <button class="delete is-small" (click)="removeContactCompat(contact, i)"
+                            title="Remove contact"></button>
+                        </div>
                       </div>
-                    </ng-template>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Publication Status -->
-              <div class="field is-horizontal mb-3">
-                <div class="field-label is-small">
-                  <label class="label">Publication Status*</label>
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <ng-container
-                      *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
-                      <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
-                        (changed)="onPublicationStatusChange($event)"
-                        [validations]="fieldValidation('publications.publication.status')" [inline]="true"
-                        [rule]="publicationStatusControlList?.rule"
-                        [defaultOntologies]="publicationStatusControlList?.defaultOntologies">
-                      </mtbls-ontology>
-                    </ng-container>
-                    <ng-template #publicationStatusDropdown>
-                      <div *ngIf="publicationStatusControlList?.values?.length">
-                        <mat-form-field class="full-width is-small">
-                          <mat-select [value]="publicationStatus[0]?.annotationValue"
-                            (selectionChange)="onPublicationStatusChange($event.value)">
-                            <mat-option *ngFor="let option of publicationStatusControlList.values"
-                              [value]="option.annotationValue">
-                              {{ option.annotationValue }}
-                            </mat-option>
-                          </mat-select>
-                          <mat-hint>{{ fieldValidation('publications.publication.status').description }}</mat-hint>
-                        </mat-form-field>
-                      </div>
-                    </ng-template>
-                  </div>
-                </div>
-              </div>
-
-              <!-- DOI -->
-              <div class="field is-horizontal mb-3">
-                <div class="field-label is-small">
-                  <label class="label">DOI<span *ngIf="isDoiRequired">*</span></label>
-                </div>
-                <div class="field-body">
-                  <div class="field">
-                    <div class="control">
-                      <mat-form-field class="full-width is-small"
-                        [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
-                        <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
-                          [required]="isDoiRequired">
-                        <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
-                          <span *ngIf="isDoiRequired"><b>(required)</b></span>
-                        </mat-hint>
-                      </mat-form-field>
-                      <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
-                      </p>
                     </div>
                   </div>
                 </div>
+                <mtbls-person #personEditor class="is-modal-only-person" [mode]="'local'"
+                  (saved)="saveContactCompat($event)"></mtbls-person>
               </div>
             </div>
-            <hr />
-            <!-- Funding -->
-            <mtbls-funding [controlList]="funderControlList" class="db mb-6"></mtbls-funding>
-            <br />
-            <!-- Related Datasets -->
-            <mtbls-related-datasets class="db mb-6"></mtbls-related-datasets>
 
-            <br />
             <hr />
             <!-- Agreements -->
             <div class="field">
@@ -191,8 +125,8 @@
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
-                <button class="button is-primary" (click)="createStudy()" [disabled]="!isStep1Valid">Continue</button>
-
+                <button class="button is-primary" (click)="currentSubStep = 2"
+                  [disabled]="!isStep1Valid">Continue</button>
               </div>
 
             </div>
@@ -213,35 +147,36 @@
           <div class="box">
             <h2 class="title is-4 has-text-weight-bold mb-5">Study Description</h2>
             <div class="field mb-4">
-              <label class="label is-small">Study Title (min 8 chars)*</label>
+              <label class="label">Study Title (min 25 chars)*</label>
               <div class="control">
-                <input class="input is-small" type="text" [(ngModel)]="studyTitle"
+                <input class="input" type="text" [(ngModel)]="studyTitle"
                   placeholder="Enter a descriptive title for your study">
 
               </div>
-              <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 8">Title must be at least 8
+              <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 25">Title must be at least 25
                 characters.</p>
 
             </div>
             <div class="field mb-4">
-              <label class="label is-small">Study Description (min 60 chars)*</label>
+              <label class="label">Study Description (min 200 chars)*</label>
               <div class="control">
-                <textarea class="textarea is-small" [(ngModel)]="studyDescription"
+                <textarea class="textarea" [(ngModel)]="studyDescription"
                   placeholder="Enter a detailed description of your study"></textarea>
 
               </div>
-              <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 60">Description must
-                be at least 60 characters.</p>
+              <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 200">Description
+                must
+                be at least 200 characters.</p>
 
             </div>
             <hr>
             <!-- Factors, Descriptors, Contacts -->
             <div class="columns is-multiline">
               <div class="column is-12">
-                <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors (at least 1)*</h3>
+                <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors</h3>
                 <div class="box p-3 is-clearfix" style="position: relative;">
-                  <button class="button is-primary is-small"
-                    style="position: absolute; top: 12px; right: 12px; " (click)="factorRef.openModal()">+
+                  <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
+                    (click)="factorRef.openModal()">+
                     Add</button>
                   <div class="tags mb-2" style="margin-right: 60px;">
                     <span *ngFor="let factor of factors; let i = index" class="tag is-primary is-light is-medium">
@@ -257,10 +192,10 @@
                 <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)</h3>
                 <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
                   <div class="box p-3 is-clearfix" style="position: relative;">
-                    <button class="button is-primary is-small"
-                      style="position: absolute; top: 12px; right: 12px; " (click)="descRef.openModal()">+
+                    <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
+                      (click)="descRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;">{{category.label}} <span
+                    <h6 class="title is-6 mb-2" style="margin-right: 60px;">{{category.label}} <span
                         *ngIf="category.min > 0">(at least {{category.min}})*</span></h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
@@ -280,10 +215,10 @@
 
                 <div class="mb-2">
                   <div class="box p-3 is-clearfix" style="position: relative;">
-                    <button class="button is-primary is-small"
-                      style="position: absolute; top: 12px; right: 12px;" (click)="kwRef.openModal()">+
+                    <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px;"
+                      (click)="kwRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-7 mb-2 has-text-grey" style="margin-right: 60px;"
+                    <h6 class="title is-6 mb-2" style="margin-right: 60px;"
                       *ngIf="activeDesignDescriptorCategories.length > 0">Others</h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getKeywords(); let i = index" class="tag is-primary is-light is-medium">
@@ -299,49 +234,6 @@
                   </div>
                 </div>
               </div>
-              <div class="column is-12">
-                <h3 class="title is-5 has-text-weight-bold mb-4">Contacts*</h3>
-                <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
-                  • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
-                </p>
-                <div class="box p-3 is-clearfix" style="position: relative;">
-                  <button class="button is-primary is-small"
-                    style="position: absolute; top: 12px; right: 12px;" (click)="addNewContact()">+ Add
-                    Contact</button>
-                  <div class="columns is-multiline">
-                    <div class="column is-4" *ngFor="let contact of contacts; let i = index">
-                      <div class="card contact-card" [class.invalid-card]="!isContactValid(contact)">
-                        <div class="card-content p-3">
-                          <p class="is-size-7 has-text-weight-bold">{{contact.firstName}} {{contact.lastName}}</p>
-                          <p class="is-size-7">{{contact.affiliation}}</p>
-                          <p class="is-size-7 has-text-grey">{{contact.roles?.[0]?.annotationValue}}</p>
-                          <div *ngIf="!isContactValid(contact)" class="has-text-danger is-size-7 mt-2 pt-1"
-                            style="border-top: 1px dashed #ff3860;">
-                            <div *ngFor="let error of getContactErrors(contact)">• {{error}}</div>
-                          </div>
-                          <div style="position: absolute; top: 5px; right: 5px; display: flex;">
-                            <span class="material-symbols-outlined is-size-6 has-text-grey clickable mr-1"
-                              (click)="editContact(contact, i)" title="Edit contact">
-                              edit
-                            </span>
-                            <button class="delete is-small" (click)="removeContactCompat(contact, i)"
-                              title="Remove contact"></button>
-
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-
-                  </div>
-                  <mtbls-person #personEditor class="is-modal-only-person" [mode]="'local'"
-                    (saved)="saveContactCompat($event)"></mtbls-person>
-
-                </div>
-
-              </div>
 
             </div>
             <hr>
@@ -350,8 +242,8 @@
                 <button class="button is-light" (click)="currentSubStep = 1">Back</button>
               </div>
               <div class="control">
-                <button class="button is-primary" (click)="triggerSubmit()" [disabled]="isLoading || !isStep2Valid">
-                  <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
+                <button class="button is-primary" (click)="createStudy()" [disabled]="!isStep2Valid">
+                  Continue
                 </button>
               </div>
             </div>
@@ -364,16 +256,110 @@
       </div>
     </div>
 
-    <!-- Step 3: Sample & Assays -->
+    <!-- Step 3: Publication & Funding -->
     <div *ngSwitchCase="3">
+      <div class="columns is-centered mt-4">
+        <div class="column is-10">
+          <div class="box">
+            <h2 class="title is-4 has-text-weight-bold mb-5">Publication</h2>
+
+            <!-- Publication Title -->
+            <div class="field mb-4">
+              <label class="label">Publication Title*</label>
+              <div class="control">
+                <input class="input" type="text" [(ngModel)]="publicationTitle" placeholder="Publication Title">
+              </div>
+              <p class="help" *ngIf="fieldValidation('publications.publication.title').description">
+                {{ fieldValidation('publications.publication.title').description }}
+              </p>
+            </div>
+            <!-- Status and DOI row -->
+            <div class="columns mb-3">
+              <div class="column is-6 pb-0">
+                <div class="field">
+                  <label class="label is-small">Publication Status*</label>
+                  <div class="control">
+                    <ng-container
+                      *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
+                      <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
+                        (changed)="onPublicationStatusChange($event)"
+                        [validations]="fieldValidation('publications.publication.status')" [inline]="true"
+                        [rule]="publicationStatusControlList?.rule"
+                        [defaultOntologies]="publicationStatusControlList?.defaultOntologies">
+                      </mtbls-ontology>
+                    </ng-container>
+                    <ng-template #publicationStatusDropdown>
+                      <div *ngIf="publicationStatusControlList?.values?.length">
+                        <mat-form-field class="full-width is-small mt-0">
+                          <mat-select [value]="publicationStatus[0]?.annotationValue"
+                            (selectionChange)="onPublicationStatusChange($event.value)">
+                            <mat-option *ngFor="let option of publicationStatusControlList.values"
+                              [value]="option.annotationValue">
+                              {{ option.annotationValue }}
+                            </mat-option>
+                          </mat-select>
+                          <mat-hint>{{ fieldValidation('publications.publication.status').description }}</mat-hint>
+                        </mat-form-field>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-6 pb-0">
+                <div class="field">
+                  <label class="label is-small">DOI<span *ngIf="isDoiRequired">*</span></label>
+                  <div class="control">
+                    <mat-form-field class="full-width is-small"
+                      [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
+                      <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
+                        [required]="isDoiRequired">
+                      <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
+                        <span *ngIf="isDoiRequired"><b>(required)</b></span>
+                      </mat-hint>
+                    </mat-form-field>
+                    <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+
+            <hr />
+            <!-- Funding -->
+            <mtbls-funding [controlList]="funderControlList" class="db mb-6"></mtbls-funding>
+            <br />
+            <!-- Related Datasets -->
+            <mtbls-related-datasets class="db mb-6"></mtbls-related-datasets>
+
+            <hr>
+            <div class="field is-grouped is-pulled-right">
+              <div class="control">
+                <button class="button is-light" (click)="currentSubStep = 2">Back</button>
+              </div>
+              <div class="control">
+                <button class="button is-primary" (click)="triggerSubmit()" [disabled]="isLoading || !isStep3Valid">
+                  <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Create Study
+                </button>
+              </div>
+            </div>
+            <div class="is-clearfix"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Sample & Assays -->
+    <div *ngSwitchCase="4">
       <div class="mt-4" *ngIf="newStudy">
-        <guide-assays [hideNav]="true" (next)="currentSubStep = 4"></guide-assays>
+        <guide-assays [hideNav]="true" (next)="currentSubStep = 5"></guide-assays>
 
       </div>
     </div>
 
-    <!-- Step 4: Upload -->
-    <div *ngSwitchCase="4">
+    <!-- Step 5: Upload -->
+    <div *ngSwitchCase="5">
       <div class="mt-4" *ngIf="newStudy">
         <raw-upload [hideNav]="true" (next)="onFinishWizard()"></raw-upload>
 
