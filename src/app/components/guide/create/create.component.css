@@ -256,3 +256,28 @@ hr {
 .dropdown-col {
   max-width: 300px;
 }
+
+/* Global Material 3 Refinements */
+.full-width {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-form-field {
+  --mdc-outlined-text-field-focus-outline-color: #00d1b2 !important;
+  --mdc-outlined-text-field-focus-label-text-color: #00d1b2 !important;
+  --mat-select-focused-arrow-color: #00d1b2 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-label {
+  color: #555;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-label {
+  color: #00d1b2 !important;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__trailing {
+  border-color: #00d1b2 !important;
+}

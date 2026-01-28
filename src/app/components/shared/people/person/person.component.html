@@ -106,7 +106,7 @@
       </div>
       <section class="modal-card-body">
         <div class="form-row">
-          <mat-form-field class="field-new" [ngClass]="
+          <mat-form-field class="field-new" appearance="outline" [ngClass]="
               form.get('lastName').errors &&
               form.get('lastName').dirty 
                 ? 'extra-margin'
@@ -124,7 +124,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="field-new">
+          <mat-form-field class="field-new" appearance="outline">
             <mat-label>Middle name(s)</mat-label>
             <input matInput formControlName="midInitials" [readonly]="isReadOnly" />
             <mat-hint>{{
@@ -135,7 +135,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="field-new" [ngClass]="
+          <mat-form-field class="field-new" appearance="outline" [ngClass]="
               form.get('firstName').errors &&
               form.get('firstName').dirty 
                 ? 'extra-margin'
@@ -169,7 +169,8 @@
           </ng-container>
 
           <ng-template #dropdownField>
-            <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('roles')">
+            <mat-form-field class="full-width" appearance="outline"
+              *ngIf="_controlList?.values?.length && form.get('roles')">
               <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
                 <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
                   {{ option.annotationValue }}
@@ -177,7 +178,7 @@
               </mat-select>
             </mat-form-field>
           </ng-template>
-          <mat-form-field class="half-width">
+          <mat-form-field class="half-width" appearance="outline">
             <mat-label>ORCID</mat-label>
             <input class="no-scroll" formControlName="orcid" [readonly]="isReadOnly" matInput />
             <a matSuffix target="_blank" [href]="getOrcidUrl()" class="search-link">
@@ -195,7 +196,7 @@
           </mat-form-field>
         </div>
         <div class="form-row">
-          <mat-form-field class="half-width">
+          <mat-form-field class="half-width" appearance="outline">
             <mat-label>Email</mat-label>
             <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput />
             <mat-hint>
@@ -211,7 +212,7 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="half-width">
+          <mat-form-field class="half-width" appearance="outline">
             <mat-label>Alternative Email</mat-label>
             <input class="no-scroll" formControlName="alternativeEmail" [readonly]="isReadOnly" matInput />
             <mat-hint>{{
@@ -271,7 +272,7 @@
             </td>
           </tr>
         </table> -->
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Address</mat-label>
           <textarea class="no-scroll" formControlName="address" [readonly]="isReadOnly" matInput cdkAutosizeMinRows="1"
             cdkAutosizeMaxRows="4" cdkTextareaAutosize></textarea>
@@ -284,7 +285,7 @@
             {{ form.get("address").errors.address.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Affiliation</mat-label>
           <input type="text" matInput formControlName="affiliation" [matAutocomplete]="auto" [readonly]="isReadOnly" />
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAffiliationSelected($event)">
@@ -312,7 +313,7 @@
           </mat-error>
         </mat-form-field>
 
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Affliation ROR ID </mat-label>
           <input class="no-scroll" formControlName="rorid" [readonly]="isReadOnly" matInput />
           <a matSuffix target="_blank" [href]="getRoridUrl()" class="search-link">

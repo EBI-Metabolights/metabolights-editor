@@ -55,50 +55,42 @@
             <div class="columns is-multiline">
                 <div class="column is-12">
                     <div class="field">
-                        <label class="label is-small">Funder Organization</label>
-                        <div class="control">
-                            <mat-form-field class="full-width is-small">
-                                <input type="text" matInput formControlName="funderOrganization"
-                                    [matAutocomplete]="funderAuto"
-                                    placeholder="e.g. European Bioinformatics Institute" />
-                                <mat-autocomplete #funderAuto="matAutocomplete" [displayWith]="displayFunderName"
-                                    (optionSelected)="onFunderSelected($event)">
-                                    <mat-option *ngFor="let org of filteredFunderOrganizations$ | async" [value]="org">
-                                        <div class="is-size-7"><b>{{ org.name }}</b> - {{ org.id?.split('/').pop() ||
-                                            '(Unknown ID)' }}</div>
-                                        <div style="font-size: 11px; color: #666; line-height: 1.2;">{{ org.description
-                                            ||
-                                            '(No description available)' }}</div>
-                                    </mat-option>
-                                </mat-autocomplete>
-                            </mat-form-field>
-                        </div>
+                        <mat-form-field class="full-width is-small" appearance="outline">
+                            <mat-label>Funder Organization</mat-label>
+                            <input type="text" matInput formControlName="funderOrganization"
+                                [matAutocomplete]="funderAuto" placeholder="e.g. European Bioinformatics Institute" />
+                            <mat-autocomplete #funderAuto="matAutocomplete" [displayWith]="displayFunderName"
+                                (optionSelected)="onFunderSelected($event)">
+                                <mat-option *ngFor="let org of filteredFunderOrganizations$ | async" [value]="org">
+                                    <div class="is-size-7"><b>{{ org.name }}</b> - {{ org.id?.split('/').pop() ||
+                                        '(Unknown ID)' }}</div>
+                                    <div style="font-size: 11px; color: #666; line-height: 1.2;">{{ org.description
+                                        ||
+                                        '(No description available)' }}</div>
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
                     </div>
                 </div>
                 <div class="column is-6">
                     <div class="field">
-                        <label class="label is-small">Funder ID</label>
-                        <div class="control">
-                            <mat-form-field class="full-width is-small">
-                                <input matInput formControlName="funderId"
-                                    placeholder="e.g. https://ror.org/02catss52" />
-                                <a matSuffix target="_blank" [href]="getFunderRorIdUrl()" class="search-link"
-                                    title="Search ROR ID">
-                                    <mat-icon>search</mat-icon>
-                                </a>
-                            </mat-form-field>
-                        </div>
+                        <mat-form-field class="full-width is-small" appearance="outline">
+                            <mat-label>Funder ID</mat-label>
+                            <input matInput formControlName="funderId" placeholder="e.g. https://ror.org/02catss52" />
+                            <a matSuffix target="_blank" [href]="getFunderRorIdUrl()" class="search-link"
+                                title="Search ROR ID">
+                                <mat-icon>search</mat-icon>
+                            </a>
+                        </mat-form-field>
                     </div>
                 </div>
                 <div class="column is-6">
                     <div class="field">
-                        <label class="label is-small">Grant Identifier</label>
-                        <div class="control">
-                            <mat-form-field class="full-width is-small">
-                                <input matInput type="text" formControlName="grantIdentifier"
-                                    placeholder="e.g. Grant #12345">
-                            </mat-form-field>
-                        </div>
+                        <mat-form-field class="full-width is-small" appearance="outline">
+                            <mat-label>Grant Identifier</mat-label>
+                            <input matInput type="text" formControlName="grantIdentifier"
+                                placeholder="e.g. Grant #12345">
+                        </mat-form-field>
                     </div>
                 </div>
             </div>

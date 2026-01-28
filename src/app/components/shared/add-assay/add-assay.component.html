@@ -21,36 +21,36 @@
             </div>
 
             <div class="field">
-              <label class="label">Assay Type</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select formControlName="assayType" (change)="onAssayTypeChange($event.target.value)">
-                    <option *ngFor="let type of activeAssayFileTemplates" [value]="type">{{ type }}</option>
-                  </select>
-                </div>
-              </div>
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Assay Type</mat-label>
+                <mat-select formControlName="assayType" (selectionChange)="onAssayTypeChange($event.value)">
+                  <mat-option *ngFor="let type of activeAssayFileTemplates" [value]="type">
+                    {{ type }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
 
             <div class="field">
-              <label class="label">Measurement Type</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select formControlName="measurementType" (change)="onMeasurementTypeChange($event.target.value)">
-                    <option *ngFor="let type of activeMeasurementTypes" [value]="type.value">{{ type.label }}</option>
-                  </select>
-                </div>
-              </div>
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Measurement Type</mat-label>
+                <mat-select formControlName="measurementType" (selectionChange)="onMeasurementTypeChange($event.value)">
+                  <mat-option *ngFor="let type of activeMeasurementTypes" [value]="type.value">
+                    {{ type.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
 
             <div class="field">
-              <label class="label">Primary Omics</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select formControlName="omics" (change)="onOmicsTypeChange($event.target.value)">
-                    <option *ngFor="let type of activeOmicsTypes" [value]="type.value">{{ type.label }}</option>
-                  </select>
-                </div>
-              </div>
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Primary Omics</mat-label>
+                <mat-select formControlName="omics" (selectionChange)="onOmicsTypeChange($event.value)">
+                  <mat-option *ngFor="let type of activeOmicsTypes" [value]="type.value">
+                    {{ type.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
           </div>
 
@@ -135,7 +135,11 @@
 
               <!-- SINGLE_COLUMN (Text) -->
               <div class="control" *ngIf="field.type === 'TEXT'">
-                <input class="input is-small" [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
+                <mat-form-field class="full-width is-small" appearance="outline">
+                  <mat-label>{{ field.label }}<span *ngIf="field.required" class="has-text-danger">*</span></mat-label>
+                  <input matInput [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
+                  <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                </mat-form-field>
               </div>
 
               <!-- SINGLE_COLUMN_AND_UNIT_ONTOLOGY -->
@@ -143,8 +147,10 @@
                 <!-- Part 1: Text or Ontology based on mainType -->
                 <div class="control is-expanded">
                   <ng-container *ngIf="field.mainType === 'TEXT'; else mainOntology">
-                    <input class="input is-small" [formControlName]="field.key" type="text"
-                      placeholder="{{ field.label }}">
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <input matInput [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
+                    </mat-form-field>
                   </ng-container>
                   <ng-template #mainOntology>
                     <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"

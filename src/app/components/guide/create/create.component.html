@@ -37,37 +37,18 @@
 
 
                 <div class="column dropdown-col">
-                  <div class="field">
-                    <label class="label is-small">Sample File Template</label>
-                    <div class="control">
-                      <div class="select is-small is-fullwidth">
-                        <select formControlName="sampleFileTemplate" [ngModel]="selectedSampleFileTemplate"
-                          (ngModelChange)="onSampleTemplateChange($event)">
-                          <option *ngFor="let temp of sampleFileTemplates" [value]="temp">{{temp}}</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
+                  <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>Sample File Template</mat-label>
+                    <mat-select [formControl]="studyCreationForm.get('sampleFileTemplate')"
+                      [ngModel]="selectedSampleFileTemplate" (ngModelChange)="onSampleTemplateChange($event)">
+                      <mat-option *ngFor="let temp of sampleFileTemplates" [value]="temp">
+                        {{temp}}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
                 </div>
-                <!-- <div class="column">
-                  <div class="field">
-                    <label class="label is-small">Investigation File Template</label>
-                    <div class="control">
-                      <div class="select is-small is-fullwidth">
-                        <select formControlName="investigationFileTemplate"
-                          [ngModel]="selectedInvestigationFileTemplate"
-                          (ngModelChange)="onInvestigationTemplateChange($event)">
-                          <option *ngFor="let temp of investigationFileTemplates" [value]="temp" disabled>{{temp}}
-                          </option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
-
               </div>
             </div>
-            <hr />
             <hr />
             <!-- Contacts (Moved from Step 2) -->
             <div class="column is-12">
@@ -110,18 +91,19 @@
             <hr />
             <!-- Agreements -->
             <div class="field">
-              <label class="checkbox db mb-2">
-                <input type="checkbox" [(ngModel)]="agreements.datasetLicenseAgreement"> I accept the terms of the
-                MetaboLights dataset license.
-                <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
-              </label>
-              <label class="checkbox db mb-2">
-                <input type="checkbox" [(ngModel)]="agreements.datasetPolicyAgreement"> I confirm that I have read and
-                agree to adhere to the MetaboLights data policy.
-                <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
-                  Policy)</a>
-              </label>
-
+              <div>
+                <mat-checkbox [(ngModel)]="agreements.datasetLicenseAgreement" color="primary">
+                  I accept the terms of the MetaboLights dataset license.
+                  <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
+                </mat-checkbox>
+              </div>
+              <div>
+                <mat-checkbox [(ngModel)]="agreements.datasetPolicyAgreement" color="primary">
+                  I confirm that I have read and agree to adhere to the MetaboLights data policy.
+                  <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
+                    Policy)</a>
+                </mat-checkbox>
+              </div>
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
@@ -146,28 +128,28 @@
         <div class="column is-10">
           <div class="box">
             <h2 class="title is-4 has-text-weight-bold mb-5">Study Description</h2>
+            <!-- Study Title -->
             <div class="field mb-4">
-              <label class="label">Study Title (min 25 chars)*</label>
-              <div class="control">
-                <input class="input" type="text" [(ngModel)]="studyTitle"
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Study Title (min 25 chars)*</mat-label>
+                <input matInput type="text" [(ngModel)]="studyTitle"
                   placeholder="Enter a descriptive title for your study">
-
-              </div>
-              <p class="help is-danger" *ngIf="studyTitle && studyTitle.trim().length < 25">Title must be at least 25
-                characters.</p>
-
+                <mat-hint *ngIf="studyTitle && studyTitle.trim().length < 25" class="has-text-danger">
+                  Title must be at least 25 characters.
+                </mat-hint>
+              </mat-form-field>
             </div>
+
+            <!-- Study Description -->
             <div class="field mb-4">
-              <label class="label">Study Description (min 200 chars)*</label>
-              <div class="control">
-                <textarea class="textarea" [(ngModel)]="studyDescription"
-                  placeholder="Enter a detailed description of your study"></textarea>
-
-              </div>
-              <p class="help is-danger" *ngIf="studyDescription && studyDescription.trim().length < 200">Description
-                must
-                be at least 200 characters.</p>
-
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Study Description (min 200 chars)*</mat-label>
+                <textarea matInput [(ngModel)]="studyDescription"
+                  placeholder="Enter a detailed description of your study" rows="5"></textarea>
+                <mat-hint *ngIf="studyDescription && studyDescription.trim().length < 200" class="has-text-danger">
+                  Description must be at least 200 characters.
+                </mat-hint>
+              </mat-form-field>
             </div>
             <hr>
             <!-- Factors, Descriptors, Contacts -->
@@ -265,22 +247,24 @@
 
             <!-- Publication Title -->
             <div class="field mb-4">
-              <label class="label">Publication Title*</label>
-              <div class="control">
-                <input class="input" type="text" [(ngModel)]="publicationTitle" placeholder="Publication Title">
-              </div>
-              <p class="help" *ngIf="fieldValidation('publications.publication.title').description">
-                {{ fieldValidation('publications.publication.title').description }}
-              </p>
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Publication Title*</mat-label>
+                <input matInput type="text" [(ngModel)]="publicationTitle" placeholder="Publication Title">
+                <mat-hint *ngIf="fieldValidation('publications.publication.title').description">
+                  {{ fieldValidation('publications.publication.title').description }}
+                </mat-hint>
+              </mat-form-field>
             </div>
+
             <!-- Status and DOI row -->
             <div class="columns mb-3">
               <div class="column is-6 pb-0">
                 <div class="field">
-                  <label class="label is-small">Publication Status*</label>
                   <div class="control">
                     <ng-container
                       *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
+                      <!-- Keep mtbls-ontology as is since it was already redesigned for premium Material -->
+                      <label class="label is-small">Publication Status*</label>
                       <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
                         (changed)="onPublicationStatusChange($event)"
                         [validations]="fieldValidation('publications.publication.status')" [inline]="true"
@@ -290,7 +274,8 @@
                     </ng-container>
                     <ng-template #publicationStatusDropdown>
                       <div *ngIf="publicationStatusControlList?.values?.length">
-                        <mat-form-field class="full-width is-small mt-0">
+                        <mat-form-field class="full-width" appearance="outline">
+                          <mat-label>Publication Status*</mat-label>
                           <mat-select [value]="publicationStatus[0]?.annotationValue"
                             (selectionChange)="onPublicationStatusChange($event.value)">
                             <mat-option *ngFor="let option of publicationStatusControlList.values"
@@ -307,10 +292,10 @@
               </div>
               <div class="column is-6 pb-0">
                 <div class="field">
-                  <label class="label is-small">DOI<span *ngIf="isDoiRequired">*</span></label>
                   <div class="control">
-                    <mat-form-field class="full-width is-small"
+                    <mat-form-field class="full-width" appearance="outline"
                       [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
+                      <mat-label>DOI<span *ngIf="isDoiRequired">*</span></mat-label>
                       <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
                         [required]="isDoiRequired">
                       <mat-hint>{{ fieldValidation('publications.publication.doi').description }}

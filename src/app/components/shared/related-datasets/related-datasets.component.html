@@ -45,29 +45,24 @@
         <div class="columns is-multiline">
             <div class="column is-6">
                 <div class="field">
-                    <label class="label is-small">Related Dataset Repository</label>
-                    <div class="control">
-                        <mat-form-field class="full-width is-small">
-                            <input type="text" matInput formControlName="identifierSource"
-                                [matAutocomplete]="sourceAuto" placeholder="e.g. MetaboLights" />
-                            <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
-                                <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
-                                    <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
-                                </mat-option>
-                            </mat-autocomplete>
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Related Dataset Repository</mat-label>
+                        <input type="text" matInput formControlName="identifierSource" [matAutocomplete]="sourceAuto"
+                            placeholder="e.g. MetaboLights" />
+                        <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
+                            <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
+                                <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
                 </div>
             </div>
             <div class="column is-6">
                 <div class="field">
-                    <label class="label is-small">Related Dataset Accession Number</label>
-                    <div class="control">
-                        <mat-form-field class="full-width is-small">
-                            <input matInput type="text" formControlName="identifier"
-                                [placeholder]="identifierPlaceholder">
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Related Dataset Accession Number</mat-label>
+                        <input matInput type="text" formControlName="identifier" [placeholder]="identifierPlaceholder">
+                    </mat-form-field>
                 </div>
             </div>
         </div>
