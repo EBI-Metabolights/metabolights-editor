@@ -144,7 +144,7 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Title</mat-label>
           <textarea class="no-scroll" formControlName="title" matInput [tabIndex]="1" cdkAutosizeMinRows="3"
             cdkAutosizeMaxRows="3" cdkTextareaAutosize required>
@@ -162,7 +162,7 @@
             {{ form.get("title").errors.title.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Authors</mat-label>
           <textarea class="no-scroll" formControlName="authorList" matInput [tabIndex]="2" cdkAutosizeMinRows="1"
             cdkAutosizeMaxRows="4" cdkTextareaAutosize>
@@ -176,7 +176,7 @@
             {{ form.get("authorList").errors.authorList.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>DOI</mat-label>
           <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
             (keydown.enter)="getArticleFromDOI()" matInput />
@@ -193,7 +193,7 @@
             {{ form.get("doi").errors.doi.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>PubMed ID</mat-label>
           <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
             (keydown.enter)="getArticleFromDOI()" matInput />
@@ -218,7 +218,8 @@
           </ng-container>
 
           <ng-template #dropdownField>
-            <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('status')">
+            <mat-form-field class="full-width" appearance="outline"
+              *ngIf="_controlList?.values?.length && form.get('status')">
               <mat-select formControlName="status" placeholder="Status">
                 <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
                   {{ option.annotationValue }}

@@ -28,7 +28,7 @@
       </span>
       <br>
       <br>
-      <mat-form-field>
+      <mat-form-field appearance="outline">
         <input matInput (dateChange)="updateReleaseDate('change', $event)" [matDatepicker]="picker"
           [(value)]="releaseDate" placeholder="Choose your study release date" />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
