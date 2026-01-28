@@ -288,6 +288,10 @@ export class AuthGuard  implements OnInit {
       const errorCode = "E-0001-002";
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
+    } else if (studyPermission.studyId !== studyIdentifier) {
+      this.editorService.redirectUrl = `/study/${studyPermission.studyId}/descriptors`;
+      this.router.navigate([this.editorService.redirectUrl]);
+      return false;
     }
 
     const isPublic = studyPermission.studyStatus.toUpperCase() === "PUBLIC";
