@@ -313,10 +313,13 @@
 
             <hr />
             <!-- Funding -->
-            <mtbls-funding [controlList]="funderControlList" class="db mb-6"></mtbls-funding>
+            <mtbls-funding [funders]="funders" (saved)="addFunderCompat($event.funder, $event.index)"
+              (deleted)="removeFunderCompat($event)"></mtbls-funding>
             <br />
             <!-- Related Datasets -->
-            <mtbls-related-datasets class="db mb-6"></mtbls-related-datasets>
+            <mtbls-related-datasets [datasets]="relatedDatasets"
+              (saved)="addDatasetCompat($event.dataset, $event.index)"
+              (deleted)="removeDatasetCompat($event)"></mtbls-related-datasets>
 
             <hr>
             <div class="field is-grouped is-pulled-right">

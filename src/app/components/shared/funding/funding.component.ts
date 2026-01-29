@@ -1,12 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { Ontology } from 'src/app/models/mtbl/mtbls/common/mtbls-ontology';
 import { EditorService } from 'src/app/services/editor.service';
 import { Observable, of } from 'rxjs';
-import { startWith, map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { Store } from '@ngxs/store';
-import { StudyCreation } from 'src/app/ngxs-store/non-study/study-creation/study-creation.actions';
-import { StudyCreationState } from 'src/app/ngxs-store/non-study/study-creation/study-creation.state';
+import { map, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'mtbls-funding',
@@ -15,15 +11,18 @@ import { StudyCreationState } from 'src/app/ngxs-store/non-study/study-creation/
 })
 export class FundingComponent implements OnInit {
   @Input() controlList: any;
+  @Input() funders: any[] = [];
+  @Input() readonly: boolean = false;
   
-  funders$: Observable<any[]> = inject(Store).select(StudyCreationState.funders);
+  @Output() saved = new EventEmitter<any>();
+  @Output() deleted = new EventEmitter<number>();
   
   form: UntypedFormGroup;
   filteredFunderOrganizations$: Observable<any[]>;
   isModalOpen = false;
   editingIndex = -1;
 
-  constructor(private fb: UntypedFormBuilder, private editorService: EditorService, private store: Store) { }
+  constructor(private fb: UntypedFormBuilder, private editorService: EditorService) { }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -125,16 +124,12 @@ export class FundingComponent implements OnInit {
           grantIdentifier: formValue.grantIdentifier || ""
       };
 
-      if (this.editingIndex > -1) {
-          this.store.dispatch(new StudyCreation.UpdateFunder(newFunder, this.editingIndex));
-      } else {
-          this.store.dispatch(new StudyCreation.AddFunder(newFunder));
-      }
+      this.saved.emit({ funder: newFunder, index: this.editingIndex });
       this.closeModal();
     }
   }
 
   removeFunder(index: number) {
-    this.store.dispatch(new StudyCreation.RemoveFunder(index));
+    this.deleted.emit(index);
   }
 }

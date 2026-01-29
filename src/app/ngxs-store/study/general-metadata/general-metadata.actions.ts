@@ -277,6 +277,44 @@ export namespace People {
 
 }
 
+export namespace Funders {
+    export class Get {
+        static readonly type = '[general] Get Funders'
+        constructor() {}
+    }
+    export class Add {
+        static readonly type = '[general] Add Funder'
+        constructor(public body: any) {}
+    }
+    export class Update {
+        static readonly type = '[general] Update Funder'
+        constructor(public body: any, public index: number) {}
+    }
+    export class Delete {
+        static readonly type = '[general] Delete Funder'
+        constructor(public index: number) {}
+    }
+}
+
+export namespace RelatedDatasets {
+    export class Get {
+        static readonly type = '[general] Get Related Datasets'
+        constructor() {}
+    }
+    export class Add {
+        static readonly type = '[general] Add Related Dataset'
+        constructor(public body: any) {}
+    }
+    export class Update {
+        static readonly type = '[general] Update Related Dataset'
+        constructor(public body: any, public index: number) {}
+    }
+    export class Delete {
+        static readonly type = '[general] Delete Related Dataset'
+        constructor(public index: number) {}
+    }
+}
+
 export namespace DatasetLicenseNS {
     export class ConfirmAgreement {
         static readonly type = '[general] Confirm Dataset License Agreement'

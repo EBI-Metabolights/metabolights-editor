@@ -153,7 +153,7 @@
 </div>
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
-    <mat-form-field class="full-width bback">
+    <mat-form-field class="full-width bback" appearance="outline">
       <input autocomplete="off" matInput (keyup)="applyFilter($event.target.value)"
         (keydown)="onKeydown($event, $event.target.value)" placeholder="Filter" />
     </mat-form-field>
@@ -286,7 +286,7 @@
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <ng-template #dropdownField>
-                    <mat-form-field class="full-width"
+                    <mat-form-field class="full-width" appearance="outline"
                       *ngIf="columnControlList(selectedColumn['header']).renderAsDropdown">
                       <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedColumn.header) }}">
                         <mat-option *ngFor="let option of columnControlList(selectedColumn['header']).values"
@@ -295,7 +295,7 @@
                         </mat-option>
                       </mat-select>
                     </mat-form-field>
-                    <mat-form-field class="full-width"
+                    <mat-form-field class="full-width" appearance="outline"
                       *ngIf="!columnControlList(selectedColumn['header']).renderAsDropdown && !isCellTypeOntology">
                       <input class="no-scroll" formControlName="cell" matInput />
                     </mat-form-field>
@@ -351,7 +351,7 @@
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="isCellTypeFile">
-                    <mat-form-field class="full-width">
+                    <mat-form-field class="full-width" appearance="outline">
                       <mat-select formControlName="cell"
                         placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
                         <mat-option *ngFor="let file of getFiles(selectedCell['column']['header'])" [value]="file.file">
@@ -373,7 +373,7 @@
                   </div>
                   <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
-                    <mat-form-field class="full-width">
+                    <mat-form-field class="full-width" appearance="outline">
                       <mat-select formControlName="cell"
                         placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
                         <mat-option *ngFor="let option of columnControlList(selectedCell['column']['header']).values"
@@ -386,7 +386,7 @@
                   <div
                     *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
-                    <mat-form-field class="full-width">
+                    <mat-form-field class="full-width" appearance="outline">
                       <input class="no-scroll" formControlName="cell" matInput />
                       <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
                         Please enter a valid URL

@@ -252,10 +252,14 @@
                         <mtbls-design-descriptors></mtbls-design-descriptors>
                       </div>
                       <div class="column is-12 mb-6">
-                        <mtbls-funding></mtbls-funding>
+                        <mtbls-funding [funders]="studyFunders$ | async"
+                          [readonly]="isCurator || isOwner ? false : true" (saved)="saveFunder($event)"
+                          (deleted)="deleteFunder($event)"></mtbls-funding>
                       </div>
                       <div class="column is-12 mb-6">
-                        <mtbls-related-datasets></mtbls-related-datasets>
+                        <mtbls-related-datasets [datasets]="relatedDatasets$ | async"
+                          [readonly]="isCurator || isOwner ? false : true" (saved)="saveRelatedDataset($event)"
+                          (deleted)="deleteRelatedDataset($event)"></mtbls-related-datasets>
                       </div>
                     </div>
                   </div>

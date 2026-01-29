@@ -731,6 +731,32 @@ export class CreateComponent implements OnInit {
           }
       });
   }
+
+  // Funding Child Component Handlers
+  addFunderCompat(funder: any, index: number) {
+      if (index > -1) {
+          this.store.dispatch(new StudyCreation.UpdateFunder(funder, index));
+      } else {
+          this.store.dispatch(new StudyCreation.AddFunder(funder));
+      }
+  }
+
+  removeFunderCompat(index: number) {
+      this.store.dispatch(new StudyCreation.RemoveFunder(index));
+  }
+
+  // Related Datasets Child Component Handlers
+  addDatasetCompat(dataset: any, index: number) {
+    if (index > -1) {
+        this.store.dispatch(new StudyCreation.UpdateRelatedDataset(dataset, index));
+    } else {
+        this.store.dispatch(new StudyCreation.AddRelatedDataset(dataset));
+    }
+  }
+
+  removeDatasetCompat(index: number) {
+      this.store.dispatch(new StudyCreation.RemoveRelatedDataset(index));
+  }
   onPublicationStatusChange(value) {
       if (value) {
           const selectedValue = Array.isArray(value) ? value[0] : value;

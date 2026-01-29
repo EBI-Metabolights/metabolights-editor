@@ -64,7 +64,7 @@ export class MafComponent implements AfterContentInit {
       if(Array.isArray(mafs) && mafs.length === 0){
         return;
       }
-      if (mafs && this.value.data.file) {
+      if (mafs && this.value && this.value.data && this.value.data.file) {
         this.mafData = mafs[this.value.data.file];
       }
     });
@@ -219,6 +219,10 @@ export class MafComponent implements AfterContentInit {
     this.isFormBusy = true;
     this.editorService.search(term, type.toLowerCase()).subscribe(
       (res) => {
+        if (!res || !res.content || res.content.length === 0) {
+          this.isFormBusy = false;
+          return;
+        }
         const resultObj = res.content[0];
         this.isFormBusy = false;
         const fields = ["name", "smiles", "inchi", "formula", "databaseId"];

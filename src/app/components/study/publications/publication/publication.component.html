@@ -144,7 +144,7 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <mat-form-field class="full-width" appearance="outline">
+        <mat-form-field class="full-width" appearance="outline" style="padding-bottom: 20px;">
           <mat-label>Title</mat-label>
           <textarea class="no-scroll" formControlName="title" matInput [tabIndex]="1" cdkAutosizeMinRows="3"
             cdkAutosizeMaxRows="3" cdkTextareaAutosize required>
@@ -155,79 +155,85 @@
             </span>
           </mat-hint>
           <mat-error *ngIf="
-              form.get('title').errors &&
-              form.get('title').dirty &&
-              form.get('title').errors.title
+              form.get('title')?.errors &&
+              form.get('title')?.dirty &&
+              form.get('title')?.errors?.title
             ">
-            {{ form.get("title").errors.title.error }}
+            {{ form.get("title")?.errors?.title?.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>Authors</mat-label>
-          <textarea class="no-scroll" formControlName="authorList" matInput [tabIndex]="2" cdkAutosizeMinRows="1"
-            cdkAutosizeMaxRows="4" cdkTextareaAutosize>
-          </textarea>
-          <mat-hint>{{ fieldValidation("authorList").description }}</mat-hint>
-          <mat-error *ngIf="
-              form.get('authorList').errors &&
-              form.get('authorList').dirty &&
-              form.get('authorList').errors.authorList
-            ">
-            {{ form.get("authorList").errors.authorList.error }}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>DOI</mat-label>
-          <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
-            (keydown.enter)="getArticleFromDOI()" matInput />
-          <mat-hint>{{ fieldValidation("doi").description }}
-            <span *ngIf="isFieldRequired('doi')">
-              <b>(required)</b>
-            </span>
-          </mat-hint>
-          <mat-error *ngIf="
-              form.get('doi').errors &&
-              form.get('doi').dirty &&
-              form.get('doi').errors.doi
-            ">
-            {{ form.get("doi").errors.doi.error }}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field class="full-width" appearance="outline">
-          <mat-label>PubMed ID</mat-label>
-          <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
-            (keydown.enter)="getArticleFromDOI()" matInput />
-          <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
-          <mat-error *ngIf="
-              form.get('pubMedID').errors &&
-              form.get('pubMedID').dirty &&
-              form.get('pubMedID').errors.pubMedID
-            ">
-            {{ form.get("pubMedID").errors.pubMedID.error }}
-          </mat-error>
-        </mat-form-field>
-        <ng-container *ngIf="form">
-          <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
-            <mtbls-ontology class="mt-20" #publicationStatus [validations]="fieldValidation('status')"
-              [controlList]="_controlList" (changed)="onChanges($event)" [values]="statusValuesForComponent()"
-              [inline]="true" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
-              [label]="'Status*'" (emptyError)="onEmptyError($event)"></mtbls-ontology>
-            <mat-error *ngIf="showError">
-              <small>{{ form?.get("status")?.errors?.status?.error }}</small>
+        <div class="form-row" style="padding-bottom: 40px;">
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>Authors</mat-label>
+            <textarea class="no-scroll" formControlName="authorList" matInput [tabIndex]="2" cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="4" cdkTextareaAutosize>
+            </textarea>
+            <mat-hint>{{ fieldValidation("authorList").description }}</mat-hint>
+            <mat-error *ngIf="
+                form.get('authorList')?.errors &&
+                form.get('authorList')?.dirty &&
+                form.get('authorList')?.errors?.authorList
+              ">
+              {{ form.get("authorList")?.errors?.authorList?.error }}
             </mat-error>
-          </ng-container>
+          </mat-form-field>
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>DOI</mat-label>
+            <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
+              (keydown.enter)="getArticleFromDOI()" matInput />
+            <mat-hint>{{ fieldValidation("doi").description }}
+              <span *ngIf="isFieldRequired('doi')">
+                <b>(required)</b>
+              </span>
+            </mat-hint>
+            <mat-error *ngIf="
+                form.get('doi')?.errors &&
+                form.get('doi')?.dirty &&
+                form.get('doi')?.errors?.doi
+              ">
+              {{ form.get("doi")?.errors?.doi?.error }}
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-          <ng-template #dropdownField>
-            <mat-form-field class="full-width" appearance="outline"
-              *ngIf="_controlList?.values?.length && form.get('status')">
-              <mat-select formControlName="status" placeholder="Status">
-                <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-                  {{ option.annotationValue }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-          </ng-template>
-        </ng-container>
+        <div class="form-row" style="padding-bottom: 0;">
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>PubMed ID</mat-label>
+            <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
+              (keydown.enter)="getArticleFromPubMedID()" matInput />
+            <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
+            <mat-error *ngIf="
+                form.get('pubMedID')?.errors &&
+                form.get('pubMedID')?.dirty &&
+                form.get('pubMedID')?.errors?.pubMedID
+              ">
+              {{ form.get("pubMedID")?.errors?.pubMedID?.error }}
+            </mat-error>
+          </mat-form-field>
+
+          <div class="half-width">
+            <ng-container *ngIf="form">
+              <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
+                <mtbls-ontology class="mt-20" #publicationStatus [validations]="fieldValidation('status')"
+                  [controlList]="_controlList" (changed)="onChanges($event)" [values]="statusValuesForComponent()"
+                  [inline]="true" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                  [label]="'Status*'" (emptyError)="onEmptyError($event)" [hasError]="showError"></mtbls-ontology>
+              </ng-container>
+
+              <ng-template #dropdownField>
+                <mat-form-field class="full-width" appearance="outline"
+                  *ngIf="_controlList?.values?.length && form.get('status')">
+                  <mat-label>Status*</mat-label>
+                  <mat-select formControlName="status" placeholder="Status">
+                    <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                      {{ option.annotationValue }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-template>
+            </ng-container>
+          </div>
+        </div>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />
           <label><small><b>Publication abstract</b></small></label><br />

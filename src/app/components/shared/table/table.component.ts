@@ -817,12 +817,13 @@ export class TableComponent
       this.controlListColumns.size > 0 &&
       this.controlListColumns.has(header)
     ) {
-      const colData = this.controlListColumns.get(header)["ontology-details"];
-      this.isRequiredField = this.controlListColumns.get(header)["ontology-details"]["is-required"] == "true";
+      const colVal = this.controlListColumns.get(header);
+      const colData = colVal?.["ontology-details"];
+      this.isRequiredField = colData?.["is-required"] === "true";
       return colData;
     }
     if (this.enableControlList) {
-      return this.validations.default_ontology_validation["ontology-details"];
+      return this.validations?.default_ontology_validation?.["ontology-details"] || {};
     }
     return {};
   }

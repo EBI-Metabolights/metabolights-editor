@@ -1,6 +1,6 @@
 <span *ngIf="inline">
   <div class="ontology-container">
-    <mat-form-field class="full-width premium-field" appearance="outline">
+    <mat-form-field class="full-width premium-field" appearance="outline" [class.mat-form-field-invalid]="hasError">
       <mat-label *ngIf="label">{{label}}</mat-label>
       <mat-chip-grid #chipList class="custom-chip-list">
         <span *ngFor="let value of values">

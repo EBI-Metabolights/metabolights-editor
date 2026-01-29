@@ -2,31 +2,30 @@
     <div class="columns is-vcentered" style="margin-top: 0px;">
         <div class="column is-6">
             <div class="field">
-                <label class="label is-small">
-                    Protocol URI
-                    <mat-icon
-                        [matTooltip]="'The Uniform Resource Identifier (URI) for the protocol. Provide a persistent link to the detailed protocol, for example from protocols.io.'">help</mat-icon>
-                </label>
-                <div class="control has-icons-right">
-                    <input class="input is-small" type="url" placeholder="https://protocols.io/" formControlName="uri"
+                <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>
+                        Protocol URI
+                        <mat-icon
+                            [matTooltip]="'The Uniform Resource Identifier (URI) for the protocol. Provide a persistent link to the detailed protocol, for example from protocols.io.'">help</mat-icon>
+                    </mat-label>
+                    <input matInput type="url" placeholder="https://protocols.io/" formControlName="uri"
                         [disabled]="readonly" />
-                    <a class="icon is-small is-right protocol-uri-action"
-                        style="cursor: pointer; margin-left: 6px; pointer-events: auto;" (click)="openProtocolUri()"
-                        (keydown.enter)="openProtocolUri()" [attr.tabindex]="parentForm.get('uri').value ? 0 : -1"
-                        title="Open URI in new tab" aria-label="Open protocol URI in new tab">
-                        <i class="material-icons">open_in_new</i>
-                    </a>
-                </div>
+                    <button mat-icon-button matSuffix *ngIf="parentForm.get('uri').value" (click)="openProtocolUri()"
+                        (keydown.enter)="openProtocolUri()" title="Open URI in new tab"
+                        aria-label="Open protocol URI in new tab">
+                        <mat-icon>open_in_new</mat-icon>
+                    </button>
+                </mat-form-field>
             </div>
         </div>
 
         <div class="column is-6">
             <div class="field">
-                <label class="label is-small">Protocol Version</label>
-                <div class="control">
-                    <input class="input is-small" type="text" placeholder="e.g. v1.0" formControlName="version"
+                <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>Protocol Version</mat-label>
+                    <input matInput type="text" placeholder="e.g. v1.0" formControlName="version"
                         [disabled]="readonly" />
-                </div>
+                </mat-form-field>
             </div>
         </div>
     </div>

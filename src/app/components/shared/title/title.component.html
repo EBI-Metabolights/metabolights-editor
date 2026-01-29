@@ -1,13 +1,13 @@
 <div [ngClass]="{ 'hover-highlight': !isReadOnly }" class="px-20 mtbls-section">
   <span class="copy-btn" (click)="copyTitle()"><mat-icon matTooltip="Copy content">content_copy</mat-icon></span>
-  <h2 #contentToCopy class="title is-3" >
+  <h2 #contentToCopy class="title is-3">
     <b>
-      <span >{{ requestedStudy }}: </span
-      ><span [innerHTML]="title" class="clickable" (click)="openModal()"  matTooltip="Click in here to edit" [matTooltipDisabled]="isReadOnly"></span>
+      <span>{{ requestedStudy }}: </span><span [innerHTML]="title" class="clickable" (click)="openModal()"
+        matTooltip="Click in here to edit" [matTooltipDisabled]="isReadOnly"></span>
     </b>
-    
+
   </h2>
-  
+
 </div>
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
@@ -23,26 +23,17 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <mat-form-field class="full-width">
+                <mat-form-field class="full-width" appearance="outline">
                   <mat-label>Study title</mat-label>
-                  <textarea
-                    class="no-scroll"
-                    formControlName="title"
-                    matInput
-                    [placeholder]="validation.placeholder"
-                    cdkAutosizeMinRows="20"
-                    cdkAutosizeMaxRows="30"
-                    cdkTextareaAutosize
-                  >
+                  <textarea class="no-scroll" formControlName="title" matInput [placeholder]="validation.placeholder"
+                    cdkAutosizeMinRows="20" cdkAutosizeMaxRows="30" cdkTextareaAutosize>
                   </textarea>
                   <mat-hint>{{ validation.description }}</mat-hint>
-                  <mat-error
-                    *ngIf="
+                  <mat-error *ngIf="
                       form.get('title').errors &&
                       form.get('title').dirty &&
                       form.get('title').errors.title
-                    "
-                  >
+                    ">
                     {{ form.get("title").errors.title.error }}
                   </mat-error>
                 </mat-form-field>
@@ -56,31 +47,15 @@
           <div class="column is-two-third">
           </div>
           <div class="column is-one-third has-text-right">
-            <button
-              *ngIf="form.get('title').dirty"
-              [disabled]="!form.valid || isFormBusy"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button *ngIf="form.get('title').dirty" [disabled]="!form.valid || isFormBusy" (click)="saveNgxs()"
+              class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
-            <button
-              *ngIf="!form.get('title').dirty"
-              (click)="closeModal()"
-              class="button is-info"
-            >
+            <button *ngIf="!form.get('title').dirty" (click)="closeModal()" class="button is-info">
               OK
             </button>
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>

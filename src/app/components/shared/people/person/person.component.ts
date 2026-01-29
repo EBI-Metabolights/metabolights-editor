@@ -314,6 +314,9 @@ export class PersonComponent implements OnInit {
     this.isModalOpen = true;
     this.showOntology = true;
     this.updateValidatorsBasedOnRoles();
+    
+    // Mark all required fields as touched to show validation errors immediately
+    this.markRequiredFieldsAsTouched();
   }
 
   toogleShowAdvanced() {
@@ -364,6 +367,9 @@ export class PersonComponent implements OnInit {
   }
 
   get validation() {
+    if (!this.validations) {
+      return {};
+    }
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
@@ -533,6 +539,7 @@ private updateValidatorsBasedOnRoles() {
     }
 
     this.updateValidatorsBasedOnRoles();
+    this.markRequiredFieldsAsTouched();
   }
 
 private updatePiValidators(isPi: boolean): void {
@@ -598,6 +605,33 @@ private updatePiValidators(isPi: boolean): void {
   });
 
   this.form.updateValueAndValidity({ emitEvent: false });
+}
+
+private markRequiredFieldsAsTouched(): void {
+  if (!this.form) return;
+  
+  const alwaysRequiredFields = ['firstName', 'lastName', 'roles'];
+  const piRequiredFields = ['affiliation', 'email'];
+  
+  // Mark always required fields as touched
+  alwaysRequiredFields.forEach(fieldName => {
+    const control = this.form.get(fieldName);
+    if (control) {
+      control.markAsTouched();
+      control.updateValueAndValidity({ emitEvent: false });
+    }
+  });
+  
+  // Mark PI-specific fields as touched if user is PI
+  if (this.isPiRole) {
+    piRequiredFields.forEach(fieldName => {
+      const control = this.form.get(fieldName);
+      if (control) {
+        control.markAsTouched();
+        control.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+  }
 }
 
 

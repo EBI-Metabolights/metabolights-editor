@@ -8,7 +8,7 @@ import {
   inject,
   model,
 } from "@angular/core";
-import { UntypedFormBuilder, UntypedFormGroup } from "@angular/forms";
+import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { EditorService } from "../../../../services/editor.service";
 import { Ontology } from "./../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import * as toastr from "toastr";
@@ -222,7 +222,7 @@ export class FactorComponent implements OnInit {
         this.selectedFactorOntoValue = this.factor?.factorType ? [this.factor.factorType] : [];
     }
     this.form = this.fb.group({
-      factorName: [this.factor.factorName],
+      factorName: [this.factor.factorName, Validators.required],
       factorType: [],
     });
     this.form.valueChanges.subscribe((values) => {

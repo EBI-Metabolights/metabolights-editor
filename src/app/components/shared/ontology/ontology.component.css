@@ -6,7 +6,11 @@
 ::ng-deep .premium-field.mat-mdc-form-field {
   --mdc-outlined-text-field-focus-outline-color: #00d1b2;
   --mdc-outlined-text-field-focus-label-text-color: #00d1b2;
-  margin-top: 8px;
+}
+
+::ng-deep .premium-field .mat-mdc-form-field-infix {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
 }
 
 .premium-chip {
@@ -84,8 +88,6 @@
 }
 
 .extended-info {
-  background-color: #fafafa;
-  border-left: 3px solid #00d1b2;
   border-radius: 0 4px 4px 0;
 }
 
@@ -102,7 +104,6 @@
 }
 
 .required-tag {
-  color: #ff3860;
   margin-left: auto;
 }
 

@@ -9,8 +9,8 @@
         </p>
     </header>
     <div class="card-content">
-        <div class="funding-list" *ngIf="(funders$ | async)?.length > 0; else emptyMessage">
-            <div class="box p-3 mb-4" *ngFor="let funder of funders$ | async; let i = index">
+        <div class="funding-list" *ngIf="funders.length > 0; else emptyMessage">
+            <div class="box p-3 mb-4" *ngFor="let funder of funders; let i = index">
                 <div class="columns is-vcentered is-mobile">
                     <div class="column">
                         <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
