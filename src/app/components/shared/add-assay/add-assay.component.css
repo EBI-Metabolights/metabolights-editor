@@ -126,7 +126,7 @@
 
 /* Modal layers */
 .modal.is-active {
-  z-index: 2000 !important;
+  z-index: 100 !important;
 }
 
 .modal:nth-of-type(2) {

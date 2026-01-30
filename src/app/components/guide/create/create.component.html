@@ -41,8 +41,8 @@
                     <mat-label>Sample File Template</mat-label>
                     <mat-select [formControl]="studyCreationForm.get('sampleFileTemplate')"
                       [ngModel]="selectedSampleFileTemplate" (ngModelChange)="onSampleTemplateChange($event)">
-                      <mat-option *ngFor="let temp of sampleFileTemplates" [value]="temp">
-                        {{temp}}
+                      <mat-option *ngFor="let temp of sampleFileTemplateOptions" [value]="temp.id">
+                        {{temp.label}}
                       </mat-option>
                     </mat-select>
                   </mat-form-field>
@@ -256,17 +256,18 @@
               </mat-form-field>
             </div>
 
-            <!-- Publication Authors -->
-            <div class="field mb-4">
-              <mat-form-field class="full-width" appearance="outline">
-                <mat-label>Publication Authors</mat-label>
-                <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors" required>
-                <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
-              </mat-form-field>
-            </div>
-
-            <!-- Status and DOI row -->
+            <!-- Row 1: Authors and Status -->
             <div class="columns mb-3">
+              <div class="column is-6 pb-0">
+                <div class="field">
+                  <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>Publication Authors</mat-label>
+                    <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors"
+                      required>
+                    <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
+                  </mat-form-field>
+                </div>
+              </div>
               <div class="column is-6 pb-0">
                 <div class="field">
                   <div class="control">
@@ -299,6 +300,10 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Row 2: DOI and PubMed ID -->
+            <div class="columns mb-3">
               <div class="column is-6 pb-0">
                 <div class="field">
                   <div class="control">
@@ -313,6 +318,17 @@
                     </mat-form-field>
                     <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
                     </p>
+                  </div>
+                </div>
+              </div>
+              <div class="column is-6 pb-0">
+                <div class="field">
+                  <div class="control">
+                    <mat-form-field class="full-width" appearance="outline">
+                      <mat-label>PubMed ID</mat-label>
+                      <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID">
+                      <mat-hint>{{ fieldValidation('publications.publication.pubmedId').description }}</mat-hint>
+                    </mat-form-field>
                   </div>
                 </div>
               </div>

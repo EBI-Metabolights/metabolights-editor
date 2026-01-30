@@ -53,6 +53,8 @@ export class CreateComponent implements OnInit {
   assayFileTypeMappings: any = {};
   studyAssaySelection: any = {};
   isAnyAssaySelected = false;
+  sampleFileTemplateOptions: any[] = [];
+  investigationFileTemplateOptions: any[] = [];
   sampleFileTemplates: string[] = [];
   investigationFileTemplates: string[] = [];
   selectedSampleFileTemplate: string = '';
@@ -76,6 +78,7 @@ export class CreateComponent implements OnInit {
   publicationDoi: string = "";
   publicationTitle: string = "";
   publicationAuthors: string = "";
+  publicationPubmedId: string = "";
   funders: any[] = [];
   filteredFunderOrganizations$: Observable<any>;
   relatedDatasets: any[] = [];
@@ -273,22 +276,37 @@ export class CreateComponent implements OnInit {
       });
       this.sampleFileTemplates = versionConfig.activeSampleFileTemplates || [];
       this.investigationFileTemplates = versionConfig.activeInvestigationFileTemplates || [];
+
+      // Resolve labels and order for Sample Templates
+      const sampleMeta = this.templateConfiguration.sampleFileTemplates || {};
+      this.sampleFileTemplateOptions = this.sampleFileTemplates.map(id => ({
+          id: id,
+          label: sampleMeta[id]?.label || id,
+          order: sampleMeta[id]?.order || 99
+      })).sort((a, b) => a.order - b.order);
+
+      // Resolve labels and order for Investigation Templates
+      const investigationMeta = this.templateConfiguration.investigationFileTemplates || {};
+      this.investigationFileTemplateOptions = this.investigationFileTemplates.map(id => ({
+          id: id,
+          label: investigationMeta[id]?.label || id,
+          order: investigationMeta[id]?.order || 99
+      })).sort((a, b) => a.order - b.order);
       
-      const defaultSampleTemplate = versionConfig.defaultSampleFileTemplate;
-      if (defaultSampleTemplate) {
-          this.selectedSampleFileTemplate = defaultSampleTemplate;
-          this.studyCreationForm.controls['sampleFileTemplate']?.setValue(defaultSampleTemplate);
-          this.onSampleTemplateChange(defaultSampleTemplate);
+      const defaultSampleTemplateId = versionConfig.defaultSampleFileTemplate;
+      if (defaultSampleTemplateId) {
+          this.selectedSampleFileTemplate = defaultSampleTemplateId;
+          this.studyCreationForm.controls['sampleFileTemplate']?.setValue(defaultSampleTemplateId);
+          this.onSampleTemplateChange(defaultSampleTemplateId);
       }
 
-      const defaultInvestigationTemplate = versionConfig.defaultInvestigationFileTemplate 
-        || (versionConfig.activeInvestigationFileTemplates && versionConfig.activeInvestigationFileTemplates.length > 0 ? versionConfig.activeInvestigationFileTemplates[0] : null)
-        || 'minimum';
+      const defaultInvestigationTemplateId = versionConfig.defaultInvestigationFileTemplate 
+        || (this.investigationFileTemplateOptions.length > 0 ? this.investigationFileTemplateOptions[0].id : 'minimum');
       
-      console.log('Default Investigation Template:', defaultInvestigationTemplate);
+      this.selectedInvestigationFileTemplate = defaultInvestigationTemplateId;
       
-      this.selectedInvestigationFileTemplate = defaultInvestigationTemplate;
-      this.studyCreationForm.controls['investigationFileTemplate']?.setValue(defaultInvestigationTemplate);
+      console.log('Resolved Investigation Template ID:', this.selectedInvestigationFileTemplate);
+      this.studyCreationForm.controls['investigationFileTemplate']?.setValue(this.selectedInvestigationFileTemplate);
 
       // License Information
       this.licenseName = versionConfig.defaultDatasetLicense || "";
@@ -890,15 +908,20 @@ export class CreateComponent implements OnInit {
         selectedSampleFileTemplate: formValue.sampleFileTemplate || "minimum",
         datasetLicenseAgreement: this.agreements.datasetLicenseAgreement,
         datasetPolicyAgreement: this.agreements.datasetPolicyAgreement,
-        publicationStatus: publicationStatus,
+        publications: [
+          {
+            title: (this as any).publicationTitle || "",
+            authorList: (this as any).publicationAuthors || "",
+            doi: (this as any).publicationDoi || "",
+            pubmedId: (this as any).publicationPubmedId || "",
+            status: publicationStatus
+          }
+        ],
         title: this.studyTitle,
         description: this.studyDescription,
         relatedDatasets: this.relatedDatasets,
         funding: funding,
         contacts: contacts,
-        publicationDoi: (this as any).publicationDoi || "", 
-        publicationTitle: (this as any).publicationTitle || "",
-        publicationAuthors: (this as any).publicationAuthors || "",
         designDescriptors: designDescriptors,
         factors: factors,
 
@@ -951,5 +974,20 @@ export class CreateComponent implements OnInit {
         this.router.navigate(["/guide/meta", this.newStudy]);
       }
     }, 3000);
+  }
+
+  onFinishWizard() {
+    Swal.fire({
+      title: "Switch to study overview?",
+      text: "You have completed the guided submission flow. Would you like to view the study details and submit it?",
+      type: "question",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+      cancelButtonText: "No"
+    }).then((result) => {
+      if (result.value) {
+        this.router.navigate(['/study', this.newStudy]);
+      }
+    });
   }
 }

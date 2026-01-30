@@ -159,8 +159,8 @@
               <span>
                 <mtbls-ontology *ngIf="showOntology" class="mt-20" #personRoles [validations]="fieldValidation('roles')"
                   [controlList]="_controlList" (changed)="onChanges($event)" [values]="person.roles" [inline]="true"
-                  [label]="'Role'" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
-                  [label]="'Role*'" (emptyError)="onEmptyError($event)"
+                  [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Role'"
+                  (emptyError)="onEmptyError($event)"
                   [hasError]="form?.get('roles')?.invalid && form?.get('roles')?.touched"></mtbls-ontology>
               </span>
             </div>
