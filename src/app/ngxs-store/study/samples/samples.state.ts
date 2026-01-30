@@ -40,7 +40,6 @@ export class SampleState {
         this.sampleSheet$.pipe(take(1)).subscribe(
             (sampleSheet) => {
                 if (sampleSheet) {
-                    this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
                     ctx.dispatch(new Samples.OrganiseAndPersist(sampleSheet.file, action.studyId));
                 } else {
                     Swal.fire({title: 'Error', text: this.samplesService.sampleSheetMissingPopupMessage, showCancelButton: false,

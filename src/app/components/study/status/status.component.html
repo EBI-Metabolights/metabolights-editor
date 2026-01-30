@@ -2,22 +2,20 @@
   <div class="tags has-addons">
     <span class="tag is-dark">Status</span>
 
-    <span class="tag clickable"  (click)="openModal()"
-    [class.is-primary]="status == 'In Review'"
-    [class.is-primary]="status == 'Private'"
-    [class.is-warning]="status == 'Provisional'"
-    [class.is-success]="status == 'Public'"
-    >
+    <span class="tag" [class.clickable]="!isReadOnly" (click)="openModal()" [class.is-primary]="status == 'In Review'"
+      [class.is-primary]="status == 'Private'" [class.is-warning]="status == 'Provisional'"
+      [class.is-success]="status == 'Public'">
       {{
-        status
+      status
       }}
-      <mat-icon>edit</mat-icon>
+      <mat-icon *ngIf="!isReadOnly">edit</mat-icon>
     </span>
-    
 
-  <span *ngIf="!isReadOnly && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable" (click)="openRevisionStatusModel()">
-    <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
-  </span>
+
+    <span *ngIf="!isReadOnly && revisionNumber > 0 && revisionStatus != 'Completed'" class="tag clickable"
+      (click)="openRevisionStatusModel()">
+      <img src="{{ baseHref }}assets/img/spinner.svg" width="22px" />
+    </span>
 
   </div>
 
@@ -36,8 +34,8 @@
       </span>
 
       <span *ngIf="revisionNumber > 0">
-        <br/>
-        <br/>Scheduled revision: <b>{{ revisionNumber }}</b>
+        <br />
+        <br />Scheduled revision: <b>{{ revisionNumber }}</b>
         <span>
           <br>Revision created at: <b>{{ revisionDatetime }}</b>
         </span>
@@ -45,7 +43,7 @@
 
           <br>Revision task message: <b>{{ revisionTaskMessage }}</b>
         </span>
-          <span>
+        <span>
           <br>Revision status: <b>{{ revisionStatus }}</b>
         </span>
       </span>
@@ -103,25 +101,32 @@
         </h4>
         <p>
           <b>ACCESSIBILITY</b><br />
-          Your study is Private and you cannot make any changes.<br /><br/>
-          Private studies can be modified at any point. Simply revert to Provisional, edit the study, and remember to re-index data files, re-run study validation and change back to Private. <br/>
-          A <a href="https://ebi-metabolights.github.io/guides/#reviewer-link" target="_BLANK" style="text-decoration: underline;">private read-only link</a> 
-          is available at the top of your study page to share with the editor of the journal, reviewers, collaborators, etc. 
+          Your study is Private and you cannot make any changes.<br /><br />
+          Private studies can be modified at any point. Simply revert to Provisional, edit the study, and remember to
+          re-index data files, re-run study validation and change back to Private. <br />
+          A <a href="https://ebi-metabolights.github.io/guides/#reviewer-link" target="_BLANK"
+            style="text-decoration: underline;">private read-only link</a>
+          is available at the top of your study page to share with the editor of the journal, reviewers, collaborators,
+          etc.
           <br /><br />
           <b>What's next?</b><br />
-          </p>
-          <ul class="list-data-policy">
-            <li><strong>Manual status update: </strong>You can make your study public by selecting ‘Public’ from the drop-down menu below.</li>
-            <li><strong>Automatic status update:</strong> MetaboLights can make your study public according to following criteria:
-              <ul class="sub-list-data-policy">
-                <li>The study publication is published in a journal.</li>
-                <li>The release date has been reached.</li>
-              </ul>
-            </li>
-          </ul>
+        </p>
+        <ul class="list-data-policy">
+          <li><strong>Manual status update: </strong>You can make your study public by selecting ‘Public’ from the
+            drop-down menu below.</li>
+          <li><strong>Automatic status update:</strong> MetaboLights can make your study public according to following
+            criteria:
+            <ul class="sub-list-data-policy">
+              <li>The study publication is published in a journal.</li>
+              <li>The release date has been reached.</li>
+            </ul>
+          </li>
+        </ul>
         <p>
-          Please be aware that once you make your study public, you cannot make any status update again.<br/><br />
-          Please check our  <a href="https://ebi-metabolights.github.io/guides/#overview" target="_BLANK" style="text-decoration: underline;">guides</a> for information on how to reference your MetaboLights study in your publication.
+          Please be aware that once you make your study public, you cannot make any status update again.<br /><br />
+          Please check our <a href="https://ebi-metabolights.github.io/guides/#overview" target="_BLANK"
+            style="text-decoration: underline;">guides</a> for information on how to reference your MetaboLights study
+          in your publication.
         </p>
       </span>
       <span *ngIf="status == 'Provisional'">
@@ -133,11 +138,14 @@
           Your study is provisional. Only study submitters are able to view and make changes to the study
           <br /><br />
           <b>What's next?</b><br />
-          Please check our <a target="_BLANK" href="https://ebi-metabolights.github.io/guides/" style="text-decoration: underline;">guides</a> for more information on how to complete your study. Check that your study passes the required validations checks (see the Study Validations tab in your study). 
-          <br />Once you have completed your study and it has met the validation criteria, please click in the drop-down menu below to change the study status from ‘Provisional’ to ‘Private’.
+          Please check our <a target="_BLANK" href="https://ebi-metabolights.github.io/guides/"
+            style="text-decoration: underline;">guides</a> for more information on how to complete your study. Check
+          that your study passes the required validations checks (see the Study Validations tab in your study).
+          <br />Once you have completed your study and it has met the validation criteria, please click in the drop-down
+          menu below to change the study status from ‘Provisional’ to ‘Private’.
         </p>
         <br>
-        
+
         <div *ngIf="validation">
           <div *ngIf="validationStatus !== 'SUCCESS' && validationStatus !== 'WARNING'">
             <p class="error-message">
@@ -153,44 +161,38 @@
 
         <span *ngIf="curator; else submitter">
           <span *ngIf="status == 'Public'">
-            <table >
+            <table>
               <tbody>
-              <tr>
-                <td>
-                  <mat-form-field>
-                    <mat-label>Change study status</mat-label>
-                    <mat-select
-                      (selectionChange)="changeStatusNgxs(toStatus)"
-                      [(value)]="toStatus"
-                    >
-                      <mat-option value="New Revision">New Revision</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </td>
-              </tr>
-            </tbody>
+                <tr>
+                  <td>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Change study status</mat-label>
+                      <mat-select (selectionChange)="changeStatusNgxs(toStatus)" [(value)]="toStatus">
+                        <mat-option value="New Revision">New Revision</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </span>
           <span *ngIf="status != 'Public'">
             <table>
               <tbody>
-              <tr>
-                <td>
-            <mat-form-field>
-              <mat-label>Change study status</mat-label>
-              <mat-select
-                (selectionChange)="changeStatusNgxs(toStatus)"
-                [(value)]="toStatus"
-              >
-                <mat-option value="Provisional">Provisional</mat-option>
-                <mat-option value="Private">Private</mat-option>
+                <tr>
+                  <td>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Change study status</mat-label>
+                      <mat-select (selectionChange)="changeStatusNgxs(toStatus)" [(value)]="toStatus">
+                        <mat-option value="Provisional">Provisional</mat-option>
+                        <mat-option value="Private">Private</mat-option>
 
-                <mat-option *ngIf="status !== 'Provisional'" value="New Revision">Public</mat-option>
-              </mat-select>
-            </mat-form-field>
-            </td>
-              </tr>
-              <!-- <tr *ngIf="
+                        <mat-option *ngIf="status !== 'Provisional'" value="New Revision">Public</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                </tr>
+                <!-- <tr *ngIf="
                 toStatus !== status &&
                 status === 'Provisional' && !firstPrivateDate">
                 <td colspan="2">
@@ -199,29 +201,26 @@
                   </p>
                 </td>
               </tr>   -->
-            </tbody>
-        </table>
+              </tbody>
+            </table>
           </span>
         </span>
         <ng-template #submitter>
           <span *ngIf="status == 'Provisional'">
-            <table >
+            <table>
               <tbody>
-              <tr>
-                <td>
-                  <mat-form-field>
-                    <mat-label>Change study status</mat-label>
-                    <mat-select
-                      (selectionChange)="changeStatusNgxs(toStatus)"
-                      [(value)]="toStatus"
-                    >
-                      <mat-option value="Provisional">Provisional</mat-option>
-                      <mat-option value="Private">Private</mat-option>
-                    </mat-select>
-                  </mat-form-field>
-                </td>
-              </tr>
-              <!-- <tr *ngIf="
+                <tr>
+                  <td>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Change study status</mat-label>
+                      <mat-select (selectionChange)="changeStatusNgxs(toStatus)" [(value)]="toStatus">
+                        <mat-option value="Provisional">Provisional</mat-option>
+                        <mat-option value="Private">Private</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                </tr>
+                <!-- <tr *ngIf="
                 toStatus !== status && !firstPrivateDate">
                 <td colspan="2">
                   <p>
@@ -229,30 +228,27 @@
                   </p>
                 </td>
               </tr>  -->
-            </tbody>
+              </tbody>
             </table>
           </span>
           <span *ngIf="status == 'Private' || status == 'In Review'">
             <table>
               <tbody>
-              <tr>
-                <td>
-            <mat-form-field>
-              <mat-label>Change study status</mat-label>
-              <mat-select
-                (selectionChange)="changeStatusNgxs(toStatus)"
-                [(value)]="toStatus"
-              >
-                <mat-option value="Provisional">Provisional</mat-option>
-                <mat-option value="Private">Private</mat-option>
+                <tr>
+                  <td>
+                    <mat-form-field appearance="outline">
+                      <mat-label>Change study status</mat-label>
+                      <mat-select (selectionChange)="changeStatusNgxs(toStatus)" [(value)]="toStatus">
+                        <mat-option value="Provisional">Provisional</mat-option>
+                        <mat-option value="Private">Private</mat-option>
 
-                <mat-option *ngIf="revisionNumber == 0" value="New Revision">Public</mat-option>
-              </mat-select>
-            </mat-form-field>
-            </td>
-              </tr>
-            </tbody>
-        </table>
+                        <mat-option *ngIf="revisionNumber == 0" value="New Revision">Public</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </span>
         </ng-template>
       </span>
@@ -260,22 +256,18 @@
     <footer class="modal-card-foot buttons is-right">
       <div class="columns is-gapless full-width">
         <div class="column is-two-third">
-         <!-- <small *ngIf="toStatus !== status &&
+          <!-- <small *ngIf="toStatus !== status &&
                 status === 'Provisional' && !firstPrivateDate" class="error-message">Tick the data policy checkbox to enable the ‘Apply’ button</small> -->
         </div>
         <div class="column is-one-third has-text-right">
-           <!-- <button
+          <!-- <button
             class="button is-info"
             *ngIf="toStatus !== status"
             [disabled]="isFormBusy || (status === 'Provisional' && !firstPrivateDate && !userAgreed)"
             (click)="applyChanges()">
             Apply
           </button>&nbsp; -->
-          <button
-            class="button is-info"
-            *ngIf="toStatus !== status"
-            [disabled]="isFormBusy"
-            (click)="applyChanges()">
+          <button class="button is-info" *ngIf="toStatus !== status" [disabled]="isFormBusy" (click)="applyChanges()">
             Apply
           </button>&nbsp;
           <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
@@ -286,7 +278,5 @@
     </footer>
   </div>
 </div>
-<data-policy-modal 
-  *ngIf="isPopupOpen" 
-  (confirm)="handlePopupClose($event)">
+<data-policy-modal *ngIf="isPopupOpen" (confirm)="handlePopupClose($event)">
 </data-policy-modal>

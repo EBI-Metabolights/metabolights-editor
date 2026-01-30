@@ -67,7 +67,7 @@ export class SamplesComponent  {
     return filterFn('[samples]')
   });
 
-  @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
+  @ViewChild(TableComponent, { static: false }) sampleTable: TableComponent;
   @ViewChildren(OntologyComponent)
   private ontologyComponents: QueryList<OntologyComponent>;
 
@@ -201,7 +201,7 @@ export class SamplesComponent  {
     const uniqueSamples = [];
     this.duplicateSamples = [];
     this.emptySamplesExist = false;
-    if (this.sampleTable.data) {
+    if (this.sampleTable && this.sampleTable.data) {
       this.sampleTable.data.rows.forEach((row) => {
         const sampleName = row["Sample Name"];
         if (uniqueSamples.indexOf(sampleName) > -1) {
@@ -242,6 +242,7 @@ export class SamplesComponent  {
           usf.push(f);
         }
       });
+      return usf;
     }
     return [];
   }

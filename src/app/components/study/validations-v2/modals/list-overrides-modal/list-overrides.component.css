@@ -1,35 +1,62 @@
 .mat-table {
-    width: 100%;
-  }
-
-  mat-card {
-    margin: 16px;
-    padding: 16px;
-  }
-
-  .scrollable-table-container {
-    max-height: 900px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: block;
-  }
-  /* Modal Footer */
-.modal-footer {
-  align-items: center;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: flex-start;
-  padding: 20px;
-  position: relative;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  background-color: white;
-
+  width: 100%;
 }
-.modal-footer .button:not(:last-child) {
-    margin-right: .5em;
+
+mat-card {
+  margin: 16px;
+  padding: 16px;
 }
-.keep-right{
-  justify-content: flex-end;
+
+.scrollable-table-container {
+  max-height: 900px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+}
+
+/* Modal Footer correction */
+.modal-card-foot {
+  background-color: white !important;
+  /* Ensure white background */
+  border-top: none;
+}
+
+/* Column Widths to ensure visibility */
+.mat-column-ruleId {
+  flex: 0 0 150px;
+}
+
+.mat-column-title {
+  flex: 0 0 20%;
+}
+
+.mat-column-newType {
+  flex: 0 0 140px;
+}
+
+.mat-column-curator {
+  flex: 0 0 150px;
+}
+
+.mat-column-comments {
+  flex: 1;
+  min-width: 200px;
+}
+
+.mat-column-createdAt {
+  flex: 0 0 160px;
+}
+
+.mat-column-actions {
+  flex: 0 0 80px;
+  justify-content: center;
+}
+
+/* Text Wrapping */
+.wrap-text {
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }

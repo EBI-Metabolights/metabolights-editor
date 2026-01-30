@@ -62,7 +62,8 @@
                               [inline]="true" [label]="'Parameter Name'"></mtbls-ontology>
                           </ng-container>
                           <ng-template #comboField>
-                            <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+                            <mat-form-field class="full-width" appearance="outline"
+                              *ngIf="_controlList?.values?.length">
                               <mat-select formControlName="parameterName" placeholder="Parameter Name"
                                 (selectionChange)="onDropdownChange($event)">
                                 <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
@@ -82,7 +83,7 @@
                     <ng-template #inputField>
                       <small>{{ formatTitle(col.name) }}</small>
                       <div class="control">
-                        <mat-form-field class="full-width">
+                        <mat-form-field class="full-width" appearance="outline">
                           <input class="no-scroll" [(ngModel)]="col.values[0]" matInput />
                           <a (click)="saveColumnValue(col, assay)" class="clickable is-pulled-right">
                             <mat-icon>save</mat-icon>
@@ -184,7 +185,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <mat-form-field class="full-width">
+                <mat-form-field class="full-width" appearance="outline" style="padding-bottom : 20px;">
                   <textarea class="no-scroll" formControlName="name" [placeholder]="fieldValidation('name').placeholder"
                     matInput cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" cdkTextareaAutosize>
                   </textarea>
@@ -394,7 +395,7 @@
           [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Parameter Name'"></mtbls-ontology>
       </ng-container>
       <ng-template #dropdownField>
-        <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
+        <mat-form-field class="full-width" appearance="outline" *ngIf="_controlList?.values?.length">
           <mat-select formControlName="parameterName" placeholder="Parameter Name"
             (selectionChange)="onDropdownChange($event)">
             <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">

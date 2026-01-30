@@ -1,11 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, inject } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { EditorService } from 'src/app/services/editor.service';
 import { Observable, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, map } from 'rxjs/operators';
-import { Store } from '@ngxs/store';
-import { StudyCreation } from 'src/app/ngxs-store/non-study/study-creation/study-creation.actions';
-import { StudyCreationState } from 'src/app/ngxs-store/non-study/study-creation/study-creation.state';
 
 @Component({
   selector: 'mtbls-related-datasets',
@@ -14,7 +11,11 @@ import { StudyCreationState } from 'src/app/ngxs-store/non-study/study-creation/
 })
 export class RelatedDatasetsComponent implements OnInit {
   
-  relatedDatasets$: Observable<any[]> = inject(Store).select(StudyCreationState.relatedDatasets);
+  @Input() datasets: any[] = [];
+  @Input() readonly: boolean = false;
+  
+  @Output() saved = new EventEmitter<any>();
+  @Output() deleted = new EventEmitter<number>();
   
   isModalOpen = false;
   editingIndex = -1;
@@ -22,7 +23,7 @@ export class RelatedDatasetsComponent implements OnInit {
   filteredIdentifierSources$: Observable<any[]>;
   identifierPlaceholder: string = 'e.g. MTBLS1';
 
-  constructor(private fb: UntypedFormBuilder, private editorService: EditorService, private store: Store) { }
+  constructor(private fb: UntypedFormBuilder, private editorService: EditorService) { }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -100,16 +101,12 @@ export class RelatedDatasetsComponent implements OnInit {
           url: url 
       };
 
-      if (this.editingIndex > -1) {
-          this.store.dispatch(new StudyCreation.UpdateRelatedDataset(newDataset, this.editingIndex));
-      } else {
-          this.store.dispatch(new StudyCreation.AddRelatedDataset(newDataset));
-      }
+      this.saved.emit({ dataset: newDataset, index: this.editingIndex });
       this.closeModal();
     }
   }
 
   removeDataset(index: number) {
-    this.store.dispatch(new StudyCreation.RemoveRelatedDataset(index));
+    this.deleted.emit(index);
   }
 }

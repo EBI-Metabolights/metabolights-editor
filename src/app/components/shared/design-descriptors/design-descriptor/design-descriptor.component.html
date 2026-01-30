@@ -52,7 +52,7 @@
           <div class="field" *ngIf="mode !== 'local'">
             <label class="label is-small">Descriptor Category</label>
             <div class="control">
-              <mat-form-field class="full-width is-small">
+              <mat-form-field class="full-width is-small" appearance="outline">
                 <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
                   placeholder="Select Category">
                   <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
@@ -67,7 +67,7 @@
             <label class="label is-small">Descriptor</label>
             <div class="control">
               <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
-                <mat-form-field class="full-width is-small">
+                <mat-form-field class="full-width is-small" appearance="outline">
                   <mat-select formControlName="descriptor" placeholder="Select Descriptor"
                     (selectionChange)="onChanges($event.value)">
                     <mat-option *ngFor="let val of _controlList.values" [value]="val.annotationValue">
@@ -132,7 +132,7 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Select Publication</mat-label>
           <mat-select (selectionChange)="getKeyWords()" [formControl]="selectedPublication" required>
             <mat-option> Please select </mat-option>

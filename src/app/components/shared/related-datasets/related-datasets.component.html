@@ -9,24 +9,33 @@
         </p>
     </header>
     <div class="card-content">
-        <div class="dataset-list" *ngIf="(relatedDatasets$ | async)?.length > 0; else emptyMessage">
-            <div class="box p-3 mb-4" *ngFor="let ds of relatedDatasets$ | async; let i = index">
-                <div class="columns is-vcentered is-mobile">
-                    <div class="column">
-                        <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                            <span class="has-text-weight-bold is-size-6 has-text-grey-dark">{{ ds.accession }}</span>
-                            <div class="is-size-6" *ngIf="ds.url">
-                                <span class="has-text-weight-semibold has-text-grey">URL:</span>
-                                <a class="ml-1" [href]="ds.url" target="_blank" style="word-break: break-all;">{{ ds.url
-                                    }}</a>
+        <div class="dataset-list">
+            <div *ngIf="datasets.length > 0; else emptyMessage">
+                <div class="box p-3 mb-4" *ngFor="let dataset of datasets; let i = index">
+                    <div class="columns is-vcentered is-mobile">
+                        <div class="column">
+                            <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                                <span class="has-text-weight-bold is-size-6 has-text-grey-dark">
+                                    {{ dataset.repository }}
+                                </span>
+                                <div class="is-flex is-align-items-center" style="gap: 1rem;">
+                                    <div *ngIf="dataset.accession" class="is-size-6">
+                                        <span class="has-text-weight-semibold has-text-grey">Accession:</span>
+                                        <span class="ml-1">{{ dataset.accession }}</span>
+                                    </div>
+                                    <div *ngIf="dataset.url" class="is-size-6">
+                                        <span class="has-text-weight-semibold has-text-grey">URL:</span>
+                                        <a class="ml-1" [href]="dataset.url" target="_blank">{{ dataset.url }}</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="column is-narrow">
-                        <button class="edit-icon-button" (click)="editDataset(i, ds)" title="Edit Dataset">
-                            <mat-icon>edit</mat-icon>
-                        </button>
-                        <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
+                        <div class="column is-narrow">
+                            <button class="edit-icon-button" (click)="editDataset(i, dataset)" title="Edit Dataset">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -45,29 +54,24 @@
         <div class="columns is-multiline">
             <div class="column is-6">
                 <div class="field">
-                    <label class="label is-small">Related Dataset Repository</label>
-                    <div class="control">
-                        <mat-form-field class="full-width is-small">
-                            <input type="text" matInput formControlName="identifierSource"
-                                [matAutocomplete]="sourceAuto" placeholder="e.g. MetaboLights" />
-                            <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
-                                <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
-                                    <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
-                                </mat-option>
-                            </mat-autocomplete>
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Related Dataset Repository</mat-label>
+                        <input type="text" matInput formControlName="identifierSource" [matAutocomplete]="sourceAuto"
+                            placeholder="e.g. MetaboLights" />
+                        <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
+                            <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
+                                <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
                 </div>
             </div>
             <div class="column is-6">
                 <div class="field">
-                    <label class="label is-small">Related Dataset Accession Number</label>
-                    <div class="control">
-                        <mat-form-field class="full-width is-small">
-                            <input matInput type="text" formControlName="identifier"
-                                [placeholder]="identifierPlaceholder">
-                        </mat-form-field>
-                    </div>
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Related Dataset Accession Number</mat-label>
+                        <input matInput type="text" formControlName="identifier" [placeholder]="identifierPlaceholder">
+                    </mat-form-field>
                 </div>
             </div>
         </div>

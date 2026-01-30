@@ -1,48 +1,51 @@
 <span>
-  <span *ngIf="studyAssayFiles && studyAssayFiles.length > 0; else noAssays">
-    <div *ngIf="!isReadOnly">
-      <add-assay></add-assay>
+  <ng-container *ngIf="studyAssayFiles === null; else dataLoaded">
+    <div class="vc vh50 has-text-centered" style="flex-direction: column;">
+      <mat-spinner [diameter]="40"></mat-spinner>
+      <p class="mt10">Loading assays...</p>
     </div>
-    <br />
-    <div class="card">
-      <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
-        <div
-          class="column is-full tabs npt"
-          style="margin-bottom: 0; padding-bottom: 0"
-        >
-          <ul>
-            <span *ngFor="let assay of studyAssayFiles; let i = index">
-              <li
-                (click)="selectCurrentSubTab(i)"
-                [ngClass]="{ 'is-active': currentSubIndex == i }"
-              >
-                <a>Assay Sheet {{ i + 1 }}</a>
-              </li>
-            </span>
-          </ul>
+  </ng-container>
+
+  <ng-template #dataLoaded>
+    <span *ngIf="studyAssayFiles && studyAssayFiles.length > 0; else noAssays">
+      <div *ngIf="!isReadOnly">
+        <add-assay></add-assay>
+      </div>
+      <br />
+      <div class="card">
+        <div class="columns" style="margin-bottom: 0; padding-bottom: 0">
+          <div class="column is-full tabs npt" style="margin-bottom: 0; padding-bottom: 0">
+            <ul>
+              <span *ngFor="let assay of studyAssayFiles; let i = index">
+                <li (click)="selectCurrentSubTab(i)" [ngClass]="{ 'is-active': currentSubIndex == i }">
+                  <a>Assay Sheet {{ i + 1 }}</a>
+                </li>
+              </span>
+            </ul>
+          </div>
+        </div>
+        <span *ngFor="let assay of studyAssayFiles; let i = index">
+          <span *ngIf="currentSubIndex == i">
+            <assay-details (assayDelete)="assayDeleted($event)" [assayName]="assay.filename"></assay-details>
+          </span>
+        </span>
+      </div>
+      <span>
+        <div>&nbsp;</div>
+      </span>
+    </span>
+    <ng-template #noAssays>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div class="has-text-centered">
+        <p>No Assays Found</p>
+        <br />
+        <div *ngIf="!isReadOnly">
+          <add-assay></add-assay>
         </div>
       </div>
-      <span *ngFor="let assay of studyAssayFiles; let i = index">
-        <span *ngIf="currentSubIndex == i">
-          <assay-details
-            (assayDelete)="assayDeleted($event)"
-            [assayName]="assay.filename"
-          ></assay-details>
-        </span>
-      </span>
-    </div>
-    <span>
       <div>&nbsp;</div>
-    </span>
-  </span>
-  <ng-template #noAssays>
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
-    <div class="has-text-centered">
-      <p>No Assays Found</p>
-      <add-assay></add-assay>
-    </div>
-    <div>&nbsp;</div>
-    <div>&nbsp;</div>
+      <div>&nbsp;</div>
+    </ng-template>
   </ng-template>
 </span>

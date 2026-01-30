@@ -49,7 +49,6 @@ export class AssayState {
 
     @Action(AssayList.Get)
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
-        this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
             this.generalMetadataService.getStudyGeneralMetadata(action.id).pipe(take(1)).subscribe(
                 (response) => {

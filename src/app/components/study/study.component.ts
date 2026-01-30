@@ -16,6 +16,7 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
 import { StudyPermission } from "src/app/services/headers";
 import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
+import { Funders, RelatedDatasets } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-study",
@@ -280,5 +281,33 @@ export class StudyComponent implements OnInit, OnDestroy {
     } else {
       return "Minimum";
     }
+  }
+
+  // Funders & Related Datasets Bindings
+  studyFunders$: Observable<any[]> = inject(Store).select(GeneralMetadataState.funders);
+  relatedDatasets$: Observable<any[]> = inject(Store).select(GeneralMetadataState.relatedDatasets);
+
+  saveFunder(event) {
+    if (event.index === -1) {
+        this.store.dispatch(new Funders.Add(event.funder));
+    } else {
+        this.store.dispatch(new Funders.Update(event.funder, event.index));
+    }
+  }
+
+  deleteFunder(index) {
+    this.store.dispatch(new Funders.Delete(index));
+  }
+
+  saveRelatedDataset(event) {
+    if (event.index === -1) {
+        this.store.dispatch(new RelatedDatasets.Add(event.dataset));
+    } else {
+        this.store.dispatch(new RelatedDatasets.Update(event.dataset, event.index));
+    }
+  }
+
+  deleteRelatedDataset(index) {
+    this.store.dispatch(new RelatedDatasets.Delete(index));
   }
 }

@@ -83,7 +83,7 @@
     </article>
   </div>
 
-  <div class="main-wrapper"  style="margin-top: 0; margin-bottom: 0" [ngClass]="{ smt: status != 'Provisional' }">
+  <div class="main-wrapper" style="margin-top: 0; margin-bottom: 0" [ngClass]="{ smt: status != 'Provisional' }">
     <div style="margin: 20px">
       <!-- <article class="message is-small has-shadow">
         <div (click)="toggleMessage()" class="message-header">
@@ -239,8 +239,12 @@
                 <span *ngIf="!studyError">
                   <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 0">
                     <div class="columns is-multiline">
-                      <mtbls-description></mtbls-description>
-                      <mtbls-organisms></mtbls-organisms>
+                      <div class="column is-12 mb-6">
+                        <mtbls-description></mtbls-description>
+                      </div>
+                      <div class="column is-12 mb-6">
+                        <mtbls-organisms></mtbls-organisms>
+                      </div>
                       <div class="column is-12 mb-6">
                         <mtbls-publications></mtbls-publications>
                       </div>
@@ -248,17 +252,19 @@
                         <mtbls-design-descriptors></mtbls-design-descriptors>
                       </div>
                       <div class="column is-12 mb-6">
-                        <mtbls-funding></mtbls-funding>
+                        <mtbls-funding [funders]="studyFunders$ | async"
+                          [readonly]="isCurator || isOwner ? false : true" (saved)="saveFunder($event)"
+                          (deleted)="deleteFunder($event)"></mtbls-funding>
                       </div>
                       <div class="column is-12 mb-6">
-                        <mtbls-related-datasets></mtbls-related-datasets>
+                        <mtbls-related-datasets [datasets]="relatedDatasets$ | async"
+                          [readonly]="isCurator || isOwner ? false : true" (saved)="saveRelatedDataset($event)"
+                          (deleted)="deleteRelatedDataset($event)"></mtbls-related-datasets>
                       </div>
                     </div>
                   </div>
                 </span>
                 <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 1">
-                  <mtbls-factors></mtbls-factors>
-                  <br />
                   <mtbls-samples></mtbls-samples>
                 </div>
                 <div class="tab-content fadeIn animated" *ngIf="(currentTabIndex$ | async) === 2">

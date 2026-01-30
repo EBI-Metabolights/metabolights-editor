@@ -1,4 +1,3 @@
-
 <span *ngIf="filesLoading; else showContent">
   <div class="vc vh30">
     <span class="has-text-centered">
@@ -11,17 +10,13 @@
 
   <div class="buttons-container">
 
-    <div *ngIf="status == 'Public'"  class="dropdown"
-        [ngClass]="{ 'is-active': isDownloadDropdownActive }"
-        #downloadDropdown>
+    <div *ngIf="status == 'Public'" class="dropdown" [ngClass]="{ 'is-active': isDownloadDropdownActive }"
+      #downloadDropdown>
       <div class="dropdown-trigger">
-        <button
-          (click)="toggleDownloadDropdown()"
-          class="button is-light"
-        >
-        <span class="icon is-small">
-          <mat-icon>cloud_download</mat-icon>
-        </span>
+        <button (click)="toggleDownloadDropdown()" class="button is-light">
+          <span class="icon is-small">
+            <mat-icon>cloud_download</mat-icon>
+          </span>
           <span>Download</span>
 
         </button>
@@ -31,30 +26,22 @@
           <a class="dropdown-item" target="_blank" [href]="publicHttpUrl">Browse Files</a>
           <a class="dropdown-item" target="_blank" [href]="publicFtpUrl">FTP Download</a>
           <a class="dropdown-item" (click)="onAsperaDownload()">Aspera Download</a>
-          <a class="dropdown-item"   target="_blank" (click)="onGlobusDownload()">Globus Download
+          <a class="dropdown-item" target="_blank" (click)="onGlobusDownload()">Globus Download
 
-        </a>
+          </a>
         </div>
       </div>
     </div>
-    <mtbls-upload *ngIf="isSyncEnabled" class="upload-button"
-      [type]="'any'"
-      [multiple]="true"
-      [mode]="'button'"
-      (complete)="loadFilesPassively()"
-      [size]="'is'"
-    ></mtbls-upload>
+    <mtbls-upload *ngIf="isSyncEnabled" class="upload-button" [type]="'any'" [multiple]="true" [mode]="'button'"
+      (complete)="loadFilesPassively()" [size]="'is'"></mtbls-upload>
 
-    <span *ngIf="isSyncEnabled" class="refresh-button" >
+    <span *ngIf="isSyncEnabled" class="refresh-button">
       <a (click)="loadFilesPassively()" class="button is-light">
         <mat-icon>refresh</mat-icon> Refresh
       </a>
       <span>
         <span *ngIf="refreshingData">
-          <img
-            style="height: 10px; margin-left: 10px"
-            src="{{ baseHref }}assets/img/loading.svg"
-          />
+          <img style="height: 10px; margin-left: 10px" src="{{ baseHref }}assets/img/loading.svg" />
         </span>
       </span>
     </span>
@@ -66,25 +53,24 @@
     </span>-->
     <span>
       <div class="tags has-addons refresh-button status-badge">
-        <span class="tag is-dark">Aspera Status</span><span *ngIf="transferStatus !== null; else loadingStatus" class="tag"
-        [ngClass]="{ 'is-danger': transferStatus.aspera.online === false, 'is-success': transferStatus.aspera.online === true }">{{transferStatus.aspera.online === true ? 'ONLINE' : 'OFFLINE'}}</span>
+        <span class="tag is-dark">Aspera Status</span><span *ngIf="transferStatus !== null; else loadingStatus"
+          class="tag"
+          [ngClass]="{ 'is-danger': transferStatus.aspera.online === false, 'is-success': transferStatus.aspera.online === true }">{{transferStatus.aspera.online
+          === true ? 'ONLINE' : 'OFFLINE'}}</span>
       </div>
     </span>
-   <span>
-    <ng-container *ngIf="transferStatus as ts; else loading">
-      <div class="tags has-addons refresh-button status-badge">
-        <span class="tag is-dark">FTP Status</span>
-        <span
-          class="tag"
-          [ngClass]="{
+    <span>
+      <ng-container *ngIf="transferStatus as ts; else loading">
+        <div class="tags has-addons refresh-button status-badge">
+          <span class="tag is-dark">FTP Status</span>
+          <span class="tag" [ngClass]="{
             'is-danger': !ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online,
             'is-success': ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online
-          }"
-        >
-          {{ ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online ? 'ONLINE' : 'OFFLINE' }}
-        </span>
-      </div>
-    </ng-container>
+          }">
+            {{ ts[ isReadOnly ? 'privateFtp' : 'publicFtp' ].online ? 'ONLINE' : 'OFFLINE' }}
+          </span>
+        </div>
+      </ng-container>
     </span>
     <ng-template #loadingStatus>
       <span class="tag is-grey"> Unknown </span>
@@ -92,24 +78,13 @@
 
 
     <span *ngIf="isSyncEnabled && curator" class="is-pulled-rightn ml-auto">
-      <a *ngIf="access == null"
-        (click)="getFolderStatus()"
-        class="button is-light"
-      >
+      <a *ngIf="access == null" (click)="getFolderStatus()" class="button is-light">
         <mat-icon>refresh</mat-icon> <small>FTP Folder Status</small>
       </a>
-      <a
-        *ngIf="access == 'Read'"
-        (click)="toggleFolderAccess()"
-        class="button is-light"
-      >
+      <a *ngIf="access == 'Read'" (click)="toggleFolderAccess()" class="button is-light">
         <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
       </a>
-      <a
-        *ngIf="access == 'Write'"
-        (click)="toggleFolderAccess()"
-        class="button is-light"
-      >
+      <a *ngIf="access == 'Write'" (click)="toggleFolderAccess()" class="button is-light">
         <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
       </a>
     </span>
@@ -118,181 +93,111 @@
   <mat-divider *ngIf="isSyncEnabled" class="file-divider" [inset]="true"></mat-divider>
 
   <div *ngIf="isSyncEnabled" class="notification is-warning message">
-    <small
-      ><mat-icon>warning</mat-icon> Please ensure your study folder is up-to-date. Start synchronization to update study folder.
-      Please note that the sync operations may take some time to complete. If your synchronization is not completed successfully, please contact us
-      <a
-        [href]="
+    <small><mat-icon>warning</mat-icon> Please ensure your study folder is up-to-date. Start synchronization to update
+      study folder.
+      Please note that the sync operations may take some time to complete. If your synchronization is not completed
+      successfully, please contact us
+      <a [href]="
           'mailto:metabolights-help@ebi.ac.uk?subject=Regarding sync from FTP folder - ' +
           requestedStudy
-        "
-        >metabolights-help&#64;ebi.ac.uk</a
-      >
-      for help.</small
-    >
+        ">metabolights-help&#64;ebi.ac.uk</a>
+      for help.</small>
   </div>
 
 
   <!--ftp management component start-->
-<div class="container parent resync-section">
-  <app-rsync
-  *ngIf="isSyncEnabled"
-  title="Metadata Files"
-  helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
-  [studyId]="studyIdentifier"
-  sourceStagingArea="ftp-private"
-  targetStagingArea="rw-study"
-  syncType="metadata"
-  startSyncLabel="Synchronise Metadata Files"
-  runSyncOnCluster="false"
-  runDryRunOnCluster="false"
-  pollingInterval=5000
-  (filesSynchronized)="onFilesSynchronized($event)"
-  ></app-rsync>
+  <div class="container parent resync-section">
+    <app-rsync *ngIf="isSyncEnabled" title="Metadata Files"
+      helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
+      [studyId]="studyIdentifier" sourceStagingArea="ftp-private" targetStagingArea="rw-study" syncType="metadata"
+      startSyncLabel="Synchronise Metadata Files" runSyncOnCluster="false" runDryRunOnCluster="false"
+      pollingInterval=5000 (filesSynchronized)="onFilesSynchronized($event)"></app-rsync>
 
-    <app-rsync
-    *ngIf="isSyncEnabled"
-    title="Data Files"
-    helpMessage="Check your study FTP folder and index your study data (raw, derived, supplementary) files."
-    [studyId]="studyIdentifier"
-    sourceStagingArea="ftp-private"
-    targetStagingArea="readonly-study"
-    syncType="data"
-    startSyncLabel="Index Data Files"
-    runSyncOnCluster="false"
-    runDryRunOnCluster="false"
-    pollingInterval=10000
-    (filesSynchronized)="onFilesSynchronized($event)"
-    ></app-rsync>
-  <div *ngIf="isSyncEnabled && curator">
-    <app-rsync
-    title="Internal Files"
-    helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
-    [studyId]="studyIdentifier"
-    sourceStagingArea="ftp-private"
-    targetStagingArea="rw-study"
-    syncType="internal"
-    runSyncOnCluster="false"
-    runDryRunOnCluster="false"
-    pollingInterval=10000
-    (filesSynchronized)="onFilesSynchronized($event)"
-    ></app-rsync>
+    <app-rsync *ngIf="isSyncEnabled" title="Data Files"
+      helpMessage="Check your study FTP folder and index your study data (raw, derived, supplementary) files."
+      [studyId]="studyIdentifier" sourceStagingArea="ftp-private" targetStagingArea="readonly-study" syncType="data"
+      startSyncLabel="Index Data Files" runSyncOnCluster="false" runDryRunOnCluster="false" pollingInterval=10000
+      (filesSynchronized)="onFilesSynchronized($event)"></app-rsync>
+    <div *ngIf="isSyncEnabled && curator">
+      <app-rsync title="Internal Files"
+        helpMessage="Check internal files (chebi_pipeline_annotations) and synchronise from FTP folder to your study folder."
+        [studyId]="studyIdentifier" sourceStagingArea="ftp-private" targetStagingArea="rw-study" syncType="internal"
+        runSyncOnCluster="false" runDryRunOnCluster="false" pollingInterval=10000
+        (filesSynchronized)="onFilesSynchronized($event)"></app-rsync>
+    </div>
+
   </div>
 
-</div>
-
-<mat-divider class="file-divider" [inset]="true"></mat-divider>
-<div *ngIf="!isReadOnly" class="notification is-warning message">
-    <small>This section shows your metadata files (‘ISA METADATA’). Metadata can be edited online or downloaded, edited locally (e.g., MS Excel) and re-uploaded. Please note, do not change filenames, extensions, encodings, etc.</small>
-</div>
+  <mat-divider class="file-divider" [inset]="true"></mat-divider>
+  <div *ngIf="!isReadOnly" class="notification is-warning message">
+    <small>This section shows your metadata files (‘ISA METADATA’). Metadata can be edited online or downloaded, edited
+      locally (e.g., MS Excel) and re-uploaded. Please note, do not change filenames, extensions, encodings,
+      etc.</small>
+  </div>
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>
-    <p
-      class="panel-heading"
-      style="z-index: 1000; padding: 7px 10px"
-      sticky
-      [spacer]="spacer1"
-      [attr.marginTop]="!isReadOnly ? '35' : '0'"
-      isReadOnly
-    >
+    <p class="panel-heading" style="z-index: 1000; padding: 7px 10px" sticky [spacer]="spacer1"
+      [attr.marginTop]="!isReadOnly ? '35' : '0'" isReadOnly>
       <label class="section-header">
-        <input
-          [checked]="filteredMetaFiles.length == selectedMetaFiles.length"
-          (change)="selectFiles($event, 'meta', null, true)"
-          type="checkbox"
-          name=""
-        />&nbsp;&nbsp;ISA METADATA
+        <input [checked]="filteredMetaFiles.length == selectedMetaFiles.length"
+          (change)="selectFiles($event, 'meta', null, true)" type="checkbox" name="" />&nbsp;&nbsp;ISA METADATA
       </label>
       <span class="is-pulled-right">
-        <mtbls-download [value]="selectedDownloadFiles()" [selectedMetaFiles]= "selectedMetaFiles"></mtbls-download>
+        <mtbls-download [value]="selectedDownloadFiles()" [selectedMetaFiles]="selectedMetaFiles"></mtbls-download>
       </span>
-      <span
-        *ngIf="selectedMetaFiles.length > 0 && !isReadOnly"
-        class="is-pulled-right"
-      >
-        <small
-          (click)="openDeleteConfirmation('meta', 'study')"
-          style="font-size: 0.67em"
-          class="button is-light is-small"
-          ><mat-icon style="font-size: 16px">delete</mat-icon> Delete
-          files</small
-        >
+      <span *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em"
+          class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete
+          files</small>
       </span>
     </p>
     <div class="panel-block">
-      <p class="control has-icons-left">
-        <input
-          (keyup)="applyFilter($event, 'meta')"
-          class="input is-small"
-          type="text"
-          placeholder="search meta data"
-        />
-        <span class="icon is-small is-left">
-          <mat-icon>search</mat-icon>
-        </span>
-      </p>
+      <mat-form-field class="full-width is-small" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Search meta data</mat-label>
+        <input matInput (keyup)="applyFilter($event, 'meta')" placeholder="e.g. filename">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
     </div>
     <span *ngIf="filteredMetaFiles.length > 0; else noMetaData">
       <span *ngFor="let file of filteredMetaFiles">
-        <a
-          class="panel-block"
-          [ngClass]="file.status == 'active' ? 'is-active-file' : ''"
-        >
+        <a class="panel-block" [ngClass]="file.status == 'active' ? 'is-active-file' : ''">
           <div class="columns w100">
             <div class="column is-four-fifths">
               <label>
-                <input
-                  (change)="selectFiles($event, 'meta', file, false)"
-                  [checked]="isChecked(file.file, 'meta')"
-                  type="checkbox"
-                  name=""
-                />
+                <input (change)="selectFiles($event, 'meta', file, false)" [checked]="isChecked(file.file, 'meta')"
+                  type="checkbox" name="" />
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
                     <span *ngIf="file.files; else openFolder">
-                      <img
-                        class="file-img"
-                        src="{{ baseHref }}assets/img/folder.png"
-                      />
+                      <img class="file-img" src="{{ baseHref }}assets/img/folder.png" />
                     </span>
                     <ng-template #openFolder>
-                      <img
-                        class="file-img"
-                        src="{{ baseHref }}assets/img/folder-open.png"
-                      />
+                      <img class="file-img" src="{{ baseHref }}assets/img/folder-open.png" />
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
-                    <img
-                      class="file-img"
-                      src="{{ baseHref }}assets/img/file.png"
-                    />
+                    <img class="file-img" src="{{ baseHref }}assets/img/file.png" />
                   </ng-template>
                 </span>
                 {{ file.file }}
                 <span class="panel-icon">
                   <span *ngIf="file.status == 'unreferenced' && !file.directory">
-                    <img src="assets/img/icons/unreferenced.png" style="height: 18px"/>
+                    <img src="assets/img/icons/unreferenced.png" style="height: 18px" />
                   </span>
                   <span *ngIf="file.status == 'active'">
-                    <img src="assets/img/icons/referenced.png" style="height: 18px"/>
+                    <img src="assets/img/icons/referenced.png" style="height: 18px" />
                   </span>
                 </span>
-                <span class="has-text-grey-lighter"
-                  ><small>{{
+                <span class="has-text-grey-lighter"><small>{{
                     file.createdAt.replace("'", "").replace("'", "")
-                  }}</small></span
-                >
+                    }}</small></span>
               </label>
             </div>
             <div class="column is-one-fifths has-text-right">
               <span class="is-pulled-right has-text-grey">
                 <small>
-                  <mtbls-download
-                    [type]="'icon'"
-                    [value]="file.file"
-                  ></mtbls-download>
+                  <mtbls-download [type]="'icon'" [value]="file.file"></mtbls-download>
                 </small>
               </span>
             </div>
@@ -304,13 +209,10 @@
       <a class="panel-block"> No metadata files </a>
     </ng-template>
   </nav>
-   <!--ISA Metadata upload area -->
-  <div *ngIf="!isReadOnly"  style="margin-bottom: 1rem;">
-      <app-drag-and-drop
-        (uploadComplete)="onUploadComplete($event)"
-        [iscloseable]="false"
-        filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$"
-      ></app-drag-and-drop>
+  <!--ISA Metadata upload area -->
+  <div *ngIf="!isReadOnly" style="margin-bottom: 1rem;">
+    <app-drag-and-drop (uploadComplete)="onUploadComplete($event)" [iscloseable]="false"
+      filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$"></app-drag-and-drop>
   </div>
   <!--ISA Metadata panel end -->
   <mat-divider class="file-divider" [inset]="true"></mat-divider>
@@ -321,70 +223,38 @@
   <nav class="panel">
     <span #spacer2></span>
     <span *ngIf="rawFilesLoading; else rawFilesLoaded">
-      <img
-        style="height: 10px; margin-left: 10px"
-        src="{{ baseHref }}assets/img/loading.svg"
-      />
+      <img style="height: 10px; margin-left: 10px" src="{{ baseHref }}assets/img/loading.svg" />
     </span>
     <ng-template #rawFilesLoaded>
-      <p
-        class="panel-heading"
-        style="z-index: 1000; padding: 10px"
-        sticky
-        [spacer]="spacer2"
-        [attr.marginTop]="!isReadOnly ? '35' : '0'"
-      >
+      <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer2"
+        [attr.marginTop]="!isReadOnly ? '35' : '0'">
         <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
         <label class="section-header">RAW / DERIVED FILES
         </label>
         <span *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
-            <small
-              (click)="decompressFiles(selectedRawFiles)"
-              style="font-size: 0.67em"
-              class="button is-light is-small"
-              ><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip
-              files</small
-            >&nbsp;
+            <small (click)="decompressFiles(selectedRawFiles)" style="font-size: 0.67em"
+              class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip
+              files</small>&nbsp;
           </span>
-          <small
-            *ngIf="!isReadOnly"
-            (click)="openDeleteConfirmation('raw', 'study')"
-            style="font-size: 0.67em"
-            class="button is-light is-small"
-            ><mat-icon style="font-size: 14px">delete</mat-icon> Delete
-            files</small
-          >
+          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em"
+            class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete
+            files</small>
         </span>
       </p>
       <div class="panel-block">
-        <p class="control has-icons-left">
-          <input
-            (keyup)="applyFilter($event, 'raw')"
-            class="input is-small"
-            type="text"
-            placeholder="search raw files"
-          />
-          <span class="icon is-small is-left">
-            <mat-icon>search</mat-icon>
-          </span>
-        </p>
+        <mat-form-field class="full-width is-small" appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Search raw files</mat-label>
+          <input matInput (keyup)="applyFilter($event, 'raw')" placeholder="e.g. filename">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
       </div>
       <span *ngIf="filteredRawFiles.length > 0; else noRawFiles">
         <span *ngFor="let file of filteredRawFiles">
-          <mtbls-directory
-            [category]="raw"
-            [level]="0"
-            [parent]="''"
-            [file]="file"
-            [collapse]="autoCollapsedFolder(file)"
-            [deletionEnabled]="false"
-            [downloadEnabled]="false"
-            [downloadContents]="false"
-            [readonlyFolder]="true"
-            [showReferencedFiles]="true"
-            (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"
-          ></mtbls-directory>
+          <mtbls-directory [category]="raw" [level]="0" [parent]="''" [file]="file"
+            [collapse]="autoCollapsedFolder(file)" [deletionEnabled]="false" [downloadEnabled]="false"
+            [downloadContents]="false" [readonlyFolder]="true" [showReferencedFiles]="true"
+            (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"></mtbls-directory>
         </span>
       </span>
       <ng-template #noRawFiles>
@@ -397,30 +267,18 @@
   <!-- Audit files panel start-->
   <nav *ngIf="auditFiles.length > 0" class="panel">
     <span #spacer3></span>
-    <p
-      class="panel-heading"
-      style="z-index: 1000; padding: 10px"
-      sticky
-      [spacer]="spacer3"
-      [attr.marginTop]="!isReadOnly ? '35' : '0'"
-    >
+    <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer3"
+      [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label class="section-header">
         SYSTEM FILES
       </label>
     </p>
     <span *ngIf="filteredAuditFiles.length > 0">
       <span *ngFor="let file of filteredAuditFiles">
-        <mtbls-directory
-        [category]="audit"
-          [level]="0"
-          [parent]="''"
-          [file]="file"
-          [deletionEnabled]="deletionEnabled(file)"
-          [downloadEnabled]="downloadEnabled(file)"
-          [readonlyFolder]="readonlyFolder(file)"
-          [managedFolders]="getManagedSubFolders()"
-          (fileDeleted)="handleDeletedFile($event, auditFiles, filteredAuditFiles, selectedAuditFiles)"
-        ></mtbls-directory>
+        <mtbls-directory [category]="audit" [level]="0" [parent]="''" [file]="file"
+          [deletionEnabled]="deletionEnabled(file)" [downloadEnabled]="downloadEnabled(file)"
+          [readonlyFolder]="readonlyFolder(file)" [managedFolders]="getManagedSubFolders()"
+          (fileDeleted)="handleDeletedFile($event, auditFiles, filteredAuditFiles, selectedAuditFiles)"></mtbls-directory>
       </span>
     </span>
   </nav>
@@ -429,59 +287,30 @@
   <!-- Inferred Data panel start-->
   <nav *ngIf="derivedFiles.length > 0" class="panel">
     <span #spacer4></span>
-    <p
-      class="panel-heading"
-      style="z-index: 1000; padding: 10px"
-      sticky
-      [spacer]="spacer4"
-      [attr.marginTop]="!isReadOnly ? '35' : '0'"
-    >
+    <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer4"
+      [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label class="section-header">
-        <input
-          [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length"
-          (change)="selectFiles($event, 'derived', null, true)"
-          type="checkbox"
-          name=""
-        />&nbsp;&nbsp;DERIVED DATA
+        <input [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length"
+          (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="" />&nbsp;&nbsp;DERIVED DATA
       </label>
-      <span
-        *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly"
-        class="is-pulled-right"
-      >
-        <small
-          (click)="openDeleteConfirmation('derived', 'study')"
-          style="font-size: 0.67em"
-          class="button is-light is-small"
-          ><mat-icon style="font-size: 14px">delete</mat-icon> Delete
-          files</small
-        >
+      <span *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right">
+        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em"
+          class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete
+          files</small>
       </span>
     </p>
     <div class="panel-block">
-      <p class="control has-icons-left">
-        <input
-          (keyup)="applyFilter($event, 'derived')"
-          class="input is-small"
-          type="text"
-          placeholder="search derived files"
-        />
-        <span class="icon is-small is-left">
-          <mat-icon>search</mat-icon>
-        </span>
-      </p>
+      <mat-form-field class="full-width is-small" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Search derived files</mat-label>
+        <input matInput (keyup)="applyFilter($event, 'derived')" placeholder="e.g. filename">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
     </div>
     <span *ngIf="filteredDerivedDataFiles.length > 0">
       <span *ngFor="let file of filteredDerivedDataFiles">
-       <mtbls-directory
-       [category]="derived"
-         [level]="0"
-         [parent]="''"
-         [file]="file"
-         [downloadEnabled]="false"
-         [downloadContents]="false"
-         [readonlyFolder]="false"
-         (fileDeleted)="handleDeletedFile($event, derivedFiles, filteredDerivedFiles, selectedDerivedFiles)"
-       ></mtbls-directory>
+        <mtbls-directory [category]="derived" [level]="0" [parent]="''" [file]="file" [downloadEnabled]="false"
+          [downloadContents]="false" [readonlyFolder]="false"
+          (fileDeleted)="handleDeletedFile($event, derivedFiles, filteredDerivedFiles, selectedDerivedFiles)"></mtbls-directory>
       </span>
     </span>
     <span *ngIf="filteredDerivedFiles.length > 0">
@@ -490,48 +319,30 @@
           <div class="columns w100">
             <div class="column is-four-fifths">
               <label>
-                <input
-                  (change)="selectFiles($event, 'derived', file, false)"
-                  [checked]="isChecked(file.file, 'derived')"
-                  type="checkbox"
-                  name=""
-                />
+                <input (change)="selectFiles($event, 'derived', file, false)"
+                  [checked]="isChecked(file.file, 'derived')" type="checkbox" name="" />
                 <span class="panel-icon">
                   <span *ngIf="isFolder(file); else fileIcon">
                     <span *ngIf="file.files; else openFolder">
-                      <img
-                        class="file-img"
-                        src="{{ baseHref }}assets/img/folder.png"
-                      />
+                      <img class="file-img" src="{{ baseHref }}assets/img/folder.png" />
                     </span>
                     <ng-template #openFolder>
-                      <img
-                        class="file-img"
-                        src="{{ baseHref }}assets/img/folder-open.png"
-                      />
+                      <img class="file-img" src="{{ baseHref }}assets/img/folder-open.png" />
                     </ng-template>
                   </span>
                   <ng-template #fileIcon>
-                    <img
-                      class="file-img"
-                      src="{{ baseHref }}assets/img/file.png"
-                    />
+                    <img class="file-img" src="{{ baseHref }}assets/img/file.png" />
                   </ng-template>
                 </span>
                 {{ file.file }}
-                <span class="has-text-grey-lighter"
-                  ><small>{{
+                <span class="has-text-grey-lighter"><small>{{
                     file.createdAt.replace("'", "").replace("'", "")
-                  }}</small></span
-                >
+                    }}</small></span>
               </label>
             </div>
             <div class="column is-one-fifths has-text-right">
               <small>
-                <mtbls-download
-                  [type]="'icon'"
-                  [value]="file.file"
-                ></mtbls-download>
+                <mtbls-download [type]="'icon'" [value]="file.file"></mtbls-download>
               </small>
             </div>
           </div>
@@ -550,28 +361,21 @@
 
   <!-- i_Investigation.txt warning start-->
   <div *ngIf="!isReadOnly && privateFtpAccessible" class="notification is-warning message">
-    <small>This section shows your FTP folder contents. Please start synchronization to use the updated files on FTP folder.</small>
+    <small>This section shows your FTP folder contents. Please start synchronization to use the updated files on FTP
+      folder.</small>
   </div>
   <!-- i_Investigation.txt warning end-->
   <!-- FTP panel start-->
   <nav *ngIf="!isReadOnly && privateFtpAccessible" class="panel">
 
     <span #spacer5></span>
-    <p
-      class="panel-heading"
-      style="z-index: 1000; padding: 10px"
-      sticky
-      [spacer]="spacer5"
-      [attr.marginTop]="!isReadOnly ? '35' : '0'"
-    >
+    <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer5"
+      [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label class="section-header">
         FTP UPLOAD FOLDER
       </label>
       <span class="is-pulled-right">
-        <a
-          (click)="loadFiles()"
-          class="button is-small is-light"
-        >
+        <a (click)="loadFiles()" class="button is-small is-light">
           <mat-icon>refresh</mat-icon> Refresh
         </a>
       </span>
@@ -588,37 +392,22 @@
       </span> -->
     </p>
     <div class="panel-block">
-      <p class="control has-icons-left">
-        <input
-          (keyup)="applyFilter($event, 'upload')"
-          class="input is-small"
-          type="text"
-          placeholder="search uploaded files"
-        />
-        <span class="icon is-small is-left">
-          <mat-icon>search</mat-icon>
-        </span>
-      </p>
+      <mat-form-field class="full-width is-small" appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Search uploaded files</mat-label>
+        <input matInput (keyup)="applyFilter($event, 'upload')" placeholder="e.g. filename">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
     </div>
     <span *ngIf="filteredUploadFiles.length > 0">
       <span *ngFor="let file of filteredUploadFiles">
-        <mtbls-directory
-          [category]="upload"
-          [level]="0"
-          [parent]="''"
-          [file]="file"
-          [deletionEnabled]="true"
-          [downloadEnabled]="false"
-          [downloadContents]="false"
-          [readonlyFolder]="false"
-          [location]="ftpLocation"
-          (fileDeleted)="handleDeletedFile($event, uploadFiles, filteredUploadFiles, selectedUploadFiles)"
-        ></mtbls-directory>
+        <mtbls-directory [category]="upload" [level]="0" [parent]="''" [file]="file" [deletionEnabled]="true"
+          [downloadEnabled]="false" [downloadContents]="false" [readonlyFolder]="false" [location]="ftpLocation"
+          (fileDeleted)="handleDeletedFile($event, uploadFiles, filteredUploadFiles, selectedUploadFiles)"></mtbls-directory>
       </span>
     </span>
   </nav>
 
-<!--FTP panel end-->
+  <!--FTP panel end-->
 </ng-template>
 <!--Modals start-->
 <!-- Delete Modal start-->
@@ -628,11 +417,7 @@
     <section class="modal-card-body">
       <p>Are you sure you want to delete?</p>
       <label>
-        <input
-          type="checkbox"
-          [checked]="forceMetaDataDelete"
-          (change)="changeforceMetaDataDeleteValue($event)"
-        />
+        <input type="checkbox" [checked]="forceMetaDataDelete" (change)="changeforceMetaDataDeleteValue($event)" />
         <small>&nbsp;Force delete meta data</small>
       </label>
     </section>
@@ -654,14 +439,12 @@
 </div>
 <!-- Delete Modal end-->
 <!--Aspera Modal start-->
-<mtbls-download-aspera
-*ngIf="isAsperaModalActive"
-(closed)="closeAsperaModal()" #asperaDownloadModal></mtbls-download-aspera>
+<mtbls-download-aspera *ngIf="isAsperaModalActive" (closed)="closeAsperaModal()"
+  #asperaDownloadModal></mtbls-download-aspera>
 
 <!--Aspera Modal end-->
 <!--Globus Modal start-->
-<mtbls-download-globus
-*ngIf="isGlobusModalActive"
-(closed)="closeGlobusModal()" #globusDownloadModal></mtbls-download-globus>
+<mtbls-download-globus *ngIf="isGlobusModalActive" (closed)="closeGlobusModal()"
+  #globusDownloadModal></mtbls-download-globus>
 <!--Global Modal end-->
 <!--Modals end-->

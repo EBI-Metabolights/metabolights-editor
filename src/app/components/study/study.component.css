@@ -25,6 +25,7 @@
   border-radius: 0px;
   border: 1px solid #cce9ff;
 }
+
 .files-tab {
   padding: 0px;
 }
@@ -37,6 +38,7 @@
   border-radius: 5px;
   padding: 5px;
 }
+
 .has-warning a {
   color: #b34700 !important;
   font-weight: bold;
@@ -47,4 +49,10 @@
   margin-left: 0.3rem;
   color: #ff5722;
   font-weight: bold;
+}
+
+.tabs li.is-active a {
+  background-color: aliceblue;
+  border-bottom-color: #3273dc;
+  color: #3273dc;
 }

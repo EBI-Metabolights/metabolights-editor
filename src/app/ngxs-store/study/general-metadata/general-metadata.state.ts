@@ -2,7 +2,7 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -47,6 +47,9 @@ export interface GeneralMetadataStateModel {
     templateVersion: string;
     studyCategory: string;
     studyCreatedAt: string;
+    funders: any[];
+    relatedDatasets: any[];
+    comments: any[];
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -74,7 +77,10 @@ const defaultState: GeneralMetadataStateModel = {
     sampleTemplate: null,
     templateVersion: null,
     studyCategory: null,
-    studyCreatedAt: null
+    studyCreatedAt: null,
+    funders: [],
+    relatedDatasets: [],
+    comments: []
 }
 
 @State<GeneralMetadataStateModel>({
@@ -145,6 +151,33 @@ export class GeneralMetadataState {
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
+                
+                // Parse Funders
+                const comments = gm_response.isaInvestigation.studies[0].comments || [];
+                ctx.patchState({ comments }); // Store raw comments for later use
+
+                const funderNames = comments.find(c => c.name === 'Funder')?.value.split(';') || [];
+                const funderIds = comments.find(c => c.name === 'Funder ROR ID')?.value.split(';') || [];
+                const grantIds = comments.find(c => c.name === 'Grant Identifier')?.value.split(';') || [];
+                
+                const funders = funderNames.map((name, i) => ({
+                    fundingOrganization: {
+                        annotationValue: name,
+                        termAccession: funderIds[i] || ''
+                    },
+                    grantIdentifier: grantIds[i] || ''
+                }));
+                ctx.patchState({ funders });
+
+                // Parse Related Datasets
+                const relatedAccessions = comments.find(c => c.name === 'Related Data Accession')?.value.split(';') || [];
+                const relatedRepos = comments.find(c => c.name === 'Related Data Repository')?.value.split(';') || [];
+                
+                const relatedDatasets = relatedAccessions.map((acc, i) => ({
+                    accession: acc,
+                    repository: relatedRepos[i] || ''
+                }));
+                ctx.patchState({ relatedDatasets });
                 
 
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
@@ -843,4 +876,138 @@ export class GeneralMetadataState {
         return state?.studyCreatedAt
     }
     
+    @Action(Funders.Get)
+    GetFunders(ctx: StateContext<GeneralMetadataStateModel>, action: Funders.Get) {
+        // Already handled by GetStudyGeneralMetadata as it parses from comments
+        // If we needed to re-fetch, we would call GetStudyGeneralMetadata
+    }
+
+    @Action(Funders.Add)
+    AddFunder(ctx: StateContext<GeneralMetadataStateModel>, action: Funders.Add) {
+        const state = ctx.getState();
+        const currentFunders = state.funders || [];
+        const newFunders = [...currentFunders, action.body];
+        
+        ctx.patchState({ funders: newFunders });
+        this.saveFundersToComments(ctx, newFunders);
+    }
+
+    @Action(Funders.Update)
+    UpdateFunder(ctx: StateContext<GeneralMetadataStateModel>, action: Funders.Update) {
+        const state = ctx.getState();
+        const currentFunders = [...(state.funders || [])];
+        if (action.index >= 0 && action.index < currentFunders.length) {
+            currentFunders[action.index] = action.body;
+            ctx.patchState({ funders: currentFunders });
+            this.saveFundersToComments(ctx, currentFunders);
+        }
+    }
+
+    @Action(Funders.Delete)
+    DeleteFunder(ctx: StateContext<GeneralMetadataStateModel>, action: Funders.Delete) {
+        const state = ctx.getState();
+        const currentFunders = [...(state.funders || [])];
+        if (action.index >= 0 && action.index < currentFunders.length) {
+            currentFunders.splice(action.index, 1);
+            ctx.patchState({ funders: currentFunders });
+            this.saveFundersToComments(ctx, currentFunders);
+        }
+    }
+
+    @Action(RelatedDatasets.Add)
+    AddRelatedDataset(ctx: StateContext<GeneralMetadataStateModel>, action: RelatedDatasets.Add) {
+        const state = ctx.getState();
+        const currentDatasets = state.relatedDatasets || [];
+        const newDatasets = [...currentDatasets, action.body];
+        
+        ctx.patchState({ relatedDatasets: newDatasets });
+        this.saveRelatedDatasetsToComments(ctx, newDatasets);
+    }
+
+    @Action(RelatedDatasets.Update)
+    UpdateRelatedDataset(ctx: StateContext<GeneralMetadataStateModel>, action: RelatedDatasets.Update) {
+        const state = ctx.getState();
+        const currentDatasets = [...(state.relatedDatasets || [])];
+        if (action.index >= 0 && action.index < currentDatasets.length) {
+            currentDatasets[action.index] = action.body;
+            ctx.patchState({ relatedDatasets: currentDatasets });
+            this.saveRelatedDatasetsToComments(ctx, currentDatasets);
+        }
+    }
+
+    @Action(RelatedDatasets.Delete)
+    DeleteRelatedDataset(ctx: StateContext<GeneralMetadataStateModel>, action: RelatedDatasets.Delete) {
+        const state = ctx.getState();
+        const currentDatasets = [...(state.relatedDatasets || [])];
+        if (action.index >= 0 && action.index < currentDatasets.length) {
+            currentDatasets.splice(action.index, 1);
+            ctx.patchState({ relatedDatasets: currentDatasets });
+            this.saveRelatedDatasetsToComments(ctx, currentDatasets);
+        }
+    }
+
+    // Helper to serialize Funders and save to comments
+    private saveFundersToComments(ctx: StateContext<GeneralMetadataStateModel>, funders: any[]) {
+        const state = ctx.getState();
+        let comments = [...(state.comments || [])];
+        
+        // Remove existing Funder-related comments
+        comments = comments.filter(c => !['Funder', 'Funder ROR ID', 'Grant Identifier'].includes(c.name));
+
+        const names = funders.map(f => f.fundingOrganization.annotationValue).join(';');
+        const rorIds = funders.map(f => f.fundingOrganization.termAccession).join(';');
+        const grants = funders.map(f => f.grantIdentifier).join(';');
+
+        if (names) comments.push({ name: 'Funder', value: names });
+        if (rorIds) comments.push({ name: 'Funder ROR ID', value: rorIds });
+        if (grants) comments.push({ name: 'Grant Identifier', value: grants });
+
+        this.generalMetadataService.updateComments(comments, state.id).subscribe(
+            (response) => {
+                ctx.patchState({ comments });
+                toastr.success('Funding details updated.', "Success");
+            },
+            (error) => {
+                console.error("Failed to update funding comments", error);
+                toastr.error('Failed to update funding details.', "Error");
+            }
+        );
+    }
+
+    // Helper to serialize Related Datasets and save to comments
+    private saveRelatedDatasetsToComments(ctx: StateContext<GeneralMetadataStateModel>, datasets: any[]) {
+        const state = ctx.getState();
+        let comments = [...(state.comments || [])];
+        
+        // Remove existing Related Dataset comments
+        comments = comments.filter(c => !['Related Data Accession', 'Related Data Repository'].includes(c.name));
+
+        const accessions = datasets.map(d => d.accession).join(';');
+        const repos = datasets.map(d => d.repository).join(';');
+
+        if (accessions) comments.push({ name: 'Related Data Accession', value: accessions });
+        if (repos) comments.push({ name: 'Related Data Repository', value: repos });
+
+        this.generalMetadataService.updateComments(comments, state.id).subscribe(
+            (response) => {
+                ctx.patchState({ comments });
+                toastr.success('Related datasets updated.', "Success");
+            },
+            (error) => {
+                console.error("Failed to update related datasets comments", error);
+                toastr.error('Failed to update related datasets.', "Error");
+            }
+        );
+    }
+
+
+    @Selector()
+    static funders(state: GeneralMetadataStateModel): any[] {
+        return state?.funders;
+    }
+
+    @Selector()
+    static relatedDatasets(state: GeneralMetadataStateModel): any[] {
+        return state?.relatedDatasets;
+    }
 }

@@ -43,6 +43,7 @@ import { AddAssayComponent } from "./add-assay/add-assay.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 import { AuthGuard } from "src/app/auth-guard.service";
 import { EditorService } from "src/app/services/editor.service";
 import { AuthService } from "src/app/services/metabolights/auth.service";
@@ -151,7 +152,8 @@ import { ModalComponent } from './modal/modal.component';
     PromptRefreshComponent,
     MatCardModule,
     ConfirmationDialogComponent,
-    MatDividerModule
+    MatDividerModule,
+    MatCheckboxModule
   ],
   exports: [
     AddAssayComponent,
@@ -194,7 +196,8 @@ import { ModalComponent } from './modal/modal.component';
     DragAndDropComponent,
     FundingComponent,
     RelatedDatasetsComponent,
-    ModalComponent
+    ModalComponent,
+    MatCheckboxModule
   ],
   providers: [
     AuthGuard,

@@ -71,11 +71,9 @@ hr {
 
 .checkmark {
   position: absolute;
-  top: 2px;
   left: 0;
   height: 16px;
   width: 16px;
-  background-color: #eee;
   border-radius: 3px;
   border: 1px solid #dbdbdb;
 }
@@ -208,4 +206,78 @@ hr {
 ::ng-deep .is-modal-only-person>span,
 ::ng-deep .is-modal-only-person>a {
   display: none !important;
+}
+
+.category-boxes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.category-box {
+  flex: 0 0 100%;
+  background-color: #fcfcfc;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.category-box:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-color: #26a69a;
+}
+
+.category-title {
+  font-size: 0.85rem;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.assay-types-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.assay-types-list .mb-2 {
+  margin-bottom: 0 !important;
+}
+
+.assay-type-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-col {
+  max-width: 300px;
+}
+
+/* Global Material 3 Refinements */
+.full-width {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-form-field {
+  --mdc-outlined-text-field-focus-outline-color: #00d1b2 !important;
+  --mdc-outlined-text-field-focus-label-text-color: #00d1b2 !important;
+  --mat-select-focused-arrow-color: #00d1b2 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-label {
+  color: #555;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-label {
+  color: #00d1b2 !important;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__trailing {
+  border-color: #00d1b2 !important;
 }

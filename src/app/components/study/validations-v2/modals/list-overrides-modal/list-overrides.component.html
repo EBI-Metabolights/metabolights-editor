@@ -14,7 +14,7 @@
         <!-- Title Column -->
         <ng-container matColumnDef="title">
           <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.title }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.title }} </mat-cell>
         </ng-container>
 
         <!-- New Type Column -->
@@ -32,7 +32,7 @@
         <!-- Comments Column -->
         <ng-container matColumnDef="comments">
           <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.comment }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.comment }} </mat-cell>
         </ng-container>
 
         <!-- Created At Column -->
@@ -58,18 +58,12 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
       </mat-table>
     </div>
-<<<<<<< HEAD
     <footer class="modal-card-foot">
-        <div class="columns is-gapless full-width">
-          <div class="column is-full has-text-right">
-            <button class="button is-info" (click)="close()">Close</button>
-          </div>
+      <div class="columns is-gapless full-width">
+        <div class="column is-full has-text-right">
+          <button class="button is-info" (click)="close()">Close</button>
         </div>
-      </footer>
-=======
-     <div class="modal-footer keep-right">
-        <button class="button is-info" (click)="close()">Close</button>
       </div>
->>>>>>> 52db761 (Info: beautify metadata-modifier modal)
+    </footer>
   </mat-card>
 </div>

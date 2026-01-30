@@ -65,6 +65,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input() unitId: string;
   @Input("label") label: string;
   @Input() rule: FieldValueValidation | null = null;
+  @Input() hasError: boolean = false;
   @ViewChild('input', { static: false }) inputRef!: ElementRef<HTMLInputElement>;
   @Output() changed = new EventEmitter<any>();
   @Output() emptyError = new EventEmitter<boolean>();

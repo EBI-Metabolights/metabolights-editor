@@ -82,6 +82,7 @@ export class TableComponent
   @Input("validationsId") validationsId: any;
   @Input("enableControlList") enableControlList = true;
   @Input("templateRowPresent") templateRowPresent: boolean = false;
+  @Input() showAddSample = false;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -90,6 +91,7 @@ export class TableComponent
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
   @Output() refreshTableData = new EventEmitter<void>();
+  @Output() addSampleClick = new EventEmitter<void>();
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(
@@ -812,15 +814,39 @@ export class TableComponent
     if (
       this.enableControlList &&
       header &&
-      this.controlListColumns.size > 0 &&
       this.controlListColumns.has(header)
     ) {
-      const colData = this.controlListColumns.get(header)["ontology-details"];
-      this.isRequiredField = this.controlListColumns.get(header)["ontology-details"]["is-required"] == "true";
-      return colData;
+      const colVal = this.controlListColumns.get(header);
+      let colData = colVal?.["ontology-details"];
+      
+      // If we have a validation rule but no description in colData, look it up in global validations
+      if (!colData?.description && this.validation?.default_order) {
+          const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+          // Extract the part inside Parameter Value[...] if applicable
+          let innerName = formattedColumnName;
+          const match = formattedColumnName.match(/\[(.*?)\]/);
+          if (match) {
+              innerName = match[1];
+          }
+
+          const targetHeaders = [header, formattedColumnName, innerName];
+          const validationEntry = this.validation.default_order.find(entry => 
+            targetHeaders.includes(entry.header) || targetHeaders.includes(entry.columnDef)
+          );
+
+          if (validationEntry) {
+              const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
+              if (ruleDesc) {
+                  colData = { ...(colData || {}), description: ruleDesc };
+              }
+          }
+      }
+
+      this.isRequiredField = colData?.["is-required"] === "true";
+      return colData || {};
     }
     if (this.enableControlList) {
-      return this.validations.default_ontology_validation["ontology-details"];
+      return this.validations?.default_ontology_validation?.["ontology-details"] || {};
     }
     return {};
   }

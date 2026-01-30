@@ -1,8 +1,9 @@
 <div class="control">
   <div class="tags has-addons">
     <span class="tag is-dark">Release Date</span>
-    <span (click)="openModal()" class="tag is-link clickable">
-      {{ releaseDate ? (releaseDate  | date: 'yyyy-MM-dd') : ''}}
+    <span (click)="openModal()" class="tag is-link" [class.clickable]="!isReadOnly">
+      {{ releaseDate ? (releaseDate | date: 'yyyy-MM-dd') : ''}}
+      <mat-icon *ngIf="!isReadOnly">edit</mat-icon>
     </span>
   </div>
 </div>
@@ -11,28 +12,25 @@
   <div class="modal-card">
     <section class="modal-card-body">
       <span *ngIf="status != 'Public'">
-      <span>
-      If your study reaches 'Private' status, you can make it public at any time.</span> <br/>
-      <span> MetaboLights will automatically release your dataset to the public upon notification of the corresponding publication. </span>
-      <br/>
-      <span> If the MetaboLights team selects your study for manual curation, it will become public once the curation is complete.  </span>
-      <br/>
-      <span> Otherwise, the study will be made public automatically when the selected release date is reached.</span>
+        <span>
+          If your study reaches 'Private' status, you can make it public at any time.</span> <br />
+        <span> MetaboLights will automatically release your dataset to the public upon notification of the corresponding
+          publication. </span>
+        <br />
+        <span> If the MetaboLights team selects your study for manual curation, it will become public once the curation
+          is complete. </span>
+        <br />
+        <span> Otherwise, the study will be made public automatically when the selected release date is reached.</span>
 
-      <br/>
-      <br/>
-      Please select a release date for this study.
+        <br />
+        <br />
+        Please select a release date for this study.
       </span>
       <br>
       <br>
-      <mat-form-field>
-        <input
-          matInput
-          (dateChange)="updateReleaseDate('change', $event)"
-          [matDatepicker]="picker"
-          [(value)]="releaseDate"
-          placeholder="Choose your study release date"
-        />
+      <mat-form-field appearance="outline">
+        <input matInput (dateChange)="updateReleaseDate('change', $event)" [matDatepicker]="picker"
+          [(value)]="releaseDate" placeholder="Choose your study release date" />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
@@ -41,9 +39,10 @@
       <span>
         <b>Note:</b>
       </span>
-      <br/>
+      <br />
       <span>
-        If the study is selected by the MetaboLights team for manual curation, the curation process may extend the selected release date
+        If the study is selected by the MetaboLights team for manual curation, the curation process may extend the
+        selected release date
       </span>
     </section>
     <footer class="modal-card-foot buttons is-right">
