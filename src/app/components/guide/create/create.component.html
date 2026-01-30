@@ -256,6 +256,15 @@
               </mat-form-field>
             </div>
 
+            <!-- Publication Authors -->
+            <div class="field mb-4">
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Publication Authors</mat-label>
+                <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors" required>
+                <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
+              </mat-form-field>
+            </div>
+
             <!-- Status and DOI row -->
             <div class="columns mb-3">
               <div class="column is-6 pb-0">

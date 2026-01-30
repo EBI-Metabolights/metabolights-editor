@@ -1,36 +1,39 @@
 <span>
-  <a (click)="openAddAssayModal()" class="button button-primary is-pulled-right">Add Assay</a>
+  <a (click)="openAddAssayModal()" class="button button-primary">Add Assay</a>
 </span>
 
 <div class="modal" [ngClass]="{ 'is-active': isAddAssayModalOpen }">
   <div class="modal-background"></div>
-  <div class="modal-card vw80">
+  <div class="modal-card vw90">
     <section class="modal-card-body" style='overflow-x: hidden;'>
       <form [formGroup]="assayForm">
-        <h1 class="title is-4 has-text-weight-semibold mb20">Add Assay</h1>
+        <h1 class="title is-4 has-text-weight-semibold mb20 pull-left">Add Assay</h1>
 
         <!-- Top Grid -->
-        <div class="columns is-variable is-6">
-          <!-- Left Column -->
-          <div class="column is-6">
-            <div class="field">
-              <label class="label">Study Category</label>
-              <div class="control">
-                <input class="input" type="text" [value]="studyCategory" disabled>
-              </div>
-            </div>
+        <div class="columns is-variable is-6 is-multiline">
 
+          <!-- Top Inputs Row -->
+          <div class="column is-6">
+            <div class="notification is-light p-2 mb-2 is-size-7"
+              style="height: 56px; display: flex; align-items: center;">
+              <strong>Study Category:</strong>&nbsp;{{ studyCategory }}
+            </div>
+          </div>
+
+          <div class="column is-6">
             <div class="field">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Assay Type</mat-label>
                 <mat-select formControlName="assayType" (selectionChange)="onAssayTypeChange($event.value)">
-                  <mat-option *ngFor="let type of activeAssayFileTemplates" [value]="type">
-                    {{ type }}
+                  <mat-option *ngFor="let type of activeAssayFileTemplates" [value]="type.value">
+                    {{ type.label }}
                   </mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
+          </div>
 
+          <div class="column is-6 pb-0">
             <div class="field">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Measurement Type</mat-label>
@@ -41,7 +44,9 @@
                 </mat-select>
               </mat-form-field>
             </div>
+          </div>
 
+          <div class="column is-6 pb-0">
             <div class="field">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Primary Omics</mat-label>
@@ -54,24 +59,23 @@
             </div>
           </div>
 
-          <!-- Right Column (Design Descriptors) -->
-          <div class="column is-6">
+
+          <!-- Design Descriptors (Full Width) -->
+          <div class="column is-12 mt-2">
             <div class="card" style="height: 100%;">
               <header class="card-header">
-                <p class="card-header-title">
+                <p class="card-header-title is-size-6 pull-left">
                   Design Descriptors
                   <span class="icon is-small ml-2 has-text-grey-light">
                     <mat-icon style="font-size: 18px; height: 18px; width: 18px;"
                       matTooltip="Design Descriptors are the keywords you would use to describe the study">help</mat-icon>
                   </span>
                 </p>
-                <a class="card-header-icon" aria-label="add" (click)="addDescriptorModal.openModal()">
-                  <span class="icon">
-                    <mat-icon>add_circle</mat-icon>
-                  </span>
-                </a>
+                <button class="button is-primary is-small" style="position: absolute; top: 7px; right: 12px;"
+                  (click)="addDescriptorModal.openModal()">+ Add
+                </button>
               </header>
-              <div class="card-content">
+              <div class="card-content p-3">
                 <div class="content">
                   <div *ngIf="designDescriptors.length > 0; else noDescriptors">
                     <div class="field is-grouped is-grouped-multiline">
@@ -109,62 +113,62 @@
         <hr>
 
         <!-- Dynamic Sections -->
-        <div *ngFor="let section of dynamicSections" class="dynamic-section mb-4">
-          <h4 class="main-heading">
-            <mat-icon class="heading-icon">play_arrow</mat-icon>
-            {{ section.header }}
-          </h4>
-          <div class="columns is-variable is-6 mt10 is-multiline">
-            <div class="column is-6" *ngFor="let field of section.fields">
-              <!-- Label logic -->
-              <label class="label is-small">
-                {{ field.label }}
-                <span *ngIf="field.required" class="has-text-danger">*</span>
-                <span *ngIf="field.description" class="icon is-small has-text-grey-light ml-1">
-                  <mat-icon style="font-size: 14px; height: 14px; width: 14px;"
-                    [matTooltip]="field.description">help</mat-icon>
-                </span>
-              </label>
+        <div *ngFor="let section of dynamicSections" class="dynamic-section mb-5">
+          <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
+            <div class="card-content p-4">
+              <h5 class="title is-6 mb-4 has-text-weight-bold has-text-primary pull-left">
+                {{ section.header }}
+              </h5>
+              <div class="columns is-variable is-3 is-multiline">
+                <div [class]="field.type === 'TEXT_AND_ONTOLOGY' ? 'column is-12' : 'column is-6'"
+                  [style.margin-bottom]="field.description ? '20px' : '0'" *ngFor="let field of section.fields">
 
-              <!-- ONTOLOGY_COLUMN -->
-              <div class="control" *ngIf="field.type === 'ONTOLOGY'">
-                <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"
-                  [inline]="true" [rule]="field.validationRule">
-                </mtbls-ontology>
-              </div>
-
-              <!-- SINGLE_COLUMN (Text) -->
-              <div class="control" *ngIf="field.type === 'TEXT'">
-                <mat-form-field class="full-width is-small" appearance="outline">
-                  <mat-label>{{ field.label }}<span *ngIf="field.required" class="has-text-danger">*</span></mat-label>
-                  <input matInput [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
-                  <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
-                </mat-form-field>
-              </div>
-
-              <!-- SINGLE_COLUMN_AND_UNIT_ONTOLOGY -->
-              <div class="field has-addons" *ngIf="field.type === 'TEXT_AND_ONTOLOGY'">
-                <!-- Part 1: Text or Ontology based on mainType -->
-                <div class="control is-expanded">
-                  <ng-container *ngIf="field.mainType === 'TEXT'; else mainOntology">
-                    <mat-form-field class="full-width is-small" appearance="outline">
-                      <mat-label>{{ field.label }}</mat-label>
-                      <input matInput [formControlName]="field.key" type="text" placeholder="{{ field.label }}">
-                    </mat-form-field>
-                  </ng-container>
-                  <ng-template #mainOntology>
-                    <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="validations"
-                      [inline]="true" [rule]="field.validationRule">
+                  <!-- ONTOLOGY_COLUMN -->
+                  <div class="control" *ngIf="field.type === 'ONTOLOGY'">
+                    <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
+                      [validations]="{ description: field.description, 'is-required': field.required ? 'true' : 'false' }"
+                      [inline]="true" [rule]="field.validationRule" [label]="field.label">
                     </mtbls-ontology>
-                  </ng-template>
-                </div>
+                  </div>
 
-                <!-- Part 2: Unit (Always Ontology with unitRule) -->
-                <div class="control" style="width: 120px;">
-                  <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')" [validations]="validations"
-                    [inline]="true" [rule]="field.unitRule" [controlListKey]="'unit'">
-                    <!-- Passing control list key just in case rule lookup failed, but we passed rule object -->
-                  </mtbls-ontology>
+                  <!-- SINGLE_COLUMN (Text) -->
+                  <div class="control" *ngIf="field.type === 'TEXT'">
+                    <mat-form-field class="full-width" appearance="outline">
+                      <mat-label>{{ field.label }}</mat-label>
+                      <input matInput [formControlName]="field.key" type="text" [placeholder]="field.label"
+                        [required]="field.required">
+                      <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                    </mat-form-field>
+                  </div>
+
+                  <!-- SINGLE_COLUMN_AND_UNIT_ONTOLOGY -->
+                  <div class="control" *ngIf="field.type === 'TEXT_AND_ONTOLOGY'">
+                    <div class="columns is-variable is-2 mb-0 mt-0">
+                      <div class="column is-8">
+                        <ng-container *ngIf="field.mainType === 'TEXT'; else mainOntologyField">
+                          <mat-form-field class="full-width" appearance="outline">
+                            <mat-label>{{ field.label }}</mat-label>
+                            <input matInput [formControlName]="field.key" type="text" placeholder="Value"
+                              [required]="field.required">
+                            <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                          </mat-form-field>
+                        </ng-container>
+                        <ng-template #mainOntologyField>
+                          <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
+                            [validations]="{ description: field.description, 'is-required': field.required ? 'true' : 'false' }"
+                            [inline]="true" [rule]="field.validationRule" [label]="field.label">
+                          </mtbls-ontology>
+                        </ng-template>
+                      </div>
+                      <div class="column is-4">
+                        <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')"
+                          [validations]="{ description: '' }" [inline]="true" [rule]="field.unitRule"
+                          [controlListKey]="'unit'" [label]="'Unit'">
+                        </mtbls-ontology>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -175,8 +179,12 @@
       </form>
     </section>
     <footer class="modal-card-foot buttons is-right">
-      <button class="button is-primary" (click)="saveAssay()" [disabled]="assayForm.invalid">Add Assay</button>
-      <button class="button" (click)="closeAddAssayModal()">Cancel</button>
+      <button class="button is-primary" (click)="saveAssay()" [disabled]="assayForm.invalid">
+        Add
+      </button>
+      <button class="button" (click)="closeAddAssayModal()">
+        Close
+      </button>
     </footer>
   </div>
 </div>

@@ -745,7 +745,6 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          this.store.dispatch(new SetLoadingInfo("Loading samples data"))
           samplesExist = true;
 
           this.store.dispatch(new Samples.OrganiseAndPersist(file.file, studyId));
@@ -1068,5 +1067,15 @@ export class EditorService {
               return of([]);
           })
       );
+  }
+
+  addAssay(studyId: string, payload: any): Observable<any> {
+    const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/metadata-files/assays`;
+    return this.http.post(url, payload, httpOptions).pipe(
+      catchError(err => {
+        console.error('Error creating assay:', err);
+        return this.dataService.handleError(err);
+      })
+    );
   }
 }

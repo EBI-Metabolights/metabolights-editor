@@ -814,13 +814,36 @@ export class TableComponent
     if (
       this.enableControlList &&
       header &&
-      this.controlListColumns.size > 0 &&
       this.controlListColumns.has(header)
     ) {
       const colVal = this.controlListColumns.get(header);
-      const colData = colVal?.["ontology-details"];
+      let colData = colVal?.["ontology-details"];
+      
+      // If we have a validation rule but no description in colData, look it up in global validations
+      if (!colData?.description && this.validation?.default_order) {
+          const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+          // Extract the part inside Parameter Value[...] if applicable
+          let innerName = formattedColumnName;
+          const match = formattedColumnName.match(/\[(.*?)\]/);
+          if (match) {
+              innerName = match[1];
+          }
+
+          const targetHeaders = [header, formattedColumnName, innerName];
+          const validationEntry = this.validation.default_order.find(entry => 
+            targetHeaders.includes(entry.header) || targetHeaders.includes(entry.columnDef)
+          );
+
+          if (validationEntry) {
+              const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
+              if (ruleDesc) {
+                  colData = { ...(colData || {}), description: ruleDesc };
+              }
+          }
+      }
+
       this.isRequiredField = colData?.["is-required"] === "true";
-      return colData;
+      return colData || {};
     }
     if (this.enableControlList) {
       return this.validations?.default_ontology_validation?.["ontology-details"] || {};

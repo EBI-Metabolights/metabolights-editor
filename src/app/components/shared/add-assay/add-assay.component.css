@@ -112,14 +112,21 @@
 }
 
 /* Modal sizing */
-.vw80 {
-  width: 80vw;
-  max-width: 1000px;
+.vw90 {
+  width: 90vw;
+  max-width: 1100px;
+  max-height: 90vh;
+}
+
+.modal-card-body {
+  max-height: calc(90vh - 120px);
+  /* Adjust for header/footer */
+  overflow-y: auto;
 }
 
 /* Modal layers */
 .modal.is-active {
-  z-index: 1000;
+  z-index: 2000 !important;
 }
 
 .modal:nth-of-type(2) {

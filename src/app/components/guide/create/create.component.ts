@@ -75,6 +75,7 @@ export class CreateComponent implements OnInit {
   publicationStatus: Ontology[] = [];
   publicationDoi: string = "";
   publicationTitle: string = "";
+  publicationAuthors: string = "";
   funders: any[] = [];
   filteredFunderOrganizations$: Observable<any>;
   relatedDatasets: any[] = [];
@@ -505,6 +506,7 @@ export class CreateComponent implements OnInit {
       const isDoiOk = this.isDoiRequired ? (this.publicationDoi && this.publicationDoi.trim() !== "") : true;
       return !!(this.publicationStatus && this.publicationStatus.length > 0 &&
              this.publicationTitle && this.publicationTitle.trim() !== "" &&
+             this.publicationAuthors && this.publicationAuthors.trim() !== "" &&
              isDoiOk &&
              this.doiErrorMessage === "");
   }
@@ -896,6 +898,7 @@ export class CreateComponent implements OnInit {
         contacts: contacts,
         publicationDoi: (this as any).publicationDoi || "", 
         publicationTitle: (this as any).publicationTitle || "",
+        publicationAuthors: (this as any).publicationAuthors || "",
         designDescriptors: designDescriptors,
         factors: factors,
 
@@ -920,10 +923,10 @@ export class CreateComponent implements OnInit {
               this.router.navigate(['/console']);
             });
         } else {
-            // Single Category Flow: Proceed to wizard Step 3
+            // Single Category Flow: Proceed to wizard Step 4
             this.store.dispatch(new GetGeneralMetadata(this.newStudy, false));
             this.store.dispatch(new Operations.GetFreshFilesList(false, false, this.newStudy));
-            this.currentSubStep = 3;
+            this.currentSubStep = 4;
         }
       },
       error: (err) => {

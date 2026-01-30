@@ -1,7 +1,9 @@
 <span *ngIf="inline">
   <div class="ontology-container">
-    <mat-form-field class="full-width premium-field" appearance="outline" [class.mat-form-field-invalid]="hasError">
-      <mat-label *ngIf="label">{{label}}</mat-label>
+    <mat-form-field class="full-width premium-field" appearance="outline" [class.mat-form-field-invalid]="hasError"
+      subscriptSizing="dynamic">
+      <mat-label *ngIf="label && values.length === 0">{{label}}<span *ngIf="isRequired"
+          class="ml-1">*</span></mat-label>
       <mat-chip-grid #chipList class="custom-chip-list">
         <span *ngFor="let value of values">
           <mat-chip-row *ngIf="value && value.annotationValue" [selectable]="selectable" [removable]="removable"
@@ -9,11 +11,12 @@
             <span class="chip-text">{{ value.annotationValue }}</span>
             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
           </mat-chip-row>
-          <mat-chip [@fadeInOut]="fadeState" class="copy-notification"> term copied! </mat-chip>
+          <mat-chip [@fadeInOut]="fadeState" class="copy-notification" *ngIf="fadeState === 'in'"> term copied!
+          </mat-chip>
         </span>
         <input matInput [placeholder]="validations?.label" #input id="test" [formControl]="valueCtrl"
           [matAutocomplete]="auto" [matChipInputFor]="chipList" [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-          (matChipInputTokenEnd)="add($event)" class="premium-input" />
+          (matChipInputTokenEnd)="add($event)" class="premium-input" [hidden]="values.length > 0" />
       </mat-chip-grid>
 
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected($event)" class="premium-autocomplete">
@@ -53,14 +56,12 @@
         </mat-option>
       </mat-autocomplete>
 
-      <mat-hint class="premium-hint">
-        <span class="hint-text">{{ validations?.description }}</span>
+      <mat-hint class="premium-hint" *ngIf="validations?.description || loading || isRequired">
+        <span class="hint-text" *ngIf="validations?.description">{{ validations?.description }}</span>
         <span *ngIf="loading" class="spinner-container">
           <mat-spinner diameter="12" class="inline-spinner"></mat-spinner>
         </span>
-        <span *ngIf="isRequired" class="required-tag">
-          <b>(required)</b>
-        </span>
+        <span *ngIf="isRequired" class="required-tag has-text-grey-light is-size-7"><b>(required)</b></span>
       </mat-hint>
     </mat-form-field>
   </div>

@@ -7,7 +7,7 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { Store } from "@ngxs/store";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
-import { Assay } from "src/app/ngxs-store/study/assay/assay.actions";
+import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
@@ -36,7 +36,7 @@ export class AddAssayComponent implements OnInit {
   
   // Data for Dropdowns
   studyCategory: string = "";
-  activeAssayFileTemplates: string[] = [];
+  activeAssayFileTemplates: any[] = [];
   activeMeasurementTypes: any[] = [];
   activeOmicsTypes: any[] = [];
   
@@ -59,16 +59,10 @@ export class AddAssayComponent implements OnInit {
   assaySetup: any = null;
 
   assayForm = this.fb.group({
-    assayType: ['LC-MS'],
-    measurementType: ['Untargeted Metabolite Profiling'],
-    omics: ['Lipidomics'],
-    chromInstrument: ['', Validators.required],
-    columnType: ['reverse phase'],
-    msInstrument: ['', Validators.required],
-    polarity: ['positive'],
-    ionSource: ['electrospray ionization'],
-    analyzer: ['quadrupole time-of-flight'],
-    assayId: ['01', Validators.required]
+    assayType: ["", Validators.required],
+    measurementType: ["", Validators.required],
+    omics: ["", Validators.required],
+    assayId: ["01", Validators.required],
   });
 
   designDescriptors: Ontology[] = [];
@@ -153,15 +147,25 @@ export class AddAssayComponent implements OnInit {
             const versionConfig = config.versions[this.currentTemplateVersion];
             if (versionConfig) {
                 // Assay Types
-                let assayKeys = versionConfig.activeAssayFileTemplates || [];
-                if (!Array.isArray(assayKeys)) {
-                     if (typeof assayKeys === 'object') {
-                         assayKeys = Object.keys(assayKeys);
-                     } else {
-                         assayKeys = [];
-                     }
+                const assayTemplates = versionConfig.activeAssayFileTemplates || {};
+                let assayKeys = [];
+                if (Array.isArray(assayTemplates)) {
+                    assayKeys = assayTemplates;
+                } else if (typeof assayTemplates === 'object') {
+                    assayKeys = Object.keys(assayTemplates);
                 }
-                 this.activeAssayFileTemplates = assayKeys;
+                
+                // Use assayTemplates itself as the configMap if it contains labels and order
+                this.activeAssayFileTemplates = this.processOptions(assayKeys, assayTemplates);
+
+                // Filter by Study Category (Case-insensitive)
+                if (this.studyCategory) {
+                    const categoryLower = this.studyCategory.toLowerCase();
+                    this.activeAssayFileTemplates = this.activeAssayFileTemplates.filter(item => 
+                        item.value.toLowerCase().includes(categoryLower) || 
+                        item.label.toLowerCase().includes(categoryLower)
+                    );
+                }
 
                 // Measurement Types
                 const measurementKeys = (versionConfig as any).activeMeasurementTypes || [];
@@ -186,6 +190,11 @@ export class AddAssayComponent implements OnInit {
                      if (defaultOmics) {
                         this.assayForm.patchValue({ omics: defaultOmics.value });
                     }
+                }
+
+                // Set Default Assay Type (First item)
+                if (!this.assayForm.get('assayType').value && this.activeAssayFileTemplates.length > 0) {
+                    this.assayForm.patchValue({ assayType: this.activeAssayFileTemplates[0].value });
                 }
 
                 // Trigger update if assay type is already selected (e.g. default)
@@ -241,192 +250,167 @@ export class AddAssayComponent implements OnInit {
       }
 
       const defaults = (versionConfig as any).activeAssayFileTemplates;
-      console.log('ActiveAssayFileTemplates (as defaults) found:', defaults);
-      
       if (!defaults) {
-          console.warn('No activeAssayFileTemplates found in version config.');
           this.dynamicSections = [];
           return;
       }
 
       let assayConfig = defaults[assayType];
-      
       if (!assayConfig) {
-          // Try case-insensitive match
           const matchingKey = Object.keys(defaults).find(k => k.toLowerCase() === assayType.toLowerCase());
-          if (matchingKey) {
-              assayConfig = defaults[matchingKey];
-              console.log(`Found case-insensitive match for '${assayType}': '${matchingKey}'`);
-          }
+          if (matchingKey) assayConfig = defaults[matchingKey];
       }
 
       if (!assayConfig || !assayConfig.assayFileDefaultValues) {
-          console.warn(`No assayFileDefaultValues found for assayType '${assayType}'. AssayConfig keys:`, assayConfig ? Object.keys(assayConfig) : 'null');
           this.dynamicSections = [];
           return;
       }
-      
+
       const sectionsMap = assayConfig.assayFileDefaultValues;
       
-      
-      // key from defaults might differ from assayType if case-insensitive matched
-      // But we need the Header Templates for the *same* assay type (conceptually).
-      // We should try to find the matching key in assayHeaderTemplates too.
-      
+      const baseControls = ['assayType', 'measurementType', 'omics', 'assayId'];
+      const touchedControls = new Set<string>(baseControls);
+
+      // Resolve Header Templates for the current assay type
       let headersList = this.assayHeaderTemplates[assayType];
-      if (!headersList && this.assayHeaderTemplates) {
+      if (!headersList) {
           const matchingHeaderKey = Object.keys(this.assayHeaderTemplates).find(k => k.toLowerCase() === assayType.toLowerCase());
-          if (matchingHeaderKey) {
-              headersList = this.assayHeaderTemplates[matchingHeaderKey];
-          }
+          if (matchingHeaderKey) headersList = this.assayHeaderTemplates[matchingHeaderKey];
       }
-      
-      this.dynamicSections = Object.keys(sectionsMap).map(sectionHeader => {
-          const columnNames = sectionsMap[sectionHeader];
-          const fields = columnNames.map(colName => {
-               if (!headersList) {
-                   console.warn(`Missing headersList for assayType '${assayType}' when processing column '${colName}'`);
-                   return null;
-               }
-               
-               const template = headersList.find(t => t.version === this.currentTemplateVersion);
-               if (!template) {
-                   console.warn(`Template version mismatch. Current: ${this.currentTemplateVersion}, Headers available versions:`, headersList.map(h => h.version));
-                   return null;
-               }
 
-               // Robust matching for column header
-               // 1. Direct match
-               let colDef = template.headers.find(h => h.columnHeader.trim() === colName.trim());
-               
-               // 2. Try matching with Parameter Value wrapper
-               if (!colDef) {
-                   const paramValueHeader = `Parameter Value[${colName.trim()}]`;
-                   colDef = template.headers.find(h => h.columnHeader.trim() === paramValueHeader);
-               }
+      this.dynamicSections = Object.keys(sectionsMap)
+          .map(key => {
+              const sectionData = sectionsMap[key];
+              const isObject = typeof sectionData === 'object' && sectionData !== null && !Array.isArray(sectionData);
+              const sectionLabel = isObject ? (sectionData.label || key) : key;
+              const columnNames = isObject ? (sectionData.fields || []) : (Array.isArray(sectionData) ? sectionData : []);
+              const order = isObject ? (sectionData.order || 99) : 99;
 
-               if (!colDef) {
-                   console.warn(`Column definition not found for '${colName}'. Tried exact match and 'Parameter Value[...]'. Available headers:`, template.headers.map(h => h.columnHeader));
-                   return null;
-               }
+              const fields = columnNames.map(colName => {
+                   if (!headersList) return null;
+                   
+                   const template = headersList.find(t => t.version === this.currentTemplateVersion);
+                   if (!template) return null;
 
-               const isRequired = colDef.required;
-               let fieldType = 'TEXT';
-               if (colDef.columnStructure === 'ONTOLOGY_COLUMN') fieldType = 'ONTOLOGY';
-               if (colDef.columnStructure === 'SINGLE_COLUMN_AND_UNIT_ONTOLOGY') fieldType = 'TEXT_AND_ONTOLOGY';
+                   // Robust matching for column header
+                   let colDef = template.headers.find(h => h.columnHeader.trim() === colName.trim());
+                   if (!colDef) {
+                       const paramValueHeader = `Parameter Value[${colName.trim()}]`;
+                       colDef = template.headers.find(h => h.columnHeader.trim() === paramValueHeader);
+                   }
 
-              if (!this.assayForm.contains(colDef.columnHeader)) {
-                   this.assayForm.addControl(colDef.columnHeader, this.fb.control(colDef.defaultValue || '', isRequired ? Validators.required : null));
-              }
+                   if (!colDef) return null;
 
-               if (fieldType === 'TEXT_AND_ONTOLOGY') {
-                    if (!this.assayForm.contains(colDef.columnHeader + '_unit')) {
-                         this.assayForm.addControl(colDef.columnHeader + '_unit', this.fb.control(''));
-                    }
-               }
-               
-               // Resolve Rule with proper selection input
-               let mainRule = null;
-               if (this.controlLists) {
-                   // Create selection input like table.component.ts
-                   const selectionInput: ValidationRuleSelectionInput = {
-                       studyCategory: this.studyCategory as any,
-                       studyCreatedAt: this.studyCreatedAt,
-                       isaFileType: "assay" as any,
-                       isaFileTemplateName: assayType,
-                       templateVersion: this.currentTemplateVersion,
-                   };
+                   const isRequired = colDef.required;
+                   let fieldType = 'TEXT';
+                   if (colDef.columnStructure === 'ONTOLOGY_COLUMN') fieldType = 'ONTOLOGY';
+                   if (colDef.columnStructure === 'SINGLE_COLUMN_AND_UNIT_ONTOLOGY') fieldType = 'TEXT_AND_ONTOLOGY';
 
-                   try {
-                       // 1. Try clean colName first
-                       mainRule = getValidationRuleForField(
-                           { controlLists: this.controlLists } as MetabolightsFieldControls,
-                           colName,
-                           selectionInput
-                       );
-                       // 2. If not found, try full column header
-                       if (!mainRule && colDef.columnHeader !== colName) {
-                           mainRule = getValidationRuleForField(
-                               { controlLists: this.controlLists } as MetabolightsFieldControls,
-                               colDef.columnHeader,
-                               selectionInput
-                           );
-                       }
-                       // 3. Fallback: extract inner value if not found
-                       if (!mainRule && colDef.columnHeader.includes('[') && colDef.columnHeader.includes(']')) {
-                           const regex = /\[(.*?)\]/;
-                           const match = regex.exec(colDef.columnHeader);
-                           if (match && match[1] && match[1] !== colName) {
-                                mainRule = getValidationRuleForField(
-                                   { controlLists: this.controlLists } as MetabolightsFieldControls,
-                                   match[1],
-                                   selectionInput
-                               );
+                   // Dynamically add or update form controls
+                   const controlName = colDef.columnHeader;
+                   touchedControls.add(controlName);
+                   
+                   const currentControl = this.assayForm.get(controlName);
+                   if (!currentControl) {
+                        this.assayForm.addControl(controlName, this.fb.control(colDef.defaultValue || '', isRequired ? Validators.required : null));
+                   } else {
+                        currentControl.setValidators(isRequired ? Validators.required : null);
+                        currentControl.updateValueAndValidity();
+                   }
+
+                   if (fieldType === 'TEXT_AND_ONTOLOGY') {
+                        const unitKey = controlName + '_unit';
+                        touchedControls.add(unitKey);
+                        if (!this.assayForm.contains(unitKey)) {
+                            this.assayForm.addControl(unitKey, this.fb.control(''));
+                        }
+                   }
+
+                   // Resolve Description and Rules (Legacy Logic)
+                   let description = colDef.description;
+                   if (this.validations) {
+                       const targetHeaders = [colDef.columnHeader, colName];
+                       if (this.validations.assays && this.validations.assays.default_order) {
+                           const validationEntry = this.validations.assays.default_order.find(entry => targetHeaders.includes(entry.header) || targetHeaders.includes(entry.columnDef));
+                           if (validationEntry) {
+                               description = validationEntry['ontology-details']?.description || validationEntry.description || description;
                            }
                        }
-                   } catch(e) { console.warn('Error resolving rule for', colDef.columnHeader, e); }
-               }
+                   }
 
-               // Determine if field should render as dropdown (like table.component.ts)
-               let renderAsDropdown = false;
-               if (mainRule) {
-                   renderAsDropdown = mainRule.validationType === 'selected-ontology-term' && mainRule.termEnforcementLevel === 'required';
-               }
+                   // Resolve Rule with proper selection input
+                   let mainRule = null;
+                   if (this.controlLists && this.controlLists.controls) {
+                       const selectionInput: ValidationRuleSelectionInput = {
+                           studyCategory: this.studyCategory as any,
+                           studyCreatedAt: this.studyCreatedAt,
+                           isaFileType: "assay" as any,
+                           isaFileTemplateName: assayType,
+                           templateVersion: this.currentTemplateVersion,
+                       };
+                       try {
+                           const namesToTry = [colName, colDef.columnHeader];
+                           for (const name of namesToTry) {
+                               mainRule = getValidationRuleForField({ controlLists: this.controlLists } as MetabolightsFieldControls, name, selectionInput);
+                               if (mainRule) break;
+                           }
+                       } catch(e) {}
+                   }
 
-               // Update Types based on Rule and columnStructure
-               let mainType = fieldType === 'TEXT_AND_ONTOLOGY' ? 'TEXT' : (fieldType === 'ONTOLOGY' ? 'ONTOLOGY' : 'TEXT');
-               
-               if (fieldType === 'ONTOLOGY' || fieldType === 'TEXT_AND_ONTOLOGY') {
-                    // Check if rule indicates ontology type
-                    const isOntologyType = mainRule && [
-                        'selected-ontology-term',
-                        'ontology-term-in-selected-ontologies',
-                        'child-ontology-term'
-                    ].includes(mainRule.validationType);
-                    
-                    if (isOntologyType) {
-                       mainType = 'ONTOLOGY';
-                    }
-               }
+                   let renderAsDropdown = false;
+                   if (mainRule) {
+                       renderAsDropdown = mainRule.validationType === 'selected-ontology-term' && mainRule.termEnforcementLevel === 'required';
+                   }
 
-               let unitRule = null;
-               if (fieldType === 'TEXT_AND_ONTOLOGY' && this.controlLists) {
-                    const selectionInput: ValidationRuleSelectionInput = {
-                        studyCategory: this.studyCategory as any,
-                        studyCreatedAt: this.studyCreatedAt,
-                        isaFileType: "assay" as any,
-                        isaFileTemplateName: assayType,
-                        templateVersion: this.currentTemplateVersion,
-                    };
-                    try {
-                       unitRule = getValidationRuleForField(
-                           { controlLists: this.controlLists } as MetabolightsFieldControls,
-                           'unit', 
-                           selectionInput
-                       );
-                    } catch(e) {}
-               }
+                   let mainType = fieldType === 'TEXT_AND_ONTOLOGY' ? 'TEXT' : (fieldType === 'ONTOLOGY' ? 'ONTOLOGY' : 'TEXT');
+                   if (fieldType === 'ONTOLOGY' || fieldType === 'TEXT_AND_ONTOLOGY') {
+                        const isOntologyType = mainRule && ['selected-ontology-term', 'ontology-term-in-selected-ontologies', 'child-ontology-term'].includes(mainRule.validationType);
+                        if (isOntologyType) mainType = 'ONTOLOGY';
+                   }
 
-               return {
-                   label: colName, // Clean name uses colName from the array
-                   key: colDef.columnHeader,
-                   required: isRequired,
-                   description: colDef.description,
-                   type: fieldType,
-                   mainType: mainType,
-                   renderAsDropdown: renderAsDropdown,
-                   
-                   ontology: null,
-                   def: colDef,
-                   validationRule: mainRule,
-                   unitRule: unitRule
-               };
-          }).filter(f => f !== null);
+                   let unitRule = null;
+                   if (fieldType === 'TEXT_AND_ONTOLOGY' && this.controlLists && this.controlLists.controls) {
+                        const selectionInput: ValidationRuleSelectionInput = {
+                            studyCategory: this.studyCategory as any,
+                            studyCreatedAt: this.studyCreatedAt,
+                            isaFileType: "assay" as any,
+                            isaFileTemplateName: assayType,
+                            templateVersion: this.currentTemplateVersion,
+                        };
+                        try {
+                           unitRule = getValidationRuleForField({ controlLists: this.controlLists } as MetabolightsFieldControls, 'unit', selectionInput);
+                        } catch(e) {}
+                   }
 
-          return {
-              header: sectionHeader,
-              fields: fields
-          };
+                   return {
+                       label: colName,
+                       key: colDef.columnHeader,
+                       required: isRequired,
+                       description: description,
+                       placeholder: colDef.placeholder,
+                       type: fieldType,
+                       mainType: mainType,
+                       renderAsDropdown: renderAsDropdown,
+                       ontology: null,
+                       def: colDef,
+                       validationRule: mainRule,
+                       unitRule: unitRule
+                   };
+              }).filter(f => f !== null);
+
+              return {
+                  header: sectionLabel,
+                  fields: fields,
+                  order: order
+              };
+          })
+          .sort((a, b) => a.order - b.order);
+
+      // Final Cleanup: Remove any controls that were not touched in this cycle
+      Object.keys(this.assayForm.controls).forEach(controlName => {
+          if (!touchedControls.has(controlName)) {
+              this.assayForm.removeControl(controlName);
+          }
       });
   }
 
@@ -459,60 +443,79 @@ export class AddAssayComponent implements OnInit {
   }
 
   saveAssay() {
-    const validDescriptors = this.designDescriptors.map(d => {
-        if (!d.termSource) d.termSource = new OntologySourceReference();
-        if (!d.comments) d.comments = [];
-        return d;
+    // 1. Format Design Descriptors as per sample
+    const formattedDescriptors = this.designDescriptors.map(d => {
+        const dd = JSON.parse(JSON.stringify(d)); // deep clone
+        if (!dd.termSource) {
+            dd.termSource = {
+                comments: [],
+                name: "",
+                file: "",
+                version: "",
+                description: ""
+            };
+        }
+        // Ensure standard comments reach the backend if expected
+        if (!dd.comments || dd.comments.length === 0) {
+            dd.comments = [
+                { name: "Assay Descriptor Category", value: "disease" },
+                { name: "Assay Descriptor Source", value: "submitter" }
+            ];
+        }
+        return dd;
     });
 
+    // 2. Format Dynamic Fields (assayFileDefaultValues)
     const assayFileDefaultValues = [];
     this.dynamicSections.forEach(section => {
         section.fields.forEach(field => {
             const controlValue = this.assayForm.get(field.key)?.value;
             let val = null;
             let fieldFormat = 'Text';
-            let unitVal = null;
 
             if (field.type === 'ONTOLOGY') {
                 fieldFormat = 'Ontology';
-                if (Array.isArray(controlValue) && controlValue.length > 0) {
-                    val = controlValue[0];
-                } else {
-                    val = controlValue;
+                const ontologyVal = Array.isArray(controlValue) ? controlValue[0] : controlValue;
+                if (ontologyVal) {
+                    val = {
+                        annotationValue: ontologyVal.annotationValue || '',
+                        termSource: ontologyVal.termSource || { comments: [], name: '', file: '', version: '', description: '' },
+                        termAccession: ontologyVal.termAccession || '',
+                        unit: null
+                    };
                 }
             } else if (field.type === 'TEXT') {
                fieldFormat = 'Text';
                val = {
-                   annotationValue: controlValue,
+                   annotationValue: controlValue || '',
                    termSource: null,
                    termAccession: null,
                    unit: null
                };
             } else if (field.type === 'TEXT_AND_ONTOLOGY') {
-                fieldFormat = 'Numeric'; // Approximate since usually it is value + unit
-                
+                fieldFormat = 'Numeric'; 
                 const unitControlValue = this.assayForm.get(field.key + '_unit')?.value;
-                if (Array.isArray(unitControlValue) && unitControlValue.length > 0) {
-                    unitVal = unitControlValue[0];
-                } else {
-                    unitVal = unitControlValue;
-                }
-
+                const unitOntology = Array.isArray(unitControlValue) ? unitControlValue[0] : unitControlValue;
+                
                 val = {
-                   annotationValue: controlValue,
+                   annotationValue: controlValue || '',
                    termSource: null,
                    termAccession: null,
-                   unit: unitVal
+                   unit: unitOntology ? {
+                       annotationValue: unitOntology.annotationValue || '',
+                       termSource: unitOntology.termSource || { comments: [], name: '', file: '', version: '', description: '' },
+                       termAccession: unitOntology.termAccession || ''
+                   } : null
                };
             }
             
-            if (val && !val.unit) val.unit = null;
-
-            assayFileDefaultValues.push({
-                fieldName: field.key,
-                fieldFormat: fieldFormat,
-                defaultValue: val
-            });
+            if (val) {
+                assayFileDefaultValues.push({
+                    fieldName: field.key, // Should already be "Parameter Value[...]" from colDef.columnHeader
+                    fieldFormat: fieldFormat,
+                    defaultValue: val
+                });
+            }
         });
     });
 
@@ -523,19 +526,31 @@ export class AddAssayComponent implements OnInit {
       assayResultFileName: null,
       selectedMeasurementType: this.assayForm.get('measurementType').value || '', 
       selectedOmicsType: this.assayForm.get('omics').value || '',
-      designDescriptors: validDescriptors,
+      designDescriptors: formattedDescriptors,
       assayFileDefaultValues: assayFileDefaultValues
     };
 
-    console.log('Create assay payload', payload);
+    console.log('Final Payload for API:', payload);
     
-    this.store.dispatch(new Assay.Add(payload, this.requestedStudy)).subscribe(
-        (completed) => {
+    this.editorService.addAssay(this.requestedStudy, payload).subscribe(
+        (response) => {
           this.isAddAssayModalOpen = false;
           Swal.fire({
             title: "Assay added!",
-            text: "",
+            text: "Your assay has been successfully created.",
             type: "success",
+            confirmButtonColor: "#10c1e5",
+          });
+          // Optionally trigger a refresh of the assay list here
+          this.store.dispatch(new AssayList.Get(this.requestedStudy));
+        },
+        (error) => {
+          console.error('API Error:', error);
+          Swal.fire({
+            title: "Error creating assay",
+            text: error.message || "An unexpected error occurred while creating the assay.",
+            type: "error",
+            confirmButtonColor: "#DD6B55",
           });
         }
     );

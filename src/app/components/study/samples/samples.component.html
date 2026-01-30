@@ -7,28 +7,37 @@
       information on how to complete your Samples section.</b>
   </small>
 </div>
-<div *ngIf="duplicateSamples.length > 0 && !isReadOnly" class="notification is-warning">
-  <small><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br />
-    <span *ngFor="let sample of duplicateSamples">
-      <span (click)="sampleTable.filterDuplicate(sample)" class="pointer tag is-white">{{ sample }}</span>&nbsp;
-    </span>
-  </small>
-</div>
-<!--
-  <div *ngIf="emptySamplesExist" class="notification is-warning">
-    <small><mat-icon>info</mat-icon>Empty samples exist in the sample sheet</small>
+<ng-container *ngIf="samples === null; else dataLoaded">
+  <div class="vc vh50 has-text-centered" style="flex-direction: column;">
+    <mat-spinner [diameter]="40"></mat-spinner>
+    <p class="mt10">Loading samples...</p>
   </div>
--->
-<div class="column is-12 nprl nmrl fadeIn">
-  <mtbls-factors [isSampleSheet]="true" [unSelectedFactors]="unSelectedFactors"
-    (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
-    (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"></mtbls-factors>
-</div>
-<app-prompt-refresh *ngIf="!isReadOnly && showRefreshPrompt()" [context]="'samples'"></app-prompt-refresh>
+</ng-container>
 
-<mtbls-table [fileTypes]="fileTypes" (updated)="refresh()" [tableData]="samples" validationsId="samples"
-  [factors]="factors" [showAddSample]="true" (addSampleClick)="openAddSamplesModal()"
-  (refreshTableData)="refreshSamplesTableWithoutPopup()"></mtbls-table>
+<ng-template #dataLoaded>
+  <div *ngIf="duplicateSamples.length > 0 && !isReadOnly" class="notification is-warning">
+    <small><mat-icon>info</mat-icon>Duplicate samples exist in the sample sheet <br />
+      <span *ngFor="let sample of duplicateSamples">
+        <span (click)="sampleTable.filterDuplicate(sample)" class="pointer tag is-white">{{ sample }}</span>&nbsp;
+      </span>
+    </small>
+  </div>
+  <!--
+    <div *ngIf="emptySamplesExist" class="notification is-warning">
+      <small><mat-icon>info</mat-icon>Empty samples exist in the sample sheet</small>
+    </div>
+  -->
+  <div class="column is-12 nprl nmrl fadeIn">
+    <mtbls-factors [isSampleSheet]="true" [unSelectedFactors]="unSelectedFactors"
+      (addFactorToSampleSheet)="openAddColumnModal('factor', $event)"
+      (addFactorToSampleSheetUnitInclusive)="handleIncl('factor', $event)"></mtbls-factors>
+  </div>
+  <app-prompt-refresh *ngIf="!isReadOnly && showRefreshPrompt()" [context]="'samples'"></app-prompt-refresh>
+
+  <mtbls-table [fileTypes]="fileTypes" (updated)="refresh()" [tableData]="samples" validationsId="samples"
+    [factors]="factors" [showAddSample]="true" (addSampleClick)="openAddSamplesModal()"
+    (refreshTableData)="refreshSamplesTableWithoutPopup()"></mtbls-table>
+</ng-template>
 
 <!--Add column modal start-->
 <div class="modal" [ngClass]="{ 'is-active': addColumnModalOpen }">

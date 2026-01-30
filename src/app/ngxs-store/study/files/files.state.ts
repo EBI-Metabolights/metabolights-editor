@@ -174,6 +174,7 @@ export class FilesState {
 
     @Selector()
     static getAssaySheets(state: FilesStateModel) {
+        if (!state.files) return null;
         return state?.files?.study?.filter(file => file.type === 'metadata_assay' || file.file.startsWith('a_')) || []
     }
 
