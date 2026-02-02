@@ -96,7 +96,7 @@ export class TableComponent
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(
     Store
-  ).select(ValidationState.rules);
+  ).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(
     ApplicationState.readonly
   );
@@ -313,6 +313,9 @@ export class TableComponent
     });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      if (this.data && this.data.header && this.controlListColumns.size === 0) {
+        this.detectControlListColumns();
+      }
     });
     this.studyFiles$.subscribe((value) => {
       if (value) {
@@ -829,10 +832,24 @@ export class TableComponent
               innerName = match[1];
           }
 
-          const targetHeaders = [header, formattedColumnName, innerName];
-          const validationEntry = this.validation.default_order.find(entry => 
-            targetHeaders.includes(entry.header) || targetHeaders.includes(entry.columnDef)
-          );
+          const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+          
+          const techniquePrefix = (this.technique || "").replace("-", "_").toUpperCase() + "_";
+          
+          // 1. Try to find an entry that matches both technique and header in columnDef
+          let validationEntry = this.validation.default_order.find(entry => {
+            const entryColDef = (entry.columnDef || "").toUpperCase();
+            const entryHeader = (entry.header || "").toLowerCase();
+            return entryColDef.startsWith(techniquePrefix) && targetHeaders.includes(entryHeader);
+          });
+
+          // 2. Fallback
+          if (!validationEntry) {
+            validationEntry = this.validation.default_order.find(entry => 
+               targetHeaders.includes((entry.header || "").toLowerCase()) || 
+               targetHeaders.includes((entry.columnDef || "").toLowerCase())
+            );
+          }
 
           if (validationEntry) {
               const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
@@ -1910,7 +1927,12 @@ export class TableComponent
   }
 
   getValidationDefinition(header) {
+    if (!header) return null;
+
     let selectedColumn = null;
+    let techniqueSpecificColumn = null;
+
+    // Resolve technique if likely an assay file
     if (
       this.tableData?.data?.file &&
       this.tableData.data.file.startsWith("a_") &&
@@ -1924,27 +1946,62 @@ export class TableComponent
       this.assayTechnique.sub = result.assaySubTechnique?.name;
       this.assayTechnique.main = result.assayMainTechnique?.name;
     }
-    // const tableTechnique = this.tableData.meta?.assayTechnique?.name;
-    let techniqueSpecificColumn = null;
-    this.validation.default_order.forEach((col) => {
-      if (col.header === header) {
-        if (
-          this.assayTechnique.name !== null &&
-          "techniqueNames" in col &&
-          col["techniqueNames"] &&
-          col["techniqueNames"].length > 0
-        ) {
-          if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1) {
-            selectedColumn = col;
-            if (techniqueSpecificColumn === null) {
-              techniqueSpecificColumn = col;
-            }
+
+    const currentTechnique = this.assayTechnique.name;
+    const techniquePrefix = currentTechnique 
+      ? (currentTechnique.replace(/-/g, "_").toUpperCase() + "_") 
+      : "";
+
+    // Prepare target headers (current header, stripped header, inner Parameter Value)
+    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+    let innerName = formattedColumnName;
+    const match = formattedColumnName.match(/\[(.*?)\]/);
+    if (match) {
+        innerName = match[1];
+    }
+    // Comparison set: original, formatted, inner (all lowercased)
+    const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+
+    // Iterate through validations
+    if (this.validation && this.validation.default_order) {
+      this.validation.default_order.forEach((col) => {
+        const entryHeader = (col.header || "").toLowerCase();
+        const entryColDef = (col.columnDef || "").toUpperCase();
+
+        // 1. Check if this entry matches our column header
+        const isHeaderMatch = targetHeaders.includes(entryHeader);
+        
+        // 2. Check if this entry is intended for our specific technique
+        const isTechniqueMatch = techniquePrefix && entryColDef.startsWith(techniquePrefix);
+        
+        // 3. Fallback: check if columnDef matches our header (sometimes used)
+        const isColDefMatch = targetHeaders.includes((col.columnDef || "").toLowerCase());
+
+        if (isHeaderMatch || isColDefMatch) {
+          // If we already have a technique-specific match, don't overwrite it with a generic one
+          if (techniqueSpecificColumn) return;
+
+          // If this validation entry has specific technique names listed
+          if (
+            currentTechnique &&
+            col["techniqueNames"] &&
+            col["techniqueNames"].length > 0
+          ) {
+             if (col["techniqueNames"].indexOf(currentTechnique) > -1) {
+                // Strict technique match found in list
+                techniqueSpecificColumn = col;
+             }
+          } else if (isTechniqueMatch) {
+             // Implicit technique match via columnDef prefix
+             techniqueSpecificColumn = col;
+          } else {
+             // Generic match
+             selectedColumn = col;
           }
-        } else {
-          selectedColumn = col;
         }
-      }
-    });
+      });
+    }
+
     return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
 
@@ -2054,6 +2111,15 @@ export class TableComponent
           this.isFormBusy = false;
         }
       );
+  }
+
+  get technique(): string {
+    const filename = this.data?.file || "";
+    const parts = filename.split("_");
+    if (parts.length >= 3 && parts[0] === 'a') {
+        return parts[2];
+    }
+    return null;
   }
 
   get validation() {

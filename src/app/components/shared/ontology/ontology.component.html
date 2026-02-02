@@ -13,7 +13,7 @@
           <mat-chip [@fadeInOut]="fadeState" class="copy-notification" *ngIf="fadeState === 'in'"> term copied!
           </mat-chip>
         </span>
-        <input matInput [placeholder]="validations?.label || 'Search for ontology terms'" #input id="test"
+        <input matInput [placeholder]="validations?.label || 'Search for ontology terms'" #input
           [formControl]="valueCtrl" [matAutocomplete]="auto" [matChipInputFor]="chipList"
           [matChipInputSeparatorKeyCodes]="separatorKeysCodes" (matChipInputTokenEnd)="add($event)"
           class="premium-input" [hidden]="values.length > 0" />

@@ -152,11 +152,11 @@
             <!-- Study Description -->
             <div class="field mb-4">
               <mat-form-field class="full-width" appearance="outline">
-                <mat-label>Study Description (min 200 chars)*</mat-label>
+                <mat-label>Study Description (min 60 chars)*</mat-label>
                 <textarea matInput [(ngModel)]="studyDescription"
                   placeholder="Enter a detailed description of your study" rows="5"></textarea>
-                <mat-hint *ngIf="studyDescription && studyDescription.trim().length < 200" class="has-text-danger">
-                  Description must be at least 200 characters.
+                <mat-hint *ngIf="studyDescription && studyDescription.trim().length < 60" class="has-text-danger">
+                  Description must be at least 60 characters.
                 </mat-hint>
               </mat-form-field>
             </div>

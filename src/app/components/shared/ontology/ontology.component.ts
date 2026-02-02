@@ -140,7 +140,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
       }
     }
-    this.isRequired = this.validations?.["is-required"] === "true";
+    this.isRequired = this.validations?.["is-required"] === "true" || this.validations?.["is-required"] === true;
     this.isFormBusy = false;
     this.searchedMore = false;
     this.getDefaultTerms();
@@ -442,7 +442,16 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
       this.values = this.values.filter((val) => val !== null);
-
+      if (changes.validations) {
+        this.isRequired = this.validations?.["is-required"] === "true" || this.validations?.["is-required"] === true;
+        if (this.validations?.["recommended-ontologies"]) {
+          this.isforcedOntology = this.validations["recommended-ontologies"]["is-forced-ontology"];
+          this.url = this.validations["recommended-ontologies"].ontology.url;
+          this.addOnBlur = this.validations["recommended-ontologies"].ontology.allowFreeText;
+          this.endPoints = this.validations["recommended-ontologies"].ontology;
+        }
+      }
+      
       // Emit to parent when array becomes empty
       this.emptyError.emit(this.values.length === 0);
   }
@@ -454,8 +463,9 @@ export class OntologyComponent implements OnInit, OnChanges {
   optionSelected(selected: MatAutocompleteSelectedEvent) {
     if (selected.option.value !== null && selected.option.value !== undefined) {
       this.setValue(selected.option.value);
-      const inputElement = document.getElementById("test") as HTMLInputElement;
-      inputElement.value = "";
+      if (this.inputRef?.nativeElement) {
+        this.inputRef.nativeElement.value = "";
+      }
       this.triggerChanges();
     } else {
       this.searchTerm(this.inputValue, true);
@@ -540,10 +550,9 @@ export class OntologyComponent implements OnInit, OnChanges {
           newOntology.termSource.version = "1.0";
           this.setValue(newOntology);
         }
-        const inputElement = document.getElementById(
-          "test"
-        ) as HTMLInputElement;
-        inputElement.value = "";
+        if (this.inputRef?.nativeElement) {
+          this.inputRef.nativeElement.value = "";
+        }
         this.valueCtrl.setValue(null);
         this.getDefaultTerms();
         this.valueInput.closePanel();

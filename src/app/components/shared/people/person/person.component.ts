@@ -57,7 +57,7 @@ export class PersonComponent implements OnInit {
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
   
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   

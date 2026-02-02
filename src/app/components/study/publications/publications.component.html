@@ -13,13 +13,16 @@
       <div class="accordion-item" *ngFor="let publication of publications; let i = index"
         [ngClass]="{ 'is-expanded': expandedIndex === i }">
         <div class="accordion-header clickable" (click)="toggleExpand(i)">
-          <span *ngIf="publication?.status?.annotationValue?.length > 0"
-            class="tag is-default is-small publication-status" title="Publication status">
-            {{ publication.status.annotationValue }}
-          </span>
-          <h4 class="publication-title-compact">
-            {{ publication.title | slice: 0: 200 }}{{ publication.title.length > 200 ? '...' : '' }}
-          </h4>
+          <div style="display: flex; align-items: center;">
+            <span class="publication-index">{{ i + 1 }}</span>
+            <span *ngIf="publication?.status?.annotationValue?.length > 0"
+              class="tag is-default is-small publication-status mr-2" title="Publication status">
+              {{ publication.status.annotationValue }}
+            </span>
+            <h4 class="publication-title-compact">
+              {{ publication.title | slice: 0: 200 }}{{ publication.title.length > 200 ? '...' : '' }}
+            </h4>
+          </div>
 
           <div class="publication-actions" (click)="$event.stopPropagation()">
 

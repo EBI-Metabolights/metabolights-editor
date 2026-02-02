@@ -17,7 +17,7 @@ import { IAssay } from 'src/app/models/mtbl/mtbls/interfaces/assay.interface';
 export class AssaysService extends BaseConfigDependentService {
 
   //private studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  private validationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  private validationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
 
   //private id: string;
   private rules: Record<string, any>;
@@ -53,7 +53,7 @@ export class AssaysService extends BaseConfigDependentService {
       let assaySubTechnique = null;
       let assayTechnique = null;
       let assayMainTechnique = null;
-      if (this.rules) {
+      if (this.rules && this.rules["assays"] && this.rules["assays"]["assaySetup"]) {
         this.rules["assays"]["assaySetup"].main_techniques.forEach((mt) => {
           mt.techniques.forEach((t) => {
             if (t.sub_techniques && t.sub_techniques.length > 0) {

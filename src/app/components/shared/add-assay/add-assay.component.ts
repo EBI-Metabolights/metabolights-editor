@@ -22,7 +22,7 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 })
 export class AddAssayComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
   templateVersion$: Observable<string> = inject(Store).select(GeneralMetadataState.templateVersion);
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
@@ -125,7 +125,7 @@ export class AddAssayComponent implements OnInit {
         // 2. Validation Rules
         if (rules) {
             this.validations = rules;
-            this.assaySetup = rules.assays.assaySetup;
+            this.assaySetup = rules.assays?.assaySetup;
         }
 
         // 3. Header Templates & Control Lists (Dependencies for Dynamic Sections)
@@ -333,33 +333,31 @@ export class AddAssayComponent implements OnInit {
                         }
                    }
 
-                   // Resolve Description and Rules (Legacy Logic)
+                   // Resolve Description and Validation Object
                    let description = colDef.description;
+                   let validationObj: any = {
+                       description: description,
+                       'is-required': isRequired ? 'true' : 'false'
+                   };
+
                    if (this.validations) {
-                       const targetHeaders = [colDef.columnHeader, strippedColName, colName];
-                       const targetHeadersLower = targetHeaders.map(h => h ? h.toLowerCase().trim() : "");
-                       
-                       // Explicitly add ISA-TAB variations for lookup
-                       if (strippedColName) {
-                           const s = strippedColName.toLowerCase().trim();
-                           targetHeadersLower.push(`parameter value[${s}]`);
-                           targetHeadersLower.push(`characteristic[${s}]`);
-                           targetHeadersLower.push(`factor value[${s}]`);
-                       }
-                       
-                       if (this.validations.assays && this.validations.assays.default_order) {
-                           const validationEntry = this.validations.assays.default_order.find(entry => {
-                               const entryHeader = (entry.header || "").toLowerCase();
-                               const entryColDef = (entry.columnDef || "").toLowerCase();
-                               return targetHeadersLower.includes(entryHeader) || 
-                                      targetHeadersLower.includes(entryColDef) ||
-                                      targetHeadersLower.some(h => entryHeader.includes(`[${h}]`) || entryColDef.includes(`[${h}]`));
-                           });
-                           if (validationEntry) {
-                               description = validationEntry['ontology-details']?.description || validationEntry.description || description;
+                        const validationEntry = this.getValidationDefinition(colDef.columnHeader, assayType);
+                        if (validationEntry) {
+                           description = validationEntry['ontology-details']?.description || validationEntry.description || description;
+                           if (validationEntry['ontology-details']) {
+                               validationObj = validationEntry['ontology-details'];
+                           } else {
+                               validationObj.description = description;
                            }
                        }
                    }
+
+                   // START: ValidationObj Cleanup
+                   // Ensure description is set in the object if not present
+                   if (!validationObj.description) validationObj.description = description;
+                   // Ensure is-required is set (defaulting to colDef if not in ontology-details)
+                   if (!validationObj['is-required']) validationObj['is-required'] = isRequired ? 'true' : 'false';
+                   // END: ValidationObj Cleanup
 
                    // Resolve Rule with proper selection input
                    let mainRule = null;
@@ -432,7 +430,8 @@ export class AddAssayComponent implements OnInit {
                        ontology: null,
                        def: colDef,
                        validationRule: mainRule,
-                       unitRule: unitRule
+                       unitRule: unitRule,
+                       validation: validationObj
                    };
               }).filter(f => f !== null);
 
@@ -478,6 +477,70 @@ export class AddAssayComponent implements OnInit {
   get resultFileName() {
     const id = this.requestedStudy || 'MTBLSxxx';
     return `m_${id}-${this.assayForm.value.assayId}_LC-MS.maf.tsv`;
+  }
+
+  getValidationDefinition(header: string, technique: string) {
+    if (!header) return null;
+
+    let selectedColumn = null;
+    let techniqueSpecificColumn = null;
+
+    const currentTechnique = technique;
+    const techniquePrefix = currentTechnique 
+      ? (currentTechnique.replace(/-/g, "_").toUpperCase() + "_") 
+      : "";
+
+    // Prepare target headers (current header, stripped header, inner Parameter Value)
+    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+    let innerName = formattedColumnName;
+    const match = formattedColumnName.match(/\[(.*?)\]/);
+    if (match) {
+        innerName = match[1];
+    }
+    // Comparison set: original, formatted, inner (all lowercased)
+    const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+
+    // Iterate through validations
+    if (this.validations && this.validations.assays && this.validations.assays.default_order) {
+      this.validations.assays.default_order.forEach((col) => {
+        const entryHeader = (col.header || "").toLowerCase();
+        const entryColDef = (col.columnDef || "").toUpperCase();
+
+        // 1. Check if this entry matches our column header
+        const isHeaderMatch = targetHeaders.includes(entryHeader);
+        
+        // 2. Check if this entry is intended for our specific technique
+        const isTechniqueMatch = techniquePrefix && entryColDef.startsWith(techniquePrefix);
+        
+        // 3. Fallback: check if columnDef matches our header (sometimes used in validations.json)
+        const isColDefMatch = targetHeaders.includes((col.columnDef || "").toLowerCase());
+
+        if (isHeaderMatch || isColDefMatch) {
+          // If we already have a technique-specific match, don't overwrite it with a generic one
+          if (techniqueSpecificColumn) return;
+
+          // If this validation entry has specific technique names listed
+          if (
+            currentTechnique &&
+            col["techniqueNames"] &&
+            col["techniqueNames"].length > 0
+          ) {
+             if (col["techniqueNames"].indexOf(currentTechnique) > -1) {
+                // Strict technique match found in list
+                techniqueSpecificColumn = col;
+             }
+          } else if (isTechniqueMatch) {
+             // Implicit technique match via columnDef prefix
+             techniqueSpecificColumn = col;
+          } else {
+             // Generic match
+             selectedColumn = col;
+          }
+        }
+      });
+    }
+
+    return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
 
   saveAssay() {
@@ -602,5 +665,13 @@ export class AddAssayComponent implements OnInit {
 
   closeAddAssayModal() {
     this.isAddAssayModalOpen = false;
+  }
+
+  trackByField(index: number, field: any) {
+    return field.key;
+  }
+
+  trackBySection(index: number, section: any) {
+    return section.header;
   }
 }
