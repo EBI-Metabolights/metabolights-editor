@@ -30,7 +30,7 @@ import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 export class ProtocolsComponent implements OnInit, OnChanges {
   @Input("assay") assay: any;
 
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
   studyProtocols$: Observable<MTBLSProtocol[]> = inject(Store).select(ProtocolsState.protocols);

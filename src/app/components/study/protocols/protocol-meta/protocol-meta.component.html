@@ -8,8 +8,9 @@
                         <mat-icon
                             [matTooltip]="'The Uniform Resource Identifier (URI) for the protocol. Provide a persistent link to the detailed protocol, for example from protocols.io.'">help</mat-icon>
                     </mat-label>
-                    <input matInput type="url" placeholder="https://protocols.io/" formControlName="uri"
-                        [disabled]="readonly" />
+                    <input matInput type="url"
+                        placeholder="Protocol DOI or URL. e.g., 10.17504/protocols.io.nyxdfxn or https://www.protocols.io/xyz"
+                        formControlName="uri" [disabled]="readonly" />
                     <button mat-icon-button matSuffix *ngIf="parentForm.get('uri').value" (click)="openProtocolUri()"
                         (keydown.enter)="openProtocolUri()" title="Open URI in new tab"
                         aria-label="Open protocol URI in new tab">

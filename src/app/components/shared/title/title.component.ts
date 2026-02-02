@@ -27,7 +27,7 @@ export class TitleComponent implements OnInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 

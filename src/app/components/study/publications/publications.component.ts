@@ -52,5 +52,6 @@ export class PublicationsComponent implements OnInit {
     }
   }
 
+
   ngOnInit() {}
 }

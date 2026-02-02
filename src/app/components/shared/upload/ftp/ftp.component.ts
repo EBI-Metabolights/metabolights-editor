@@ -21,7 +21,7 @@ import { ValidationState } from "src/app/ngxs-store/study/validation/validation.
 export class FTPUploadComponent implements OnInit {
 
   uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
 
   rules: Record<string, any> = null;
   details: FtpDetails = {

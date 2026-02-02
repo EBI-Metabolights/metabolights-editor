@@ -27,7 +27,7 @@ declare let AW4: any;
 export class AsperaUploadComponent implements OnInit {
 
   uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 

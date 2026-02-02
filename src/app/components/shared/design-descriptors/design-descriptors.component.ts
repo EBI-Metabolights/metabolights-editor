@@ -15,7 +15,7 @@ export class DesignDescriptorsComponent implements OnInit {
 
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   descriptors$: Observable<Ontology[]> = inject(Store).select(DescriptorsState.studyDesignDescriptors);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   
   @Input("inline") inline: boolean;
   @Input("readOnly") readOnly: boolean;

@@ -68,7 +68,7 @@ export class ValidationState {
 
         ctx.setState({
             ...state,
-            rules: action.rules["study"]
+            rules: action.rules
         });
     }
 
@@ -291,12 +291,26 @@ export class ValidationState {
 
     @Action(ResetValidationState)
     Reset(ctx: StateContext<ValidationStateModel>, action: ResetValidationState) {
-        ctx.setState(defaultState);
+        const state = ctx.getState();
+        ctx.setState({
+            ...defaultState,
+            rules: state.rules
+        });
     }
 
     @Selector()
     static rules(state: ValidationStateModel): Record<string, any> {
         return state?.rules;
+    }
+
+    @Selector()
+    static studyRules(state: ValidationStateModel): Record<string, any> {
+        return state?.rules?.study;
+    }
+
+    @Selector()
+    static assayRules(state: ValidationStateModel): Record<string, any> {
+        return state?.rules?.study?.assays;
     }
 
     @Selector()

@@ -19,7 +19,7 @@ import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
-import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
+import { Owner, User } from "src/app/ngxs-store/non-study/user/user.actions";
 import { StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
@@ -36,7 +36,7 @@ export class CreateComponent implements OnInit {
   requestedStudy: string = null;
   title$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
   description$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   sampleFileHeaderTemplates$: Observable<any> = inject(Store).select(ApplicationState.sampleFileHeaderTemplates);
   controlLists$: Observable<any> = inject(Store).select(ApplicationState.controlLists);
@@ -140,7 +140,7 @@ export class CreateComponent implements OnInit {
     this.user$.subscribe(user => {
       this.currentUser = user;
     });
-    this.editorValidationRules$.subscribe((value) => {
+    this.store.select(ValidationState.studyRules).subscribe((value) => {
       if (value) {
         this.validations = value;
       }
@@ -452,7 +452,7 @@ export class CreateComponent implements OnInit {
   }
   
   get isDescriptionValid(): boolean {
-      return this.studyDescription && this.studyDescription.trim().length >= 200;
+      return this.studyDescription && this.studyDescription.trim().length >= 60;
   }
   
   get isDoiRequired(): boolean {
@@ -518,7 +518,7 @@ export class CreateComponent implements OnInit {
       });
       
       const isTitleOk = !!(this.studyTitle && this.studyTitle.trim().length >= 25);
-      const isDescriptionOk = !!(this.studyDescription && this.studyDescription.trim().length >= 200);
+      const isDescriptionOk = !!(this.studyDescription && this.studyDescription.trim().length >= 60);
 
       return isTitleOk && isDescriptionOk && mandatoryCategoriesSatisfied;
   }
@@ -810,6 +810,7 @@ export class CreateComponent implements OnInit {
       }
   }
   submitStudy(isMultipleCategories: boolean = false) {
+    if (this.isLoading) return;
     this.isLoading = true;
     
     // Construct the payload
@@ -940,13 +941,12 @@ export class CreateComponent implements OnInit {
 
     };
 
-    if (this.isLoading) return;
-    this.isLoading = true;
     console.log('Creating study with payload:', JSON.stringify(payload, null, 2));
     this.editorService.createStudy(payload).subscribe({
       next: (res) => {
         // Dispatch common actions
         this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
+        this.store.dispatch(new User.Studies.Get());
         this.newStudy = res.new_study;
         this.isLoading = false;
 
@@ -1001,6 +1001,7 @@ export class CreateComponent implements OnInit {
       cancelButtonText: "No"
     }).then((result) => {
       if (result.value) {
+        this.editorService.loadStudyId(null);
         this.router.navigate(['/study', this.newStudy]);
       }
     });

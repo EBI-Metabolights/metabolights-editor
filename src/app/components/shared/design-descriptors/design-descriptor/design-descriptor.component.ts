@@ -47,7 +47,7 @@ export class DesignDescriptorComponent implements OnInit {
   );
   editorValidationRules$: Observable<Record<string, any>> = inject(
     Store
-  ).select(ValidationState.rules);
+  ).select(ValidationState.studyRules);
   descriptors$: Observable<Ontology[]> = inject(Store).select(
     DescriptorsState.studyDesignDescriptors
   );

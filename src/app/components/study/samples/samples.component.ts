@@ -45,7 +45,7 @@ export class SamplesComponent  {
   rawFiles$: Observable<StudyFile[]> = inject(Store).select(FilesState.rawFiles);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);

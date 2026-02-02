@@ -4,23 +4,32 @@
 
 <div class="modal" [ngClass]="{ 'is-active': isAddAssayModalOpen }">
   <div class="modal-background"></div>
-  <div class="modal-card vw90">
+  <div class="modal-card vw90" style="max-height: 90vh;">
+    <header class="modal-card-head p-4"
+      style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; height: auto;">
+      <div style="display: flex; align-items: center; line-height: 1;">
+        <h1 class="title is-4 has-text-weight-semibold mb-0 mr-4"
+          style="line-height: 1;margin-bottom: 0;margin-right: 20px;">Add Assay
+        </h1>
+        <div class="control" style="display: flex; align-items: center;">
+          <div class="tags has-addons mb-0">
+            <span class="tag is-dark is-medium">Category</span>
+            <span class="tag is-info is-medium has-text-weight-semibold">
+              {{ studyCategory }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <button class="delete" aria-label="close" (click)="closeAddAssayModal()"></button>
+    </header>
     <section class="modal-card-body" style='overflow-x: hidden;'>
       <form [formGroup]="assayForm">
-        <h1 class="title is-4 has-text-weight-semibold mb20 pull-left">Add Assay</h1>
 
         <!-- Top Grid -->
         <div class="columns is-variable is-6 is-multiline">
 
           <!-- Top Inputs Row -->
-          <div class="column is-6">
-            <div class="notification is-light p-2 mb-2 is-size-7"
-              style="height: 56px; display: flex; align-items: center;">
-              <strong>Study Category:</strong>&nbsp;{{ studyCategory }}
-            </div>
-          </div>
-
-          <div class="column is-6">
+          <div class="column is-4">
             <div class="field">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Assay Type</mat-label>
@@ -33,7 +42,8 @@
             </div>
           </div>
 
-          <div class="column is-6 pb-0">
+          <!-- Rest of the top row fields move up -->
+          <div class="column is-4">
             <div class="field">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Measurement Type</mat-label>
@@ -46,7 +56,7 @@
             </div>
           </div>
 
-          <div class="column is-6 pb-0">
+          <div class="column is-4">
             <div class="field">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Primary Omics</mat-label>
@@ -61,59 +71,55 @@
 
 
           <!-- Design Descriptors (Full Width) -->
-          <div class="column is-12 mt-2">
-            <div class="card" style="height: 100%;">
-              <header class="card-header">
-                <p class="card-header-title is-size-6 pull-left">
+          <div class="column is-12 mt-0">
+            <!-- Simplified style to match header-card pattern -->
+            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
+              <header class="card-header"
+                style="box-shadow: none; background: transparent; border-bottom: 1px solid #f1f1f4;">
+                <p class="card-header-title is-size-7 has-text-grey-dark">
                   Design Descriptors
                   <span class="icon is-small ml-2 has-text-grey-light">
-                    <mat-icon style="font-size: 18px; height: 18px; width: 18px;"
-                      matTooltip="Design Descriptors are the keywords you would use to describe the study">help</mat-icon>
+                    <mat-icon style="font-size: 16px; height: 16px; width: 16px;"
+                      matTooltip="Design Descriptors describe the study">help</mat-icon>
                   </span>
                 </p>
-                <button class="button is-primary is-small" style="position: absolute; top: 7px; right: 12px;"
-                  (click)="addDescriptorModal.openModal()">+ Add
-                </button>
+                <button class="button is-primary is-small"
+                  style="position: absolute; top: 7px; right: 12px; height: 24px;"
+                  (click)="addDescriptorModal.openModal()">+ Add</button>
               </header>
-              <div class="card-content p-3">
+              <div class="card-content p-2" style="min-height: 48px;">
                 <div class="content">
                   <div *ngIf="designDescriptors.length > 0; else noDescriptors">
                     <div class="field is-grouped is-grouped-multiline">
                       <div *ngFor="let descriptor of designDescriptors; let i = index">
                         <div class="control">
                           <div class="tags has-addons clickable" (click)="editModal.openModal()">
-                            <span class="tag is-primary">
-                              <mat-icon style="font-size: 14px; height: 14px; width: 14px;">edit</mat-icon>
+                            <span class="tag is-primary is-light">
+                              <mat-icon style="font-size: 10px; height: 10px; width: 10px;">edit</mat-icon>
                             </span>
-                            <span class="tag is-light">{{ descriptor.annotationValue }}</span>
+                            <span class="tag is-white is-size-7">{{ descriptor.annotationValue }}</span>
                           </div>
                         </div>
-                        <!-- Hidden Edit Modal for this item -->
                         <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
                           [controlListKey]="'Study Design Type'" (saved)="onDescriptorEdited($event, i)"
-                          (deleted)="removeDescriptor(i)">
-                        </mtbls-design-descriptor>
+                          (deleted)="removeDescriptor(i)"></mtbls-design-descriptor>
                       </div>
                     </div>
                   </div>
                   <ng-template #noDescriptors>
-                    <p class="has-text-grey is-size-7 is-italic">No design descriptors added.</p>
+                    <p class="has-text-grey is-size-7 is-italic m-0">No design descriptors added.</p>
                   </ng-template>
                 </div>
               </div>
             </div>
-
-            <!-- Hidden Add Modal -->
             <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
-              [controlListKey]="'Study Design Type'" (saved)="onDescriptorSaved($event)">
-            </mtbls-design-descriptor>
+              [controlListKey]="'Study Design Type'" (saved)="onDescriptorSaved($event)"></mtbls-design-descriptor>
           </div>
         </div>
 
-        <hr>
 
         <!-- Dynamic Sections -->
-        <div *ngFor="let section of dynamicSections" class="dynamic-section mb-5">
+        <div *ngFor="let section of dynamicSections; trackBy: trackBySection" class="dynamic-section mb-5">
           <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
             <div class="card-content p-4">
               <h5 class="title is-6 mb-4 has-text-weight-bold has-text-primary pull-left">
@@ -121,14 +127,15 @@
               </h5>
               <div class="columns is-variable is-3 is-multiline">
                 <div [class]="field.type === 'TEXT_AND_ONTOLOGY' ? 'column is-12' : 'column is-6'"
-                  [style.margin-bottom]="field.description ? '20px' : '0'" *ngFor="let field of section.fields">
+                  [style.margin-bottom]="field.description ? '20px' : '0'"
+                  *ngFor="let field of section.fields; trackBy: trackByField">
 
-                  <!-- ONTOLOGY_COLUMN -->
-                  <div class="control" *ngIf="field.type === 'ONTOLOGY'">
-                    <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
-                      [validations]="{ description: field.description, 'is-required': field.required ? 'true' : 'false' }"
-                      [inline]="true" [rule]="field.validationRule" [label]="field.label">
-                    </mtbls-ontology>
+                  <div class="field" *ngIf="field.mainType === 'ONTOLOGY'">
+                    <div class="control" *ngIf="field.type === 'ONTOLOGY'">
+                      <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="field.validation"
+                        [inline]="true" [rule]="field.validationRule" [label]="field.label">
+                      </mtbls-ontology>
+                    </div>
                   </div>
 
                   <!-- SINGLE_COLUMN (Text) -->
@@ -154,10 +161,24 @@
                           </mat-form-field>
                         </ng-container>
                         <ng-template #mainOntologyField>
-                          <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
-                            [validations]="{ description: field.description, 'is-required': field.required ? 'true' : 'false' }"
-                            [inline]="true" [rule]="field.validationRule" [label]="field.label">
-                          </mtbls-ontology>
+                          <div class="control" style="width: 100%;">
+                            <div class="columns is-gapless is-desktop is-vcentered">
+                              <div class="column" [ngClass]="{'is-11': field.unitRule, 'is-12': !field.unitRule}">
+                                <div class="field">
+                                  <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
+                                    [validations]="field.validation" [inline]="true" [rule]="field.validationRule"
+                                    [label]="field.label">
+                                  </mtbls-ontology>
+                                </div>
+                              </div>
+                              <div class="column is-1" *ngIf="field.unitRule">
+                                <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')"
+                                  [validations]="{ description: '' }" [inline]="true" [rule]="field.unitRule"
+                                  [controlListKey]="'unit'" [label]="'Unit'">
+                                </mtbls-ontology>
+                              </div>
+                            </div>
+                          </div>
                         </ng-template>
                       </div>
                       <div class="column is-4">
@@ -175,7 +196,6 @@
           </div>
         </div>
 
-        <hr>
       </form>
     </section>
     <footer class="modal-card-foot buttons is-right">
