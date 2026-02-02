@@ -338,8 +338,8 @@
               (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <button type="button" *ngIf="!addNewPerson && person.email" class="button is-secondary is-pulled-left"
-              (click)="approveGrantSubmitterRole()">
+            <button type="button" *ngIf="!addNewPerson && person.email && mode === 'store'"
+              class="button is-secondary is-pulled-left" (click)="approveGrantSubmitterRole()">
               <mat-icon>person</mat-icon> Make Submitter
             </button>
           </div>

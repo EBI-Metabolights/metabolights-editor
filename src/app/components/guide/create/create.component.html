@@ -1,6 +1,7 @@
 <nav-bar mode="light"></nav-bar>
 <div class="container fixed-navbar-offset">
-  <mtbls-progress [study]="newStudy" [step]="currentSubStep"></mtbls-progress>
+  <mtbls-progress [study]="newStudy" [step]="currentSubStep" [internalNavigationOnly]="true"
+    (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4"></mtbls-progress>
 
   <div [ngSwitch]="currentSubStep">
     <!-- Step 1: Submission Details -->
@@ -11,27 +12,33 @@
             <h2 class="title is-4 has-text-weight-bold mb-5">New Submission</h2>
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
-              <p [class.has-text-danger]="!isAnyAssaySelected">
+              <p [class.has-text-danger]="!isAnyAssaySelected" style="margin-bottom: 10px;">
                 Which type of techniques have you used in your study?
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
-              <div class="category-boxes-container">
-                <div class="category-box" *ngFor="let cat of activeCategories">
-                  <h5 class="category-title has-text-weight-bold">{{cat.label}}</h5>
-                  <div class="assay-types-list">
-                    <div *ngFor="let assayType of cat.assayTypes" class="mb-2">
-                      <label class="checkbox is-size-7 beautified-checkbox assay-type-label">
-                        <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
-                          [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
-                        <span class="checkmark"></span>
-                        {{assayType}}
-                      </label>
+              <div class="category-rows-container mt-4">
+                <div class="category-box mb-3" *ngFor="let cat of activeCategories">
+                  <div class="columns is-vcentered">
+                    <div class="column is-3 py-1">
+                      <span class="is-size-7 has-text-weight-bold has-text-grey">{{cat.label}}</span>
+                    </div>
+                    <div class="column py-1">
+                      <div class="assay-types-list is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
+                        <div *ngFor="let assayType of cat.assayTypes">
+                          <label class="checkbox is-size-7 beautified-checkbox assay-type-label mb-0">
+                            <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
+                              [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
+                            <span class="checkmark"></span>
+                            {{assayType}}
+                          </label>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <hr class="mt-4 mb-4">
-              <div class="columns" [formGroup]="studyCreationForm">
+              <!-- <hr class="mt-4 mb-4"> -->
+              <!-- <div class="columns" [formGroup]="studyCreationForm">
 
 
 
@@ -47,19 +54,21 @@
                     </mat-select>
                   </mat-form-field>
                 </div>
-              </div>
+              </div> -->
             </div>
             <hr />
             <!-- Contacts (Moved from Step 2) -->
             <div class="column is-12">
-              <h3 class="title is-5 has-text-weight-bold mb-4">Contacts*</h3>
-              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
+              <div class="is-justify-content-space-between is-align-items-center mb-4">
+                <h3 class="title is-5 has-text-weight-bold" style="margin-bottom: 0;">Contacts*</h3>
+                <button class="button is-primary is-small" style="float: right;" (click)="addNewContact()">+ Add
+                  Contact</button>
+              </div>
+              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" style="clear: both;"
+                class="has-text-danger is-size-7 mb-3 ml-2">
                 • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
               </p>
-              <div class="box p-3 is-clearfix" style="position: relative;">
-                <button class="button is-primary is-small" style="position: absolute; top: 7px; right: 12px;"
-                  (click)="addNewContact()">+ Add
-                  Contact</button>
+              <div class="box p-3 is-clearfix">
                 <div class="columns is-multiline">
                   <div class="column is-4" *ngFor="let contact of contacts; let i = index">
                     <div class="card contact-card" [class.invalid-card]="!isContactValid(contact)">

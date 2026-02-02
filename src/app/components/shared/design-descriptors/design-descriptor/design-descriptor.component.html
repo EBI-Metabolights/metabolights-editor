@@ -4,12 +4,15 @@
 <ng-template #showDescriptorDetails>
   <div class="control" *ngIf="mode !== 'local'">
     <div class="tags has-addons" style="margin-bottom: 5px">
-      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()">
-        <i class="material-icons"> edit </i>
+      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()"
+        title="Edit Design Descriptor">
+        <i class="material-icons" style="font-size: 16px;"> edit </i>
       </span>
-      <span class="tag is-default is-small">
-        <span *ngIf="getCategoryLabel(descriptor) as category"><b>{{ category }}:</b>&nbsp;</span>
-        <ontology-details [value]="descriptor"></ontology-details>
+      <span class="tag is-default is-small" style="height: auto; padding: 4px 10px; display: block;">
+        <span class="descriptor-value">
+          <ontology-details [value]="descriptor"></ontology-details>
+        </span>
+        <span *ngIf="getCategoryLabel(descriptor) as category" class="badge ml-1">{{ category }}</span>
       </span>
     </div>
   </div>
@@ -49,26 +52,12 @@
       </div>
       <section class="modal-card-body">
         <div [formGroup]="form">
-          <div class="field" *ngIf="mode !== 'local'">
-            <label class="label is-small">Descriptor Category</label>
-            <div class="control">
-              <mat-form-field class="full-width is-small" appearance="outline">
-                <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
-                  placeholder="Select Category">
-                  <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
-                    {{ cat.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
-
           <div class="field pt-0">
-            <label class="label is-small">Descriptor</label>
+            <label class="label is-small">Design Descriptor (Keyword)</label>
             <div class="control">
               <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
                 <mat-form-field class="full-width is-small" appearance="outline">
-                  <mat-select formControlName="descriptor" placeholder="Select Descriptor"
+                  <mat-select formControlName="descriptor" placeholder="Select Keyword"
                     (selectionChange)="onChanges($event.value)">
                     <mat-option *ngFor="let val of _controlList.values" [value]="val.annotationValue">
                       {{ val.annotationValue }}
@@ -83,9 +72,20 @@
                   [validations]="validation" [isRorSearch]="false" [isModal]="true" [inline]="true" [label]="''">
                 </mtbls-ontology>
               </ng-template>
-              <mat-error *ngIf="false"> <!-- showError logic if needed -->
-                <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
-              </mat-error>
+            </div>
+          </div>
+
+          <div class="field" *ngIf="mode !== 'local'">
+            <label class="label is-small">Group</label>
+            <div class="control">
+              <mat-form-field class="full-width is-small" appearance="outline">
+                <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
+                  placeholder="Select Group">
+                  <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
+                    {{ cat.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
             </div>
           </div>
         </div>

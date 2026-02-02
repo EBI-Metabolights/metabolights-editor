@@ -8,7 +8,8 @@
     <div class="step-details">
       <p *ngIf="!study" class="step-title">Submission Details</p>
       <p *ngIf="study" class="step-title">
-        <a [ngClass]="{ 'has-text-grey': step < 2 }" (click)="redirectTo('info', null, 1)">
+        <a [ngClass]="{ 'has-text-grey': step < 2 || (step > 1 && !allowBackward) }"
+          (click)="redirectTo('info', null, 1)">
           Submission Details </a>
       </p>
     </div>
@@ -17,7 +18,8 @@
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{ 'has-text-grey': step < 2 }" (click)="redirectTo('meta', null, 2)">Study description</a>
+        <a [ngClass]="{ 'has-text-grey': step < 2 || (step > 2 && !allowBackward) }"
+          (click)="redirectTo('meta', null, 2)">Study description</a>
       </p>
     </div>
   </div>
@@ -25,7 +27,8 @@
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{ 'has-text-grey': step < 3 }" (click)="redirectTo('publication', null, 3)">Publication &
+        <a [ngClass]="{ 'has-text-grey': step < 3 || (step > 3 && !allowBackward) }"
+          (click)="redirectTo('publication', null, 3)">Publication &
           Funding</a>
       </p>
     </div>
@@ -34,7 +37,8 @@
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{ 'has-text-grey': step < 4 }" (click)="redirectTo('assays', null, 4)">Sample & assay details</a>
+        <a [ngClass]="{ 'has-text-grey': step < 4 || (step > 4 && !allowBackward) }"
+          (click)="redirectTo('assays', null, 4)">Sample & assay details</a>
       </p>
     </div>
   </div>
@@ -42,7 +46,8 @@
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
-        <a [ngClass]="{ 'has-text-grey': step < 5 }" (click)="redirectTo('upload', null, 5)">Upload files</a>
+        <a [ngClass]="{ 'has-text-grey': step < 5 || (step > 5 && !allowBackward) }"
+          (click)="redirectTo('upload', null, 5)">Upload files</a>
       </p>
     </div>
   </div>

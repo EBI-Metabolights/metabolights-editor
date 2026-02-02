@@ -56,6 +56,7 @@
   font-size: .875em;
   font-style: italic;
 }
+
 /* line up header content */
 .accordion-header {
   display: flex;
@@ -94,6 +95,16 @@
     flex-wrap: wrap;
     align-items: flex-start;
   }
-  .publication-actions { order: 2; }
-  .expand-icon { order: 3; }
+
+  .publication-actions {
+    order: 2;
+  }
+
+  .expand-icon {
+    order: 3;
+  }
+}
+
+.p-5 {
+  padding: 1.25rem;
 }

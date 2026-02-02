@@ -270,7 +270,7 @@ export class GeneralMetadataService extends DataService {
   }
 
   updateComments(comments: any[], studyId: string): Observable<any> {
-      return this.http.put(
+      return this.http.patch(
           this.url.baseURL + "/studies/" + studyId + "/comments",
           { comments: comments },
           httpOptions

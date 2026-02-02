@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, inject, Output, EventEmitter } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, inject, Output, EventEmitter, ChangeDetectorRef } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -119,7 +119,8 @@ export class DesignDescriptorComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
-    private europePMCService: EuropePMCService
+    private europePMCService: EuropePMCService,
+    private cdr: ChangeDetectorRef
   ) {
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
       this.legacyControlLists = lists || {};
@@ -137,6 +138,7 @@ export class DesignDescriptorComponent implements OnInit {
     });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      this.cdr.markForCheck();
     });
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
@@ -478,8 +480,13 @@ export class DesignDescriptorComponent implements OnInit {
           this.selectedCategory = matchingCat;
         }
       } else {
-        // Standard flow: Default to first category if adding new
-        if (this.descriptorCategories.length > 0) {
+        // Standard flow: Default to "other" category if adding new, as requested
+        const otherCat = this.descriptorCategories.find(c => c.id === 'other');
+        if (otherCat) {
+          this.selectedCategory = otherCat;
+          this.controlListKey = otherCat.controlListKey;
+          this.isaFileType = otherCat.isaFileType;
+        } else if (this.descriptorCategories.length > 0) {
           const firstCat = this.descriptorCategories[0];
           this.selectedCategory = firstCat;
           this.controlListKey = firstCat.controlListKey;
