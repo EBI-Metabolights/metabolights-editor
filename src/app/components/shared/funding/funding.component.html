@@ -14,20 +14,22 @@
                 <div class="columns is-vcentered is-mobile">
                     <div class="column">
                         <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                            <span class="has-text-weight-bold is-size-6 has-text-grey-dark">
-                                {{ funder.fundingOrganization.annotationValue }}
-                            </span>
-                            <div class="is-flex is-align-items-center" style="gap: 1rem;">
-                                <div *ngIf="funder.fundingOrganization.termAccession" class="is-size-6">
-                                    <span class="has-text-weight-semibold has-text-grey">ROR ID:</span>
-                                    <a class="ml-1" [href]="funder.fundingOrganization.termAccession" target="_blank">
-                                        {{ funder.fundingOrganization.termAccession }}
+                            <div class="is-size-6">
+                                <span>Funder: </span>
+                                <span class="has-text-weight-bold">
+                                    <a *ngIf="funder.fundingOrganization.termAccession; else noLink"
+                                        [href]="funder.fundingOrganization.termAccession" target="_blank"
+                                        class="has-text-link">
+                                        {{ funder.fundingOrganization.annotationValue }}
                                     </a>
-                                </div>
-                                <div *ngIf="funder.grantIdentifier" class="is-size-6">
-                                    <span class="has-text-weight-semibold has-text-grey">Grant Identifier:</span>
-                                    <span class="ml-1">{{ funder.grantIdentifier }}</span>
-                                </div>
+                                    <ng-template #noLink>
+                                        {{ funder.fundingOrganization.annotationValue }}
+                                    </ng-template>
+                                </span>
+                            </div>
+                            <div *ngIf="funder.grantIdentifier" class="is-size-6">
+                                <span>Grand Identifier: </span>
+                                <span class="has-text-weight-bold">{{ funder.grantIdentifier }}</span>
                             </div>
                         </div>
                     </div>

@@ -6,7 +6,8 @@ import {
   ViewChild,
   inject,
   Output,
-  EventEmitter
+  EventEmitter,
+  ChangeDetectorRef
 } from "@angular/core";
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
@@ -109,7 +110,8 @@ export class PersonComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private generalMetadataService: GeneralMetadataService,
-    private store: Store
+    private store: Store,
+    private cdr: ChangeDetectorRef
   ) {
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
         this.legacyControlLists = lists || {};
@@ -122,6 +124,7 @@ export class PersonComponent implements OnInit {
     this.toastrSettings$.subscribe((value) => {this.toastrSettings = value})
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      this.cdr.markForCheck();
     });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
@@ -317,6 +320,7 @@ export class PersonComponent implements OnInit {
     
     // Mark all required fields as touched to show validation errors immediately
     this.markRequiredFieldsAsTouched();
+    this.cdr.detectChanges();
   }
 
   toogleShowAdvanced() {

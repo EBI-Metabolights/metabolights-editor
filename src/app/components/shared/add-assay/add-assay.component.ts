@@ -12,6 +12,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 import { MetabolightsFieldControls, getValidationRuleForField, ValidationRuleSelectionInput } from "src/app/models/mtbl/mtbls/control-list";
+import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 
 
 @Component({
@@ -192,15 +193,17 @@ export class AddAssayComponent implements OnInit {
                     }
                 }
 
-                // Set Default Assay Type (First item)
-                if (!this.assayForm.get('assayType').value && this.activeAssayFileTemplates.length > 0) {
-                    this.assayForm.patchValue({ assayType: this.activeAssayFileTemplates[0].value });
-                }
+                // Set Default Assay Type (First item) - REMOVED AUTO-SELECT as requested
+                // if (!this.assayForm.get('assayType').value && this.activeAssayFileTemplates.length > 0) {
+                //     this.assayForm.patchValue({ assayType: this.activeAssayFileTemplates[0].value });
+                // }
 
                 // Trigger update if assay type is already selected (e.g. default)
                  const currentAssayType = this.assayForm.get('assayType').value;
                  if (currentAssayType) {
                      this.updateDynamicSections(currentAssayType);
+                 } else {
+                     this.dynamicSections = [];
                  }
             }
         }
@@ -306,6 +309,10 @@ export class AddAssayComponent implements OnInit {
                    if (colDef.columnStructure === 'ONTOLOGY_COLUMN') fieldType = 'ONTOLOGY';
                    if (colDef.columnStructure === 'SINGLE_COLUMN_AND_UNIT_ONTOLOGY') fieldType = 'TEXT_AND_ONTOLOGY';
 
+                   const strippedColName = colDef.columnHeader.replace(/Parameter Value\[/i, '').replace(/\]/gi, '')
+                       .replace(/Characteristic\[/i, '').replace(/\]/gi, '')
+                       .replace(/Factor Value\[/i, '').replace(/\]/gi, '').trim();
+
                    // Dynamically add or update form controls
                    const controlName = colDef.columnHeader;
                    touchedControls.add(controlName);
@@ -329,9 +336,25 @@ export class AddAssayComponent implements OnInit {
                    // Resolve Description and Rules (Legacy Logic)
                    let description = colDef.description;
                    if (this.validations) {
-                       const targetHeaders = [colDef.columnHeader, colName];
+                       const targetHeaders = [colDef.columnHeader, strippedColName, colName];
+                       const targetHeadersLower = targetHeaders.map(h => h ? h.toLowerCase().trim() : "");
+                       
+                       // Explicitly add ISA-TAB variations for lookup
+                       if (strippedColName) {
+                           const s = strippedColName.toLowerCase().trim();
+                           targetHeadersLower.push(`parameter value[${s}]`);
+                           targetHeadersLower.push(`characteristic[${s}]`);
+                           targetHeadersLower.push(`factor value[${s}]`);
+                       }
+                       
                        if (this.validations.assays && this.validations.assays.default_order) {
-                           const validationEntry = this.validations.assays.default_order.find(entry => targetHeaders.includes(entry.header) || targetHeaders.includes(entry.columnDef));
+                           const validationEntry = this.validations.assays.default_order.find(entry => {
+                               const entryHeader = (entry.header || "").toLowerCase();
+                               const entryColDef = (entry.columnDef || "").toLowerCase();
+                               return targetHeadersLower.includes(entryHeader) || 
+                                      targetHeadersLower.includes(entryColDef) ||
+                                      targetHeadersLower.some(h => entryHeader.includes(`[${h}]`) || entryColDef.includes(`[${h}]`));
+                           });
                            if (validationEntry) {
                                description = validationEntry['ontology-details']?.description || validationEntry.description || description;
                            }
@@ -354,6 +377,18 @@ export class AddAssayComponent implements OnInit {
                                mainRule = getValidationRuleForField({ controlLists: this.controlLists } as MetabolightsFieldControls, name, selectionInput);
                                if (mainRule) break;
                            }
+
+                           // Robust Fallback: If no rule found with strict selection criteria,
+                           // check if ANY rule exists for this field name in the control list.
+                           if (!mainRule) {
+                               for (const name of namesToTry) {
+                                   const allRules = this.controlLists.controls.assayFileControls?.[name];
+                                   if (allRules && allRules.length > 0) {
+                                       mainRule = allRules[0]; // Take first available rule
+                                       break;
+                                   }
+                               }
+                           }
                        } catch(e) {}
                    }
 
@@ -363,9 +398,12 @@ export class AddAssayComponent implements OnInit {
                    }
 
                    let mainType = fieldType === 'TEXT_AND_ONTOLOGY' ? 'TEXT' : (fieldType === 'ONTOLOGY' ? 'ONTOLOGY' : 'TEXT');
-                   if (fieldType === 'ONTOLOGY' || fieldType === 'TEXT_AND_ONTOLOGY') {
-                        const isOntologyType = mainRule && ['selected-ontology-term', 'ontology-term-in-selected-ontologies', 'child-ontology-term'].includes(mainRule.validationType);
-                        if (isOntologyType) mainType = 'ONTOLOGY';
+                   if (fieldType === 'ONTOLOGY' || fieldType === 'TEXT_AND_ONTOLOGY' || colDef.columnStructure === 'SINGLE_COLUMN') {
+                        const isOntologyType = mainRule && ['selected-ontology-term', 'ontology-term-in-selected-ontologies', 'child-ontology-term', 'any-ontology-term'].includes(mainRule.validationType);
+                        if (isOntologyType) {
+                            mainType = 'ONTOLOGY';
+                            fieldType = 'ONTOLOGY'; // Ensure it renders using the ontology template
+                        }
                    }
 
                    let unitRule = null;
@@ -541,8 +579,9 @@ export class AddAssayComponent implements OnInit {
             type: "success",
             confirmButtonColor: "#10c1e5",
           });
-          // Optionally trigger a refresh of the assay list here
+          // Refresh both Assay List and Protocols
           this.store.dispatch(new AssayList.Get(this.requestedStudy));
+          this.store.dispatch(new Protocols.Get());
         },
         (error) => {
           console.error('API Error:', error);

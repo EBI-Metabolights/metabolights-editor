@@ -1,58 +1,53 @@
 <div class="card mb-6" [ngClass]="{ 'hover-highlight': !isReadOnly }">
-  <mtbls-publication *ngIf="!isReadOnly" [value]="null" style="position: absolute; top: 12px; right: 12px;"></mtbls-publication>
+  <mtbls-publication *ngIf="!isReadOnly" [value]="null"
+    style="position: absolute; top: 12px; right: 12px;"></mtbls-publication>
   <header class="card-heading" [ngClass]="{ 'hover-highlight': isReadOnly }">
-      <p>
-        Publications
-        <span *ngIf="!isReadOnly"><mat-icon
-            [matTooltip]="'The act of publishing, and also any copies issued for public distribution'">help</mat-icon></span>
-      </p>
-    </header>
-    <div class="card-content" *ngIf="publications && publications.length > 0; else noPublicationsFound">
-      <div class="publications-accordion mt1">
-<div class="accordion-item" *ngFor="let publication of publications; let i = index"
-  [ngClass]="{ 'is-expanded': expandedIndex === i }">
-  <div class="accordion-header clickable" (click)="toggleExpand(i)">
-    <span *ngIf="publication?.status?.annotationValue?.length > 0"
-            class="tag is-default is-small publication-status"
-            title="Publication status">
-        {{ publication.status.annotationValue }}
-    </span>
-    <h4 class="publication-title-compact">
-      {{ publication.title | slice: 0: 200 }}{{ publication.title.length > 200 ? '...' : '' }}
-    </h4>
-    
-    <div class="publication-actions" (click)="$event.stopPropagation()">
+    <p>
+      Publications
+      <span *ngIf="!isReadOnly"><mat-icon
+          [matTooltip]="'The act of publishing, and also any copies issued for public distribution'">help</mat-icon></span>
+    </p>
+  </header>
+  <div class="card-content" *ngIf="publications && publications.length > 0; else noPublicationsFound">
+    <div class="publications-accordion mt1">
+      <div class="accordion-item" *ngFor="let publication of publications; let i = index"
+        [ngClass]="{ 'is-expanded': expandedIndex === i }">
+        <div class="accordion-header clickable" (click)="toggleExpand(i)">
+          <span *ngIf="publication?.status?.annotationValue?.length > 0"
+            class="tag is-default is-small publication-status" title="Publication status">
+            {{ publication.status.annotationValue }}
+          </span>
+          <h4 class="publication-title-compact">
+            {{ publication.title | slice: 0: 200 }}{{ publication.title.length > 200 ? '...' : '' }}
+          </h4>
 
-      <a *ngIf="publication.doi && publication.doi.length > 0"
-         class="button is-small custom-button"
-         [href]="'//dx.doi.org/' + publication.doi"
-         target="_blank"
-         rel="noopener"
-         (click)="$event.stopPropagation()"
-         title="Open DOI in new tab">
-        <mat-icon>insert_link</mat-icon>
-      </a>
+          <div class="publication-actions" (click)="$event.stopPropagation()">
 
-      
-    </div>
+            <a *ngIf="publication.doi && publication.doi.length > 0" class="button is-small custom-button"
+              [href]="'//dx.doi.org/' + publication.doi" target="_blank" rel="noopener"
+              (click)="$event.stopPropagation()" title="Open DOI in new tab">
+              <mat-icon>insert_link</mat-icon>
+            </a>
 
-    <!-- Expand icon remains part of the header (clicking it toggles) -->
-    <mat-icon class="expand-icon">{{ expandedIndex === i ? 'expand_less' : 'expand_more' }}</mat-icon>
-  </div>
 
-  <div class="accordion-content" *ngIf="expandedIndex === i">
-    <mtbls-publication [value]="publication"></mtbls-publication>
-  </div>
-</div>
+          </div>
+
+          <!-- Expand icon remains part of the header (clicking it toggles) -->
+          <mat-icon class="expand-icon">{{ expandedIndex === i ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+
+        <div class="accordion-content" *ngIf="expandedIndex === i">
+          <mtbls-publication [value]="publication"></mtbls-publication>
+        </div>
       </div>
     </div>
-    <ng-template #noPublicationsFound>
-      <p class="placeholder-text">
-        <small>Please provide details of any scientific article(s), preprint(s), or report(s) associated with the study.
-          This includes manuscripts that are in preparation, submitted, available as preprints, or already published.
-        </small>
-      </p>
-      <div>&nbsp;</div>
-    </ng-template>
-  
+  </div>
+  <ng-template #noPublicationsFound>
+    <p class="placeholder-text p-5">
+      <small>Please provide details of any scientific article(s), preprint(s), or report(s) associated with the study.
+        This includes manuscripts that are in preparation, submitted, available as preprints, or already published.
+      </small>
+    </p>
+  </ng-template>
+
 </div>

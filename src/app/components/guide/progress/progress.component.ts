@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { Router } from "@angular/router";
 
 @Component({
@@ -9,6 +9,9 @@ import { Router } from "@angular/router";
 export class ProgressComponent implements OnInit {
   @Input() step: number;
   @Input() study: string;
+  @Input() internalNavigationOnly = false;
+  @Input() allowBackward = true;
+  @Output() stepClick = new EventEmitter<number>();
 
   constructor(private router: Router) {}
 
@@ -16,6 +19,13 @@ export class ProgressComponent implements OnInit {
 
   redirectTo(component, step, index) {
     if (index < this.step) {
+      if (!this.allowBackward) {
+        return;
+      }
+      if (this.internalNavigationOnly) {
+        this.stepClick.emit(index);
+        return;
+      }
       if (step) {
         this.router.navigate(["/guide/" + step + "/" + component, this.study]);
       } else {

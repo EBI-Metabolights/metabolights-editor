@@ -92,6 +92,7 @@ export class CreateComponent implements OnInit {
   contacts: any[] = [];
   editingContactIndex: number = -1;
   private isManualDelete = false;
+  private isPrimaryContactInitialized = false;
   descriptorControlLists: any = {};
   
   studyCreationForm: UntypedFormGroup;
@@ -138,9 +139,6 @@ export class CreateComponent implements OnInit {
     this.description$.subscribe(v => this.studyDescription = v);
     this.user$.subscribe(user => {
       this.currentUser = user;
-      if (user && (!this.contacts || this.contacts.length === 0)) {
-        this.initializePrimaryContact();
-      }
     });
     this.editorValidationRules$.subscribe((value) => {
       if (value) {
@@ -436,11 +434,16 @@ export class CreateComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.isPrimaryContactInitialized = false;
     this.store.dispatch(new Loading.Disable());
     this.store.dispatch(new StudyCreation.Reset());
   }
   nextSubStep() {
     this.currentSubStep = this.currentSubStep + 1;
+  }
+  
+  onStepClick(step: number) {
+    this.currentSubStep = step;
   }
   
   // Validation Getters
@@ -645,6 +648,15 @@ export class CreateComponent implements OnInit {
 
   initializePrimaryContact() {
       // Create primary contact from Current User
+      if (this.isPrimaryContactInitialized) return;
+      
+      if (this.currentUser && this.currentUser.email) {
+          const exists = this.contacts.some(c => c.email === this.currentUser.email);
+          if (exists) {
+              this.isPrimaryContactInitialized = true;
+              return;
+          }
+      }
       const newContact = {
           firstName: this.currentUser?.firstName || '',
           lastName: this.currentUser?.lastName || '',
@@ -655,6 +667,7 @@ export class CreateComponent implements OnInit {
           roles: [],
           comments: []
       };
+      this.isPrimaryContactInitialized = true;
       this.store.dispatch(new StudyCreation.AddContact(newContact));
   }
   
@@ -927,6 +940,8 @@ export class CreateComponent implements OnInit {
 
     };
 
+    if (this.isLoading) return;
+    this.isLoading = true;
     console.log('Creating study with payload:', JSON.stringify(payload, null, 2));
     this.editorService.createStudy(payload).subscribe({
       next: (res) => {

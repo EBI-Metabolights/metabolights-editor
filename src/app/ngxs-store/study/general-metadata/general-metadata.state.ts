@@ -949,22 +949,25 @@ export class GeneralMetadataState {
     // Helper to serialize Funders and save to comments
     private saveFundersToComments(ctx: StateContext<GeneralMetadataStateModel>, funders: any[]) {
         const state = ctx.getState();
-        let comments = [...(state.comments || [])];
+        const studyId = state.id;
         
-        // Remove existing Funder-related comments
-        comments = comments.filter(c => !['Funder', 'Funder ROR ID', 'Grant Identifier'].includes(c.name));
-
         const names = funders.map(f => f.fundingOrganization.annotationValue).join(';');
         const rorIds = funders.map(f => f.fundingOrganization.termAccession).join(';');
         const grants = funders.map(f => f.grantIdentifier).join(';');
 
-        if (names) comments.push({ name: 'Funder', value: names });
-        if (rorIds) comments.push({ name: 'Funder ROR ID', value: rorIds });
-        if (grants) comments.push({ name: 'Grant Identifier', value: grants });
+        const relevantComments = [];
+        if (names) relevantComments.push({ name: 'Funder', value: names });
+        if (rorIds) relevantComments.push({ name: 'Funder ROR ID', value: rorIds });
+        if (grants) relevantComments.push({ name: 'Grant Identifier', value: grants });
 
-        this.generalMetadataService.updateComments(comments, state.id).subscribe(
+        this.generalMetadataService.updateComments(relevantComments, studyId).subscribe(
             (response) => {
-                ctx.patchState({ comments });
+                let allComments = [...(state.comments || [])];
+                // Remove existing ones from local state to merge
+                allComments = allComments.filter(c => !['Funder', 'Funder ROR ID', 'Grant Identifier'].includes(c.name));
+                allComments = [...allComments, ...relevantComments];
+                
+                ctx.patchState({ comments: allComments });
                 toastr.success('Funding details updated.', "Success");
             },
             (error) => {
@@ -977,20 +980,23 @@ export class GeneralMetadataState {
     // Helper to serialize Related Datasets and save to comments
     private saveRelatedDatasetsToComments(ctx: StateContext<GeneralMetadataStateModel>, datasets: any[]) {
         const state = ctx.getState();
-        let comments = [...(state.comments || [])];
-        
-        // Remove existing Related Dataset comments
-        comments = comments.filter(c => !['Related Data Accession', 'Related Data Repository'].includes(c.name));
+        const studyId = state.id;
 
         const accessions = datasets.map(d => d.accession).join(';');
         const repos = datasets.map(d => d.repository).join(';');
 
-        if (accessions) comments.push({ name: 'Related Data Accession', value: accessions });
-        if (repos) comments.push({ name: 'Related Data Repository', value: repos });
+        const relevantComments = [];
+        if (accessions) relevantComments.push({ name: 'Related Data Accession', value: accessions });
+        if (repos) relevantComments.push({ name: 'Related Data Repository', value: repos });
 
-        this.generalMetadataService.updateComments(comments, state.id).subscribe(
+        this.generalMetadataService.updateComments(relevantComments, studyId).subscribe(
             (response) => {
-                ctx.patchState({ comments });
+                let allComments = [...(state.comments || [])];
+                // Remove existing ones from local state to merge
+                allComments = allComments.filter(c => !['Related Data Accession', 'Related Data Repository'].includes(c.name));
+                allComments = [...allComments, ...relevantComments];
+
+                ctx.patchState({ comments: allComments });
                 toastr.success('Related datasets updated.', "Success");
             },
             (error) => {

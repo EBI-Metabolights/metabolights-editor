@@ -142,6 +142,12 @@ export class StudyCreationState {
   @Action(StudyCreation.AddContact)
   addContact(ctx: StateContext<StudyCreationStateModel>, action: StudyCreation.AddContact) {
       const state = ctx.getState();
+      if (action.contact && action.contact.email) {
+          const exists = state.contacts.some(c => c.email === action.contact.email);
+          if (exists) {
+              return;
+          }
+      }
       ctx.patchState({ contacts: [...state.contacts, action.contact] });
   }
 

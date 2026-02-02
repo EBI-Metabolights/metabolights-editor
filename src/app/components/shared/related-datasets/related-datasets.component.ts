@@ -88,17 +88,10 @@ export class RelatedDatasetsComponent implements OnInit {
       const source = formValue.identifierSource;
       const identifier = formValue.identifier;
       
-      let url = '';
-      if (typeof source === 'object' && source.urlPattern) {
-          url = source.urlPattern.replace('{$id}', identifier);
-      } else {
-          url = ''; 
-      }
-      
       const newDataset = {
           repository: typeof source === 'object' ? source.name : source,
           accession: identifier,
-          url: url 
+          url: '' 
       };
 
       this.saved.emit({ dataset: newDataset, index: this.editingIndex });

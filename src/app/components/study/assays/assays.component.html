@@ -8,7 +8,7 @@
 
   <ng-template #dataLoaded>
     <span *ngIf="studyAssayFiles && studyAssayFiles.length > 0; else noAssays">
-      <div *ngIf="!isReadOnly">
+      <div *ngIf="!isReadOnly" class="is-flex is-justify-content-end" style="justify-content: end;">
         <add-assay></add-assay>
       </div>
       <br />
@@ -40,7 +40,7 @@
       <div class="has-text-centered">
         <p>No Assays Found</p>
         <br />
-        <div *ngIf="!isReadOnly">
+        <div *ngIf="!isReadOnly" class="is-flex is-justify-content-end" style="justify-content: end;">
           <add-assay></add-assay>
         </div>
       </div>
