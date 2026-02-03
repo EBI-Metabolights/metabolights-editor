@@ -154,6 +154,7 @@
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
     <mat-form-field class="full-width bback" appearance="outline">
+      <mat-label>Filter</mat-label>
       <input autocomplete="off" matInput (keyup)="applyFilter($event.target.value)"
         (keydown)="onKeydown($event, $event.target.value)" placeholder="Filter" />
     </mat-form-field>

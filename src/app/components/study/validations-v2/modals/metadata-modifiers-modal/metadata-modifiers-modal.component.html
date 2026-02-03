@@ -22,7 +22,7 @@
           <ng-container matColumnDef="action">
             <mat-header-cell *matHeaderCellDef> Action </mat-header-cell>
             <mat-cell *matCellDef="let s">
-              <span class="tag is-light"
+              <span class="is-light"
                 [ngClass]="{'is-primary': s.action === 'UPDATE', 'is-danger': s.action === 'DELETE', 'is-success': s.action === 'ADD'}">
                 {{ s.action }}
               </span>

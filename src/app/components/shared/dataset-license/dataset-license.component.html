@@ -6,7 +6,7 @@
     @defer (when datasetLicense != null) {
 
     <span *ngIf="datasetLicense && datasetLicense.name.length > 0; else noLicense"
-      class="tag clickable is-success is-info" (click)="goFullText()">
+      class="tag clickable is-link" (click)="goFullText()">
       {{ datasetLicense.name | stripTermsOfUse }}
       <mat-icon>insert_link</mat-icon>
     </span>
