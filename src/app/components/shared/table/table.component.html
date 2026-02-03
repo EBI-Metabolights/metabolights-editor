@@ -282,7 +282,7 @@
                     <mtbls-ontology [id]="'editOntologyColumn'"
                       [validations]="columnValidations(selectedColumn['header'])"
                       [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
-                      [values]="[]" [inline]="true" [rule]="columnControlList(selectedColumn['header']).rule"
+                      [values]="[]" [inline]="true" [rule]="columnControlList(selectedColumn['header'])?.rule"
                       [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
