@@ -44,6 +44,11 @@
   font-weight: bold;
 
 }
+.has-error a {
+  color: #ff5722 !important;
+  font-weight: bold;
+
+}
 
 .validation-warning-icon {
   margin-left: 0.3rem;
