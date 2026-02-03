@@ -9,7 +9,7 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission</h2>
+            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission  -> Start</h2>
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
               <p [class.has-text-danger]="!isAnyAssaySelected" style="margin-bottom: 10px;">
@@ -61,14 +61,14 @@
             <div class="column is-12">
               <div class="is-justify-content-space-between is-align-items-center mb-4">
                 <h3 class="title is-5 has-text-weight-bold" style="margin-bottom: 0;">Contacts*</h3>
-                <button class="button is-primary is-small" style="float: right;" (click)="addNewContact()">+ Add
+                <button class="button is-primary is-small" style="float: right;margin-bottom: 10px;" (click)="addNewContact()">+ Add
                   Contact</button>
               </div>
-              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" style="clear: both;"
+              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" 
                 class="has-text-danger is-size-7 mb-3 ml-2">
                 • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
               </p>
-              <div class="box p-3 is-clearfix">
+              <div class="box p-3 is-clearfix" style="clear:both;">
                 <div class="columns is-multiline">
                   <div class="column is-4" *ngFor="let contact of contacts; let i = index">
                     <div class="card contact-card" [class.invalid-card]="!isContactValid(contact)">
@@ -102,15 +102,14 @@
             <div class="field">
               <div>
                 <mat-checkbox [(ngModel)]="agreements.datasetLicenseAgreement" color="primary">
-                  I accept the terms of the MetaboLights dataset license.
+                  I accept the terms of the MetaboLights dataset license
                   <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
                 </mat-checkbox>
               </div>
               <div>
                 <mat-checkbox [(ngModel)]="agreements.datasetPolicyAgreement" color="primary">
-                  I confirm that I have read and agree to adhere to the MetaboLights data policy.
-                  <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">(View Data
-                    Policy)</a>
+                  I confirm that I have read and agree to adhere to the 
+                  <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">MetaboLights Data Policy</a>.
                 </mat-checkbox>
               </div>
             </div>
@@ -136,7 +135,7 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h2 class="title is-4 has-text-weight-bold mb-5">Study Description</h2>
+            <h2 class="title is-5 has-text-weight-bold mb-5">Study Description</h2>
             <!-- Study Title -->
             <div class="field mb-4">
               <mat-form-field class="full-width" appearance="outline">
@@ -154,7 +153,8 @@
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Study Description (min 60 chars)*</mat-label>
                 <textarea matInput [(ngModel)]="studyDescription"
-                  placeholder="Enter a detailed description of your study" rows="5"></textarea>
+                  placeholder="Please provide a description of your experiment, why not use the abstract of your paper (min 60 chars)
+" rows="5"></textarea>
                 <mat-hint *ngIf="studyDescription && studyDescription.trim().length < 60" class="has-text-danger">
                   Description must be at least 60 characters.
                 </mat-hint>
@@ -252,9 +252,10 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h2 class="title is-4 has-text-weight-bold mb-5">Publication</h2>
-
-            <!-- Publication Title -->
+            <div class="box gray-box mb-4">
+              <h4 class="title is-5 has-text-weight-bold mb-5">Publication</h4>
+              <div class="category-rows-container mt-4">
+                            <!-- Publication Title -->
             <div class="field mb-4">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Publication Title*</mat-label>
@@ -342,9 +343,9 @@
                 </div>
               </div>
             </div>
-
-
-
+              </div>
+              
+            </div>
             <hr />
             <!-- Funding -->
             <mtbls-funding [funders]="funders" (saved)="addFunderCompat($event.funder, $event.index)"

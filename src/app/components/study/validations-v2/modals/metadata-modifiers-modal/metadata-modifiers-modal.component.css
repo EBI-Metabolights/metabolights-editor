@@ -51,10 +51,6 @@ mat-header-cell {
   flex: 0 0 25%;
 }
 
-.mat-column-action {
-  flex: 0 0 100px;
-}
-
 .mat-column-oldValue,
 .mat-column-newValue {
   flex: 1;
@@ -73,4 +69,7 @@ mat-header-cell {
 .modal-card-foot {
   background-color: whitesmoke;
   border-top: 1px solid #dbdbdb;
+}
+.is-justify-content-flex-end {
+  justify-content: flex-end;
 }
