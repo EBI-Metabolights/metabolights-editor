@@ -83,3 +83,6 @@ mat-form-field.margin-normal {
 ::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline {
   border-width: 2px !important;
 }
+::ng-deep .mat-mdc-text-field-wrapper {
+  will-change: opacity, transform, color;
+}
