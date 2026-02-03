@@ -45,7 +45,7 @@
 
 }
 .has-error a {
-  color: #ff5722 !important;
+  color: red !important;
   font-weight: bold;
 
 }
