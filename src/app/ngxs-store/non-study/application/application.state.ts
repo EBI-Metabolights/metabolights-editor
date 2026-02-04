@@ -135,7 +135,6 @@ export class ApplicationState {
     GetEditorVersion(ctx: StateContext<ApplicationStateModel>, action: EditorVersion.Get) {
         this.applicationService.getVersionInfo().subscribe(
             (versionInfo) => {
-                console.log("Loaded version: " + versionInfo.version + "-" + versionInfo.releaseName);
                 ctx.dispatch(new EditorVersion.Set(versionInfo));
             },
             (error) => {
@@ -168,7 +167,6 @@ export class ApplicationState {
     GetBackendVersion(ctx: StateContext<ApplicationStateModel>, action: BackendVersion.Get) {
         this.applicationService.getApiVersionInfo().subscribe(
             (apiVersionInfo) => {
-                console.log("Loaded API version: " + apiVersionInfo.about.api.version);
                 ctx.dispatch(new BackendVersion.Set(apiVersionInfo));
             },
             (error) => {

@@ -9,10 +9,12 @@
         <i class="material-icons" style="font-size: 16px;"> edit </i>
       </span>
       <span class="tag is-default is-small" style="height: auto; padding: 4px 10px; display: block;">
+        <span *ngIf="!isStudyReadOnly && getCategoryLabel(descriptor) as category" class="ml-1"><b>{{ category }}</b> :
+        </span>
         <span class="descriptor-value">
           <ontology-details [value]="descriptor"></ontology-details>
         </span>
-        <span *ngIf="getCategoryLabel(descriptor) as category" class="badge ml-1">{{ category }}</span>
+
       </span>
     </div>
   </div>

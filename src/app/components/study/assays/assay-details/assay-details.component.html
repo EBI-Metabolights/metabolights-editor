@@ -2,13 +2,57 @@
   <div class="column" style="width: 100%; overflow-x: auto">
     <div class="panel-block-wrapper">
       <span *ngIf="assay; else loadingDetail">
-        <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
-          <a (click)="openAddSamplesModal()" class="button is-small is-light">
-            <mat-icon>add</mat-icon> Samples
-          </a>
-          &nbsp;
-          <a (click)="deleteSelectedAssay(assayName)" class="button is-small is-light"><mat-icon>delete</mat-icon>
-            Delete Assay</a>
+        <div>
+          <span *ngIf="assayTypeLabel" class="has-text-weight-semibold">{{ assayTypeLabel }}</span>
+          <span *ngIf="measurementType" class="has-text-weight-semibold"> - {{ measurementType }}</span>
+          <span *ngIf="omicsType" class="has-text-weight-semibold"> - {{ omicsType }}</span>
+        </div>
+        <span class="column is-12 nprl nmrl fadeIn">
+          <div *ngIf="!isReadOnly"
+            style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px;">
+            <div>
+              <a (click)="openAddSamplesModal()" class="button is-small is-primary">
+                <mat-icon>add</mat-icon> Samples
+              </a>
+              &nbsp;
+              <a (click)="openEditAssayModal()" class="button is-small is-primary">
+                <mat-icon>edit</mat-icon> Edit Assay
+              </a>
+              &nbsp;
+              <a (click)="deleteSelectedAssay(assayName)" class="button is-small is-primary">
+                <mat-icon>delete</mat-icon> Delete Assay
+              </a>
+            </div>
+          </div>
+
+          <!-- Design Descriptors Section -->
+          <div class="card mb-4" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
+            <header class="card-header"
+              style="box-shadow: none; background: transparent; border-bottom: 1px solid #f1f1f4; min-height: 40px;">
+              <p class="card-header-title is-size-7 has-text-grey-dark" style="padding: 0.5rem 0.75rem;">
+                Assay Descriptors
+                <span class="icon is-small ml-2 has-text-grey-light">
+                  <mat-icon style="font-size: 16px; height: 16px; width: 16px;"
+                    matTooltip="Descriptors describe the assay">help</mat-icon>
+                </span>
+              </p>
+            </header>
+            <div class="card-content p-2" style="min-height: 48px;">
+              <div *ngIf="designDescriptors.length > 0; else noDescriptors"
+                class="field is-grouped is-grouped-multiline">
+                <div *ngFor="let descriptor of designDescriptors; let i = index">
+                  <div class="control">
+                    <div class="tags has-addons">
+                      <span class="tag is-white is-size-7">{{ descriptor.annotationValue }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noDescriptors>
+                <p class="has-text-grey is-size-7 is-italic m-0 ml-2">No design descriptors added.</p>
+              </ng-template>
+            </div>
+          </div>
         </span>
         <div *ngIf="!isReadOnly" class="notification is-primary">
           <small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. <span
@@ -92,3 +136,4 @@
     </footer>
   </div>
 </div>
+<add-assay #editAssayModal mode="edit" [assayData]="assayInfo"></add-assay>

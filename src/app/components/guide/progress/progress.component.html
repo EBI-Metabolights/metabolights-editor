@@ -23,7 +23,7 @@
       </p>
     </div>
   </div>
-  <div class="step-item" [ngClass]="{ 'is-active': step == 3, 'is-completed': step > 3 }">
+  <div *ngIf="!hidePublicationStep" class="step-item" [ngClass]="{ 'is-active': step == 3, 'is-completed': step > 3 }">
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">

@@ -34,6 +34,7 @@ export interface IMtblsStudySummaryInformation {
   createdAt: string;
   datasetLicense: string;
   datasetLicenseUrl: string;
+  mhdAccession?: string;
 }
 
 export class IStudyRevision {

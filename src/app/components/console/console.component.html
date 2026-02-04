@@ -57,7 +57,7 @@
           <span class="panel-block">
             <span class="px-2 py-1">
               <h2 class="has-text-weight-bold">
-                <b>{{ study.accession }}:
+                <b>{{ getDisplayAccession(study) }}:
                   <span *ngIf="
                       study.title.replace(' ', '') == '';
                       else noStudyTitle
@@ -95,12 +95,12 @@
                   </div>
                 </div>
 
-                <div class="control py-0 mb0">
+                <!-- <div class="control py-0 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Sample type</span>
                     <span class="tag is-info">{{ getSampleTypeLabel(study.sampleTemplate) }}</span>
                   </div>
-                </div>
+                </div> -->
 
                 <div class="control py-0 mb0">
                   <div class="tags has-addons">

@@ -80,7 +80,6 @@ export class MetabolightsService extends DataService {
         }
         if (this.url.guides.endsWith("/")) {
             this.url.guides = this.url.guides.slice(0, -1);
-            console.log(this.url.guides)
         }
         this.setUpSubscriptionsNgxs();
 

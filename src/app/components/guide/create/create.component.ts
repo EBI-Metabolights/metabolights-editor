@@ -303,7 +303,6 @@ export class CreateComponent implements OnInit {
       
       this.selectedInvestigationFileTemplate = defaultInvestigationTemplateId;
       
-      console.log('Resolved Investigation Template ID:', this.selectedInvestigationFileTemplate);
       this.studyCreationForm.controls['investigationFileTemplate']?.setValue(this.selectedInvestigationFileTemplate);
 
       // License Information
@@ -869,52 +868,24 @@ export class CreateComponent implements OnInit {
              roles: c.roles || []
         };
     });
-    // Factors (Mapped from Wizard Step 2 if single, else dummy)
-    let factors = [];
-    if (isMultipleCategories) {
-        factors = [
-            {
-                comments: [],
-                factorName: "Disease",
-                factorType: {
-                    comments: [],
-                    termAccession: "http://www.ebi.ac.uk/efo/EFO_0000408",
-                    annotationValue: "disease",
-                    termSource: { comments: [], description: "", file: "", name: "EFO", version: "" }
-                }
-            }
-        ];
-    } else {
-        factors = this.factors.map(f => ({
-            comments: f.comments || [],
-            factorName: f.factorName,
-            factorType: {
-                 comments: f.factorType?.comments || [],
-                 termAccession: f.factorType?.termAccession || '',
-                 annotationValue: f.factorType?.annotationValue || '',
-                 termSource: f.factorType?.termSource || { comments: [], description: "", file: "", name: "EFO", version: "" }
-            }
-        }));
-    }
-    // Design Descriptors (Mapped from Wizard Step 2 if single, else dummy)
-    let designDescriptors = [];
-    if (isMultipleCategories) {
-        designDescriptors = [
-             {
-                comments: [{ name: "Study Design Type Category", value: "disease" }, { name: "Study Design Type Source", value: "submitter" }],
-                annotationValue: "cancer",
-                termSource: { comments: [], name: "MONDO", file: "", version: "", description: "" },
-                termAccession: "http://purl.obolibrary.org/obo/MONDO_0004992"
-            }
-        ];
-    } else {
-        designDescriptors = this.designDescriptors.map(d => ({
-            comments: d.comments || [], 
-            annotationValue: d.annotationValue || '',
-            termAccession: d.termAccession || '',
-            termSource: d.termSource || { comments: [], name: '', file: '', version: '', description: '' }
-        }));
-    }
+    // Factors (Mapped from Wizard Step 2)
+    const factors = this.factors.map(f => ({
+        comments: f.comments || [],
+        factorName: f.factorName,
+        factorType: {
+             comments: f.factorType?.comments || [],
+             termAccession: f.factorType?.termAccession || '',
+             annotationValue: f.factorType?.annotationValue || '',
+             termSource: f.factorType?.termSource || { comments: [], description: "", file: "", name: "EFO", version: "" }
+        }
+    }));
+    // Design Descriptors (Mapped from Wizard Step 2)
+    const designDescriptors = this.designDescriptors.map(d => ({
+        comments: d.comments || [], 
+        annotationValue: d.annotationValue || '',
+        termAccession: d.termAccession || '',
+        termSource: d.termSource || { comments: [], name: '', file: '', version: '', description: '' }
+    }));
     const payload = {
         selectedTemplateVersion: this.templateConfiguration?.defaultTemplateVersion || "1.0",
         selectedStudyCategories: selectedStudyCategories,
@@ -941,7 +912,6 @@ export class CreateComponent implements OnInit {
 
     };
 
-    console.log('Creating study with payload:', JSON.stringify(payload, null, 2));
     this.editorService.createStudy(payload).subscribe({
       next: (res) => {
         // Dispatch common actions

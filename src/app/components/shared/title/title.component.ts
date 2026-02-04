@@ -27,6 +27,7 @@ export class TitleComponent implements OnInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
+  mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
@@ -35,6 +36,7 @@ export class TitleComponent implements OnInit {
 
   isReadOnly = false;
   requestedStudy: string = null;
+  mhdAccession: string = null;
   title = "";
   validations: any;
   form: UntypedFormGroup;
@@ -83,13 +85,12 @@ export class TitleComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
-        if (document.title.indexOf("|") > -1) {
-          document.title =
-            this.requestedStudy + " | " + document.title.split(" | ")[1];
-        } else {
-          document.title = this.requestedStudy + " | ";
-        }
+        this.updateDocumentTitle();
       }
+    });
+    this.mhdAccession$.subscribe((value) => {
+      this.mhdAccession = value;
+      this.updateDocumentTitle();
     });
     this.readonly$.subscribe((value) => {
       if (value != null) {
@@ -140,6 +141,24 @@ export class TitleComponent implements OnInit {
     return {
       title,
     };
+  }
+
+  updateDocumentTitle() {
+    if (this.requestedStudy) {
+      const displayAcc = this.getDisplayAccession();
+      if (document.title.indexOf("|") > -1) {
+        document.title = displayAcc + " | " + document.title.split(" | ")[1];
+      } else {
+        document.title = displayAcc + " | ";
+      }
+    }
+  }
+
+  getDisplayAccession(): string {
+    if (this.mhdAccession && this.mhdAccession !== "" && this.mhdAccession !== this.requestedStudy) {
+      return `${this.mhdAccession} (${this.requestedStudy})`;
+    }
+    return this.requestedStudy;
   }
 
   get validation() {

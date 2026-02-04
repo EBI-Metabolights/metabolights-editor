@@ -1078,4 +1078,18 @@ export class EditorService {
       })
     );
   }
+
+  updateAssayComments(studyId: string, assayName: string, payload: any): Observable<any> {
+    const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/assays/comments`;
+    const updatedPayload = {
+        assay_name: assayName,
+        ...payload
+    };
+    return this.http.patch(url, updatedPayload, httpOptions).pipe(
+      catchError(err => {
+        console.error('Error updating assay comments:', err);
+        return this.dataService.handleError(err);
+      })
+    );
+  }
 }

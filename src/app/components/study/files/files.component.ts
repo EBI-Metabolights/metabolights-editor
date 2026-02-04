@@ -206,7 +206,6 @@ onGlobusDownload() {
   this.isGlobusModalActive = true;
 }
 closeGlobusModal() {
-  console.log('hitting globus closing method')
   this.isGlobusModalActive = false;
 }
 
@@ -648,8 +647,7 @@ closeGlobusModal() {
   }
 
   deletionEnabledDebug(file: StudyFile): boolean {
-    console.log(file.type);
-    console.log(file);
+  
     if (file.type === "audit" && this.curator == false) return false
     return !this.MANAGED_FOLDERS.includes(file.file);
   }
