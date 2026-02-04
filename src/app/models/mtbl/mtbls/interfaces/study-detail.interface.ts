@@ -12,6 +12,7 @@ export interface IStudyDetail {
   revisionDatetime: string;
   studyCategory?: string;
   sampleTemplate?: string;
+  mhdAccession?: string;
 }
 
 export interface IStudyDetailWrapper {

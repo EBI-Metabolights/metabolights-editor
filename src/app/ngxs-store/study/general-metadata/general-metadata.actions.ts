@@ -186,6 +186,13 @@ export namespace PublicAsperaPath {
   }
 }
 
+export namespace MhdAccession {
+  export class Set{
+      static readonly type = '[general] Set Mhd Accession'
+      constructor(public mhdAccession: string) {}
+  }
+}
+
 export namespace RevisionStatus {
 
   export class Set{

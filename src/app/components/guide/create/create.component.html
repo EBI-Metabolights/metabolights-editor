@@ -1,7 +1,8 @@
 <nav-bar mode="light"></nav-bar>
 <div class="container fixed-navbar-offset">
   <mtbls-progress [study]="newStudy" [step]="currentSubStep" [internalNavigationOnly]="true"
-    (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4"></mtbls-progress>
+    (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4"
+    [hidePublicationStep]="false"></mtbls-progress>
 
   <div [ngSwitch]="currentSubStep">
     <!-- Step 1: Submission Details -->
@@ -9,7 +10,7 @@
       <div class="columns is-centered mt-4">
         <div class="column is-10">
           <div class="box">
-            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission  -> Start</h2>
+            <h2 class="title is-4 has-text-weight-bold mb-5">New Submission -> Start</h2>
             <!-- Categories & Assays -->
             <div class="box gray-box mb-4">
               <p [class.has-text-danger]="!isAnyAssaySelected" style="margin-bottom: 10px;">
@@ -19,7 +20,7 @@
               <div class="category-rows-container mt-4">
                 <div class="category-box mb-3" *ngFor="let cat of activeCategories">
                   <div class="columns is-vcentered">
-                    <div class="column is-3 py-1">
+                    <div class="column is-2 py-1">
                       <span class="is-size-7 has-text-weight-bold has-text-grey">{{cat.label}}</span>
                     </div>
                     <div class="column py-1">
@@ -61,11 +62,11 @@
             <div class="column is-12">
               <div class="is-justify-content-space-between is-align-items-center mb-4">
                 <h3 class="title is-5 has-text-weight-bold" style="margin-bottom: 0;">Contacts*</h3>
-                <button class="button is-primary is-small" style="float: right;margin-bottom: 10px;" (click)="addNewContact()">+ Add
+                <button class="button is-primary is-small" style="float: right;margin-bottom: 10px;"
+                  (click)="addNewContact()">+ Add
                   Contact</button>
               </div>
-              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" 
-                class="has-text-danger is-size-7 mb-3 ml-2">
+              <p *ngIf="contacts.length > 0 && !hasPrincipalInvestigator" class="has-text-danger is-size-7 mb-3 ml-2">
                 • No Principal Investigator found. At least one contact must have the 'Principal Investigator' role.
               </p>
               <div class="box p-3 is-clearfix" style="clear:both;">
@@ -101,15 +102,18 @@
             <!-- Agreements -->
             <div class="field">
               <div>
-                <mat-checkbox [(ngModel)]="agreements.datasetLicenseAgreement" color="primary">
+                <mat-checkbox [(ngModel)]="agreements.datasetLicenseAgreement" color="primary"
+                  [class.warn-unchecked]="!agreements.datasetLicenseAgreement">
                   I accept the terms of the MetaboLights dataset license
                   <a target="_blank" [href]="licenseUrl" *ngIf="licenseUrl" class="ml-1">( {{licenseName}} )</a>
                 </mat-checkbox>
               </div>
               <div>
-                <mat-checkbox [(ngModel)]="agreements.datasetPolicyAgreement" color="primary">
-                  I confirm that I have read and agree to adhere to the 
-                  <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank" class="ml-1">MetaboLights Data Policy</a>.
+                <mat-checkbox [(ngModel)]="agreements.datasetPolicyAgreement" color="primary"
+                  [class.warn-unchecked]="!agreements.datasetPolicyAgreement">
+                  I confirm that I have read and agree to adhere to the
+                  <a href="https://www.ebi.ac.uk/metabolights/editor/datapolicy" target="_blank"
+                    class="ml-1">MetaboLights Data Policy</a>.
                 </mat-checkbox>
               </div>
             </div>
@@ -152,8 +156,7 @@
             <div class="field mb-4">
               <mat-form-field class="full-width" appearance="outline">
                 <mat-label>Study Description (min 60 chars)*</mat-label>
-                <textarea matInput [(ngModel)]="studyDescription"
-                  placeholder="Please provide a description of your experiment, why not use the abstract of your paper (min 60 chars)
+                <textarea matInput [(ngModel)]="studyDescription" placeholder="Please provide a description of your experiment, why not use the abstract of your paper (min 60 chars)
 " rows="5"></textarea>
                 <mat-hint *ngIf="studyDescription && studyDescription.trim().length < 60" class="has-text-danger">
                   Description must be at least 60 characters.
@@ -255,96 +258,96 @@
             <div class="box gray-box mb-4">
               <h4 class="title is-5 has-text-weight-bold mb-5">Publication</h4>
               <div class="category-rows-container mt-4">
-                            <!-- Publication Title -->
-            <div class="field mb-4">
-              <mat-form-field class="full-width" appearance="outline">
-                <mat-label>Publication Title*</mat-label>
-                <input matInput type="text" [(ngModel)]="publicationTitle" placeholder="Publication Title">
-                <mat-hint *ngIf="fieldValidation('publications.publication.title').description">
-                  {{ fieldValidation('publications.publication.title').description }}
-                </mat-hint>
-              </mat-form-field>
-            </div>
-
-            <!-- Row 1: Authors and Status -->
-            <div class="columns mb-3">
-              <div class="column is-6 pb-0">
-                <div class="field">
+                <!-- Publication Title -->
+                <div class="field mb-4">
                   <mat-form-field class="full-width" appearance="outline">
-                    <mat-label>Publication Authors</mat-label>
-                    <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors"
-                      required>
-                    <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
+                    <mat-label>Publication Title*</mat-label>
+                    <input matInput type="text" [(ngModel)]="publicationTitle" placeholder="Publication Title">
+                    <mat-hint *ngIf="fieldValidation('publications.publication.title').description">
+                      {{ fieldValidation('publications.publication.title').description }}
+                    </mat-hint>
                   </mat-form-field>
                 </div>
-              </div>
-              <div class="column is-6 pb-0">
-                <div class="field">
-                  <div class="control">
-                    <ng-container
-                      *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
-                      <!-- Keep mtbls-ontology as is since it was already redesigned for premium Material -->
-                      <label class="label is-small">Publication Status*</label>
-                      <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
-                        (changed)="onPublicationStatusChange($event)"
-                        [validations]="fieldValidation('publications.publication.status')" [inline]="true"
-                        [rule]="publicationStatusControlList?.rule"
-                        [defaultOntologies]="publicationStatusControlList?.defaultOntologies">
-                      </mtbls-ontology>
-                    </ng-container>
-                    <ng-template #publicationStatusDropdown>
-                      <div *ngIf="publicationStatusControlList?.values?.length">
+
+                <!-- Row 1: Authors and Status -->
+                <div class="columns mb-3">
+                  <div class="column is-6 pb-0">
+                    <div class="field">
+                      <mat-form-field class="full-width" appearance="outline">
+                        <mat-label>Publication Authors</mat-label>
+                        <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors"
+                          required>
+                        <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                  <div class="column is-6 pb-0">
+                    <div class="field">
+                      <div class="control">
+                        <ng-container
+                          *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
+                          <!-- Keep mtbls-ontology as is since it was already redesigned for premium Material -->
+                          <label class="label is-small">Publication Status*</label>
+                          <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
+                            (changed)="onPublicationStatusChange($event)"
+                            [validations]="fieldValidation('publications.publication.status')" [inline]="true"
+                            [rule]="publicationStatusControlList?.rule"
+                            [defaultOntologies]="publicationStatusControlList?.defaultOntologies">
+                          </mtbls-ontology>
+                        </ng-container>
+                        <ng-template #publicationStatusDropdown>
+                          <div *ngIf="publicationStatusControlList?.values?.length">
+                            <mat-form-field class="full-width" appearance="outline">
+                              <mat-label>Publication Status*</mat-label>
+                              <mat-select [value]="publicationStatus[0]?.annotationValue"
+                                (selectionChange)="onPublicationStatusChange($event.value)">
+                                <mat-option *ngFor="let option of publicationStatusControlList.values"
+                                  [value]="option.annotationValue">
+                                  {{ option.annotationValue }}
+                                </mat-option>
+                              </mat-select>
+                              <mat-hint>{{ fieldValidation('publications.publication.status').description }}</mat-hint>
+                            </mat-form-field>
+                          </div>
+                        </ng-template>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Row 2: DOI and PubMed ID -->
+                <div class="columns mb-3">
+                  <div class="column is-6 pb-0">
+                    <div class="field">
+                      <div class="control">
+                        <mat-form-field class="full-width" appearance="outline"
+                          [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
+                          <mat-label>DOI<span *ngIf="isDoiRequired">*</span></mat-label>
+                          <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
+                            [required]="isDoiRequired">
+                          <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
+                            <span *ngIf="isDoiRequired"><b>(required)</b></span>
+                          </mat-hint>
+                        </mat-form-field>
+                        <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="column is-6 pb-0">
+                    <div class="field">
+                      <div class="control">
                         <mat-form-field class="full-width" appearance="outline">
-                          <mat-label>Publication Status*</mat-label>
-                          <mat-select [value]="publicationStatus[0]?.annotationValue"
-                            (selectionChange)="onPublicationStatusChange($event.value)">
-                            <mat-option *ngFor="let option of publicationStatusControlList.values"
-                              [value]="option.annotationValue">
-                              {{ option.annotationValue }}
-                            </mat-option>
-                          </mat-select>
-                          <mat-hint>{{ fieldValidation('publications.publication.status').description }}</mat-hint>
+                          <mat-label>PubMed ID</mat-label>
+                          <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID">
+                          <mat-hint>{{ fieldValidation('publications.publication.pubmedId').description }}</mat-hint>
                         </mat-form-field>
                       </div>
-                    </ng-template>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Row 2: DOI and PubMed ID -->
-            <div class="columns mb-3">
-              <div class="column is-6 pb-0">
-                <div class="field">
-                  <div class="control">
-                    <mat-form-field class="full-width" appearance="outline"
-                      [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
-                      <mat-label>DOI<span *ngIf="isDoiRequired">*</span></mat-label>
-                      <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
-                        [required]="isDoiRequired">
-                      <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
-                        <span *ngIf="isDoiRequired"><b>(required)</b></span>
-                      </mat-hint>
-                    </mat-form-field>
-                    <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="column is-6 pb-0">
-                <div class="field">
-                  <div class="control">
-                    <mat-form-field class="full-width" appearance="outline">
-                      <mat-label>PubMed ID</mat-label>
-                      <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID">
-                      <mat-hint>{{ fieldValidation('publications.publication.pubmedId').description }}</mat-hint>
-                    </mat-form-field>
-                  </div>
-                </div>
-              </div>
-            </div>
-              </div>
-              
             </div>
             <hr />
             <!-- Funding -->

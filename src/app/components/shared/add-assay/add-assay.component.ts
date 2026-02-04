@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
@@ -20,7 +20,7 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
   templateUrl: "./add-assay.component.html",
   styleUrls: ["./add-assay.component.css"],
 })
-export class AddAssayComponent implements OnInit {
+export class AddAssayComponent implements OnInit, OnChanges {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
@@ -28,6 +28,9 @@ export class AddAssayComponent implements OnInit {
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   assayFileHeaderTemplates$: Observable<any> = inject(Store).select(ApplicationState.assayFileHeaderTemplates);
   controlLists$: Observable<any> = inject(Store).select(ApplicationState.controlLists);
+  
+  @Input() mode: 'add' | 'edit' = 'add';
+  @Input() assayData: any = null;
 
   requestedStudy: string = null;
   validations: any = null;
@@ -63,7 +66,7 @@ export class AddAssayComponent implements OnInit {
     assayType: ["", Validators.required],
     measurementType: ["", Validators.required],
     omics: ["", Validators.required],
-    assayId: ["01", Validators.required],
+    assayId: ["01"],
   });
 
   designDescriptors: Ontology[] = [];
@@ -79,6 +82,122 @@ export class AddAssayComponent implements OnInit {
     this.setUpSubscriptionsNgxs();
   }
   ngOnInit(): void {
+  }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.assayData && this.mode === 'edit' && this.assayData && this.activeAssayFileTemplates.length > 0) {
+        this.populateFormFromComments();
+    }
+  }
+
+  populateFormFromComments() {
+    if (!this.assayData || !this.assayData.comments) return;
+
+    const comments = this.assayData.comments;
+    const getValue = (name: string) => comments.find(c => c.name === name)?.value || "";
+
+    const assayTypeComment = getValue('Assay Type').trim();
+    const assayTypeLabelComment = getValue('Assay Type Label').trim();
+    
+    // 1. Match Assay Type against available templates
+    let assayType = "";
+    const searchMatch = (opt: any, searchStr: string) => {
+        if (!searchStr) return false;
+        const lowerSearch = searchStr.toLowerCase();
+        return (opt.value && opt.value.toLowerCase() === lowerSearch) || 
+               (opt.label && opt.label.toLowerCase() === lowerSearch);
+    };
+
+    const matchedAssayOption = this.activeAssayFileTemplates.find(a => 
+        searchMatch(a, assayTypeComment) || searchMatch(a, assayTypeLabelComment)
+    );
+    
+    if (matchedAssayOption) {
+        assayType = matchedAssayOption.value;
+    } else if (assayTypeComment || assayTypeLabelComment) {
+        const fallbackValue = assayTypeComment || assayTypeLabelComment;
+        // Check if already in list to avoid duplicates
+        if (!this.activeAssayFileTemplates.find(a => searchMatch(a, fallbackValue))) {
+            this.activeAssayFileTemplates.push({ value: fallbackValue, label: fallbackValue });
+        }
+        assayType = fallbackValue;
+    }
+
+    // Ensure dynamic sections (measurement types, etc.) are populated for this assayType
+    if (assayType) {
+        this.updateDynamicSections(assayType);
+    }
+
+    // 2. Match Measurement Type
+    const measurementTypeComment = getValue('Measurement Type').trim();
+    const measurementTypeAnnotation = this.assayData.measurementType?.annotationValue || "";
+    let measurementType = "";
+    const measurementOption = this.activeMeasurementTypes.find(m => 
+        searchMatch(m, measurementTypeComment) || 
+        searchMatch(m, measurementTypeAnnotation) || 
+        searchMatch(m, assayTypeLabelComment)
+    );
+    if (measurementOption) {
+        measurementType = measurementOption.value;
+    } else if (measurementTypeAnnotation || measurementTypeComment) {
+        measurementType = measurementTypeAnnotation || measurementTypeComment;
+    }
+
+    // 3. Match Omics
+    const omicsCommentRaw = getValue('Omics Type').trim();
+    let omics = "";
+    const omicsOption = this.activeOmicsTypes.find(o => 
+        searchMatch(o, omicsCommentRaw)
+    );
+    if (omicsOption) {
+        omics = omicsOption.value;
+    }
+
+    // Extract assayId from filename: a_MTBLSxxx-01_...
+    let assayId = "01";
+    if (this.assayData.filename) {
+        const match = this.assayData.filename.match(/-(\d+)_/);
+        if (match) {
+            assayId = match[1];
+        }
+    }
+
+    this.assayForm.patchValue({
+        assayType,
+        measurementType,
+        omics,
+        assayId
+    }, { emitEvent: false }); // Avoid triggering extra dynamic section updates
+
+    // Parse Design Descriptors
+    const descriptors = getValue('Assay Descriptor');
+    const accessions = getValue('Assay Descriptor Term Accession Number');
+    const refs = getValue('Assay Descriptor Term Source REF');
+
+    if (descriptors) {
+        const descArray = descriptors.split(';');
+        const accArray = accessions ? accessions.split(';') : [];
+        const refArray = refs ? refs.split(';') : [];
+
+        this.designDescriptors = descArray.map((name, i) => {
+            const ontology = new Ontology();
+            ontology.annotationValue = name;
+            ontology.termAccession = accArray[i] || "";
+            const ts = new OntologySourceReference();
+            ts.name = refArray[i] || "";
+            ontology.termSource = ts;
+            return ontology;
+        });
+    }
+
+    if (this.mode === 'edit') {
+        const assayTypeControl = this.assayForm.get('assayType');
+        assayTypeControl.disable();
+        
+        // Ensure Omics and Measurement Type are also enabled for editing if they were disabled
+        this.assayForm.get('omics').enable();
+        this.assayForm.get('measurementType').enable();
+    }
   }
 
   initDefaultDescriptors() {
@@ -159,8 +278,8 @@ export class AddAssayComponent implements OnInit {
                 // Use assayTemplates itself as the configMap if it contains labels and order
                 this.activeAssayFileTemplates = this.processOptions(assayKeys, assayTemplates);
 
-                // Filter by Study Category (Case-insensitive)
-                if (this.studyCategory) {
+                // Filter by Study Category (Case-insensitive) - ONLY for Add mode or if not set
+                if (this.studyCategory && this.mode === 'add') {
                     const categoryLower = this.studyCategory.toLowerCase();
                     this.activeAssayFileTemplates = this.activeAssayFileTemplates.filter(item => 
                         item.value.toLowerCase().includes(categoryLower) || 
@@ -198,17 +317,21 @@ export class AddAssayComponent implements OnInit {
                 //     this.assayForm.patchValue({ assayType: this.activeAssayFileTemplates[0].value });
                 // }
 
-                // Trigger update if assay type is already selected (e.g. default)
-                 const currentAssayType = this.assayForm.get('assayType').value;
-                 if (currentAssayType) {
-                     this.updateDynamicSections(currentAssayType);
-                 } else {
-                     this.dynamicSections = [];
-                 }
-            }
-        }
-    });
-  }
+                 // Trigger update if assay type is already selected (e.g. default)
+                  const currentAssayType = this.assayForm.get('assayType').value;
+                  if (currentAssayType) {
+                      this.updateDynamicSections(currentAssayType);
+                  } else {
+                      this.dynamicSections = [];
+                  }
+
+                  if (this.mode === 'edit' && this.assayData) {
+                    this.populateFormFromComments();
+                  }
+             }
+         }
+     });
+   }
 
   processOptions(keys: any, configMap: any): any[] {
       if (!keys || !configMap) return [];
@@ -235,7 +358,6 @@ export class AddAssayComponent implements OnInit {
   }
 
   updateDynamicSections(assayType: string) {
-      console.log('updateDynamicSections called with:', assayType);
       
       if (!this.templateConfiguration || !this.currentTemplateVersion || !this.assayHeaderTemplates) {
           console.warn('Missing config deps:', {
@@ -304,7 +426,11 @@ export class AddAssayComponent implements OnInit {
 
                    if (!colDef) return null;
 
-                   const isRequired = colDef.required;
+                   const isRequired = colDef.required === true || 
+                                      colDef.required === 'true' || 
+                                      colDef.required === '1' || 
+                                      colDef.required === 1 ||
+                                      (typeof colDef.required === 'string' && colDef.required.toLowerCase() === 'yes');
                    let fieldType = 'TEXT';
                    if (colDef.columnStructure === 'ONTOLOGY_COLUMN') fieldType = 'ONTOLOGY';
                    if (colDef.columnStructure === 'SINGLE_COLUMN_AND_UNIT_ONTOLOGY') fieldType = 'TEXT_AND_ONTOLOGY';
@@ -318,10 +444,13 @@ export class AddAssayComponent implements OnInit {
                    touchedControls.add(controlName);
                    
                    const currentControl = this.assayForm.get(controlName);
+                   // Skip validators in Edit mode as fields are hidden
+                   const validators = (this.mode === 'edit') ? null : (isRequired ? Validators.required : null);
+                   
                    if (!currentControl) {
-                        this.assayForm.addControl(controlName, this.fb.control(colDef.defaultValue || '', isRequired ? Validators.required : null));
+                        this.assayForm.addControl(controlName, this.fb.control(colDef.defaultValue || '', validators));
                    } else {
-                        currentControl.setValidators(isRequired ? Validators.required : null);
+                        currentControl.setValidators(validators);
                         currentControl.updateValueAndValidity();
                    }
 
@@ -457,13 +586,13 @@ export class AddAssayComponent implements OnInit {
 
   onMeasurementTypeChange(selectedOption: any) {
       if (selectedOption && selectedOption.ontology) {
-          console.log("Selected Measurement Ontology:", selectedOption.ontology);
+        //   console.log("Selected Measurement Ontology:", selectedOption.ontology);
       }
   }
 
   onOmicsTypeChange(selectedOption: any) {
       if (selectedOption && selectedOption.ontology) {
-          console.log("Selected Omics Ontology:", selectedOption.ontology);
+        //   console.log("Selected Omics Ontology:", selectedOption.ontology);
       }
   }
 
@@ -566,6 +695,11 @@ export class AddAssayComponent implements OnInit {
         return dd;
     });
 
+    if (this.mode === 'edit') {
+        this.saveEditAssay(formattedDescriptors);
+        return;
+    }
+
     // 2. Format Dynamic Fields (assayFileDefaultValues)
     const assayFileDefaultValues = [];
     this.dynamicSections.forEach(section => {
@@ -620,18 +754,18 @@ export class AddAssayComponent implements OnInit {
         });
     });
 
+    const formValues = this.assayForm.getRawValue();
     const payload = {
-      selectedAssayFileTemplate: this.assayForm.get('assayType').value,
+      selectedAssayFileTemplate: formValues.assayType,
       assayIdentifier: null,
       assayResultFileType: "maf",
       assayResultFileName: null,
-      selectedMeasurementType: this.assayForm.get('measurementType').value || '', 
-      selectedOmicsType: this.assayForm.get('omics').value || '',
+      selectedMeasurementType: formValues.measurementType || '', 
+      selectedOmicsType: formValues.omics || '',
       designDescriptors: formattedDescriptors,
       assayFileDefaultValues: assayFileDefaultValues
     };
 
-    console.log('Final Payload for API:', payload);
     
     this.editorService.addAssay(this.requestedStudy, payload).subscribe(
         (response) => {
@@ -656,6 +790,59 @@ export class AddAssayComponent implements OnInit {
           });
         }
     );
+  }
+
+  saveEditAssay(formattedDescriptors: any[]) {
+      const formValues = this.assayForm.getRawValue();
+      
+      const assayOption = this.activeAssayFileTemplates.find(a => a.value === formValues.assayType);
+      const assayLabel = assayOption ? assayOption.ontologyTerm.term : formValues.assayType;
+
+      const measurementKey = formValues.measurementType;
+      const measurementOption = this.activeMeasurementTypes.find(m => m.value === measurementKey);
+      const measurementLabel = measurementOption ? measurementOption.label : measurementKey;
+
+      const omicsKey = formValues.omics;
+      const omicsOption = this.activeOmicsTypes.find(o => o.value === omicsKey);
+      const omicsLabel = omicsOption ? omicsOption.label : omicsKey;
+
+      const payload = {
+          fields: {
+              measurementType: measurementLabel
+          },
+          comments: [
+              { name: "Assay Type", value: assayLabel }, // e.g. "liquid chromatography mass spectrometry assay"
+              { name: "Assay Type Label", value: formValues.assayType }, // e.g. "LC-MS" (key)
+              { name: "Omics Type", value: omicsLabel },
+              { name: "Assay Descriptor", value: this.designDescriptors.map(d => d.annotationValue).join(';') },
+              { name: "Assay Descriptor Term Accession Number", value: this.designDescriptors.map(d => d.termAccession).join(';') },
+              { name: "Assay Descriptor Term Source REF", value: this.designDescriptors.map(d => d.termSource?.name).join(';') }
+          ]
+      };
+
+      this.editorService.updateAssayComments(this.requestedStudy, this.assayData.filename, payload).subscribe(
+          (response) => {
+              this.isAddAssayModalOpen = false;
+              Swal.fire({
+                  title: "Assay updated!",
+                  text: "Your assay has been successfully updated.",
+                  type: "success",
+                  confirmButtonColor: "#10c1e5",
+              });
+              // Refresh both Assay List and Protocols
+              this.store.dispatch(new AssayList.Get(this.requestedStudy));
+              this.store.dispatch(new Protocols.Get());
+          },
+          (error) => {
+              console.error('API Error:', error);
+              Swal.fire({
+                  title: "Error updating assay",
+                  text: error.message || "An unexpected error occurred while updating the assay.",
+                  type: "error",
+                  confirmButtonColor: "#DD6B55",
+              });
+          }
+      );
   }
 
 

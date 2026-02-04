@@ -2,7 +2,7 @@
   <span class="copy-btn" (click)="copyTitle()"><mat-icon matTooltip="Copy content">content_copy</mat-icon></span>
   <h2 #contentToCopy class="title is-3">
     <b>
-      <span>{{ requestedStudy }}: </span><span [innerHTML]="title" class="clickable" (click)="openModal()"
+      <span>{{ getDisplayAccession() }}: </span><span [innerHTML]="title" class="clickable" (click)="openModal()"
         matTooltip="Click in here to edit" [matTooltipDisabled]="isReadOnly"></span>
     </b>
 

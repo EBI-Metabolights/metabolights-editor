@@ -280,3 +280,19 @@ hr {
 ::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__trailing {
   border-color: #00d1b2 !important;
 }
+
+.warn-unchecked {
+  --mdc-checkbox-unselected-icon-color: #ff3860 !important;
+  --mdc-checkbox-unselected-hover-icon-color: #ff3860 !important;
+  --mdc-checkbox-unselected-focus-icon-color: #ff3860 !important;
+  --mdc-checkbox-unselected-pressed-icon-color: #ff3860 !important;
+}
+
+::ng-deep .mat-mdc-checkbox.warn-unchecked .mdc-label {
+  color: #ff3860;
+  transition: color 0.3s ease;
+}
+
+::ng-deep .mat-mdc-checkbox.warn-unchecked.mat-mdc-checkbox-checked .mdc-label {
+  color: inherit;
+}

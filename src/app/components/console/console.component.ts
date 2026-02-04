@@ -176,7 +176,14 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   getString(s) {
-    return s.accession + " " + s.title + " " + s.description + " " + s.studyCategory + " " + s.sampleTemplate;
+    return this.getDisplayAccession(s) + " " + s.title + " " + s.description + " " + s.studyCategory + " " + s.sampleTemplate;
+  }
+
+  getDisplayAccession(study: IStudyDetail): string {
+    if (study.mhdAccession && study.mhdAccession !== "" && study.mhdAccession !== study.accession) {
+      return `${study.mhdAccession} (${study.accession})`;
+    }
+    return study.accession;
   }
 
   getStudyCategoryLabel(category: string) {

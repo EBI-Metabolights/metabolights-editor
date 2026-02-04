@@ -425,14 +425,8 @@ export class DesignDescriptorComponent implements OnInit {
         isaFileType: isaFileType,
       };
     });
-
-    this.descriptorCategories.push({
-      id: "other",
-      label: "Other",
-      controlListKey: "Study Design Type",
-      isaFileType: "investigation",
-    });
   }
+
 
   onCategoryChange(categoryId) {
     const category = this.descriptorCategories.find((c) => c.id === categoryId);
@@ -452,7 +446,7 @@ export class DesignDescriptorComponent implements OnInit {
       descriptor: [null, isRequired ? [Validators.required] : []],
     };
     if (this.mode !== 'local') {
-      group.descriptorCategory = [this.selectedCategory?.id || null, Validators.required];
+      group.descriptorCategory = [this.selectedCategory?.id || null, []];
     }
     this.form = this.fb.group(group);
   }
@@ -473,25 +467,20 @@ export class DesignDescriptorComponent implements OnInit {
             this.isaFileType = category.isaFileType;
           }
         }
-      } else if (this.mode === 'local' && this.controlListKey) {
-        // Respect provided controlListKey in local mode (creation wizard)
-        const matchingCat = this.descriptorCategories.find(c => c.controlListKey === this.controlListKey);
+      } else if (!this.addNewDescriptor && this.mode === "local" && this.controlListKey) {
+        // Respect provided controlListKey in local mode when editing
+        const matchingCat = this.descriptorCategories.find(
+          (c) => c.controlListKey === this.controlListKey
+        );
         if (matchingCat) {
           this.selectedCategory = matchingCat;
         }
       } else {
-        // Standard flow: Default to "other" category if adding new, as requested
-        const otherCat = this.descriptorCategories.find(c => c.id === 'other');
-        if (otherCat) {
-          this.selectedCategory = otherCat;
-          this.controlListKey = otherCat.controlListKey;
-          this.isaFileType = otherCat.isaFileType;
-        } else if (this.descriptorCategories.length > 0) {
-          const firstCat = this.descriptorCategories[0];
-          this.selectedCategory = firstCat;
-          this.controlListKey = firstCat.controlListKey;
-          this.isaFileType = firstCat.isaFileType;
-        }
+        // Standard flow for NEW descriptor or no specific context:
+        // Do not default to any category, show "Select category" placeholder
+        this.selectedCategory = null;
+        this.controlListKey = this.controlListKey || null;
+        this.isaFileType = "investigation";
       }
 
       this._controlList = this.controlList();
@@ -651,9 +640,9 @@ export class DesignDescriptorComponent implements OnInit {
         } catch {
           const tmp = new Ontology();
           tmp.annotationValue =
-            descriptorRaw.annotationValue ||
-            descriptorRaw.termName ||
             descriptorRaw.label ||
+            descriptorRaw.termName ||
+            descriptorRaw.annotationValue ||
             "";
           tmp.termAccession =
             descriptorRaw.termAccession ||
@@ -704,7 +693,7 @@ export class DesignDescriptorComponent implements OnInit {
       if (categoryComment) {
         const categoryId = categoryComment.value;
         if (categoryId === "other") {
-          return "Other";
+          return null;
         }
         const descriptorMetadata =
           this.templateConfiguration.descriptorConfiguration

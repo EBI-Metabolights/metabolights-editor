@@ -332,7 +332,6 @@ export class TableComponent
 
   @HostListener("window:keydown", ["$event"])
   handleDeleteKeydown(event: KeyboardEvent) {
-    //console.log(`event key: ${event.key}`)
     if (["Delete", "Backspace"].includes(event.key) && !this.isEditModalOpen) {
       // reusing an existing method to delete cell content by instead pasting empty strings
       if (this.selectedCells.length > 0)
