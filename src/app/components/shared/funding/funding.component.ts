@@ -132,4 +132,11 @@ export class FundingComponent implements OnInit {
   removeFunder(index: number) {
     this.deleted.emit(index);
   }
+
+  get hasValidFunders(): boolean {
+    return this.funders && this.funders.length > 0 && this.funders.some(funder => 
+      funder?.fundingOrganization?.annotationValue && 
+      funder.fundingOrganization.annotationValue.trim() !== ''
+    );
+  }
 }

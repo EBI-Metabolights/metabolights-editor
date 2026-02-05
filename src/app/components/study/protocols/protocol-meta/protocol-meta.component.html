@@ -11,8 +11,8 @@
                     <input matInput type="url"
                         placeholder="Protocol DOI or URL. e.g., 10.17504/protocols.io.nyxdfxn or https://www.protocols.io/xyz"
                         formControlName="uri" [disabled]="readonly" />
-                    <button mat-icon-button matSuffix *ngIf="parentForm.get('uri').value" (click)="openProtocolUri()"
-                        (keydown.enter)="openProtocolUri()" title="Open URI in new tab"
+                    <button mat-icon-button matSuffix *ngIf="parentForm.get('uri').value.toLowerCase().includes('http')"
+                        (click)="openProtocolUri()" (keydown.enter)="openProtocolUri()" title="Open URI in new tab"
                         aria-label="Open protocol URI in new tab">
                         <mat-icon>open_in_new</mat-icon>
                     </button>

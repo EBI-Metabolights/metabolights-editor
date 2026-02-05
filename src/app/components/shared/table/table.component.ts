@@ -1848,6 +1848,12 @@ export class TableComponent
   }
 
   onEditCellChanges(event) {
+    // Update form control when ontology changes (including removal)
+    if (Array.isArray(event)) {
+      // If ontology array is empty or has values, update the form control
+      const value = event.length > 0 ? event[0].annotationValue : '';
+      this.editCellform.get('cell')?.setValue(value);
+    }
     this.editCellform.markAsDirty();
   }
 
@@ -2198,7 +2204,14 @@ export class TableComponent
     );
   }
 
-  onChanges() {}
+  onChanges(event) {
+    // Update form control when ontology changes in column edit modal
+    if (Array.isArray(event) && this.editColumnform) {
+      const value = event.length > 0 ? event[0].annotationValue : '';
+      this.editColumnform.get('cell')?.setValue(value);
+      this.editColumnform.markAsDirty();
+    }
+  }
 
   triggerChanges() {
     this.updated.emit();

@@ -2,15 +2,15 @@
   <div class="column" style="width: 100%; overflow-x: auto">
     <div class="panel-block-wrapper">
       <span *ngIf="assay; else loadingDetail">
-        <div>
-          <span *ngIf="assayTypeLabel" class="has-text-weight-semibold">{{ assayTypeLabel }}</span>
-          <span *ngIf="measurementType" class="has-text-weight-semibold"> - {{ measurementType }}</span>
-          <span *ngIf="omicsType" class="has-text-weight-semibold"> - {{ omicsType }}</span>
-        </div>
+
         <span class="column is-12 nprl nmrl fadeIn">
-          <div *ngIf="!isReadOnly"
-            style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 15px;">
-            <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span *ngIf="assayTypeLabel" class="tag is-link is-light">{{ assayTypeLabel }}</span>
+              <span *ngIf="measurementType" class="tag is-link is-light">{{ measurementType }}</span>
+              <span *ngIf="omicsType" class="tag is-link is-light">{{ omicsType }}</span>
+            </div>
+            <div *ngIf="!isReadOnly">
               <a (click)="openAddSamplesModal()" class="button is-small is-primary">
                 <mat-icon>add</mat-icon> Samples
               </a>
@@ -27,13 +27,12 @@
 
           <!-- Design Descriptors Section -->
           <div class="card mb-4" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
-            <header class="card-header"
+            <header class="card-heading"
               style="box-shadow: none; background: transparent; border-bottom: 1px solid #f1f1f4; min-height: 40px;">
-              <p class="card-header-title is-size-7 has-text-grey-dark" style="padding: 0.5rem 0.75rem;">
+              <p>
                 Assay Descriptors
-                <span class="icon is-small ml-2 has-text-grey-light">
-                  <mat-icon style="font-size: 16px; height: 16px; width: 16px;"
-                    matTooltip="Descriptors describe the assay">help</mat-icon>
+                <span>
+                  <mat-icon matTooltip="Descriptors describe the assay">help</mat-icon>
                 </span>
               </p>
             </header>
@@ -49,7 +48,8 @@
                 </div>
               </div>
               <ng-template #noDescriptors>
-                <p class="has-text-grey is-size-7 is-italic m-0 ml-2">No design descriptors added.</p>
+                <p class="has-text-grey is-size-7 is-italic m-0 ml-2" style="text-align: center;">No assay design
+                  descriptors added.</p>
               </ng-template>
             </div>
           </div>

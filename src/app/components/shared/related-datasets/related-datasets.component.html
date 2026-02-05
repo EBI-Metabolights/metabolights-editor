@@ -10,8 +10,9 @@
     </header>
     <div class="card-content">
         <div class="dataset-list">
-            <div *ngIf="datasets.length > 0; else emptyMessage">
-                <div class="box p-3 mb-4" *ngFor="let dataset of datasets; let i = index">
+            <ng-container *ngFor="let dataset of datasets; let i = index">
+                <div class="box p-3 mb-4"
+                    *ngIf="(dataset?.repository && dataset.repository.trim() !== '') || (dataset?.accession && dataset.accession.trim() !== '')">
                     <div class="columns is-vcentered is-mobile">
                         <div class="column">
                             <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
@@ -33,13 +34,11 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </ng-container>
         </div>
-        <ng-template #emptyMessage>
-            <p class="placeholder-text has-text-centered p-4">
-                <small>No related datasets defined.</small>
-            </p>
-        </ng-template>
+        <p *ngIf="!hasValidDatasets" class="placeholder-text has-text-centered p-4">
+            <small>No related datasets defined.</small>
+        </p>
     </div>
 </div>
 

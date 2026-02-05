@@ -347,7 +347,7 @@ export class AddAssayComponent implements OnInit, OnChanges {
           return {
               value: key,
               label: details?.label || key,
-              ontology: details?.ontology || null, // Capture ontology
+              ontologyTerm: details?.ontologyTerm || null, // Capture ontology
               order: details?.order || 0
           };
       }).sort((a, b) => a.order - b.order);
