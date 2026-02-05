@@ -6,7 +6,10 @@
         <span class="column is-12 nprl nmrl fadeIn">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-              <span *ngIf="assayTypeLabel" class="tag is-link is-light">{{ assayTypeLabel }}</span>
+              <span *ngIf="assayTypeLabel" class="tag is-link is-light"
+                style="display: inline-flex; align-items: center; gap: 4px;">
+                <mat-icon style="font-size: 14px; height: 14px; width: 14px;">timeline</mat-icon> {{ assayTypeLabel }}
+              </span>
               <span *ngIf="measurementType" class="tag is-link is-light">{{ measurementType }}</span>
               <span *ngIf="omicsType" class="tag is-link is-light">{{ omicsType }}</span>
             </div>

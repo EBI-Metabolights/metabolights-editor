@@ -2,7 +2,9 @@
   {{value.annotationValue}}
 </span>
 <ng-template #displayExtOnt>
-  <span *ngIf="value" class="clickable" (click)="displayOntologyInfo()">
+  <span *ngIf="value"
+    [ngClass]="{'clickable': value.termSource.name !== 'MTBLS' && value.termSource.name !== 'Metabolights'}"
+    (click)="displayOntologyInfo()">
     <!-- {{ value.termSource.name ? value.termSource.name + ':'+ value.annotationValue :value.annotationValue }} -->
     {{ value.annotationValue }}
     <mat-spinner style="display: inline" [diameter]="16" [strokeWidth]="2" *ngIf="isLoading"></mat-spinner>
