@@ -35,6 +35,9 @@ export class OntologyDetailsComponent implements OnInit {
     if (!this.showOntologyDetail) {
       return
     }
+    if (this.value && this.value.termSource && (this.value.termSource.name === 'MTBLS' || this.value.termSource.name === 'Metabolights')) {
+      return;
+    }
     this.isLoading = true;
     const value = Object.assign({}, this.value);
     this.editorService.getOntologyDetails(value).subscribe(

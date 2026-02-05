@@ -21,6 +21,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import {
   getValidationRuleForField,
   MetabolightsFieldControls,
@@ -614,9 +615,20 @@ export class DesignDescriptorComponent implements OnInit {
       if (!value) {
         value = this.descriptor.annotationValue;
       }
-      this.isFormBusy = true;
-      this.store.dispatch(new Descriptors.Delete(value, this.studyId));
+        this.store.dispatch(new Descriptors.Delete(value, this.studyId));
     }
+  }
+
+  isCuratorAdded(descriptor: Ontology): boolean {
+    if (descriptor && descriptor.comments) {
+      const sourceComment = descriptor.comments.find(
+        (c) => c.name === "Study Design Type Source"
+      );
+      if (sourceComment) {
+        return sourceComment.value.toLowerCase() !== "submitter";
+      }
+    }
+    return false;
   }
 
   compileBody(val: any = null) {
@@ -679,6 +691,23 @@ export class DesignDescriptorComponent implements OnInit {
       }
     }
 
+    if (studyDesignDescriptor) {
+      if (!studyDesignDescriptor.comments) {
+        studyDesignDescriptor.comments = [];
+      }
+      const isCurator = this.store.selectSnapshot(UserState.isCurator);
+      // Remove existing source comment if any
+      studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
+        (c) => c.name !== "Study Design Type Source"
+      );
+      studyDesignDescriptor.comments.push(
+        new MTBLSComment(
+          "Study Design Type Source",
+          isCurator ? "data-curation" : "submitter"
+        )
+      );
+    }
+    
     const body = {
       studyDesignDescriptor: studyDesignDescriptor,
     };

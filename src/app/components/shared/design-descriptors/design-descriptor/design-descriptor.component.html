@@ -13,6 +13,10 @@
         </span>
         <span class="descriptor-value">
           <ontology-details [value]="descriptor"></ontology-details>
+          <span *ngIf="!isStudyReadOnly && isCuratorAdded(descriptor)" class="icon is-small has-text-info ml-1"
+            style="cursor: pointer;" matTooltip="Curator added descriptors">
+            <i class="material-icons" style="font-size: 16px;">info</i>
+          </span>
         </span>
 
       </span>

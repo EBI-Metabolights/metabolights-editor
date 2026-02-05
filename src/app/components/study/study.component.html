@@ -198,37 +198,45 @@
               <ul>
                 <li *ngIf="!studyError" color="primary" (click)="selectCurrentTab(0, 'overview')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 0 }">
-                  <a>Overview</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">description</mat-icon>Overview</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(1, 'samples')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }">
-                  <a>Samples</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">view_module</mat-icon>Samples</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(2, 'assays')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }">
-                  <a>Assays</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">timeline</mat-icon>Assays</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(3, 'protocols')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }">
-                  <a>Protocols</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">menu_book</mat-icon>Protocols</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(4, 'metabolites')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }">
-                  <a>Metabolites</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">grain</mat-icon>Metabolites</a>
                 </li>
                 <li (click)="selectCurrentTab(5, 'files')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }">
-                  <a>Files</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">folder</mat-icon>Files</a>
                 </li>
                 <li (click)="selectCurrentTab(6, 'validations')" [ngClass]="{
                  'is-active': (currentTabIndex$ | async) === 6,
                  'has-error': validationNeeded || validationStatus == 'ERROR'}">
                   <a [ngClass]="{
                   'has-error': validationNeeded || validationStatus == 'ERROR'
-                  }">Study Validations
+                  }">
+                    <mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">build_circle</mat-icon>Study
+                    Validations
                     &nbsp;<mat-icon *ngIf=" validationNeeded || validationStatus == 'ERROR'">build_circle</mat-icon>
                   </a>
-
                 </li>
               </ul>
             </div>

@@ -904,6 +904,9 @@ export class EditorService {
   }
 
   getOntologyDetails(value) {
+    if (value && value.termSource && (value.termSource.name === 'MTBLS' || value.termSource.name === 'Metabolights')) {
+      return of(value);
+    }
     if (!this.ontologyDetails[value.termAccession]) {
       return this.dataService.getOntologyDetails(value).pipe(
         map((result) => {
@@ -1082,7 +1085,7 @@ export class EditorService {
   updateAssayComments(studyId: string, assayName: string, payload: any): Observable<any> {
     const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/assays/comments`;
     const updatedPayload = {
-        assay_name: assayName,
+        "x-assay-file-name": assayName,
         ...payload
     };
     return this.http.patch(url, updatedPayload, httpOptions).pipe(
