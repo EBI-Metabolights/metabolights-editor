@@ -9,44 +9,45 @@
         </p>
     </header>
     <div class="card-content">
-        <div class="funding-list" *ngIf="funders.length > 0; else emptyMessage">
-            <div class="box p-3 mb-4" *ngFor="let funder of funders; let i = index">
-                <div class="columns is-vcentered is-mobile">
-                    <div class="column">
-                        <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                            <div class="is-size-6">
-                                <span>Funder: </span>
-                                <span class="has-text-weight-bold">
-                                    <a *ngIf="funder.fundingOrganization.termAccession; else noLink"
-                                        [href]="funder.fundingOrganization.termAccession" target="_blank"
-                                        class="has-text-link">
-                                        {{ funder.fundingOrganization.annotationValue }}
-                                    </a>
-                                    <ng-template #noLink>
-                                        {{ funder.fundingOrganization.annotationValue }}
-                                    </ng-template>
-                                </span>
-                            </div>
-                            <div *ngIf="funder.grantIdentifier" class="is-size-6">
-                                <span>Grand Identifier: </span>
-                                <span class="has-text-weight-bold">{{ funder.grantIdentifier }}</span>
+        <div class="funding-list">
+            <ng-container *ngFor="let funder of funders; let i = index">
+                <div class="box p-3 mb-4"
+                    *ngIf="funder?.fundingOrganization?.annotationValue && funder.fundingOrganization.annotationValue.trim() !== ''">
+                    <div class="columns is-vcentered is-mobile">
+                        <div class="column">
+                            <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                                <div class="is-size-6">
+                                    <span>Funder: </span>
+                                    <span class="has-text-weight-bold">
+                                        <a *ngIf="funder.fundingOrganization.termAccession; else noLink"
+                                            [href]="funder.fundingOrganization.termAccession" target="_blank"
+                                            class="has-text-link">
+                                            {{ funder.fundingOrganization.annotationValue }}
+                                        </a>
+                                        <ng-template #noLink>
+                                            {{ funder.fundingOrganization.annotationValue }}
+                                        </ng-template>
+                                    </span>
+                                </div>
+                                <div *ngIf="funder.grantIdentifier" class="is-size-6">
+                                    <span>Grand Identifier: </span>
+                                    <span class="has-text-weight-bold">{{ funder.grantIdentifier }}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="column is-narrow">
-                        <button class="edit-icon-button" (click)="editFunder(i, funder)" title="Edit Funding">
-                            <mat-icon>edit</mat-icon>
-                        </button>
-                        <button class="delete is-medium" (click)="removeFunder(i)" title="Remove Funding"></button>
+                        <div class="column is-narrow">
+                            <button class="edit-icon-button" (click)="editFunder(i, funder)" title="Edit Funding">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button class="delete is-medium" (click)="removeFunder(i)" title="Remove Funding"></button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </ng-container>
         </div>
-        <ng-template #emptyMessage>
-            <p class="placeholder-text has-text-centered p-4">
-                <small>No funding information defined.</small>
-            </p>
-        </ng-template>
+        <p *ngIf="!hasValidFunders" class="placeholder-text has-text-centered p-4">
+            <small>No funding information defined.</small>
+        </p>
     </div>
 </div>
 

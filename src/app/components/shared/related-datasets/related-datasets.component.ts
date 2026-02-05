@@ -102,4 +102,11 @@ export class RelatedDatasetsComponent implements OnInit {
   removeDataset(index: number) {
     this.deleted.emit(index);
   }
+
+  get hasValidDatasets(): boolean {
+    return this.datasets && this.datasets.length > 0 && this.datasets.some(dataset => 
+      (dataset?.repository && dataset.repository.trim() !== '') || 
+      (dataset?.accession && dataset.accession.trim() !== '')
+    );
+  }
 }

@@ -31,15 +31,17 @@ label {
 
 .guide-text {
   color: #666666;
-
+  font-size: small;
 }
 
 .bold-text {
   font-weight: bold;
 }
+
 .card-heading span {
- font-weight: normal;
+  font-weight: normal;
 }
+
 ::ng-deep .mat-mdc-text-field-wrapper {
   will-change: opacity, transform, color;
 }

@@ -6,7 +6,7 @@
       </span>
     </div>
     <div class="step-details">
-      <p *ngIf="!study" class="step-title">Submission Details</p>
+      <p *ngIf="!study" class="step-title">New Submission → Start</p>
       <p *ngIf="study" class="step-title">
         <a [ngClass]="{ 'has-text-grey': step < 2 || (step > 1 && !allowBackward) }"
           (click)="redirectTo('info', null, 1)">
@@ -38,7 +38,10 @@
     <div class="step-details">
       <p class="step-title">
         <a [ngClass]="{ 'has-text-grey': step < 4 || (step > 4 && !allowBackward) }"
-          (click)="redirectTo('assays', null, 4)">Sample & assay details</a>
+          (click)="redirectTo('assays', null, 4)">
+          <span *ngIf="!study">Assay details</span>
+          <span *ngIf="study">Sample & assay details</span>
+        </a>
       </p>
     </div>
   </div>

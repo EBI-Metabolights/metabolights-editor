@@ -130,11 +130,16 @@
           <div class="control" *ngIf="protocol.uri">
             <div class="tags has-addons">
               <span class="tag is-light" style="border: 1px solid #dbdbdb; border-right: none;">Protocol URI</span>
-              <a class="tag is-white" (click)="openUri(protocol.uri)"
+              <a *ngIf="protocol.uri.toLowerCase().includes('http')" class="tag is-white"
+                (click)="openUri(protocol.uri)"
                 style="cursor: pointer; text-decoration: underline; border: 1px solid #dbdbdb;">
                 {{ protocol.uri }}
                 <mat-icon style="font-size: 14px; height: 14px; width: 14px; margin-left: 4px;">open_in_new</mat-icon>
               </a>
+              <span *ngIf="!protocol.uri.toLowerCase().includes('http')" class="tag is-white"
+                style="border: 1px solid #dbdbdb;">
+                {{ protocol.uri }}
+              </span>
             </div>
           </div>
 

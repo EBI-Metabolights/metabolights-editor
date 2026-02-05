@@ -75,13 +75,11 @@
           <div class="column is-12 mt-0">
             <!-- Simplified style to match header-card pattern -->
             <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
-              <header class="card-header"
-                style="box-shadow: none; background: transparent; border-bottom: 1px solid #f1f1f4;">
-                <p class="card-header-title is-size-7 has-text-grey-dark">
-                  Design Descriptors
-                  <span class="icon is-small ml-2 has-text-grey-light">
-                    <mat-icon style="font-size: 16px; height: 16px; width: 16px;"
-                      matTooltip="Design Descriptors describe the study">help</mat-icon>
+              <header class="card-heading">
+                <p>
+                  Assay Descriptors
+                  <span>
+                    <mat-icon matTooltip="Assay Design Descriptors describe the study">help</mat-icon>
                   </span>
                 </p>
                 <button class="button is-primary is-small"
@@ -108,7 +106,8 @@
                     </div>
                   </div>
                   <ng-template #noDescriptors>
-                    <p class="has-text-grey is-size-7 is-italic m-0">No design descriptors added.</p>
+                    <p class="has-text-grey is-size-7 is-italic m-0" style="text-align: center;">No assay design
+                      descriptors added.</p>
                   </ng-template>
                 </div>
               </div>
