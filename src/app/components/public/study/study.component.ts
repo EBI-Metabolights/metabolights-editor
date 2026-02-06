@@ -44,6 +44,7 @@ export class PublicStudyComponent implements OnInit {
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.reportV2);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
 
   revisionNumber = null;
   revisionDatetime = null;
@@ -69,6 +70,7 @@ export class PublicStudyComponent implements OnInit {
   validationStatus: ViolationType = null;
   obfuscationCode: string = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
+  mhdAccession: string = null;
   constructor(
     private store: Store,
     private editorService: EditorService,
@@ -141,6 +143,10 @@ export class PublicStudyComponent implements OnInit {
           }
         }
       }
+    });
+
+    this.mhdAccession$.subscribe((value) => {
+      this.mhdAccession = value;
     });
 
     this.studyValidation$.subscribe((value) => {

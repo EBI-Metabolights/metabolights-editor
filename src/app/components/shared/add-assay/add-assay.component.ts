@@ -40,6 +40,7 @@ export class AddAssayComponent implements OnInit, OnChanges {
   
   // Data for Dropdowns
   studyCategory: string = "";
+  studyCategoryLabel: string = "";
   activeAssayFileTemplates: any[] = [];
   activeMeasurementTypes: any[] = [];
   activeOmicsTypes: any[] = [];
@@ -257,11 +258,12 @@ export class AddAssayComponent implements OnInit, OnChanges {
             this.currentTemplateVersion = version || config.defaultTemplateVersion; 
             
              // Handle Study Category Label
+             this.studyCategory = studyCategoryVal;
              if (config.studyCategories && studyCategoryVal) {
                  const categoryConfig = config.studyCategories[studyCategoryVal];
-                 this.studyCategory = (categoryConfig && categoryConfig.label) ? categoryConfig.label : studyCategoryVal;
+                 this.studyCategoryLabel = (categoryConfig && categoryConfig.label) ? categoryConfig.label : studyCategoryVal;
              } else {
-                 this.studyCategory = studyCategoryVal;
+                 this.studyCategoryLabel = studyCategoryVal;
              }
 
             const versionConfig = config.versions[this.currentTemplateVersion];
@@ -269,22 +271,40 @@ export class AddAssayComponent implements OnInit, OnChanges {
                 // Assay Types
                 const assayTemplates = versionConfig.activeAssayFileTemplates || {};
                 let assayKeys = [];
-                if (Array.isArray(assayTemplates)) {
-                    assayKeys = assayTemplates;
-                } else if (typeof assayTemplates === 'object') {
-                    assayKeys = Object.keys(assayTemplates);
+                
+                // 1. Try to get keys from Mapping
+                let keysFromMapping = false;
+                if (this.studyCategory && this.mode === 'add' && versionConfig.assayFileTypeMappings) {
+                    const mappings = versionConfig.assayFileTypeMappings;
+                    // Case-insensitive lookup for category in mappings
+                    const categoryLower = this.studyCategory.toLowerCase();
+                    const mappingKey = Object.keys(mappings).find(k => k.toLowerCase() === categoryLower);
+                    
+                    if (mappingKey) {
+                        assayKeys = mappings[mappingKey];
+                        keysFromMapping = true;
+                    }
+                }
+                
+                if (!keysFromMapping) {
+                    // 2. Fallback to all keys
+                    if (Array.isArray(assayTemplates)) {
+                        assayKeys = assayTemplates;
+                    } else if (typeof assayTemplates === 'object') {
+                        assayKeys = Object.keys(assayTemplates);
+                    }
                 }
                 
                 // Use assayTemplates itself as the configMap if it contains labels and order
                 this.activeAssayFileTemplates = this.processOptions(assayKeys, assayTemplates);
 
-                // Filter by Study Category (Case-insensitive) - ONLY for Add mode or if not set
-                if (this.studyCategory && this.mode === 'add') {
-                    const categoryLower = this.studyCategory.toLowerCase();
-                    this.activeAssayFileTemplates = this.activeAssayFileTemplates.filter(item => 
-                        item.value.toLowerCase().includes(categoryLower) || 
-                        item.label.toLowerCase().includes(categoryLower)
-                    );
+                // 3. Fallback Filter by Study Category (Case-insensitive) - Only if Mapping WAS NOT used
+                if (!keysFromMapping && this.studyCategory && this.mode === 'add') {
+                     const categoryLower = this.studyCategory.toLowerCase();
+                     this.activeAssayFileTemplates = this.activeAssayFileTemplates.filter(item => 
+                         item.value.toLowerCase().includes(categoryLower) || 
+                         item.label.toLowerCase().includes(categoryLower)
+                     );
                 }
 
                 // Measurement Types
@@ -795,8 +815,27 @@ export class AddAssayComponent implements OnInit, OnChanges {
   saveEditAssay(formattedDescriptors: any[]) {
       const formValues = this.assayForm.getRawValue();
       
-      const assayOption = this.activeAssayFileTemplates.find(a => a.value === formValues.assayType);
+      // Filter Assay Types based on study category mappings
+      let validAssayTypes = this.activeAssayFileTemplates;
+      if (this.templateConfiguration && this.currentTemplateVersion) {
+            const versionConfig = this.templateConfiguration.versions[this.currentTemplateVersion];
+            if (versionConfig && versionConfig.assayFileTypeMappings) {
+                 const mappings = versionConfig.assayFileTypeMappings;
+                 const categoryLower = this.studyCategory ? this.studyCategory.toLowerCase() : "";
+                 const mappingKey = Object.keys(mappings).find(k => k.toLowerCase() === categoryLower);
+                 
+                 const mappedTypes = mappingKey ? mappings[mappingKey] : [];
+                 
+                 if (mappedTypes.length > 0) {
+                     validAssayTypes = this.activeAssayFileTemplates.filter(a => mappedTypes.includes(a.value));
+                 }
+            }
+      }
+
+      const assayOption = validAssayTypes.find(a => a.value === formValues.assayType);
       const assayLabel = assayOption ? assayOption.ontologyTerm.term : formValues.assayType;
+      const assayTermSource = assayOption?.ontologyTerm?.termSource?.name || "";
+      const assayTermAccession = assayOption?.ontologyTerm?.termAccession || "";
 
       const measurementKey = formValues.measurementType;
       const measurementOption = this.activeMeasurementTypes.find(m => m.value === measurementKey);
@@ -805,18 +844,27 @@ export class AddAssayComponent implements OnInit, OnChanges {
       const omicsKey = formValues.omics;
       const omicsOption = this.activeOmicsTypes.find(o => o.value === omicsKey);
       const omicsLabel = omicsOption ? omicsOption.label : omicsKey;
+      const omicsTermSource = omicsOption?.ontologyTerm?.termSourceReference || omicsOption?.termSource?.name || "";
+      const omicsTermAccession = omicsOption?.ontologyTerm?.termAccession || omicsOption?.termAccession || "";
 
       const payload = {
           fields: {
-              measurementType: measurementLabel
+              measurementType: measurementKey // User requested valid inputs are keys
           },
           comments: [
-              { name: "Assay Type", value: assayLabel }, // e.g. "liquid chromatography mass spectrometry assay"
-              { name: "Assay Type Label", value: formValues.assayType }, // e.g. "LC-MS" (key)
+              { name: "Assay Type", value: assayLabel }, 
+              { name: "Assay Type Label", value: formValues.assayType }, 
+              { name: "Assay Type Term Source REF", value: assayTermSource },
+              { name: "Assay Type Term Accession Number", value: assayTermAccession },
+              { name: "Measurement Type", value: measurementLabel }, // Label for comment endpoint
               { name: "Omics Type", value: omicsLabel },
+              { name: "Omics Type Term Source REF", value: omicsTermSource },
+              { name: "Omics Type Term Accession Number", value: omicsTermAccession },
               { name: "Assay Descriptor", value: this.designDescriptors.map(d => d.annotationValue).join(';') },
               { name: "Assay Descriptor Term Accession Number", value: this.designDescriptors.map(d => d.termAccession).join(';') },
-              { name: "Assay Descriptor Term Source REF", value: this.designDescriptors.map(d => d.termSource?.name).join(';') }
+              { name: "Assay Descriptor Term Source REF", value: this.designDescriptors.map(d => d.termSource?.name).join(';') },
+              { name: "Assay Descriptor Category", value: this.designDescriptors.map(d => d.comments.find(c => c.name === "Assay Descriptor Category")?.value || "").join(';') },
+              { name: "Assay Descriptor Source", value: this.designDescriptors.map(d => d.comments.find(c => c.name === "Assay Descriptor Source")?.value || "submitter").join(';') }
           ]
       };
 

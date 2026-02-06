@@ -395,6 +395,7 @@ export class DesignDescriptorComponent implements OnInit {
       const isaFileType = meta?.isaFileType || "investigation";
 
       if (controlListKey && this.legacyControlLists) {
+        // ... existing logic to validate rule ...
         const selectionInput = {
           isaFileType: isaFileType,
           studyCategory: this.studyCategory,
@@ -425,6 +426,14 @@ export class DesignDescriptorComponent implements OnInit {
         controlListKey: controlListKey,
         isaFileType: isaFileType,
       };
+    });
+
+    // Add "Not Applicable" option
+    this.descriptorCategories.unshift({
+        id: 'default',
+        label: 'Not Applicable',
+        controlListKey: 'Study Design Type',
+        isaFileType: 'investigation'
     });
   }
 
@@ -461,7 +470,8 @@ export class DesignDescriptorComponent implements OnInit {
         );
         if (categoryComment) {
           const catId = categoryComment.value;
-          const category = this.descriptorCategories.find((c) => c.id === catId);
+          const lookupId = (catId === 'other') ? 'default' : catId;
+          const category = this.descriptorCategories.find((c) => c.id === lookupId);
           if (category) {
             this.selectedCategory = category;
             this.controlListKey = category.controlListKey;
@@ -721,7 +731,7 @@ export class DesignDescriptorComponent implements OnInit {
       );
       if (categoryComment) {
         const categoryId = categoryComment.value;
-        if (categoryId === "other") {
+        if (categoryId === "other" || categoryId === "default" || categoryId === "Not Applicable") {
           return null;
         }
         const descriptorMetadata =

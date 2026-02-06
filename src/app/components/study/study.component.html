@@ -22,7 +22,9 @@
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon> Your study
-          ({{ requestedStudy }}) is now {{ status}}. <b>Private studies can be modified at any point. Simply revert to
+          {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession + ' (' +
+          requestedStudy + ')' : requestedStudy }} is now {{ status}}. <b>Private studies can be modified at any point.
+            Simply revert to
             Provisional, edit the study, and remember to re-index data files, re-run study validation and change back to
             Private.</b>
         </p>
@@ -51,7 +53,9 @@
     <ng-template #anonymousCurationArticle>
       <article class="message is-warning">
         <div class="message-body">
-          This study ({{requestedStudy}}) is now in the 'Private' stage. The link <b> {{ endpoint + requestedStudy
+          This study ({{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession + ' ('
+          + requestedStudy + ')' : requestedStudy }}) is now in the 'Private' stage. The link <b> {{ endpoint +
+            requestedStudy
             }}</b> will be the official link for referencing your MetaboLights study in any paper, website or other
           communication.
           <br />
@@ -70,7 +74,9 @@
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon>
-          Your study ({{ requestedStudy }}) is publicly accessible.
+          Your study {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession + ' ('
+          + requestedStudy + ')' : requestedStudy }} is publicly
+          accessible.
           <br />
           <br />
           If you have comments or suggestions, please get in touch with MetaboLights team (<b>
