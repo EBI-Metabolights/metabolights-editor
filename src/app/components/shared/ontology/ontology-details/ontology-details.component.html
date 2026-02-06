@@ -3,7 +3,7 @@
 </span>
 <ng-template #displayExtOnt>
   <span *ngIf="value"
-    [ngClass]="{'clickable': value.termSource.name !== 'MTBLS' && value.termSource.name !== 'Metabolights'}"
+    [ngClass]="{'clickable': value.termSource && value.termSource.name !== 'MTBLS' && value.termSource.name !== 'Metabolights'}"
     (click)="displayOntologyInfo()">
     <!-- {{ value.termSource.name ? value.termSource.name + ':'+ value.annotationValue :value.annotationValue }} -->
     {{ value.annotationValue }}

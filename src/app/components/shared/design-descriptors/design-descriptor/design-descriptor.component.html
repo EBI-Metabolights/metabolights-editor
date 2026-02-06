@@ -14,7 +14,7 @@
         <span class="descriptor-value">
           <ontology-details [value]="descriptor"></ontology-details>
           <span *ngIf="!isStudyReadOnly && isCuratorAdded(descriptor)" class="icon is-small has-text-info ml-1"
-            style="cursor: pointer;" matTooltip="Curator added descriptors">
+            style="cursor: pointer;" matTooltip="Curated by metabolights">
             <i class="material-icons" style="font-size: 16px;">info</i>
           </span>
         </span>
@@ -50,7 +50,7 @@
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
-    <div class="modal-card">
+    <div class="modal-card vw80">
       <div *ngIf="isFormBusy" class="load-bar">
         <div class="bar"></div>
         <div class="bar"></div>
@@ -58,41 +58,51 @@
       </div>
       <section class="modal-card-body">
         <div [formGroup]="form">
-          <div class="field pt-0">
-            <label class="label is-small">Design Descriptor (Keyword)</label>
-            <div class="control">
-              <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
-                <mat-form-field class="full-width is-small" appearance="outline">
-                  <mat-select formControlName="descriptor" placeholder="Select Keyword"
-                    (selectionChange)="onChanges($event.value)">
-                    <mat-option *ngFor="let val of _controlList.values" [value]="val.annotationValue">
-                      {{ val.annotationValue }}
-                    </mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </span>
-              <ng-template #ontologyField>
-                <mtbls-ontology #descriptorComponent (changed)="onChanges($event)"
-                  [controlList]="{ name: controlListKey, values: _controlList?.values || [] }"
-                  [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
-                  [validations]="validation" [isRorSearch]="false" [isModal]="true" [inline]="true" [label]="''">
-                </mtbls-ontology>
-              </ng-template>
-            </div>
-          </div>
+          <div class="columns is-variable is-2">
 
-          <div class="field" *ngIf="mode !== 'local'">
-            <label class="label is-small">Group</label>
-            <div class="control">
-              <mat-form-field class="full-width is-small" appearance="outline">
-                <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
-                  placeholder="Select Group">
-                  <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
-                    {{ cat.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+            <!-- Column 1: Group (Category) - Show First -->
+            <div class="column is-5" *ngIf="mode !== 'local'">
+              <div class="field">
+                <label class="label is-small">Group</label>
+                <div class="control">
+                  <mat-form-field class="full-width is-small" appearance="outline">
+                    <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
+                      placeholder="Select Group">
+                      <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
+                        {{ cat.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
             </div>
+
+            <!-- Column 2: Design Descriptor -->
+            <div class="column" [ngClass]="mode !== 'local' ? 'is-7' : 'is-12'">
+              <div class="field">
+                <label class="label is-small">Design Descriptor (Keyword)</label>
+                <div class="control">
+                  <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                      <mat-select formControlName="descriptor" placeholder="Select Keyword"
+                        (selectionChange)="onChanges($event.value)">
+                        <mat-option *ngFor="let val of _controlList.values" [value]="val.annotationValue">
+                          {{ val.annotationValue }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </span>
+                  <ng-template #ontologyField>
+                    <mtbls-ontology #descriptorComponent (changed)="onChanges($event)"
+                      [controlList]="{ name: controlListKey, values: _controlList?.values || [] }"
+                      [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                      [validations]="validation" [isRorSearch]="false" [isModal]="true" [inline]="true" [label]="''">
+                    </mtbls-ontology>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>

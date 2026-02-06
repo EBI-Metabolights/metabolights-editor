@@ -1085,10 +1085,10 @@ export class EditorService {
   updateAssayComments(studyId: string, assayName: string, payload: any): Observable<any> {
     const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/assays/comments`;
     const updatedPayload = {
-        "x-assay-file-name": assayName,
         ...payload
     };
-    return this.http.patch(url, updatedPayload, httpOptions).pipe(
+    const headers = httpOptions.headers.set("x-assay-file-name", assayName);
+    return this.http.patch(url, updatedPayload, { headers }).pipe(
       catchError(err => {
         console.error('Error updating assay comments:', err);
         return this.dataService.handleError(err);

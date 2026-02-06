@@ -44,6 +44,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
   sampleTemplate$: Observable<string> = inject(Store).select(GeneralMetadataState.sampleTemplate);
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
+  mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
 
   revisionNumber = null;
   revisionDatetime = null;
@@ -72,6 +73,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   studyCategory = "";
   sampleTemplate = "";
   templateConfiguration: any = null;
+  mhdAccession: string = null;
 
   constructor(
     private store: Store,
@@ -183,6 +185,10 @@ export class StudyComponent implements OnInit, OnDestroy {
 
     this.sampleTemplate$.subscribe((value) => {
       this.sampleTemplate = value;
+    });
+
+    this.mhdAccession$.subscribe((value) => {
+      this.mhdAccession = value;
     });
 
     this.route.params.subscribe((params) => {

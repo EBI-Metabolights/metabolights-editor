@@ -15,7 +15,7 @@
           <div class="tags has-addons mb-0">
             <span class="tag is-dark is-medium">Category</span>
             <span class="tag is-info is-medium has-text-weight-semibold">
-              {{ studyCategory }}
+              {{ studyCategoryLabel }}
             </span>
           </div>
         </div>
@@ -74,7 +74,7 @@
           <!-- Design Descriptors (Full Width) -->
           <div class="column is-12 mt-0">
             <!-- Simplified style to match header-card pattern -->
-            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
+            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4;">
               <header class="card-heading">
                 <p>
                   Assay Descriptors
@@ -96,7 +96,7 @@
                             <span class="tag is-primary is-light">
                               <mat-icon style="font-size: 10px; height: 10px; width: 10px;">edit</mat-icon>
                             </span>
-                            <span class="tag is-white is-size-7">{{ descriptor.annotationValue }}</span>
+                            <span class="tag is-default is-size-7">{{ descriptor.annotationValue }}</span>
                           </div>
                         </div>
                         <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
@@ -121,7 +121,7 @@
         <!-- Dynamic Sections (Hidden in Edit mode for now) -->
         <div *ngIf="mode === 'add'">
           <div *ngFor="let section of dynamicSections; trackBy: trackBySection" class="dynamic-section mb-5">
-            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4; background-color: #fafbfc;">
+            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4;">
               <div class="card-content p-4">
                 <h5 class="title is-6 mb-4 has-text-weight-bold has-text-primary pull-left">
                   {{ section.header }}

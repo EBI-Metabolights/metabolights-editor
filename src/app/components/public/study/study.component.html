@@ -79,7 +79,7 @@
       <div class="message-body">
         <p>
           <mat-icon class="mat-icon material-icons">info</mat-icon>
-          This study ({{ requestedStudy }}) is publicly accessible upon request from the submitter(s). It <b><u>is not curated</u></b> in full by the MetaboLights curation team but does pass the new MetaboLights Validation and minimum submission requirements.
+          Your study {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession + ' (' + requestedStudy + ')' : requestedStudy }} is publicly accessible upon request from the submitter(s). It <b><u>is not curated</u></b> in full by the MetaboLights curation team but does pass the new MetaboLights Validation and minimum submission requirements.
           <br/>
           <br/>
           If you have comments or suggestions, please get in touch with the submitter(s) or MetaboLights team (<b>
