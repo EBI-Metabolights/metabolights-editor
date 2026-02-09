@@ -33,7 +33,7 @@
       </p>
     </div>
   </div>
-  <div class="step-item" [ngClass]="{ 'is-active': step == 4, 'is-completed': step > 4 }">
+  <div *ngIf="!hideAssayStep" class="step-item" [ngClass]="{ 'is-active': step == 4, 'is-completed': step > 4 }">
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
@@ -45,13 +45,20 @@
       </p>
     </div>
   </div>
-  <div class="step-item" [ngClass]="{ 'is-active': step == 5, 'is-completed': step > 5 }">
+  <div *ngIf="!hideUploadStep" class="step-item" [ngClass]="{ 'is-active': step == 5, 'is-completed': step > 5 }">
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">
         <a [ngClass]="{ 'has-text-grey': step < 5 || (step > 5 && !allowBackward) }"
           (click)="redirectTo('upload', null, 5)">Upload files</a>
       </p>
+    </div>
+  </div>
+  <div class="step-item"
+    [ngClass]="{ 'is-active': step == 4 && hideAssayStep && hideUploadStep, 'is-completed': step > 4 && hideAssayStep && hideUploadStep }">
+    <div class="step-marker"></div>
+    <div class="step-details">
+      <p class="step-title">Done</p>
     </div>
   </div>
 </div>

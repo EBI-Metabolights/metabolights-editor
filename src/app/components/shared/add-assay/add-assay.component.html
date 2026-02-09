@@ -101,7 +101,7 @@
                         </div>
                         <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
                           [controlListKey]="'Assay Design Descriptor'" (saved)="onDescriptorEdited($event, i)"
-                          (deleted)="removeDescriptor(i)"></mtbls-design-descriptor>
+                          (deleted)="removeDescriptor(i)" [isCreationFlow]="true"></mtbls-design-descriptor>
                       </div>
                     </div>
                   </div>
@@ -113,7 +113,7 @@
               </div>
             </div>
             <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
-              [controlListKey]="'Assay Descriptor'" (saved)="onDescriptorSaved($event)"></mtbls-design-descriptor>
+              [controlListKey]="'Assay Descriptor'" (saved)="onDescriptorSaved($event)" [isCreationFlow]="true"></mtbls-design-descriptor>
           </div>
         </div>
 

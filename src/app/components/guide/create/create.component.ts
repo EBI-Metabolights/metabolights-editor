@@ -72,7 +72,7 @@ export class CreateComponent implements OnInit {
     datasetLicenseAgreement: false,
     datasetPolicyAgreement: false,
     emailCommunicationAgreement: false,
-    privacyPolicyAgreement: true
+    privacyPolicyAgreement: false
   };
   publicationStatus: Ontology[] = [];
   publicationDoi: string = "";
@@ -501,6 +501,7 @@ export class CreateComponent implements OnInit {
            this.selectedInvestigationFileTemplate &&
            this.agreements?.datasetLicenseAgreement &&
            this.agreements?.datasetPolicyAgreement &&
+           this.agreements?.privacyPolicyAgreement &&
            this.hasPrincipalInvestigator &&
            allContactsValid);
   }
@@ -685,8 +686,8 @@ export class CreateComponent implements OnInit {
   // Descriptors
   addDescriptorWithCategory(descriptor: any, categoryId: string) {
       if (!descriptor.comments) descriptor.comments = [];
-      descriptor.comments.push(new MTBLSComment("Study Design Type Category", categoryId));
-      descriptor.comments.push(new MTBLSComment("Study Design Type Source", "submitter"));
+      descriptor.comments.push(new MTBLSComment("Study Design Category", categoryId));
+      descriptor.comments.push(new MTBLSComment("Study Design Source", "submitter"));
       this.store.dispatch(new StudyCreation.AddDesignDescriptor(descriptor));
   }
 
@@ -699,13 +700,13 @@ export class CreateComponent implements OnInit {
   
   getDescriptorsByCategory(categoryId: string) {
       return this.designDescriptors.filter(d => 
-          d.comments && d.comments.some(c => c.name === "Study Design Type Category" && c.value === categoryId)
+          d.comments && d.comments.some(c => c.name === "Study Design Category" && c.value === categoryId)
       );
   }
 
   getKeywords() {
       return this.designDescriptors.filter(d => 
-          !d.comments || !d.comments.some(c => c.name === "Study Design Type Category")
+          !d.comments || !d.comments.some(c => c.name === "Study Design Category")
       );
   }
 
@@ -893,6 +894,7 @@ export class CreateComponent implements OnInit {
         selectedSampleFileTemplate: formValue.sampleFileTemplate || "minimum",
         datasetLicenseAgreement: this.agreements.datasetLicenseAgreement,
         datasetPolicyAgreement: this.agreements.datasetPolicyAgreement,
+        privacyPolicyAgreement: this.agreements.privacyPolicyAgreement,
         publications: [
           {
             title: (this as any).publicationTitle || "",
@@ -920,22 +922,8 @@ export class CreateComponent implements OnInit {
         this.newStudy = res.new_study;
         this.isLoading = false;
 
-        if (isMultipleCategories) {
-            const count = Object.keys(selectedStudyCategories).length;
-            Swal.fire({
-              title: "Success",
-              text: `We created the following ${count} MetaboLights submissions for your study. You can select and update your MetaboLights submissions.`,
-              type: "success",
-              confirmButtonText: "OK"
-            }).then(() => {
-              this.router.navigate(['/console']);
-            });
-        } else {
-            // Single Category Flow: Proceed to wizard Step 4
-            this.store.dispatch(new GetGeneralMetadata(this.newStudy, false));
-            this.store.dispatch(new Operations.GetFreshFilesList(false, false, this.newStudy));
-            this.currentSubStep = 4;
-        }
+        // Transition to the "Done" guide step
+        this.currentSubStep = 4;
       },
       error: (err) => {
         toastr.error("Study creation error.", "Error", {
@@ -949,6 +937,20 @@ export class CreateComponent implements OnInit {
       }
     });
   }
+  onFinishCreation() {
+    // Construct selectedStudyCategories from studyAssaySelection to check if multiple
+    const selectedCategoryKeys = Object.keys(this.studyAssaySelection || {}).filter(key => 
+      this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
+    );
+    const isMultiple = selectedCategoryKeys.length > 1;
+
+    if (isMultiple) {
+      this.router.navigate(['/console']);
+    } else {
+      this.router.navigate(['/study', this.newStudy]);
+    }
+  }
+
   proceedToNextStep() {
     this.isLoading = true;
     setTimeout(() => {

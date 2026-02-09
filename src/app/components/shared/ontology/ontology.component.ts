@@ -452,6 +452,11 @@ export class OntologyComponent implements OnInit, OnChanges {
         }
       }
       
+      if (changes.controlList || changes.rule) {
+        this.getDefaultTerms();
+        this.setCurrentOptions(this.allvalues);
+      }
+      
       // Emit to parent when array becomes empty
       this.emptyError.emit(this.values.length === 0);
   }

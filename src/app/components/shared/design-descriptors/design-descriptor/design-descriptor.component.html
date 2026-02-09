@@ -50,7 +50,7 @@
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
-    <div class="modal-card vw80">
+    <div class="modal-card" [ngClass]="isCreationFlow ? '' : 'vw80'">
       <div *ngIf="isFormBusy" class="load-bar">
         <div class="bar"></div>
         <div class="bar"></div>

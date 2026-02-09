@@ -12,6 +12,8 @@ export class ProgressComponent implements OnInit {
   @Input() internalNavigationOnly = false;
   @Input() allowBackward = true;
   @Input() hidePublicationStep = false;
+  @Input() hideAssayStep = false;
+  @Input() hideUploadStep = false;
   @Output() stepClick = new EventEmitter<number>();
 
   constructor(private router: Router) {}
