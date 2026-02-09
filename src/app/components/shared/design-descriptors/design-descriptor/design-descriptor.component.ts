@@ -73,9 +73,32 @@ export class DesignDescriptorComponent implements OnInit {
   @Input("mode") mode: 'store' | 'local' = 'store';
   @Input() controlListKey: string = null;
   @Input() isaFileType: string = 'investigation';
-  @Input() templateVersion: string = null;
-  @Input() isaFileTemplateName: string = null;
-  @Input() selectedStudyCategories: string[] = null;
+  @Input() set templateVersion(value: string) {
+    this._templateVersion = value;
+    this.initDescriptorCategories();
+  }
+  get templateVersion(): string {
+    return this._templateVersion;
+  }
+  private _templateVersion: string = null;
+
+  @Input() set isaFileTemplateName(value: string) {
+    this._isaFileTemplateName = value;
+    this.initDescriptorCategories();
+  }
+  get isaFileTemplateName(): string {
+    return this._isaFileTemplateName;
+  }
+  private _isaFileTemplateName: string = null;
+  @Input() set selectedStudyCategories(value: any) {
+    this._selectedStudyCategories = value;
+    this.initDescriptorCategories();
+  }
+  get selectedStudyCategories(): any {
+    return this._selectedStudyCategories;
+  }
+  private _selectedStudyCategories: any = null;
+  @Input("isCreationFlow") isCreationFlow: boolean = false;
   @Output() saved = new EventEmitter<Ontology>();
   @Output() deleted = new EventEmitter<Ontology>();
 
@@ -396,18 +419,21 @@ export class DesignDescriptorComponent implements OnInit {
 
       if (controlListKey && this.legacyControlLists) {
         // ... existing logic to validate rule ...
-        const selectionInput = {
+        const ruleSelectionInput = {
           isaFileType: isaFileType,
-          studyCategory: this.studyCategory,
-          studyCreatedAt: this.studyCreatedAt || new Date(),
+          studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0) 
+            ? this.selectedStudyCategories[0] 
+            : (typeof this.selectedStudyCategories === 'string' ? this.selectedStudyCategories : this.studyCategory),
+          studyCreatedAt: this.studyCreatedAt || null,
           templateVersion: version,
+          isaFileTemplateName: this.isaFileTemplateName,
         };
         let rule = null;
         try {
           rule = getValidationRuleForField(
             { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
             controlListKey,
-            selectionInput as any
+            ruleSelectionInput as any
           );
         } catch (e) {
           rule = null;
@@ -466,7 +492,7 @@ export class DesignDescriptorComponent implements OnInit {
       // Resolve category if editing
       if (!this.addNewDescriptor && this.descriptor && this.descriptor.comments) {
         const categoryComment = this.descriptor.comments.find(
-          (c) => c.name === "Study Design Type Category"
+          (c) => c.name === "Study Design Category"
         );
         if (categoryComment) {
           const catId = categoryComment.value;
@@ -632,7 +658,7 @@ export class DesignDescriptorComponent implements OnInit {
   isCuratorAdded(descriptor: Ontology): boolean {
     if (descriptor && descriptor.comments) {
       const sourceComment = descriptor.comments.find(
-        (c) => c.name === "Study Design Type Source"
+        (c) => c.name === "Study Design Source"
       );
       if (sourceComment) {
         return sourceComment.value.toLowerCase() !== "submitter";
@@ -695,9 +721,9 @@ export class DesignDescriptorComponent implements OnInit {
         }
         // Remove existing category comment if any
         studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
-          (c) => c.name !== "Study Design Type Category"
+          (c) => c.name !== "Study Design Category"
         );
-        studyDesignDescriptor.comments.push(new MTBLSComment("Study Design Type Category", categoryId));
+        studyDesignDescriptor.comments.push(new MTBLSComment("Study Design Category", categoryId));
       }
     }
 
@@ -708,11 +734,11 @@ export class DesignDescriptorComponent implements OnInit {
       const isCurator = this.store.selectSnapshot(UserState.isCurator);
       // Remove existing source comment if any
       studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
-        (c) => c.name !== "Study Design Type Source"
+        (c) => c.name !== "Study Design Source"
       );
       studyDesignDescriptor.comments.push(
         new MTBLSComment(
-          "Study Design Type Source",
+          "Study Design Source",
           isCurator ? "data-curation" : "submitter"
         )
       );
@@ -727,7 +753,7 @@ export class DesignDescriptorComponent implements OnInit {
   getCategoryLabel(descriptor: Ontology): string {
     if (descriptor && descriptor.comments && this.templateConfiguration) {
       const categoryComment = descriptor.comments.find(
-        (c) => c.name === "Study Design Type Category"
+        (c) => c.name === "Study Design Category"
       );
       if (categoryComment) {
         const categoryId = categoryComment.value;
@@ -769,7 +795,7 @@ export class DesignDescriptorComponent implements OnInit {
     const listName = this.controlListKey || this.defaultControlListName;
     
     if (
-      !(this.defaultControlList && this.defaultControlList.name.length > 0) &&
+      this.defaultControlList.name !== listName &&
       this.editorService.defaultControlLists &&
       listName in this.editorService.defaultControlLists
     ) {
@@ -792,8 +818,10 @@ export class DesignDescriptorComponent implements OnInit {
       defaultOntologies = defaultRule;
     }
 
-    const selectionInput = {
-      studyCategory: this.selectedStudyCategories ? this.selectedStudyCategories : this.studyCategory,
+    const ruleSelectionInput = {
+      studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0) 
+        ? this.selectedStudyCategories[0] 
+        : (typeof this.selectedStudyCategories === 'string' ? this.selectedStudyCategories : this.studyCategory),
       studyCreatedAt: this.studyCreatedAt,
       isaFileType: this.isaFileType ? this.isaFileType : "investigation",
       isaFileTemplateName: this.isaFileTemplateName,
@@ -811,7 +839,7 @@ export class DesignDescriptorComponent implements OnInit {
             controlLists: this.legacyControlLists,
           } as MetabolightsFieldControls,
           listName,
-          selectionInput
+          ruleSelectionInput
         );
       }
     } catch (e) {

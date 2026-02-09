@@ -9,7 +9,7 @@
 </span>
 <ng-template #showCard>
   <div class="card mb-6" style="position: relative;">
-    <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null"
+    <mtbls-design-descriptor *ngIf="!isReadOnly" [readOnly]="readOnly" [value]="null" [isCreationFlow]="isCreationFlow"
       style="position: absolute; top: 12px; right: 12px;"></mtbls-design-descriptor>
     <header class="card-heading" [ngClass]="{ 'hover-highlight': isReadOnly }">
       <p>
@@ -23,7 +23,8 @@
         <div *ngIf="(descriptors$ | async)?.length > 0; else emptyMessage">
           <div id="meta" class="field is-grouped is-grouped-multiline">
             <div *ngFor="let descriptor of descriptors$ | async">
-              <mtbls-design-descriptor [readOnly]="readOnly" [value]="descriptor"></mtbls-design-descriptor>
+              <mtbls-design-descriptor [readOnly]="readOnly" [value]="descriptor"
+                [isCreationFlow]="isCreationFlow"></mtbls-design-descriptor>
             </div>
           </div>
         </div>

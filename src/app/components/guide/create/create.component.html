@@ -1,8 +1,8 @@
 <nav-bar mode="light"></nav-bar>
 <div class="container fixed-navbar-offset">
   <mtbls-progress [study]="newStudy" [step]="currentSubStep" [internalNavigationOnly]="true"
-    (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4"
-    [hidePublicationStep]="false"></mtbls-progress>
+    (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4" [hidePublicationStep]="false"
+    [hideAssayStep]="true" [hideUploadStep]="true"></mtbls-progress>
 
   <div [ngSwitch]="currentSubStep">
     <!-- Step 1: Submission Details -->
@@ -116,6 +116,15 @@
                     class="ml-1">MetaboLights Data Policy</a>.
                 </mat-checkbox>
               </div>
+              <div>
+                <mat-checkbox [(ngModel)]="agreements.privacyPolicyAgreement" color="primary"
+                  [class.warn-unchecked]="!agreements.privacyPolicyAgreement">
+                  I agree to EMBL-EBI MetaboLights cookie policy and the limited processing of my personal data as
+                  outlined in
+                  <a href="https://www.ebi.ac.uk/metabolights/assets/dpe/Metabolights-privacy-notice-v1.pdf"
+                    target="_blank" class="ml-1">Privacy Notice</a>.
+                </mat-checkbox>
+              </div>
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
@@ -183,7 +192,10 @@
 
               </div>
               <div class="column is-12">
-                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)</h3>
+                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)*
+                  <mat-icon [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'"
+                    class="info-icon">help</mat-icon>
+                </h3>
                 <div class="mb-4" *ngFor="let category of activeDesignDescriptorCategories">
                   <div class="box p-3 is-clearfix" style="position: relative;">
                     <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
@@ -199,10 +211,10 @@
                       </span>
                     </div>
                     <mtbls-design-descriptor #descRef [mode]="'local'" [controlListKey]="category.controlListKey"
-                      [isaFileType]="category.isaFileType"
+                      [isaFileType]="category.isaFileType" [isCreationFlow]="true"
                       [templateVersion]="templateConfiguration?.defaultTemplateVersion"
                       [isaFileTemplateName]="selectedInvestigationFileTemplate"
-                      [selectedStudyCategories]="selectedStudyCategoryIds"
+                      [selectedStudyCategories]="selectedCategories"
                       (saved)="addDescriptorWithCategory($event, category.id)"></mtbls-design-descriptor>
                   </div>
                 </div>
@@ -221,9 +233,9 @@
                       </span>
                     </div>
                     <mtbls-design-descriptor #kwRef [mode]="'local'" [controlListKey]="'Study Design Type'"
-                      [templateVersion]="templateConfiguration?.defaultTemplateVersion"
+                      [isCreationFlow]="true" [templateVersion]="templateConfiguration?.defaultTemplateVersion"
                       [isaFileTemplateName]="selectedInvestigationFileTemplate"
-                      [selectedStudyCategories]="selectedStudyCategoryIds"
+                      [selectedStudyCategories]="selectedCategories"
                       (saved)="addKeyword($event)"></mtbls-design-descriptor>
                   </div>
                 </div>
@@ -256,7 +268,16 @@
         <div class="column is-10">
           <div class="box">
             <div class="box gray-box mb-4">
-              <h4 class="title is-5 has-text-weight-bold mb-5">Publication</h4>
+              <h4 class="title is-5 has-text-weight-bold mb-2">Publication*
+                <mat-icon [matTooltip]="'The act of publishing, and also any copies issued for public distribution'"
+                  class="info-icon">help</mat-icon>
+              </h4>
+              <p class="is-size-7 has-text-grey mb-5">
+                Please provide details of any scientific article(s), preprint(s), or report(s) associated with the
+                study.
+                This includes manuscripts that are in preparation, submitted, available as preprints, or already
+                published.
+              </p>
               <div class="category-rows-container mt-4">
                 <!-- Publication Title -->
                 <div class="field mb-4">
@@ -322,14 +343,15 @@
                       <div class="control">
                         <mat-form-field class="full-width" appearance="outline"
                           [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
-                          <mat-label>DOI<span *ngIf="isDoiRequired">*</span></mat-label>
+                          <mat-label>DOI</mat-label>
                           <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
                             [required]="isDoiRequired">
                           <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
                             <span *ngIf="isDoiRequired"><b>(required)</b></span>
                           </mat-hint>
                         </mat-form-field>
-                        <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 4px;">{{ doiErrorMessage }}
+                        <p class="help is-danger" *ngIf="doiErrorMessage" style="margin-top: 20px;">{{ doiErrorMessage
+                          }}
                         </p>
                       </div>
                     </div>
@@ -376,19 +398,89 @@
       </div>
     </div>
 
-    <!-- Step 4: Sample & Assays -->
+    <!-- Step 4: Done (Guide) -->
     <div *ngSwitchCase="4">
-      <div class="mt-4" *ngIf="newStudy">
-        <guide-assays [hideNav]="true" (next)="currentSubStep = 5"></guide-assays>
+      <div class="columns is-centered mt-4">
+        <div class="column is-10">
+          <div class="box">
+            <div class="has-text-centered mb-5">
+              <span class="material-symbols-outlined is-size-1 has-text-success">check_circle</span>
+              <h2 class="title is-4 has-text-weight-bold">Successfully Completed Study Creation!</h2>
+              <p class="subtitle is-6 mt-2 mb-2">
+                In order to know more about your study, please go through the study document:
+                <a href="https://ebi-metabolights.github.io/guides/Study_description/" target="_blank"
+                  class="has-text-link">Study Description Guide</a>
+              </p>
+            </div>
 
-      </div>
-    </div>
+            <div class="columns is-multiline">
+              <div class="column is-6">
+                <div class="box h-100 gray-box">
+                  <h5 class="title is-6 has-text-weight-bold mb-3">Sample</h5>
+                  <p class="is-size-7 mb-2">
+                    The sample information should provide all relevant facts about each sample and any
+                    controls/standards included in the study. There is ONE sample sheet per study.
+                  </p>
+                  <p class="is-size-7 mb-2">
+                    Sample metadata should include a unique sample name, organism, organism part and sample type.
+                    Further sample descriptors should be included where available by selecting +Factor to add new
+                    columns.
+                  </p>
+                  <p class="is-size-7">
+                    A group of samples can be added using +Samples and pasting a list or selecting to import Raw data
+                    file names if appropriate.
+                  </p>
+                </div>
+              </div>
 
-    <!-- Step 5: Upload -->
-    <div *ngSwitchCase="5">
-      <div class="mt-4" *ngIf="newStudy">
-        <raw-upload [hideNav]="true" (next)="onFinishWizard()"></raw-upload>
+              <div class="column is-6">
+                <div class="box h-100 gray-box">
+                  <h5 class="title is-6 has-text-weight-bold mb-3">Assay</h5>
+                  <p class="is-size-7 mb-2">
+                    The assay information describes the assay process for each control and sample and connects the
+                    sample name to both its corresponding raw data file and metabolite identification table. MULTIPLE
+                    assays can be added per study.
+                  </p>
+                  <p class="is-size-7">
+                    Assays are divided into sections each starting with a Protocol Ref column, which describes the
+                    specifics of that part of the assay using controlled vocabulary.
+                  </p>
+                </div>
+              </div>
 
+              <div class="column is-6">
+                <div class="box h-100 gray-box">
+                  <h5 class="title is-6 has-text-weight-bold mb-3">Study Protocols</h5>
+                  <p class="is-size-7">
+                    Protocols are central for reproducibility purposes and should provide a detailed description of the
+                    steps taken in the study. When an assay is selected, the protocol section will populate with several
+                    titled sections adapted to your assay type.
+                  </p>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="box h-100 gray-box">
+                  <h5 class="title is-6 has-text-weight-bold mb-3">Metabolite Annotation File (MAF)</h5>
+                  <p class="is-size-7">
+                    When you create an assay, a corresponding metabolite annotation file is added. This should include
+                    all metabolites/unknowns identified. The MAF should be referenced in the metabolite assignment
+                    file column of each assay.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="field is-grouped is-pulled-right mt-5">
+              <div class="control">
+                <button class="button is-primary" (click)="onFinishCreation()">
+                  Finish & View Study
+                </button>
+              </div>
+            </div>
+            <div class="is-clearfix"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -19,6 +19,7 @@ export class DesignDescriptorsComponent implements OnInit {
   
   @Input("inline") inline: boolean;
   @Input("readOnly") readOnly: boolean;
+  @Input("isCreationFlow") isCreationFlow: boolean = false;
   isReadOnly = false;
 
   constructor() {
