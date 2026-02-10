@@ -3,7 +3,7 @@
     <mat-form-field class="full-width premium-field" appearance="outline" [class.mat-form-field-invalid]="hasError"
       subscriptSizing="dynamic">
       <mat-label *ngIf="label">{{label}}<span *ngIf="isRequired && !label.includes('*')"
-          class="ml-1">*</span></mat-label>
+          class="ml-1 has-error">*</span></mat-label>
       <mat-chip-grid #chipList class="custom-chip-list">
         <span *ngFor="let value of values">
           <mat-chip-row *ngIf="value && value.annotationValue" [selectable]="selectable" [removable]="removable"

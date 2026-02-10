@@ -116,15 +116,6 @@
                     class="ml-1">MetaboLights Data Policy</a>.
                 </mat-checkbox>
               </div>
-              <div>
-                <mat-checkbox [(ngModel)]="agreements.privacyPolicyAgreement" color="primary"
-                  [class.warn-unchecked]="!agreements.privacyPolicyAgreement">
-                  I agree to EMBL-EBI MetaboLights cookie policy and the limited processing of my personal data as
-                  outlined in
-                  <a href="https://www.ebi.ac.uk/metabolights/assets/dpe/Metabolights-privacy-notice-v1.pdf"
-                    target="_blank" class="ml-1">Privacy Notice</a>.
-                </mat-checkbox>
-              </div>
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
@@ -152,7 +143,7 @@
             <!-- Study Title -->
             <div class="field mb-4">
               <mat-form-field class="full-width" appearance="outline">
-                <mat-label>Study Title (min 25 chars)*</mat-label>
+                <mat-label>Study Title (min 25 chars)<span class="has-error">*</span></mat-label>
                 <input matInput type="text" [(ngModel)]="studyTitle"
                   placeholder="Enter a descriptive title for your study">
                 <mat-hint *ngIf="studyTitle && studyTitle.trim().length < 25" class="has-text-danger">
@@ -164,7 +155,7 @@
             <!-- Study Description -->
             <div class="field mb-4">
               <mat-form-field class="full-width" appearance="outline">
-                <mat-label>Study Description (min 60 chars)*</mat-label>
+                <mat-label>Study Description (min 60 chars)<span class="has-error">*</span></mat-label>
                 <textarea matInput [(ngModel)]="studyDescription" placeholder="Please provide a description of your experiment, why not use the abstract of your paper (min 60 chars)
 " rows="5"></textarea>
                 <mat-hint *ngIf="studyDescription && studyDescription.trim().length < 60" class="has-text-danger">
@@ -192,7 +183,8 @@
 
               </div>
               <div class="column is-12">
-                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)*
+                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)<span
+                    class="has-error">*</span>
                   <mat-icon [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'"
                     class="info-icon">help</mat-icon>
                 </h3>
@@ -202,7 +194,7 @@
                       (click)="descRef.openModal()">+
                       Add</button>
                     <h6 class="title is-6 mb-2" style="margin-right: 60px;">{{category.label}} <span
-                        *ngIf="category.min > 0">(at least {{category.min}})*</span></h6>
+                        *ngIf="category.min > 0">(at least {{category.min}})<span class="has-error">*</span></span></h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
                         class="tag is-primary is-light is-medium">
@@ -268,7 +260,7 @@
         <div class="column is-10">
           <div class="box">
             <div class="box gray-box mb-4">
-              <h4 class="title is-5 has-text-weight-bold mb-2">Publication*
+              <h4 class="title is-5 has-text-weight-bold mb-2">Publication<span class="has-error">*</span>
                 <mat-icon [matTooltip]="'The act of publishing, and also any copies issued for public distribution'"
                   class="info-icon">help</mat-icon>
               </h4>
@@ -282,7 +274,7 @@
                 <!-- Publication Title -->
                 <div class="field mb-4">
                   <mat-form-field class="full-width" appearance="outline">
-                    <mat-label>Publication Title*</mat-label>
+                    <mat-label>Publication Title<span class="has-error">*</span></mat-label>
                     <input matInput type="text" [(ngModel)]="publicationTitle" placeholder="Publication Title">
                     <mat-hint *ngIf="fieldValidation('publications.publication.title').description">
                       {{ fieldValidation('publications.publication.title').description }}
@@ -308,7 +300,7 @@
                         <ng-container
                           *ngIf="publicationStatusControlList && !publicationStatusControlList.renderAsDropdown; else publicationStatusDropdown">
                           <!-- Keep mtbls-ontology as is since it was already redesigned for premium Material -->
-                          <label class="label is-small">Publication Status*</label>
+                          <label class="label is-small">Publication Status<span class="has-error">*</span></label>
                           <mtbls-ontology [controlList]="publicationStatusControlList" [values]="publicationStatus"
                             (changed)="onPublicationStatusChange($event)"
                             [validations]="fieldValidation('publications.publication.status')" [inline]="true"
@@ -319,7 +311,7 @@
                         <ng-template #publicationStatusDropdown>
                           <div *ngIf="publicationStatusControlList?.values?.length">
                             <mat-form-field class="full-width" appearance="outline">
-                              <mat-label>Publication Status*</mat-label>
+                              <mat-label>Publication Status<span class="has-error">*</span></mat-label>
                               <mat-select [value]="publicationStatus[0]?.annotationValue"
                                 (selectionChange)="onPublicationStatusChange($event.value)">
                                 <mat-option *ngFor="let option of publicationStatusControlList.values"

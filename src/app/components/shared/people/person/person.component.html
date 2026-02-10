@@ -115,9 +115,6 @@
             <mat-label>Last name</mat-label>
             <input matInput formControlName="lastName" [readonly]="isReadOnly" />
             <mat-hint>{{ fieldValidation("lastName")?.description }}
-              <span *ngIf="isFieldRequired('firstName')">
-                <b>(required)</b>
-              </span>
             </mat-hint>
             <mat-error *ngIf="form.get('lastName')?.errors?.lastName">
               {{ form.get("lastName").errors.lastName.error }}
@@ -144,9 +141,6 @@
             <mat-label>First name</mat-label>
             <input matInput formControlName="firstName" [readonly]="isReadOnly" />
             <mat-hint>{{ fieldValidation("firstName")?.description }}
-              <span *ngIf="isFieldRequired('firstName')">
-                <b>(required)</b>
-              </span>
             </mat-hint>
             <mat-error *ngIf="form.get('firstName')?.errors?.firstName">
               {{ form.get("firstName").errors.firstName.error }}
@@ -199,7 +193,6 @@
             <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput />
             <mat-hint>
               {{ fieldValidation("email")?.description }}
-              <span *ngIf="getIsRequired('email')"><b>(required)</b></span>
             </mat-hint>
             <mat-error *ngIf="
                 form.get('email').errors &&
@@ -300,9 +293,6 @@
             </mat-autocomplete>
             <mat-hint>
               {{ fieldValidation("affiliation")?.description }}
-              <span *ngIf="getIsRequired('affiliation')">
-                <b>(required)</b>
-              </span>
             </mat-hint>
             <mat-error *ngIf="
                 form.get('affiliation').errors &&
