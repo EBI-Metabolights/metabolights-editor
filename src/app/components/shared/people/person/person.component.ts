@@ -187,6 +187,31 @@ export class PersonComponent implements OnInit {
     }
   }
 
+  autoMapAffiliation() {
+    const affiliation = this.form.get('affiliation')?.value;
+    const rorid = this.form.get('rorid')?.value;
+    
+    if (affiliation && affiliation.length >= 3 && !rorid) {
+      this.editorService.getRorOrganizations(affiliation).subscribe((res: any) => {
+        const docs = res?.response?.docs || [];
+        if (docs.length > 0) {
+          // Find best match: first priority is exact name, otherwise just take the first one
+          const bestMatch = docs.find(doc => doc.label?.toLowerCase() === affiliation.toLowerCase()) || docs[0];
+          
+          if (bestMatch) {
+            this.form.patchValue({
+              affiliation: bestMatch.label || bestMatch.name || affiliation,
+              rorid: bestMatch.iri || bestMatch.id
+            }, { emitEvent: false });
+            this.form.get('affiliation')?.markAsDirty();
+            this.form.get('rorid')?.markAsDirty();
+            this.cdr.detectChanges();
+          }
+        }
+      });
+    }
+  }
+
   initialiseForm() {
     this.isFormBusy = false;
 
@@ -290,6 +315,7 @@ export class PersonComponent implements OnInit {
     }
 
     this.initialiseForm();
+    this.autoMapAffiliation();
 
     // ensure roles control / ontology child are initialised with the current value
     try {
@@ -510,9 +536,10 @@ private updateValidatorsBasedOnRoles() {
     if (this._controlList?.renderAsDropdown) {
       this.isPiRole = rolesValue === 'Principal Investigator';
     }else{
-      this.isPiRole = rolesValue.some((role: any) =>
-        role.annotationValue?.includes('Principal Investigator')
-      );
+      this.isPiRole = rolesValue.some((role: any) => {
+        const val = typeof role === 'string' ? role : role?.annotationValue;
+        return val?.includes('Principal Investigator');
+      });
   }
     this.updatePiValidators(this.isPiRole);
   }
@@ -542,13 +569,14 @@ private updateValidatorsBasedOnRoles() {
       // ignore sync errors
     }
 
+    this.form.markAsDirty();
     this.updateValidatorsBasedOnRoles();
     this.markRequiredFieldsAsTouched();
   }
 
 private updatePiValidators(isPi: boolean): void {
   const piFields = ['affiliation', 'email'];
-  const alwaysRequiredFields = ['firstName', 'lastName'];
+  const alwaysRequiredFields = ['firstName', 'lastName', 'roles'];
 
   // Helper to normalize validators to an array
   const getValidatorArray = (fieldControl: AbstractControl): any[] => {

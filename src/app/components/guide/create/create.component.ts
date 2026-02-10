@@ -98,6 +98,7 @@ export class CreateComponent implements OnInit {
   studyCreationForm: UntypedFormGroup;
   selectedCreateOption = 2;
   currentSubStep = 1;
+  doneStepExpandedIndex = 0;
   newStudy = null;
   options: any[] = [
     {
@@ -400,6 +401,23 @@ export class CreateComponent implements OnInit {
     
     this.updateSelectionStatus();
   }
+
+  get firstSelectedAssayTypeRaw(): string | null {
+    if (this.selectedCategories && this.selectedCategories.length > 0) {
+      const firstCatId = this.selectedCategories[0];
+      const selectedAssays = this.studyAssaySelection[firstCatId];
+      if (selectedAssays && selectedAssays.length > 0) {
+        return selectedAssays[0];
+      }
+    }
+    return null;
+  }
+
+  get firstSelectedAssayType(): string | null {
+    const raw = this.firstSelectedAssayTypeRaw;
+    return raw ? raw.split(';')[0] : null;
+  }
+
   updateSelectionStatus() {
       this.isAnyAssaySelected = Object.values(this.studyAssaySelection).some((assays: string[]) => assays.length > 0);
   }
@@ -615,7 +633,7 @@ export class CreateComponent implements OnInit {
     
     this.confirmationTitle = "Confirm Submission";
     if (count > 0) {
-        this.confirmationMessage = `We created the following ${count} MetaboLights submissions for your study. Are you sure to continue?`;
+        this.confirmationMessage = `We will create the following ${count} MetaboLights submissions for your study. Are you sure to continue?`;
     } else {
         this.confirmationMessage = "Are you sure you would like to create this study?";
     }
@@ -976,5 +994,9 @@ export class CreateComponent implements OnInit {
         this.router.navigate(['/study', this.newStudy]);
       }
     });
+  }
+
+  toggleDoneStepExpand(index: number) {
+    this.doneStepExpandedIndex = this.doneStepExpandedIndex === index ? -1 : index;
   }
 }

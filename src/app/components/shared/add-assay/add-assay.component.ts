@@ -559,7 +559,7 @@ export class AddAssayComponent implements OnInit, OnChanges {
                             studyCategory: this.studyCategory as any,
                             studyCreatedAt: this.studyCreatedAt,
                             isaFileType: "assay" as any,
-                            isaFileTemplateName: assayType,
+                            isaFileTemplateName: assayType ? assayType.split(';')[0] : null,
                             templateVersion: this.currentTemplateVersion,
                         };
                         try {

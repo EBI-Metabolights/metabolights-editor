@@ -100,6 +100,7 @@
                           </div>
                         </div>
                         <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
+                          [isaFileTemplateName]="assayForm.get('assayType').value ? assayForm.get('assayType').value.split(';')[0] : null"
                           [controlListKey]="'Assay Design Descriptor'" (saved)="onDescriptorEdited($event, i)"
                           (deleted)="removeDescriptor(i)" [isCreationFlow]="true"></mtbls-design-descriptor>
                       </div>
@@ -113,6 +114,7 @@
               </div>
             </div>
             <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
+              [isaFileTemplateName]="assayForm.get('assayType').value ? assayForm.get('assayType').value.split(';')[0] : null"
               [controlListKey]="'Assay Descriptor'" (saved)="onDescriptorSaved($event)"
               [isCreationFlow]="true"></mtbls-design-descriptor>
           </div>
