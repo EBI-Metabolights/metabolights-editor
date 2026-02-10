@@ -72,7 +72,7 @@ export class CreateComponent implements OnInit {
     datasetLicenseAgreement: false,
     datasetPolicyAgreement: false,
     emailCommunicationAgreement: false,
-    privacyPolicyAgreement: false
+    privacyPolicyAgreement: true
   };
   publicationStatus: Ontology[] = [];
   publicationDoi: string = "";
@@ -501,7 +501,6 @@ export class CreateComponent implements OnInit {
            this.selectedInvestigationFileTemplate &&
            this.agreements?.datasetLicenseAgreement &&
            this.agreements?.datasetPolicyAgreement &&
-           this.agreements?.privacyPolicyAgreement &&
            this.hasPrincipalInvestigator &&
            allContactsValid);
   }
@@ -687,7 +686,7 @@ export class CreateComponent implements OnInit {
   addDescriptorWithCategory(descriptor: any, categoryId: string) {
       if (!descriptor.comments) descriptor.comments = [];
       descriptor.comments.push(new MTBLSComment("Study Design Category", categoryId));
-      descriptor.comments.push(new MTBLSComment("Study Design Source", "submitter"));
+
       this.store.dispatch(new StudyCreation.AddDesignDescriptor(descriptor));
   }
 

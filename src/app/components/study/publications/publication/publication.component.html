@@ -150,9 +150,6 @@
             cdkAutosizeMaxRows="3" cdkTextareaAutosize required>
           </textarea>
           <mat-hint>{{ fieldValidation("title").description }}
-            <span *ngIf="isFieldRequired('title')">
-              <b>(required)</b>
-            </span>
           </mat-hint>
           <mat-error *ngIf="
               form.get('title')?.errors &&
@@ -178,13 +175,10 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>DOI</mat-label>
+            <mat-label>DOI<span class="has-error">*</span></mat-label>
             <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
               (keydown.enter)="getArticleFromDOI()" matInput />
             <mat-hint>{{ fieldValidation("doi").description }}
-              <span *ngIf="isFieldRequired('doi')">
-                <b>(required)</b>
-              </span>
             </mat-hint>
             <mat-error *ngIf="
                 form.get('doi')?.errors &&
@@ -223,7 +217,7 @@
               <ng-template #dropdownField>
                 <mat-form-field class="full-width" appearance="outline"
                   *ngIf="_controlList?.values?.length && form.get('status')">
-                  <mat-label>Status*</mat-label>
+                  <mat-label>Status<span class="has-error">*</span></mat-label>
                   <mat-select formControlName="status" placeholder="Status">
                     <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
                       {{ option.annotationValue }}

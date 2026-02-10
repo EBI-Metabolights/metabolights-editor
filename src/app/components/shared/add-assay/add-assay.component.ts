@@ -815,6 +815,14 @@ export class AddAssayComponent implements OnInit, OnChanges {
   saveEditAssay(formattedDescriptors: any[]) {
       const formValues = this.assayForm.getRawValue();
       
+      const getExistingComment = (name: string) => {
+          if (this.assayData && this.assayData.comments) {
+              const comment = this.assayData.comments.find(c => c.name === name);
+              return comment ? comment.value : "";
+          }
+          return "";
+      };
+
       // Filter Assay Types based on study category mappings
       let validAssayTypes = this.activeAssayFileTemplates;
       if (this.templateConfiguration && this.currentTemplateVersion) {
@@ -833,19 +841,41 @@ export class AddAssayComponent implements OnInit, OnChanges {
       }
 
       const assayOption = validAssayTypes.find(a => a.value === formValues.assayType);
-      const assayLabel = assayOption ? assayOption.ontologyTerm.term : formValues.assayType;
-      const assayTermSource = assayOption?.ontologyTerm?.termSource?.name || "";
-      const assayTermAccession = assayOption?.ontologyTerm?.termAccession || "";
+      const assayLabel = assayOption ? (assayOption.ontologyTerm?.term || assayOption.label) : formValues.assayType;
+      
+      // Use existing technologyType if available (Assay Type corresponds to technologyType in model)
+      const existingTechType = this.assayData?.technologyType;
+      const assayTermSource = assayOption?.ontologyTerm?.termSource?.name || existingTechType?.termSource?.name || getExistingComment("Assay Type Term Source REF");
+      const assayTermAccession = assayOption?.ontologyTerm?.termAccession || existingTechType?.termAccession || getExistingComment("Assay Type Term Accession Number");
 
       const measurementKey = formValues.measurementType;
       const measurementOption = this.activeMeasurementTypes.find(m => m.value === measurementKey);
       const measurementLabel = measurementOption ? measurementOption.label : measurementKey;
+      
+      // Check if user changed the value. If same as existing typed object, prefer existing metadata
+      const existingMeasurementObj = this.assayData?.measurementType;
+      const isMeasurementChanged = measurementKey !== existingMeasurementObj?.annotationValue && measurementLabel !== existingMeasurementObj?.annotationValue;
+
+      const measurementTermSource = measurementOption?.ontologyTerm?.termSourceReference || measurementOption?.termSource?.name 
+                                    || (!isMeasurementChanged ? existingMeasurementObj?.termSource?.name : "")
+                                    || (!isMeasurementChanged ? getExistingComment("Measurement Type Term Source REF") : "");
+
+      const measurementTermAccession = measurementOption?.ontologyTerm?.termAccession || measurementOption?.termAccession 
+                                       || (!isMeasurementChanged ? existingMeasurementObj?.termAccession : "")
+                                       || (!isMeasurementChanged ? getExistingComment("Measurement Type Term Accession Number") : "");
+
 
       const omicsKey = formValues.omics;
       const omicsOption = this.activeOmicsTypes.find(o => o.value === omicsKey);
       const omicsLabel = omicsOption ? omicsOption.label : omicsKey;
-      const omicsTermSource = omicsOption?.ontologyTerm?.termSourceReference || omicsOption?.termSource?.name || "";
-      const omicsTermAccession = omicsOption?.ontologyTerm?.termAccession || omicsOption?.termAccession || "";
+
+      const existingOmics = getExistingComment("Omics Type");
+      const isOmicsChanged = omicsKey !== existingOmics && omicsLabel !== existingOmics;
+
+      const omicsTermSource = omicsOption?.ontologyTerm?.termSourceReference || omicsOption?.termSource?.name 
+                              || (!isOmicsChanged ? getExistingComment("Omics Type Term Source REF") : "");
+      const omicsTermAccession = omicsOption?.ontologyTerm?.termAccession || omicsOption?.termAccession 
+                                 || (!isOmicsChanged ? getExistingComment("Omics Type Term Accession Number") : "");
 
       const payload = {
           fields: {
@@ -857,6 +887,8 @@ export class AddAssayComponent implements OnInit, OnChanges {
               { name: "Assay Type Term Source REF", value: assayTermSource },
               { name: "Assay Type Term Accession Number", value: assayTermAccession },
               { name: "Measurement Type", value: measurementLabel }, // Label for comment endpoint
+              { name: "Measurement Type Term Source REF", value: measurementTermSource },
+              { name: "Measurement Type Term Accession Number", value: measurementTermAccession },
               { name: "Omics Type", value: omicsLabel },
               { name: "Omics Type Term Source REF", value: omicsTermSource },
               { name: "Omics Type Term Accession Number", value: omicsTermAccession },

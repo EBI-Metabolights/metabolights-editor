@@ -50,7 +50,7 @@
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
-    <div class="modal-card" [ngClass]="isCreationFlow ? '' : 'vw80'">
+    <div class="modal-card" [ngClass]="isCreationFlow ? '' : 'vw60'">
       <div *ngIf="isFormBusy" class="load-bar">
         <div class="bar"></div>
         <div class="bar"></div>
@@ -67,7 +67,7 @@
                 <div class="control">
                   <mat-form-field class="full-width is-small" appearance="outline">
                     <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
-                      placeholder="Select Group">
+                      placeholder="Select Group" required>
                       <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
                         {{ cat.label }}
                       </mat-option>

@@ -113,7 +113,8 @@
               </div>
             </div>
             <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
-              [controlListKey]="'Assay Descriptor'" (saved)="onDescriptorSaved($event)" [isCreationFlow]="true"></mtbls-design-descriptor>
+              [controlListKey]="'Assay Descriptor'" (saved)="onDescriptorSaved($event)"
+              [isCreationFlow]="true"></mtbls-design-descriptor>
           </div>
         </div>
 
@@ -134,8 +135,8 @@
                     <div class="field" *ngIf="field.mainType === 'ONTOLOGY'">
                       <div class="control" *ngIf="field.type === 'ONTOLOGY'">
                         <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="field.validation"
-                          [inline]="true" [rule]="field.validationRule"
-                          [label]="field.label + (field.required ? ' *' : '')">
+                          [inline]="true" [rule]="field.validationRule" [label]="field.label"
+                          [isRequired]="field.required">
                         </mtbls-ontology>
                       </div>
                     </div>
@@ -169,7 +170,7 @@
                                   <div class="field">
                                     <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
                                       [validations]="field.validation" [inline]="true" [rule]="field.validationRule"
-                                      [label]="field.label + (field.required ? ' *' : '')">
+                                      [label]="field.label" [isRequired]="field.required">
                                     </mtbls-ontology>
                                   </div>
                                 </div>

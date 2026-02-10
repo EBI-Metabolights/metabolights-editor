@@ -522,8 +522,8 @@ a.disabled {
   height: 80vh;
 }
 
-.vw80 {
-  width: 80vw;
+.vw60 {
+  width: 60vw;
 }
 
 element.style {
@@ -634,6 +634,15 @@ element.style {
 .px-20 {
   padding-right: 20px;
   padding-left: 20px;
+}
+
+.has-error {
+  color: red !important;
+}
+
+.mat-mdc-form-field-required-marker,
+.mat-form-field-required-marker {
+  color: red !important;
 }
 
 .main-wrapper {
