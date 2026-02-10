@@ -225,6 +225,12 @@ export class TableComponent
   imageErrorMap = new Map<string, boolean>(); 
   private legacyControlLists: Record<string, any[]> | null = null;
 
+  // Caches for unstable objects to prevent infinite loops in change detection
+  private _columnControlListCache = new Map<string, any>();
+  private _columnValidationsCache = new Map<string, any>();
+  private _defaultOntologiesCache = new Map<string, any[]>();
+  private readonly EMPTY_ARRAY = [];
+
   private studyCategory: StudyCategoryStr = null;
   private templateVersion: string = null;
   private sampleTemplate: string = null;
@@ -386,6 +392,11 @@ export class TableComponent
     this.deSelect();
     this.data = this.tableData.data;
     if (this.data) {
+      // Clear caches for new data
+      this._columnControlListCache.clear();
+      this._columnValidationsCache.clear();
+      this._defaultOntologiesCache.clear();
+
       this.hit = true;
       this.fullRows = this.data.rows;
       this.refreshDisplayedColumns();
@@ -683,6 +694,11 @@ export class TableComponent
   }
 
   detectControlListColumns() {
+    // Clear caches as validations are being re-evaluated
+    this._columnControlListCache.clear();
+    this._columnValidationsCache.clear();
+    this._defaultOntologiesCache.clear();
+
     Object.keys(this.data.header).forEach((col) => {
       const formattedColumnName = col.replace(/\.[0-9]+$/, "");
 
@@ -787,35 +803,57 @@ export class TableComponent
   }
 
   columnControlList(header) {
-  if (this.enableControlList && header && this.controlListNames.has(header)) {
-    const controlList = this.controlLists.get(header);
-    const colData = this.controlListColumns.get(header);
-    if (controlList) {
-      return {
-        ...controlList,
-        renderAsDropdown: colData?.renderAsDropdown || false,
-        rule: colData?.rule || null,
-      };
-    } else if (colData) {
-      return {
-        name: header,
-        values: [],
-        renderAsDropdown: colData?.renderAsDropdown || false,
-        rule: colData?.rule || null,
-      };
+    if (!header) {
+      return {};
     }
+
+    // Check cache first
+    if (this._columnControlListCache.has(header)) {
+      return this._columnControlListCache.get(header);
+    }
+
+    let result = {};
+    if (this.enableControlList && this.controlListNames.has(header)) {
+      const controlList = this.controlLists.get(header);
+      const colData = this.controlListColumns.get(header);
+      if (controlList) {
+        result = {
+          ...controlList,
+          renderAsDropdown: colData?.renderAsDropdown || false,
+          rule: colData?.rule || null,
+        };
+      } else if (colData) {
+        result = {
+          name: header,
+          values: [],
+          renderAsDropdown: colData?.renderAsDropdown || false,
+          rule: colData?.rule || null,
+        };
+      }
+    } else if (this.enableControlList) {
+      result = this.defaultControlList;
+    }
+
+    // Cache the result
+    this._columnControlListCache.set(header, result);
+    return result;
   }
-  if (this.enableControlList) {
-    return this.defaultControlList;
-  }
-  return {};
-}
 
 
   columnValidations(header) {
+    if (!header) {
+      return {};
+    }
+
+    // Check cache
+    if (this._columnValidationsCache.has(header)) {
+      return this._columnValidationsCache.get(header);
+    }
+
+    let result = {};
+
     if (
       this.enableControlList &&
-      header &&
       this.controlListColumns.has(header)
     ) {
       const colVal = this.controlListColumns.get(header);
@@ -857,14 +895,15 @@ export class TableComponent
               }
           }
       }
+      // Note: Removed side-effect setting this.isRequiredField here. it is handled in editCell/editColumn
+      result = colData || {};
+    } else if (this.enableControlList) {
+      result = this.validations?.default_ontology_validation?.["ontology-details"] || {};
+    }
 
-      this.isRequiredField = colData?.["is-required"] === "true";
-      return colData || {};
-    }
-    if (this.enableControlList) {
-      return this.validations?.default_ontology_validation?.["ontology-details"] || {};
-    }
-    return {};
+    // Cache the result
+    this._columnValidationsCache.set(header, result);
+    return result;
   }
 
   toggleView() {
@@ -1476,6 +1515,10 @@ export class TableComponent
       this.selectedCell["row"] = row;
       this.selectedCell["column"] = column;
 
+      // Calculate isRequiredField for the selected column
+      const colValData = this.columnValidations(column.header);
+      this.isRequiredField = colValData?.["is-required"] === "true";
+
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
       // }
@@ -2022,6 +2065,10 @@ export class TableComponent
 
       this.selectedColumn = column;
 
+      // Calculate isRequiredField for the selected column
+      const colValData = this.columnValidations(column.header);
+      this.isRequiredField = colValData?.["is-required"] === "true";
+
       if (
         this.enableControlList &&
         this.ontologyColumns.indexOf(column.header) > -1
@@ -2297,6 +2344,10 @@ export class TableComponent
     this.refreshTableData.emit();
   }
  getDefaultOntologies(header: string): string[] {
+  if (this._defaultOntologiesCache.has(header)) {
+    return this._defaultOntologiesCache.get(header);
+  }
+
   const fileType = this.getIsaFileType(this.data.file); 
   const fileTypeKey = `${fileType}FileControls`; 
 
@@ -2316,10 +2367,15 @@ export class TableComponent
     if (header.includes("Characteristics[") && fileType === "sample") {
       defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_characteristic__?.[0];
     }
-    return defaultRule;
+
+    if (defaultRule) {
+      this._defaultOntologiesCache.set(header, defaultRule);
+      return defaultRule;
+    }
   }
 
-  return [];
+  this._defaultOntologiesCache.set(header, this.EMPTY_ARRAY);
+  return this.EMPTY_ARRAY;
 }
 onEmptyError(isEmpty: boolean) {
     this.isEmptyOntology = isEmpty;
