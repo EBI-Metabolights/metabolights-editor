@@ -296,3 +296,72 @@ hr {
 ::ng-deep .mat-mdc-checkbox.warn-unchecked.mat-mdc-checkbox-checked .mdc-label {
   color: inherit;
 }
+
+/* Accordion Refinements for Step 4 (Publication Style) */
+.publications-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.accordion-item {
+  border: 1px solid #f1f1f4;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background-color: #fff;
+}
+
+.accordion-header {
+  padding: 12px 18px;
+  background-color: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid transparent;
+}
+
+.accordion-item.is-expanded .accordion-header {
+  border-bottom-color: #eee;
+}
+
+.publication-index {
+  font-weight: bold;
+  color: #26a69a;
+  margin-right: 15px;
+  min-width: 25px;
+  font-size: 1.1rem;
+}
+
+.publication-title-compact {
+  flex: 1 1 auto;
+  margin: 0 !important;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.accordion-content {
+  padding: 20px 24px 24px 52px;
+  background-color: #fff;
+  color: #555;
+  line-height: 1.6;
+}
+
+.expand-icon {
+  cursor: pointer;
+  color: #777;
+  transition: transform 0.3s ease;
+}
+
+.accordion-item.is-expanded {
+  border-color: #26a69a;
+  box-shadow: 0 4px 12px rgba(38, 166, 154, 0.1);
+}
+
+.accordion-header:hover {
+  background-color: #f5f5f5;
+}

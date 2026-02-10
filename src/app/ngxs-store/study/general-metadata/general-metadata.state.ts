@@ -1,4 +1,5 @@
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
+import { Router } from "@angular/router";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
@@ -94,7 +95,8 @@ export class GeneralMetadataState {
     constructor(
         private generalMetadataService: GeneralMetadataService,
         private datasetLicenseService: DatasetLicenseService,
-        private store: Store
+        private store: Store,
+        private router: Router
         ) {
     }
 
@@ -733,6 +735,10 @@ export class GeneralMetadataState {
                 readOnlySub.subscribe((ro) => {
                     this.store.dispatch(new User.Studies.Get())
                     ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
+                    
+                    if (state.id !== updated_study_id) {
+                        this.router.navigate(['/study', updated_study_id]);
+                    }
                 })
 
             }

@@ -206,6 +206,10 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   setCurrentOptions(values: Ontology[] = []) {
     this.currentOptions = values.filter((value) => {
+      // Point 5: Filter out results that match the control list name exactly (e.g. "Disease" category)
+      if (this.controlList && this.controlList.name && value.annotationValue === this.controlList.name) {
+        return false;
+      }
       if (values) {
         let match = false;
         this.values.forEach((ontology) => {

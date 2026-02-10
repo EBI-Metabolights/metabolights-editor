@@ -229,24 +229,29 @@ function selectValidationRule(
             !selectionCriteria.studyCreatedBefore ||
             (studyCreatedAtStr !== null && beforeStr !== null && studyCreatedAtStr < beforeStr);
         // If a criteria is null/undefined, consider it as matching (true)
+        // Point 4: If an input property in ruleSelectionInput is null/undefined, consider it as matching the filter
         const matches = [
-            // Study category check
+            // Study category check: if input is null, it matches any category filter
             !selectionCriteria.studyCategoryFilter ||
+            !ruleSelectionInput.studyCategory ||
             selectionCriteria.studyCategoryFilter.includes(ruleSelectionInput.studyCategory),
 
             // Creation date range checks (use afterMatches/beforeMatches)
             afterMatches,
             beforeMatches,
 
-            // // Template version check
+            // // Template version check: if input is null, it matches any version filter
             !selectionCriteria.templateVersionFilter ||
+            !ruleSelectionInput.templateVersion ||
             selectionCriteria.templateVersionFilter.includes(ruleSelectionInput.templateVersion),
 
             // // ISA file type check
+            !selectionCriteria.isaFileType ||
             selectionCriteria.isaFileType === ruleSelectionInput.isaFileType,
 
-            // // ISA file template check
+            // // ISA file template check: if input is null, it matches any template filter
             !selectionCriteria.isaFileTemplateNameFilter ||
+            !ruleSelectionInput.isaFileTemplateName ||
             selectionCriteria.isaFileTemplateNameFilter.includes(ruleSelectionInput.isaFileTemplateName),
 
             // Linked fields check (if provided)
