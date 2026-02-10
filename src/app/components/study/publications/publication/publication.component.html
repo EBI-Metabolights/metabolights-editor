@@ -253,7 +253,7 @@
 
   <ng-template #dropdownField>
     <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('status')">
-      <mat-select formControlName="status" placeholder="Status">
+      <mat-select formControlName="status" placeholder="Status" (selectionChange)="onChanges($event)">
         <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
           {{ option.annotationValue }}
         </mat-option>
