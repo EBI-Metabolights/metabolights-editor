@@ -621,6 +621,7 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   triggerChanges() {
     this.changed.emit(this.values);
+    this.emptyError.emit(this.values.length === 0);
   }
 
   copyText(ontologyTerm) {
