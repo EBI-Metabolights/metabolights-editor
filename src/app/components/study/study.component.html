@@ -209,13 +209,12 @@
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(1, 'samples')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }">
-                  <a><mat-icon
-                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">view_module</mat-icon>Samples</a>
+                  <a><span class="material-symbols-outlined"
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">experiment</span>Samples</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(2, 'assays')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }">
-                  <a><mat-icon
-                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">timeline</mat-icon>Assays</a>
+                  <a><span class="material-symbols-outlined" style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">browse_activity</span>Assays</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(3, 'protocols')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }">
@@ -229,8 +228,7 @@
                 </li>
                 <li (click)="selectCurrentTab(5, 'files')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }">
-                  <a><mat-icon
-                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">folder</mat-icon>Files</a>
+                  <a><span class="material-symbols-outlined" style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">folder</span>Files</a>
                 </li>
                 <li (click)="selectCurrentTab(6, 'validations')" [ngClass]="{
                  'is-active': (currentTabIndex$ | async) === 6,

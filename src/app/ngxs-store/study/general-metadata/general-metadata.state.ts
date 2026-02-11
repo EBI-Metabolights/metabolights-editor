@@ -177,10 +177,12 @@ export class GeneralMetadataState {
                 // Parse Related Datasets
                 const relatedAccessions = comments.find(c => c.name === 'Related Data Accession')?.value.split(';') || [];
                 const relatedRepos = comments.find(c => c.name === 'Related Data Repository')?.value.split(';') || [];
+                const relatedUrls = comments.find(c => c.name === 'Related Data URL')?.value.split(';') || [];
                 
                 const relatedDatasets = relatedAccessions.map((acc, i) => ({
                     accession: acc,
-                    repository: relatedRepos[i] || ''
+                    repository: relatedRepos[i] || '',
+                    url: relatedUrls[i] || ''
                 }));
                 ctx.patchState({ relatedDatasets });
                 
@@ -1008,16 +1010,18 @@ export class GeneralMetadataState {
 
         const accessions = datasets.map(d => d.accession).join(';');
         const repos = datasets.map(d => d.repository).join(';');
+        const urls = datasets.map(d => d.url || '').join(';');
 
         const relevantComments = [];
         if (accessions) relevantComments.push({ name: 'Related Data Accession', value: accessions });
         if (repos) relevantComments.push({ name: 'Related Data Repository', value: repos });
+        if (urls) relevantComments.push({ name: 'Related Data URL', value: urls });
 
         this.generalMetadataService.updateComments(relevantComments, studyId).subscribe(
             (response) => {
                 let allComments = [...(state.comments || [])];
                 // Remove existing ones from local state to merge
-                allComments = allComments.filter(c => !['Related Data Accession', 'Related Data Repository'].includes(c.name));
+                allComments = allComments.filter(c => !['Related Data Accession', 'Related Data Repository', 'Related Data URL'].includes(c.name));
                 allComments = [...allComments, ...relevantComments];
 
                 ctx.patchState({ comments: allComments });

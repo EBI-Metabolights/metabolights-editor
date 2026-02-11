@@ -199,23 +199,26 @@
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(1, 'samples')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 1 }">
-                  <a>Samples</a>
+                  <a><span class="material-symbols-outlined"
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">experiment</span>Samples</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(2, 'assays')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 2 }">
-                  <a>Assays</a>
+                  <a><span class="material-symbols-outlined" style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">browse_activity</span>Assays</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(3, 'protocols')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 3 }">
-                  <a>Protocols</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">menu_book</mat-icon>Protocols</a>
                 </li>
                 <li *ngIf="!studyError" (click)="selectCurrentTab(4, 'metabolites')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 4 }">
-                  <a>Metabolites</a>
+                  <a><mat-icon
+                      style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">grain</mat-icon>Metabolites</a>
                 </li>
                 <li (click)="selectCurrentTab(5, 'files')"
                   [ngClass]="{ 'is-active': (currentTabIndex$ | async) === 5 }">
-                  <a>Files</a>
+                  <a><span class="material-symbols-outlined" style="font-size: 18px; height: 18px; width: 18px; vertical-align: bottom; margin-right: 5px;">folder</span>Files</a>
                 </li>
               </ul>
             </div>

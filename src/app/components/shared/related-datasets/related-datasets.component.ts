@@ -48,9 +48,18 @@ export class RelatedDatasetsComponent implements OnInit {
     this.form.get('identifierSource').valueChanges.subscribe(value => {
         if (value && typeof value === 'object') {
             this.identifierPlaceholder = value.sampleId ? `e.g. ${value.sampleId}` : `e.g. ${value.prefix}:12345`;
+            
+            // Set dynamic pattern validator if pattern is provided
+            if (value.pattern) {
+                this.form.get('identifier').setValidators([Validators.required, Validators.pattern(value.pattern)]);
+            } else {
+                this.form.get('identifier').setValidators([Validators.required]);
+            }
         } else {
             this.identifierPlaceholder = 'e.g. MTBLS1';
+            this.form.get('identifier').setValidators([Validators.required]);
         }
+        this.form.get('identifier').updateValueAndValidity();
     });
   }
 
@@ -88,10 +97,15 @@ export class RelatedDatasetsComponent implements OnInit {
       const source = formValue.identifierSource;
       const identifier = formValue.identifier;
       
+      let constructedUrl = '';
+      if (typeof source === 'object' && source.urlPattern) {
+          constructedUrl = source.urlPattern.replace('{$id}', identifier);
+      }
+
       const newDataset = {
           repository: typeof source === 'object' ? source.name : source,
           accession: identifier,
-          url: '' 
+          url: constructedUrl 
       };
 
       this.saved.emit({ dataset: newDataset, index: this.editingIndex });
