@@ -1057,7 +1057,8 @@ export class EditorService {
                   prefix: ns.prefix,
                   name: ns.name,
                   description: ns.description,
-                  sampleId: ns.sampleId, 
+                  sampleId: ns.sampleId,
+                  pattern: ns.pattern || '',
                   urlPattern: ns.resources?.[0]?.urlPattern || '' 
               })).filter(ns => ns.urlPattern); 
           }),

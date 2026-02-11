@@ -183,8 +183,7 @@
 
               </div>
               <div class="column is-12">
-                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)<span
-                    class="has-error">*</span>
+                <h3 class="title is-5 has-text-weight-bold mb-4">Design Descriptors (Keywords)
                   <mat-icon [matTooltip]="'Design Descriptors are the keywords you would use to describe the study'"
                     class="info-icon">help</mat-icon>
                 </h3>
@@ -412,7 +411,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(0)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">1</span>
-                      <mat-icon class="mr-2 has-text-primary">assignment</mat-icon>
+                      <span class="material-symbols-outlined mr-2 has-text-primary">experiment</span>
                       <h4 class="publication-title-compact">Complete Sample Sheet</h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 0 ? 'expand_less' : 'expand_more' }}
@@ -440,7 +439,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(1)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">2</span>
-                      <mat-icon class="mr-2 has-text-primary">science</mat-icon>
+                      <span class="material-symbols-outlined mr-2 has-text-primary">experiment</span>
                       <h4 class="publication-title-compact">Complete Assay Sheet</h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 1 ? 'expand_less' : 'expand_more' }}
