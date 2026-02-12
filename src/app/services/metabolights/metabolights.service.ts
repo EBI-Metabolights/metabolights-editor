@@ -598,9 +598,9 @@ export class MetabolightsService extends DataService {
    *
    * @returns A StudyWrapper object containing the new study accession number as confirmation, via the Observable.
    */
-  createStudy(): Observable<{ new_study: string }> {
+  createStudy(): Observable<{ new_study: string, studies?: any }> {
     return this.http
-      .get<{ new_study: string }>(
+      .get<{ new_study: string, studies?: any }>(
         this.url.baseURL + "/provisional-studies",
         httpOptions
       )
@@ -611,7 +611,7 @@ export class MetabolightsService extends DataService {
              const ids = Object.keys(studies);
              if (ids.length > 0) {
                ids.sort().reverse();
-               return { new_study: ids[0] };
+               return { ...response, new_study: ids[0] };
              }
           }
           return response;
@@ -619,9 +619,9 @@ export class MetabolightsService extends DataService {
         catchError(this.handleError));
   }
 
-  createStudyWithMetadata(body: any): Observable<{ new_study: string }> {
+  createStudyWithMetadata(body: any): Observable<{ new_study: string, studies?: any }> {
     return this.http
-      .post<{ new_study: string }>(
+      .post<{ new_study: string, studies?: any }>(
         this.url.baseURL + "/provisional-studies",
         body,
         httpOptions
@@ -633,7 +633,7 @@ export class MetabolightsService extends DataService {
              const ids = Object.keys(studies);
              if (ids.length > 0) {
                ids.sort().reverse();
-               return { new_study: ids[0] };
+               return { ...response, new_study: ids[0] };
              }
           }
           return response;

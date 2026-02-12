@@ -478,6 +478,13 @@ a.disabled {
   right: 10px;
 }
 
+.third-bottom-right {
+  position: fixed;
+  z-index: 10000 !important;
+  bottom: 150px;
+  right: 10px;
+}
+
 .modal-ml-close {
   border-radius: 0 !important;
   font-size: 0.8em !important;

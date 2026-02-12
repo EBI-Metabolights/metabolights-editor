@@ -1,0 +1,87 @@
+.checklist-container {
+    padding: 1.25rem !important;
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+@media screen and (max-width: 768px) {
+    .checklist-container {
+        padding: 0.75rem !important;
+    }
+}
+
+.header-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    vertical-align: bottom;
+    margin-right: 5px;
+    color: #1890ff;
+    /* Adding the info color back as it was previously has-text-info */
+}
+
+.checklist-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.75rem;
+}
+
+.checklist-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    background: #fdfdfd;
+    display: flex;
+    align-items: center;
+}
+
+@media screen and (max-width: 480px) {
+    .checklist-items {
+        grid-template-columns: 1fr;
+    }
+}
+
+.checklist-item.is-valid {
+    background-color: #f6ffed;
+    border-color: #b7eb8f;
+}
+
+.checklist-item.is-invalid {
+    background-color: #fff1f0;
+    border-color: #ffa39e;
+}
+
+.checklist-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.progress-bar-container {
+    height: 8px;
+}
+
+.progress.is-success::-webkit-progress-value {
+    background-color: #52c41a;
+}
+
+.progress.is-success::-moz-progress-bar {
+    background-color: #52c41a;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.info-icon {
+    font-size: 14px;
+    vertical-align: middle;
+    color: #1890ff;
+    margin-left: 4px;
+}
+
+.is-extrasmall {
+    height: .25rem;
+}

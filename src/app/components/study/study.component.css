@@ -44,6 +44,7 @@
   font-weight: bold;
 
 }
+
 .has-error a {
   color: red !important;
   font-weight: bold;
@@ -60,4 +61,37 @@
   background-color: aliceblue;
   border-bottom-color: #3273dc;
   color: #3273dc;
+}
+
+.tabs ul {
+  flex-wrap: wrap;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  border-bottom-color: #dbdbdb;
+}
+
+.tabs li {
+  margin-bottom: -1px;
+}
+
+.tab-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+  vertical-align: bottom;
+  margin-right: 5px;
+}
+
+@media screen and (max-width: 768px) {
+  .tabs a {
+    padding: 0.5em 0.75em;
+    font-size: 0.9rem;
+  }
+
+  .tab-icon {
+    margin-right: 3px;
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
 }

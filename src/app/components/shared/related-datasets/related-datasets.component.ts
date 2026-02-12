@@ -32,7 +32,7 @@ export class RelatedDatasetsComponent implements OnInit {
     });
 
     this.filteredIdentifierSources$ = this.form.get('identifierSource').valueChanges.pipe(
-      debounceTime(400),
+      debounceTime(300),
       distinctUntilChanged(),
       switchMap((value: string | any) => {
         if (!value) return of([]);

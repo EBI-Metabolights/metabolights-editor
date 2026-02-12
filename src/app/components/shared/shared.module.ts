@@ -11,6 +11,7 @@ import { LoadingComponent } from "./loading/loading.component";
 import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { QuickLinkComponent } from "./quick-link/quick-link.component";
 import { UploadComponent } from "./upload/upload.component";
+import { ChecklistComponent } from "./checklist/checklist.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AsperaDownloadComponent } from "./download/aspera/aspera.component";
 import { FtpDownloadComponent } from "./download/ftp/ftp.component";
@@ -102,6 +103,7 @@ import { ModalComponent } from './modal/modal.component';
     PaginatedTableComponent,
     TableComponent,
     UploadComponent,
+    ChecklistComponent,
     FTPUploadComponent,
     AsperaUploadComponent,
     DesignDescriptorsComponent,
@@ -175,6 +177,7 @@ import { ModalComponent } from './modal/modal.component';
     PaginatedTableComponent,
     TableComponent,
     UploadComponent,
+    ChecklistComponent,
     FTPUploadComponent,
     AsperaUploadComponent,
     DesignDescriptorsComponent,
