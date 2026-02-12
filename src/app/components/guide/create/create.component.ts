@@ -4,6 +4,8 @@ import { Router } from "@angular/router";
 import { EditorService } from "../../../services/editor.service";
 import * as toastr from "toastr";
 import { environment } from "src/environments/environment";
+import { DOIService } from "../../../services/publications/doi.service";
+import { EuropePMCService } from "../../../services/publications/europePMC.service";
 import { PlatformLocation } from "@angular/common";
 import { Store } from "@ngxs/store";
 import { Loading } from "src/app/ngxs-store/non-study/transitions/transitions.actions";
@@ -25,6 +27,7 @@ import { debounceTime, distinctUntilChanged, switchMap } from "rxjs/operators";
 import { of } from "rxjs";
 import { MatAutocompleteSelectedEvent } from "@angular/material/autocomplete";
 import { PersonComponent } from "../../shared/people/person/person.component";
+import { ChecklistItem } from "../../shared/checklist/checklist.component";
 import Swal from "sweetalert2";
 @Component({
   selector: "app-create",
@@ -100,6 +103,7 @@ export class CreateComponent implements OnInit {
   currentSubStep = 1;
   doneStepExpandedIndex = 0;
   newStudy = null;
+  createdStudies: string[] = [];
   options: any[] = [
     {
       text: "Yes, I would like to upload files now",
@@ -116,6 +120,8 @@ export class CreateComponent implements OnInit {
   baseHref: string;
   constructor(
     private fb: UntypedFormBuilder,
+    private doiService: DOIService,
+    private europePMCService: EuropePMCService,
     private editorService: EditorService,
     private router: Router,
     private store: Store,
@@ -418,6 +424,23 @@ export class CreateComponent implements OnInit {
     return raw ? raw.split(';')[0] : null;
   }
 
+  get selectedTechniquesLabel(): string {
+    const selectedAssays = new Set<string>();
+    Object.values(this.studyAssaySelection || {}).forEach((assays: string[]) => {
+      assays.forEach(a => {
+        const label = a.split(';')[0];
+        if (label) selectedAssays.add(label);
+      });
+    });
+    
+    const labs = Array.from(selectedAssays);
+    if (labs.length === 0) return '';
+    if (labs.length === 1) return labs[0];
+    if (labs.length === 2) return `${labs[0]} and ${labs[1]}`;
+    
+    return labs.slice(0, -1).join(', ') + ', and ' + labs[labs.length - 1];
+  }
+
   updateSelectionStatus() {
       this.isAnyAssaySelected = Object.values(this.studyAssaySelection).some((assays: string[]) => assays.length > 0);
   }
@@ -603,6 +626,100 @@ export class CreateComponent implements OnInit {
 
     return errors;
   }
+
+  get checklistItems(): ChecklistItem[] {
+    const items: ChecklistItem[] = [];
+
+    // Section 1: Submission Details
+    items.push({
+      id: "techniques",
+      label: "Study Techniques",
+      isValid: this.isAnyAssaySelected,
+      isRequired: true,
+      section: 1,
+      error: !this.isAnyAssaySelected ? "Select at least one technique" : null
+    });
+
+    const allContactsValid = this.contacts.length > 0 && this.contacts.every(c => this.isContactValid(c));
+    items.push({
+      id: "contacts",
+      label: "Valid Contacts",
+      isValid: allContactsValid,
+      isRequired: true,
+      section: 1,
+      error: this.contacts.length === 0 ? "Add at least one contact" : (!allContactsValid ? "Some contacts have errors" : null)
+    });
+
+    items.push({
+      id: "pi",
+      label: "Principal Investigator",
+      isValid: this.hasPrincipalInvestigator,
+      isRequired: true,
+      section: 1,
+      error: !this.hasPrincipalInvestigator ? "At least one contact must be a PI" : null
+    });
+
+    const agreementsOk = !!(this.agreements?.datasetLicenseAgreement && this.agreements?.datasetPolicyAgreement);
+    items.push({
+      id: "agreements",
+      label: "Agreements",
+      isValid: agreementsOk,
+      isRequired: true,
+      section: 1,
+      error: !agreementsOk ? "Accept the terms and data policy" : null
+    });
+
+    // Section 2: Description
+    items.push({
+      id: "title",
+      label: "Study Title",
+      isValid: this.isTitleValid,
+      isRequired: true,
+      section: 2,
+      error: !this.isTitleValid ? "Title must be at least 25 characters" : null
+    });
+
+    items.push({
+      id: "description",
+      label: "Study Description",
+      isValid: this.isDescriptionValid,
+      isRequired: true,
+      section: 2,
+      error: !this.isDescriptionValid ? "Description must be at least 60 characters" : null
+    });
+
+    const activeCategories = this.activeDesignDescriptorCategories || [];
+    const missingDescriptors = activeCategories.filter(cat => {
+      const minRequired = Number(cat.min) || 0;
+      return minRequired > 0 && this.getDescriptorsByCategory(cat.id).length < minRequired;
+    });
+
+    items.push({
+      id: "descriptors",
+      label: "Mandatory Descriptors",
+      isValid: missingDescriptors.length === 0,
+      isRequired: true,
+      section: 2,
+      error: missingDescriptors.length > 0 ? `Missing ${missingDescriptors.map(m => m.label).join(", ")}` : null
+    });
+
+    // Section 3: Publication
+    const publicationOk = !!(this.publicationStatus && this.publicationStatus.length > 0 &&
+                           this.publicationTitle && this.publicationTitle.trim() !== "" &&
+                           this.publicationAuthors && this.publicationAuthors.trim() !== "");
+    const doiOk = this.isDoiRequired ? (!!this.publicationDoi && this.publicationDoi.trim() !== "" && this.doiErrorMessage === "") : true;
+
+    items.push({
+      id: "publication",
+      label: "Publication Details",
+      isValid: publicationOk && doiOk,
+      isRequired: true,
+      section: 3,
+      error: !publicationOk ? "Enter mandatory publication details" : (!doiOk ? (this.doiErrorMessage || "DOI is required") : null)
+    });
+
+    return items;
+  }
   createStudy() {
     // Check if Single or Multiple Category
     // We filter based on studyAssaySelection keys that have at least one selected item.
@@ -630,10 +747,12 @@ export class CreateComponent implements OnInit {
         this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
     );
     const count = selectedCategoryKeys.length;
+    const techniqueLabel = this.selectedTechniquesLabel;
     
     this.confirmationTitle = "Confirm Submission";
     if (count > 0) {
-        this.confirmationMessage = `We will create the following ${count} MetaboLights submissions for your study. Are you sure to continue?`;
+        const studyText = count === 1 ? "study" : "studies";
+        this.confirmationMessage = `We will create the following ${count} MetaboLights ${count === 1 ? 'submission' : 'submissions'} for your ${techniqueLabel} ${studyText}. Are you sure to continue?`;
     } else {
         this.confirmationMessage = "Are you sure you would like to create this study?";
     }
@@ -807,6 +926,41 @@ export class CreateComponent implements OnInit {
   removeDatasetCompat(index: number) {
       this.store.dispatch(new StudyCreation.RemoveRelatedDataset(index));
   }
+  
+  getArticleFromDOI() {
+    const doi = this.publicationDoi ? this.publicationDoi.trim().replace("http://dx.doi.org/", "") : "";
+    if (doi !== "") {
+      this.publicationDoi = doi;
+      const doiURL = "http://dx.doi.org/" + doi;
+      this.doiService.getArticleInfo(doiURL).subscribe((article) => {
+        this.publicationTitle = article.title.trim();
+        this.publicationAuthors = article.authorList.trim();
+        this.onPublicationStatusChange("Published");
+      });
+      this.europePMCService
+        .getArticleInfo("DOI:" + doi)
+        .subscribe((article) => {
+          if (article.doi === doi) {
+            this.publicationPubmedId = article.pubMedID.trim();
+          }
+        });
+    }
+  }
+
+  getArticleFromPubMedID() {
+    const pubMedID = this.publicationPubmedId ? this.publicationPubmedId.trim() : "";
+    if (pubMedID !== "") {
+      this.europePMCService
+        .getArticleInfo("(SRC:MED AND EXT_ID:" + pubMedID + ")")
+        .subscribe((article) => {
+          this.publicationTitle = article.title.trim();
+          this.publicationAuthors = article.authorList.trim();
+          this.publicationDoi = article.doi.trim();
+          this.onPublicationStatusChange("Published");
+        });
+    }
+  }
+
   onPublicationStatusChange(value) {
       if (value) {
           const selectedValue = Array.isArray(value) ? value[0] : value;
@@ -937,6 +1091,13 @@ export class CreateComponent implements OnInit {
         this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
         this.store.dispatch(new User.Studies.Get());
         this.newStudy = res.new_study;
+        
+        if (res.studies) {
+          this.createdStudies = Object.keys(res.studies);
+        } else {
+          this.createdStudies = [res.new_study];
+        }
+        
         this.isLoading = false;
 
         // Transition to the "Done" guide step

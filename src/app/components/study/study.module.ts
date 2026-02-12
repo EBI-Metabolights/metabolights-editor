@@ -18,6 +18,7 @@ import { PublicationComponent } from "./publications/publication/publication.com
 import { ReleaseDateComponent } from "./release-date/release-date.component";
 import { SamplesComponent } from "./samples/samples.component";
 import { StatusComponent } from "./status/status.component";
+import { StudyGuideComponent } from "./study-guide/study-guide.component";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -114,7 +115,8 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     NoViolationsComponent,
     ValidationTaskBoxComponent,
     DeleteOverrideDialogComponent,
-    OverviewBadgesComponent
+    OverviewBadgesComponent,
+    StudyGuideComponent
   ],
   imports: [
     CommonModule,
@@ -192,7 +194,8 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     NoViolationsComponent,
     ValidationTaskBoxComponent,
     DeleteOverrideDialogComponent,
-    OverviewBadgesComponent
+    OverviewBadgesComponent,
+    StudyGuideComponent
 
   ],
   providers: [

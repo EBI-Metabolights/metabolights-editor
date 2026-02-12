@@ -45,6 +45,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   sampleTemplate$: Observable<string> = inject(Store).select(GeneralMetadataState.sampleTemplate);
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
 
   revisionNumber = null;
   revisionDatetime = null;
@@ -74,6 +75,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   sampleTemplate = "";
   templateConfiguration: any = null;
   mhdAccession: string = null;
+  isReadOnly = true;
 
   constructor(
     private store: Store,
@@ -131,6 +133,11 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.maintenanceMode$.subscribe((value) => {
       this.underMaintenance = value;
+    });
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
     });
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {

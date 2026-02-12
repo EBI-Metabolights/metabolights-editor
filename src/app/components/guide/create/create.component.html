@@ -4,6 +4,12 @@
     (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4" [hidePublicationStep]="false"
     [hideAssayStep]="true" [hideUploadStep]="true"></mtbls-progress>
 
+  <div class="columns is-centered mt-4" *ngIf="currentSubStep < 4">
+    <div class="column is-10">
+      <mtbls-checklist [items]="checklistItems"></mtbls-checklist>
+    </div>
+  </div>
+
   <div [ngSwitch]="currentSubStep">
     <!-- Step 1: Submission Details -->
     <div *ngSwitchCase="1">
@@ -61,7 +67,7 @@
             <!-- Contacts (Moved from Step 2) -->
             <div class="column is-12">
               <div class="is-justify-content-space-between is-align-items-center mb-4">
-                <h3 class="title is-5 has-text-weight-bold" style="margin-bottom: 0;">Contacts*</h3>
+                <h3 class="title is-5 has-text-weight-bold" style="margin-bottom: 0;">Contacts</h3>
                 <button class="button is-primary is-small" style="float: right;margin-bottom: 10px;"
                   (click)="addNewContact()">+ Add
                   Contact</button>
@@ -259,16 +265,11 @@
         <div class="column is-10">
           <div class="box">
             <div class="box gray-box mb-4">
-              <h4 class="title is-5 has-text-weight-bold mb-2">Publication<span class="has-error">*</span>
-                <mat-icon [matTooltip]="'The act of publishing, and also any copies issued for public distribution'"
-                  class="info-icon">help</mat-icon>
+              <h4 class="title is-5 has-text-weight-bold mb-4">Publication
+                <mat-icon [matTooltip]="'Please provide details of any scientific article(s), preprint(s), or report(s) associated with the
+                study. This includes manuscripts that are in preparation, submitted, available as preprints, or already
+                published.'" class="info-icon">help</mat-icon>
               </h4>
-              <p class="is-size-7 has-text-grey mb-5">
-                Please provide details of any scientific article(s), preprint(s), or report(s) associated with the
-                study.
-                This includes manuscripts that are in preparation, submitted, available as preprints, or already
-                published.
-              </p>
               <div class="category-rows-container mt-4">
                 <!-- Publication Title -->
                 <div class="field mb-4">
@@ -336,7 +337,8 @@
                           [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
                           <mat-label>DOI</mat-label>
                           <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
-                            [required]="isDoiRequired">
+                            [required]="isDoiRequired" (blur)="getArticleFromDOI()"
+                            (keydown.enter)="getArticleFromDOI()">
                           <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
                             <span *ngIf="isDoiRequired"><b>(required)</b></span>
                           </mat-hint>
@@ -352,7 +354,8 @@
                       <div class="control">
                         <mat-form-field class="full-width" appearance="outline">
                           <mat-label>PubMed ID</mat-label>
-                          <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID">
+                          <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID"
+                            (blur)="getArticleFromPubMedID()" (keydown.enter)="getArticleFromPubMedID()">
                           <mat-hint>{{ fieldValidation('publications.publication.pubmedId').description }}</mat-hint>
                         </mat-form-field>
                       </div>
@@ -397,6 +400,25 @@
             <div class="has-text-centered mb-5">
               <span class="material-symbols-outlined is-size-1 has-text-success">check_circle</span>
               <h2 class="title is-4 has-text-weight-bold">Successfully Completed Study Creation!</h2>
+              <div class="mt-4 mb-4">
+                <div *ngIf="createdStudies && createdStudies.length > 1">
+                  <p class="is-size-5">
+                    Your submissions have been assigned the following unique identifiers:<br />
+                    <span *ngFor="let study of createdStudies; let last = last">
+                      <span class="has-text-link"><b>{{ study }}</b></span>{{ last ? '' : ', ' }}
+                    </span>
+                  </p>
+                </div>
+                <div *ngIf="!createdStudies || createdStudies.length <= 1">
+                  <p class="is-size-5">
+                    Your submission has been assigned the unique identifier
+                    <span class="has-text-link"><b>{{ newStudy }}</b></span>
+                  </p>
+                </div>
+                <p class="mt-2 has-text-grey">
+                  Please refer to these identifiers in any communication with the MetaboLights team.
+                </p>
+              </div>
               <p class="subtitle is-6 mt-2 mb-2">
                 In order to know more about your study, please go through the study document:
                 <a href="https://ebi-metabolights.github.io/guides/Study_description/" target="_blank"

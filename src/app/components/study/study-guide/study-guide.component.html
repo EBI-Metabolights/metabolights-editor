@@ -1,0 +1,137 @@
+<nav-bar mode="light"></nav-bar>
+<div class="container fixed-navbar-offset">
+    <div class="columns is-centered mt-4">
+        <div class="column is-10">
+            <div class="box">
+                <div class="is-flex is-justify-content-space-between is-align-items-center mb-5">
+                    <a [routerLink]="['/study', requestedStudy]" class="button is-white is-small">
+                        <mat-icon>arrow_back</mat-icon> 
+                    </a>
+                    <h2 class="title is-4 has-text-weight-bold mb-0">Study Guide</h2>
+                    
+                </div>
+
+                <div class="has-text-centered mb-5">
+                    <span class="material-symbols-outlined is-size-1 has-text-success">info</span>
+                    <h2 class="title is-4 has-text-weight-bold">Guided Information for your Study</h2>
+                    <p class="subtitle is-6 mt-2 mb-2">
+                        In order to know more about your study, please go through the study document:
+                        <a href="https://ebi-metabolights.github.io/guides/Study_description/" target="_blank"
+                            class="has-text-link">Study Description Guide</a>
+                    </p>
+                </div>
+
+                <div class="mt-4">
+                    <div class="publications-accordion">
+                        <!-- Step 1: Sample -->
+                        <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 0 }">
+                            <div class="accordion-header clickable" (click)="toggleDoneStepExpand(0)">
+                                <div style="display: flex; align-items: center; min-width: 90%;">
+                                    <span class="publication-index">1</span>
+                                    <span class="material-symbols-outlined mr-2 has-text-primary">experiment</span>
+                                    <h4 class="publication-title-compact">Complete Sample Sheet</h4>
+                                </div>
+                                <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 0 ? 'expand_less' :
+                                    'expand_more' }}
+                                </mat-icon>
+                            </div>
+                            <div class="accordion-content" *ngIf="doneStepExpandedIndex === 0">
+                                <p class="is-size-7 mb-2">
+                                    The sample information should provide all relevant facts about each sample and any
+                                    controls/standards included in the study. There is <b>ONE</b> sample sheet per
+                                    study.
+                                </p>
+                                <p class="is-size-7 mb-2">
+                                    Sample metadata should include a unique sample name, organism, organism part and
+                                    sample type.
+                                    Further sample descriptors should be included where available by selecting
+                                    <b>+Factor</b> to add
+                                    new columns.
+                                </p>
+                                <p class="is-size-7">
+                                    A group of samples can be added using <b>+Samples</b> and pasting a list or
+                                    selecting to import
+                                    Raw data file names if appropriate.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Assay -->
+                        <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 1 }">
+                            <div class="accordion-header clickable" (click)="toggleDoneStepExpand(1)">
+                                <div style="display: flex; align-items: center; min-width: 90%;">
+                                    <span class="publication-index">2</span>
+                                    <span class="material-symbols-outlined mr-2 has-text-primary">experiment</span>
+                                    <h4 class="publication-title-compact">Complete Assay Sheet</h4>
+                                </div>
+                                <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 1 ? 'expand_less' :
+                                    'expand_more' }}
+                                </mat-icon>
+                            </div>
+                            <div class="accordion-content" *ngIf="doneStepExpandedIndex === 1">
+                                <p class="is-size-7 mb-2">
+                                    The assay information describes the assay process for each control and sample and
+                                    connects the
+                                    sample name to both its corresponding raw data file and metabolite identification
+                                    table.
+                                    <b>MULTIPLE</b> assays can be added per study.
+                                </p>
+                                <p class="is-size-7">
+                                    Assays are divided into sections each starting with a <b>Protocol Ref</b> column,
+                                    which describes
+                                    the specifics of that part of the assay using controlled vocabulary.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Protocols -->
+                        <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 2 }">
+                            <div class="accordion-header clickable" (click)="toggleDoneStepExpand(2)">
+                                <div style="display: flex; align-items: center; min-width: 90%;">
+                                    <span class="publication-index">3</span>
+                                    <mat-icon class="mr-2 has-text-primary">menu_book</mat-icon>
+                                    <h4 class="publication-title-compact">Define Study Protocols</h4>
+                                </div>
+                                <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 2 ? 'expand_less' :
+                                    'expand_more' }}
+                                </mat-icon>
+                            </div>
+                            <div class="accordion-content" *ngIf="doneStepExpandedIndex === 2">
+                                <p class="is-size-7">
+                                    Protocols are central for reproducibility purposes and should provide a detailed
+                                    description of
+                                    the steps taken in the study. When an assay is selected, the protocol section will
+                                    populate with
+                                    several titled sections adapted to your assay type.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: MAF -->
+                        <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 3 }">
+                            <div class="accordion-header clickable" (click)="toggleDoneStepExpand(3)">
+                                <div style="display: flex; align-items: center; min-width: 90%;">
+                                    <span class="publication-index">4</span>
+                                    <mat-icon class="mr-2 has-text-primary">table_view</mat-icon>
+                                    <h4 class="publication-title-compact">Annotate Metabolites (MAF)</h4>
+                                </div>
+                                <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 3 ? 'expand_less' :
+                                    'expand_more' }}
+                                </mat-icon>
+                            </div>
+                            <div class="accordion-content" *ngIf="doneStepExpandedIndex === 3">
+                                <p class="is-size-7">
+                                    When you create an assay, a corresponding metabolite annotation file is added. This
+                                    should include
+                                    all metabolites/unknowns identified. The MAF should be referenced in the
+                                    <b>metabolite assignment
+                                        file</b> column of each assay.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
