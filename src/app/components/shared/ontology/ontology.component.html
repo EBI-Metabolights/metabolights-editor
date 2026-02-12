@@ -21,6 +21,13 @@
       </mat-chip-grid>
 
       <mat-autocomplete #auto="matAutocomplete" (optionSelected)="optionSelected($event)" class="premium-autocomplete">
+        <mat-option *ngIf="showSearchMore" [value]="'__SEARCH_MORE__'" class="search-more-option">
+          <div class="search-more-content">
+            <mat-icon class="search-more-icon">search</mat-icon>
+            <span class="search-more-text">Search more terms for <b>"{{inputValue}}"</b> from API</span>
+          </div>
+        </mat-option>
+
         <mat-option *ngIf="termsLoading" class="loading-option">
           <mat-spinner diameter="20"></mat-spinner>
           <span class="ml-2">Searching...</span>
@@ -53,6 +60,13 @@
             <div *ngFor="let key of getObjectKeys(value.info.annotation || {})">
               <small><b>{{ key.replace("_", " ") }}</b>: {{ value.info.annotation[key].join(" ") }}</small>
             </div>
+          </div>
+        </mat-option>
+
+        <mat-option *ngIf="noResultsFound" class="no-results-option" disabled>
+          <div class="no-results-content">
+            <mat-icon class="no-results-icon">info_outline</mat-icon>
+            <span class="no-results-text">No ontology terms are present.</span>
           </div>
         </mat-option>
       </mat-autocomplete>

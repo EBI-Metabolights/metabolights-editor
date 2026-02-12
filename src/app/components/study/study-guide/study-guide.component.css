@@ -74,3 +74,33 @@
 .clickable {
     cursor: pointer;
 }
+
+.step-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.step-link:hover {
+    color: #26a69a !important;
+    text-decoration: underline;
+}
+
+.accordion-header:hover .publication-title-compact {
+    color: #26a69a;
+}
+
+.button.is-medium {
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease !important;
+}
+
+.button.is-medium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.has-text-success .material-symbols-outlined {
+    vertical-align: middle;
+}

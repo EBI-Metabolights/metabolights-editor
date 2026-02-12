@@ -395,140 +395,218 @@
     <!-- Step 4: Done (Guide) -->
     <div *ngSwitchCase="4">
       <div class="columns is-centered mt-4">
-        <div class="column is-10">
-          <div class="box">
+        <div class="column is-10 pb-6">
+          <div class="box p-6">
             <div class="has-text-centered mb-5">
-              <span class="material-symbols-outlined is-size-1 has-text-success">check_circle</span>
-              <h2 class="title is-4 has-text-weight-bold">Successfully Completed Study Creation!</h2>
-              <div class="mt-4 mb-4">
-                <div *ngIf="createdStudies && createdStudies.length > 1">
-                  <p class="is-size-5">
-                    Your submissions have been assigned the following unique identifiers:<br />
-                    <span *ngFor="let study of createdStudies; let last = last">
-                      <span class="has-text-link"><b>{{ study }}</b></span>{{ last ? '' : ', ' }}
-                    </span>
-                  </p>
+              <span class="material-symbols-outlined is-size-1 has-text-success mb-2">check</span>
+              <h2 class="title is-4 has-text-weight-bold">Study Creation successful</h2>
+
+              <div class="mt-5 mb-5 is-flex is-justify-content-center" style="flex-direction: column"
+                *ngIf="createdStudiesDetails">
+                <div class="has-text-left">
+                  <div class="created-studies-list box py-4 px-5 "
+                    style="margin-bottom: 1rem; background: #fdfdfd; border-radius: 12px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div *ngFor="let studyId of createdStudies" class="is-flex is-align-items-center">
+                      <span class="material-symbols-outlined has-text-success is-size-5 mr-3">check</span>
+                      <div class="is-size-6">
+                        <span class="has-text-link has-text-weight-bold">{{ studyId }}</span>:
+                        <span class="is-italic has-text-grey-dark">{{ createdStudiesDetails[studyId] }}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div *ngIf="!createdStudies || createdStudies.length <= 1">
-                  <p class="is-size-5">
-                    Your submission has been assigned the unique identifier
-                    <span class="has-text-link"><b>{{ newStudy }}</b></span>
-                  </p>
-                </div>
-                <p class="mt-2 has-text-grey">
-                  Please refer to these identifiers in any communication with the MetaboLights team.
-                </p>
               </div>
-              <p class="subtitle is-6 mt-2 mb-2">
-                In order to know more about your study, please go through the study document:
-                <a href="https://ebi-metabolights.github.io/guides/Study_description/" target="_blank"
-                  class="has-text-link">Study Description Guide</a>
-              </p>
             </div>
 
-            <div class="mt-4">
+            <div class="mt-6 mb-5 px-4">
+              <h3 class="title is-6 has-text-weight-bold mb-3">To complete your submission(s):</h3>
+              <p class="is-size-6 mb-5">Please follow these essential steps in the study editor to prepare your
+                submission for curation.</p>
+
               <div class="publications-accordion">
-                <!-- Step 1: Sample -->
+                <!-- Step 1: Samples -->
                 <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 0 }">
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(0)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">1</span>
-                      <span class="material-symbols-outlined mr-2 has-text-primary">experiment</span>
-                      <h4 class="publication-title-compact">Complete Sample Sheet</h4>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_blank"
+                          class="step-link">Complete 'Sample'
+                          metadata table</a>
+                      </h4>
                     </div>
-                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 0 ? 'expand_less' : 'expand_more' }}
-                    </mat-icon>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 0 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 0">
                     <p class="is-size-7 mb-2">
-                      The sample information should provide all relevant facts about each sample and any
-                      controls/standards included in the study. There is <b>ONE</b> sample sheet per study.
-                    </p>
-                    <p class="is-size-7 mb-2">
-                      Sample metadata should include a unique sample name, organism, organism part and sample type.
+                      Sample metadata should include a unique sample name, organism, organism part (for controls use
+                      e.g. experimental blank and solvent) and sample type (i.e. control, experimental sample, QC).
                       Further sample descriptors should be included where available by selecting <b>+Factor</b> to add
-                      new columns.
-                    </p>
-                    <p class="is-size-7">
-                      A group of samples can be added using <b>+Samples</b> and pasting a list or selecting to import
-                      Raw data file names if appropriate.
+                      new columns (e.g. Gender, Age, Treatment etc.).
                     </p>
                   </div>
                 </div>
 
-                <!-- Step 2: Assay -->
+                <!-- Step 2: Assay Table -->
                 <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 1 }">
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(1)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">2</span>
-                      <span class="material-symbols-outlined mr-2 has-text-primary">experiment</span>
-                      <h4 class="publication-title-compact">Complete Assay Sheet</h4>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank"
+                          class="step-link">Complete 'Assay'
+                          metadata table(s) except raw/derived data filenames</a>
+                      </h4>
                     </div>
-                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 1 ? 'expand_less' : 'expand_more' }}
-                    </mat-icon>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 1 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 1">
-                    <p class="is-size-7 mb-2">
-                      The assay information describes the assay process for each control and sample and connects the
-                      sample name to both its corresponding raw data file and metabolite identification table.
-                      <b>MULTIPLE</b> assays can be added per study.
-                    </p>
-                    <p class="is-size-7">
-                      Assays are divided into sections each starting with a <b>Protocol Ref</b> column, which describes
-                      the specifics of that part of the assay using controlled vocabulary.
-                    </p>
+                    <p class="is-size-7">Describe the assay process for each control and sample. Multiple assays can be
+                      added per study to reflect different analytical techniques or modalities.</p>
                   </div>
                 </div>
 
-                <!-- Step 3: Protocols -->
+                <!-- Step 3: Data Upload -->
                 <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 2 }">
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(2)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">3</span>
-                      <mat-icon class="mr-2 has-text-primary">menu_book</mat-icon>
-                      <h4 class="publication-title-compact">Define Study Protocols</h4>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
+                          class="step-link">Upload raw &
+                          derived data files</a>
+                      </h4>
                     </div>
-                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 2 ? 'expand_less' : 'expand_more' }}
-                    </mat-icon>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 2 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 2">
-                    <p class="is-size-7">
-                      Protocols are central for reproducibility purposes and should provide a detailed description of
-                      the steps taken in the study. When an assay is selected, the protocol section will populate with
-                      several titled sections adapted to your assay type.
-                    </p>
+                    <p class="is-size-7">Upload your raw and derived data files to the study's FTP/Aspera folder. Ensure
+                      your filenames are unique and consistently named.</p>
                   </div>
                 </div>
 
-                <!-- Step 4: MAF -->
+                <!-- Step 4: Map Files -->
                 <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 3 }">
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(3)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">4</span>
-                      <mat-icon class="mr-2 has-text-primary">table_view</mat-icon>
-                      <h4 class="publication-title-compact">Annotate Metabolites (MAF)</h4>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" class="step-link">Add
+                          raw/derived
+                          data filenames to 'Assay' metadata tables(s)</a>
+                      </h4>
                     </div>
-                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 3 ? 'expand_less' : 'expand_more' }}
-                    </mat-icon>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 3 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 3">
-                    <p class="is-size-7">
-                      When you create an assay, a corresponding metabolite annotation file is added. This should include
-                      all metabolites/unknowns identified. The MAF should be referenced in the <b>metabolite assignment
-                        file</b> column of each assay.
-                    </p>
+                    <p class="is-size-7">Associate your uploaded data files with the corresponding samples in the assay
+                      metadata table by adding the filenames to the relevant columns.</p>
+                  </div>
+                </div>
+
+                <!-- Step 5: Protocols -->
+                <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 4 }">
+                  <div class="accordion-header clickable" (click)="toggleDoneStepExpand(4)">
+                    <div style="display: flex; align-items: center; min-width: 90%;">
+                      <span class="publication-index">5</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/Protocols/" target="_blank"
+                          class="step-link">Complete the
+                          description of your study 'Protocols'</a>
+                      </h4>
+                    </div>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 4 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
+                  </div>
+                  <div class="accordion-content" *ngIf="doneStepExpandedIndex === 4">
+                    <p class="is-size-7">Provide detailed descriptions for each experimental protocol used in your
+                      study, ensuring clarity for future reproducibility.</p>
+                  </div>
+                </div>
+
+                <!-- Step 6: Validation -->
+                <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 5 }">
+                  <div class="accordion-header clickable" (click)="toggleDoneStepExpand(5)">
+                    <div style="display: flex; align-items: center; min-width: 90%;">
+                      <span class="publication-index">6</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="javascript:void(0)" class="step-link">Index 'Data Files' & run 'Study Validation'</a>
+                      </h4>
+                    </div>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 5 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
+                  </div>
+                  <div class="accordion-content" *ngIf="doneStepExpandedIndex === 5">
+                    <p class="is-size-7">Trigger the file indexing in the 'Files' tab and run the automated validation
+                      to check for any metadata or file consistency issues.</p>
+                  </div>
+                </div>
+
+
+                <!-- Step 7: Correct Errors -->
+                <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 6 }">
+                  <div class="accordion-header clickable" (click)="toggleDoneStepExpand(6)">
+                    <div style="display: flex; align-items: center; min-width: 90%;">
+                      <span class="publication-index">7</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/#validate-study" target="_blank"
+                          class="step-link">Make
+                          amendments to correct any 'Validation Error'(s) & re-validate</a>
+                      </h4>
+                    </div>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 6 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
+                  </div>
+                  <div class="accordion-content" *ngIf="doneStepExpandedIndex === 6">
+                    <p class="is-size-7">If the validation yields errors, make the necessary changes to your metadata or
+                      files in the editor and re-run the validation until it passes.</p>
+                  </div>
+                </div>
+
+                <!-- Step 8: Finalize -->
+                <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 7 }">
+                  <div class="accordion-header clickable" (click)="toggleDoneStepExpand(7)">
+                    <div style="display: flex; align-items: center; min-width: 90%;">
+                      <span class="publication-index">8</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <h4 class="publication-title-compact">
+                        <a href="https://ebi-metabolights.github.io/guides/#submission-process" target="_blank"
+                          class="step-link">Change
+                          study status to 'Private' (peer-review access only) or 'Public', when ready</a>
+                      </h4>
+                    </div>
+                    <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 7 ? 'expand_less' : 'expand_more'
+                      }}</mat-icon>
+                  </div>
+                  <div class="accordion-content" *ngIf="doneStepExpandedIndex === 7">
+                    <p class="is-size-7">Once your study is complete and validated, change its status in the 'Study
+                      Status' section to make it available for peer review or the public.</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div class="field is-grouped is-pulled-right mt-5">
-              <div class="control">
-                <button class="button is-primary" (click)="onFinishCreation()">
-                  Finish & View Study
-                </button>
+            <div class="mt-6 mb-4 px-4 pt-6">
+              <div class="columns is-multiline" style="margin: 0;justify-content: flex-end;">
+                <div class="column is-narrow" *ngFor="let studyId of createdStudies">
+                  <button class="button is-success is-outlined is-small px-6" (click)="navigateToStudy(studyId)">
+                    {{ studyId }}
+                  </button>
+                </div>
               </div>
             </div>
+
             <div class="is-clearfix"></div>
           </div>
         </div>
