@@ -125,3 +125,54 @@
 .selectable-chip-content {
   user-select: text !important;
 }
+
+.search-more-option {
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa !important;
+}
+
+.search-more-option:hover {
+  background-color: #f2fdfb !important;
+}
+
+.search-more-content {
+  display: flex;
+  align-items: center;
+  color: #00d1b2;
+  font-size: 0.9rem;
+}
+
+.search-more-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.search-more-text {
+  font-weight: 500;
+}
+
+.no-results-option {
+  height: auto !important;
+  min-height: 48px !important;
+  padding: 12px 16px !important;
+}
+
+.no-results-content {
+  display: flex;
+  align-items: center;
+  color: #7a7a7a;
+  font-size: 0.9rem;
+}
+
+.no-results-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.no-results-text {
+  font-style: italic;
+}

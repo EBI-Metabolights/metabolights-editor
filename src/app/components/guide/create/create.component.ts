@@ -104,6 +104,7 @@ export class CreateComponent implements OnInit {
   doneStepExpandedIndex = 0;
   newStudy = null;
   createdStudies: string[] = [];
+  createdStudiesDetails: any = null;
   options: any[] = [
     {
       text: "Yes, I would like to upload files now",
@@ -1093,9 +1094,11 @@ export class CreateComponent implements OnInit {
         this.newStudy = res.new_study;
         
         if (res.studies) {
+          this.createdStudiesDetails = res.studies;
           this.createdStudies = Object.keys(res.studies);
         } else {
           this.createdStudies = [res.new_study];
+          this.createdStudiesDetails = { [res.new_study]: this.studyTitle };
         }
         
         this.isLoading = false;
@@ -1127,6 +1130,11 @@ export class CreateComponent implements OnInit {
     } else {
       this.router.navigate(['/study', this.newStudy]);
     }
+  }
+
+  navigateToStudy(studyId: string) {
+    this.editorService.loadStudyId(null);
+   this.router.navigate(['/study', studyId]);
   }
 
   proceedToNextStep() {
