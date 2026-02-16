@@ -813,9 +813,9 @@ export class TableComponent
     }
 
     let result = {};
-    if (this.enableControlList && this.controlListNames.has(header)) {
-      const controlList = this.controlLists.get(header);
-      const colData = this.controlListColumns.get(header);
+  if (this.enableControlList && (this.controlListNames.has(header) || this.controlListColumns.has(header) || this.controlLists.has(header))) {
+    const controlList = this.controlLists.get(header);
+    const colData = this.controlListColumns.get(header);
       if (controlList) {
         result = {
           ...controlList,
