@@ -18,6 +18,19 @@
   border: 1px solid #dbdbdb !important;
   border-radius: 6px !important;
   transition: all 0.2s ease;
+  height: auto !important;
+  white-space: normal !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  max-width: 100% !important;
+}
+
+::ng-deep .premium-chip .mdc-evolution-chip__cell--primary,
+::ng-deep .premium-chip .mdc-evolution-chip__action--primary,
+::ng-deep .premium-chip .mat-mdc-chip-action-label {
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  text-overflow: clip !important;
 }
 
 .premium-chip:hover {
@@ -28,6 +41,8 @@
 .chip-text {
   font-weight: 500;
   color: #363636;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
 .copy-notification {
@@ -51,6 +66,7 @@
   padding: 12px 16px !important;
   border-bottom: 1px solid #f0f0f0;
   line-height: normal !important;
+  white-space: normal !important;
 }
 
 .premium-option:last-child {
@@ -60,6 +76,7 @@
 .term-value {
   font-size: 1rem;
   color: #00d1b2;
+  word-break: break-word;
 }
 
 .provenance-tag,
