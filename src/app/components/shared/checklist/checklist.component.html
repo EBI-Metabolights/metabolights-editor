@@ -13,16 +13,21 @@
             }}%</progress>
     </div>
 
-    <div class="checklist-items">
-        <div *ngFor="let item of items" class="checklist-item" [class.is-valid]="item.isValid"
-            [class.is-invalid]="!item.isValid && item.isRequired" [matTooltip]="item.error || item.label">
-            <mat-icon class="is-size-6 mr-2" [style.color]="item.isValid ? '#52c41a' : '#ff4d4f'">
-                {{ item.isValid ? 'check_circle' : (item.isRequired ? 'error_outline' : 'info_outline') }}
-            </mat-icon>
-            <span class="is-size-7" [class.has-text-grey-light]="item.isValid"
-                [style.font-weight]="item.isValid ? '400' : '600'">
-                {{ item.label }}
-            </span>
+    <div>
+        <div *ngFor="let group of groupedItems" class="mb-5">
+            <h7 class="title is-7 has-text-weight-bold has-text-grey mt-1" *ngIf="group.label">{{ group.label }}</h7>
+            <div class="checklist-items">
+                <div *ngFor="let item of group.items" class="checklist-item" [class.is-valid]="item.isValid"
+                    [class.is-invalid]="!item.isValid && item.isRequired" [matTooltip]="item.error || item.label">
+                    <mat-icon class="is-size-6 mr-2" [style.color]="item.isValid ? '#52c41a' : '#ff4d4f'">
+                        {{ item.isValid ? 'check_circle' : (item.isRequired ? 'error_outline' : 'info_outline') }}
+                    </mat-icon>
+                    <span class="is-size-7" [class.has-text-grey-light]="item.isValid"
+                        [style.font-weight]="item.isValid ? '400' : '600'">
+                        {{ item.label }}
+                    </span>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -16,10 +16,32 @@ export interface ChecklistItem {
 })
 export class ChecklistComponent {
   @Input() items: ChecklistItem[] = [];
+  @Input() sectionLabels: Record<number, string> = {};
   @Output() itemClick = new EventEmitter<ChecklistItem>();
 
   onItemClick(item: ChecklistItem) {
     this.itemClick.emit(item);
+  }
+
+  get groupedItems(): { section: number; label: string; items: ChecklistItem[] }[] {
+    const groups: Record<number, ChecklistItem[]> = {};
+    
+    this.items.forEach(item => {
+      const section = item.section || 0;
+      if (!groups[section]) {
+        groups[section] = [];
+      }
+      groups[section].push(item);
+    });
+
+    return Object.keys(groups)
+      .map(key => Number(key))
+      .sort((a, b) => a - b)
+      .map(section => ({
+        section,
+        label: this.sectionLabels[section] || `Step ${section}`,
+        items: groups[section]
+      }));
   }
 
   get completedCount(): number {
