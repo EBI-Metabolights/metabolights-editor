@@ -23,7 +23,7 @@ import { AssayState } from "../ngxs-store/study/assay/assay.state";
 import { FilesState } from "../ngxs-store/study/files/files.state";
 import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
 import { ValidationState } from "../ngxs-store/study/validation/validation.state";
-import { BannerMessage, DefaultControlLists, MaintenanceMode, SetProtocolExpand } from "../ngxs-store/non-study/application/application.actions";
+import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand } from "../ngxs-store/non-study/application/application.actions";
 import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
 import { SampleState } from "../ngxs-store/study/samples/samples.state";
 import { MAFState } from "../ngxs-store/study/maf/maf.state";
@@ -36,6 +36,7 @@ import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descripto
 import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
 import { MetabolightsFieldControls } from "../models/mtbl/mtbls/control-list";
+import { KeycloakService } from "keycloak-angular";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -77,6 +78,9 @@ export class EditorService {
 
   study: MTBLSStudy;
   baseHref: string;
+  private redirectUrl = "";
+  private redirectUrlKey = this.configService.config.endpoint + "/RedirectUrl"
+
   currentStudyIdentifier: string = null;
   validations: any = {};
   defaultControlLists: any = {};
@@ -106,26 +110,32 @@ export class EditorService {
     public configService: ConfigurationService,
     private platformLocation: PlatformLocation,
     private http: HttpClient,
+    private keycloak: KeycloakService
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
     this.setUpSubscriptionsNgxs();
+    // this.redirectUrl = this.configService.config.redirectURL;
+    // this.setRedirectUrl(this.configService.config.redirectURL);
     // load dev control-lists (asset) and merge into NGXS without overwriting existing controlLists
     // this.loadAndMergeDevControlLists();
   }
-
-  private _redirectUrl: string = null;
-
-  get redirectUrl(): string {
-    if (this._redirectUrl) {
-      return this._redirectUrl;
+  setRedirectUrl(newRedirectUrl) {
+    if (newRedirectUrl && newRedirectUrl.length > 0 && !newRedirectUrl.startsWith(this.configService.config.redirectURL)) {
+      localStorage.setItem(this.redirectUrlKey, newRedirectUrl);
+    } else {
+      console.log("Errror")
     }
-    return this.configService.config ? this.configService.config.redirectURL : null;
   }
-
-  set redirectUrl(value: string) {
-    this._redirectUrl = value;
+  getRedirectUrl() {
+    this.redirectUrl = localStorage.getItem(this.redirectUrlKey);
+    if (!this.redirectUrl) {
+      return this.configService.config.redirectURL;
+    }
+    return this.redirectUrl
   }
-
+  resetRedirectUrl() {
+    localStorage.setItem(this.redirectUrlKey, this.configService.config.redirectURL);
+  }
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((settings) => { this.toastrSettings = settings });
     this.studyIdentifier$.subscribe((value) => {
@@ -275,14 +285,14 @@ export class EditorService {
   }
 
   logout(redirect) {
-
-    this.clearSessionData();
-    if (this.configService.config.clearJavaSession && redirect) {
-      window.location.href = this.configService.config.javaLogoutURL;
-    } else {
-      this.resetStudyStates();
-      this.router.navigate([this.configService.config.loginURL]);
-    }
+    this.resetStudyStates()
+    this.keycloak.logout(this.configService.config.auth.logoutUrl)
+    // if (this.configService.config.clearJavaSession && redirect) {
+    //   window.location.href = this.configService.config.javaLogoutURL;
+    // } else {
+    //   this.resetStudyStates();
+    //   this.router.navigate([this.configService.config.loginURL]);
+    // }
   }
 
   resetStudyStates() {
@@ -447,80 +457,16 @@ export class EditorService {
    */
   async updateSession() {
 
-    const jwtTokenKey = "jwt"
-    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
-    const userKey = this.configService.config.endpoint + "/user"
+    this.store.dispatch(new BackendVersion.Get());
+    this.store.dispatch(new EditorVersion.Get());
+    this.store.dispatch(new BannerMessage.Get());
+    this.store.dispatch(new MaintenanceMode.Get());
+    this.store.dispatch(new DefaultControlLists.Get());
+    this.store.dispatch(new User.Studies.Set(null))
 
-    const activeJwt = localStorage.getItem(jwtTokenKey);
-    const localUser = localStorage.getItem(userKey);
-    const user: MetabolightsUser = JSON.parse(localUser);
-
-    if (environment.useNewState) {
-      this.store.dispatch(new BannerMessage.Get());
-      this.store.dispatch(new MaintenanceMode.Get());
-      this.store.dispatch(new DefaultControlLists.Get());
-
-    } else {
-      this.getDefaultControlLists().subscribe({
-        next: (response) => {
-          this.store.dispatch(new DefaultControlLists.Set(response.content));
-        },
-        error: (error) => {
-          this.store.dispatch(new DefaultControlLists.Set({}));
-
-        }
-      }
-      );
-      this.getBannerHeader().subscribe({
-        next: (response) => {
-          const message = response.content;
-          this.store.dispatch(new BannerMessage.Set(message))
-        },
-        error: (error) => {
-          this.store.dispatch(new BannerMessage.Set(null))
-        }
-      }
-      );
-      this.checkMaintenanceMode().subscribe({
-        next: (response) => {
-          const result = response.content;
-          this.store.dispatch(new MaintenanceMode.Set(result));
-        },
-        error: (error) => {
-          this.store.dispatch(new MaintenanceMode.Set(false));
-        }
-      });
-    }
-
-
-
-    if (activeJwt !== null) {
-      const decoded = jwtDecode<MtblsJwtPayload>(activeJwt);
-      const username = decoded.email;
-      if (user === null || user.email !== username) {
-        this.clearSessionData();
-        await this.loginWithJwt(activeJwt, username);
-        return true;
-      } else {
-        const isCuratorKey = this.configService.config.endpoint + "/isCurator"
-        const usernameKey = this.configService.config.endpoint + "/username"
-        const apiTokenKey = this.configService.config.endpoint + "/apiToken"
-        const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
-
-        const isCurator = user.role === 1 ? "true" : "false";
-        localStorage.setItem(isCuratorKey, isCurator);
-        const apiToken = user.apiToken ?? "";
-        localStorage.setItem(apiTokenKey, apiToken);
-
-        localStorage.setItem(usernameKey, user.email);
-        localStorage.setItem(jwtExpirationTimeKey, decoded.exp.toString());
-        this.initialise(localUser, false);
-      }
-      return false;
-    } else {
-      this.clearSessionData();
-    }
+    this.loadValidations();
     return false;
+
   }
 
   updateHistory(state: ActivatedRouteSnapshot) {
@@ -551,92 +497,6 @@ export class EditorService {
     );
   }
 
-  clearSessionData() {
-    if (this.configService.config.endpoint) {
-      // localStorage.removeItem(this.configService.config.endpoint + "/jwt");
-      localStorage.removeItem("jwt");
-      localStorage.removeItem(this.configService.config.endpoint + "/username");
-      localStorage.removeItem(this.configService.config.endpoint + "/jwtExpirationTime");
-      localStorage.removeItem(this.configService.config.endpoint + "/user");
-      localStorage.removeItem(this.configService.config.endpoint + "/isCurator");
-      localStorage.removeItem(this.configService.config.endpoint + "/userToken");
-      localStorage.removeItem(this.configService.config.endpoint + "/apiToken");
-      localStorage.removeItem(this.configService.config.endpoint + "/loginOneTimeToken");
-    }
-
-  }
-
-  async loginWithJwt(jwtToken: string, userName: string) {
-    const body = { jwt: jwtToken, user: userName };
-    const url = this.configService.config.metabolightsWSURL.baseURL + this.configService.config.authenticationURL.initialise;
-    const response = await firstValueFrom(this.authService.http.post(url, body, httpOptions));
-    const decoded = jwtDecode<MtblsJwtPayload>(jwtToken);
-    const expiration = decoded.exp;
-
-    // const jwtKey = this.configService.config.endpoint + "/jwt"
-    const jwtKey = "jwt"
-    const usernameKey = this.configService.config.endpoint + "/username"
-    const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
-
-    localStorage.setItem(jwtKey, jwtToken);
-
-    localStorage.setItem(usernameKey, userName);
-    localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
-    return this.initialise(response, true);
-  }
-
-  // many new state pivots to remove in here
-  initialise(data, signInRequest) {
-    interface User {
-      updatedAt: number;
-      owner: { apiToken: string; role: string; email: string; status: string; partner: boolean; };
-      message: string;
-      err: string;
-    }
-
-    const userKey = this.configService.config.endpoint + "/user"
-    const isCuratorKey = this.configService.config.endpoint + "/isCurator"
-    if (signInRequest) {
-      const user: Owner = data.content;
-      if (user) {
-
-
-        localStorage.setItem(userKey, JSON.stringify(user));
-        const isCurator = user.role === 1 ? "true" : "false";
-        localStorage.setItem(isCuratorKey, isCurator);
-        httpOptions.headers = httpOptions.headers.set(
-          "user-token",
-          user.apiToken
-        );
-
-        this.store.dispatch(new User.Set(user));
-      } else {
-        this.clearSessionData()
-      }
-      this.store.dispatch(new User.Studies.Set(null))
-
-
-      this.loadValidations();
-      return true;
-    } else {
-      const user: Owner = JSON.parse(data);
-      httpOptions.headers = httpOptions.headers.set(
-        "user-token",
-        disambiguateUserObj(user)
-      );
-      const isCurator = user.role === 1 ? "true" : "false";
-
-      localStorage.setItem(isCuratorKey, isCurator);
-
-      this.store.dispatch(new User.Set(user));
-
-
-      this.store.dispatch(new User.Studies.Set(null))
-
-      this.loadValidations();
-      return true;
-    }
-  }
 
   /**
    * This method circumvents the state, but it is wired closely to app init and didn't want
@@ -648,14 +508,14 @@ export class EditorService {
       return;
     }
 
-    this.validationService.getValidationRules().subscribe(
-      (validations) => {
+    this.validationService.getValidationRules().subscribe( {
+      next: (validations) => {
         this.store.dispatch(new SetLoadingInfo("Loading study validations"))
         this.store.dispatch(new EditorValidationRules.Set(validations))
       },
-      (err) => {
+      error: (err) => {
         console.log(err);
-      }
+      }}
     );
   }
 

@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession, UserStudyPermission } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -19,6 +19,7 @@ import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
 import { User } from "../../non-study/user/user.actions";
 import { DatasetLicense, DatasetLicenseService } from "src/app/services/decomposed/dataset-license.service";
+import { StudyPermission } from "src/app/services/headers";
 
 
 export interface GeneralMetadataStateModel {
@@ -52,6 +53,7 @@ export interface GeneralMetadataStateModel {
     relatedDatasets: any[];
     mhdAccession: string;
     comments: any[];
+    studyPermission: StudyPermission;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -83,7 +85,8 @@ const defaultState: GeneralMetadataStateModel = {
     funders: [],
     relatedDatasets: [],
     mhdAccession: null,
-    comments: []
+    comments: [],
+    studyPermission: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -144,6 +147,8 @@ export class GeneralMetadataState {
                 ctx.dispatch(new StudyCategory.Set(gm_response.mtblsStudy.studyCategory));
                 ctx.dispatch(new TemplateVersion.Set(gm_response.mtblsStudy.templateVersion));
                 ctx.dispatch(new MhdAccession.Set(gm_response.mtblsStudy.mhdAccession));
+                ctx.dispatch(new UserStudyPermission.Set(gm_response.mtblsStudy.studyPermission));
+                
                 ctx.dispatch(new DatasetLicenseNS.SetDatasetLicense(
                   {
                     name: gm_response.mtblsStudy.datasetLicense,
@@ -410,6 +415,15 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             studyCreatedAt: action.studyCreatedAt
+      });
+    }
+
+    @Action(UserStudyPermission.Set)
+    SetStudyPermission(ctx: StateContext<GeneralMetadataStateModel>, action: UserStudyPermission.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            studyPermission: action.studyPermission
       });
     }
 
@@ -891,6 +905,10 @@ export class GeneralMetadataState {
     @Selector()
     static studyCategory(state: GeneralMetadataStateModel): string {
         return state?.studyCategory
+    }
+    @Selector()
+    static studyPermission(state: GeneralMetadataStateModel): StudyPermission {
+        return state.studyPermission
     }
     @Selector()
     static studyCreatedAt(state: GeneralMetadataStateModel): string {

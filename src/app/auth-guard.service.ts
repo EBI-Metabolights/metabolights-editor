@@ -5,34 +5,58 @@ import { EditorService } from "./services/editor.service";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 
-import jwtDecode from "jwt-decode";
-import { httpOptions, MtblsJwtPayload } from "./services/headers";
+import { httpOptions, StudyPermission } from "./services/headers";
 import { HttpClient } from "@angular/common/http";
 
 import { ErrorMessageService } from "./services/error-message.service";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
+import { KeycloakAuthGuard, KeycloakEventType, KeycloakService } from "keycloak-angular";
+import { firstValueFrom } from "rxjs";
 @Injectable({
   providedIn: "root",
 })
-export class AuthGuard  implements OnInit {
-
+export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
-    private router: Router,
+    protected router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private store: Store
-  ) { }
+    private store: Store,
+    protected readonly keycloak: KeycloakService
+  ) {
+      super(router, keycloak)
+  }
 
-
-  async canActivate(
+  public async isAccessAllowed(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  ) {
+  )
+  {
+    if (!this.authenticated) {
+      this.editorService.setRedirectUrl(state.url);
+      this.keycloak.login()
+      return false;
+    }
+    if(this.authenticated && state.url.startsWith("/console")) {
+      return true
+    }
+    if (this.authenticated) {
+      const canAccess = await this.checkUrlAndLogin(state.url, state, false);
+      this.editorService.setRedirectUrl(state.url);
+      return canAccess;
+    }
+    return false
+
+  }
+
+  async cccanActivate(
+    route: ActivatedRouteSnapshot, state: RouterStateSnapshot
+  )
+  {
     const url: string = state.url;
     let studyIdentifier;
     let isPrivateWithMTBLSAccession = false;
@@ -44,107 +68,28 @@ export class AuthGuard  implements OnInit {
       studyIdentifier = url.split("/")[2];
       isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
     }
-    const continueProcess = await this.checkAuthenticationRequest(state);
-    if (continueProcess === false) {
-      if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
-      return false;
-    }
+    // const continueProcess = await this.checkAuthenticationRequest(state);
+    // if (continueProcess === false) {
+    //   if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
+    //   return false;
+    // }
     return await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
   }
 
   async handlePrivate(studyIdentifier): Promise<boolean> {
     const perms = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
-    const allEmptyOrFalse = (obj: Record<string, any>): boolean =>
-      Object.entries(obj)
-        .filter(([key]) => key !== 'studyId')       // skip studyId
-        .every(([, val]) => val === '' || val === false);
-    const priv = allEmptyOrFalse(perms)
-    console.log(priv);
-    return priv;
+    return perms.view === null || !perms.view
+    // const allEmptyOrFalse = (obj: Record<string, any>): boolean =>
+    //   Object.entries(obj)
+    //     .filter(([key]) => key !== 'studyId')       // skip studyId
+    //     .every(([, val]) => val === '' || val === false);
+    // const priv = allEmptyOrFalse(perms)
+    // console.log(priv);
+    // return priv;
   }
 
-  async checkAuthenticationRequest(state: RouterStateSnapshot) {
-    try {
-      let loginOneTimeToken = null;
-      if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
-        return true;
-      }
 
-      loginOneTimeToken = state.root.queryParamMap.get("loginOneTimeToken");
-      this.editorService.updateHistory(state.root);
-      if (loginOneTimeToken === "") {
-        this.editorService.redirectUrl = state.url;
-        this.router.navigate(["/login"]);
-        return false;
-      }
-      const loginOneTimeTokenKey = this.configService.config.endpoint + "/loginOneTimeToken"
-      const localLoginOneTimeToken = localStorage.getItem(loginOneTimeTokenKey);
-
-      if (localLoginOneTimeToken === loginOneTimeToken) {
-        return true;
-      }
-      const jwt = await this.editorService.getJwtWithOneTimeToken(loginOneTimeToken);
-      let decoded = null;
-      try {
-        decoded = jwtDecode<MtblsJwtPayload>(jwt);
-      } catch (err) {
-      }
-      if (decoded === null) {
-        this.editorService.redirectUrl = state.url;
-        this.router.navigate(["/login"]);
-        return false;
-      }
-      // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
-      const jwtTokenKey = "jwt"
-      const localJwt = localStorage.getItem(jwtTokenKey);
-
-      if (localJwt !== null && jwt === localJwt) {
-        return true;
-      }
-
-      const userName = decoded.email;
-
-      if (localJwt === null) {
-        this.editorService.redirectUrl = state.url;
-        await this.editorService.loginWithJwt(jwt, userName);
-        const loginOneTimeToken = this.configService.config.endpoint + "/loginOneTimeToken"
-        localStorage.setItem(loginOneTimeTokenKey, loginOneTimeToken);
-        toastr.success(userName + "is logged in successfully.", "Metabolights Editor session is activated.", {
-          timeOut: "5000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      } else {
-        let localDecoded = null;
-        try {
-          localDecoded = jwtDecode<MtblsJwtPayload>(localJwt);
-        } catch (err) {
-        }
-        const currentUser = localDecoded.email;
-        if (currentUser !== userName) {
-          this.editorService.clearSessionData();
-          await this.editorService.loginWithJwt(jwt, userName);
-          toastr.info("User: " + userName, "Session is swithed to other user.", {
-            timeOut: "5000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-        }
-      }
-      return true;
-    } catch (err) {
-      this.editorService.redirectUrl = state.url;
-      const errorCode = "E-0001-001";
-      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-      return false;
-    }
-  }
-
-  async canActivateChild(
+  async ccanActivateChild(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ) {
@@ -162,18 +107,7 @@ export class AuthGuard  implements OnInit {
    * @returns boolean indicating whether the user is logged in.
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
-    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
-    const jwtTokenKey = "jwt"
-    
-    const localJwt = localStorage.getItem(jwtTokenKey);
-    if (url.startsWith("/login")) {
-      if (localJwt !== null) {
-        this.router.navigate(["/console"]);
-        return false;
-      } else {
-        return true;
-      }
-    }
+
     let studyIdentifier = null;
     let obfuscationCode = null;
     if (url.startsWith("/MTBLS")) {
@@ -189,56 +123,59 @@ export class AuthGuard  implements OnInit {
     } else if (url.startsWith("/reviewer")) {
       obfuscationCode = url.split("/")[1].split("?")[0].replace("reviewer", "");
     } else if (url.startsWith("/study/")) {
-      this.editorService.redirectUrl = url;
+      this.editorService.setRedirectUrl(url);
       const errorCode = "E-0001-001";
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
     }
 
-    if (studyIdentifier !== null) {
-      return await this.checkStudyUrl(url, studyIdentifier, state, isPrivateWithMTBLSAccession);
-    } else if (obfuscationCode !== null) {
-      return await this.checkStudyObfuscationCode(url, obfuscationCode, state, null);
+    const baseUrl = this.configService.config.metabolightsWSURL.baseURL;
+    let permissionUrl = null
+    if (studyIdentifier) {
+      permissionUrl = baseUrl + "/auth/permissions/accession-number/" + studyIdentifier;
+    } else {
+      permissionUrl = baseUrl + "/auth/permissions/obfuscationcode/" + obfuscationCode;
     }
-
-    switch (this.evaluateSession(null)) {
-      case SessionStatus.Active:
-        return true;
-
-      case SessionStatus.Expired:
-        this.editorService.redirectUrl = url;
-        this.editorService.logout(false);
-        return false;
-
-      case SessionStatus.NotInit:
-        this.editorService.redirectUrl = url;
-        await this.editorService.updateSession();
-        break;
-
-      case SessionStatus.NoRecord:
-        this.editorService.redirectUrl = url;
-        this.router.navigate(["/login"]);
-        return false;
-
-      default:
-        console.log("hit default case in checkLogin");
-        this.editorService.redirectUrl = url;
-        this.router.navigate(["/login"]);
-        return false;
+    if (permissionUrl === null) {
+      return false;
     }
+    const studyPermission =  await firstValueFrom(this.http.get<StudyPermission>(permissionUrl,
+      {
+        headers: httpOptions.headers,
+        observe: "body",
+      }
+    ));
+    // this.store.dispatch(new StudyPermissionNS.Set(studyPermission))
+
+    if (!studyPermission.studyId) {
+      this.editorService.setRedirectUrl(url);
+      const errorCode = "E-0001-002";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+      return false;
+    }
+    if (studyPermission.view) {
+      if (url.startsWith("/reviewer")) {
+        const params = { reviewCode: obfuscationCode };
+        this.router.navigate(["/" + studyPermission.studyId + "/files"], { queryParams: params });
+        return false;
+      }
+      return true;
+    }
+    return false;
+
   }
   async checkStudyObfuscationCode(url: string, obfuscationCode: string, state: RouterStateSnapshot, studyId: string) {
     const studyPermission = await this.editorService.getStudyPermissionByObfuscationCode(obfuscationCode);
     const permissions = studyPermission;
     this.store.dispatch(new StudyPermissionNS.Set(permissions))
     if (studyPermission === null || studyPermission.studyId === "") {
-      this.editorService.redirectUrl = url;
+      this.editorService.setRedirectUrl(url)
       const errorCode = "E-0001-002";
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
     }
     if (studyId !== null && studyId !== studyPermission.studyId) {
-      this.editorService.redirectUrl = url;
+      this.editorService.setRedirectUrl(url)
       const errorCode = "E-0001-002";
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
@@ -274,7 +211,7 @@ export class AuthGuard  implements OnInit {
     const regEx = new RegExp('^((MTBLS[1-9][0-9]{0,10})|(REQ[0-9]{1,20}))($|\\?)', 'g');
     const studyIdResults = studyId.match(regEx);
     if (studyIdResults === null || studyIdResults.length === 0) {
-        this.editorService.redirectUrl = url;
+        this.editorService.setRedirectUrl(url)
         const errorCode = "E-0001-003";
         this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
         return false;
@@ -286,7 +223,7 @@ export class AuthGuard  implements OnInit {
     }
     const studyPermission = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
     if (studyPermission === null || studyPermission.studyId === "") {
-      this.editorService.redirectUrl = url;
+      this.editorService.setRedirectUrl(url)
       const errorCode = "E-0001-002";
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
@@ -307,12 +244,12 @@ export class AuthGuard  implements OnInit {
         return await this.checkStudyObfuscationCode(url, reviewCode, state, studyId);
       }
       if (isPrivateWithMTBLSAccession) {
-        this.editorService.redirectUrl = url;
+        this.editorService.setRedirectUrl(url)
         this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
         return false;
       }
 
-      this.editorService.redirectUrl = url;
+      this.editorService.setRedirectUrl(url)
       const errorCode = "E-0001-004";
       this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
       return false;
@@ -323,7 +260,7 @@ export class AuthGuard  implements OnInit {
         return true;
       } else {
         if (url.startsWith("/study/MTBLS") && studyPermission.view === false ){
-          this.editorService.redirectUrl = url;
+          this.editorService.setRedirectUrl(url)
           const errorCode = "E-0001-004";
           if (isPrivateWithMTBLSAccession){
             this.router.navigate([url.replace("/study/", "/")]);
@@ -333,15 +270,15 @@ export class AuthGuard  implements OnInit {
           return false
         }
         if (studyPermission.submitterOfStudy === true && studyPermission.view === true && url.startsWith("/study/MTBLS")) {
-          this.editorService.redirectUrl = url;
+          this.editorService.setRedirectUrl(url)
           this.router.navigate([url.replace("/study","")]);
           return false;
         }
         if (studyPermission.userName == null || studyPermission.userName.length === 0) {
-          this.editorService.redirectUrl = url;
+          this.editorService.setRedirectUrl(url)
           this.router.navigate(["/login"]);
         } else {
-          this.editorService.redirectUrl = url;
+          this.editorService.setRedirectUrl(url)
           const errorCode = "E-0001-004";
           this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
         }
@@ -351,55 +288,4 @@ export class AuthGuard  implements OnInit {
 
   }
 
-  /**
-   * check whether a user has an open session, and if they do, whether it is still valid
-   *
-   * @param isInitialisedObj Initialisation object from the state, which contains a timestamp of the session start.
-   * @returns A SessionStatus enum value, indicating the status of the session.
-   */
-  evaluateSession(isInitialisedObj: any): SessionStatus {
-    // in app.component.ts we are subscribing to all router events, and recording when that event is NavigationStart,
-    // which will either be arriving at the app for the first time, or refreshing the page.
-    // if (
-    //   isInitialisedObj.ready === false &&
-    //   typeof isInitialisedObj.time === "string" &&
-    //   localStorage.getItem(userKey) === null
-    // ) {
-    //   return SessionStatus.NoRecord;
-    // }
-    // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
-    const jwtTokenKey = "jwt"
-    const userKey = this.configService.config.endpoint + "/user"
-    const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
-    if (localStorage.getItem(jwtTokenKey) === null) {
-      return SessionStatus.NoRecord;
-    }
-
-    if (localStorage.getItem(userKey) === null) {
-      return SessionStatus.NotInit;
-    }
-
-    const now = new Date();
-    const jwtExpirationTime = localStorage.getItem(jwtExpirationTimeKey);
-    let then;
-
-    if (jwtExpirationTime == null) {
-      const decoded = jwtDecode<MtblsJwtPayload>(localStorage.getItem(jwtTokenKey));
-      const expiration = decoded.exp;
-      
-      localStorage.setItem(jwtExpirationTimeKey, expiration.toString());
-      then = new Date(expiration * 1000);
-    } else {
-      then = new Date(Number(jwtExpirationTime) * 1000);
-    }
-    const nowTime = now.getTime();
-    const thenTime = then.getTime();
-    if (nowTime > thenTime) {
-      return SessionStatus.Expired;
-    } else {
-      return SessionStatus.Active;
-    }
-
-    return SessionStatus.Active;
-  }
 }

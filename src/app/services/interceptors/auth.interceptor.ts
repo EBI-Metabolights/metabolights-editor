@@ -24,7 +24,7 @@ export class AuthInterceptor implements HttpInterceptor {
         if (error.status === 401) {
           console.debug('Unauthorized request detected:', error);
 
-          this.router.navigate(['login']);
+          this.router.navigate(['/login']);
           toastr.info("Your session has expired and you have been logged out.",{
             timeOut: "5000",
             positionClass: "toast-top-center",
