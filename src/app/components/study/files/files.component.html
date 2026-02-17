@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <mtbls-upload *ngIf="isSyncEnabled" class="upload-button" [type]="'any'" [multiple]="true" [mode]="'button'"
+    <mtbls-upload *ngIf="isSyncEnabled && !isReadOnly" class="upload-button" [type]="'any'" [multiple]="true" [mode]="'button'"
       (complete)="loadFilesPassively()" [size]="'is'"></mtbls-upload>
 
     <span *ngIf="isSyncEnabled" class="refresh-button">
@@ -51,7 +51,7 @@
         [ngClass]="{ 'is-danger': ['RETRYING', 'OUTDATED', 'FAILED', 'EXTENSION_INSTALL'].includes(asperaStatus), 'is-success': asperaStatus === 'RUNNING', 'is-grey': asperaStatus === '-' }">{{asperaStatus}}</span>
       </div>
     </span>-->
-    <span>
+    <span *ngIf="!isReadOnly">
       <div class="tags has-addons refresh-button status-badge">
         <span class="tag is-dark">Aspera Status</span><span *ngIf="transferStatus !== null; else loadingStatus"
           class="tag"
@@ -59,7 +59,7 @@
           === true ? 'ONLINE' : 'OFFLINE'}}</span>
       </div>
     </span>
-    <span>
+    <span *ngIf="!isReadOnly">
       <ng-container *ngIf="transferStatus as ts; else loading">
         <div class="tags has-addons refresh-button status-badge">
           <span class="tag is-dark">FTP Status</span>
@@ -77,7 +77,7 @@
     </ng-template>
 
 
-    <span *ngIf="isSyncEnabled && curator" class="is-pulled-rightn ml-auto">
+    <span *ngIf="isSyncEnabled && curator && !isReadOnly" class="is-pulled-rightn ml-auto">
       <a *ngIf="access == null" (click)="getFolderStatus()" class="button is-light">
         <mat-icon>refresh</mat-icon> <small>FTP Folder Status</small>
       </a>

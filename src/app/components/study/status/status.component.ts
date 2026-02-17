@@ -100,11 +100,7 @@ export class StatusComponent implements OnInit {
       }
     });
     this.revisionComment$.subscribe((value) => {
-      if (value) {
-        this.revisionComment = value;
-      } else {
         this.revisionComment = "";
-      }
     });
     this.revisionTaskMessage$.subscribe((value) => {
       if (value) {
