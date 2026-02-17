@@ -205,11 +205,12 @@
             </table>
           </span>
           <!-- Revision comment for curator when selecting New Revision -->
-          <div class="field" *ngIf="toStatus === 'New Revision' && curator" style="margin-top:12px;">
+          <div class="field" *ngIf="status === 'Public' && toStatus === 'New Revision' && curator"
+            style="margin-top:12px;">
             <label class="label">Revision comments<span class="has-text-danger">*</span></label>
             <div class="control">
-              <textarea class="textarea" placeholder="Please provide revision comments"
-                [(ngModel)]="revisionComment" rows="3" required></textarea>
+              <textarea class="textarea" placeholder="Please provide revision comments" [(ngModel)]="revisionComment"
+                rows="3" required></textarea>
             </div>
           </div>
         </span>
@@ -275,7 +276,9 @@
             (click)="applyChanges()">
             Apply
           </button>&nbsp; -->
-          <button class="button is-info" *ngIf="toStatus !== status" [disabled]="isFormBusy || (toStatus === 'New Revision' && curator && (!revisionComment || revisionComment.trim().length === 0))" (click)="applyChanges()">
+          <button class="button is-info" *ngIf="toStatus !== status"
+            [disabled]="isFormBusy || (toStatus === 'New Revision' && status === 'Public' && curator && (!revisionComment || revisionComment.trim().length === 0))"
+            (click)="applyChanges()">
             Apply
           </button>&nbsp;
           <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
