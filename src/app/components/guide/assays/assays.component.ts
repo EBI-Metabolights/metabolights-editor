@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, inject } from "@angular/core";
+import { Component, ViewChild, OnInit, inject, Input, Output, EventEmitter } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
@@ -26,8 +26,11 @@ import { Samples } from "src/app/ngxs-store/study/samples/samples.actions";
   styleUrls: ["./assays.component.css"],
 })
 export class GuidedAssaysComponent implements OnInit {
+  @Input() hideNav = false;
+  @Output() next = new EventEmitter<void>();
 
-  studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
+
+  studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
@@ -59,7 +62,9 @@ export class GuidedAssaysComponent implements OnInit {
     private router: Router,
     private store: Store
   ) {
-    this.editorService.initialiseStudy(this.route);
+    if(this.route.snapshot.paramMap.get('id')) {
+      this.editorService.initialiseStudy(this.route);
+    }
     this.setUpSubscriptionsNgxs();
     this.baseHref = this.editorService.configService.baseHref;
   }
@@ -78,7 +83,7 @@ export class GuidedAssaysComponent implements OnInit {
     this.studyFiles$.pipe(withLatestFrom(this.studyIdentifier$)).subscribe(([value, studyIdentifierValue]) => {
       if (value != null) {
         this.files = value;
-      } else if (value === null && this.files.length === 0) {
+      } else if (value === null && this.files.length === 0 && studyIdentifierValue) {
         this.store.dispatch(new Operations.GetFreshFilesList(false, false, studyIdentifierValue));
       }
     });
@@ -315,18 +320,11 @@ export class GuidedAssaysComponent implements OnInit {
   }
 
   openFullStudyView() {
-    Swal.fire({
-      title: "Switch to study overview?",
-      text: "",
-      showCancelButton: true,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "Continue",
-      cancelButtonText: "Cancel",
-    }).then((willDelete) => {
-      if (willDelete.value) {
-        this.router.navigate(["/study", this.requestedStudy]);
-      }
-    });
+    if (this.hideNav) {
+      this.next.emit();
+    } else {
+      this.router.navigate(["/guide/upload", this.requestedStudy]);
+    }
   }
 
   extractAssayInfo(reloadFiles) {

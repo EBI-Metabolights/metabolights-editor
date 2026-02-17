@@ -169,39 +169,38 @@ export class FilesState {
 
     @Selector()
     static getSampleSheet(state: FilesStateModel) {
-        let result = state.files.study.find(file => file.file.startsWith('s_'));
-        return result
+        return state?.files?.study?.find(file => file.file.startsWith('s_'))
     }
 
     @Selector()
     static getAssaySheets(state: FilesStateModel) {
-        let result = state.files.study.filter(file => file.type === 'metadata_assay' || file.file.startsWith('a_'));
-        return result
+        if (!state.files) return null;
+        return state?.files?.study?.filter(file => file.type === 'metadata_assay' || file.file.startsWith('a_')) || []
     }
 
     @Selector()
     static obfuscationCode(state: FilesStateModel) {
-        return state.obfuscationCode;
+        return state?.obfuscationCode;
     }
 
     @Selector()
     static uploadLocation(state: FilesStateModel) {
-        return state.uploadLocation;
+        return state?.uploadLocation;
     }
 
     @Selector()
     static privateFtpAccessible(state: FilesStateModel) {
-        return state.privateFtpAccessible;
+        return state?.privateFtpAccessible;
     }
 
     @Selector()
     static files(state: FilesStateModel) {
-        return state.files;
+        return state?.files;
     }
 
     @Selector()
     static rawFiles(state: FilesStateModel) {
-        return state.rawFiles
+        return state?.rawFiles
     }
 
 

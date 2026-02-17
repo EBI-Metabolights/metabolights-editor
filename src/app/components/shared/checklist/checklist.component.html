@@ -1,0 +1,28 @@
+<div class="checklist-container box">
+    <div class="is-flex is-justify-content-space-between is-align-items-center mb-3">
+        <div class="is-flex is-align-items-center">
+            <span class="material-symbols-outlined header-icon">fact_check</span>
+            <h3 class="title is-6 has-text-weight-bold mb-0" style="padding-right: 20px;">Submission Checklist</h3>
+        </div>
+        <span class="tag is-info is-light" style="font-weight: 600;">{{ completedCount }} / {{ totalCount }}
+            completed</span>
+    </div>
+
+    <div class="progress-bar-container mb-4">
+        <progress class="progress is-success is-extrasmall" [value]="progressPercentage" max="100">{{ progressPercentage
+            }}%</progress>
+    </div>
+
+    <div class="checklist-items">
+        <div *ngFor="let item of items" class="checklist-item" [class.is-valid]="item.isValid"
+            [class.is-invalid]="!item.isValid && item.isRequired" [matTooltip]="item.error || item.label">
+            <mat-icon class="is-size-6 mr-2" [style.color]="item.isValid ? '#52c41a' : '#ff4d4f'">
+                {{ item.isValid ? 'check_circle' : (item.isRequired ? 'error_outline' : 'info_outline') }}
+            </mat-icon>
+            <span class="is-size-7" [class.has-text-grey-light]="item.isValid"
+                [style.font-weight]="item.isValid ? '400' : '600'">
+                {{ item.label }}
+            </span>
+        </div>
+    </div>
+</div>

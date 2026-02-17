@@ -1,21 +1,27 @@
 mat-form-field.extra-margin {
-  margin-bottom: 24px; /* only when message is long */
+  margin-bottom: 24px;
+  /* only when message is long */
 }
+
 mat-form-field.margin-normal {
-  margin-bottom: 25px; 
+  margin-bottom: 25px;
 }
-.right{
+
+.right {
   float: right;
   text-decoration: none;
   color: blue;
 }
+
 .form-row {
   display: flex;
   width: 100%;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px; /* spacing between fields */
+  gap: 12px;
+  /* spacing between fields */
   box-sizing: border-box;
+  padding-bottom: 20px;
 }
 
 .half-width {
@@ -25,7 +31,8 @@ mat-form-field.margin-normal {
 
 .field-new {
   flex: 1;
-  min-width: 0; /* prevents field overflow */
+  min-width: 0;
+  /* prevents field overflow */
 }
 
 /* prevent extra padding that forces wrapping */
@@ -39,6 +46,7 @@ mat-form-field.margin-normal {
   .form-row {
     flex-direction: column;
   }
+
   .field-new {
     width: 100%;
   }
@@ -50,9 +58,11 @@ mat-form-field.margin-normal {
   padding: 10px;
   color: #3273dc;
 }
+
 .search-link:hover {
   text-decoration: underline;
 }
+
 .badge {
   background-color: #1976d2;
   color: white;
@@ -61,4 +71,20 @@ mat-form-field.margin-normal {
   padding: 0 4px;
   border-radius: 4px;
   vertical-align: super;
+}
+
+/* Highlight ontology field when it has validation error */
+::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__notch,
+::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-bottom-color: #f44336 !important;
+  border-right-color: #f44336 !important;
+  border-top-color: #f44336 !important;
+}
+::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__leading,
+::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline .mdc-notched-outline__trailing {
+  border-left-color: #f44336 !important;
+}
+::ng-deep .mat-form-field-invalid.mat-mdc-form-field .mdc-notched-outline {
+  border-width: 2px !important;
 }

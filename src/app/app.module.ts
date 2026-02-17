@@ -22,6 +22,7 @@ import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatStepperModule } from "@angular/material/stepper";
 
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule } from "@angular/material/paginator";
@@ -56,6 +57,7 @@ import { SampleState } from "./ngxs-store/study/samples/samples.state";
 import { ProtocolsState } from "./ngxs-store/study/protocols/protocols.state";
 import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.state";
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
+import { StudyCreationState } from "./ngxs-store/non-study/study-creation/study-creation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';

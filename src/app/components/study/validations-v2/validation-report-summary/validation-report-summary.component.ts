@@ -128,11 +128,10 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   addCustomListeners() {
     // Wait for the microtask queue to be empty so the chart is fully rendered
     setTimeout(() => {
-      console.log(this.chart);
       const elements = this.chart.chartElement.nativeElement.querySelectorAll('g.pie-grid-item');
       elements.forEach(element => {
         this.renderer.listen(element, 'click', (event) => {
-          console.log('Pie arc clicked', event);
+          // console.log('Pie arc clicked', event);
           // Implement your custom logic here
           //target.innerHTML
         });

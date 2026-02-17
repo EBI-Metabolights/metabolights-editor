@@ -3,7 +3,7 @@
   <div class="modal-content">
     <mat-card>
       <div class="modal-header">
-        <h2 class="title is-3 mt-3">MetaboLights Data Policy</h2>
+        <h2 class="title is-3 mt-3">MetaboLights Privacy Policy</h2>
       </div>
       <div class="blocks-container" (scroll)="onScroll($event)">
         <div class="container page-wrapper">
@@ -46,20 +46,14 @@
                   <strong>Dataset Licenses:</strong> The terms of the Creative
                   Commons Public Domain (CC0) License apply to all MetaboLights
                   datasets submitted from April 2025
-                  <a
-                    href="https://creativecommons.org/public-domain/cc0"
-                    target="_blank"
-                    >(https://creativecommons.org/public-domain/cc0)</a
-                  >
+                  <a href="https://creativecommons.org/public-domain/cc0"
+                    target="_blank">(https://creativecommons.org/public-domain/cc0)</a>
                   . In this case, all submitters have specifically agreed to
                   these terms during the submission process. All submitted
                   datasets before that date (April 2025) are subject to the EBI
                   terms of use
-                  <a
-                    href="https://www.ebi.ac.uk/about/terms-of-use"
-                    target="_blank"
-                    >(https://www.ebi.ac.uk/about/terms-of-use)</a
-                  >
+                  <a href="https://www.ebi.ac.uk/about/terms-of-use"
+                    target="_blank">(https://www.ebi.ac.uk/about/terms-of-use)</a>
                   .
                 </li>
                 <li>
@@ -147,85 +141,81 @@
                   resource, which should only happen in very exceptional
                   circumstances:
                   <div class="margin-list">
-                    <li>
-                      Submitters realize that the dataset is incorrect, with no
-                      immediate opportunity to correct it.
-                    </li>
-                    <li>
-                      Data is found to have been submitted to MetaboLights
-                      without the permission of the rightful owner. This is
-                      expected to be extremely rare and requires formal
-                      institutional contact with the submitting institution.
-                    </li>
-                    <li>Formal retraction of the corresponding publication.</li>
-                    <li>
-                      In any case, once a dataset has been distributed as
-                      public, MetaboLights cannot exercise any control on the
-                      downstream use of the data by third parties, even if it is
-                      subsequently removed from MetaboLights.
-                    </li>
-                  </div>
-                </li>
-              </div>
-              <br />
-              <p>
-                <strong>Note: </strong> Datasets from MetaboLights are
-                automatically downloaded and often reused, and the corresponding
-                metadata synchronized between several resources including
-                MetabolomicsHub, OmicsDI and others.
-              </p>
-              <br />
-              <div class="margin-list">
                 <li>
-                  <strong>Pre-prints: </strong>By default, we do not encourage
-                  the public release of datasets available in pre-print
-                  manuscripts until the final publication is accepted. Datasets
-                  in this situation can often be extensively modified during the
-                  peer-review process, and MetaboLights does not have the
-                  storage capacity to keep track of all the versions of a given
-                  dataset. As mentioned above, changes to published datasets
-                  should only happen in exceptional circumstances.
+                  Submitters realize that the dataset is incorrect, with no
+                  immediate opportunity to correct it.
+                </li>
+                <li>
+                  Data is found to have been submitted to MetaboLights
+                  without the permission of the rightful owner. This is
+                  expected to be extremely rare and requires formal
+                  institutional contact with the submitting institution.
+                </li>
+                <li>Formal retraction of the corresponding publication.</li>
+                <li>
+                  In any case, once a dataset has been distributed as
+                  public, MetaboLights cannot exercise any control on the
+                  downstream use of the data by third parties, even if it is
+                  subsequently removed from MetaboLights.
                 </li>
               </div>
-              <br />
-              <h4 class="title is-5">D) Sensitive Datasets</h4>
-              <p>
-                MetaboLights supports fully open data. At the moment,
-                MetaboLights cannot support appropriately datasets that contain
-                sensitive human data, meaning all those datasets that for legal
-                reasons cannot be made publicly available without further
-                restrictions (e.g. datasets that must be made available under
-                controlled-access). Submitters wanting to submit this type of
-                dataset are recommended to find an alternative to MetaboLights.
-              </p>
-              <br />
-              <h4 class="title is-5">Data reuse guidelines</h4>
-              <p>
-                Following good scientific practices, users that reuse the
-                deposited dataset in MetaboLights should give appropriate credit
-                to the original authors/submitters by citing the original
-                dataset or the publication including the dataset.
-              </p>
+              </li>
             </div>
+            <br />
+            <p>
+              <strong>Note: </strong> Datasets from MetaboLights are
+              automatically downloaded and often reused, and the corresponding
+              metadata synchronized between several resources including
+              MetabolomicsHub, OmicsDI and others.
+            </p>
+            <br />
+            <div class="margin-list">
+              <li>
+                <strong>Pre-prints: </strong>By default, we do not encourage
+                the public release of datasets available in pre-print
+                manuscripts until the final publication is accepted. Datasets
+                in this situation can often be extensively modified during the
+                peer-review process, and MetaboLights does not have the
+                storage capacity to keep track of all the versions of a given
+                dataset. As mentioned above, changes to published datasets
+                should only happen in exceptional circumstances.
+              </li>
+            </div>
+            <br />
+            <h4 class="title is-5">D) Sensitive Datasets</h4>
+            <p>
+              MetaboLights supports fully open data. At the moment,
+              MetaboLights cannot support appropriately datasets that contain
+              sensitive human data, meaning all those datasets that for legal
+              reasons cannot be made publicly available without further
+              restrictions (e.g. datasets that must be made available under
+              controlled-access). Submitters wanting to submit this type of
+              dataset are recommended to find an alternative to MetaboLights.
+            </p>
+            <br />
+            <h4 class="title is-5">Data reuse guidelines</h4>
+            <p>
+              Following good scientific practices, users that reuse the
+              deposited dataset in MetaboLights should give appropriate credit
+              to the original authors/submitters by citing the original
+              dataset or the publication including the dataset.
+            </p>
           </div>
         </div>
       </div>
-      <div class="modal-footer keep-right">
-        <div>
-           <small class="hightlight-message">Please read the MetaboLights data policy and scroll to the bottom to enable the ‘Agree’ button</small>
-        </div>
-        <div class="fit">
-           <button
-            class="button is-info"
-            (click)="onAgree()"
-            #agreepolicy
-            [disabled]="!scrolledToBottom"
-            >
-            Agree
-            </button>
-            <button class="button" (click)="onClose()">Close</button>
-        </div>
-      </div>
-    </mat-card>
   </div>
+  <div class="modal-footer keep-right">
+    <div>
+      <small class="hightlight-message">Please read the MetaboLights privacy policy and scroll to the bottom to enable
+        the ‘Agree’ button</small>
+    </div>
+    <div class="fit">
+      <button class="button is-info" (click)="onAgree()" #agreepolicy [disabled]="!scrolledToBottom">
+        Agree
+      </button>
+      <button class="button" (click)="onClose()">Close</button>
+    </div>
+  </div>
+  </mat-card>
+</div>
 </div>

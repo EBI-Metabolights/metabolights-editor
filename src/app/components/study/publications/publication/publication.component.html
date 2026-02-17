@@ -5,29 +5,24 @@
   <div *ngIf="publication">
     <article class="tile is-child box">
       <div class="content">
+        <button *ngIf="!isReadOnly" class="button is-primary is-small" style="float:right;" (click)="openModal()">
+          <mat-icon>edit</mat-icon> Edit </button>
         <h4 class="publication-title">
-          <b>
-            {{ publication.title | slice: 0:100
-            }}<span *ngIf="publication.title.length > 100">...</span>
-          </b>
+          <span style="width:90%;">
+            {{ publication.title }}
+          </span>
         </h4>
-        <h6 class="publication-authors" style="margin-bottom: 0">
+        <p class="publication-authors" style="margin-bottom: 0">
           <small>
-            <mat-icon>people</mat-icon> {{ publication.authorList | slice: 0:90 }}
-            <span *ngIf="publication.authorList.length > 90">...</span>
+            <ng-container *ngIf="publication?.authorList && publication.authorList.trim().length > 0; else noContact">
+              <mat-icon>people</mat-icon> {{ publication.authorList }}
+            </ng-container>
+            <ng-template #noContact>
+              <mat-icon>people</mat-icon>
+              <i class="is-small is-light">Please add publication authors</i>
+            </ng-template>
           </small>
-        </h6>
-        <a *ngIf="!isReadOnly" class="button is-small custom-button" (click)="openModal()">
-          <mat-icon>edit</mat-icon> Edit </a>&nbsp;
-        <a *ngIf="publication.doi && publication.doi.length > 0" class="button is-small custom-button"
-          [href]="'//dx.doi.org/' + publication.doi" target="_blank">
-          <mat-icon>insert_link</mat-icon>
-        </a>
-        <span *ngIf="publication?.status?.annotationValue?.length > 0"
-          class="tag is-default is-small publication-status">
-          {{publication.status.annotationValue}}
-        </span>
-
+        </p>
       </div>
     </article>
   </div>
@@ -149,118 +144,90 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline" style="padding-bottom: 20px;">
           <mat-label>Title</mat-label>
-          <textarea
-            class="no-scroll"
-            formControlName="title"
-            matInput
-            [tabIndex]="1"
-            cdkAutosizeMinRows="3"
-            cdkAutosizeMaxRows="3"
-            cdkTextareaAutosize
-            required
-          >
+          <textarea class="no-scroll" formControlName="title" matInput [tabIndex]="1" cdkAutosizeMinRows="3"
+            cdkAutosizeMaxRows="3" cdkTextareaAutosize required>
           </textarea>
           <mat-hint>{{ fieldValidation("title").description }}
-            <span *ngIf="isFieldRequired('title')">
-              <b>(required)</b>
-            </span>
           </mat-hint>
           <mat-error *ngIf="
-              form.get('title').errors &&
-              form.get('title').dirty &&
-              form.get('title').errors.title
+              form.get('title')?.errors &&
+              form.get('title')?.dirty &&
+              form.get('title')?.errors?.title
             ">
-            {{ form.get("title").errors.title.error }}
+            {{ form.get("title")?.errors?.title?.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Authors</mat-label>
-          <textarea class="no-scroll" formControlName="authorList" matInput [tabIndex]="2" cdkAutosizeMinRows="1"
-            cdkAutosizeMaxRows="4" cdkTextareaAutosize>
-          </textarea>
-          <mat-hint>{{ fieldValidation("authorList").description }}</mat-hint>
-          <mat-error *ngIf="
-              form.get('authorList').errors &&
-              form.get('authorList').dirty &&
-              form.get('authorList').errors.authorList
-            ">
-            {{ form.get("authorList").errors.authorList.error }}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>DOI</mat-label>
-          <input
-            class="no-scroll"
-            formControlName="doi"
-            [tabIndex]="3"
-            (blur)="getArticleFromDOI()"
-            (keydown.enter)="getArticleFromDOI()"
-            matInput
-          />
-          <mat-hint>{{ fieldValidation("doi").description }}
-            <span *ngIf="isFieldRequired('doi')">
-              <b>(required)</b>
-            </span>
-          </mat-hint>
-          <mat-error *ngIf="
-              form.get('doi').errors &&
-              form.get('doi').dirty &&
-              form.get('doi').errors.doi
-            ">
-            {{ form.get("doi").errors.doi.error }}
-          </mat-error>
-        </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>PubMed ID</mat-label>
-          <input
-            class="no-scroll"
-            [tabIndex]="4"
-            formControlName="pubMedID"
-            (blur)="getArticleFromPubMedID()"
-            (keydown.enter)="getArticleFromDOI()"
-            matInput
-          />
-          <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
-          <mat-error *ngIf="
-              form.get('pubMedID').errors &&
-              form.get('pubMedID').dirty &&
-              form.get('pubMedID').errors.pubMedID
-            ">
-            {{ form.get("pubMedID").errors.pubMedID.error }}
-          </mat-error>
-        </mat-form-field>
-        <ng-container *ngIf="form">
-  <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
-    <mtbls-ontology class="mt-20" #publicationStatus
-      [validations]="fieldValidation('status')"
-      [controlList]="_controlList"
-      (changed)="onChanges($event)"
-      [values]="statusValuesForComponent()"
-      [inline]="true"
-      [rule]="_controlList?.rule"
-      [defaultOntologies]="_controlList?.defaultOntologies"
-      [label]="'Status*'"
-      (emptyError)="onEmptyError($event)"
-      ></mtbls-ontology>
-      <mat-error
-            *ngIf="showError"
-          >
-            <small>{{ form?.get("status")?.errors?.status?.error }}</small>
-      </mat-error>
-  </ng-container>
+        <div class="form-row" style="padding-bottom: 40px;">
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>Authors</mat-label>
+            <textarea class="no-scroll" formControlName="authorList" matInput [tabIndex]="2" cdkAutosizeMinRows="1"
+              cdkAutosizeMaxRows="4" cdkTextareaAutosize>
+            </textarea>
+            <mat-hint>{{ fieldValidation("authorList").description }}</mat-hint>
+            <mat-error *ngIf="
+                form.get('authorList')?.errors &&
+                form.get('authorList')?.dirty &&
+                form.get('authorList')?.errors?.authorList
+              ">
+              {{ form.get("authorList")?.errors?.authorList?.error }}
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>DOI<span class="has-error">*</span></mat-label>
+            <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
+              (keydown.enter)="getArticleFromDOI()" matInput />
+            <mat-hint>{{ fieldValidation("doi").description }}
+            </mat-hint>
+            <mat-error *ngIf="
+                form.get('doi')?.errors &&
+                form.get('doi')?.dirty &&
+                form.get('doi')?.errors?.doi
+              ">
+              {{ form.get("doi")?.errors?.doi?.error }}
+            </mat-error>
+          </mat-form-field>
+        </div>
 
-  <ng-template #dropdownField>
-    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('status')">
-      <mat-select formControlName="status" placeholder="Status">
-        <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-          {{ option.annotationValue }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </ng-template>
-</ng-container>
+        <div class="form-row" style="padding-bottom: 0;">
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>PubMed ID</mat-label>
+            <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
+              (keydown.enter)="getArticleFromPubMedID()" matInput />
+            <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
+            <mat-error *ngIf="
+                form.get('pubMedID')?.errors &&
+                form.get('pubMedID')?.dirty &&
+                form.get('pubMedID')?.errors?.pubMedID
+              ">
+              {{ form.get("pubMedID")?.errors?.pubMedID?.error }}
+            </mat-error>
+          </mat-form-field>
+
+          <div class="half-width">
+            <ng-container *ngIf="form">
+              <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
+                <mtbls-ontology class="mt-20" #publicationStatus [validations]="fieldValidation('status')"
+                  [controlList]="_controlList" (changed)="onChanges($event)" [values]="statusValuesForComponent()"
+                  [inline]="true" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                  [label]="'Status*'" (emptyError)="onEmptyError($event)" [hasError]="showError"></mtbls-ontology>
+              </ng-container>
+
+              <ng-template #dropdownField>
+                <mat-form-field class="full-width" appearance="outline"
+                  *ngIf="_controlList?.values?.length && form.get('status')">
+                  <mat-label>Status<span class="has-error">*</span></mat-label>
+                  <mat-select formControlName="status" placeholder="Status">
+                    <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                      {{ option.annotationValue }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-template>
+            </ng-container>
+          </div>
+        </div>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />
           <label><small><b>Publication abstract</b></small></label><br />
@@ -290,16 +257,8 @@
             </button>
           </div>
           <div class="column is-one-third has-text-right">
-            <button
-              [disabled]="!form.valid || isFormBusy || form.pristine"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button [disabled]="!form.valid || isFormBusy || form.pristine" (click)="saveNgxs()" class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
             <!-- <button
@@ -310,12 +269,7 @@
             >
               OK
             </button> -->
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              [tabIndex]="7"
-              (click)="closeModal()"
-            >
+            <button class="button" [disabled]="isFormBusy" [tabIndex]="7" (click)="closeModal()">
               Cancel
             </button>
           </div>

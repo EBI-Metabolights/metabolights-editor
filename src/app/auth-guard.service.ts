@@ -112,11 +112,13 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
     let obfuscationCode = null;
     if (url.startsWith("/MTBLS")) {
       studyIdentifier = url.split("/")[1];
-    }if (url.startsWith("/REQ")) {
+    } else if (url.startsWith("/REQ")) {
       studyIdentifier = url.split("/")[1];
-    }else if (url.startsWith("/study/MTBLS")) {
+    } else if (url.startsWith("/study/MTBLS")) {
       studyIdentifier = url.split("/")[2];
-    }else if (url.startsWith("/study/REQ")) {
+    } else if (url.startsWith("/study/guide/")) {
+      studyIdentifier = url.split("/")[3];
+    } else if (url.startsWith("/study/REQ")) {
       studyIdentifier = url.split("/")[2];
     } else if (url.startsWith("/reviewer")) {
       obfuscationCode = url.split("/")[1].split("?")[0].replace("reviewer", "");

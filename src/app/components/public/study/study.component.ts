@@ -44,6 +44,7 @@ export class PublicStudyComponent implements OnInit {
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   studyValidation$: Observable<any> = inject(Store).select(ValidationState.reportV2);
   validationStatus$: Observable<ViolationType> = inject(Store).select(ValidationState.validationStatus);
+  mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
 
   revisionNumber = null;
   revisionDatetime = null;
@@ -69,6 +70,7 @@ export class PublicStudyComponent implements OnInit {
   validationStatus: ViolationType = null;
   obfuscationCode: string = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
+  mhdAccession: string = null;
   constructor(
     private store: Store,
     private editorService: EditorService,
@@ -136,6 +138,10 @@ export class PublicStudyComponent implements OnInit {
       if (value !== null) {
         this.requestedStudy = value;
       }
+    });
+
+    this.mhdAccession$.subscribe((value) => {
+      this.mhdAccession = value;
     });
 
     this.studyValidation$.subscribe((value) => {
@@ -214,20 +220,20 @@ export class PublicStudyComponent implements OnInit {
         this.requestedTab = 4;
         this.tab = "metabolites";
       } else if (params.tab === "assays") {
-        this.requestedTab = 3;
+        this.requestedTab = 2;
         this.tab = "assays";
       } else if (params.tab === "samples") {
-        this.requestedTab = 2;
+        this.requestedTab = 1;
         this.tab = "samples";
       } else if (params.tab === "protocols") {
-        this.requestedTab = 1;
+        this.requestedTab = 3;
         this.tab = "protocols";
       } else if (params.tab === "validations") {
         this.requestedTab = 6;
         this.tab = "validations";
       } else {
         this.requestedTab = 0;
-        this.tab = "descriptors";
+        this.tab = "overview";
       }
       this.selectCurrentTab(this.requestedTab, this.tab);
     });

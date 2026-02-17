@@ -21,10 +21,11 @@ export class PublicationsComponent implements OnInit {
 
   studyPublications$: Observable<IPublication[]> = inject(Store).select(GeneralMetadataState.publications);
   studyReadonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
-
+  
 
   isReadOnly = false;
   publications: any = null;
+  expandedIndex = -1;
 
   constructor() {
     this.setUpSubscriptionsNgxs();
@@ -42,6 +43,15 @@ export class PublicationsComponent implements OnInit {
     });
 
   }
+
+  toggleExpand(index: number) {
+    if (this.expandedIndex === index) {
+      this.expandedIndex = -1;
+    } else {
+      this.expandedIndex = index;
+    }
+  }
+
 
   ngOnInit() {}
 }

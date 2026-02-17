@@ -1,0 +1,21 @@
+<div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
+    <div class="modal-background" (click)="close()"></div>
+    <div class="modal-content">
+        <mat-card>
+            <div *ngIf="isBusy" class="load-bar">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <div class="modal-header">
+                <h2 class="title is-4">{{ title }}</h2>
+            </div>
+            <div class="card-content">
+                <ng-content select="[body]"></ng-content>
+            </div>
+            <div class="modal-footer">
+                <ng-content select="[footer]"></ng-content>
+            </div>
+        </mat-card>
+    </div>
+</div>

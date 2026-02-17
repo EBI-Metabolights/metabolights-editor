@@ -1,0 +1,90 @@
+<div class="card mb-6" style="position: relative;">
+    <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
+        (click)="openModal()">+ Add</button>
+    <header class="card-heading">
+        <p>
+            Related datasets
+            <mat-icon
+                [matTooltip]="'Link to related datasets in other repositories that are associated with this study, such as genomics, proteomics, or other omics data'">help</mat-icon>
+        </p>
+    </header>
+    <div class="card-content">
+        <div class="dataset-list">
+            <ng-container *ngFor="let dataset of datasets; let i = index">
+                <div class="box p-3 mb-4"
+                    *ngIf="(dataset?.repository && dataset.repository.trim() !== '') || (dataset?.accession && dataset.accession.trim() !== '')">
+                    <div class="columns is-vcentered is-mobile">
+                        <div class="column">
+                            <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                                <div class="is-size-6">
+                                    <span>Repository: </span>
+                                    <span class="has-text-weight-bold">
+                                        <a *ngIf="dataset.repository && dataset.url; else noLink" [href]="dataset.url"
+                                            target="_blank" class="has-text-link">
+                                            {{ dataset.repository }}
+                                        </a>
+                                        <ng-template #noLink>
+                                            {{ dataset.repository }}
+                                        </ng-template>
+                                    </span>
+                                </div>
+                                <div *ngIf="dataset.accession" class="is-size-6">
+                                    <span>Accession: </span>
+                                    <span class="has-text-weight-bold">{{ dataset.accession }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-narrow">
+                            <button class="edit-icon-button" (click)="editDataset(i, dataset)" title="Edit Dataset">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button class="delete is-medium" (click)="removeDataset(i)" title="Remove Dataset"></button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <p *ngIf="!hasValidDatasets" class="placeholder-text has-text-centered p-4">
+            <small>No related datasets defined.</small>
+        </p>
+    </div>
+</div>
+
+<mtbls-modal [title]="editingIndex > -1 ? 'Edit Related Dataset' : 'Add Related Dataset'" [isModalOpen]="isModalOpen"
+    (closed)="closeModal()">
+    <div body [formGroup]="form">
+        <div class="columns is-multiline">
+            <div class="column is-6">
+                <div class="field">
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Related Dataset Repository</mat-label>
+                        <input type="text" matInput formControlName="identifierSource" [matAutocomplete]="sourceAuto"
+                            placeholder="e.g. MetaboLights" />
+                        <mat-autocomplete #sourceAuto="matAutocomplete" [displayWith]="displayIdentifierSource">
+                            <mat-option *ngFor="let src of filteredIdentifierSources$ | async" [value]="src">
+                                <div class="is-size-7"><b>{{ src.name }}</b> ({{ src.prefix }})</div>
+                            </mat-option>
+                        </mat-autocomplete>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="column is-6">
+                <div class="field">
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Related Dataset Accession Number</mat-label>
+                        <input matInput type="text" formControlName="identifier" [placeholder]="identifierPlaceholder">
+                        <mat-error *ngIf="form.get('identifier').hasError('pattern')">
+                            Invalid format for selected repository.
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div footer>
+        <button class="button is-info" (click)="addDataset()" [disabled]="form.invalid">
+            {{ editingIndex > -1 ? 'Update Dataset' : 'Add Dataset' }}
+        </button>
+        <button class="button" style="margin-left:10px" (click)="closeModal()">Cancel</button>
+    </div>
+</mtbls-modal>

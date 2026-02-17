@@ -1,35 +1,38 @@
 <div *ngIf="addNewFactor || factor == null; else showFactorDetails">
-  <span *ngIf="!isDropdown; else showDropdownOption">
-    <a
-      class="button is-light is-pulled-right is-small"
-      [routerLink]="['/study', studyId, 'samples' ]"
-            >    <mat-icon>info</mat-icon>
-       Add, modify or delete Factors in the Samples section</a  
-    >
+  <span *ngIf="mode == 'store'">
+    <span *ngIf="isSampleSheet; else standardView">
+      <a (click)="openModal()" class="button is-primary is-small">
+        <span> + Add</span>
+      </a>
+    </span>
+    <ng-template #standardView>
+      <span *ngIf="!isDropdown; else showDropdownOption">
+        <a class="button is-light is-pulled-right is-small" [routerLink]="['/study', studyId, 'samples' ]">
+          <mat-icon>info</mat-icon>
+          Add, modify or delete Factors in the Samples section</a>
+      </span>
+      <ng-template #showDropdownOption>
+        <a (click)="openModal()" class="dropdown-item"> Add new factor </a>
+      </ng-template>
+    </ng-template>
   </span>
-  <ng-template #showDropdownOption>
-    <a (click)="openModal()" class="dropdown-item"> Add new factor </a>
-  </ng-template>
+  <span *ngIf="mode == 'local' && false">
+    <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
+  </span>
 </div>
 <ng-template #showFactorDetails>
-  <div class="control">
+  <div class="control" *ngIf="mode !== 'local'">
     <div class="tags has-addons">
-      <!-- <span
-        *ngIf="!isStudyReadOnly"
-        class="tag is-primary clickable"
-        (click)="openModal(true)"
-      >
-        <i class="material-icons"> edit </i>
-      </span> -->
+      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal(true)">
+        <mat-icon> edit </mat-icon>
+      </span>
       <span class="tag is-default is-small">
-        <span
-          *ngIf="
+        <span *ngIf="
             factor.factorType &&
               factor.factorType.annotationValue &&
               factor.factorType.annotationValue != '';
             else emptyFactorValue
-          "
-        >
+          ">
           <b>{{ factor.factorName }}</b> :
           <ontology-details [value]="factor.factorType"></ontology-details>
         </span>
@@ -78,52 +81,47 @@
         <h6 class="modal-card-title modal-form-title">
           Add Factor to Sample Sheet
         </h6>
-        <mat-form-field class="full-width">
-          <input class="no-scroll" formControlName="factorName" matInput />
+        <mat-form-field class="full-width" appearance="outline" style="padding-bottom : 40px;">
+          <mat-label>Factor Name</mat-label>
+          <input class="no-scroll" formControlName="factorName" matInput required />
           <mat-hint>{{ factorNameValidations.description }}</mat-hint>
-          <mat-error
-            *ngIf="
+          <mat-error *ngIf="
               form.get('factorName').errors &&
               form.get('factorName').dirty &&
               form.get('factorName').errors.factorName
-            "
-          >
+            ">
             {{ form.get("factorName").errors.factorName.error }}
           </mat-error>
         </mat-form-field>
         <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
-          <mtbls-ontology
-            #factorType
-            [id]="'factorType'"
-            [validations]="factorTypeValidations"
-            [controlList]="_controlList"
-            (changed)="onChanges($event)"
-            [values]="[factor.factorType]"
-            [inline]="true"
-            [rule]="_controlList?.rule"
-            [label]="'Factor Type'"
-            [defaultOntologies]="_controlList?.defaultOntologies"
-          ></mtbls-ontology>
+          <div class="full-width" style="padding-bottom : 20px;">
+            <mtbls-ontology #factorType [id]="'factorType'" [validations]="factorTypeValidations"
+              [controlList]="_controlList" (changed)="onChanges($event)" [values]="[factor.factorType]" [inline]="true"
+              [rule]="_controlList?.rule" [label]="'Factor Type'"
+              [defaultOntologies]="_controlList?.defaultOntologies"></mtbls-ontology>
+          </div>
         </ng-container>
         <ng-template #dropdownField>
-    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length">
-        <mat-select formControlName="factorType" placeholder="Factor Type" (selectionChange)="onDropdownChange($event)">
-          <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-            {{ option.annotationValue }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </ng-template>
-        <label
-        [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''"
-        >
-          Add factor unit (if necessary)
-          <mat-checkbox 
-          [disabled]="form.get('factorName')?.pristine"
-          (change)="toggleUnit()" ></mat-checkbox>
-        </label>
+          <mat-form-field class="full-width" appearance="outline" style="padding-bottom : 20px;"
+            *ngIf="_controlList?.values?.length">
+            <mat-select formControlName="factorType" placeholder="Factor Type"
+              (selectionChange)="onDropdownChange($event)">
+              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                {{ option.annotationValue }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </ng-template>
+        <div *ngIf="addNewFactor" style="padding-bottom: 20px;">
+          <label [matTooltip]="form.get('factorName')?.pristine ? 'Enter factor name to enable' : ''">
+            Add factor unit (if necessary)
+            <mat-checkbox [checked]="addFactorColumnVisible" [disabled]="form.get('factorName')?.pristine"
+              (change)="toggleUnit()">
+            </mat-checkbox>
+          </label>
+        </div>
       </section>
-     <!-- <section class="modal-card-body">
+      <!-- <section class="modal-card-body">
         <label>
           <input type="checkbox" (change)="toggleUnit()" />
           ADD COLUMN??? UNIT ?????
@@ -131,39 +129,32 @@
       </section>-->
       <!--Add factor column start-->
       <ng-container *ngIf="addFactorColumnVisible">
-      <section class="modal-card-body">
-        <h6 class="modal-card-title modal-form-title">
-          Add factor unit to Sample sheet -
-          <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span> <!--selectedFactor.factorName-->
-        </h6>
-        <ng-container *ngIf="_controlListFactor && !_controlListFactor.renderAsDropdown; else comboField">
-        <mtbls-ontology
-          [id]="'factorUnit'"
-          [unitId]="resolvedName"
-          class="mt-20"
-          #factorUnit
-          [validations]="unitSampleValidations"
-          [controlList]="_controlListFactor"
-          (changed)="onChanges($event)"
-          [values]="[]"
-          [inline]="true"
-          [rule]="_controlListFactor.rule"
-          [defaultOntologies]="_controlListFactor.defaultOntologies"
-          [label]="'Factor Unit'"
-        ></mtbls-ontology>
+        <section class="modal-card-body">
+          <h6 class="modal-card-title modal-form-title">
+            Add factor unit to Sample sheet -
+            <span class="highlight">{{ addNewFactor ? fieldValues['factorName'] : factor.factorName }}</span>
+            <!--selectedFactor.factorName-->
+          </h6>
+          <ng-container *ngIf="_controlListFactor && !_controlListFactor.renderAsDropdown; else comboField">
+            <mtbls-ontology [id]="'factorUnit'" [unitId]="resolvedName" class="mt-20" #factorUnit
+              [validations]="unitSampleValidations" [controlList]="_controlListFactor" (changed)="onChanges($event)"
+              [values]="[]" [inline]="true" [rule]="_controlListFactor.rule"
+              [defaultOntologies]="_controlListFactor.defaultOntologies" [label]="'Factor Unit'"></mtbls-ontology>
           </ng-container>
           <ng-template #comboField>
-    <mat-form-field class="full-width" *ngIf="_controlListFactor?.values?.length">
-      <mat-select formControlName="factorUnit" placeholder="Factor Unit"(selectionChange)="onDropdownChangeFactor($event)">
-        <mat-option *ngFor="let option of _controlListFactor.values" [value]="option.annotationValue">
-          {{ option.annotationValue }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </ng-template>
-      </section>
-      <!--The below is a relic from when adding a column was a separate modal-->
-      <!--<footer class="modal-card-foot">
+            <mat-form-field class="full-width" appearance="outline" style="padding-bottom : 20px;"
+              *ngIf="_controlListFactor?.values?.length">
+              <mat-select formControlName="factorUnit" placeholder="Factor Unit"
+                (selectionChange)="onDropdownChangeFactor($event)">
+                <mat-option *ngFor="let option of _controlListFactor.values" [value]="option.annotationValue">
+                  {{ option.annotationValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </ng-template>
+        </section>
+        <!--The below is a relic from when adding a column was a separate modal-->
+        <!--<footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half"></div>
           <div class="column is-half has-text-right">
@@ -176,47 +167,28 @@
           </div>
         </div>
       </footer>-->
-    </ng-container>
+      </ng-container>
       <!--Add factor column end-->
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
-            <button
-              *ngIf="!addNewFactor"
-              class="button is-danger is-pulled-left"
-              (click)="confirmDelete()"
-            >
+            <button *ngIf="!addNewFactor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
             <mtbls-help target="factors"></mtbls-help>
             <!-- <button *ngIf="!addNewFactor" class="button is-light is-pulled-left" (click)='showHistory()' ><mat-icon>history</mat-icon></button> -->
           </div>
           <div class="column is-half has-text-right">
-            <button
-              *ngIf="!form.pristine"
+            <button *ngIf="!form.pristine"
               [disabled]="!form.valid || isFormBusy || (_controlList?.renderAsDropdown ? !selectedFactorValue : (factorTypeComponent?.values?.length === 0))"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+              (click)="saveNgxs()" class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
-            <button
-              *ngIf="form.pristine"
-              (click)="closeModal()"
-              class="button is-info"
-            >
+            <button *ngIf="form.pristine" (click)="closeModal()" class="button is-info">
               OK
             </button>
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>

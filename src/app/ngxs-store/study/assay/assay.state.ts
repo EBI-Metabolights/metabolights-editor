@@ -15,6 +15,7 @@ import { GeneralMetadataService } from "src/app/services/decomposed/general-meta
 import { TemplateRowCollection } from "src/app/models/row-template-collection";
 import { RowTemplateService } from "src/app/services/row-template/row-template.service";
 import { filter, map, take } from "rxjs/operators";
+import { StatusNS } from "../../non-study/application/application.actions";
 
 export interface AssayStateModel {
     assayList: IAssay[],
@@ -48,7 +49,6 @@ export class AssayState {
 
     @Action(AssayList.Get)
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
-        this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
             this.generalMetadataService.getStudyGeneralMetadata(action.id).pipe(take(1)).subscribe(
                 (response) => {
@@ -195,18 +195,31 @@ export class AssayState {
      * @returns assay object.
      */
     prepareTemplateRow(templateRows: TemplateRowCollection, assay: any) {
-        const templ = this.rowTemplateService.getTemplateByAssayFilename(assay["name"]);
-        if (templ === null) return assay
+        const templ = this.rowTemplateService.getTemplateByAssayFilename(assay?.name);
+        if (!templ) return assay;
+
         const attr = stripHyphensAndLowercase(templ);
-        if (Object.keys(templateRows[attr]).length !== 0) {
-            if (assay["data"]["rows"][0].index !== -1) {
-                assay["data"]["rows"].unshift(templateRows[attr]);
-            }
-        } else {
-            console.warn(`Template row not found for ${attr}`)
+        const templateRow = templateRows?.[attr];
+
+        if (!templateRow || Object.keys(templateRow).length === 0) {
+            console.warn(`Template row not found for ${attr}`);
+            return assay;
         }
+
+        const rows = assay?.data?.rows;
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            assay.data.rows = [templateRow];
+            return assay;
+        }
+
+        if (rows[0]?.index !== -1) {
+            rows.unshift(templateRow);
+        }
+
         return assay;
     }
+
 
     @Action(Assay.Set)
     SetStudyAssay(ctx: StateContext<AssayStateModel>, action: Assay.Set) {
@@ -225,6 +238,7 @@ export class AssayState {
         this.assaysService.deleteAssay(action.assay, action.studyId).subscribe(
             (deleted) => {
                 ctx.dispatch(new AssayList.Get(action.studyId))
+                this.store.dispatch(new Protocols.Get());
             }
         )
     }
@@ -273,11 +287,11 @@ export class AssayState {
     UpdateCells(ctx: StateContext<AssayStateModel>, action: Assay.UpdateCells) {
         this.assaysService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
             (response) => {
-                // do some commitCellsToNgxs Processing
-                // or
+                ctx.dispatch(new StatusNS.SetMessage("Cells updated successfully", "success"));
                 ctx.dispatch(new Assay.OrganiseAndPersist(action.filename, action.studyId));
             },
             (error) => {
+                ctx.dispatch(new StatusNS.SetMessage(error.error.message, "error"));
                 console.log('Unable to update cells in assay sheet.')
                 console.log(error)
             }
@@ -347,12 +361,12 @@ export class AssayState {
 
     @Selector()
     static assayList(state: AssayStateModel): IAssay[] {
-        return state.assayList
+        return state?.assayList
     }
 
     @Selector()
     static assays(state: AssayStateModel): Record<string, any> {
-        return state.assays
+        return state?.assays
     }
 
 }

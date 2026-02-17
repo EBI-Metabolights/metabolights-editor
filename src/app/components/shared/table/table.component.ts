@@ -82,6 +82,7 @@ export class TableComponent
   @Input("validationsId") validationsId: any;
   @Input("enableControlList") enableControlList = true;
   @Input("templateRowPresent") templateRowPresent: boolean = false;
+  @Input() showAddSample = false;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -90,11 +91,12 @@ export class TableComponent
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
   @Output() refreshTableData = new EventEmitter<void>();
+  @Output() addSampleClick = new EventEmitter<void>();
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(
     Store
-  ).select(ValidationState.rules);
+  ).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(
     ApplicationState.readonly
   );
@@ -116,6 +118,13 @@ export class TableComponent
   templateVersion$: Observable<string> = inject(Store).select(
     GeneralMetadataState.templateVersion
   );
+  statusMessage$: Observable<string | null> = inject(Store).select(
+    ApplicationState.message
+  );
+  statusType$: Observable<'success' | 'error' | null> = inject(Store).select(
+    ApplicationState.messageType
+  );
+
 
   @Input("fileTypes") fileTypes: any = [
     {
@@ -182,7 +191,12 @@ export class TableComponent
   isDeleteModalOpen = false;
   editCellform: UntypedFormGroup;
   editColumnform: UntypedFormGroup;
-  defaultControlList = Object.freeze({ name: "", values: Object.freeze([]) });
+  defaultControlList = Object.freeze({
+    name: "",
+    values: Object.freeze([]),
+    renderAsDropdown: false,
+    rule: null,
+  });
   selectedMissingCol = null;
   selectedMissingKey = null;
   selectedMissingVal = null;
@@ -211,10 +225,18 @@ export class TableComponent
   imageErrorMap = new Map<string, boolean>(); 
   private legacyControlLists: Record<string, any[]> | null = null;
 
+  // Caches for unstable objects to prevent infinite loops in change detection
+  private _columnControlListCache = new Map<string, any>();
+  private _columnValidationsCache = new Map<string, any>();
+  private _defaultOntologiesCache = new Map<string, any[]>();
+  private readonly EMPTY_ARRAY = [];
+
   private studyCategory: StudyCategoryStr = null;
   private templateVersion: string = null;
   private sampleTemplate: string = null;
   private studyCreatedAt: any;
+  statusMessage: string;
+  statusType: string;
 
   constructor(
     private clipboardService: ClipboardService,
@@ -289,9 +311,17 @@ export class TableComponent
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
     });
-
+    this.statusMessage$.subscribe((message) => {
+      this.statusMessage = message;
+    });
+    this.statusType$.subscribe((type) => {
+      this.statusType = type;
+    });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      if (this.data && this.data.header && this.controlListColumns.size === 0) {
+        this.detectControlListColumns();
+      }
     });
     this.studyFiles$.subscribe((value) => {
       if (value) {
@@ -301,13 +331,13 @@ export class TableComponent
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        this.refreshDisplayedColumns();
       }
     });
   }
 
   @HostListener("window:keydown", ["$event"])
   handleDeleteKeydown(event: KeyboardEvent) {
-    //console.log(`event key: ${event.key}`)
     if (["Delete", "Backspace"].includes(event.key) && !this.isEditModalOpen) {
       // reusing an existing method to delete cell content by instead pasting empty strings
       if (this.selectedCells.length > 0)
@@ -362,9 +392,14 @@ export class TableComponent
     this.deSelect();
     this.data = this.tableData.data;
     if (this.data) {
+      // Clear caches for new data
+      this._columnControlListCache.clear();
+      this._columnValidationsCache.clear();
+      this._defaultOntologiesCache.clear();
+
       this.hit = true;
-      this.displayedTableColumns = this.data.displayedColumns;
       this.fullRows = this.data.rows;
+      this.refreshDisplayedColumns();
       this.dataSource = new MatTableDataSource(this.fullRows);
 
       // Important: reattach paginator & sort every time dataSource is recreated
@@ -410,9 +445,7 @@ export class TableComponent
       this.setupPaginator();
       this.detectFileColumns();
       this.validateTableOntologyColumns();
-      if (this.view === "expanded") {
-        this.displayedTableColumns = Object.keys(this.data.header);
-      }
+      this.refreshDisplayedColumns();
     }
   }
 
@@ -633,11 +666,9 @@ export class TableComponent
         )
         .subscribe(
           (completed) => {
-            toastr.success(
-              "Cells updated successfully",
-              "Success",
-              this.toastrSettings
-            );
+            if (this.statusType == 'success') {
+              toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+            }
             this.isEditModalOpen = false;
             this.isFormBusy = false;
           },
@@ -663,6 +694,11 @@ export class TableComponent
   }
 
   detectControlListColumns() {
+    // Clear caches as validations are being re-evaluated
+    this._columnControlListCache.clear();
+    this._columnValidationsCache.clear();
+    this._defaultOntologiesCache.clear();
+
     Object.keys(this.data.header).forEach((col) => {
       const formattedColumnName = col.replace(/\.[0-9]+$/, "");
 
@@ -767,63 +803,140 @@ export class TableComponent
   }
 
   columnControlList(header) {
-  if (this.enableControlList && header && this.controlListNames.has(header)) {
+    if (!header) {
+      return {};
+    }
+
+    // Check cache first
+    if (this._columnControlListCache.has(header)) {
+      return this._columnControlListCache.get(header);
+    }
+
+    let result = {};
+  if (this.enableControlList && (this.controlListNames.has(header) || this.controlListColumns.has(header) || this.controlLists.has(header))) {
     const controlList = this.controlLists.get(header);
     const colData = this.controlListColumns.get(header);
-    if (controlList) {
-      return {
-        ...controlList,
-        renderAsDropdown: colData?.renderAsDropdown || false,
-        rule: colData?.rule || null,
-      };
-    } else if (colData) {
-      return {
-        name: header,
-        values: [],
-        renderAsDropdown: colData?.renderAsDropdown || false,
-        rule: colData?.rule || null,
-      };
+      if (controlList) {
+        result = {
+          ...controlList,
+          renderAsDropdown: colData?.renderAsDropdown || false,
+          rule: colData?.rule || null,
+        };
+      } else if (colData) {
+        result = {
+          name: header,
+          values: [],
+          renderAsDropdown: colData?.renderAsDropdown || false,
+          rule: colData?.rule || null,
+        };
+      }
+    } else if (this.enableControlList) {
+      result = this.defaultControlList;
     }
+
+    // Cache the result
+    this._columnControlListCache.set(header, result);
+    return result;
   }
-  if (this.enableControlList) {
-    return this.defaultControlList;
-  }
-  return {};
-}
 
 
   columnValidations(header) {
+    if (!header) {
+      return {};
+    }
+
+    // Check cache
+    if (this._columnValidationsCache.has(header)) {
+      return this._columnValidationsCache.get(header);
+    }
+
+    let result = {};
+
     if (
       this.enableControlList &&
-      header &&
-      this.controlListColumns.size > 0 &&
       this.controlListColumns.has(header)
     ) {
-      const colData = this.controlListColumns.get(header)["ontology-details"];
-      this.isRequiredField = this.controlListColumns.get(header)["ontology-details"]["is-required"] == "true";
-      return colData;
+      const colVal = this.controlListColumns.get(header);
+      let colData = colVal?.["ontology-details"];
+      
+      // If we have a validation rule but no description in colData, look it up in global validations
+      if (!colData?.description && this.validation?.default_order) {
+          const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+          // Extract the part inside Parameter Value[...] if applicable
+          let innerName = formattedColumnName;
+          const match = formattedColumnName.match(/\[(.*?)\]/);
+          if (match) {
+              innerName = match[1];
+          }
+
+          const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+          
+          const techniquePrefix = (this.technique || "").replace("-", "_").toUpperCase() + "_";
+          
+          // 1. Try to find an entry that matches both technique and header in columnDef
+          let validationEntry = this.validation.default_order.find(entry => {
+            const entryColDef = (entry.columnDef || "").toUpperCase();
+            const entryHeader = (entry.header || "").toLowerCase();
+            return entryColDef.startsWith(techniquePrefix) && targetHeaders.includes(entryHeader);
+          });
+
+          // 2. Fallback
+          if (!validationEntry) {
+            validationEntry = this.validation.default_order.find(entry => 
+               targetHeaders.includes((entry.header || "").toLowerCase()) || 
+               targetHeaders.includes((entry.columnDef || "").toLowerCase())
+            );
+          }
+
+          if (validationEntry) {
+              const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
+              if (ruleDesc) {
+                  colData = { ...(colData || {}), description: ruleDesc };
+              }
+          }
+      }
+      // Note: Removed side-effect setting this.isRequiredField here. it is handled in editCell/editColumn
+      result = colData || {};
+    } else if (this.enableControlList) {
+      result = this.validations?.default_ontology_validation?.["ontology-details"] || {};
     }
-    if (this.enableControlList) {
-      return this.validations.default_ontology_validation["ontology-details"];
-    }
-    return {};
+
+    // Cache the result
+    this._columnValidationsCache.set(header, result);
+    return result;
   }
 
   toggleView() {
     const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
     if (this.view === "compact") {
-      this.displayedTableColumns = Object.keys(this.data.header);
-      this.displayedTableColumns.unshift("Select");
       this.view = "expanded";
       localStorage.setItem(fileKey, "expanded");
     } else {
-      this.displayedTableColumns = this.data.displayedColumns;
       this.view = "compact";
       localStorage.setItem(fileKey, "compact");
     }
+    this.refreshDisplayedColumns();
 
     // After toggling, check if scroll is really needed
     setTimeout(() => this.updateScrollBehavior());
+  }
+
+  refreshDisplayedColumns() {
+    if (this.data) {
+      if (this.view === 'compact') {
+        this.displayedTableColumns = Array.from(this.data.displayedColumns || []);
+      } else {
+        this.displayedTableColumns = Object.keys(this.data.header || {});
+      }
+
+      if (this.isReadOnly) {
+        this.displayedTableColumns = this.displayedTableColumns.filter(c => c !== 'Select');
+      } else {
+        if (this.displayedTableColumns.indexOf('Select') === -1) {
+          this.displayedTableColumns.unshift('Select');
+        }
+      }
+    }
   }
 
   validateTableOntologyColumns() {
@@ -1251,24 +1364,28 @@ export class TableComponent
     );
   }
 
-  isSelected(row: any, column?: any): boolean {
+   isSelected(row, column) {
+
     if (!row) return false;
 
-    if (column && this.selectedCells.length > 0) {
-      return (
-        this.selectedCells.filter(
-          (cell) => cell[0] === column.columnDef && cell[1] === row.index
-        ).length > 0
-      );
-    } else if (this.selectedColumns.length === 0) {
-      if (this.selectedRows.indexOf(row.index) > -1) {
-        return true;
-      }
-    } else if (this.selectedRows.length === 0 && column) {
-      if (this.selectedColumns.indexOf(column.columnDef) > -1) {
-        return true;
-      }
+    if (Array.isArray(this.selectedRows) && this.selectedRows.indexOf(row.index) > -1) {
+      return true;
     }
+
+    if (!column) {
+      return false;
+    }
+
+    if (Array.isArray(this.selectedCells) && this.selectedCells.length > 0) {
+      return this.selectedCells.some(
+        (cell) => cell[0] === column.columnDef && cell[1] === row.index
+      );
+    }
+
+    if (Array.isArray(this.selectedColumns) && this.selectedColumns.indexOf(column.columnDef) > -1) {
+      return true;
+    }
+
     return false;
   }
 
@@ -1326,51 +1443,59 @@ export class TableComponent
     this.lastColSelection = column;
   }
 
-  rowClick(row: any, event) {
+  rowClick(row: any, event: MouseEvent) {
+    const entryIndex = row.index;
+    const rowNamesArray: number[] = this.tableData.data.rows.map((e) => e.index);
+    const rowIndex = this.selectedRows.indexOf(entryIndex);
+
     this.selectedCells = [];
     this.selectedColumns = [];
-    const entryIndex = row.index;
-    const rowIndex = this.selectedRows.indexOf(entryIndex);
-    if (event && event.altKey) {
+
+    // ALT key toggle 
+    if (event.altKey) {
       if (rowIndex > -1) {
         this.selectedRows.splice(rowIndex, 1);
       } else {
         this.selectedRows.push(entryIndex);
       }
-    } else if (event && event.shiftKey) {
-      let lastSelectionIndex = null;
+      this.lastRowSelection = row;
+      return;
+    }
+
+    // SHIFT key still works
+    if (event.shiftKey) {
       let lastRowIndex = -1;
-      const rowNamesArray: any[] = this.tableData.data.rows.map((e) => e.index);
+
       if (this.lastRowSelection) {
-        lastSelectionIndex = this.lastRowSelection.index;
-        lastRowIndex = rowNamesArray.indexOf(lastSelectionIndex);
+        const last = this.lastRowSelection.index;
+        lastRowIndex = rowNamesArray.indexOf(last);
       } else {
         lastRowIndex = 0;
       }
-      const currentRowIndex = rowNamesArray.indexOf(entryIndex);
-      let currentSelection = [];
 
-      if (lastRowIndex > currentRowIndex) {
-        currentSelection = rowNamesArray.slice(
-          currentRowIndex,
-          lastRowIndex + 1
-        );
-      } else {
-        currentSelection = rowNamesArray.slice(
-          lastRowIndex,
-          currentRowIndex + 1
-        );
-      }
-      this.selectedRows = this.selectedRows.concat(currentSelection);
-    } else {
-      if (rowIndex < 0) {
-        this.selectedRows = [entryIndex];
-      } else {
-        this.selectedRows = [];
-      }
+      const currentRowIndex = rowNamesArray.indexOf(entryIndex);
+
+      const range =
+        lastRowIndex > currentRowIndex
+          ? rowNamesArray.slice(currentRowIndex, lastRowIndex + 1)
+          : rowNamesArray.slice(lastRowIndex, currentRowIndex + 1);
+
+      this.selectedRows = Array.from(new Set([...this.selectedRows, ...range]));
+
+      this.lastRowSelection = row;
+      return;
     }
+
+    // NORMAL CLICK → toggle row (MULTI SELECT)
+    if (rowIndex === -1) {
+      this.selectedRows.push(entryIndex);
+    } else {
+      this.selectedRows.splice(rowIndex, 1);
+    }
+
     this.lastRowSelection = row;
   }
+
 
   cellClick(row: any, column: any, event) {
     if (event.altKey) {
@@ -1389,6 +1514,10 @@ export class TableComponent
       this.isEditModalOpen = true;
       this.selectedCell["row"] = row;
       this.selectedCell["column"] = column;
+
+      // Calculate isRequiredField for the selected column
+      const colValData = this.columnValidations(column.header);
+      this.isRequiredField = colValData?.["is-required"] === "true";
 
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
@@ -1461,24 +1590,34 @@ export class TableComponent
 
     const controlList = this.columnControlList(this.selectedCell["column"].header);
 
+    // CONTROL-LIST cell (could be ontology widget or dropdown)
     if (this.enableControlList && this.isCellTypeControlList) {
-      const selectedOntology = this.getOntologyComponentValue("editControlListCell").values[0];
-      const value = selectedOntology ? selectedOntology.annotationValue : "";
+      const editControlComp = this.getOntologyComponentValue("editControlListCell");
+      const selectedControlOntology = editControlComp?.values?.[0];
+      const controlValueFromForm = this.editCellform?.get("cell")?.value;
+      const value =
+        selectedControlOntology?.annotationValue ??
+        (typeof controlValueFromForm === "string" ? controlValueFromForm : "");
+
       cellsToUpdate = [
         {
           row: this.selectedCell["row"].index,
           column: columnIndex,
           value,
-        }
+        },
       ];
+
+    // ONTOLOGY cell (either dropdown or autocomplete)
     } else if (this.enableControlList && this.isCellTypeOntology) {
-      if (controlList && 'renderAsDropdown' in controlList && controlList.renderAsDropdown) {
-        // Handle dropdown for "selected-ontology-term"
-        const selectedValue = this.editCellform.get("cell").value;
-        const selectedOption = ((controlList as any).values || []).find(option => option.annotationValue === selectedValue);
+      // Dropdown flow for selected-ontology-term
+      if (controlList && controlList.renderAsDropdown) {
+        const selectedValue = this.editCellform?.get("cell")?.value ?? "";
+        const selectedOption = (controlList.values || []).find(
+          (option: any) => option.annotationValue === selectedValue
+        );
         const value = selectedValue || "";
-        const termSource = selectedOption ? selectedOption.termSource.name : "";
-        const termAccession = selectedOption ? selectedOption.termAccession : "";
+        const termSource = selectedOption?.termSource?.name ?? "";
+        const termAccession = selectedOption?.termAccession ?? "";
         cellsToUpdate = [
           {
             row: this.selectedCell["row"].index,
@@ -1497,15 +1636,26 @@ export class TableComponent
           },
         ];
       } else {
-        // Handle autocomplete for other ontology types
-        if(this.isRequiredField && this.getOntologyComponentValue("editOntologyCell")?.values.length === 0) {
+        // Autocomplete / ontology component flow - prefer component value, fallback to form string
+        const editOntComp = this.getOntologyComponentValue("editOntologyCell");
+        const selectedOntology =
+          editOntComp?.values?.[0] ??
+          (this.editCellform?.get("cell")?.value
+            ? {
+                annotationValue: this.editCellform.get("cell").value,
+                termAccession: "",
+                termSource: { name: "" },
+              }
+            : null);
+
+        if (this.isRequiredField && (!selectedOntology || !selectedOntology.annotationValue)) {
           toastr.error("This is a required field.", "Error", this.toastrSettings);
           return;
         }
-        const selectedOntology = this.getOntologyComponentValue("editOntologyCell").values[0];
-        const value = selectedOntology ? selectedOntology.annotationValue : "";
-        const termSource = selectedOntology ? selectedOntology.termSource.name : "";
-        const termAccession = selectedOntology ? selectedOntology.termAccession : "";
+
+        const value = selectedOntology?.annotationValue ?? "";
+        const termSource = selectedOntology?.termSource?.name ?? "";
+        const termAccession = selectedOntology?.termAccession ?? "";
         cellsToUpdate = [
           {
             row: this.selectedCell["row"].index,
@@ -1524,12 +1674,14 @@ export class TableComponent
           },
         ];
       }
+
+    // FILE or plain cell
     } else if (this.enableControlList && this.isCellTypeFile) {
       cellsToUpdate = [
         {
           row: this.selectedCell["row"].index,
           column: columnIndex,
-          value: this.editCellform.get("cell").value,
+          value: this.editCellform?.get("cell")?.value,
         },
       ];
     } else {
@@ -1537,7 +1689,7 @@ export class TableComponent
         {
           row: this.selectedCell["row"].index,
           column: columnIndex,
-          value: this.editCellform.get("cell").value,
+          value: this.editCellform?.get("cell")?.value,
         },
       ];
     }
@@ -1546,7 +1698,9 @@ export class TableComponent
     let actionClass = this.getCellUpdateAction(this.getTableType(this.data.file));
     this.store.dispatch(new actionClass(this.data.file, { data: cellsToUpdate }, this.studyId)).subscribe({
       next: (completed) => {
-        toastr.success("Cells updated successfully", "Success", this.toastrSettings);
+        if (this.statusType == 'success') {
+          toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+        }
         this.isEditModalOpen = false;
         this.isFormBusy = false;
       },
@@ -1622,11 +1776,9 @@ export class TableComponent
       )
       .subscribe({
         next: (completed) => {
-          toastr.success(
-            "Cells updated successfully",
-            "Success",
-            this.toastrSettings
-          );
+           if (this.statusType == 'success') {
+            toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+          }
           this.closeEditMissingColValModal();
           if (
             this.selectedMissingCol.missingTerms.has(
@@ -1725,11 +1877,9 @@ export class TableComponent
       )
       .subscribe(
         (completed) => {
-          toastr.success(
-            "Cells updated successfully.",
-            "Success",
-            this.toastrSettings
-          );
+          if (this.statusType == 'success') {
+            toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+          }
           this.isEditColumnModalOpen = false;
           this.isFormBusy = false;
         },
@@ -1741,6 +1891,12 @@ export class TableComponent
   }
 
   onEditCellChanges(event) {
+    // Update form control when ontology changes (including removal)
+    if (Array.isArray(event)) {
+      // If ontology array is empty or has values, update the form control
+      const value = event.length > 0 ? event[0].annotationValue : '';
+      this.editCellform.get('cell')?.setValue(value);
+    }
     this.editCellform.markAsDirty();
   }
 
@@ -1819,7 +1975,12 @@ export class TableComponent
   }
 
   getValidationDefinition(header) {
+    if (!header) return null;
+
     let selectedColumn = null;
+    let techniqueSpecificColumn = null;
+
+    // Resolve technique if likely an assay file
     if (
       this.tableData?.data?.file &&
       this.tableData.data.file.startsWith("a_") &&
@@ -1833,27 +1994,62 @@ export class TableComponent
       this.assayTechnique.sub = result.assaySubTechnique?.name;
       this.assayTechnique.main = result.assayMainTechnique?.name;
     }
-    // const tableTechnique = this.tableData.meta?.assayTechnique?.name;
-    let techniqueSpecificColumn = null;
-    this.validation.default_order.forEach((col) => {
-      if (col.header === header) {
-        if (
-          this.assayTechnique.name !== null &&
-          "techniqueNames" in col &&
-          col["techniqueNames"] &&
-          col["techniqueNames"].length > 0
-        ) {
-          if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1) {
-            selectedColumn = col;
-            if (techniqueSpecificColumn === null) {
-              techniqueSpecificColumn = col;
-            }
+
+    const currentTechnique = this.assayTechnique.name;
+    const techniquePrefix = currentTechnique 
+      ? (currentTechnique.replace(/-/g, "_").toUpperCase() + "_") 
+      : "";
+
+    // Prepare target headers (current header, stripped header, inner Parameter Value)
+    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+    let innerName = formattedColumnName;
+    const match = formattedColumnName.match(/\[(.*?)\]/);
+    if (match) {
+        innerName = match[1];
+    }
+    // Comparison set: original, formatted, inner (all lowercased)
+    const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+
+    // Iterate through validations
+    if (this.validation && this.validation.default_order) {
+      this.validation.default_order.forEach((col) => {
+        const entryHeader = (col.header || "").toLowerCase();
+        const entryColDef = (col.columnDef || "").toUpperCase();
+
+        // 1. Check if this entry matches our column header
+        const isHeaderMatch = targetHeaders.includes(entryHeader);
+        
+        // 2. Check if this entry is intended for our specific technique
+        const isTechniqueMatch = techniquePrefix && entryColDef.startsWith(techniquePrefix);
+        
+        // 3. Fallback: check if columnDef matches our header (sometimes used)
+        const isColDefMatch = targetHeaders.includes((col.columnDef || "").toLowerCase());
+
+        if (isHeaderMatch || isColDefMatch) {
+          // If we already have a technique-specific match, don't overwrite it with a generic one
+          if (techniqueSpecificColumn) return;
+
+          // If this validation entry has specific technique names listed
+          if (
+            currentTechnique &&
+            col["techniqueNames"] &&
+            col["techniqueNames"].length > 0
+          ) {
+             if (col["techniqueNames"].indexOf(currentTechnique) > -1) {
+                // Strict technique match found in list
+                techniqueSpecificColumn = col;
+             }
+          } else if (isTechniqueMatch) {
+             // Implicit technique match via columnDef prefix
+             techniqueSpecificColumn = col;
+          } else {
+             // Generic match
+             selectedColumn = col;
           }
-        } else {
-          selectedColumn = col;
         }
-      }
-    });
+      });
+    }
+
     return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
 
@@ -1868,6 +2064,10 @@ export class TableComponent
       this.isEditColumnModalOpen = true;
 
       this.selectedColumn = column;
+
+      // Calculate isRequiredField for the selected column
+      const colValData = this.columnValidations(column.header);
+      this.isRequiredField = colValData?.["is-required"] === "true";
 
       if (
         this.enableControlList &&
@@ -1949,11 +2149,9 @@ export class TableComponent
       )
       .subscribe(
         (completed) => {
-          toastr.success(
-            "Cells updated successfully.",
-            "Success",
-            this.toastrSettings
-          );
+          if (this.statusType == 'success') {
+            toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
+          }
           this.isEditColumnModalOpen = false;
           this.isFormBusy = false;
           if (col.missingTerms.has(val)) {
@@ -1965,6 +2163,15 @@ export class TableComponent
           this.isFormBusy = false;
         }
       );
+  }
+
+  get technique(): string {
+    const filename = this.data?.file || "";
+    const parts = filename.split("_");
+    if (parts.length >= 3 && parts[0] === 'a') {
+        return parts[2];
+    }
+    return null;
   }
 
   get validation() {
@@ -2044,7 +2251,14 @@ export class TableComponent
     );
   }
 
-  onChanges() {}
+  onChanges(event) {
+    // Update form control when ontology changes in column edit modal
+    if (Array.isArray(event) && this.editColumnform) {
+      const value = event.length > 0 ? event[0].annotationValue : '';
+      this.editColumnform.get('cell')?.setValue(value);
+      this.editColumnform.markAsDirty();
+    }
+  }
 
   triggerChanges() {
     this.updated.emit();
@@ -2130,6 +2344,10 @@ export class TableComponent
     this.refreshTableData.emit();
   }
  getDefaultOntologies(header: string): string[] {
+  if (this._defaultOntologiesCache.has(header)) {
+    return this._defaultOntologiesCache.get(header);
+  }
+
   const fileType = this.getIsaFileType(this.data.file); 
   const fileTypeKey = `${fileType}FileControls`; 
 
@@ -2149,12 +2367,66 @@ export class TableComponent
     if (header.includes("Characteristics[") && fileType === "sample") {
       defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_characteristic__?.[0];
     }
-    return defaultRule;
+
+    if (defaultRule) {
+      this._defaultOntologiesCache.set(header, defaultRule);
+      return defaultRule;
+    }
   }
 
-  return [];
+  this._defaultOntologiesCache.set(header, this.EMPTY_ARRAY);
+  return this.EMPTY_ARRAY;
 }
 onEmptyError(isEmpty: boolean) {
     this.isEmptyOntology = isEmpty;
   }
+
+private getSelectableRowIndexes(): number[] {
+  if (!this.tableData?.data?.rows) return [];
+
+  const allIndexes = this.tableData.data.rows.map(r => r.index);
+
+  if (this.getTableType(this.data.file) === 'assay') {
+    const firstRowObj = this.tableData.data.rows.find(r => this.isFirstRow(r));
+    if (firstRowObj) {
+      return allIndexes.filter(idx => idx !== firstRowObj.index);
+    }
+  }
+
+  return allIndexes;
+}
+
+isAllSelected(): boolean {
+  const selectable = this.getSelectableRowIndexes();
+  if (selectable.length === 0) return false;
+  return selectable.every(idx => this.selectedRows.includes(idx));
+}
+
+toggleSelectAll(): void {
+  const selectable = this.getSelectableRowIndexes();
+
+  if (this.isAllSelected()) {
+    this.selectedRows = this.selectedRows.filter(idx => !selectable.includes(idx));
+  } else {
+    this.selectedRows = Array.from(new Set([ ...this.selectedRows, ...selectable ]));
+  }
+}
+  get hasRows(): boolean {
+    const rows = this.tableData?.data?.rows;
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return false;
+    }
+
+    if (this.templateRowPresent) {
+      return rows.length > 1;
+    }
+
+    if (this.getTableType(this.data.file) === 'assay') {
+      return rows.some(row => row?.index !== -1);
+    }
+
+    return rows.length > 0;
+  }
+
 }

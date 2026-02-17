@@ -45,7 +45,7 @@ export class SamplesComponent  {
   rawFiles$: Observable<StudyFile[]> = inject(Store).select(FilesState.rawFiles);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   studySamples$: Observable<Record<string, any>> = inject(Store).select(SampleState.samples);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   studyFactors$: Observable<MTBLSFactor[]> = inject(Store).select(DescriptorsState.studyFactors);
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
@@ -67,7 +67,7 @@ export class SamplesComponent  {
     return filterFn('[samples]')
   });
 
-  @ViewChild(TableComponent, { static: true }) sampleTable: TableComponent;
+  @ViewChild(TableComponent, { static: false }) sampleTable: TableComponent;
   @ViewChildren(OntologyComponent)
   private ontologyComponents: QueryList<OntologyComponent>;
 
@@ -201,7 +201,7 @@ export class SamplesComponent  {
     const uniqueSamples = [];
     this.duplicateSamples = [];
     this.emptySamplesExist = false;
-    if (this.sampleTable.data) {
+    if (this.sampleTable && this.sampleTable.data) {
       this.sampleTable.data.rows.forEach((row) => {
         const sampleName = row["Sample Name"];
         if (uniqueSamples.indexOf(sampleName) > -1) {
@@ -242,6 +242,7 @@ export class SamplesComponent  {
           usf.push(f);
         }
       });
+      return usf;
     }
     return [];
   }

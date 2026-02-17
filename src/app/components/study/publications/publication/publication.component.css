@@ -1,8 +1,6 @@
 .publication-title {
-  min-height: 3.5em;
   font-size: 1em;
-  line-height: 1.55em;
-  margin-top: 0px;
+  font-weight: normal;
 }
 
 .publication-authors {
@@ -16,10 +14,6 @@
 .publication-status {
   margin-top: 12px;
   margin-left: 5px;
-}
-
-.box {
-  padding: 1.2rem 1.9rem 1.2rem 1.2rem;
 }
 
 .mat-icon {
@@ -37,4 +31,29 @@ a:hover {
   color: #3273dc;
   cursor: pointer;
   text-decoration: none;
+}
+
+.form-row {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 20px;
+  box-sizing: border-box;
+}
+
+.half-width {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+}
+
+.full-width {
+  width: 100%;
 }

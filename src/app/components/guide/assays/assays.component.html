@@ -1,27 +1,16 @@
-<nav-bar :mode="light"></nav-bar>
-<mtbls-progress [study]="requestedStudy" [step]="4"></mtbls-progress>
-<quick-link
-  path="study"
-  icon="chrome_reader_mode"
-  text="Study overview"
-></quick-link>
-<div class="columns">
+<nav-bar mode="light" *ngIf="!hideNav"></nav-bar>
+<mtbls-progress [study]="requestedStudy" [step]="4" [hidePublicationStep]="true" *ngIf="!hideNav"></mtbls-progress>
+<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
+<div class="columns fixed-navbar-offset">
   <div class="column is-8 is-offset-2 mb-5">
     <div>&nbsp;</div>
     <div>&nbsp;</div>
     <div class="panel-heading">
-      <img
-        style="height: 32px"
-        class="is-pulled-left"
-        src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-      />&emsp;&emsp;
-      <span style="margin-top: -25px"
-        ><span class="is-link">{{ requestedStudy }}</span
-        >: Study samples and assay details</span
-      >
-      <span style="font-size: 0.8em" class="is-pulled-right"
-        ><mtbls-help target="createAssay"></mtbls-help
-      ></span>
+      <img style="height: 32px" class="is-pulled-left"
+        src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />&emsp;&emsp;
+      <span style="margin-top: -25px"><span class="is-link">{{ requestedStudy }}</span>: Study samples and assay
+        details</span>
+      <span style="font-size: 0.8em" class="is-pulled-right"><mtbls-help target="createAssay"></mtbls-help></span>
     </div>
     <div class="panel-block has-background-white">
       <span *ngIf="loading" style="flex: 0 0 100%">
@@ -41,37 +30,27 @@
                   <label class="has-text-muted">
                     <b>
                       ASSAY {{ i + 1 }}&nbsp;
-                      <a
-                        *ngIf="
+                      <a *ngIf="
                           assay.meta.assaySubTechnique.name &&
                           assay.meta.assaySubTechnique.name != ''
-                        "
-                        class="tag is-primary"
-                        >{{ assay.meta.assaySubTechnique.name }}</a
-                      >&nbsp;<a
-                        *ngIf="
+                        " class="tag is-primary">{{ assay.meta.assaySubTechnique.name }}</a>&nbsp;<a *ngIf="
                           assay.meta.assayTechnique.name &&
                           assay.meta.assayTechnique.name != ''
-                        "
-                        class="tag is-success"
-                        >{{ assay.meta.assayTechnique.name }}</a
-                      >
+                        " class="tag is-success">{{ assay.meta.assayTechnique.name }}</a>
                       <div class="is-pulled-right">
-                        <span
-                          *ngIf="
+                        <span *ngIf="
                             assay.meta.assayMainTechnique.name &&
                               assay.meta.assayMainTechnique.name != '';
                             else noMetaData
-                          "
-                        >
+                          ">
                           <a class="tag has-text-grey-light">{{
                             assay.meta.assayMainTechnique.name
-                          }}</a>
+                            }}</a>
                         </span>
                         <ng-template #noMetaData>
                           <a class="tag has-text-grey-light">{{
                             assay.name
-                          }}</a>
+                            }}</a>
                         </ng-template>
                       </div>
                     </b>
@@ -80,33 +59,20 @@
               </p>
             </span>
             <p class="panel-tabs" style="justify-content: space-between">
-              <a
-                (click)="openEditAssayModal(assay, 1)"
-                class="has-text-muted br"
-                ><mat-icon>edit</mat-icon> Add / edit details</a
-              >
+              <a (click)="openEditAssayModal(assay, 1)" class="has-text-muted br"><mat-icon>edit</mat-icon> Add / edit
+                details</a>
               {{assay.name}}
-              <a
-                (click)="deleteSelectedAssay(assay.name)"
-                class="has-text-muted bl"
-                ><mat-icon>delete</mat-icon></a
-              >
+              <a (click)="deleteSelectedAssay(assay.name)" class="has-text-muted bl"><mat-icon>delete</mat-icon></a>
             </p>
             <br />
           </span>
-          <span
-            class="is-centered column add-assays-wrapper border-dashed"
-            style="margin-bottom: 10px"
-          >
+          <span class="is-centered column add-assays-wrapper border-dashed" style="margin-bottom: 10px">
             <div class="add-assays-wrapper">
               <add-assay></add-assay>
             </div>
           </span>
           <div>
-            <a
-              (click)="openFullStudyView()"
-              class="button is-success is-fullwidth"
-            >
+            <a (click)="openFullStudyView()" class="button is-success is-fullwidth">
               Next
             </a>
           </div>
@@ -125,69 +91,43 @@
   </div>
 </div>
 <span>
-  <div
-    class="modal"
-    *ngIf="selectedAssay"
-    [ngClass]="{ 'is-active': isEditAssayModalOpen }"
-  >
+  <div class="modal" *ngIf="selectedAssay" [ngClass]="{ 'is-active': isEditAssayModalOpen }">
     <div class="modal-background"></div>
     <div class="modal-card vw80">
       <span class="has-text-right">
-        <a
-          class="button button-default modal-ml-close"
-          (click)="closeEditAssayModal()"
-          >Close</a
-        >
+        <a class="button button-default modal-ml-close" (click)="closeEditAssayModal()">Close</a>
       </span>
       <section class="modal-card-body">
         <div class="panel-block is-0 bg-white">
           <div class="column">
             <div class="tabs is-small is-toggle is-fullwidth">
               <ul>
-                <li
-                  (click)="changeSubStep(1)"
-                  [ngClass]="{ 'is-active': subStep == 1 }"
-                >
+                <li (click)="changeSubStep(1)" [ngClass]="{ 'is-active': subStep == 1 }">
                   <a>
                     <span>Protocols</span>
                   </a>
                 </li>
-                <li
-                  (click)="changeSubStep(2)"
-                  [ngClass]="{ 'is-active': subStep == 2 }"
-                >
+                <li (click)="changeSubStep(2)" [ngClass]="{ 'is-active': subStep == 2 }">
                   <a>
                     <span>Experimental control names</span>
                   </a>
                 </li>
-                <li
-                  (click)="changeSubStep(3)"
-                  [ngClass]="{ 'is-active': subStep == 3 }"
-                >
+                <li (click)="changeSubStep(3)" [ngClass]="{ 'is-active': subStep == 3 }">
                   <a>
                     <span>Sample names</span>
                   </a>
                 </li>
-                <li
-                  (click)="changeSubStep(4)"
-                  [ngClass]="{ 'is-active': subStep == 4 }"
-                >
+                <li (click)="changeSubStep(4)" [ngClass]="{ 'is-active': subStep == 4 }">
                   <a>
                     <span>Sample details</span>
                   </a>
                 </li>
-                <li
-                  (click)="changeSubStep(6)"
-                  [ngClass]="{ 'is-active': subStep == 6 }"
-                >
+                <li (click)="changeSubStep(6)" [ngClass]="{ 'is-active': subStep == 6 }">
                   <a>
                     <span>Assay details</span>
                   </a>
                 </li>
-                <li
-                  (click)="changeSubStep(5)"
-                  [ngClass]="{ 'is-active': subStep == 5 }"
-                >
+                <li (click)="changeSubStep(5)" [ngClass]="{ 'is-active': subStep == 5 }">
                   <a>
                     <span>Metabolite annotation</span>
                   </a>
@@ -208,27 +148,11 @@
               </div>
             </div>
             <div class="panel-block">
-              <button
-                (click)="closeEditAssayModal()"
-                class="button is-default is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Close
+              <button (click)="closeEditAssayModal()" class="button is-default is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
               </button>
-              <button
-                (click)="changeSubStep(2)"
-                class="button is-success is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Next
+              <button (click)="changeSubStep(2)" class="button is-success is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
               </button>
             </div>
           </span>
@@ -237,49 +161,23 @@
               <div class="column">
                 <div class="panel-block-wrapper">
                   <div class="field is-fullwidth">
-                    <mat-form-field floatLabel="always" class="full-width">
-                      <mat-label
-                        >Add names for experimental controls (for example blank,
-                        QC, pooled sample). <mat-icon>edit</mat-icon></mat-label
-                      >
-                      <textarea
-                        class="no-scroll"
-                        matInput
-                        [(ngModel)]="controlsNames"
-                        [placeholder]="
+                    <mat-form-field floatLabel="always" class="full-width" appearance="outline">
+                      <mat-label>Add names for experimental controls (for example blank,
+                        QC, pooled sample). <mat-icon>edit</mat-icon></mat-label>
+                      <textarea class="no-scroll" matInput [(ngModel)]="controlsNames" [placeholder]="
                           'Please add names in list or comma separated format.'
-                        "
-                        cdkAutosizeMinRows="20"
-                        cdkAutosizeMaxRows="10"
-                        cdkTextareaAutosize
-                      ></textarea>
+                        " cdkAutosizeMinRows="20" cdkAutosizeMaxRows="10" cdkTextareaAutosize></textarea>
                     </mat-form-field>
                   </div>
                 </div>
               </div>
             </div>
             <div class="panel-block">
-              <button
-                (click)="closeEditAssayModal()"
-                class="button is-default is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Close
+              <button (click)="closeEditAssayModal()" class="button is-default is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
               </button>
-              <button
-                (click)="changeSubStep(3)"
-                class="button is-success is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Next
+              <button (click)="changeSubStep(3)" class="button is-success is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
               </button>
             </div>
           </span>
@@ -288,48 +186,22 @@
               <div class="column">
                 <div class="panel-block-wrapper">
                   <div class="field is-fullwidth">
-                    <mat-form-field floatLabel="always" class="full-width">
-                      <mat-label
-                        >Add sample names <mat-icon>edit</mat-icon></mat-label
-                      >
-                      <textarea
-                        class="no-scroll"
-                        matInput
-                        [(ngModel)]="samplesNames"
-                        [placeholder]="
+                    <mat-form-field floatLabel="always" class="full-width" appearance="outline">
+                      <mat-label>Add sample names <mat-icon>edit</mat-icon></mat-label>
+                      <textarea class="no-scroll" matInput [(ngModel)]="samplesNames" [placeholder]="
                           'Please add names in list or comma separated format.'
-                        "
-                        cdkAutosizeMinRows="20"
-                        cdkAutosizeMaxRows="10"
-                        cdkTextareaAutosize
-                      ></textarea>
+                        " cdkAutosizeMinRows="20" cdkAutosizeMaxRows="10" cdkTextareaAutosize></textarea>
                     </mat-form-field>
                   </div>
                 </div>
               </div>
             </div>
             <div class="panel-block">
-              <button
-                (click)="closeEditAssayModal()"
-                class="button is-default is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Close
+              <button (click)="closeEditAssayModal()" class="button is-default is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
               </button>
-              <button
-                (click)="saveSamples()"
-                class="button is-success is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Next
+              <button (click)="saveSamples()" class="button is-success is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
               </button>
             </div>
           </span>
@@ -342,27 +214,11 @@
               </div>
             </div>
             <div class="panel-block">
-              <button
-                (click)="closeEditAssayModal()"
-                class="button is-default is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Close
+              <button (click)="closeEditAssayModal()" class="button is-default is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
               </button>
-              <button
-                (click)="changeSubStep(6)"
-                class="button is-success is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Next
+              <button (click)="changeSubStep(6)" class="button is-success is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
               </button>
             </div>
           </span>
@@ -370,34 +226,16 @@
             <div class="panel-block bg-white p2">
               <div class="column" style="width: 100%; overflow-x: auto">
                 <div class="panel-block-wrapper">
-                  <assay-details
-                    [assayName]="selectedAssay.name"
-                  ></assay-details>
+                  <assay-details [assayName]="selectedAssay.name"></assay-details>
                 </div>
               </div>
             </div>
             <div class="panel-block">
-              <button
-                (click)="closeEditAssayModal()"
-                class="button is-default is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Close
+              <button (click)="closeEditAssayModal()" class="button is-default is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
               </button>
-              <button
-                (click)="changeSubStep(5)"
-                class="button is-success is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Next
+              <button (click)="changeSubStep(5)" class="button is-success is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
               </button>
             </div>
           </span>
@@ -410,16 +248,8 @@
               </div>
             </div>
             <div class="panel-block">
-              <button
-                (click)="closeEditAssayModal()"
-                class="button is-default is-fullwidth"
-              >
-                <mat-spinner
-                  [diameter]="20"
-                  [strokeWidth]="3"
-                  *ngIf="isLoading"
-                ></mat-spinner
-                >&nbsp;Close
+              <button (click)="closeEditAssayModal()" class="button is-default is-fullwidth">
+                <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Close
               </button>
             </div>
           </span>

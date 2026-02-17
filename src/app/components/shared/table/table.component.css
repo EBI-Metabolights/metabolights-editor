@@ -206,6 +206,7 @@ a.dropdown-item {
   background-color: #333;
   color: #fff;
 }
+
 .tags .tag {
   text-transform: none;
 }
@@ -259,7 +260,7 @@ a.dropdown-item {
 }
 
 .first-row {
-  background-color: rgba(220, 245, 249, 0.481); 
+  background-color: rgba(220, 245, 249, 0.481);
   font-style: italic;
 }
 
@@ -270,19 +271,23 @@ a.dropdown-item {
 .dismiss {
   position: absolute;
   right: 2%;
-  cursor: pointer; /* This gives you the little hand */
+  cursor: pointer;
+  /* This gives you the little hand */
 }
+
 .scroll-wrapper {
   overflow-x: auto;
   overflow-y: auto;
 }
 
 #wrapper1 {
-  height: 20px;
+  height: 32px;
 }
+
 #wrapper2 {
   height: auto !important;
 }
+
 .radio-tick {
   display: inline-block;
   width: 18px;
@@ -320,3 +325,46 @@ a.dropdown-item {
   text-align: center;
 }
 
+::ng-deep .mat-mdc-paginator {
+  font-size: 14px !important;
+  background: transparent !important;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 8px !important;
+  min-height: 48px !important;
+  flex-wrap: nowrap !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size {
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size-label {
+  margin: 0 8px 0 0 !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+::ng-deep .mat-mdc-paginator-range-label {
+  margin: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size .mat-mdc-form-field {
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-paginator-navigation-container {
+  display: flex !important;
+  align-items: center !important;
+}

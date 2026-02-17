@@ -45,7 +45,7 @@ export class UserState {
     @Action(User.Set)
     SetUser(ctx: StateContext<UserStateModel>, action: User.Set) {
         const state = ctx.getState();
-        const isCurator = action.user.role === "ROLE_SUPER_USER" ? true : false;
+        const isCurator = action.user.role === 1? true : false;
         ctx.dispatch(new Curator.Set(isCurator));
         ctx.setState({
             ...state,
@@ -64,16 +64,16 @@ export class UserState {
 
     @Selector()
     static user(state: UserStateModel): Owner {
-        return state.user
+        return state?.user
     }
 
     @Selector()
     static userStudies(state: UserStateModel): IStudyDetail[] {
-        return state.userStudies
+        return state?.userStudies
     }
 
     @Selector()
     static isCurator(state: UserStateModel): boolean {
-        return state.isCurator
+        return state?.isCurator
     }
 }

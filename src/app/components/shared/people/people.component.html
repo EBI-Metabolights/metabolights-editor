@@ -1,6 +1,7 @@
 <div class="px-20" [ngClass]="{ 'hover-highlight': !isReadOnly }">
-  <div class="mtbls-section bb">
+  <div class="mtbls-section">
     <h6>
+      <mat-icon _ngcontent-ng-c2485283026="" role="img" class="mat-icon notranslate material-icons mat-ligature-font mat-icon-no-color" aria-hidden="true" data-mat-icon-type="font">people</mat-icon>
       <span *ngFor="let person of people$ | async; let i = index">
         <span *ngIf="i != 0">,&nbsp;</span>
         <mtbls-person [value]="person"></mtbls-person>

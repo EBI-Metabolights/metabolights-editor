@@ -28,7 +28,8 @@ export class AuthService {
   ) {
     configService.configLoaded$.subscribe((value) => {
       if (value) {
-        this.accessTokenKey = this.configService.config.endpoint + "/jwt"
+        // this.accessTokenKey = this.configService.config.endpoint + "/jwt"
+        this.accessTokenKey = "jwt"
         this.refreshTokenKey = this.configService.config.endpoint + "/refreshToken"
         this.apiTokenKey = this.configService.config.endpoint + "/apiToken"
         const rootUrl = this.configService.config

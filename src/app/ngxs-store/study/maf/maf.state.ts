@@ -4,6 +4,7 @@ import { MAF, ResetMAFState } from "./maf.actions";
 import { MafService } from "src/app/services/decomposed/maf.service";
 import { take } from "rxjs/operators";
 import * as toastr from "toastr";
+import { StatusNS } from "../../non-study/application/application.actions";
 
 
 // move this
@@ -171,11 +172,11 @@ export class MAFState {
     UpdateCells(ctx: StateContext<MAFStateModel>, action: MAF.UpdateCells) {
         this.mafService.updateCells(action.filename, action.cellsToUpdate, action.studyId).subscribe(
             (response) => {
-                // do some commitUpdatedTableCellsNgxs type processing
-                // or
+                ctx.dispatch(new StatusNS.SetMessage("Cells updated successfully", "success"));
                 ctx.dispatch(new MAF.Organise(action.filename, action.studyId));
             },
             (error) => {
+                ctx.dispatch(new StatusNS.SetMessage("Cells updated successfully", "success"));
                 console.log("Unable to edit cells in MAF sheet");
                 console.log(error);
             }
@@ -189,7 +190,7 @@ export class MAFState {
 
     @Selector()
     static mafs(state: MAFStateModel): Record<string, any> {
-        return state.mafs
+        return state?.mafs
     }
 
 }

@@ -268,6 +268,14 @@ export class GeneralMetadataService extends DataService {
   emitMessage(message: AppMessage) {
     this.messageSubject.next(message);
   }
+
+  updateComments(comments: any[], studyId: string): Observable<any> {
+      return this.http.patch(
+          this.url.baseURL + "/studies/" + studyId + "/comments",
+          { comments: comments },
+          httpOptions
+      ).pipe(catchError(this.handleError));
+  }
 }
 
 

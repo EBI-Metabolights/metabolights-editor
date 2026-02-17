@@ -3,8 +3,8 @@
 </span>
 <ng-template #showPersonDetails>
   <span class="clickable" (click)="openModal()">
-  {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
-    <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
+    {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
+  <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
 </ng-template>
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
@@ -106,7 +106,7 @@
       </div>
       <section class="modal-card-body">
         <div class="form-row">
-          <mat-form-field class="field-new" [ngClass]="
+          <mat-form-field class="field-new" appearance="outline" [ngClass]="
               form.get('lastName').errors &&
               form.get('lastName').dirty 
                 ? 'extra-margin'
@@ -114,28 +114,25 @@
             ">
             <mat-label>Last name</mat-label>
             <input matInput formControlName="lastName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("lastName").description }}
-              <span *ngIf="isFieldRequired('firstName')">
-                <b>(required)</b>
-              </span>
+            <mat-hint>{{ fieldValidation("lastName")?.description }}
             </mat-hint>
             <mat-error *ngIf="form.get('lastName')?.errors?.lastName">
               {{ form.get("lastName").errors.lastName.error }}
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="field-new">
+          <mat-form-field class="field-new" appearance="outline">
             <mat-label>Middle name(s)</mat-label>
             <input matInput formControlName="midInitials" [readonly]="isReadOnly" />
             <mat-hint>{{
-              fieldValidation("midInitials").description
+              fieldValidation("midInitials")?.description
               }}</mat-hint>
             <mat-error *ngIf="form.get('midInitials')?.errors?.midInitials">
               {{ form.get("midInitials").errors.midInitials.error }}
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="field-new" [ngClass]="
+          <mat-form-field class="field-new" appearance="outline" [ngClass]="
               form.get('firstName').errors &&
               form.get('firstName').dirty 
                 ? 'extra-margin'
@@ -143,10 +140,7 @@
             ">
             <mat-label>First name</mat-label>
             <input matInput formControlName="firstName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("firstName").description }}
-              <span *ngIf="isFieldRequired('firstName')">
-                <b>(required)</b>
-              </span>
+            <mat-hint>{{ fieldValidation("firstName")?.description }}
             </mat-hint>
             <mat-error *ngIf="form.get('firstName')?.errors?.firstName">
               {{ form.get("firstName").errors.firstName.error }}
@@ -159,38 +153,30 @@
               <span>
                 <mtbls-ontology *ngIf="showOntology" class="mt-20" #personRoles [validations]="fieldValidation('roles')"
                   [controlList]="_controlList" (changed)="onChanges($event)" [values]="person.roles" [inline]="true"
-                  [label]="'Role'" [rule]="_controlList?.rule"
-                  [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Role*'"
-                (emptyError)="onEmptyError($event)"
-              ></mtbls-ontology>
-            </span>
-            <mat-error
-              *ngIf="showError"
-            >
-              <small>{{ form?.get("roles")?.errors?.roles?.error }}</small>
-            </mat-error>
-          </div>
+                  [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Role'"
+                  (emptyError)="onEmptyError($event)"
+                  [hasError]="form?.get('roles')?.invalid && form?.get('roles')?.touched"></mtbls-ontology>
+              </span>
+            </div>
           </ng-container>
 
           <ng-template #dropdownField>
-            <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('roles')">
-            <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
-              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-                {{ option.annotationValue }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
+            <mat-form-field class="full-width" appearance="outline"
+              *ngIf="_controlList?.values?.length && form.get('roles')">
+              <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
+                <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                  {{ option.annotationValue }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </ng-template>
-          <mat-form-field class="half-width">
+          <mat-form-field class="half-width" appearance="outline">
             <mat-label>ORCID</mat-label>
             <input class="no-scroll" formControlName="orcid" [readonly]="isReadOnly" matInput />
             <a matSuffix target="_blank" [href]="getOrcidUrl()" class="search-link">
               <small>Search ORCID</small>
             </a>
-            <mat-hint>{{ fieldValidation("orcid").description }}
-              <span *ngIf="getIsRequired('orcid')">
-                <b>(required)</b>
-              </span>
+            <mat-hint>{{ fieldValidation("orcid")?.description }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('orcid').errors &&
@@ -202,12 +188,11 @@
           </mat-form-field>
         </div>
         <div class="form-row">
-          <mat-form-field class="half-width">
+          <mat-form-field class="half-width" appearance="outline">
             <mat-label>Email</mat-label>
             <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput />
             <mat-hint>
-              {{ fieldValidation("email").description }}
-              <span *ngIf="getIsRequired('email')"><b>(required)</b></span>
+              {{ fieldValidation("email")?.description }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('email').errors &&
@@ -218,11 +203,11 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field class="half-width">
+          <mat-form-field class="half-width" appearance="outline">
             <mat-label>Alternative Email</mat-label>
             <input class="no-scroll" formControlName="alternativeEmail" [readonly]="isReadOnly" matInput />
             <mat-hint>{{
-              fieldValidation("alternativeEmail").description
+              fieldValidation("alternativeEmail")?.description
               }}</mat-hint>
             <mat-error *ngIf="
                 form.get('alternativeEmail').errors &&
@@ -244,7 +229,7 @@
                   [readonly]="isReadOnly"
                   matInput
                 />
-                <mat-hint>{{ fieldValidation("phone").description }}</mat-hint>
+                <mat-hint>{{ fieldValidation("phone")?.description }}</mat-hint>
                 <mat-error
                   *ngIf="
                     form.get('phone').errors &&
@@ -264,7 +249,7 @@
                   [readonly]="isReadOnly"
                   matInput
                 />
-                <mat-hint>{{ fieldValidation("fax").description }}</mat-hint>
+                <mat-hint>{{ fieldValidation("fax")?.description }}</mat-hint>
                 <mat-error
                   *ngIf="
                     form.get('fax').errors &&
@@ -278,11 +263,11 @@
             </td>
           </tr>
         </table> -->
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline" style="padding-bottom: 20px;">
           <mat-label>Address</mat-label>
           <textarea class="no-scroll" formControlName="address" [readonly]="isReadOnly" matInput cdkAutosizeMinRows="1"
             cdkAutosizeMaxRows="4" cdkTextareaAutosize></textarea>
-          <mat-hint>{{ fieldValidation("address").description }}</mat-hint>
+          <mat-hint>{{ fieldValidation("address")?.description }}</mat-hint>
           <mat-error *ngIf="
               form.get('address').errors &&
               form.get('address').dirty &&
@@ -291,53 +276,50 @@
             {{ form.get("address").errors.address.error }}
           </mat-error>
         </mat-form-field>
-        <mat-form-field class="full-width">
-          <mat-label>Affiliation</mat-label>
-          <input type="text" matInput formControlName="affiliation" [matAutocomplete]="auto" [readonly]="isReadOnly" />
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAffiliationSelected($event)">
-            <mat-option *ngFor="let org of filteredOrganizations$ | async" [value]="org">
-              <div>
-                {{ org.name }} - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
-              </div>
-              <div style="font-size: 12px; color: #666;">
-                {{ org.description || '(No description available)' }}
-              </div>
-            </mat-option>
-          </mat-autocomplete>
-          <mat-hint>
-            {{ fieldValidation("affiliation").description }}
-            <span *ngIf="getIsRequired('affiliation')">
-              <b>(required)</b>
-            </span>
-          </mat-hint>
-          <mat-error *ngIf="
-              form.get('affiliation').errors &&
-              form.get('affiliation').dirty &&
-              form.get('affiliation').errors.affiliation
-            ">
-            {{ form.get("affiliation").errors.affiliation.error }}
-          </mat-error>
-        </mat-form-field>
+        <div class="form-row">
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>Affiliation</mat-label>
+            <input type="text" matInput formControlName="affiliation" [matAutocomplete]="auto"
+              [readonly]="isReadOnly" />
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAffiliationSelected($event)">
+              <mat-option *ngFor="let org of filteredOrganizations$ | async" [value]="org">
+                <div>
+                  {{ org.name }} - {{ org.id?.split('/').pop() || '(Unknown ID)' }}
+                </div>
+                <div style="font-size: 12px; color: #666;">
+                  {{ org?.description || '(No description available)' }}
+                </div>
+              </mat-option>
+            </mat-autocomplete>
+            <mat-hint>
+              {{ fieldValidation("affiliation")?.description }}
+            </mat-hint>
+            <mat-error *ngIf="
+                form.get('affiliation').errors &&
+                form.get('affiliation').dirty &&
+                form.get('affiliation').errors.affiliation
+              ">
+              {{ form.get("affiliation").errors.affiliation.error }}
+            </mat-error>
+          </mat-form-field>
 
-        <mat-form-field class="full-width">
-          <mat-label>Affliation ROR ID </mat-label>
-          <input class="no-scroll" formControlName="rorid" [readonly]="isReadOnly" matInput />
-          <a matSuffix target="_blank" [href]="getRoridUrl()" class="search-link">
-            <small>Search ROR ID</small>
-          </a>
-          <mat-hint>{{ fieldValidation("rorid").description }}
-            <span *ngIf="getIsRequired('rorid')">
-              <b>(required)</b>
-            </span>
-          </mat-hint>
-          <mat-error *ngIf="
-              form.get('rorid').errors &&
-              form.get('rorid').dirty &&
-              form.get('rorid').errors.rorid
-            ">
-            {{ form.get("rorid").errors.rorid.error }}
-          </mat-error>
-        </mat-form-field>
+          <mat-form-field class="half-width" appearance="outline">
+            <mat-label>Affiliation ROR ID</mat-label>
+            <input class="no-scroll" formControlName="rorid" [readonly]="isReadOnly" matInput />
+            <a matSuffix target="_blank" [href]="getRoridUrl()" class="search-link">
+              <small>Search ROR ID</small>
+            </a>
+            <mat-hint>{{ fieldValidation("rorid")?.description }}
+            </mat-hint>
+            <mat-error *ngIf="
+                form.get('rorid').errors &&
+                form.get('rorid').dirty &&
+                form.get('rorid').errors.rorid
+              ">
+              {{ form.get("rorid").errors.rorid.error }}
+            </mat-error>
+          </mat-form-field>
+        </div>
       </section>
       <footer *ngIf="!isReadOnly" class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -346,22 +328,15 @@
               (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <button type="button" *ngIf="!addNewPerson && person.email" class="button is-secondary is-pulled-left"
-              (click)="approveGrantSubmitterRole()">
+            <button type="button" *ngIf="!addNewPerson && person.email && mode === 'store'"
+              class="button is-secondary is-pulled-left" (click)="approveGrantSubmitterRole()">
               <mat-icon>person</mat-icon> Make Submitter
             </button>
           </div>
           <div class="column is-half has-text-right">
-            <button type="submit"
-              [disabled]="!form.valid || isFormBusy || form.pristine"
-              (click)="saveNgxs()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button type="submit" [disabled]="!form.valid || isFormBusy || form.pristine" (click)="saveNgxs()"
+              class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
             <!-- <button type="submit"
@@ -371,11 +346,7 @@
             >
               OK
             </button> -->
-            <button type="button"  
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeModal()"
-            >
+            <button type="button" class="button" [disabled]="isFormBusy" (click)="closeModal()">
               Cancel
             </button>
           </div>

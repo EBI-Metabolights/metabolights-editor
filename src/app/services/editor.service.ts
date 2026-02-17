@@ -526,7 +526,10 @@ export class EditorService {
     this.store.dispatch(new Identifier.Set(id))
   }
 
-  createStudy() {
+  createStudy(payload: any = null) {
+    if (payload) {
+      return this.dataService.createStudyWithMetadata(payload);
+    }
     return this.dataService.createStudy();
   }
 
@@ -602,7 +605,6 @@ export class EditorService {
       let samplesExist = false;
       this.files.study.forEach((file) => {
         if (file.file.indexOf("s_") === 0 && file.status === "active") {
-          this.store.dispatch(new SetLoadingInfo("Loading samples data"))
           samplesExist = true;
 
           this.store.dispatch(new Samples.OrganiseAndPersist(file.file, studyId));
@@ -762,6 +764,9 @@ export class EditorService {
   }
 
   getOntologyDetails(value) {
+    if (value && value.termSource && (value.termSource.name === 'MTBLS' || value.termSource.name === 'Metabolights')) {
+      return of(value);
+    }
     if (!this.ontologyDetails[value.termAccession]) {
       return this.dataService.getOntologyDetails(value).pipe(
         map((result) => {
@@ -877,5 +882,78 @@ export class EditorService {
       body.allowedParentOntologyTerms = allowedParentOntologyTerms;
     }
     return this.dataService.getOntologyTermsV2(keyword, isExactMatchRequired, body);
+  }
+
+  // Cache for identifier sources
+  private identifierSourcesCache: any[] = null;
+
+  getIdentifierSources(query: string): Observable<any> {
+    if (!query || query.trim().length < 2) {
+      return of([]);
+    }
+
+    return this.fetchIdentifierSources().pipe(
+        map(sources => {
+             const lowerQuery = query.toLowerCase();
+             return sources.filter(s =>
+                 (s.name && s.name.toLowerCase().indexOf(lowerQuery) !== -1) ||
+                 (s.prefix && s.prefix.toLowerCase().indexOf(lowerQuery) !== -1)
+             ).slice(0, 50); 
+        })
+    );
+  }
+
+  private fetchIdentifierSources(): Observable<any[]> {
+      if (this.identifierSourcesCache) {
+          return of(this.identifierSourcesCache);
+      }
+
+      // Public endpoint returns full dataset (~2MB)
+      const url = 'https://registry.api.identifiers.org/resolutionApi/getResolverDataset';
+      return this.http.get<any>(url).pipe(
+          map(response => {
+              const namespaces = response.payload?.namespaces || [];
+              return namespaces.map(ns => ({
+                  prefix: ns.prefix,
+                  name: ns.name,
+                  description: ns.description,
+                  sampleId: ns.sampleId,
+                  pattern: ns.pattern || '',
+                  urlPattern: ns.resources?.[0]?.urlPattern || '' 
+              })).filter(ns => ns.urlPattern); 
+          }),
+          map(sources => {
+              this.identifierSourcesCache = sources;
+              return sources;
+          }),
+          catchError(err => {
+              console.error('Error fetching identifier sources', err);
+              return of([]);
+          })
+      );
+  }
+
+  addAssay(studyId: string, payload: any): Observable<any> {
+    const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/metadata-files/assays`;
+    return this.http.post(url, payload, httpOptions).pipe(
+      catchError(err => {
+        console.error('Error creating assay:', err);
+        return this.dataService.handleError(err);
+      })
+    );
+  }
+
+  updateAssayComments(studyId: string, assayName: string, payload: any): Observable<any> {
+    const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/assays/comments`;
+    const updatedPayload = {
+        ...payload
+    };
+    const headers = httpOptions.headers.set("x-assay-file-name", assayName);
+    return this.http.patch(url, updatedPayload, { headers }).pipe(
+      catchError(err => {
+        console.error('Error updating assay comments:', err);
+        return this.dataService.handleError(err);
+      })
+    );
   }
 }

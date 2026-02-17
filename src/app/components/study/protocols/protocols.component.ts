@@ -9,6 +9,7 @@ import {
   effect,
   signal,
 } from "@angular/core";
+import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
@@ -18,6 +19,8 @@ import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.sta
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
 import { SetProtocolExpand } from "src/app/ngxs-store/non-study/application/application.actions";
 import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/transitions.state";
+import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
+import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 
 @Component({
   selector: "mtbls-protocols",
@@ -27,11 +30,12 @@ import { TransitionsState } from "src/app/ngxs-store/non-study/transitions/trans
 export class ProtocolsComponent implements OnInit, OnChanges {
   @Input("assay") assay: any;
 
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
   studyProtocols$: Observable<MTBLSProtocol[]> = inject(Store).select(ProtocolsState.protocols);
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
+  toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
   actionStack$ = computed(() => {
@@ -57,6 +61,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
 
   validationsId = "protocols";
   expand = true;
+  private toastrSettings: Record<string, any> = {};
 
   constructor(private editorService: EditorService, private store: Store) {
     this.customProtocols = [];
@@ -110,6 +115,10 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       this.protocolGuides = value;
     });
 
+    this.toastrSettings$.subscribe((settings) => {
+      this.toastrSettings = settings;
+    })
+
     effect(() => {
       const intermediateList = this.actionStack$();
       if (this.debounceTimeout) clearTimeout(this.debounceTimeout);
@@ -125,7 +134,12 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   initialiseProtocols(value) {
     this.protocols = [];
     this.customProtocols = [];
-    if (this.assay !== null && this.assay !== undefined) {
+
+    if (
+      this.assay &&
+      Array.isArray(this.assay.protocols) &&
+      Array.isArray(value)
+    ) {
       this.assay.protocols.forEach((protocol) => {
         value.forEach((p) => {
           if (p.name === protocol) {
@@ -133,11 +147,12 @@ export class ProtocolsComponent implements OnInit, OnChanges {
           }
         });
       });
+    } else if (Array.isArray(value)) {
+      this.protocols = value;
     } else {
-      if (value !== null) this.protocols = value;
-      else this.protocols = []
-      
+      this.protocols = [];
     }
+
   }
 
   toggleExpand() {
@@ -164,4 +179,5 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       this.initialiseProtocols(this.allProtocols);
     }
   }
+
 }

@@ -1,158 +1,217 @@
-<span>
-  <a (click)="openAddAssayModal()" class="button button-primary"
-    >Add technique</a
-  >
+<span *ngIf="mode === 'add'">
+  <a (click)="openAddAssayModal()" class="button is-primary is-pulled-right is-small">+ Add Assay</a>
 </span>
-<span>
-  <div
-    *ngIf="assaySetup"
-    class="modal"
-    [ngClass]="{ 'is-active': isAddAssayModalOpen }"
-  >
-    <div class="modal-background"></div>
-    <div class="modal-card vw80">
-      <div *ngIf="isFormBusy" class="load-bar">
-        <div class="bar"></div>
-        <div class="bar"></div>
-        <div class="bar"></div>
+
+<div class="modal" [ngClass]="{ 'is-active': isAddAssayModalOpen }">
+  <div class="modal-background"></div>
+  <div class="modal-card vw90" style="max-height: 90vh;">
+    <header class="modal-card-head p-4"
+      style="display: flex; flex-direction: row; align-items: center; justify-content: space-between; height: auto;">
+      <div style="display: flex; align-items: center; line-height: 1;">
+        <h1 class="title is-4 has-text-weight-semibold mb-0 mr-4"
+          style="line-height: 1;margin-bottom: 0;margin-right: 20px;">{{ mode === 'edit' ? 'Edit' : 'Add' }} Assay
+        </h1>
+        <div class="control" style="display: flex; align-items: center;">
+          <div class="tags has-addons mb-0">
+            <span class="tag is-dark is-medium">Category</span>
+            <span class="tag is-info is-medium has-text-weight-semibold">
+              {{ studyCategoryLabel }}
+            </span>
+          </div>
+        </div>
       </div>
-      <section class="modal-card-body">
-        <div class="field is-horizontal">
-          <div class="field-body">
+      <button class="delete" aria-label="close" (click)="closeAddAssayModal()"></button>
+    </header>
+    <section class="modal-card-body" style='overflow-x: hidden;'>
+      <form [formGroup]="assayForm">
+
+        <!-- Top Grid -->
+        <div class="columns is-variable is-6 is-multiline">
+
+          <!-- Top Inputs Row -->
+          <div class="column is-4">
             <div class="field">
-              <div class="bg-white">
-                <span style="flex: 0 0 100%">
-                  <h3 class="mb5">Select technique</h3>
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Assay Type</mat-label>
+                <mat-select formControlName="assayType" (selectionChange)="onAssayTypeChange($event.value)" required>
+                  <mat-option *ngFor="let type of activeAssayFileTemplates" [value]="type.value">
+                    {{ type.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Rest of the top row fields move up -->
+          <div class="column is-4">
+            <div class="field">
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Measurement Type</mat-label>
+                <mat-select formControlName="measurementType" (selectionChange)="onMeasurementTypeChange($event.value)"
+                  required>
+                  <mat-option *ngFor="let type of activeMeasurementTypes" [value]="type.value">
+                    {{ type.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="column is-4">
+            <div class="field">
+              <mat-form-field class="full-width" appearance="outline">
+                <mat-label>Primary Omics</mat-label>
+                <mat-select formControlName="omics" (selectionChange)="onOmicsTypeChange($event.value)" required>
+                  <mat-option *ngFor="let type of activeOmicsTypes" [value]="type.value">
+                    {{ type.label }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+
+          <!-- Design Descriptors (Full Width) -->
+          <div class="column is-12 mt-0">
+            <!-- Simplified style to match header-card pattern -->
+            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4;">
+              <header class="card-heading">
+                <p>
+                  Assay Descriptors
                   <span>
-                    <mat-button-toggle-group
-                      [(ngModel)]="selectedAssayTechnologyOption"
-                      (ngModelChange)="assayTechnologyChange()"
-                      class="mat-button-toggle-group-vertical"
-                      #group="matButtonToggleGroup"
-                    >
-                      <mat-button-toggle
-                        [disabled]="technology.disabled"
-                        class="mb5"
-                        *ngFor="let technology of assaySetup.main_techniques"
-                        [value]="technology"
-                      >
-                        {{ technology.name }}
-                      </mat-button-toggle>
-                    </mat-button-toggle-group>
+                    <mat-icon matTooltip="Assay Design Descriptors describe the study">help</mat-icon>
                   </span>
-                  <br />
-                  <span
-                    *ngIf="
-                      selectedAssayTechnologyOption != null &&
-                      selectedAssayTechnologyOption.techniques &&
-                      selectedAssayTechnologyOption.techniques.length > 0
-                    "
-                  >
-                    <br />
-                    <h3 class="mb5">Select assay</h3>
-                    <mat-button-toggle-group
-                      [(ngModel)]="selectedAssayTypeOption"
-                      (ngModelChange)="assayTypeChange()"
-                      class="mat-button-toggle-group-vertical"
-                      #group="matButtonToggleGroup"
-                    >
-                      <mat-button-toggle
-                        [disabled]="technique.disabled"
-                        class="mb5"
-                        *ngFor="
-                          let technique of selectedAssayTechnologyOption.techniques
-                        "
-                        [value]="technique"
-                      >
-                        {{ technique.name }}
-                      </mat-button-toggle>
-                    </mat-button-toggle-group>
-                    <br />
-                  </span>
-                  <span
-                    *ngIf="
-                      selectedAssayTypeOption != null &&
-                      selectedAssayTypeOption.sub_techniques &&
-                      selectedAssayTypeOption.sub_techniques.length > 0
-                    "
-                  >
-                    <br />
-                    <h3 class="mb5">Define assay</h3>
-                    <mat-button-toggle-group
-                      [(ngModel)]="selectedAssayVariantOption"
-                      (ngModelChange)="assayTypeVariantChange()"
-                      class="mat-button-toggle-group-vertical"
-                      #group="matButtonToggleGroup"
-                    >
-                      <mat-button-toggle
-                        [disabled]="sub_technique.disabled"
-                        class="mb5"
-                        *ngFor="
-                          let sub_technique of selectedAssayTypeOption.sub_techniques
-                        "
-                        [value]="sub_technique"
-                      >
-                        {{ sub_technique.name }}
-                      </mat-button-toggle>
-                    </mat-button-toggle-group>
-                  </span>
-                  <span
-                    *ngIf="
-                      selectedAssayVariantOption &&
-                      selectedAssayVariantOption.columns &&
-                      selectedAssayVariantOption.columns.length > 0
-                    "
-                  >
-                    <br />
-                    <!-- <h3>Column details</h3> -->
-                    <span
-                      class="mb5"
-                      *ngFor="
-                        let column of selectedAssayVariantOption.columns;
-                        index as i
-                      "
-                    >
-                      <br />
-                      <small>Select {{ column.name }}</small>
-                      <span class="mb5">
-                        <mat-button-toggle-group
-                          [(ngModel)]="selectedAssayVariantColumnOption[i]"
-                          (ngModelChange)="assayTypeVariantColumnChange()"
-                          class="mat-button-toggle-group-vertical"
-                          #group="matButtonToggleGroup"
-                        >
-                          <mat-button-toggle
-                            [disabled]="columnValue.disabled"
-                            class="mb5"
-                            *ngFor="let columnValue of column.values"
-                            [value]="columnValue"
-                          >
-                            {{ columnValue.name }}
-                          </mat-button-toggle>
-                        </mat-button-toggle-group>
-                      </span>
-                    </span>
-                  </span>
-                </span>
+                </p>
+                <button class="button is-primary is-small"
+                  style="position: absolute; top: 7px; right: 12px; height: 24px;"
+                  (click)="addDescriptorModal.openModal()">+ Add</button>
+              </header>
+              <div class="card-content p-2" style="min-height: 48px;">
+                <div class="content">
+                  <div *ngIf="designDescriptors.length > 0; else noDescriptors">
+                    <div class="field is-grouped is-grouped-multiline">
+                      <div *ngFor="let descriptor of designDescriptors; let i = index">
+                        <div class="control">
+                          <div class="tags has-addons clickable" (click)="editModal.openModal()">
+                            <span class="tag is-primary is-light">
+                              <mat-icon style="font-size: 10px; height: 10px; width: 10px;">edit</mat-icon>
+                            </span>
+                            <span class="tag is-default is-size-7">{{ descriptor.annotationValue }}</span>
+                          </div>
+                        </div>
+                        <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
+                          [isaFileTemplateName]="assayForm.get('assayType').value ? assayForm.get('assayType').value.split(';')[0] : null"
+                          [controlListKey]="'Assay Design Descriptor'" (saved)="onDescriptorEdited($event, i)"
+                          (deleted)="removeDescriptor(i)" [isCreationFlow]="true"></mtbls-design-descriptor>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-template #noDescriptors>
+                    <p class="has-text-grey is-size-7 is-italic m-0" style="text-align: center;">No assay design
+                      descriptors added.</p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+            <mtbls-design-descriptor #addDescriptorModal [mode]="'local'" [value]="null"
+              [isaFileTemplateName]="assayForm.get('assayType').value ? assayForm.get('assayType').value.split(';')[0] : null"
+              [controlListKey]="'Assay Descriptor'" (saved)="onDescriptorSaved($event)"
+              [isCreationFlow]="true"></mtbls-design-descriptor>
+          </div>
+        </div>
+
+
+        <!-- Dynamic Sections (Hidden in Edit mode for now) -->
+        <div *ngIf="mode === 'add'">
+          <div *ngFor="let section of dynamicSections; trackBy: trackBySection" class="dynamic-section mb-5">
+            <div class="card" style="box-shadow: none; border: 1px solid #f1f1f4;">
+              <div class="card-content p-4">
+                <h5 class="title is-6 mb-4 has-text-weight-bold has-text-primary pull-left">
+                  {{ section.header }}
+                </h5>
+                <div class="columns is-variable is-3 is-multiline">
+                  <div [class]="field.type === 'TEXT_AND_ONTOLOGY' ? 'column is-12' : 'column is-6'"
+                    [style.margin-bottom]="field.description ? '20px' : '0'"
+                    *ngFor="let field of section.fields; trackBy: trackByField">
+
+                    <div class="field" *ngIf="field.mainType === 'ONTOLOGY'">
+                      <div class="control" *ngIf="field.type === 'ONTOLOGY'">
+                        <mtbls-ontology (changed)="onOntologyChange($event, field.key)" [validations]="field.validation"
+                          [inline]="true" [rule]="field.validationRule" [label]="field.label"
+                          [isRequired]="field.required">
+                        </mtbls-ontology>
+                      </div>
+                    </div>
+
+                    <!-- SINGLE_COLUMN (Text) -->
+                    <div class="control" *ngIf="field.type === 'TEXT'">
+                      <mat-form-field class="full-width" appearance="outline">
+                        <mat-label>{{ field.label }}</mat-label>
+                        <input matInput [formControlName]="field.key" type="text" [placeholder]="field.label"
+                          [required]="field.required">
+                        <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                      </mat-form-field>
+                    </div>
+
+                    <!-- SINGLE_COLUMN_AND_UNIT_ONTOLOGY -->
+                    <div class="control" *ngIf="field.type === 'TEXT_AND_ONTOLOGY'">
+                      <div class="columns is-variable is-2 mb-0 mt-0">
+                        <div class="column is-8">
+                          <ng-container *ngIf="field.mainType === 'TEXT'; else mainOntologyField">
+                            <mat-form-field class="full-width" appearance="outline">
+                              <mat-label>{{ field.label }}</mat-label>
+                              <input matInput [formControlName]="field.key" type="text" placeholder="Value"
+                                [required]="field.required">
+                              <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                            </mat-form-field>
+                          </ng-container>
+                          <ng-template #mainOntologyField>
+                            <div class="control" style="width: 100%;">
+                              <div class="columns is-gapless is-desktop is-vcentered">
+                                <div class="column" [ngClass]="{'is-11': field.unitRule, 'is-12': !field.unitRule}">
+                                  <div class="field">
+                                    <mtbls-ontology (changed)="onOntologyChange($event, field.key)"
+                                      [validations]="field.validation" [inline]="true" [rule]="field.validationRule"
+                                      [label]="field.label" [isRequired]="field.required">
+                                    </mtbls-ontology>
+                                  </div>
+                                </div>
+                                <div class="column is-1" *ngIf="field.unitRule">
+                                  <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')"
+                                    [validations]="{ description: '' }" [inline]="true" [rule]="field.unitRule"
+                                    [controlListKey]="'unit'" [label]="'Unit'">
+                                  </mtbls-ontology>
+                                </div>
+                              </div>
+                            </div>
+                          </ng-template>
+                        </div>
+                        <div class="column is-4">
+                          <mtbls-ontology (changed)="onOntologyChange($event, field.key + '_unit')"
+                            [validations]="{ description: '' }" [inline]="true" [rule]="field.unitRule"
+                            [controlListKey]="'unit'" [label]="'Unit'">
+                          </mtbls-ontology>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-      <footer class="modal-card-foot buttons is-right">
-        <span
-          *ngIf="
-            selectedAssayTechnologyOption != null &&
-            selectedAssayTypeOption != null &&
-            selectedAssayVariantOption != null
-          "
-        >
-          <button (click)="addAssay()" class="button is-primary">
-            + Add assay type
-          </button>
-        </span>
-        <button class="button" (click)="closeAddAssayModal()">Cancel</button>
-      </footer>
-    </div>
+
+      </form>
+    </section>
+    <footer class="modal-card-foot buttons is-right">
+      <button class="button is-primary" (click)="saveAssay()"
+        [disabled]="mode === 'edit' ? (!assayForm.get('assayType').value || !assayForm.get('measurementType').value || !assayForm.get('omics').value) : assayForm.invalid">
+        {{ mode === 'edit' ? 'Save' : 'Add' }}
+      </button>
+      <button class="button" (click)="closeAddAssayModal()">
+        Close
+      </button>
+    </footer>
   </div>
-</span>
+</div>

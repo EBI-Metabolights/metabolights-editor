@@ -1,32 +1,80 @@
 <div class="panel-block bg-white p2">
   <div class="column" style="width: 100%; overflow-x: auto">
     <div class="panel-block-wrapper">
-      <span *ngIf="assay">
-        <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn">
-          <a (click)="openAddSamplesModal()" class="button is-small is-light">
-            <mat-icon>add</mat-icon> Samples
-          </a>
-          &nbsp;
-          <a
-            (click)="deleteSelectedAssay(assayName)"
-            class="button is-small is-light"
-            ><mat-icon>delete</mat-icon> Delete Assay</a
-          >
+      <span *ngIf="assay; else loadingDetail">
+
+        <span class="column is-12 nprl nmrl fadeIn">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span *ngIf="assayTypeLabel" class="tag is-link is-light"
+                style="display: inline-flex; align-items: center; gap: 4px;">
+                <mat-icon style="font-size: 14px; height: 14px; width: 14px;">timeline</mat-icon> {{ assayTypeLabel }}
+              </span>
+              <span *ngIf="measurementType" class="tag is-link is-light">{{ measurementType }}</span>
+              <span *ngIf="omicsType" class="tag is-link is-light">{{ omicsType }}</span>
+            </div>
+            <div *ngIf="!isReadOnly">
+              <a (click)="openAddSamplesModal()" class="button is-small is-primary">
+                <mat-icon>add</mat-icon> Samples
+              </a>
+              &nbsp;
+              <a (click)="openEditAssayModal()" class="button is-small is-primary">
+                <mat-icon>edit</mat-icon> Edit Assay
+              </a>
+              &nbsp;
+              <a (click)="deleteSelectedAssay(assayName)" class="button is-small is-primary">
+                <mat-icon>delete</mat-icon> Delete Assay
+              </a>
+            </div>
+          </div>
+
+          <!-- Design Descriptors Section -->
+          <div class="card mb-4" style="box-shadow: none; border: 1px solid #f1f1f4;">
+            <header class="card-heading"
+              style="box-shadow: none; background: transparent; border-bottom: 1px solid #f1f1f4; min-height: 40px;">
+              <p>
+                Assay Descriptors
+                <span>
+                  <mat-icon matTooltip="Descriptors describe the assay">help</mat-icon>
+                </span>
+              </p>
+            </header>
+            <div class="card-content p-2" style="min-height: 48px;">
+              <div *ngIf="designDescriptors.length > 0; else noDescriptors"
+                class="field is-grouped is-grouped-multiline">
+                <div *ngFor="let descriptor of designDescriptors; let i = index">
+                  <div class="control">
+                    <div class="tags has-addons">
+                      <span class="tag is-default is-size-7">{{ descriptor.annotationValue }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noDescriptors>
+                <p class="has-text-grey is-size-7 is-italic m-0 ml-2" style="text-align: center;">No assay design
+                  descriptors added.</p>
+              </ng-template>
+            </div>
+          </div>
         </span>
         <div *ngIf="!isReadOnly" class="notification is-primary">
-<small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. <span *ngIf="templateRowPresent">The first row in light blue is an example row. It is not included in the assay or ‘ISA METADATA’.</span> <b> <br>Please see the <a href="{{ guidesUrl }}/Assay/#assay_overview" target="_blank">Guides</a> for more information on how to complete your Assays section.</b></small>
+          <small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. <span
+              *ngIf="templateRowPresent">The first row in light blue is an example row. It is not included in the assay
+              or ‘ISA METADATA’.</span> <b> <br>Please see the <a href="{{ guidesUrl }}/Assay/#assay_overview"
+                target="_blank">Guides</a> for more information on how to complete your Assays section.</b></small>
         </div>
         <span *ngIf="assay">
-          <mtbls-table
-            [fileTypes]="fileTypes"
-            (rowsUpdated)="validateAssaySheet()"
-            [tableData]="assay"
-            [templateRowPresent]="templateRowPresent"
-            validationsId="assays"
-            (refreshTableData)="refreshData()"
-          ></mtbls-table>
+          <mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateAssaySheet()" [tableData]="assay"
+            [templateRowPresent]="templateRowPresent" validationsId="assays"
+            (refreshTableData)="refreshData()"></mtbls-table>
         </span>
       </span>
+      <ng-template #loadingDetail>
+        <div class="vc vh50 has-text-centered" style="flex-direction: column;">
+          <mat-spinner [diameter]="40"></mat-spinner>
+          <p class="mt10">Loading assay details...</p>
+        </div>
+      </ng-template>
     </div>
   </div>
 </div>
@@ -36,65 +84,59 @@
     <section class="modal-card-body">
       <div class="columns mb0 is-vcentered is-hcentered">
         <div class="column is-12">
-          <mat-form-field class="full-width bback">
-            <input
-              (keydown)="onSamplesFilterKeydown($event, $event.target.value)"
-              autocomplete="off"
-              matInput
-              (keyup)="applySamplesFilter($event.target.value)"
-              placeholder="Filter sample names"
-            />
+          <mat-form-field class="full-width bback" appearance="outline">
+            <input (keydown)="onSamplesFilterKeydown($event, $event.target.value)" autocomplete="off" matInput
+              (keyup)="applySamplesFilter($event.target.value)" placeholder="Filter sample names" />
           </mat-form-field>
         </div>
       </div>
       <div *ngIf="filteredSampleNames.length > 0" class="select-all-row">
-        <mat-checkbox
-          [checked]="areAllSelected()"
-          (change)="toggleSelectAll($event.checked)"
-        ><strong>
-          Select all
+        <mat-checkbox [checked]="areAllSelected()" (change)="toggleSelectAll($event.checked)"><strong>
+            Select all
           </strong>
         </mat-checkbox>
       </div>
 
-        <ul>
-          <ng-container *ngFor="let s of filteredSampleNames">
-            <li *ngIf="s && s.toString().trim().length > 0" class="sample-row">
-              <mat-checkbox [(ngModel)]="selectedSampleMap[s]">{{ s }}</mat-checkbox>
-            </li>
-          </ng-container>
-        </ul>
+      <ul>
+        <ng-container *ngFor="let s of filteredSampleNames">
+          <li *ngIf="s && s.toString().trim().length > 0" class="sample-row">
+            <mat-checkbox [(ngModel)]="selectedSampleMap[s]">{{ s }}</mat-checkbox>
+          </li>
+        </ng-container>
+      </ul>
 
     </section>
     <footer class="modal-card-foot">
-  <div class="columns is-gapless full-width is-mobile is-vcentered">
-    <div class="column">
-      <div class="footer-left">
-        <div class="msg" *ngIf="duplicateSampleNamesInAssay.length > 0">
-          <mat-icon>info</mat-icon>
-          <small>Sample rows already exist in assay sheet</small>
+      <div class="columns is-gapless full-width is-mobile is-vcentered">
+        <div class="column">
+          <div class="footer-left">
+            <div class="msg" *ngIf="duplicateSampleNamesInAssay.length > 0">
+              <mat-icon>info</mat-icon>
+              <small>Sample rows already exist in assay sheet</small>
+            </div>
+
+            <label class="auto-fill">
+              <mat-checkbox [(ngModel)]="autoFillColumns" aria-label="Enable autofill">
+                <small>Autofill assay columns from the first row </small>
+              </mat-checkbox>
+            </label>
+          </div>
         </div>
 
-        <label class="auto-fill">
-          <mat-checkbox [(ngModel)]="autoFillColumns" aria-label="Enable autofill">
-            <small>Autofill assay columns from the first row </small>
-          </mat-checkbox>
-        </label>
+        <div class="column has-text-right">
+          <button class="button is-default" (click)="closeAddSamplesModal()">Cancel</button>
+          <button (click)="addSamples()" [disabled]="(filteredSampleNames.length === 0) && (namesToAddCount === 0)"
+            class="button is-info">
+            Add&nbsp;<span *ngIf="namesToAddCount > 0; else showFiltered">
+              {{ namesToAddCount }} Samples
+            </span>
+            <ng-template #showFiltered>
+              <span *ngIf="filteredSampleNames.length > 0">{{ filteredSampleNames.length }} Samples</span>
+            </ng-template>
+          </button>
+        </div>
       </div>
-    </div>
-
-    <div class="column has-text-right">
-      <button class="button is-default" (click)="closeAddSamplesModal()">Cancel</button>
-      <button (click)="addSamples()" [disabled]="(filteredSampleNames.length === 0) && (namesToAddCount === 0)" class="button is-info">
-        Add&nbsp;<span *ngIf="namesToAddCount > 0; else showFiltered">
-      {{ namesToAddCount }} Samples
-    </span>
-    <ng-template #showFiltered>
-      <span *ngIf="filteredSampleNames.length > 0">{{ filteredSampleNames.length }} Samples</span>
-    </ng-template>
-      </button>
-    </div>
-  </div>
-</footer>
+    </footer>
   </div>
 </div>
+<add-assay #editAssayModal mode="edit" [assayData]="assayInfo"></add-assay>

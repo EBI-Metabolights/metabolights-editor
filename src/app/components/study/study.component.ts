@@ -16,6 +16,7 @@ import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import { ViolationType } from "./validations-v2/interfaces/validation-report.types";
 import { StudyPermission } from "src/app/services/headers";
 import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
+import { Funders, RelatedDatasets } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
 @Component({
   selector: "mtbls-study",
@@ -40,6 +41,11 @@ export class StudyComponent implements OnInit, OnDestroy {
   revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
   revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
+  studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
+  sampleTemplate$: Observable<string> = inject(Store).select(GeneralMetadataState.sampleTemplate);
+  templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
+  mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   studyPermission$: Observable<StudyPermission> = inject(Store).select(GeneralMetadataState.studyPermission);
 
   revisionNumber = null;
@@ -47,7 +53,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   revisionStatus = null;
   studyError = false;
   requestedTab = 0;
-  tab = "descriptors";
+  tab = "overview";
   requestedStudy: string = null;
   status = "";
   curationRequest = "";
@@ -66,6 +72,11 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationNeeded: boolean = false;
   studyPermission: StudyPermission = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
+  studyCategory = "";
+  sampleTemplate = "";
+  templateConfiguration: any = null;
+  mhdAccession: string = null;
+  isReadOnly = true;
 
   constructor(
     private store: Store,
@@ -74,11 +85,16 @@ export class StudyComponent implements OnInit, OnDestroy {
     private editorService: EditorService,
     private configService: ConfigurationService
   ) {
-     this.setUpSubscriptionsNgxs()
+    this.setUpSubscriptionsNgxs()
   }
 
 
   setUpSubscriptionsNgxs() {
+    this.templateConfiguration$.subscribe((value) => {
+      this.templateConfiguration = value;
+    });
+    this.permissions = this.store.snapshot().application.studyPermission
+    this.obfuscationCode = this.permissions.obfuscationCode
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
     this.revisionNumber$.subscribe((value) => {
@@ -125,6 +141,11 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.maintenanceMode$.subscribe((value) => {
       this.underMaintenance = value;
     });
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
+    });
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
@@ -168,6 +189,18 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.validationNeeded = value;
     })
 
+    this.studyCategory$.subscribe((value) => {
+      this.studyCategory = value;
+    });
+
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+    });
+
+    this.mhdAccession$.subscribe((value) => {
+      this.mhdAccession = value;
+    });
+
     this.route.params.subscribe((params) => {
       this.requestedStudy = params.id;
       if (params.tab === "files") {
@@ -177,24 +210,20 @@ export class StudyComponent implements OnInit, OnDestroy {
         this.requestedTab = 4;
         this.tab = "metabolites";
       } else if (params.tab === "assays") {
-        this.requestedTab = 3;
+        this.requestedTab = 2;
         this.tab = "assays";
       } else if (params.tab === "samples") {
-        this.requestedTab = 2;
+        this.requestedTab = 1;
         this.tab = "samples";
       } else if (params.tab === "protocols") {
-        this.requestedTab = 1;
+        this.requestedTab = 3;
         this.tab = "protocols";
-      } /*else if (params.tab === "validations") {
+      } else if (params.tab === "validations") {
         this.requestedTab = 6;
         this.tab = "validations";
-      }*/ else if (params.tab === "validations") {
-        this.requestedTab = 7;
-        this.tab = "validations"
-      }
-      else {
+      } else {
         this.requestedTab = 0;
-        this.tab = "descriptors";
+        this.tab = "overview";
       }
       this.selectCurrentTab(this.requestedTab, this.tab);
     });
@@ -229,7 +258,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       "",
       window.location.origin + "/" + urlSplit.join("/") + "/" + tab
     );
-    if (index === 6) {
+    if (index === 5) {
       this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
       if (document.getElementById("tab-content-wrapper")) {
         document.getElementById("tab-content-wrapper").scrollIntoView();
@@ -252,6 +281,14 @@ export class StudyComponent implements OnInit, OnDestroy {
     document.body.scrollTop = 0;
     document.documentElement.scrollTop = 0;
   }
+
+  getCategoryLabel(id: string): string {
+    if (this.templateConfiguration && this.templateConfiguration.studyCategories) {
+      return this.templateConfiguration.studyCategories[id]?.label || id;
+    }
+    return id;
+  }
+
   updateCurationStatus() {
     if (this.curationRequest === "NO_CURATION") {
       this.curationStatus = "Minimum";
@@ -260,5 +297,33 @@ export class StudyComponent implements OnInit, OnDestroy {
     } else {
       return "Minimum";
     }
+  }
+
+  // Funders & Related Datasets Bindings
+  studyFunders$: Observable<any[]> = inject(Store).select(GeneralMetadataState.funders);
+  relatedDatasets$: Observable<any[]> = inject(Store).select(GeneralMetadataState.relatedDatasets);
+
+  saveFunder(event) {
+    if (event.index === -1) {
+        this.store.dispatch(new Funders.Add(event.funder));
+    } else {
+        this.store.dispatch(new Funders.Update(event.funder, event.index));
+    }
+  }
+
+  deleteFunder(index) {
+    this.store.dispatch(new Funders.Delete(index));
+  }
+
+  saveRelatedDataset(event) {
+    if (event.index === -1) {
+        this.store.dispatch(new RelatedDatasets.Add(event.dataset));
+    } else {
+        this.store.dispatch(new RelatedDatasets.Update(event.dataset, event.index));
+    }
+  }
+
+  deleteRelatedDataset(index) {
+    this.store.dispatch(new RelatedDatasets.Delete(index));
   }
 }

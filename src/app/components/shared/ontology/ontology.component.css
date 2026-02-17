@@ -1,59 +1,195 @@
-.mat-mdc-option {
-  white-space: nowrap;
-  line-height: 1.25;
-  min-height: 75px;
+/* Premium Material Design Styling */
+.full-width {
+  width: 100%;
+}
+
+::ng-deep .premium-field.mat-mdc-form-field {
+  --mdc-outlined-text-field-focus-outline-color: #00d1b2;
+  --mdc-outlined-text-field-focus-label-text-color: #00d1b2;
+}
+
+::ng-deep .premium-field .mat-mdc-form-field-infix {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.premium-chip {
+  background-color: #f5f5f5 !important;
+  border: 1px solid #dbdbdb !important;
+  border-radius: 6px !important;
+  transition: all 0.2s ease;
+  height: auto !important;
+  white-space: normal !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  max-width: 100% !important;
+}
+
+::ng-deep .premium-chip .mdc-evolution-chip__cell--primary,
+::ng-deep .premium-chip .mdc-evolution-chip__action--primary,
+::ng-deep .premium-chip .mat-mdc-chip-action-label {
+  white-space: normal !important;
+  overflow-wrap: anywhere !important;
+  text-overflow: clip !important;
+}
+
+.premium-chip:hover {
+  border-color: #00d1b2 !important;
+  background-color: #f2fdfb !important;
+}
+
+.chip-text {
+  font-weight: 500;
+  color: #363636;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.copy-notification {
+  background-color: #e8fcf9 !important;
+  color: #00d1b2 !important;
+  font-size: 0.75rem !important;
+  height: 24px !important;
+  padding: 0 8px !important;
+}
+
+/* Autocomplete Redesign */
+::ng-deep .premium-autocomplete.mat-mdc-autocomplete-panel {
+  max-width: 600px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.premium-option {
+  height: auto !important;
+  min-height: 80px !important;
+  padding: 12px 16px !important;
+  border-bottom: 1px solid #f0f0f0;
+  line-height: normal !important;
+  white-space: normal !important;
+}
+
+.premium-option:last-child {
+  border-bottom: none;
+}
+
+.term-value {
+  font-size: 1rem;
+  color: #00d1b2;
+  word-break: break-word;
+}
+
+.provenance-tag,
+.source-tag {
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  height: 1.5em !important;
+}
+
+.accession-code {
   display: block;
-  flex-direction: row;
-  max-width: 600px;
-  padding-top: 20px;
-  padding-bottom: 20px;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: #7a7a7a;
+  background: #f8f8f8;
+  padding: 2px 4px;
+  border-radius: 4px;
+  width: fit-content;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version. */
-.mat-option-text {
-  max-width: 570px;
+.term-definition {
+  font-size: 0.85rem;
+  color: #4a4a4a;
+  line-height: 1.4;
+  white-space: normal;
 }
 
+.extended-info {
+  border-radius: 0 4px 4px 0;
+}
+
+/* Spinner and Hint */
+.premium-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.inline-spinner {
+  display: inline-block;
+}
+
+.required-tag {
+  margin-left: auto;
+}
+
+.loading-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px !important;
+}
+
+/* Legacy overrides clean up */
 .ont-description {
   max-width: 570px;
   font-size: 0.9em;
-  margin: 1rem 0;
-  overflow: visible;
-  line-height: initial;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-}
-
-.ont-description small {
-  max-width: 570px;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of option that may no longer apply for the MDC version. */
-::ng-deep .mat-option-text {
-  display: inline-block;
-  flex-grow: 1;
-  padding: 25px 15px;
-  overflow: visible !important;
-}
-
-.np {
-  padding: 0 !important;
-}
-
-::ng-deep .tiny {
-  font-size: 0.7em !important;
+  margin: 0.5rem 0;
+  white-space: normal;
 }
 
 .selectable-chip-content {
   user-select: text !important;
 }
-::ng-deep .custom-chip-list .mat-mdc-chip.mat-mdc-standard-chip {
-  --mdc-chip-container-height: 25px !important;
-}
-::ng-deep .custom-chip-list .mat-mdc-chip-set .mdc-evolution-chip {
-  margin: 0px 0 0px 8px !important;
+
+.search-more-option {
+  border-top: 1px solid #f0f0f0;
+  background-color: #fafafa !important;
 }
 
-::ng-deep .custom-padding .mat-mdc-form-field-infix {
-  padding-bottom: 0px !important;
+.search-more-option:hover {
+  background-color: #f2fdfb !important;
+}
+
+.search-more-content {
+  display: flex;
+  align-items: center;
+  color: #00d1b2;
+  font-size: 0.9rem;
+}
+
+.search-more-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.search-more-text {
+  font-weight: 500;
+}
+
+.no-results-option {
+  height: auto !important;
+  min-height: 48px !important;
+  padding: 12px 16px !important;
+}
+
+.no-results-content {
+  display: flex;
+  align-items: center;
+  color: #7a7a7a;
+  font-size: 0.9rem;
+}
+
+.no-results-icon {
+  margin-right: 8px;
+  font-size: 1.2rem;
+  height: 1.2rem;
+  width: 1.2rem;
+}
+
+.no-results-text {
+  font-style: italic;
 }

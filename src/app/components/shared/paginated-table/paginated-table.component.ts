@@ -65,7 +65,7 @@ export class PaginatedTableComponent implements OnInit, AfterViewInit, AfterView
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
@@ -1325,11 +1325,56 @@ loadIsaTablePage() {
   }
 
   columnValidations(header) {
-    if (this.enableControlList && header && this.controlListColumns.size > 0 && this.controlListColumns.has(header)){
-      return this.controlListColumns.get(header)["ontology-details"];
+    if (
+      this.enableControlList &&
+      header &&
+      this.controlListColumns.has(header)
+    ) {
+      let colData = this.controlListColumns.get(header)["ontology-details"] || {};
+
+      // If we have a validation rule but no description in colData, look it up in global validations
+      if (!colData?.description && this.validation?.default_order) {
+          const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+          // Extract the part inside Parameter Value[...] if applicable
+          let innerName = formattedColumnName;
+          const match = formattedColumnName.match(/\[(.*?)\]/);
+          if (match) {
+              innerName = match[1];
+          }
+
+          const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+          
+          const techniquePrefix = (this.technique || "").replace("-", "_").toUpperCase() + "_";
+          
+          // 1. Try to find an entry that matches both technique and header in columnDef
+          let validationEntry = this.validation.default_order.find(entry => {
+            const entryColDef = (entry.columnDef || "").toUpperCase();
+            const entryHeader = (entry.header || "").toLowerCase();
+            return entryColDef.startsWith(techniquePrefix) && targetHeaders.includes(entryHeader);
+          });
+
+          // 2. Fallback
+          if (!validationEntry) {
+            validationEntry = this.validation.default_order.find(entry => 
+               targetHeaders.includes((entry.header || "").toLowerCase()) || 
+               targetHeaders.includes((entry.columnDef || "").toLowerCase())
+            );
+          }
+
+          if (validationEntry) {
+              const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
+              if (ruleDesc) {
+                  colData = { ...(colData || {}), description: ruleDesc };
+              }
+          }
+      }
+
+      return colData;
     }
-    if (this.enableControlList){
-      return this.validations.default_ontology_validation["ontology-details"];
+    if (this.enableControlList) {
+      return (
+        this.validations?.default_ontology_validation?.["ontology-details"] || {}
+      );
     }
     return {};
     // const formattedColumnName = header.replace(/\.[0-9]+$/, "");
@@ -1450,6 +1495,15 @@ loadIsaTablePage() {
         this.isFormBusy = false;
       }
     )
+  }
+
+  get technique(): string {
+    const filename = this.tableData?.data?.file || "";
+    const parts = filename.split("_");
+    if (parts.length >= 3 && parts[0] === 'a') {
+        return parts[2];
+    }
+    return null;
   }
 
   get validation() {

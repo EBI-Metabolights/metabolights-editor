@@ -1,0 +1,33 @@
+<div [formGroup]="parentForm">
+    <div class="columns is-vcentered" style="margin-top: 0px;">
+        <div class="column is-6">
+            <div class="field">
+                <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>
+                        Protocol URI
+                        <mat-icon
+                            [matTooltip]="'The Uniform Resource Identifier (URI) for the protocol. Provide a persistent link to the detailed protocol, for example from protocols.io.'">help</mat-icon>
+                    </mat-label>
+                    <input matInput type="url"
+                        placeholder="Protocol DOI or URL. e.g., 10.17504/protocols.io.nyxdfxn or https://www.protocols.io/xyz"
+                        formControlName="uri" [disabled]="readonly" />
+                    <button mat-icon-button matSuffix *ngIf="parentForm.get('uri').value.toLowerCase().includes('http')"
+                        (click)="openProtocolUri()" (keydown.enter)="openProtocolUri()" title="Open URI in new tab"
+                        aria-label="Open protocol URI in new tab">
+                        <mat-icon>open_in_new</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+        </div>
+
+        <div class="column is-6">
+            <div class="field">
+                <mat-form-field class="full-width" appearance="outline">
+                    <mat-label>Protocol Version</mat-label>
+                    <input matInput type="text" placeholder="e.g. v1.0" formControlName="version"
+                        [disabled]="readonly" />
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+</div>

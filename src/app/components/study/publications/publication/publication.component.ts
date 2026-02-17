@@ -39,7 +39,7 @@ export class PublicationComponent implements OnInit {
 
   editorValidationRules$: Observable<Record<string, any>> = inject(
     Store
-  ).select(ValidationState.rules);
+  ).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(
     ApplicationState.readonly
   );

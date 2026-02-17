@@ -3,6 +3,7 @@ import { StudyPermission } from "../../../services/headers";
 import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand,
   SetReadonly, SetSelectedLanguage, SetStudyError,
   SetTransferStatus,
+  StatusNS,
   StudyPermissionNS} from "./application.actions";
 import { Injectable } from "@angular/core";
 import { ApplicationService } from "src/app/services/decomposed/application.service";
@@ -42,8 +43,9 @@ export interface ApplicationStateModel {
     readonly: boolean
     isProtocolsExpanded: boolean,
     toastrSettings: Record<string, any>,
-    transferStatus: TransferStatus
-
+    transferStatus: TransferStatus,
+    statusMessage: string | null,
+    statusType: 'success' | 'error' | null
 }
 @Injectable()
 @State<ApplicationStateModel>({
@@ -92,7 +94,9 @@ export interface ApplicationStateModel {
             aspera: {
                 online: null
             }
-        }
+        },
+        statusMessage: null,
+        statusType: null
     }
 })
 export class ApplicationState {
@@ -110,7 +114,7 @@ export class ApplicationState {
 
     @Selector()
     static investigationFailed(state: ApplicationStateModel): boolean {
-        return state.investigationFailed
+        return state?.investigationFailed
     }
 
     @Action(SetReadonly)
@@ -124,14 +128,13 @@ export class ApplicationState {
 
     @Selector()
     static readonly(state: ApplicationStateModel): boolean {
-        return state.readonly
+        return state?.readonly
     }
 
     @Action(EditorVersion.Get)
     GetEditorVersion(ctx: StateContext<ApplicationStateModel>, action: EditorVersion.Get) {
         this.applicationService.getVersionInfo().subscribe(
             (versionInfo) => {
-                console.log("Loaded version: " + versionInfo.version + "-" + versionInfo.releaseName);
                 ctx.dispatch(new EditorVersion.Set(versionInfo));
             },
             (error) => {
@@ -157,14 +160,13 @@ export class ApplicationState {
 
     @Selector()
     static editorVersion(state: ApplicationStateModel): MtblsEditorVersion {
-        return state.editorVersion
+        return state?.editorVersion
     }
 
     @Action(BackendVersion.Get)
     GetBackendVersion(ctx: StateContext<ApplicationStateModel>, action: BackendVersion.Get) {
         this.applicationService.getApiVersionInfo().subscribe(
             (apiVersionInfo) => {
-                console.log("Loaded API version: " + apiVersionInfo.about.api.version);
                 ctx.dispatch(new BackendVersion.Set(apiVersionInfo));
             },
             (error) => {
@@ -197,7 +199,7 @@ export class ApplicationState {
 
     @Selector()
     static backendVersion(state: ApplicationStateModel) {
-        return state.backendVersion
+        return state?.backendVersion
     }
 
     @Action(SetSelectedLanguage)
@@ -211,12 +213,12 @@ export class ApplicationState {
 
     @Selector()
     static selectedLanguage(state: ApplicationStateModel) {
-        return state.selectedLanguage
+        return state?.selectedLanguage
     }
 
     @Selector()
     static guides(state: ApplicationStateModel) {
-        return state.guides
+        return state?.guides
     }
 
     @Action(BannerMessage.Get)
@@ -243,7 +245,7 @@ export class ApplicationState {
 
     @Selector()
     static bannerMessage(state: ApplicationStateModel) {
-        return state.bannerMessage
+        return state?.bannerMessage
     }
 
     @Action(MaintenanceMode.Get)
@@ -270,15 +272,10 @@ export class ApplicationState {
 
     @Selector()
     static maintenanceMode(state: ApplicationStateModel) {
-        return state.maintenanceMode
+        return state?.maintenanceMode
     }
 
-    // @Action(DefaultControlLists.Get)
-    // GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>) {
-    //     return ctx.getState().controlLists; //just for development purposes
-    // }
-
-    @Action(DefaultControlLists.Get) //enable thsis when production
+    @Action(DefaultControlLists.Get)
     GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Get) {
         this.applicationService.getDefaultControlLists().subscribe({
             next: (response) => {
@@ -299,55 +296,42 @@ export class ApplicationState {
 
     const incomingFlat: Record<string, any[]> = {controls:  payload.controls}
 
-  //  const merged = {
-  //     ...(state.controlLists || {}),
-  //     ...(payload.controls || {})
-  //   };
-
     ctx.setState({
         ...state,
         applicationTemplates: payload.templates,
         controlLists: incomingFlat
     });
-
   }
 
-    // @Action(DefaultControlLists.Set)
-    // SetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
-    //     const state = ctx.getState();
-    //     ctx.setState({
-    //         ...state,
-    //         controlLists: action.lists
-    //     });
-    // }
 
     @Selector()
     static controlLists(state: ApplicationStateModel) {
-        return state.controlLists
+        return state?.controlLists
     }
 
     @Selector()
     static assayFileHeaderTemplates(state: ApplicationStateModel) {
-        return state.applicationTemplates.assayFileHeaderTemplates
+        return state?.applicationTemplates?.assayFileHeaderTemplates
     }
     @Selector()
     static sampleFileHeaderTemplates(state: ApplicationStateModel) {
-        return state.applicationTemplates.sampleFileHeaderTemplates
+        return state?.applicationTemplates?.sampleFileHeaderTemplates
     }
-   @Selector()
+    @Selector()
     static assignmentFileHeaderTemplates(state: ApplicationStateModel) {
-        return state.applicationTemplates.assignmentFileHeaderTemplates
+        return state?.applicationTemplates?.assignmentFileHeaderTemplates
     }
-   @Selector()    static investigationFileHeaderTemplates(state: ApplicationStateModel) {
-        return state.applicationTemplates.investigationFileTemplates
+    @Selector()
+    static investigationFileHeaderTemplates(state: ApplicationStateModel) {
+        return state?.applicationTemplates?.investigationFileTemplates
     }
-   @Selector()
+    @Selector()
     static protocolTemplates(state: ApplicationStateModel) {
-        return state.applicationTemplates.protocolTemplates
+        return state?.applicationTemplates?.protocolTemplates
     }
-   @Selector()
+    @Selector()
     static templateConfiguration(state: ApplicationStateModel) {
-        return state.applicationTemplates.configuration
+        return state?.applicationTemplates?.configuration
     }
     @Action(SetProtocolExpand)
     SetProtocolsExpanded(ctx: StateContext<ApplicationStateModel>, action: SetProtocolExpand) {
@@ -360,12 +344,12 @@ export class ApplicationState {
 
     @Selector()
     static isProtocolsExpanded(state: ApplicationStateModel) {
-        return state.isProtocolsExpanded
+        return state?.isProtocolsExpanded
     }
 
     @Selector()
     static toastrSettings(state: ApplicationStateModel) {
-        return state.toastrSettings
+        return state?.toastrSettings
     }
 
     @Action(StudyPermissionNS.Set)
@@ -379,7 +363,7 @@ export class ApplicationState {
 
     @Selector()
     static studyPermission(state: ApplicationStateModel) {
-        return state.studyPermission;
+        return state?.studyPermission;
     }
 
     @Action(SetTransferStatus)
@@ -393,7 +377,32 @@ export class ApplicationState {
 
     @Selector()
     static transferStatus(state: ApplicationStateModel) {
-        return state.transferStatus
+        return state?.transferStatus
+    }
+    
+    @Selector()
+    static message(state: ApplicationStateModel) {
+        return state?.statusMessage;
     }
 
+    @Selector()
+    static messageType(state: ApplicationStateModel) {
+        return state?.statusType;
+    }
+
+    @Action(StatusNS.SetMessage)
+    setMessage(ctx: StateContext<ApplicationStateModel>, action: StatusNS.SetMessage) {
+        ctx.patchState({
+            statusMessage: action.message,
+            statusType: action.messageType
+        });
+    }
+
+    @Action(StatusNS.ClearMessage)
+    clearMessage(ctx: StateContext<ApplicationStateModel>) {
+        ctx.patchState({
+            statusMessage: null,
+            statusType: null
+        });
+    }
 }

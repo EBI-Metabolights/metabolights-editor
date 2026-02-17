@@ -1,9 +1,14 @@
 export interface Owner {
     apiToken: string;
-    role: string;
+    role: number;
     email: string;
     status: string;
     partner: boolean;
+    firstName?: string;
+    lastName?: string;
+    affiliation?: string;
+    address?: string;
+    orcid?: string;
 }
 
 export namespace User {

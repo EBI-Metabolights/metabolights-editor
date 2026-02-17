@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, inject } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, inject, Output, EventEmitter, ChangeDetectorRef } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -12,6 +12,7 @@ import { OntologyComponent } from "../../ontology/ontology.component";
 import { EuropePMCService } from "../../../../services/publications/europePMC.service";
 import { UntypedFormControl } from "@angular/forms";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
+import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
 import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable, timer } from "rxjs";
@@ -20,6 +21,7 @@ import { ApplicationState } from "src/app/ngxs-store/non-study/application/appli
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 import {
   getValidationRuleForField,
   MetabolightsFieldControls,
@@ -46,7 +48,7 @@ export class DesignDescriptorComponent implements OnInit {
   );
   editorValidationRules$: Observable<Record<string, any>> = inject(
     Store
-  ).select(ValidationState.rules);
+  ).select(ValidationState.studyRules);
   descriptors$: Observable<Ontology[]> = inject(Store).select(
     DescriptorsState.studyDesignDescriptors
   );
@@ -59,9 +61,47 @@ export class DesignDescriptorComponent implements OnInit {
   templateVersion$: Observable<string> = inject(Store).select(
     GeneralMetadataState.templateVersion
   );
+  sampleTemplate$: Observable<string> = inject(Store).select(
+    GeneralMetadataState.sampleTemplate
+  );
+  templateConfiguration$: Observable<any> = inject(Store).select(
+    ApplicationState.templateConfiguration
+  );
 
   @Input("value") descriptor: Ontology;
   @Input("readOnly") readOnly: boolean;
+  @Input("mode") mode: 'store' | 'local' = 'store';
+  @Input() controlListKey: string = null;
+  @Input() isaFileType: string = 'investigation';
+  @Input() set templateVersion(value: string) {
+    this._templateVersion = value;
+    this.initDescriptorCategories();
+  }
+  get templateVersion(): string {
+    return this._templateVersion;
+  }
+  private _templateVersion: string = null;
+
+  @Input() set isaFileTemplateName(value: string) {
+    this._isaFileTemplateName = value;
+    this.initDescriptorCategories();
+  }
+  get isaFileTemplateName(): string {
+    return this._isaFileTemplateName;
+  }
+  private _isaFileTemplateName: string = null;
+  @Input() set selectedStudyCategories(value: any) {
+    this._selectedStudyCategories = value;
+    this.initDescriptorCategories();
+  }
+  get selectedStudyCategories(): any {
+    return this._selectedStudyCategories;
+  }
+  private _selectedStudyCategories: any = null;
+  @Input("isCreationFlow") isCreationFlow: boolean = false;
+  @Output() saved = new EventEmitter<Ontology>();
+  @Output() deleted = new EventEmitter<Ontology>();
+
   @ViewChild(OntologyComponent) descriptorComponent: OntologyComponent;
 
   private studyId: string = "";
@@ -89,9 +129,13 @@ export class DesignDescriptorComponent implements OnInit {
   baseHref: string;
   private legacyControlLists: Record<string, any[]> | null = null;
   studyCategory: any;
-  templateVersion: any;
+  templateConfiguration: any = null;
+  descriptorCategories: any[] = [];
+  selectedCategory: any = null;
+  storeTemplateVersion: any;
   defaultControlListName = "Study Design Type";
   studyCreatedAt: any;
+  sampleTemplate: any = null;
   private _controlList: any = null;
   isDescriptorValid = false;
 
@@ -99,7 +143,8 @@ export class DesignDescriptorComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
-    private europePMCService: EuropePMCService
+    private europePMCService: EuropePMCService,
+    private cdr: ChangeDetectorRef
   ) {
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
       this.legacyControlLists = lists || {};
@@ -117,6 +162,7 @@ export class DesignDescriptorComponent implements OnInit {
     });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      this.cdr.markForCheck();
     });
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
@@ -125,7 +171,16 @@ export class DesignDescriptorComponent implements OnInit {
       this.studyCategory = value as StudyCategoryStr;
     });
     this.templateVersion$.subscribe((value) => {
-      this.templateVersion = value;
+      this.storeTemplateVersion = value;
+      this.initDescriptorCategories();
+    });
+    this.sampleTemplate$.subscribe((value) => {
+      this.sampleTemplate = value;
+      this.initDescriptorCategories();
+    });
+    this.templateConfiguration$.subscribe((v) => {
+      this.templateConfiguration = v;
+      this.initDescriptorCategories();
     });
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
@@ -223,9 +278,18 @@ export class DesignDescriptorComponent implements OnInit {
                this.loading = true;
                 this.isFormBusy = true;
               setTimeout(() => {
-                this.store.dispatch(
-                  new Descriptors.New(descriptor, this.studyId)
-                );
+                if (this.mode === 'local') {
+                    // Not supported in local mode via keyword selection yet unless refactored
+                    // But assume this flow is mostly for existing studies
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                } else {
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                }
+
                   this.loading = false;
                   this.isFormBusy = false;
                   this.status = "Added keyword successfully";
@@ -255,9 +319,16 @@ export class DesignDescriptorComponent implements OnInit {
               this.loading = true;
               this.isFormBusy = true;
               setTimeout(() => {
-                this.store.dispatch(
-                  new Descriptors.New(descriptor, this.studyId)
-                );
+                if(this.mode === 'local') {
+                     // Not supported yet
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                } else {
+                    this.store.dispatch(
+                      new Descriptors.New(descriptor, this.studyId)
+                    );
+                }
                   this.loading = false;
                   this.isFormBusy = false;
                   this.status = "Added keyword successfully";
@@ -302,18 +373,165 @@ export class DesignDescriptorComponent implements OnInit {
     this.isImportModalOpen = true;
   }
 
+  initDescriptorCategories() {
+    if (!this.templateConfiguration) return;
+
+    let version = this.sampleTemplate || this.storeTemplateVersion || this.templateVersion || this.templateConfiguration.defaultTemplateVersion;
+    if (!version) return;
+
+    let versionConfig = this.templateConfiguration.versions[version];
+    if (!versionConfig && this.templateConfiguration.defaultTemplateVersion) {
+        versionConfig = this.templateConfiguration.versions[this.templateConfiguration.defaultTemplateVersion];
+    }
+
+    if (!versionConfig) return;
+
+    const activeDescriptorCategoryIdsConfig =
+      versionConfig.activeStudyDesignDescriptorCategories || [];
+    const descriptorMetadata =
+      this.templateConfiguration.descriptorConfiguration
+        ?.defaultDescriptorCategories || {};
+
+    let descriptorSource: any[] = [];
+    if (Array.isArray(activeDescriptorCategoryIdsConfig)) {
+      descriptorSource = activeDescriptorCategoryIdsConfig.map((id) => ({
+        id,
+        min: 0,
+      }));
+    } else if (typeof activeDescriptorCategoryIdsConfig === "object") {
+      descriptorSource = Object.keys(activeDescriptorCategoryIdsConfig)
+        .filter((key) => activeDescriptorCategoryIdsConfig[key].visible)
+        .sort(
+          (a, b) =>
+            activeDescriptorCategoryIdsConfig[a].order -
+            activeDescriptorCategoryIdsConfig[b].order
+        )
+        .map((key) => ({
+          id: key,
+          min: activeDescriptorCategoryIdsConfig[key].min || 0,
+        }));
+    }
+
+    this.descriptorCategories = descriptorSource.map((item) => {
+      const meta = descriptorMetadata[item.id];
+      let controlListKey = meta?.controlListKey || null;
+      const isaFileType = meta?.isaFileType || "investigation";
+
+      if (controlListKey && this.legacyControlLists) {
+        // ... existing logic to validate rule ...
+        const ruleSelectionInput = {
+          isaFileType: isaFileType,
+          studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0) 
+            ? this.selectedStudyCategories[0] 
+            : (typeof this.selectedStudyCategories === 'string' ? this.selectedStudyCategories : this.studyCategory),
+          studyCreatedAt: this.studyCreatedAt || null,
+          templateVersion: version,
+          isaFileTemplateName: this.isaFileTemplateName,
+        };
+        let rule = null;
+        try {
+          rule = getValidationRuleForField(
+            { controlLists: this.legacyControlLists } as MetabolightsFieldControls,
+            controlListKey,
+            ruleSelectionInput as any
+          );
+        } catch (e) {
+          rule = null;
+        }
+
+        if (!rule) {
+          controlListKey = "Study Design Type";
+        }
+      } else if (!controlListKey) {
+        controlListKey = "Study Design Type";
+      }
+
+      return {
+        id: item.id,
+        label: meta?.label || item.id,
+        controlListKey: controlListKey,
+        isaFileType: isaFileType,
+      };
+    });
+
+    // Add "Not Applicable" option
+    this.descriptorCategories.unshift({
+        id: 'default',
+        label: '----------------------------',
+        controlListKey: 'Study Design Type',
+        isaFileType: 'investigation'
+    });
+  }
+
+
+  onCategoryChange(categoryId) {
+    const category = this.descriptorCategories.find((c) => c.id === categoryId);
+    if (category) {
+      this.selectedCategory = category;
+      this.controlListKey = category.controlListKey;
+      this.isaFileType = category.isaFileType;
+      this._controlList = this.controlList();
+    }
+  }
+
+  initialiseForm() {
+    this.isFormBusy = false;
+    const controlList = this._controlList || this.controlList();
+    const isRequired = controlList?.rule?.termEnforcementLevel === "required";
+    const group: any = {
+      descriptor: [null, isRequired ? [Validators.required] : []],
+    };
+    if (this.mode !== 'local') {
+      group.descriptorCategory = [this.selectedCategory?.id || null, []];
+    }
+    this.form = this.fb.group(group);
+  }
+
   openModal() {
     if (!this.readOnly && !this.isStudyReadOnly) {
+      // Resolve category if editing
+      if (!this.addNewDescriptor && this.descriptor && this.descriptor.comments) {
+        const categoryComment = this.descriptor.comments.find(
+          (c) => c.name === "Study Design Category"
+        );
+        if (categoryComment) {
+          const catId = categoryComment.value;
+          const lookupId = (catId === 'other') ? 'default' : catId;
+          const category = this.descriptorCategories.find((c) => c.id === lookupId);
+          if (category) {
+            this.selectedCategory = category;
+            this.controlListKey = category.controlListKey;
+            this.isaFileType = category.isaFileType;
+          }
+        }
+      } else if (!this.addNewDescriptor && this.mode === "local" && this.controlListKey) {
+        // Respect provided controlListKey in local mode when editing
+        const matchingCat = this.descriptorCategories.find(
+          (c) => c.controlListKey === this.controlListKey
+        );
+        if (matchingCat) {
+          this.selectedCategory = matchingCat;
+        }
+      } else {
+        // Standard flow for NEW descriptor or no specific context:
+        // Do not default to any category, show "Select category" placeholder
+        this.selectedCategory = null;
+        this.controlListKey = this.controlListKey || null;
+        this.isaFileType = "investigation";
+      }
+
       this._controlList = this.controlList();
       this.isModalOpen = true;
       this.initialiseForm();
-      if (this.addNewDescriptor) {
-        this.descriptor = null;
-        if (this.descriptorComponent) {
-          this.descriptorComponent.reset();
-        }
-      } else {
-        if (this.descriptor) {
+
+      setTimeout(() => {
+        if (this.addNewDescriptor) {
+          this.descriptor = null;
+          if (this.descriptorComponent) {
+            this.descriptorComponent.reset();
+          }
+          this.isDescriptorValid = false;
+        } else if (this.descriptor) {
           if (this.descriptorComponent) {
             this.descriptorComponent.values = [this.descriptor];
           }
@@ -330,18 +548,11 @@ export class DesignDescriptorComponent implements OnInit {
                 .get("descriptor")
                 .setValue([this.descriptor], { emitEvent: false });
             }
+            this.isDescriptorValid = true;
           }
         }
-      }
+      }, 100);
     }
-  }
-
-  initialiseForm() {
-    this.isFormBusy = false;
-    const controlList = this._controlList || this.controlList();
-    this.form = this.fb.group({
-      descriptor: [null],
-    });
   }
 
   confirmDelete() {
@@ -356,7 +567,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   closeModal() {
     this.isModalOpen = false;
-    this.descriptorComponent.reset();
+    this.descriptorComponent?.reset();
   }
 
   closeImportModal() {
@@ -365,6 +576,18 @@ export class DesignDescriptorComponent implements OnInit {
 
   saveNgxs() {
     const descriptorValues = this.descriptorValuesForComponent();
+    
+    if (this.mode === 'local') {
+         if (descriptorValues && descriptorValues.length > 0) {
+             const body = this.compileBody(descriptorValues[0]);
+             // Extract Ontology from body.studyDesignDescriptor
+             const ontology = body.studyDesignDescriptor;
+             this.saved.emit(ontology);
+             this.closeModal();
+         }
+         return;
+    }
+    
     if (!this.isStudyReadOnly && descriptorValues.length > 0) {
       this.isFormBusy = true;
       if (!this.addNewDescriptor) {
@@ -418,18 +641,35 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   deleteNgxs(value) {
+    if(this.mode === 'local') {
+          this.deleted.emit(this.descriptor);
+          this.isDeleteModalOpen = false;
+          return;
+    }
+    
     if (!this.isStudyReadOnly) {
       if (!value) {
         value = this.descriptor.annotationValue;
       }
-      this.isFormBusy = true;
-      this.store.dispatch(new Descriptors.Delete(value, this.studyId));
+        this.store.dispatch(new Descriptors.Delete(value, this.studyId));
     }
   }
 
-  compileBody() {
+  isCuratorAdded(descriptor: Ontology): boolean {
+    if (descriptor && descriptor.comments) {
+      const sourceComment = descriptor.comments.find(
+        (c) => c.name === "Study Design Source"
+      );
+      if (sourceComment) {
+        return sourceComment.value.toLowerCase() !== "submitter";
+      }
+    }
+    return false;
+  }
+
+  compileBody(val: any = null) {
     const jsonConvert: JsonConvert = new JsonConvert();
-    const descriptorValues = this.descriptorValuesForComponent();
+    const descriptorValues = val ? [val] : this.descriptorValuesForComponent();
     const descriptorRaw =
       descriptorValues.length > 0 ? descriptorValues[0] : null;
 
@@ -448,9 +688,9 @@ export class DesignDescriptorComponent implements OnInit {
         } catch {
           const tmp = new Ontology();
           tmp.annotationValue =
-            descriptorRaw.annotationValue ||
-            descriptorRaw.termName ||
             descriptorRaw.label ||
+            descriptorRaw.termName ||
+            descriptorRaw.annotationValue ||
             "";
           tmp.termAccession =
             descriptorRaw.termAccession ||
@@ -473,10 +713,60 @@ export class DesignDescriptorComponent implements OnInit {
       }
     }
 
+    if (studyDesignDescriptor && this.form && this.form.get("descriptorCategory")) {
+      const categoryId = this.form.get("descriptorCategory").value;
+      if (categoryId) {
+        if (!studyDesignDescriptor.comments) {
+          studyDesignDescriptor.comments = [];
+        }
+        // Remove existing category comment if any
+        studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
+          (c) => c.name !== "Study Design Category"
+        );
+        studyDesignDescriptor.comments.push(new MTBLSComment("Study Design Category", categoryId));
+      }
+    }
+
+    if (studyDesignDescriptor) {
+      if (!studyDesignDescriptor.comments) {
+        studyDesignDescriptor.comments = [];
+      }
+      const isCurator = this.store.selectSnapshot(UserState.isCurator);
+      // Remove existing source comment if any
+      studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
+        (c) => c.name !== "Study Design Source"
+      );
+      studyDesignDescriptor.comments.push(
+        new MTBLSComment(
+          "Study Design Source",
+          isCurator ? "data-curation" : "submitter"
+        )
+      );
+    }
+    
     const body = {
       studyDesignDescriptor: studyDesignDescriptor,
     };
     return body;
+  }
+
+  getCategoryLabel(descriptor: Ontology): string {
+    if (descriptor && descriptor.comments && this.templateConfiguration) {
+      const categoryComment = descriptor.comments.find(
+        (c) => c.name === "Study Design Category"
+      );
+      if (categoryComment) {
+        const categoryId = categoryComment.value;
+        if (categoryId === "other" || categoryId === "default" || categoryId === "Not Applicable") {
+          return null;
+        }
+        const descriptorMetadata =
+          this.templateConfiguration.descriptorConfiguration
+            ?.defaultDescriptorCategories || {};
+        return descriptorMetadata[categoryId]?.label || categoryId;
+      }
+    }
+    return null;
   }
 
   fieldValidation(fieldId) {
@@ -498,19 +788,21 @@ export class DesignDescriptorComponent implements OnInit {
       while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
-    return this.validations[this.validationsId];
+    return this.validations ? this.validations[this.validationsId] : {};
   }
 
   controlList() {
+    const listName = this.controlListKey || this.defaultControlListName;
+    
     if (
-      !(this.defaultControlList && this.defaultControlList.name.length > 0) &&
+      this.defaultControlList.name !== listName &&
       this.editorService.defaultControlLists &&
-      this.defaultControlListName in this.editorService.defaultControlLists
+      listName in this.editorService.defaultControlLists
     ) {
       this.defaultControlList.values =
-        this.editorService.defaultControlLists[this.defaultControlListName]
+        this.editorService.defaultControlLists[listName]
           .OntologyTerm || [];
-      this.defaultControlList.name = this.defaultControlListName;
+      this.defaultControlList.name = listName;
     }
 
     let defaultOntologies = {};
@@ -526,12 +818,14 @@ export class DesignDescriptorComponent implements OnInit {
       defaultOntologies = defaultRule;
     }
 
-    const selectionInput = {
-      studyCategory: this.studyCategory,
+    const ruleSelectionInput = {
+      studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0) 
+        ? this.selectedStudyCategories[0] 
+        : (typeof this.selectedStudyCategories === 'string' ? this.selectedStudyCategories : this.studyCategory),
       studyCreatedAt: this.studyCreatedAt,
-      isaFileType: "investigation" as any,
-      isaFileTemplateName: null,
-      templateVersion: this.templateVersion,
+      isaFileType: this.isaFileType ? this.isaFileType : "investigation",
+      isaFileTemplateName: this.isaFileTemplateName,
+      templateVersion: this.templateVersion ? this.templateVersion : (this.store.selectSnapshot(GeneralMetadataState.templateVersion)),
     };
 
     let rule = null;
@@ -544,8 +838,8 @@ export class DesignDescriptorComponent implements OnInit {
           {
             controlLists: this.legacyControlLists,
           } as MetabolightsFieldControls,
-          this.defaultControlListName,
-          selectionInput
+          listName,
+          ruleSelectionInput
         );
       }
     } catch (e) {

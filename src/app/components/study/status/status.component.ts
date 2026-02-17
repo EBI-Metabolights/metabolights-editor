@@ -100,11 +100,7 @@ export class StatusComponent implements OnInit {
       }
     });
     this.revisionComment$.subscribe((value) => {
-      if (value) {
-        this.revisionComment = value;
-      } else {
         this.revisionComment = "";
-      }
     });
     this.revisionTaskMessage$.subscribe((value) => {
       if (value) {
@@ -195,7 +191,9 @@ export class StatusComponent implements OnInit {
   }
   applyChanges() {
     let newRevisionComment = ""
-    if (this.revisionNumber == 0) {
+    if (this.toStatus === 'New Revision' && this.status !== 'Public') {
+      newRevisionComment = 'Initial revision'
+    } else if (this.revisionNumber == 0) {
       newRevisionComment = 'Initial revision'
     } else {
       newRevisionComment = this.revisionComment
