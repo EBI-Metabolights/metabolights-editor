@@ -101,6 +101,11 @@ export class CreateComponent implements OnInit {
   studyCreationForm: UntypedFormGroup;
   selectedCreateOption = 2;
   currentSubStep = 1;
+  checklistSectionLabels: Record<number, string> = {
+    1: "Step 1: Submission Details",
+    2: "Step 2: Study Description",
+    3: "Step 3: Publication"
+  };
   doneStepExpandedIndex = 0;
   newStudy = null;
   createdStudies: string[] = [];
