@@ -368,3 +368,54 @@ a.dropdown-item {
   display: flex !important;
   align-items: center !important;
 }
+
+::ng-deep .small-toggle .mat-button-toggle-label-content {
+  line-height: 1.5 !important;
+  padding: 0 0.75em !important;
+  font-size: 0.75rem !important;
+  font-weight: bold !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+::ng-deep .small-toggle {
+  height: 2em !important;
+  align-items: center !important;
+  border-radius: 2px !important;
+  margin-right: 5px !important;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+}
+
+::ng-deep .small-toggle .mat-button-toggle-button {
+  height: 2em !important;
+  align-items: center !important;
+}
+
+.table-action-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-action-row > * {
+  display: inline-flex;
+  align-items: center;
+}
+
+.add-rows-group {
+  width: 13% !important;
+  min-width: 145px;
+  max-width: 190px;
+  margin-bottom: 0 !important;
+}
+
+::ng-deep .small-toggle .mdc-button__label {
+  font-size: 0.75rem !important;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
