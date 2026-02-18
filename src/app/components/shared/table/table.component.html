@@ -78,17 +78,16 @@
     padding: 10px;
     border: 1px solid rgba(0, 0, 0, 0.03);
   " marginTop="50">
-  <span class="column is-12 fadeIn nmrl">
-    <a class="button is-small is-light" (click)="toggleView()">
-      <span *ngIf="view == 'compact'; else expandedTable"> Expand Table </span>
-      <ng-template #expandedTable> Compact Table </ng-template>
-    </a>
-    &nbsp;
+  <span class="column is-12 fadeIn nmrl table-action-row">
+    <mat-button-toggle-group [value]="view" (change)="onViewChange($event.value)" class="small-toggle"
+      appearance="legacy" name="viewMode" aria-label="Table View">
+      <mat-button-toggle value="compact">Compact</mat-button-toggle>
+      <mat-button-toggle value="expanded">Expand</mat-button-toggle>
+    </mat-button-toggle-group>
     <a *ngIf="!isReadOnly && showAddSample" (click)="addSampleClick.emit()" class="button is-small is-light">
       <mat-icon>add</mat-icon> Samples
     </a>
-    &nbsp;
-    <div *ngIf="!isReadOnly" style="display: inline-flex; width: 13%" class="field has-addons">
+    <div *ngIf="!isReadOnly" class="field has-addons add-rows-group">
       <p class="control">
         <input [(ngModel)]="rowsToAdd" class="input is-small" type="text" />
       </p>
@@ -99,7 +98,6 @@
       </p>
 
     </div>
-    &nbsp;
     <!-- <span *ngIf="data">
       <mtbls-upload
         [fileTypes]="fileTypes"
@@ -108,7 +106,6 @@
         [file]="data.file"
       ></mtbls-upload>
     </span> -->
-    &nbsp;
     <span *ngIf="data && data.file">
       <mtbls-download [value]="data.file"></mtbls-download>
       <a *ngIf="!isReadOnly" style="margin-left: 0.5rem;" (click)="setFilePattern(data.file);openUploadArea = true"
@@ -119,7 +116,6 @@
           [filePatternString]="filePatternString" (uploadComplete)="onUploadComplete($event)"
           (closeUpload)="openUploadArea = false"></app-drag-and-drop> </div>
     </span>
-    &nbsp;
     <span *ngIf="!isReadOnly && (
         selectedRows.length > 0 ||
         selectedColumns.length > 0 ||

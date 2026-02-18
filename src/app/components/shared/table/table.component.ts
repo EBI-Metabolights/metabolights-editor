@@ -906,19 +906,20 @@ export class TableComponent
     return result;
   }
 
-  toggleView() {
-    const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
-    if (this.view === "compact") {
-      this.view = "expanded";
-      localStorage.setItem(fileKey, "expanded");
-    } else {
-      this.view = "compact";
-      localStorage.setItem(fileKey, "compact");
-    }
+  onViewChange(value: string) {
+    this.view = value;
+    const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file;
+    localStorage.setItem(fileKey, this.view);
     this.refreshDisplayedColumns();
-
-    // After toggling, check if scroll is really needed
     setTimeout(() => this.updateScrollBehavior());
+  }
+
+  toggleView() {
+    if (this.view === "compact") {
+      this.onViewChange("expanded");
+    } else {
+      this.onViewChange("compact");
+    }
   }
 
   refreshDisplayedColumns() {
