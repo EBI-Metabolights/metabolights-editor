@@ -364,13 +364,31 @@ export class AddAssayComponent implements OnInit, OnChanges {
       }
       return keys.map(key => {
           const details = configMap[key];
+          
+          // Synthesize ontologyTerm if missing but metadata exists at top level
+          const synthesizedOntology = (details?.termAccession || details?.termSourceReference) ? {
+              term: details.label || key,
+              termAccession: details.termAccession,
+              termSource: { name: details.termSource?.name || (typeof details.termSource === 'string' ? details.termSource : "") },
+              termSourceReference: details.termSourceReference
+          } : null;
+
           return {
               value: key,
               label: details?.label || key,
-              ontologyTerm: details?.ontologyTerm || null, // Capture ontology
+              ontologyTerm: details?.ontologyTerm || synthesizedOntology,
               order: details?.order || 0
           };
       }).sort((a, b) => a.order - b.order);
+  }
+
+  getOntologyMetadata(type: 'measurement' | 'omics', value: string): any {
+      if (!this.templateConfiguration) return null;
+      const configMap = type === 'measurement' ? this.templateConfiguration.measurementTypes : this.templateConfiguration.omicsTypes;
+      if (!configMap || !configMap[value]) return null;
+      
+      const processed = this.processOptions([value], configMap);
+      return processed.length > 0 ? processed[0] : null;
   }
 
   onAssayTypeChange(value) {
@@ -849,32 +867,35 @@ export class AddAssayComponent implements OnInit, OnChanges {
       const assayTermAccession = assayOption?.ontologyTerm?.termAccession || existingTechType?.termAccession || getExistingComment("Assay Type Term Accession Number");
 
       const measurementKey = formValues.measurementType;
-      const measurementOption = this.activeMeasurementTypes.find(m => m.value === measurementKey);
+      // Fetch proper ontology terms for the selected measurement option from configuration
+      const measurementOption = this.getOntologyMetadata('measurement', measurementKey) || this.activeMeasurementTypes.find(m => m.value === measurementKey);
       const measurementLabel = measurementOption ? measurementOption.label : measurementKey;
       
-      // Check if user changed the value. If same as existing typed object, prefer existing metadata
       const existingMeasurementObj = this.assayData?.measurementType;
       const isMeasurementChanged = measurementKey !== existingMeasurementObj?.annotationValue && measurementLabel !== existingMeasurementObj?.annotationValue;
 
-      const measurementTermSource = measurementOption?.ontologyTerm?.termSourceReference || measurementOption?.termSource?.name 
+      const measurementTermSource = measurementOption?.ontologyTerm?.termSourceRef 
+                                    || measurementOption?.ontologyTerm?.termSource?.name 
                                     || (!isMeasurementChanged ? existingMeasurementObj?.termSource?.name : "")
                                     || (!isMeasurementChanged ? getExistingComment("Measurement Type Term Source REF") : "");
 
-      const measurementTermAccession = measurementOption?.ontologyTerm?.termAccession || measurementOption?.termAccession 
+      const measurementTermAccession = measurementOption?.ontologyTerm?.termAccessionNumber || measurementOption?.termAccession 
                                        || (!isMeasurementChanged ? existingMeasurementObj?.termAccession : "")
                                        || (!isMeasurementChanged ? getExistingComment("Measurement Type Term Accession Number") : "");
 
 
       const omicsKey = formValues.omics;
-      const omicsOption = this.activeOmicsTypes.find(o => o.value === omicsKey);
+      // Fetch proper ontology terms for the selected omics option from configuration
+      const omicsOption = this.getOntologyMetadata('omics', omicsKey) || this.activeOmicsTypes.find(o => o.value === omicsKey);
       const omicsLabel = omicsOption ? omicsOption.label : omicsKey;
 
       const existingOmics = getExistingComment("Omics Type");
       const isOmicsChanged = omicsKey !== existingOmics && omicsLabel !== existingOmics;
 
-      const omicsTermSource = omicsOption?.ontologyTerm?.termSourceReference || omicsOption?.termSource?.name 
+      const omicsTermSource = omicsOption?.ontologyTerm?.termSourceRef 
+                              || omicsOption?.ontologyTerm?.termSource?.name 
                               || (!isOmicsChanged ? getExistingComment("Omics Type Term Source REF") : "");
-      const omicsTermAccession = omicsOption?.ontologyTerm?.termAccession || omicsOption?.termAccession 
+      const omicsTermAccession = omicsOption?.ontologyTerm?.termAccessionNumber || omicsOption?.termAccession 
                                  || (!isOmicsChanged ? getExistingComment("Omics Type Term Accession Number") : "");
 
       const payload = {
