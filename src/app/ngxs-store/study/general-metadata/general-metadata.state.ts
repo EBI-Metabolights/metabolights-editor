@@ -2,7 +2,7 @@ import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, SampleSheetFilename, StudyCategory, TemplateVersion, StudyCreatedAt } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -44,6 +44,7 @@ export interface GeneralMetadataStateModel {
     firstPrivateDate: string;
     firstPublicDate: string;
     sampleTemplate: string;
+    sampleSheetFilename: string;
     templateVersion: string;
     studyCategory: string;
     studyCreatedAt: string;
@@ -72,6 +73,7 @@ const defaultState: GeneralMetadataStateModel = {
     firstPrivateDate: null,
     firstPublicDate: null,
     sampleTemplate: null,
+    sampleSheetFilename: null,
     templateVersion: null,
     studyCategory: null,
     studyCreatedAt: null
@@ -130,6 +132,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new FirstPrivateDate.Set(gm_response.mtblsStudy.firstPrivateDate));
                 ctx.dispatch(new FirstPublicDate.Set(gm_response.mtblsStudy.firstPublicDate));
                 ctx.dispatch(new SampleTemplate.Set(gm_response.mtblsStudy.sampleTemplate));
+                ctx.dispatch(new SampleSheetFilename.Set(gm_response.isaInvestigation?.studies?.[0]?.filename || null));
                 ctx.dispatch(new StudyCreatedAt.Set(gm_response.mtblsStudy.createdAt));
                 ctx.dispatch(new StudyCategory.Set(gm_response.mtblsStudy.studyCategory));
                 ctx.dispatch(new TemplateVersion.Set(gm_response.mtblsStudy.templateVersion));
@@ -361,6 +364,15 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             sampleTemplate: action.sampleTemplate
+      });
+    }
+
+    @Action(SampleSheetFilename.Set)
+    SetSampleSheetFilename(ctx: StateContext<GeneralMetadataStateModel>, action: SampleSheetFilename.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            sampleSheetFilename: action.sampleSheetFilename
       });
     }
 
@@ -830,6 +842,10 @@ export class GeneralMetadataState {
     @Selector()
     static sampleTemplate(state: GeneralMetadataStateModel): string {
         return state.sampleTemplate
+    }
+    @Selector()
+    static sampleSheetFilename(state: GeneralMetadataStateModel): string {
+        return state.sampleSheetFilename
     }
     @Selector()
     static templateVersion(state: GeneralMetadataStateModel): string {
