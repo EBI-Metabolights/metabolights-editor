@@ -45,7 +45,9 @@
                 <div *ngFor="let descriptor of designDescriptors; let i = index">
                   <div class="control">
                     <div class="tags has-addons">
-                      <span class="tag is-default is-size-7">{{ descriptor.annotationValue }}</span>
+                      <span class="tag is-default is-size-7">
+                        <ontology-details [value]="descriptor"></ontology-details>
+                      </span>
                     </div>
                   </div>
                 </div>

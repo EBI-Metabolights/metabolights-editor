@@ -92,11 +92,13 @@
                     <div class="field is-grouped is-grouped-multiline">
                       <div *ngFor="let descriptor of designDescriptors; let i = index">
                         <div class="control">
-                          <div class="tags has-addons clickable" (click)="editModal.openModal()">
-                            <span class="tag is-primary is-light">
+                          <div class="tags has-addons">
+                            <span class="tag is-primary is-light clickable" (click)="editModal.openModal()">
                               <mat-icon style="font-size: 10px; height: 10px; width: 10px;">edit</mat-icon>
                             </span>
-                            <span class="tag is-default is-size-7">{{ descriptor.annotationValue }}</span>
+                            <span class="tag is-default is-size-7">
+                              <ontology-details [value]="descriptor"></ontology-details>
+                            </span>
                           </div>
                         </div>
                         <mtbls-design-descriptor #editModal [mode]="'local'" [value]="descriptor"
