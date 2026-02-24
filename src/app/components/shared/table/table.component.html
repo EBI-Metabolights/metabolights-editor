@@ -196,7 +196,8 @@
 
         <ng-container *ngFor="let column of data.columns" [sticky]="column.sticky" [matColumnDef]="column.columnDef">
           <th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)"
-            class="headercell clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header>
+            [matTooltip]="getColumnTooltip(column.header)" class="headercell clickable hover-highlight mlc-table"
+            mat-header-cell *matHeaderCellDef mat-sort-header>
             {{ formatHeader(column.header) }}
           </th>
           <ng-container *ngIf="!column.structure; else isStructure">

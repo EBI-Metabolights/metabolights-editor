@@ -655,4 +655,47 @@ export class ProtocolComponent implements OnInit, OnChanges {
         window.open(url, '_blank', 'noopener');
       }
 
+      getFieldMetadata(fieldId: string) {
+        const fieldMapping = {
+          'name': 'Study Protocol Name',
+          'description': 'Study Protocol Description',
+          'uri': 'Study Protocol URI',
+          'version': 'Study Protocol Version',
+          'parameterName': 'Study Protocol Parameter Name'
+        };
+        const fieldName = fieldMapping[fieldId] || fieldId;
+        return this.editorService.getFieldMetadata(fieldName, 'investigation');
+      }
+
+      getFieldHint(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.combinedDescription) {
+          return metadata.combinedDescription;
+        }
+        return this.fieldValidation(fieldId)?.description || '';
+      }
+
+      getFieldPlaceholder(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.placeholder) {
+          return metadata.placeholder;
+        }
+        return this.fieldValidation(fieldId)?.placeholder || '';
+      }
+
+      getFieldLabel(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.label) {
+          return metadata.label;
+        }
+        // Fallback to a prettified version of the field mapping if available
+        const fieldMapping = {
+          'name': 'Protocol Name',
+          'description': 'Protocol Description',
+          'uri': 'Protocol URI',
+          'version': 'Protocol Version',
+          'parameterName': 'Protocol Parameter Name'
+        };
+        return fieldMapping[fieldId] || fieldId;
+      }
 }

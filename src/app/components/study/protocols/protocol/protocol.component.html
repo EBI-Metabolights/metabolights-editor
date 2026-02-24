@@ -191,11 +191,11 @@
             <div class="field">
               <div class="control">
                 <mat-form-field class="full-width" appearance="outline" style="padding-bottom : 20px;">
-                  <mat-label>{{fieldValidation('name').placeholder}}</mat-label>
-                  <textarea class="no-scroll" formControlName="name" [placeholder]="fieldValidation('name').placeholder"
+                  <mat-label>{{getFieldLabel('name')}}</mat-label>
+                  <textarea class="no-scroll" formControlName="name" [placeholder]="getFieldPlaceholder('name')"
                     matInput cdkAutosizeMinRows="1" cdkAutosizeMaxRows="4" cdkTextareaAutosize>
                   </textarea>
-                  <mat-hint>{{ fieldValidation("name").description }}</mat-hint>
+                  <mat-hint>{{ getFieldHint("name") }}</mat-hint>
                   <mat-error *ngIf="
                       form.get('name').errors &&
                       form.get('name').dirty &&
@@ -214,7 +214,7 @@
                   <!-- <div *ngIf="form.get('description').value != ''" class="is-clearfix">
                     </div>  -->
                   <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px"
-                    formControlName="description" [placeholder]="fieldValidation('description').placeholder">
+                    formControlName="description" [placeholder]="getFieldPlaceholder('description')">
                     <div quill-editor-toolbar>
                       <span class="ql-formats">
                         <button class="ql-bold"></button>

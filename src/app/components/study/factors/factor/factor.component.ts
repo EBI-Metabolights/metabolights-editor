@@ -565,4 +565,45 @@ export class FactorComponent implements OnInit {
     this.selectedFactorUnitOntoValue = [ont];
     this.selectedFactorUnitValue = event.value;
   }
+
+  getFieldMetadata(fieldId: string) {
+    const fieldMapping = {
+      'factorName': 'Study Factor Name',
+      'factorType': 'Study Factor Type',
+      'unit': 'Unit'
+    };
+    const fieldName = fieldMapping[fieldId] || fieldId;
+    return this.editorService.getFieldMetadata(fieldName, 'investigation');
+  }
+
+  getFieldHint(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.description || '';
+  }
+
+  getFieldPlaceholder(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.placeholder) {
+      return metadata.placeholder;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.placeholder || '';
+  }
+
+  getFieldLabel(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.label) {
+      return metadata.label;
+    }
+    const fieldMapping = {
+      'factorName': 'Factor Name',
+      'factorType': 'Factor Type',
+      'unit': 'Factor Unit'
+    };
+    return fieldMapping[fieldId] || fieldId;
+  }
 }

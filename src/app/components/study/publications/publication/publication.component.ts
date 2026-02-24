@@ -791,6 +791,49 @@ export class PublicationComponent implements OnInit {
     return this.form.get(name).value;
   }
 
+  getFieldMetadata(fieldId: string) {
+    const fieldMapping = {
+      'title': 'Study Publication Title',
+      'authorList': 'Study Publication Author List',
+      'doi': 'Study Publication DOI',
+      'pubMedID': 'Study PubMed ID',
+      'status': 'Study Publication Status'
+    };
+    const fieldName = fieldMapping[fieldId] || fieldId;
+    return this.editorService.getFieldMetadata(fieldName, 'investigation');
+  }
+
+  getFieldHint(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+    return this.fieldValidation(fieldId)?.description || '';
+  }
+
+  getFieldPlaceholder(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.placeholder) {
+      return metadata.placeholder;
+    }
+    return this.fieldValidation(fieldId)?.placeholder || '';
+  }
+
+  getFieldLabel(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.label) {
+      return metadata.label;
+    }
+    const fieldMapping = {
+      'title': 'Publication Title',
+      'authorList': 'Author List',
+      'doi': 'Publication DOI',
+      'pubMedID': 'PubMed ID',
+      'status': 'Publication Status'
+    };
+    return fieldMapping[fieldId] || fieldId;
+  }
+
   isFieldRequired(field: string): boolean {
     try {
       const cfgRequired = JSON.parse(

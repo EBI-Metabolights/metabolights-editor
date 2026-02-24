@@ -228,6 +228,7 @@ export class TableComponent
   // Caches for unstable objects to prevent infinite loops in change detection
   private _columnControlListCache = new Map<string, any>();
   private _columnValidationsCache = new Map<string, any>();
+  private _columnMetadataCache = new Map<string, any>();
   private _defaultOntologiesCache = new Map<string, any[]>();
   private readonly EMPTY_ARRAY = [];
 
@@ -395,6 +396,7 @@ export class TableComponent
       // Clear caches for new data
       this._columnControlListCache.clear();
       this._columnValidationsCache.clear();
+      this._columnMetadataCache.clear();
       this._defaultOntologiesCache.clear();
 
       this.hit = true;
@@ -1081,6 +1083,42 @@ export class TableComponent
       return "InChI";
     }
     return s;
+  }
+
+  getColumnMetadata(header: string) {
+    if (!header || !this.data || !this.data.file) {
+      return null;
+    }
+
+    // Check cache
+    if (this._columnMetadataCache.has(header)) {
+      return this._columnMetadataCache.get(header);
+    }
+
+    const fileTypeRaw = this.getTableType(this.data.file);
+    const fileType: IsaTabFileType = fileTypeRaw === 'samples' ? 'sample' : fileTypeRaw as IsaTabFileType;
+    
+    // For assay files, attempt to resolve the assay type (templateName)
+    let templateName = null;
+    if (fileType === 'assay') {
+      // try to get it from assayTechnique or some other source if available
+      templateName = this.assayTechnique?.name || null;
+    }
+
+    const metadata = this.editorService.getFieldMetadata(header, fileType, templateName);
+    this._columnMetadataCache.set(header, metadata);
+    return metadata;
+  }
+
+  getColumnTooltip(header: string): string {
+    const metadata = this.getColumnMetadata(header);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+    
+    // Fallback to existing validation-based description
+    const validation = this.columnValidations(header);
+    return validation?.description || '';
   }
 
   getDataString(row) {
