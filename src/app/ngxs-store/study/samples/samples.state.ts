@@ -82,11 +82,6 @@ export class SampleState {
                   return assertA - assertB;
                 });
 
-                let index = displayedColumns.indexOf("Characteristics[Sample type]");
-                if (index > -1) {
-                  displayedColumns.splice(index, 1);
-                }
-
                 displayedColumns.sort(
                   (a, b) =>
                     /* eslint-disable radix */
@@ -107,6 +102,12 @@ export class SampleState {
                 if (displayedColumns[3] !== "Sample Name") {
                   displayedColumns.splice(displayedColumns.indexOf("Sample Name"), 1);
                   displayedColumns.splice(3, 0, "Sample Name");
+                }
+
+                const sampleTypeColumn = "Characteristics[Sample type]";
+                if (displayedColumns.indexOf(sampleTypeColumn) > -1 && displayedColumns[4] !== sampleTypeColumn) {
+                  displayedColumns.splice(displayedColumns.indexOf(sampleTypeColumn), 1);
+                  displayedColumns.splice(4, 0, sampleTypeColumn);
                 }
 
                 displayedColumns = displayedColumns.filter(

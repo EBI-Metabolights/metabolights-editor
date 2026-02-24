@@ -112,9 +112,10 @@
                 ? 'extra-margin'
                 : ''
             ">
-            <mat-label>Last name</mat-label>
-            <input matInput formControlName="lastName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("lastName")?.description }}
+            <mat-label>{{getFieldLabel('lastName')}}</mat-label>
+            <input matInput formControlName="lastName" [readonly]="isReadOnly"
+              [placeholder]="getFieldPlaceholder('lastName')" />
+            <mat-hint>{{ getFieldHint("lastName") }}
             </mat-hint>
             <mat-error *ngIf="form.get('lastName')?.errors?.lastName">
               {{ form.get("lastName").errors.lastName.error }}
@@ -122,11 +123,10 @@
           </mat-form-field>
 
           <mat-form-field class="field-new" appearance="outline">
-            <mat-label>Middle name(s)</mat-label>
-            <input matInput formControlName="midInitials" [readonly]="isReadOnly" />
-            <mat-hint>{{
-              fieldValidation("midInitials")?.description
-              }}</mat-hint>
+            <mat-label>{{getFieldLabel('midInitials')}}</mat-label>
+            <input matInput formControlName="midInitials" [readonly]="isReadOnly"
+              [placeholder]="getFieldPlaceholder('midInitials')" />
+            <mat-hint>{{ getFieldHint("midInitials") }}</mat-hint>
             <mat-error *ngIf="form.get('midInitials')?.errors?.midInitials">
               {{ form.get("midInitials").errors.midInitials.error }}
             </mat-error>
@@ -138,9 +138,10 @@
                 ? 'extra-margin'
                 : ''
             ">
-            <mat-label>First name</mat-label>
-            <input matInput formControlName="firstName" [readonly]="isReadOnly" />
-            <mat-hint>{{ fieldValidation("firstName")?.description }}
+            <mat-label>{{getFieldLabel('firstName')}}</mat-label>
+            <input matInput formControlName="firstName" [readonly]="isReadOnly"
+              [placeholder]="getFieldPlaceholder('firstName')" />
+            <mat-hint>{{ getFieldHint("firstName") }}
             </mat-hint>
             <mat-error *ngIf="form.get('firstName')?.errors?.firstName">
               {{ form.get("firstName").errors.firstName.error }}
@@ -153,8 +154,8 @@
               <span>
                 <mtbls-ontology *ngIf="showOntology" class="mt-20" #personRoles [validations]="fieldValidation('roles')"
                   [controlList]="_controlList" (changed)="onChanges($event)" [values]="person.roles" [inline]="true"
-                  [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies" [label]="'Role'"
-                  (emptyError)="onEmptyError($event)"
+                  [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                  [label]="getFieldLabel('roles')" (emptyError)="onEmptyError($event)"
                   [hasError]="form?.get('roles')?.invalid && form?.get('roles')?.touched"></mtbls-ontology>
               </span>
             </div>
@@ -163,7 +164,8 @@
           <ng-template #dropdownField>
             <mat-form-field class="full-width" appearance="outline"
               *ngIf="_controlList?.values?.length && form.get('roles')">
-              <mat-select formControlName="roles" placeholder="Role" (selectionChange)="onChanges($event)">
+              <mat-select formControlName="roles" [placeholder]="getFieldPlaceholder('roles')"
+                (selectionChange)="onChanges($event)">
                 <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
                   {{ option.annotationValue }}
                 </mat-option>
@@ -171,12 +173,13 @@
             </mat-form-field>
           </ng-template>
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>ORCID</mat-label>
-            <input class="no-scroll" formControlName="orcid" [readonly]="isReadOnly" matInput />
+            <mat-label>{{getFieldLabel('orcid')}}</mat-label>
+            <input class="no-scroll" formControlName="orcid" [readonly]="isReadOnly" matInput
+              [placeholder]="getFieldPlaceholder('orcid')" />
             <a matSuffix target="_blank" [href]="getOrcidUrl()" class="search-link">
               <small>Search ORCID</small>
             </a>
-            <mat-hint>{{ fieldValidation("orcid")?.description }}
+            <mat-hint>{{ getFieldHint("orcid") }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('orcid').errors &&
@@ -189,10 +192,11 @@
         </div>
         <div class="form-row">
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>Email</mat-label>
-            <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput />
+            <mat-label>{{getFieldLabel('email')}}</mat-label>
+            <input class="no-scroll" formControlName="email" [readonly]="isReadOnly" matInput
+              [placeholder]="getFieldPlaceholder('email')" />
             <mat-hint>
-              {{ fieldValidation("email")?.description }}
+              {{ getFieldHint("email") }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('email').errors &&
@@ -204,11 +208,10 @@
           </mat-form-field>
 
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>Alternative Email</mat-label>
-            <input class="no-scroll" formControlName="alternativeEmail" [readonly]="isReadOnly" matInput />
-            <mat-hint>{{
-              fieldValidation("alternativeEmail")?.description
-              }}</mat-hint>
+            <mat-label>{{getFieldLabel('alternativeEmail')}}</mat-label>
+            <input class="no-scroll" formControlName="alternativeEmail" [readonly]="isReadOnly" matInput
+              [placeholder]="getFieldPlaceholder('alternativeEmail')" />
+            <mat-hint>{{ getFieldHint("alternativeEmail") }}</mat-hint>
             <mat-error *ngIf="
                 form.get('alternativeEmail').errors &&
                 form.get('alternativeEmail').dirty &&
@@ -264,10 +267,10 @@
           </tr>
         </table> -->
         <mat-form-field class="full-width" appearance="outline" style="padding-bottom: 20px;">
-          <mat-label>Address</mat-label>
+          <mat-label>{{getFieldLabel('address')}}</mat-label>
           <textarea class="no-scroll" formControlName="address" [readonly]="isReadOnly" matInput cdkAutosizeMinRows="1"
-            cdkAutosizeMaxRows="4" cdkTextareaAutosize></textarea>
-          <mat-hint>{{ fieldValidation("address")?.description }}</mat-hint>
+            cdkAutosizeMaxRows="4" cdkTextareaAutosize [placeholder]="getFieldPlaceholder('address')"></textarea>
+          <mat-hint>{{ getFieldHint("address") }}</mat-hint>
           <mat-error *ngIf="
               form.get('address').errors &&
               form.get('address').dirty &&
@@ -278,9 +281,9 @@
         </mat-form-field>
         <div class="form-row">
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>Affiliation</mat-label>
-            <input type="text" matInput formControlName="affiliation" [matAutocomplete]="auto"
-              [readonly]="isReadOnly" />
+            <mat-label>{{getFieldLabel('affiliation')}}</mat-label>
+            <input type="text" matInput formControlName="affiliation" [matAutocomplete]="auto" [readonly]="isReadOnly"
+              [placeholder]="getFieldPlaceholder('affiliation')" />
             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAffiliationSelected($event)">
               <mat-option *ngFor="let org of filteredOrganizations$ | async" [value]="org">
                 <div>
@@ -292,7 +295,7 @@
               </mat-option>
             </mat-autocomplete>
             <mat-hint>
-              {{ fieldValidation("affiliation")?.description }}
+              {{ getFieldHint("affiliation") }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('affiliation').errors &&
@@ -304,12 +307,13 @@
           </mat-form-field>
 
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>Affiliation ROR ID</mat-label>
-            <input class="no-scroll" formControlName="rorid" [readonly]="isReadOnly" matInput />
+            <mat-label>{{getFieldLabel('rorid')}}</mat-label>
+            <input class="no-scroll" formControlName="rorid" [readonly]="isReadOnly" matInput
+              [placeholder]="getFieldPlaceholder('rorid')" />
             <a matSuffix target="_blank" [href]="getRoridUrl()" class="search-link">
               <small>Search ROR ID</small>
             </a>
-            <mat-hint>{{ fieldValidation("rorid")?.description }}
+            <mat-hint>{{ getFieldHint("rorid") }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('rorid').errors &&

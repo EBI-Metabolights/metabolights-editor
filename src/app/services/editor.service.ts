@@ -35,7 +35,7 @@ import { ValidationService } from "./decomposed/validation.service";
 import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
 import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
-import { MetabolightsFieldControls } from "../models/mtbl/mtbls/control-list";
+import { getValidationRuleForField, MetabolightsFieldControls, IsaTabFileType } from "../models/mtbl/mtbls/control-list";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -1072,6 +1072,226 @@ export class EditorService {
           })
       );
   }
+  /**
+   * Fetches field metadata from templateConfiguration, combining description and examples,
+   * and capturing other properties like required, columnStructure, etc.
+   * 
+   * @param fieldName The name of the field (e.g., column header or property name)
+   * @param fileType The type of file (assay, sample, investigation, maf)
+   * @param templateName Optional template name (e.g., assay type or investigation template)
+   */
+  getFieldMetadata(fieldName: string, type?: IsaTabFileType, templateName?: string, validationsId?: string) {
+    const applicationTemplates = this.store.selectSnapshot(ApplicationState.applicationTemplates);
+    const config = this.store.selectSnapshot(ApplicationState.templateConfiguration) as any;
+    const version = this.store.selectSnapshot(GeneralMetadataState.templateVersion);
+
+    let fieldDef: any = null;
+    const fileType = type || null;
+
+    if (!config) return null;
+
+    const strippedFieldName = fieldName?.replace(/\.[0-9]+$/, "").trim();
+
+    const versionConfig = config.versions?.[version];
+
+    // 1. Search in File Header Templates (Assay, Sample, MAF)
+    if (fileType && (fileType === 'assay' || fileType === 'sample' || fileType === 'maf')) {
+      let templates = null;
+      if (fileType === 'assay') templates = applicationTemplates?.assayFileHeaderTemplates;
+      if (fileType === 'sample') templates = applicationTemplates?.sampleFileHeaderTemplates;
+      if (fileType === 'maf') templates = applicationTemplates?.assignmentFileHeaderTemplates;
+
+      if (templates) {
+        let headersList = null;
+        if (templateName) {
+           headersList = templates[templateName];
+           if (!headersList) {
+             const matchingKey = Object.keys(templates).find(k => {
+               const normalizedK = k.toLowerCase().replace(/[-_ ]/g, "");
+               const normalizedT = templateName.toLowerCase().replace(/[-_ ]/g, "");
+               return normalizedK === normalizedT;
+             });
+             if (matchingKey) headersList = templates[matchingKey];
+           }
+        }
+
+        const findInTemplate = (t) => {
+          if (!t || !t.headers) return null;
+          const target = strippedFieldName.toLowerCase();
+          
+          // Check for suffix like .1, .2 to find the N-th occurrence
+          const suffixMatch = fieldName?.match(/\.([0-9]+)$/);
+          const occurrenceIndex = suffixMatch ? parseInt(suffixMatch[1], 10) : 0;
+
+          const matches = t.headers.filter(h => {
+             const head = (h.columnHeader || h.fieldName || h.label || "")?.trim().toLowerCase();
+             if (head === target) return true;
+             // Try Param/Char/Factor variants
+             const paramValueHeader = `parameter value[${target}]`;
+             const charValueHeader = `characteristic[${target}]`;
+             const factorValueHeader = `factor value[${target}]`;
+             return head === paramValueHeader || head === charValueHeader || head === factorValueHeader;
+          });
+          
+          if (matches.length > occurrenceIndex) {
+            return matches[occurrenceIndex];
+          }
+          return matches.length > 0 ? matches[0] : null;
+        };
+
+        if (headersList) {
+           const template = headersList.find(t => String(t.version) === String(version)) || (headersList.length > 0 ? headersList[0] : null);
+           if (template) {
+             fieldDef = findInTemplate(template);
+           }
+        } else {
+           // Search across all templates for this file type
+           for (const key of Object.keys(templates)) {
+              const list = templates[key];
+              const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
+              if (template) {
+                fieldDef = findInTemplate(template);
+                if (fieldDef) break;
+              }
+           }
+        }
+      }
+    }
+
+    // 2. Search in Investigation Templates if not found or if investigation fileType
+    if (!fieldDef && (fileType === 'investigation' || !fileType)) {
+       const invTemplates = applicationTemplates?.investigationFileTemplates;
+        if (invTemplates) {
+           // Search in all investigation templates
+           for (const key of Object.keys(invTemplates)) {
+              const list = invTemplates[key];
+              const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
+              if (template && template.fields) {
+                const target = strippedFieldName.toLowerCase();
+                fieldDef = template.fields.find(f => {
+                   const field = (f.fieldName || "")?.trim().toLowerCase();
+                   const label = (f.label || "")?.trim().toLowerCase();
+                   const header = (f.columnHeader || "")?.trim().toLowerCase();
+                   return field === target || label === target || header === target;
+                });
+                if (fieldDef) break;
+              }
+           }
+        }
+    }
+
+    // 3. Fallback to general configuration metadata (measurementTypes, omicsTypes, etc.)
+    if (!fieldDef) {
+       // Search in measurementTypes, omicsTypes, studyCategories, etc. in root config
+       const categories = ['measurementTypes', 'omicsTypes', 'studyCategories', 'sampleFileTemplates', 'investigationFileTemplates'];
+       for (const cat of categories) {
+         if (config[cat] && config[cat][fieldName]) {
+           fieldDef = config[cat][fieldName];
+           break;
+         }
+       }
+    }
+
+    // 4. Fallback to validations.json if still not found
+    if (!fieldDef) {
+      fieldDef = this.getValidationDefinitionFromStore(fieldName, validationsId);
+    }
+
+    if (!fieldDef) return null;
+
+    // Process and combine description and examples
+    const description = fieldDef.description || '';
+    const examples = fieldDef.examples || '';
+    let combinedDescription = description;
+    if (examples) {
+      let examplesStr = '';
+      if (Array.isArray(examples)) {
+          examplesStr = examples.map(e => (typeof e === 'object' ? JSON.stringify(e) : e)).join(', ');
+      } else {
+          examplesStr = examples;
+      }
+      combinedDescription += (description ? '\n\n' : '') + `Examples: ${examplesStr}`;
+    }
+
+    let cleanPlaceholder = fieldDef.placeholder || fieldDef.columnHeader || fieldDef.fieldName || fieldName;
+    if (cleanPlaceholder) {
+      // Remove everything from "(e.g." or "(example" onwards
+      const index1 = cleanPlaceholder.toLowerCase().indexOf('(e.g.');
+      const index2 = cleanPlaceholder.toLowerCase().indexOf('(example');
+      const index3 = cleanPlaceholder.toLowerCase().indexOf('e.g.');
+      
+      let splitIndex = -1;
+      if (index1 !== -1) splitIndex = index1;
+      else if (index2 !== -1) splitIndex = index2;
+      else if (index3 !== -1) splitIndex = index3;
+
+      if (splitIndex !== -1) {
+        cleanPlaceholder = cleanPlaceholder.substring(0, splitIndex).trim();
+      }
+    }
+
+    return {
+      ...fieldDef,
+      description,
+      examples,
+      combinedDescription,
+      label: fieldDef.label || fieldDef.columnHeader || fieldDef.fieldName || fieldName,
+      placeholder: cleanPlaceholder,
+      required: fieldDef.required === true || fieldDef.required === 'true' || fieldDef.required === 'yes' || fieldDef.required === 1 || fieldDef['is-required'] === 'true' || fieldDef['is-required'] === true
+    };
+  }
+
+  /**
+   * Retrieves validation definition from the store (validations.json)
+   * @param fieldName The field name or column header to search for
+   * @param validationsId Optional path in the validations object (e.g., 'assays.assay')
+   * @returns The validation definition if found, null otherwise
+   */
+  getValidationDefinitionFromStore(fieldName: string, validationsId?: string) {
+    if (!this.validations) return null;
+    let validationsRoot = this.validations;
+    if (validationsId) {
+       const keys = validationsId.split('.');
+       for (const key of keys) {
+         if (validationsRoot[key]) {
+           validationsRoot = validationsRoot[key];
+         } else {
+           break;
+         }
+       }
+    }
+
+    if (!validationsRoot) return null;
+
+    // If it's a flat object (like 'study'), just return the field if it exists
+    if (validationsRoot[fieldName]) {
+       return validationsRoot[fieldName];
+    }
+
+    // Common column stripping for matching
+    const formatted = fieldName.replace(/\.[0-9]+$/, "");
+    let innerName = formatted;
+    const match = formatted.match(/\[(.*?)\]/);
+    if (match) {
+        innerName = match[1];
+    }
+    const targetHeaders = [fieldName, formatted, innerName].map(h => h.toLowerCase());
+
+    // If it has 'default_order' (like assays.assay), search there
+    if (validationsRoot.default_order && Array.isArray(validationsRoot.default_order)) {
+       return validationsRoot.default_order.find(col => {
+         const entryHeader = (col.header || "").toLowerCase();
+         const entryColDef = (col.columnDef || "").toLowerCase();
+         return targetHeaders.includes(entryHeader) || targetHeaders.includes(entryColDef);
+       });
+    }
+
+    // Recursive search if not found in root or default_order? 
+    // Usually for study.people.person we need the specific path.
+    
+    return null;
+  }
+
 
   addAssay(studyId: string, payload: any): Observable<any> {
     const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/metadata-files/assays`;

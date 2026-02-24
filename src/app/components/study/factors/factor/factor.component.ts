@@ -266,7 +266,7 @@ export class FactorComponent implements OnInit {
       if (!this.addNewFactor) { // if we are updating an existing factor
         this.store.dispatch(new Factors.Update(this.studyId, this.factor.factorName, this.compileBody())).subscribe(
           (completed) => {
-            this.refreshFactors(null, "Factor updated.");
+            this.refreshFactors(null, "Factor updated.", !this.isSampleSheet);
 
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: this.factor, unitId: this.resolvedName})
             else this.addFactorToSampleSheet.next(this.factor);
@@ -278,9 +278,7 @@ export class FactorComponent implements OnInit {
         const newFactor =  this.compileBody()
         this.store.dispatch(new Factors.Add(this.studyId, newFactor)).subscribe(
           (completed) => {
-           setTimeout(() => {
-              this.refreshFactors(null, "Factor saved.");
-            }, 0);
+            this.refreshFactors(null, "Factor saved.", !this.isSampleSheet);
             this.isModalOpen = false;
             //
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: newFactor.factor, unitId: this.resolvedName})
@@ -323,14 +321,14 @@ export class FactorComponent implements OnInit {
     }
   }
 
-  refreshFactors(data, message) {
+  refreshFactors(data, message, keepModalOpen: boolean = true) {
     if(!this.isStudyReadOnly) {
       this.store.dispatch(new Factors.Get(this.studyId)).subscribe(
         (completed) => {
           toastr.success(message, "Success", this.toastrSettings);
           this.form.markAsPristine();
           this.initialiseForm();
-          this.isModalOpen = true;
+          this.isModalOpen = keepModalOpen;
         }
       )
     }
@@ -564,5 +562,46 @@ export class FactorComponent implements OnInit {
      ont.termSource = new OntologySourceReference();
     this.selectedFactorUnitOntoValue = [ont];
     this.selectedFactorUnitValue = event.value;
+  }
+
+  getFieldMetadata(fieldId: string) {
+    const fieldMapping = {
+      'factorName': 'Study Factor Name',
+      'factorType': 'Study Factor Type',
+      'unit': 'Unit'
+    };
+    const fieldName = fieldMapping[fieldId] || fieldId;
+    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+  }
+
+  getFieldHint(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.description || '';
+  }
+
+  getFieldPlaceholder(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.placeholder) {
+      return metadata.placeholder;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.placeholder || '';
+  }
+
+  getFieldLabel(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.label) {
+      return metadata.label;
+    }
+    const fieldMapping = {
+      'factorName': 'Factor Name',
+      'factorType': 'Factor Type',
+      'unit': 'Factor Unit'
+    };
+    return fieldMapping[fieldId] || fieldId;
   }
 }
