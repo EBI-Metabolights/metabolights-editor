@@ -266,7 +266,7 @@ export class FactorComponent implements OnInit {
       if (!this.addNewFactor) { // if we are updating an existing factor
         this.store.dispatch(new Factors.Update(this.studyId, this.factor.factorName, this.compileBody())).subscribe(
           (completed) => {
-            this.refreshFactors(null, "Factor updated.");
+            this.refreshFactors(null, "Factor updated.", !this.isSampleSheet);
 
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: this.factor, unitId: this.resolvedName})
             else this.addFactorToSampleSheet.next(this.factor);
@@ -278,9 +278,7 @@ export class FactorComponent implements OnInit {
         const newFactor =  this.compileBody()
         this.store.dispatch(new Factors.Add(this.studyId, newFactor)).subscribe(
           (completed) => {
-           setTimeout(() => {
-              this.refreshFactors(null, "Factor saved.");
-            }, 0);
+            this.refreshFactors(null, "Factor saved.", !this.isSampleSheet);
             this.isModalOpen = false;
             //
             if (this.addFactorColumnVisible) this.addFactorToSampleSheetUnitInclusive.next({factor: newFactor.factor, unitId: this.resolvedName})
@@ -323,14 +321,14 @@ export class FactorComponent implements OnInit {
     }
   }
 
-  refreshFactors(data, message) {
+  refreshFactors(data, message, keepModalOpen: boolean = true) {
     if(!this.isStudyReadOnly) {
       this.store.dispatch(new Factors.Get(this.studyId)).subscribe(
         (completed) => {
           toastr.success(message, "Success", this.toastrSettings);
           this.form.markAsPristine();
           this.initialiseForm();
-          this.isModalOpen = true;
+          this.isModalOpen = keepModalOpen;
         }
       )
     }

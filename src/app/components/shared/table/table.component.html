@@ -188,7 +188,7 @@
           <td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell
             *matCellDef="let row">
 
-            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && isFirstRow(row))" class="radio-tick"
+            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && templateRowPresent && isFirstRow(row))" class="radio-tick"
               [class.selected]="isSelected(row, null)">
             </span>
           </td>

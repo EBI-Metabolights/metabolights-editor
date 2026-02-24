@@ -264,15 +264,13 @@ export class TableComponent
     if (this.data) {
       this.columnHidden = this.data.columns_hidden;
       this.sampleAbundance = this.data.sample_abundance;
-      const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
+      const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file;
       if (localStorage.getItem(fileKey) !== null) {
         this.view = localStorage.getItem(fileKey);
-        if (this.view === "expanded") {
-          this.displayedTableColumns = Object.keys(this.data.header);
-        }
       } else {
         localStorage.setItem(fileKey, "compact");
       }
+      this.refreshDisplayedColumns();
       this.tableTypeValue = this.getTableTypeVal(this.data.file);
     }
   }
@@ -2425,7 +2423,7 @@ private getSelectableRowIndexes(): number[] {
 
   const allIndexes = this.tableData.data.rows.map(r => r.index);
 
-  if (this.getTableType(this.data.file) === 'assay') {
+  if (this.getTableType(this.data.file) === 'assay' && this.templateRowPresent) {
     const firstRowObj = this.tableData.data.rows.find(r => this.isFirstRow(r));
     if (firstRowObj) {
       return allIndexes.filter(idx => idx !== firstRowObj.index);
