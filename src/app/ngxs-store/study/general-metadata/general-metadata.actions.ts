@@ -152,6 +152,13 @@ export namespace SampleTemplate {
   }
 }
 
+export namespace SampleSheetFilename {
+  export class Set{
+      static readonly type = '[general] Set Sample Sheet Filename'
+      constructor(public sampleSheetFilename: string) {}
+  }
+}
+
 export namespace StudyCreatedAt {
   export class Set{
       static readonly type = '[general] Set Study Created At'
@@ -297,4 +304,3 @@ export class ResetGeneralMetadataState {
     static readonly type = '[general] Reset General Metadata State'
     constructor() {}
 }
-

@@ -1,14 +1,12 @@
-import { inject, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext, Store } from "@ngxs/store";
 import { Organisms, ResetSamplesState, Samples } from "./samples.actions";
-import { FilesState } from "../files/files.state";
-import { Observable } from "rxjs";
 import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 import Swal from "sweetalert2";
-import { StudyFile } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
 import { SamplesService } from "src/app/services/decomposed/samples.service";
 import { take } from "rxjs/operators";
 import { StatusNS } from "../../non-study/application/application.actions";
+import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
 
 // we should type the below properly once we get a better handle on what the data looks like
 export interface SamplesStateModel {
@@ -26,28 +24,24 @@ const defaultState: SamplesStateModel = {
 })
 @Injectable()
 export class SampleState {
-
-
-    // subscribing to other state containers isnt forbidden but feels wrong, so try and limit doing so
-    sampleSheet$: Observable<StudyFile> = inject(Store).select(FilesState.getSampleSheet);
-
     constructor(private store: Store, private samplesService: SamplesService) {
 
     }
 
     @Action(Samples.Get)
     GetStudySamples(ctx: StateContext<SamplesStateModel>, action: Samples.Get) {
-        this.sampleSheet$.pipe(take(1)).subscribe(
-            (sampleSheet) => {
-                if (sampleSheet) {
-                    this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
-                    ctx.dispatch(new Samples.OrganiseAndPersist(sampleSheet.file, action.studyId));
-                } else {
-                    Swal.fire({title: 'Error', text: this.samplesService.sampleSheetMissingPopupMessage, showCancelButton: false,
-                    confirmButtonColor: "#DD6B55", confirmButtonText: "OK"});
-                }
-            }
-        )
+        const sampleSheetFromInvestigation = this.store.selectSnapshot(GeneralMetadataState.sampleSheetFilename);
+        const sampleSheetFilename = sampleSheetFromInvestigation && sampleSheetFromInvestigation.startsWith("s_")
+          ? sampleSheetFromInvestigation
+          : null;
+
+        if (sampleSheetFilename) {
+            this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));
+            ctx.dispatch(new Samples.OrganiseAndPersist(sampleSheetFilename, action.studyId));
+        } else {
+            Swal.fire({title: 'Error', text: this.samplesService.sampleSheetMissingPopupMessage, showCancelButton: false,
+            confirmButtonColor: "#DD6B55", confirmButtonText: "OK"});
+        }
     }
 
     @Action(Samples.OrganiseAndPersist)
