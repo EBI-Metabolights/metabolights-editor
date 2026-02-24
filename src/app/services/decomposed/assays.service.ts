@@ -72,12 +72,14 @@ export class AssaysService extends BaseConfigDependentService {
         assaySubTechnique,
         assayTechnique,
         assayMainTechnique,
+        template: assaySubTechnique?.template || null
       };
     }
     return {
-      assaySubTechnique: "",
-      assayTechnique: "",
-      assayMainTechnique: "",
+      assaySubTechnique: null,
+      assayTechnique: null,
+      assayMainTechnique: null,
+      template: null
     };
   }
 

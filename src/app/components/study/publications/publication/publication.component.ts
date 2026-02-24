@@ -800,7 +800,7 @@ export class PublicationComponent implements OnInit {
       'status': 'Study Publication Status'
     };
     const fieldName = fieldMapping[fieldId] || fieldId;
-    return this.editorService.getFieldMetadata(fieldName, 'investigation');
+    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
   }
 
   getFieldHint(fieldId: string): string {
@@ -835,19 +835,14 @@ export class PublicationComponent implements OnInit {
   }
 
   isFieldRequired(field: string): boolean {
-    try {
-      const cfgRequired = JSON.parse(
-        this.fieldValidation(field)?.["is-required"] ?? "false"
-      );
-      if (field === "doi") {
-        if (cfgRequired) return true;
-        const statusVal = this.form?.controls?.status?.value;
-        return this.isStatusPublishedOrPreprint(statusVal);
-      }
-      return !!cfgRequired;
-    } catch {
-      return false;
+    const metadata = this.getFieldMetadata(field);
+    const cfgRequired = metadata?.required === true;
+    if (field === "doi") {
+      if (cfgRequired) return true;
+      const statusVal = this.form?.controls?.status?.value;
+      return this.isStatusPublishedOrPreprint(statusVal);
     }
+    return cfgRequired;
   }
   setFieldValue(name, value) {
     return this.form.get(name).setValue(value);

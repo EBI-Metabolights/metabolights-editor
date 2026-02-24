@@ -571,7 +571,7 @@ export class FactorComponent implements OnInit {
       'unit': 'Unit'
     };
     const fieldName = fieldMapping[fieldId] || fieldId;
-    return this.editorService.getFieldMetadata(fieldName, 'investigation');
+    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
   }
 
   getFieldHint(fieldId: string): string {

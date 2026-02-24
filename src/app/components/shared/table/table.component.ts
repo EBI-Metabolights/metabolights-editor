@@ -201,10 +201,11 @@ export class TableComponent
   selectedMissingKey = null;
   selectedMissingVal = null;
   isEditColumnMissingModalOpen = false;
-  assayTechnique: { name: string; sub: string; main: string } = {
+  assayTechnique: { name: string; sub: string; main: string; template: string } = {
     name: null,
     sub: null,
     main: null,
+    template: null,
   };
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
   ontologies = [];
@@ -444,6 +445,18 @@ export class TableComponent
 
       this.setupPaginator();
       this.detectFileColumns();
+
+      // Ensure assayTechnique is extracted early for metadata fetching
+      if (this.getIsaFileType(this.data.file) === "assay") {
+        const result = this.tableData.meta || this.assayService.extractAssayDetails(this.tableData, this.studyId);
+        if (result) {
+          this.assayTechnique.name = result.assayTechnique?.name;
+          this.assayTechnique.sub = result.assaySubTechnique?.name;
+          this.assayTechnique.main = result.assayMainTechnique?.name;
+          this.assayTechnique.template = result.template || result.assaySubTechnique?.template;
+        }
+      }
+
       this.validateTableOntologyColumns();
       this.refreshDisplayedColumns();
     }
@@ -850,7 +863,7 @@ export class TableComponent
       return this._columnValidationsCache.get(header);
     }
 
-    let result = {};
+    let result: any = {};
 
     if (
       this.enableControlList &&
@@ -899,6 +912,18 @@ export class TableComponent
       result = colData || {};
     } else if (this.enableControlList) {
       result = this.validations?.default_ontology_validation?.["ontology-details"] || {};
+    }
+
+    // Add prioritized metadata (Configuration over validations.json)
+    const metadata = this.getColumnMetadata(header);
+    if (metadata) {
+      result = { ...result };
+      if (metadata.combinedDescription) {
+        result.description = (result.description || "") + (result.description ? " " : "") + metadata.combinedDescription;
+      }
+      if (metadata.required !== undefined) {
+        result["is-required"] = metadata.required;
+      }
     }
 
     // Cache the result
@@ -1099,11 +1124,11 @@ export class TableComponent
     // For assay files, attempt to resolve the assay type (templateName)
     let templateName = null;
     if (fileType === 'assay') {
-      // try to get it from assayTechnique or some other source if available
-      templateName = this.assayTechnique?.name || null;
+      // Prioritize template (e.g. "LC-MS") over tech name (e.g. "LCMS")
+      templateName = this.assayTechnique?.template || this.assayTechnique?.name || null;
     }
 
-    const metadata = this.editorService.getFieldMetadata(header, fileType, templateName);
+    const metadata = this.editorService.getFieldMetadata(header, fileType, templateName, this.validationsId);
     this._columnMetadataCache.set(header, metadata);
     return metadata;
   }
@@ -1117,6 +1142,11 @@ export class TableComponent
     // Fallback to existing validation-based description
     const validation = this.columnValidations(header);
     return validation?.description || '';
+  }
+
+  isFieldRequired(header: string): boolean {
+    const metadata = this.getColumnMetadata(header);
+    return metadata?.required === true;
   }
 
   getDataString(row) {
@@ -1553,8 +1583,8 @@ export class TableComponent
       this.selectedCell["column"] = column;
 
       // Calculate isRequiredField for the selected column
-      const colValData = this.columnValidations(column.header);
-      this.isRequiredField = colValData?.["is-required"] === "true";
+      const metadata = this.getColumnMetadata(column.header);
+      this.isRequiredField = metadata?.required === true;
 
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
@@ -2023,13 +2053,16 @@ export class TableComponent
       this.tableData.data.file.startsWith("a_") &&
       this.assayTechnique.name === null
     ) {
-      const result = this.assayService.extractAssayDetails(
+      const result = this.tableData.meta || this.assayService.extractAssayDetails(
         this.tableData,
         this.studyId
       );
-      this.assayTechnique.name = result.assayTechnique?.name;
-      this.assayTechnique.sub = result.assaySubTechnique?.name;
-      this.assayTechnique.main = result.assayMainTechnique?.name;
+      if (result) {
+        this.assayTechnique.name = result.assayTechnique?.name;
+        this.assayTechnique.sub = result.assaySubTechnique?.name;
+        this.assayTechnique.main = result.assayMainTechnique?.name;
+        this.assayTechnique.template = result.template || result.assaySubTechnique?.template;
+      }
     }
 
     const currentTechnique = this.assayTechnique.name;
@@ -2103,8 +2136,8 @@ export class TableComponent
       this.selectedColumn = column;
 
       // Calculate isRequiredField for the selected column
-      const colValData = this.columnValidations(column.header);
-      this.isRequiredField = colValData?.["is-required"] === "true";
+      const metadata = this.getColumnMetadata(column.header);
+      this.isRequiredField = metadata?.required === true;
 
       if (
         this.enableControlList &&

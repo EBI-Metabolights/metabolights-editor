@@ -1080,18 +1080,22 @@ export class EditorService {
    * @param fileType The type of file (assay, sample, investigation, maf)
    * @param templateName Optional template name (e.g., assay type or investigation template)
    */
-  getFieldMetadata(fieldName: string, fileType: IsaTabFileType, templateName?: string): any {
+  getFieldMetadata(fieldName: string, type?: IsaTabFileType, templateName?: string, validationsId?: string) {
     const applicationTemplates = this.store.selectSnapshot(ApplicationState.applicationTemplates);
     const config = this.store.selectSnapshot(ApplicationState.templateConfiguration) as any;
     const version = this.store.selectSnapshot(GeneralMetadataState.templateVersion);
 
-    if (!config || !version) return null;
-
     let fieldDef: any = null;
+    const fileType = type || null;
+
+    if (!config) return null;
+
+    const strippedFieldName = fieldName?.replace(/\.[0-9]+$/, "").trim();
+
     const versionConfig = config.versions?.[version];
 
     // 1. Search in File Header Templates (Assay, Sample, MAF)
-    if (fileType === 'assay' || fileType === 'sample' || fileType === 'maf') {
+    if (fileType && (fileType === 'assay' || fileType === 'sample' || fileType === 'maf')) {
       let templates = null;
       if (fileType === 'assay') templates = applicationTemplates?.assayFileHeaderTemplates;
       if (fileType === 'sample') templates = applicationTemplates?.sampleFileHeaderTemplates;
@@ -1102,35 +1106,51 @@ export class EditorService {
         if (templateName) {
            headersList = templates[templateName];
            if (!headersList) {
-             const matchingKey = Object.keys(templates).find(k => k.toLowerCase() === templateName.toLowerCase());
+             const matchingKey = Object.keys(templates).find(k => {
+               const normalizedK = k.toLowerCase().replace(/[-_ ]/g, "");
+               const normalizedT = templateName.toLowerCase().replace(/[-_ ]/g, "");
+               return normalizedK === normalizedT;
+             });
              if (matchingKey) headersList = templates[matchingKey];
            }
         }
 
-        // If no templateName or not found, search in all templates for that fileType
+        const findInTemplate = (t) => {
+          if (!t || !t.headers) return null;
+          const target = strippedFieldName.toLowerCase();
+          
+          // Check for suffix like .1, .2 to find the N-th occurrence
+          const suffixMatch = fieldName?.match(/\.([0-9]+)$/);
+          const occurrenceIndex = suffixMatch ? parseInt(suffixMatch[1], 10) : 0;
+
+          const matches = t.headers.filter(h => {
+             const head = (h.columnHeader || h.fieldName || h.label || "")?.trim().toLowerCase();
+             if (head === target) return true;
+             // Try Param/Char/Factor variants
+             const paramValueHeader = `parameter value[${target}]`;
+             const charValueHeader = `characteristic[${target}]`;
+             const factorValueHeader = `factor value[${target}]`;
+             return head === paramValueHeader || head === charValueHeader || head === factorValueHeader;
+          });
+          
+          if (matches.length > occurrenceIndex) {
+            return matches[occurrenceIndex];
+          }
+          return matches.length > 0 ? matches[0] : null;
+        };
+
         if (headersList) {
-           const template = headersList.find(t => t.version === version);
-           if (template && template.headers) {
-             fieldDef = template.headers.find(h => h.columnHeader?.trim() === fieldName?.trim());
-             if (!fieldDef) {
-                // Try Param/Char/Factor variants
-                const paramValueHeader = `Parameter Value[${fieldName?.trim()}]`;
-                const charValueHeader = `Characteristic[${fieldName?.trim()}]`;
-                const factorValueHeader = `Factor Value[${fieldName?.trim()}]`;
-                fieldDef = template.headers.find(h => 
-                  h.columnHeader?.trim() === paramValueHeader || 
-                  h.columnHeader?.trim() === charValueHeader || 
-                  h.columnHeader?.trim() === factorValueHeader
-                );
-             }
+           const template = headersList.find(t => String(t.version) === String(version)) || (headersList.length > 0 ? headersList[0] : null);
+           if (template) {
+             fieldDef = findInTemplate(template);
            }
         } else {
            // Search across all templates for this file type
            for (const key of Object.keys(templates)) {
               const list = templates[key];
-              const template = list.find(t => t.version === version);
-              if (template && template.headers) {
-                fieldDef = template.headers.find(h => h.columnHeader?.trim() === fieldName?.trim());
+              const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
+              if (template) {
+                fieldDef = findInTemplate(template);
                 if (fieldDef) break;
               }
            }
@@ -1141,16 +1161,23 @@ export class EditorService {
     // 2. Search in Investigation Templates if not found or if investigation fileType
     if (!fieldDef && (fileType === 'investigation' || !fileType)) {
        const invTemplates = applicationTemplates?.investigationFileTemplates;
-       if (invTemplates) {
-          // Search in all investigation templates
-          for (const key of Object.keys(invTemplates)) {
-             const template = invTemplates[key].find(t => t.version === version);
-             if (template && template.fields) {
-               fieldDef = template.fields.find(f => f.fieldName?.trim() === fieldName?.trim() || f.label?.trim() === fieldName?.trim());
-               if (fieldDef) break;
-             }
-          }
-       }
+        if (invTemplates) {
+           // Search in all investigation templates
+           for (const key of Object.keys(invTemplates)) {
+              const list = invTemplates[key];
+              const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
+              if (template && template.fields) {
+                const target = strippedFieldName.toLowerCase();
+                fieldDef = template.fields.find(f => {
+                   const field = (f.fieldName || "")?.trim().toLowerCase();
+                   const label = (f.label || "")?.trim().toLowerCase();
+                   const header = (f.columnHeader || "")?.trim().toLowerCase();
+                   return field === target || label === target || header === target;
+                });
+                if (fieldDef) break;
+              }
+           }
+        }
     }
 
     // 3. Fallback to general configuration metadata (measurementTypes, omicsTypes, etc.)
@@ -1165,6 +1192,11 @@ export class EditorService {
        }
     }
 
+    // 4. Fallback to validations.json if still not found
+    if (!fieldDef) {
+      fieldDef = this.getValidationDefinitionFromStore(fieldName, validationsId);
+    }
+
     if (!fieldDef) return null;
 
     // Process and combine description and examples
@@ -1172,7 +1204,13 @@ export class EditorService {
     const examples = fieldDef.examples || '';
     let combinedDescription = description;
     if (examples) {
-      combinedDescription += (description ? '\n\n' : '') + `Examples: ${examples}`;
+      let examplesStr = '';
+      if (Array.isArray(examples)) {
+          examplesStr = examples.map(e => (typeof e === 'object' ? JSON.stringify(e) : e)).join(', ');
+      } else {
+          examplesStr = examples;
+      }
+      combinedDescription += (description ? '\n\n' : '') + `Examples: ${examplesStr}`;
     }
 
     let cleanPlaceholder = fieldDef.placeholder || fieldDef.columnHeader || fieldDef.fieldName || fieldName;
@@ -1199,8 +1237,59 @@ export class EditorService {
       combinedDescription,
       label: fieldDef.label || fieldDef.columnHeader || fieldDef.fieldName || fieldName,
       placeholder: cleanPlaceholder,
-      required: fieldDef.required === true || fieldDef.required === 'true' || fieldDef.required === 'yes' || fieldDef.required === 1
+      required: fieldDef.required === true || fieldDef.required === 'true' || fieldDef.required === 'yes' || fieldDef.required === 1 || fieldDef['is-required'] === 'true' || fieldDef['is-required'] === true
     };
+  }
+
+  /**
+   * Retrieves validation definition from the store (validations.json)
+   * @param fieldName The field name or column header to search for
+   * @param validationsId Optional path in the validations object (e.g., 'assays.assay')
+   * @returns The validation definition if found, null otherwise
+   */
+  getValidationDefinitionFromStore(fieldName: string, validationsId?: string) {
+    if (!this.validations) return null;
+    let validationsRoot = this.validations;
+    if (validationsId) {
+       const keys = validationsId.split('.');
+       for (const key of keys) {
+         if (validationsRoot[key]) {
+           validationsRoot = validationsRoot[key];
+         } else {
+           break;
+         }
+       }
+    }
+
+    if (!validationsRoot) return null;
+
+    // If it's a flat object (like 'study'), just return the field if it exists
+    if (validationsRoot[fieldName]) {
+       return validationsRoot[fieldName];
+    }
+
+    // Common column stripping for matching
+    const formatted = fieldName.replace(/\.[0-9]+$/, "");
+    let innerName = formatted;
+    const match = formatted.match(/\[(.*?)\]/);
+    if (match) {
+        innerName = match[1];
+    }
+    const targetHeaders = [fieldName, formatted, innerName].map(h => h.toLowerCase());
+
+    // If it has 'default_order' (like assays.assay), search there
+    if (validationsRoot.default_order && Array.isArray(validationsRoot.default_order)) {
+       return validationsRoot.default_order.find(col => {
+         const entryHeader = (col.header || "").toLowerCase();
+         const entryColDef = (col.columnDef || "").toLowerCase();
+         return targetHeaders.includes(entryHeader) || targetHeaders.includes(entryColDef);
+       });
+    }
+
+    // Recursive search if not found in root or default_order? 
+    // Usually for study.people.person we need the specific path.
+    
+    return null;
   }
 
 

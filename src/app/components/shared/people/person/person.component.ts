@@ -860,7 +860,7 @@ private markRequiredFieldsAsTouched(): void {
       'alternativeEmail': 'Study Person Alternative Email'
     };
     const fieldName = fieldMapping[fieldId] || fieldId;
-    return this.editorService.getFieldMetadata(fieldName, 'investigation');
+    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
   }
 
   getFieldHint(fieldId: string): string {

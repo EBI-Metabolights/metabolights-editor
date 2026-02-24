@@ -188,8 +188,8 @@
           <td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell
             *matCellDef="let row">
 
-            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && templateRowPresent && isFirstRow(row))" class="radio-tick"
-              [class.selected]="isSelected(row, null)">
+            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && templateRowPresent && isFirstRow(row))"
+              class="radio-tick" [class.selected]="isSelected(row, null)">
             </span>
           </td>
         </ng-container>
@@ -292,10 +292,18 @@
                           {{ option.annotationValue }}
                         </mat-option>
                       </mat-select>
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedColumn['header']) }}
+                        <b *ngIf="isFieldRequired(selectedColumn['header'])">(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                     <mat-form-field class="full-width" appearance="outline"
                       *ngIf="!columnControlList(selectedColumn['header']).renderAsDropdown && !isCellTypeOntology">
                       <input class="no-scroll" formControlName="cell" matInput />
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedColumn['header']) }}
+                        <b *ngIf="isFieldRequired(selectedColumn['header'])">(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                   </ng-template>
                 </div>
@@ -356,6 +364,10 @@
                           {{ file.file }}
                         </mat-option>
                       </mat-select>
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedCell['column']['header']) }}
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                   </div>
                   <div
@@ -379,6 +391,10 @@
                           {{ option.annotationValue }}
                         </mat-option>
                       </mat-select>
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedCell['column']['header']) }}
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                   </div>
                   <div
@@ -386,6 +402,10 @@
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
                     <mat-form-field class="full-width" appearance="outline">
                       <input class="no-scroll" formControlName="cell" matInput />
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedCell['column']['header']) }}
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">(required)</b>
+                      </mat-hint>
                       <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
                         Please enter a valid URL
                       </mat-error>
