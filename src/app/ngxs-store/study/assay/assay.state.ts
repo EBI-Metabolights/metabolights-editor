@@ -145,6 +145,22 @@ export class AssayState {
                         key.indexOf("Term Accession Number") < 0 &&
                         key.indexOf("Term Source REF") < 0
                 );
+
+                const compactPriorityColumns = [
+                  "Sample Name",
+                  "Raw Spectral Data File",
+                  "Derived Spectral Data File",
+                  "Acquisition Parameter File",
+                  "Free Induction Decay Data File",
+                ];
+                const existingPriorityColumns = compactPriorityColumns.filter((column) =>
+                  displayedColumns.includes(column)
+                );
+                const remainingColumns = displayedColumns.filter(
+                  (column) => column !== "Select" && !compactPriorityColumns.includes(column)
+                );
+                displayedColumns = ["Select", ...existingPriorityColumns, ...remainingColumns];
+
                 data["columns"] = columns;
                 data["displayedColumns"] = displayedColumns;
                 data["file"] = action.assaySheetFilename;
