@@ -457,7 +457,7 @@ export class DesignDescriptorComponent implements OnInit {
     // Add "Not Applicable" option
     this.descriptorCategories.unshift({
         id: 'default',
-        label: '----------------------------',
+        label: '-- General Keywords --',
         controlListKey: 'Study Design Type',
         isaFileType: 'investigation'
     });
