@@ -262,7 +262,7 @@
   <div class="modal prevent-deselect" [ngClass]="{ 'is-active': isEditColumnModalOpen }">
     <form *ngIf="editColumnform" [formGroup]="editColumnform">
       <div class="modal-background"></div>
-      <div class="modal-card">
+      <div class="modal-card table-edit-modal-card">
         <div *ngIf="isFormBusy" class="load-bar">
           <div class="bar"></div>
           <div class="bar"></div>
@@ -334,7 +334,7 @@
   <div class="modal editModal prevent-deselect" *ngIf="isEditModalOpen" [ngClass]="{ 'is-active': isEditModalOpen }">
     <form *ngIf="editCellform" [formGroup]="editCellform">
       <div class="modal-background"></div>
-      <div class="modal-card">
+      <div class="modal-card table-edit-modal-card">
         <div *ngIf="isFormBusy" class="load-bar">
           <div class="bar"></div>
           <div class="bar"></div>

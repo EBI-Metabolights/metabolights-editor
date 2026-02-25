@@ -8,7 +8,7 @@
       {{
       status
       }}
-      <mat-icon *ngIf="!isReadOnly">edit</mat-icon>
+      <mat-icon *ngIf="!isReadOnly && (curator || status !== 'Public')">edit</mat-icon>
     </span>
 
 

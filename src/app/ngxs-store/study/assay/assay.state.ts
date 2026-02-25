@@ -149,9 +149,9 @@ export class AssayState {
                 const compactPriorityColumns = [
                   "Sample Name",
                   "Raw Spectral Data File",
-                  "Derived Spectral Data File",
-                  "Acquisition Parameter File",
                   "Free Induction Decay Data File",
+                  "Acquisition Parameter Data File",
+                  "Derived Spectral Data File"
                 ];
                 const existingPriorityColumns = compactPriorityColumns.filter((column) =>
                   displayedColumns.includes(column)
