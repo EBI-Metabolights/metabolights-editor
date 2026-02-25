@@ -318,6 +318,47 @@ h2 {
   height: 80vh;
 }
 
+/* Standard action buttons across study screens */
+mtbls-download .button.is-light,
+mtbls-maf .button.is-light,
+mtbls-protocol .button.is-light,
+mtbls-files .button.is-light,
+validations-v2-parent .button.is-light,
+mtbls-upload .button.is-light {
+  color: #fff;
+  background-color: rgb(0, 209, 178);
+  border-color: rgb(0, 209, 178);
+}
+
+mtbls-download .button.is-light .mat-icon,
+mtbls-maf .button.is-light .mat-icon,
+mtbls-protocol .button.is-light .mat-icon,
+mtbls-files .button.is-light .mat-icon,
+validations-v2-parent .button.is-light .mat-icon,
+mtbls-upload .button.is-light .mat-icon {
+  color: #fff;
+}
+
+mtbls-download .button.is-light:hover,
+mtbls-maf .button.is-light:hover,
+mtbls-protocol .button.is-light:hover,
+mtbls-files .button.is-light:hover,
+validations-v2-parent .button.is-light:hover,
+mtbls-upload .button.is-light:hover {
+  color: #fff;
+  background-color: rgb(0, 190, 162);
+  border-color: rgb(0, 190, 162);
+}
+
+mtbls-download .button.is-light:hover .mat-icon,
+mtbls-maf .button.is-light:hover .mat-icon,
+mtbls-protocol .button.is-light:hover .mat-icon,
+mtbls-files .button.is-light:hover .mat-icon,
+validations-v2-parent .button.is-light:hover .mat-icon,
+mtbls-upload .button.is-light:hover .mat-icon {
+  color: #fff;
+}
+
 .vc {
   display: flex;
   justify-content: center;
@@ -481,7 +522,7 @@ a.disabled {
 .third-bottom-right {
   position: fixed;
   z-index: 10000 !important;
-  bottom: 150px;
+  bottom: 90px;
   right: 10px;
 }
 

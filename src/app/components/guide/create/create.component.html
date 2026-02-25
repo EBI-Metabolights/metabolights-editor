@@ -405,7 +405,7 @@
                 *ngIf="createdStudiesDetails">
                 <div class="has-text-left">
                   <div class="created-studies-list box py-4 px-5 "
-                    style="margin-bottom: 1rem; background: #fdfdfd; border-radius: 12px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 0.75rem;">
+                    style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
                     <div *ngFor="let studyId of createdStudies" class="is-flex is-align-items-center">
                       <span class="material-symbols-outlined has-text-success is-size-5 mr-3">check</span>
                       <div class="is-size-6">
@@ -418,9 +418,9 @@
               </div>
             </div>
 
-            <div class="mt-6 mb-5 px-4">
+            <div class="box mt-6">
               <h3 class="title is-6 has-text-weight-bold mb-3">To complete your submission(s):</h3>
-              <p class="is-size-6 mb-5">Please follow these essential steps in the study editor to prepare your
+              <p class="is-size-6 mb-3">Please follow these essential steps in the study editor to prepare your
                 submission for curation.</p>
 
               <div class="publications-accordion">
@@ -600,8 +600,10 @@
             <div class="mt-6 mb-4 px-4 pt-6">
               <div class="columns is-multiline" style="margin: 0;justify-content: flex-end;">
                 <div class="column is-narrow" *ngFor="let studyId of createdStudies">
-                  <button class="button is-success is-outlined is-small px-6" (click)="navigateToStudy(studyId)">
-                    {{ studyId }}
+                  <button class="button is-primary px-6" (click)="navigateToStudy(studyId)">
+                    {{ studyId }} <span class="material-symbols-outlined">
+arrow_right_alt
+</span>
                   </button>
                 </div>
               </div>
