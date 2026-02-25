@@ -157,11 +157,18 @@ export class PersonComponent implements OnInit {
     }
     this.subscription = this.generalMetadataService.messageSubject.subscribe((appMessage: AppMessage) => {
       this.message = appMessage;  
+      if (appMessage.type === 'add' || appMessage.type === 'update') {
+        this.isFormBusy = false;
+      }
       if (appMessage.status === 'success') {
-        this.refreshContacts(appMessage.message);
-        this.closeModal();
-        this.isDeleteModalOpen = false;
-        this.isApproveSubmitterModalOpen = false;
+        if (appMessage.type === 'add' || appMessage.type === 'update') {
+          this.refreshContacts(appMessage.message);
+          this.closeModal();
+          this.isDeleteModalOpen = false;
+          this.isApproveSubmitterModalOpen = false;
+        }
+      } else if (appMessage.status === 'error') {
+        toastr.error(appMessage.message, "Error", this.toastrSettings);
       }
     });
     this._controlList = this.controlList();
@@ -491,21 +498,16 @@ export class PersonComponent implements OnInit {
     }
 
     this.store.dispatch(updateAction).subscribe({
-        next: () => {
-          this.isFormBusy = false;  // Success handling
-        },
+        next: () => {},
         error: () => {
-          this.isFormBusy = false;  // Fallback
+          this.isFormBusy = false;
         },
       });
 
   } else {
     // Adding a new person
     this.store.dispatch(new People.Add(body)).subscribe({
-      next: () => {
-        // this.refreshContacts('Person Added.');
-        this.isFormBusy = false;
-      },
+      next: () => {},
       error: () => {
         this.isFormBusy = false;
       },
@@ -903,4 +905,3 @@ private markRequiredFieldsAsTouched(): void {
     return fieldMapping[fieldId] || fieldId;
   }
 }
-
