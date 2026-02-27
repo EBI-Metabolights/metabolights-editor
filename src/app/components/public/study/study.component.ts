@@ -71,6 +71,8 @@ export class PublicStudyComponent implements OnInit {
   obfuscationCode: string = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
   mhdAccession: string = null;
+  private loadMode: "public" | "review" = "public";
+  private subscriptionsInitialized = false;
   constructor(
     private store: Store,
     private editorService: EditorService,
@@ -85,9 +87,15 @@ export class PublicStudyComponent implements OnInit {
   }
 
   studyPermissionUpdated() {
+      if (!this.studyPermission) {
+        this.isOwner = false;
+        this.isCurator = false;
+        return;
+      }
+
       let reviewMode = false
       
-      if (this.studyPermission.studyId.length > 0 && this.studyPermission.studyId === this.requestedStudy){
+      if (this.studyPermission.studyId && this.studyPermission.studyId.length > 0 && this.studyPermission.studyId === this.requestedStudy){
         if (this.obfuscationCode === this.studyPermission.obfuscationCode 
           && ["INREVIEW", "INCURATION"].includes(this.studyPermission.studyStatus.toUpperCase())){
           reviewMode = true;
@@ -104,14 +112,9 @@ export class PublicStudyComponent implements OnInit {
       } else {
         this.isCurator = false;
       }
-      
 
-      this.isCurator = true;
-
-    if (reviewMode === true) {
+    if (reviewMode && this.loadMode !== "review") {
       this.loadStudyNgxs(this.studyPermission.studyId);
-    } else {
-      this.loadStudyNgxs(null);
     }
     this.calculateNotReadyValidationMessage();
 
@@ -122,10 +125,14 @@ export class PublicStudyComponent implements OnInit {
     } else {
       this.endpoint = this.configService.config.endpoint + "/";
     }
+    this.obfuscationCode = this.route.snapshot.queryParamMap.get("reviewCode");
+    this.loadStudyNgxs(null);
 
   }
 
   loadStudyNgxs(studyId) {
+    this.loadMode = studyId ? "review" : "public";
+    this.loading = true;
     this.editorService.toggleLoading(false);
     if (studyId) {
       this.editorService.loadStudyInReview(studyId);
@@ -134,6 +141,11 @@ export class PublicStudyComponent implements OnInit {
         id: this.route.snapshot.paramMap.get("study"),
       });
     }
+    if (this.subscriptionsInitialized) {
+      return;
+    }
+    this.subscriptionsInitialized = true;
+
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;

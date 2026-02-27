@@ -36,7 +36,15 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
     state: RouterStateSnapshot
   )
   {
+    const isAnonymousStudyUrl =
+      state.url.startsWith("/MTBLS") ||
+      state.url.startsWith("/REQ") ||
+      state.url.startsWith("/reviewer");
+
     if (!this.authenticated) {
+      if (isAnonymousStudyUrl) {
+        return await this.checkUrlAndLogin(state.url, state, false);
+      }
       this.editorService.setRedirectUrl(state.url);
       this.keycloak.login()
       return false;

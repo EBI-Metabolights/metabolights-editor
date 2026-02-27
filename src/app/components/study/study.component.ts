@@ -93,8 +93,8 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.templateConfiguration$.subscribe((value) => {
       this.templateConfiguration = value;
     });
-    this.permissions = this.store.snapshot().application.studyPermission
-    this.obfuscationCode = this.permissions.obfuscationCode
+    this.studyPermission = this.store.snapshot().application.studyPermission;
+    this.obfuscationCode = this.studyPermission?.obfuscationCode || null;
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
     this.revisionNumber$.subscribe((value) => {
