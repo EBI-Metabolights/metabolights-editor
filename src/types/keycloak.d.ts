@@ -1,0 +1,1 @@
+/////// <reference types="keycloak-js" />

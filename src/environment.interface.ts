@@ -14,8 +14,18 @@ export interface Environment {
   authenticationURL: AuthenticationURL; // Object containing the different authentication and authorization endpoints.
   videoURL: VideoURL; // Object containing links to all help videos.
   ws3URL: string;
+  auth: AuthSettings;
 }
 
+export interface AuthSettings {
+  url: string;
+  realm: string;
+  clientId: string;
+  silentCheckSsoRedirectUri: string;
+  redirectUri: string;
+  profileUrl: string;
+  logoutUrl: string;
+}
 export interface VersionInfo {
   version: string;
   releaseName: string;

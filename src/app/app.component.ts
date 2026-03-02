@@ -32,47 +32,48 @@ export class AppComponent implements OnInit {
     });
   }
   async ngOnInit() {
-    const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
-    const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
 
-    const isOwner = this.elementRef.nativeElement.getAttribute("isOwner");
-    const isCurator = this.elementRef.nativeElement.getAttribute("isCurator");
+    await this.editorService.updateSession();
 
-    const mtblsid = this.elementRef.nativeElement.getAttribute("mtblsid");
-    const obfuscationcode =
-      this.elementRef.nativeElement.getAttribute("obfuscationcode");
-    const result = await this.editorService.updateSession();
-    if (result === true){
-      const redirectUrl = this.editorService.redirectUrl;
-      const url = this.router.routerState.snapshot.url;
-      if (url === "/login" ){
-        if (redirectUrl !== null && redirectUrl !== "") {
-          this.router.navigate([this.editorService.redirectUrl]);
-        } else {
-          this.router.navigate(["/console"]);
-        }
-      }
-      return;
-    }
-    if (jwt && jwt !== "" && user && user !== "") {
-      localStorage.setItem("mtblsuser", user);
-      localStorage.setItem("mtblsjwt", jwt);
-    } else if (
-      mtblsid &&
-      mtblsid !== "" &&
-      obfuscationcode &&
-      obfuscationcode !== ""
-    ) {
-      localStorage.setItem("mtblsid", mtblsid);
-      localStorage.setItem("obfuscationcode", obfuscationcode);
-    } else {
-      localStorage.removeItem("mtblsjwt");
-      localStorage.removeItem("mtblsuser");
-    }
+    const url = this.router.routerState.snapshot.url;
+    this.editorService.setRedirectUrl(url)
+
+    // const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
+    // const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
+
+    // // const isOwner = this.elementRef.nativeElement.getAttribute("isOwner");
+    // // const isCurator = this.elementRef.nativeElement.getAttribute("isCurator");
+
+    // const mtblsid = this.elementRef.nativeElement.getAttribute("mtblsid");
+    // const obfuscationcode =
+    //   this.elementRef.nativeElement.getAttribute("obfuscationcode");
+    // const redirectUrl = this.editorService.getRedirectUrl();
+    // const url = this.router.routerState.snapshot.url
+    // if (redirectUrl){
+
+    //   if (url === "/login" ){
+    //     this.router.navigate([redirectUrl]);
+    //   } else {
+    //     this.editorService.setRedirectUrl(url);
+    //   }
+    //   return;
+    // }
+    // if (jwt && jwt !== "" && user && user !== "") {
+    //   localStorage.setItem("mtblsuser", user);
+    //   localStorage.setItem("mtblsjwt", jwt);
+    // } else if (
+    //   mtblsid &&
+    //   mtblsid !== "" &&
+    //   obfuscationcode &&
+    //   obfuscationcode !== ""
+    // ) {
+    //   localStorage.setItem("mtblsid", mtblsid);
+    //   localStorage.setItem("obfuscationcode", obfuscationcode);
+    // } else {
+    //   localStorage.removeItem("mtblsjwt");
+    //   localStorage.removeItem("mtblsuser");
+    // }
     //  this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
-     this.store.dispatch(new BackendVersion.Get());
-     this.store.dispatch(new EditorVersion.Get());
-
 
   }
 

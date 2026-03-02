@@ -33,12 +33,12 @@ export class StudyNotPublicComponent implements OnInit {
 }
 
   ngOnInit() {
-    
+
     this.store.dispatch(new Loading.Disable())
 
       this.route.queryParams.subscribe((params) => {
         this.study = params.studyIdentifier;
-        const url = this.editorService.redirectUrl ?? "";
+        const url = this.editorService.getRedirectUrl() ?? "";
       });
   }
 
