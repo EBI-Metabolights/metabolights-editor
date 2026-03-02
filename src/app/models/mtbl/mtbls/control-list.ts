@@ -1,7 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 
-export type IsaTabFileType = "assay" | "sample" | "investigation";
+export type IsaTabFileType = "assay" | "sample" | "investigation" | "maf";
 export type StudyCategoryStr = "other" | "ms-mhd-enabled" | "ms-imaging" | "ms-other" | "nmr" | "ms-mhd-legacy";
 export type EnforcementLevel = "required" | "recommended" | "optional";
 /**

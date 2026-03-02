@@ -93,6 +93,22 @@ export class MAFState {
                     key.indexOf("Term Source REF") < 0
                 );
 
+                const compactPriorityColumns = [
+                  "Structure",
+                  "metabolite_identification",
+                  "mass_to_charge",
+                  "retention_time",
+                  "chemical_shift",
+                  "multiplicity",
+                ];
+                const existingPriorityColumns = compactPriorityColumns.filter((column) =>
+                  mdisplayedColumns.includes(column)
+                );
+                const remainingColumns = mdisplayedColumns.filter(
+                  (column) => column !== "Select" && !compactPriorityColumns.includes(column)
+                );
+                mdisplayedColumns = ["Select", ...existingPriorityColumns, ...remainingColumns];
+
                 mdata["columns"] = mcolumns;
                 mdata["displayedColumns"] = mdisplayedColumns;
                 mdata["rows"] = mdata.data.rows;

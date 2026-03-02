@@ -2,7 +2,7 @@
   <div class="tags has-addons">
     <span class="tag is-dark">Release Date</span>
     <span (click)="openModal()" class="tag is-link" [class.clickable]="!isReadOnly">
-      {{ releaseDate ? (releaseDate | date: 'yyyy-MM-dd') : ''}}
+      {{ releaseDate || '' }}
       <mat-icon *ngIf="!isReadOnly">edit</mat-icon>
     </span>
   </div>
@@ -30,6 +30,7 @@
       <br>
       <mat-form-field appearance="outline">
         <input matInput (dateChange)="updateReleaseDate('change', $event)" [matDatepicker]="picker"
+          [min]="minReleaseDate" [matDatepickerFilter]="releaseDateFilter"
           [(value)]="releaseDate" placeholder="Choose your study release date" />
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>

@@ -145,11 +145,11 @@
       </div>
       <section class="modal-card-body">
         <mat-form-field class="full-width" appearance="outline" style="padding-bottom: 20px;">
-          <mat-label>Title</mat-label>
+          <mat-label>{{getFieldLabel('title')}}</mat-label>
           <textarea class="no-scroll" formControlName="title" matInput [tabIndex]="1" cdkAutosizeMinRows="3"
-            cdkAutosizeMaxRows="3" cdkTextareaAutosize required>
+            cdkAutosizeMaxRows="3" cdkTextareaAutosize required [placeholder]="getFieldPlaceholder('title')">
           </textarea>
-          <mat-hint>{{ fieldValidation("title").description }}
+          <mat-hint>{{ getFieldHint("title") }}
           </mat-hint>
           <mat-error *ngIf="
               form.get('title')?.errors &&
@@ -161,11 +161,11 @@
         </mat-form-field>
         <div class="form-row" style="padding-bottom: 40px;">
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>Authors</mat-label>
+            <mat-label>{{getFieldLabel('authorList')}}</mat-label>
             <textarea class="no-scroll" formControlName="authorList" matInput [tabIndex]="2" cdkAutosizeMinRows="1"
-              cdkAutosizeMaxRows="4" cdkTextareaAutosize>
+              cdkAutosizeMaxRows="4" cdkTextareaAutosize [placeholder]="getFieldPlaceholder('authorList')">
             </textarea>
-            <mat-hint>{{ fieldValidation("authorList").description }}</mat-hint>
+            <mat-hint>{{ getFieldHint("authorList") }}</mat-hint>
             <mat-error *ngIf="
                 form.get('authorList')?.errors &&
                 form.get('authorList')?.dirty &&
@@ -175,10 +175,10 @@
             </mat-error>
           </mat-form-field>
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>DOI<span class="has-error">*</span></mat-label>
+            <mat-label>{{getFieldLabel('doi')}}<span class="has-error">*</span></mat-label>
             <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
-              (keydown.enter)="getArticleFromDOI()" matInput />
-            <mat-hint>{{ fieldValidation("doi").description }}
+              (keydown.enter)="getArticleFromDOI()" matInput [placeholder]="getFieldPlaceholder('doi')" />
+            <mat-hint>{{ getFieldHint("doi") }}
             </mat-hint>
             <mat-error *ngIf="
                 form.get('doi')?.errors &&
@@ -192,10 +192,10 @@
 
         <div class="form-row" style="padding-bottom: 0;">
           <mat-form-field class="half-width" appearance="outline">
-            <mat-label>PubMed ID</mat-label>
+            <mat-label>{{getFieldLabel('pubMedID')}}</mat-label>
             <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
-              (keydown.enter)="getArticleFromPubMedID()" matInput />
-            <mat-hint>{{ fieldValidation("pubMedID").description }}</mat-hint>
+              (keydown.enter)="getArticleFromPubMedID()" matInput [placeholder]="getFieldPlaceholder('pubMedID')" />
+            <mat-hint>{{ getFieldHint("pubMedID") }}</mat-hint>
             <mat-error *ngIf="
                 form.get('pubMedID')?.errors &&
                 form.get('pubMedID')?.dirty &&
@@ -211,7 +211,8 @@
                 <mtbls-ontology class="mt-20" #publicationStatus [validations]="fieldValidation('status')"
                   [controlList]="_controlList" (changed)="onChanges($event)" [values]="statusValuesForComponent()"
                   [inline]="true" [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
-                  [label]="'Status*'" (emptyError)="onEmptyError($event)" [hasError]="showError"></mtbls-ontology>
+                  [label]="getFieldLabel('status') + '*'" (emptyError)="onEmptyError($event)"
+                  [hasError]="showError"></mtbls-ontology>
               </ng-container>
 
               <ng-template #dropdownField>

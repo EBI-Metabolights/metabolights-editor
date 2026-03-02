@@ -303,6 +303,11 @@ export class ApplicationState {
     });
   }
 
+    @Selector()
+    static applicationTemplates(state: ApplicationStateModel) {
+        return state?.applicationTemplates
+    }
+
 
     @Selector()
     static controlLists(state: ApplicationStateModel) {

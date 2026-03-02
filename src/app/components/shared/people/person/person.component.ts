@@ -157,11 +157,18 @@ export class PersonComponent implements OnInit {
     }
     this.subscription = this.generalMetadataService.messageSubject.subscribe((appMessage: AppMessage) => {
       this.message = appMessage;  
+      if (appMessage.type === 'add' || appMessage.type === 'update') {
+        this.isFormBusy = false;
+      }
       if (appMessage.status === 'success') {
-        this.refreshContacts(appMessage.message);
-        this.closeModal();
-        this.isDeleteModalOpen = false;
-        this.isApproveSubmitterModalOpen = false;
+        if (appMessage.type === 'add' || appMessage.type === 'update') {
+          this.refreshContacts(appMessage.message);
+          this.closeModal();
+          this.isDeleteModalOpen = false;
+          this.isApproveSubmitterModalOpen = false;
+        }
+      } else if (appMessage.status === 'error') {
+        toastr.error(appMessage.message, "Error", this.toastrSettings);
       }
     });
     this._controlList = this.controlList();
@@ -491,21 +498,16 @@ export class PersonComponent implements OnInit {
     }
 
     this.store.dispatch(updateAction).subscribe({
-        next: () => {
-          this.isFormBusy = false;  // Success handling
-        },
+        next: () => {},
         error: () => {
-          this.isFormBusy = false;  // Fallback
+          this.isFormBusy = false;
         },
       });
 
   } else {
     // Adding a new person
     this.store.dispatch(new People.Add(body)).subscribe({
-      next: () => {
-        // this.refreshContacts('Person Added.');
-        this.isFormBusy = false;
-      },
+      next: () => {},
       error: () => {
         this.isFormBusy = false;
       },
@@ -843,6 +845,63 @@ private markRequiredFieldsAsTouched(): void {
     this._controlList = result;
     return result;
   }
-  
-}
 
+  getFieldMetadata(fieldId: string) {
+    const fieldMapping = {
+      'lastName': 'Study Person Last Name',
+      'firstName': 'Study Person First Name',
+      'midInitials': 'Study Person Mid Initials',
+      'email': 'Study Person Email',
+      'phone': 'Study Person Phone',
+      'fax': 'Study Person Fax',
+      'address': 'Study Person Address',
+      'affiliation': 'Study Person Affiliation',
+      'roles': 'Study Person Roles',
+      'orcid': 'Study Person ORCID',
+      'rorid': 'Study Person Affiliation ROR ID',
+      'alternativeEmail': 'Study Person Alternative Email'
+    };
+    const fieldName = fieldMapping[fieldId] || fieldId;
+    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+  }
+
+  getFieldHint(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.description || '';
+  }
+
+  getFieldPlaceholder(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.placeholder) {
+      return metadata.placeholder;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.placeholder || '';
+  }
+
+  getFieldLabel(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.label) {
+      return metadata.label;
+    }
+    const fieldMapping = {
+      'lastName': 'Last Name',
+      'firstName': 'First Name',
+      'midInitials': 'Middle Initials',
+      'email': 'Email',
+      'phone': 'Phone',
+      'fax': 'Fax',
+      'address': 'Address',
+      'affiliation': 'Affiliation',
+      'roles': 'Roles',
+      'orcid': 'ORCID',
+      'rorid': 'ROR ID',
+      'alternativeEmail': 'Alternative Email'
+    };
+    return fieldMapping[fieldId] || fieldId;
+  }
+}

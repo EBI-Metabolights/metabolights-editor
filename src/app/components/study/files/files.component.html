@@ -137,7 +137,7 @@
   <!---ISA Metadata Panel start-->
   <nav class="panel">
     <span #spacer1></span>
-    <p class="panel-heading" style="z-index: 1000; padding: 7px 10px" sticky [spacer]="spacer1"
+    <p class="panel-heading" style="z-index: 1000;" sticky [spacer]="spacer1"
       [attr.marginTop]="!isReadOnly ? '35' : '0'" isReadOnly>
       <label class="section-header">
         <input [checked]="filteredMetaFiles.length == selectedMetaFiles.length"
@@ -226,7 +226,7 @@
       <img style="height: 10px; margin-left: 10px" src="{{ baseHref }}assets/img/loading.svg" />
     </span>
     <ng-template #rawFilesLoaded>
-      <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer2"
+      <p class="panel-heading" style="z-index: 1000;" sticky [spacer]="spacer2"
         [attr.marginTop]="!isReadOnly ? '35' : '0'">
         <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
         <label class="section-header">RAW / DERIVED FILES
@@ -267,7 +267,7 @@
   <!-- Audit files panel start-->
   <nav *ngIf="auditFiles.length > 0" class="panel">
     <span #spacer3></span>
-    <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer3"
+    <p class="panel-heading" style="z-index: 1000;" sticky [spacer]="spacer3"
       [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label class="section-header">
         SYSTEM FILES
@@ -287,7 +287,7 @@
   <!-- Inferred Data panel start-->
   <nav *ngIf="derivedFiles.length > 0" class="panel">
     <span #spacer4></span>
-    <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer4"
+    <p class="panel-heading" style="z-index: 1000;" sticky [spacer]="spacer4"
       [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label class="section-header">
         <input [checked]="filteredDerivedFiles.length == selectedDerivedFiles.length"
@@ -369,7 +369,7 @@
   <nav *ngIf="!isReadOnly && privateFtpAccessible" class="panel">
 
     <span #spacer5></span>
-    <p class="panel-heading" style="z-index: 1000; padding: 10px" sticky [spacer]="spacer5"
+    <p class="panel-heading" style="z-index: 1000;" sticky [spacer]="spacer5"
       [attr.marginTop]="!isReadOnly ? '35' : '0'">
       <label class="section-header">
         FTP UPLOAD FOLDER

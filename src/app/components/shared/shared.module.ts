@@ -43,6 +43,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { AddAssayComponent } from "./add-assay/add-assay.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { AuthGuard } from "src/app/auth-guard.service";
@@ -148,6 +149,7 @@ import { ModalComponent } from './modal/modal.component';
     MatTableModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatSlideToggleModule,
     MatExpansionModule,
     MatTooltipModule,
     QuillModule,
@@ -200,7 +202,8 @@ import { ModalComponent } from './modal/modal.component';
     FundingComponent,
     RelatedDatasetsComponent,
     ModalComponent,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSlideToggleModule
   ],
   providers: [
     AuthGuard,

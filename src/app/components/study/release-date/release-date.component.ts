@@ -33,7 +33,16 @@ export class ReleaseDateComponent implements OnInit {
   isFormBusy = false;
   requestedStudy: string = null;
   releaseDate: string = null;
+  confirmedReleaseDate: string = null;
+  minReleaseDate: string = this.normalizeDateToYmd(new Date());
   status: string = null;
+  releaseDateFilter = (date: string | null): boolean => {
+    if (!date) {
+      return false;
+    }
+    const normalized = this.normalizeDateToYmd(date);
+    return !!normalized && normalized >= this.minReleaseDate;
+  };
 
 
   constructor(private editorService: EditorService, private store: Store) {
@@ -46,10 +55,12 @@ export class ReleaseDateComponent implements OnInit {
     this.studyReleaseDate$.subscribe((value) => {
       if (value !== null) {
         if (value.toString() !== "") {
-          this.releaseDate = value;
+          this.releaseDate = this.normalizeDateToYmd(value);
+          this.confirmedReleaseDate = this.releaseDate;
         } else {
           this.editorService.metaInfo().subscribe((response) => {
-            this.releaseDate = response.data[1].split(":")[1];
+            this.releaseDate = this.normalizeDateToYmd(response.data[1].split(":")[1]);
+            this.confirmedReleaseDate = this.releaseDate;
             this.updateReleaseDateSilent(this.releaseDate);
           });
         }
@@ -90,14 +101,8 @@ export class ReleaseDateComponent implements OnInit {
   // ADJUST POST STATE MIGRATION
   updateReleaseDate(op, e) {
     if (!this.isReadOnly) {
-      const selectedValue = new Date(e.value);
-      const dateTo =
-        selectedValue.getFullYear() +
-        "-" +
-        this.strPad(selectedValue.getMonth() + 1) +
-        "-" +
-        this.strPad(selectedValue.getDate());
-      if (selectedValue != null) {
+      const dateTo = this.normalizeDateToYmd(e?.value);
+      if (dateTo != null && dateTo >= this.minReleaseDate) {
         Swal.fire({
           title:
             "Are you sure? Would you like to change your study release date to " +
@@ -110,14 +115,56 @@ export class ReleaseDateComponent implements OnInit {
           if (willChange.value) {
             this.store.dispatch(new StudyReleaseDate.Update(dateTo)).subscribe(
               (completed) => {
+                this.confirmedReleaseDate = dateTo;
+                this.releaseDate = dateTo;
                 this.closeModal();
                 toastr.success("Study release date updated.", "Success", this.toastrSettings);
               }
             )
+          } else {
+            this.releaseDate = this.confirmedReleaseDate;
           }
         });
+      } else if (dateTo != null) {
+        this.releaseDate = this.confirmedReleaseDate;
+        toastr.error("Release date cannot be in the past.", "Invalid Date", this.toastrSettings);
       }
     }
+  }
+
+  private normalizeDateToYmd(value: unknown): string | null {
+    if (!value) {
+      return null;
+    }
+
+    if (value instanceof Date) {
+      return (
+        value.getFullYear() +
+        "-" +
+        this.strPad(value.getMonth() + 1) +
+        "-" +
+        this.strPad(value.getDate())
+      );
+    }
+
+    const text = String(value).trim();
+    const ymdMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (ymdMatch) {
+      return `${ymdMatch[1]}-${ymdMatch[2]}-${ymdMatch[3]}`;
+    }
+
+    const parsed = new Date(text);
+    if (!isNaN(parsed.getTime())) {
+      return (
+        parsed.getFullYear() +
+        "-" +
+        this.strPad(parsed.getMonth() + 1) +
+        "-" +
+        this.strPad(parsed.getDate())
+      );
+    }
+
+    return null;
   }
 
   strPad(n) {

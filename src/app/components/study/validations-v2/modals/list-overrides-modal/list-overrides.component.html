@@ -1,14 +1,14 @@
 <div class="modal is-active">
   <div class="modal-background"></div>
 
-  <mat-card>
+  <mat-card class="overrides-modal-card">
     <!-- Scrollable Container for mat-table -->
     <div class="scrollable-table-container">
       <mat-table [dataSource]="overrides" class="mat-elevation-z8">
         <!-- Rule ID Column -->
         <ng-container matColumnDef="ruleId">
           <mat-header-cell *matHeaderCellDef> Rule ID </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.ruleId }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.ruleId }} </mat-cell>
         </ng-container>
 
         <!-- Title Column -->
@@ -26,7 +26,7 @@
         <!-- Curator Column -->
         <ng-container matColumnDef="curator">
           <mat-header-cell *matHeaderCellDef> Curator </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.curator }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.curator }} </mat-cell>
         </ng-container>
 
         <!-- Comments Column -->

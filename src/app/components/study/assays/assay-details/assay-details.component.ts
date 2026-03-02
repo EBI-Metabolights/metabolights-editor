@@ -279,7 +279,7 @@ export class AssayDetailsComponent implements OnInit {
     return valid.every((n) => !!this.selectedSampleMap[n]);
   }
 
- addSamples() {
+  addSamples() {
     const emptyRow = this.assayTable.getEmptyRow();
     const dataToWrite: any[] = [];
 
@@ -288,8 +288,10 @@ export class AssayDetailsComponent implements OnInit {
       this.assay && this.assay.data && Array.isArray(this.assay.data.rows)
         ? this.assay.data.rows
         : [];
-     // always copy from the first row (if present), otherwise use emptyRow
-    const sourceRow = rows.length > 0 ? rows[1] : emptyRow;
+    // copy from first real data row if available; otherwise fallback to default empty row
+    const sourceRowIndex = this.templateRowPresent ? 1 : 0;
+    const sourceRow = rows[sourceRowIndex] || rows[0] || emptyRow;
+    const hasSourceDataRow = !!rows[sourceRowIndex] || (!this.templateRowPresent && !!rows[0]);
 
     // columns to clear when copying from sourceRow
     const ignoreColumns = [
@@ -318,12 +320,16 @@ export class AssayDetailsComponent implements OnInit {
     namesToAdd.forEach((s) => {
       if (!s || s.toString().trim().length === 0) return;
       const useSource = !!(useSourceForAll && this.selectedSampleMap[s]);
-      const base = useSource ? sourceRow : emptyRow;
-      const newRow = JSON.parse(JSON.stringify(base));
+      const base = (useSource ? sourceRow : emptyRow) || emptyRow;
+      const newRow = JSON.parse(JSON.stringify(base || {}));
 
       if (newRow["Sample Name"] !== undefined) newRow["Sample Name"] = s;
       else if (newRow.sampleName !== undefined) newRow.sampleName = s;
       else newRow["Sample Name"] = s;
+
+      if (!hasSourceDataRow) {
+        this.applyDefaultAssayValues(newRow, s);
+      }
 
       if (useSource) {
         ignoreColumns.forEach((col) =>
@@ -348,6 +354,23 @@ export class AssayDetailsComponent implements OnInit {
     this.addSamplesModalOpen = false;
     this.selectedSampleMap = {};
     this.autoFillColumns = false;
+  }
+
+  private applyDefaultAssayValues(row: any, sampleName: string): void {
+    if (!row) return;
+
+    if (row["Extract Name"] !== undefined && (!row["Extract Name"] || row["Extract Name"] === "")) {
+      row["Extract Name"] = sampleName;
+    }
+    if (row["MS Assay Name"] !== undefined && (!row["MS Assay Name"] || row["MS Assay Name"] === "")) {
+      row["MS Assay Name"] = sampleName;
+    }
+    if (row["NMR Assay Name"] !== undefined && (!row["NMR Assay Name"] || row["NMR Assay Name"] === "")) {
+      row["NMR Assay Name"] = sampleName;
+    }
+    if (row["Protocol REF"] !== undefined && (!row["Protocol REF"] || row["Protocol REF"] === "")) {
+      row["Protocol REF"] = "Extraction";
+    }
   }
 
   closeAddSamplesModal() {
