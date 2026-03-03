@@ -215,16 +215,18 @@
                   [hasError]="showError"></mtbls-ontology>
               </ng-container>
 
-  <ng-template #dropdownField>
-    <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('status')">
-      <mat-select formControlName="status" placeholder="Status" (selectionChange)="onChanges($event)">
-        <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-          {{ option.annotationValue }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </ng-template>
-</ng-container>
+              <ng-template #dropdownField>
+                <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('status')">
+                  <mat-select formControlName="status" placeholder="Status" (selectionChange)="onChanges($event)">
+                    <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
+                      {{ option.annotationValue }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </ng-template>
+            </ng-container>
+          </div>
+        </div>
         <div class="control" *ngIf="publicationAbstract != ''">
           <br />
           <label><small><b>Publication abstract</b></small></label><br />
