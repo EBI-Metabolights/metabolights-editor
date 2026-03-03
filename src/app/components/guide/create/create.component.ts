@@ -941,13 +941,13 @@ export class CreateComponent implements OnInit {
       this.doiService.getArticleInfo(doiURL).subscribe((article) => {
         this.publicationTitle = article.title.trim();
         this.publicationAuthors = article.authorList.trim();
-        this.onPublicationStatusChange("Published");
       });
       this.europePMCService
         .getArticleInfo("DOI:" + doi)
         .subscribe((article) => {
           if (article.doi === doi) {
             this.publicationPubmedId = article.pubMedID.trim();
+            this.applyPublicationStatus(article.status);
           }
         });
     }
@@ -962,9 +962,39 @@ export class CreateComponent implements OnInit {
           this.publicationTitle = article.title.trim();
           this.publicationAuthors = article.authorList.trim();
           this.publicationDoi = article.doi.trim();
-          this.onPublicationStatusChange("Published");
+          this.applyPublicationStatus(article.status);
         });
     }
+  }
+
+  onPublicationIdentifierPaste(event: ClipboardEvent, field: "doi" | "pubMedID") {
+    const pastedText = event.clipboardData?.getData("text")?.trim();
+    if (pastedText) {
+      event.preventDefault();
+      if (field === "doi") {
+        this.publicationDoi = pastedText;
+        this.getArticleFromDOI();
+      } else {
+        this.publicationPubmedId = pastedText;
+        this.getArticleFromPubMedID();
+      }
+      return;
+    }
+
+    // fallback for environments where clipboardData is unavailable
+    setTimeout(() => {
+      if (field === "doi") {
+        this.getArticleFromDOI();
+      } else {
+        this.getArticleFromPubMedID();
+      }
+    }, 0);
+  }
+
+  private applyPublicationStatus(statusFromResponse?: string) {
+    const statusLabel = (statusFromResponse || "Published").trim();
+    if (!statusLabel) return;
+    this.onPublicationStatusChange(statusLabel);
   }
 
   onPublicationStatusChange(value) {
@@ -981,9 +1011,15 @@ export class CreateComponent implements OnInit {
               matchedStatus = selectedValue;
           }
 
-          if (matchedStatus) {
-              this.publicationStatus = [matchedStatus];
+          if (!matchedStatus && typeof selectedValue === "string") {
+              const fallback = new Ontology();
+              fallback.annotationValue = selectedValue;
+              fallback.termAccession = "";
+              fallback.termSource = { name: "" } as any;
+              matchedStatus = fallback;
           }
+
+          this.publicationStatus = matchedStatus ? [matchedStatus] : [];
       }
   }
   submitStudy(isMultipleCategories: boolean = false) {

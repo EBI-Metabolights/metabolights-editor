@@ -337,7 +337,7 @@
                           [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
                           <mat-label>DOI</mat-label>
                           <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
-                            [required]="isDoiRequired" (blur)="getArticleFromDOI()"
+                            [required]="isDoiRequired" (paste)="onPublicationIdentifierPaste($event, 'doi')" (blur)="getArticleFromDOI()"
                             (keydown.enter)="getArticleFromDOI()">
                           <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
                             <span *ngIf="isDoiRequired"><b>(required)</b></span>
@@ -355,7 +355,7 @@
                         <mat-form-field class="full-width" appearance="outline">
                           <mat-label>PubMed ID</mat-label>
                           <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID"
-                            (blur)="getArticleFromPubMedID()" (keydown.enter)="getArticleFromPubMedID()">
+                            (paste)="onPublicationIdentifierPaste($event, 'pubMedID')" (blur)="getArticleFromPubMedID()" (keydown.enter)="getArticleFromPubMedID()">
                           <mat-hint>{{ fieldValidation('publications.publication.pubmedId').description }}</mat-hint>
                         </mat-form-field>
                       </div>
@@ -409,7 +409,7 @@
                     <div *ngFor="let studyId of createdStudies" class="is-flex is-align-items-center">
                       <span class="material-symbols-outlined has-text-success is-size-5 mr-3">check</span>
                       <div class="is-size-6">
-                        <span class="has-text-link has-text-weight-bold">{{ studyId }}</span>:
+                        <span class="has-text-weight-bold">{{ studyId }}</span>:
                         <span class="is-italic has-text-grey-dark">{{ createdStudiesDetails[studyId] }}</span>
                       </div>
                     </div>
@@ -519,7 +519,7 @@
                       <span class="publication-index">5</span>
                       <span class="material-symbols-outlined mr-3 has-text-success">check</span>
                       <h4 class="publication-title-compact">
-                        <a href="https://ebi-metabolights.github.io/guides/Protocols/" target="_blank"
+                        <a href="https://ebi-metabolights.github.io/guides/Protocol/" target="_blank"
                           class="step-link">Complete the
                           description of your study 'Protocols'</a>
                       </h4>

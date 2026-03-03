@@ -176,7 +176,7 @@
           </mat-form-field>
           <mat-form-field class="half-width" appearance="outline">
             <mat-label>{{getFieldLabel('doi')}}<span class="has-error">*</span></mat-label>
-            <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
+            <input class="no-scroll" formControlName="doi" [tabIndex]="3" (paste)="onIdentifierPaste($event, 'doi')" (blur)="getArticleFromDOI()"
               (keydown.enter)="getArticleFromDOI()" matInput [placeholder]="getFieldPlaceholder('doi')" />
             <mat-hint>{{ getFieldHint("doi") }}
             </mat-hint>
@@ -193,7 +193,7 @@
         <div class="form-row" style="padding-bottom: 0;">
           <mat-form-field class="half-width" appearance="outline">
             <mat-label>{{getFieldLabel('pubMedID')}}</mat-label>
-            <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
+            <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (paste)="onIdentifierPaste($event, 'pubMedID')" (blur)="getArticleFromPubMedID()"
               (keydown.enter)="getArticleFromPubMedID()" matInput [placeholder]="getFieldPlaceholder('pubMedID')" />
             <mat-hint>{{ getFieldHint("pubMedID") }}</mat-hint>
             <mat-error *ngIf="
