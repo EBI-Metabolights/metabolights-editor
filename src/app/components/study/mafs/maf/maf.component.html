@@ -1,8 +1,7 @@
 <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn p2">
   <span *ngIf="mafData && mafData.data.rows && mafData.data.rows.length > 0">
     <a (click)="autoPopulate(true)" class="button is-small is-light">
-      <span><mat-icon>add</mat-icon>Compound Search</span> </a
-    >&nbsp;
+      <span><mat-icon>add</mat-icon>Compound Search</span> </a>&nbsp;
     <a (click)="autoPopulate(false)" class="button is-small is-light">
       <span><mat-icon>refresh</mat-icon>Auto Populate</span>
     </a>
@@ -14,15 +13,9 @@
   <div class="column" style="width: 100%; overflow-x: auto">
     <div class="panel-block-wrapper">
       <span *ngIf="mafData">
-        <mtbls-table
-          [fileTypes]="fileTypes"
-          (rowsUpdated)="validateMAFSheet()"
-          (rowEdit)="openRowEditModal($event)"
-          [tableData]="mafData"
-          validationsId="maf"
-          [enableControlList]="false"
-          (refreshTableData)="autoPopulate(false)"
-        ></mtbls-table>
+        <mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateMAFSheet()" (rowEdit)="openRowEditModal($event)"
+          [tableData]="mafData" validationsId="maf" [enableControlList]="false"
+          (refreshTableData)="autoPopulate(false)"></mtbls-table>
       </span>
     </div>
   </div>
@@ -30,11 +23,7 @@
 <!--Table block end-->
 
 <!--Autopopulate modal block start - also used as compound search modal.-->
-<div
-  class="modal"
-  *ngIf="isAutoPopulateModalOpen"
-  [ngClass]="{ 'is-active': isAutoPopulateModalOpen }"
->
+<div class="modal" *ngIf="isAutoPopulateModalOpen" [ngClass]="{ 'is-active': isAutoPopulateModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -46,21 +35,15 @@
       <section class="modal-card-body">
         <div class="columns">
           <div class="column" *ngIf="currentID; else noImage">
-            <img
-              width="100%"
-              [src]="
+            <img width="100%" [src]="
                 'https://www.ebi.ac.uk/chebi/backend/api/public/structure/' +
                 currentID +
                 '/'
-              "
-              alt=""
-            />
+              " alt="" />
           </div>
           <ng-template #noImage>
             <p class="has-text-centered noImg">
-              <i class="has-text-light-gray"
-                ><small>Structure unavailable</small></i
-              >
+              <i class="has-text-light-gray"><small>Structure unavailable</small></i>
             </p>
           </ng-template>
           <div class="column">
@@ -68,101 +51,46 @@
               <div class="field-body">
                 <div class="field">
                   <div class="control">
-                    <label><small>Metabolite Identification</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="name"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('name')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Metabolite Identification</mat-label>
+                      <input class="no-scroll" formControlName="name" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('name')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>SMILES</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="smiles"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('smiles')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>SMILES</mat-label>
+                      <input class="no-scroll" formControlName="smiles" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('smiles')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>Chemical Formula</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="formula"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('formula')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Chemical Formula</mat-label>
+                      <input class="no-scroll" formControlName="formula" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('formula')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>InChI</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="inchi"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('inchi')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>InChI</mat-label>
+                      <input class="no-scroll" formControlName="inchi" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('inchi')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>Database Identifier</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="databaseId"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('databaseId')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Database Identifier</mat-label>
+                      <input class="no-scroll" formControlName="databaseId" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('databaseId')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
@@ -177,39 +105,23 @@
         <div class="columns is-gapless full-width">
           <div class="column is-half">
             <span *ngIf="currentRow > 0">
-              <button class="button" (click)="previousRow()">Previous</button
-              >&nbsp;
+              <button class="button" (click)="previousRow()">Previous</button>&nbsp;
             </span>
             <span>
               <button class="button" disabled>
-                <small
-                  >{{ currentRow + 1 }} /
-                  {{ this.mafTable.data.rows.length }}</small
-                ></button
-              >&nbsp;
+                <small>{{ currentRow + 1 }} /
+                  {{ this.mafTable.data.rows.length }}</small></button>&nbsp;
             </span>
             <span *ngIf="currentRow < this.mafTable.data.rows.length - 1">
               <button class="button" (click)="nextRow()">Next</button>
             </span>
           </div>
           <div class="column is-half has-text-right">
-            <button
-              [disabled]="!form.valid || isFormBusy"
-              (click)="saveCell()"
-              class="button is-info"
-            >
-              <mat-spinner
-                [diameter]="20"
-                [strokeWidth]="3"
-                *ngIf="isFormBusy"
-              ></mat-spinner>
+            <button [disabled]="!form.valid || isFormBusy" (click)="saveCell()" class="button is-info">
+              <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
               Save
             </button>
-            <button
-              class="button"
-              [disabled]="isFormBusy"
-              (click)="closeAutoPopulateModal()"
-            >
+            <button class="button" [disabled]="isFormBusy" (click)="closeAutoPopulateModal()">
               Done
             </button>
           </div>
@@ -220,11 +132,7 @@
 </div>
 <!--Autopopulate modal block end - also used as compound search modal.-->
 
-<div
-  class="modal"
-  *ngIf="isRowEditModalOpen"
-  [ngClass]="{ 'is-active': isRowEditModalOpen }"
->
+<div class="modal" *ngIf="isRowEditModalOpen" [ngClass]="{ 'is-active': isRowEditModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -236,21 +144,15 @@
       <section class="modal-card-body">
         <div class="columns">
           <div class="column" *ngIf="currentID; else noImage">
-            <img
-              width="100%"
-              [src]="
+            <img width="100%" [src]="
                 'https://www.ebi.ac.uk/chebi/backend/api/public/compound/' +
                 currentID +
                 '/structure/?width=300&height=300'
-              "
-              alt=""
-            />
+              " alt="" />
           </div>
           <ng-template #noImage>
             <p class="has-text-centered noImg">
-              <i class="has-text-light-gray"
-                ><small>Structure unavailable</small></i
-              >
+              <i class="has-text-light-gray"><small>Structure unavailable</small></i>
             </p>
           </ng-template>
           <div class="column">
@@ -258,101 +160,46 @@
               <div class="field-body">
                 <div class="field">
                   <div class="control">
-                    <label><small>Metabolite Identification</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="name"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('name')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Metabolite Identification</mat-label>
+                      <input class="no-scroll" formControlName="name" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('name')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>SMILES</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="smiles"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('smiles')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>SMILES</mat-label>
+                      <input class="no-scroll" formControlName="smiles" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('smiles')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>InChI</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="inchi"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('inchi')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>InChI</mat-label>
+                      <input class="no-scroll" formControlName="inchi" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('inchi')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>Chemical Formula</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="formula"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('formula')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Chemical Formula</mat-label>
+                      <input class="no-scroll" formControlName="formula" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('formula')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
                   </div>
                   <div class="control">
-                    <label><small>Database Identifier</small></label>
-                    <mat-form-field class="full-width">
-                      <input
-                        class="no-scroll"
-                        formControlName="databaseId"
-                        matInput
-                      />
-                      <button
-                        style="border: none"
-                        mat-button
-                        matSuffix
-                        mat-icon-button
-                        aria-label="Clear"
-                        (click)="search('databaseId')"
-                      >
+                    <mat-form-field class="full-width" appearance="outline" subscriptSizing="dynamic">
+                      <mat-label>Database Identifier</mat-label>
+                      <input class="no-scroll" formControlName="databaseId" matInput />
+                      <button mat-button matSuffix mat-icon-button aria-label="Search" (click)="search('databaseId')">
                         <mat-icon>search</mat-icon>
                       </button>
                     </mat-form-field>
@@ -364,31 +211,15 @@
         </div>
       </section>
       <footer class="modal-card-foot buttons is-right">
-        <button
-          *ngIf="!form.pristine"
-          [disabled]="!form.valid || isFormBusy"
-          (click)="saveCell()"
-          class="button is-info"
-        >
-          <mat-spinner
-            [diameter]="20"
-            [strokeWidth]="3"
-            *ngIf="isFormBusy"
-          ></mat-spinner>
+        <button *ngIf="!form.pristine" [disabled]="!form.valid || isFormBusy" (click)="saveCell()"
+          class="button is-info">
+          <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isFormBusy"></mat-spinner>
           Save
         </button>
-        <button
-          *ngIf="form.pristine"
-          (click)="closeRowEditModal()"
-          class="button is-info"
-        >
+        <button *ngIf="form.pristine" (click)="closeRowEditModal()" class="button is-info">
           OK
         </button>
-        <button
-          class="button"
-          [disabled]="isFormBusy"
-          (click)="closeRowEditModal()"
-        >
+        <button class="button" [disabled]="isFormBusy" (click)="closeRowEditModal()">
           Cancel
         </button>
       </footer>

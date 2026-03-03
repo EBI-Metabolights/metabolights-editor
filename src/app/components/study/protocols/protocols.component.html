@@ -2,17 +2,10 @@
   <div>
     <div class="mtbls-section">
       <h6 class="mb10">
-        <span style="font-size: 0.8em"
-          ><mtbls-help
-            *ngIf="!isStudyReadOnly"
-            target="protocols"
-          ></mtbls-help></span
-        >&nbsp;
-        <a
-          (click)="toggleExpand()"
-          style="margin-right: 10px; margin-left: 10px"
-          class="button is-default is-pulled-right is-small"
-        >
+        <span style="font-size: 0.8em"><mtbls-help *ngIf="!isStudyReadOnly"
+            target="protocols"></mtbls-help></span>&nbsp;
+        <a (click)="toggleExpand()" style="margin-right: 10px; margin-left: 10px"
+          class="button is-default is-pulled-right is-small">
           <div *ngIf="!expand; else expandSections">
             <i class="material-icons"> list </i> Expand all
           </div>
@@ -20,33 +13,24 @@
             <i class="material-icons"> list </i> Collapse all
           </ng-template>
         </a>
-        <mtbls-protocol
-          *ngIf="!isStudyReadOnly"
-          [value]="null"
-          [validations]="validations"
-        ></mtbls-protocol
-        >&nbsp;
+        <mtbls-protocol *ngIf="!isStudyReadOnly" [value]="null" [validations]="validations"></mtbls-protocol>&nbsp;
       </h6>
     </div>
   </div>
   <app-prompt-refresh *ngIf="!isStudyReadOnly && actionStack.length > 0" [context]="'protocols'"></app-prompt-refresh>
-  
+
+
+
   <div *ngFor="let protocol of defaultProtocols">
     <span *ngIf="getProtocol(protocol) != null">
-      <mtbls-protocol
-        [value]="getProtocol(protocol)"
-        [required]="true"
-        [validations]="validations"
-        [guides]="protocolGuides"
-      ></mtbls-protocol>
+      <mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"
+        [guides]="protocolGuides"></mtbls-protocol>
     </span>
   </div>
+
   <div *ngFor="let protocol of customProtocols">
     <span *ngIf="getProtocol(protocol) != null">
-      <mtbls-protocol
-        [value]="getProtocol(protocol)"
-        [validations]="validations"
-      ></mtbls-protocol>
+      <mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>
     </span>
   </div>
 </span>

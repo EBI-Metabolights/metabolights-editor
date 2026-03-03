@@ -1,20 +1,20 @@
 <div class="modal is-active">
   <div class="modal-background"></div>
 
-  <mat-card>
+  <mat-card class="overrides-modal-card">
     <!-- Scrollable Container for mat-table -->
     <div class="scrollable-table-container">
       <mat-table [dataSource]="overrides" class="mat-elevation-z8">
         <!-- Rule ID Column -->
         <ng-container matColumnDef="ruleId">
           <mat-header-cell *matHeaderCellDef> Rule ID </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.ruleId }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.ruleId }} </mat-cell>
         </ng-container>
 
         <!-- Title Column -->
         <ng-container matColumnDef="title">
           <mat-header-cell *matHeaderCellDef> Title </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.title }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.title }} </mat-cell>
         </ng-container>
 
         <!-- New Type Column -->
@@ -26,13 +26,13 @@
         <!-- Curator Column -->
         <ng-container matColumnDef="curator">
           <mat-header-cell *matHeaderCellDef> Curator </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.curator }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.curator }} </mat-cell>
         </ng-container>
 
         <!-- Comments Column -->
         <ng-container matColumnDef="comments">
           <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
-          <mat-cell *matCellDef="let override"> {{ override.comment }} </mat-cell>
+          <mat-cell *matCellDef="let override" class="wrap-text"> {{ override.comment }} </mat-cell>
         </ng-container>
 
         <!-- Created At Column -->
@@ -59,11 +59,11 @@
       </mat-table>
     </div>
     <footer class="modal-card-foot">
-        <div class="columns is-gapless full-width">
-          <div class="column is-full has-text-right">
-            <button class="button is-info" (click)="close()">Close</button>
-          </div>
+      <div class="columns is-gapless full-width">
+        <div class="column is-full has-text-right">
+          <button class="button is-info" (click)="close()">Close</button>
         </div>
-      </footer>
+      </div>
+    </footer>
   </mat-card>
 </div>

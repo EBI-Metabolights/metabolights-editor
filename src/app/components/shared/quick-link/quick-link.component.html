@@ -1,8 +1,6 @@
-<span *ngIf="requestedStudy" class="bottom-right">
+<span *ngIf="requestedStudy" [ngClass]="className">
   <a id="collapse-button" (click)="navigate()" class="button is-rounded">
-    <small
-      ><mat-icon>{{ icon }}</mat-icon></small
-    >
+    <small><mat-icon>{{ icon }}</mat-icon></small>
     <span>
       <small>&nbsp;{{ text }}</small>
     </span>

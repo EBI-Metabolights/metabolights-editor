@@ -49,7 +49,6 @@ export class AssayState {
 
     @Action(AssayList.Get)
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
-        this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
             this.generalMetadataService.getStudyGeneralMetadata(action.id).pipe(take(1)).subscribe(
                 (response) => {
@@ -146,6 +145,22 @@ export class AssayState {
                         key.indexOf("Term Accession Number") < 0 &&
                         key.indexOf("Term Source REF") < 0
                 );
+
+                const compactPriorityColumns = [
+                  "Sample Name",
+                  "Raw Spectral Data File",
+                  "Free Induction Decay Data File",
+                  "Acquisition Parameter Data File",
+                  "Derived Spectral Data File"
+                ];
+                const existingPriorityColumns = compactPriorityColumns.filter((column) =>
+                  displayedColumns.includes(column)
+                );
+                const remainingColumns = displayedColumns.filter(
+                  (column) => column !== "Select" && !compactPriorityColumns.includes(column)
+                );
+                displayedColumns = ["Select", ...existingPriorityColumns, ...remainingColumns];
+
                 data["columns"] = columns;
                 data["displayedColumns"] = displayedColumns;
                 data["file"] = action.assaySheetFilename;
@@ -362,12 +377,12 @@ export class AssayState {
 
     @Selector()
     static assayList(state: AssayStateModel): IAssay[] {
-        return state.assayList
+        return state?.assayList
     }
 
     @Selector()
     static assays(state: AssayStateModel): Record<string, any> {
-        return state.assays
+        return state?.assays
     }
 
 }

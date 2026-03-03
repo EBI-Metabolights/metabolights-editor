@@ -1,77 +1,407 @@
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-group-vertical {
-  flex-direction: column !important;
-  width: 100%;
+.gray-box {
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-group,
-.mat-button-toggle-standalone {
-  box-shadow: none !important;
+.border-right {
+  border-right: 1px solid #dbdbdb;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-label-content {
-  width: 100% !important;
-  text-align: left;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle {
-  border: 1px solid rgba(0, 0, 0, 0.38) !important;
-  border-radius: 4px;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-button {
-  width: 100% !important;
-}
-
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-/deep/ .mat-button-toggle-checked {
-  background-color: #5193fb;
-  color: white;
-}
-
-/deep/ .mat-mdc-checkbox {
+.db {
   display: block;
 }
 
-.no-pointer {
-  cursor: inherit !important;
+.mb-2 {
+  margin-bottom: 0.5rem !important;
 }
 
-/* TODO(mdc-migration): The following rule targets internal classes of button that may no longer apply for the MDC version. */
-.mat-button-toggle-checked.mat-button-toggle-appearance-standard {
-  color: white;
+.mb-3 {
+  margin-bottom: 0.75rem !important;
 }
 
-.cborder {
-  border: 1px solid #f1f1f4;
+
+.label {
+  font-weight: 700;
 }
 
-.cborder-radius {
-  border-radius: 4px;
+.teal-input-label {
+  min-width: 80px;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
-.create-radio-group {
-  display: inline-flex;
+.pr-5 {
+  padding-right: 1.5rem !important;
+}
+
+hr {
+  background-color: #dbdbdb;
+  height: 1px;
+  margin: 1.5rem 0;
+}
+
+.contact-card {
+  height: 100%;
+  position: relative;
+  border: 1px solid #e0e0e0;
+}
+
+.field-label.is-small {
+  text-align: left;
+  margin-right: 1rem;
+}
+
+/* Beautified Checkbox */
+.beautified-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 25px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.beautified-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  left: 0;
+  height: 16px;
+  width: 16px;
+  border-radius: 3px;
+  border: 1px solid #dbdbdb;
+}
+
+.beautified-checkbox:hover input~.checkmark {
+  background-color: #ccc;
+}
+
+.beautified-checkbox input:checked~.checkmark {
+  background-color: #26a69a;
+  border-color: #26a69a;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.beautified-checkbox input:checked~.checkmark:after {
+  display: block;
+}
+
+.beautified-checkbox .checkmark:after {
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.stepper-container-offset {
+  margin-top: 5rem !important;
+}
+
+.section-header-line {
+  border-bottom: 3px solid black;
+  padding-bottom: 5px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.section-header-line .icon-button {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.ml-checkbox-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.ml-checkbox-item {
+  min-width: 150px;
+}
+
+.grid-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.full-width-hr {
+  border: 0;
+  border-top: 2px solid #ccc;
+  margin: 20px 0;
+}
+
+.icon-action-button {
+  cursor: pointer;
+  vertical-align: middle;
+  user-select: none;
+  transition: color 0.2s;
+}
+
+.icon-action-button:hover {
+  color: #00897b !important;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  padding-top: 24px;
+  /* Aligns icons with the input field by offsetting for the label height */
+  height: 100%;
+}
+
+.subsequent-row-actions {
+  padding-top: 0;
+  /* No offset needed when there are no labels */
+  height: 32px;
+  /* Matches teal-input height */
+  display: flex;
+  align-items: center;
+}
+
+.dataset-row {
+  margin-bottom: 1.5rem !important;
+}
+
+.characteristic-column {
+  margin-bottom: 1rem !important;
+}
+
+/* Disable pointer events on stepper headers to prevent navigation via headers */
+::ng-deep .mat-horizontal-stepper-header {
+  pointer-events: none !important;
+}
+
+/* Allow backward navigation only to Step 1 when on Step 2 */
+::ng-deep .allow-back-to-step-1 .mat-horizontal-stepper-header:nth-of-type(1) {
+  pointer-events: auto !important;
+}
+
+.category-column {
+  padding-right: 2rem !important;
+  margin-bottom: 1.5rem !important;
+}
+
+.invalid-card {
+  border: 1px solid #ff3860 !important;
+  background-color: #fffafb;
+}
+
+::ng-deep .is-modal-only-person>span,
+::ng-deep .is-modal-only-person>a {
+  display: none !important;
+}
+
+.category-boxes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.category-box {
+  flex: 0 0 100%;
+  background-color: #fcfcfc;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.2s ease;
+}
+
+.category-box:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  border-color: #26a69a;
+}
+
+.category-title {
+  font-size: 0.85rem;
+  color: #555;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.assay-types-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.assay-types-list .mb-2 {
+  margin-bottom: 0 !important;
+}
+
+.assay-type-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dropdown-col {
+  max-width: 300px;
+}
+
+/* Global Material 3 Refinements */
+.full-width {
+  width: 100%;
+}
+
+::ng-deep .mat-mdc-form-field {
+  --mdc-outlined-text-field-focus-outline-color: #00d1b2 !important;
+  --mdc-outlined-text-field-focus-label-text-color: #00d1b2 !important;
+  --mat-select-focused-arrow-color: #00d1b2 !important;
+}
+
+::ng-deep .mat-mdc-form-field .mat-mdc-label {
+  color: #555;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-label {
+  color: #00d1b2 !important;
+}
+
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__leading,
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__notch,
+::ng-deep .mat-mdc-text-field-wrapper.mdc-text-field--outlined .mdc-notched-outline--focused .mdc-notched-outline__trailing {
+  border-color: #00d1b2 !important;
+}
+
+.warn-unchecked {
+  --mdc-checkbox-unselected-icon-color: #ff3860 !important;
+  --mdc-checkbox-unselected-hover-icon-color: #ff3860 !important;
+  --mdc-checkbox-unselected-focus-icon-color: #ff3860 !important;
+  --mdc-checkbox-unselected-pressed-icon-color: #ff3860 !important;
+}
+
+::ng-deep .mat-mdc-checkbox.warn-unchecked .mdc-label {
+  color: #ff3860;
+  transition: color 0.3s ease;
+}
+
+::ng-deep .mat-mdc-checkbox.warn-unchecked.mat-mdc-checkbox-checked .mdc-label {
+  color: inherit;
+}
+
+/* Accordion Refinements for Step 4 (Publication Style) */
+.publications-accordion {
+  display: flex;
   flex-direction: column;
+  gap: 12px;
 }
 
-.create-radio-button {
-  margin: 5px;
+.accordion-item {
+  border: 1px solid #f1f1f4;
+  border-radius: 6px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background-color: #fff;
 }
 
-.mb5 {
-  margin-bottom: 5px !important;
+.accordion-header {
+  padding: 12px 18px;
+  background-color: #fafafa;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid transparent;
 }
 
-.create-selected-value {
-  margin: 15px 0;
+.accordion-item.is-expanded .accordion-header {
+  border-bottom-color: #eee;
 }
 
-.central-text {
-  text-align: center;
+.publication-index {
+  font-weight: bold;
+  color: #26a69a;
+  margin-right: 15px;
+  min-width: 25px;
+  font-size: 1.1rem;
+}
+
+.publication-title-compact {
+  flex: 1 1 auto;
+  margin: 0 !important;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+}
+
+.step-link {
+  color: #26a69a;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.step-link:hover {
+  color: #00796b;
+  text-decoration: underline;
+}
+
+.accordion-content {
+  padding: 20px 24px 24px 52px;
+  background-color: #fff;
+  color: #555;
+  line-height: 1.6;
+}
+
+.expand-icon {
+  cursor: pointer;
+  color: #777;
+  transition: transform 0.3s ease;
+}
+
+.accordion-item.is-expanded {
+  border-color: #26a69a;
+  box-shadow: 0 4px 12px rgba(38, 166, 154, 0.1);
+}
+
+.accordion-header:hover {
+  background-color: #f5f5f5;
+}
+
+.created-studies-list {
+  border: 1px solid #eee !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02) !important;
+  transition: all 0.3s ease;
+}
+
+.created-studies-list:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05) !important;
+  border-color: #ddd !important;
+}
+
+.is-italic {
+  font-style: italic;
+}
+
+.button.is-medium {
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.2s ease !important;
+}
+
+.button.is-medium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+.has-text-success .material-symbols-outlined {
+  vertical-align: middle;
 }

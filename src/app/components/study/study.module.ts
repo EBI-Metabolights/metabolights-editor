@@ -12,11 +12,13 @@ import { OrganismsComponent } from "./organisms/organisms.component";
 import { OrganismComponent } from "./organisms/organism/organism.component";
 import { ProtocolsComponent } from "./protocols/protocols.component";
 import { ProtocolComponent } from "./protocols/protocol/protocol.component";
+import { ProtocolMetaComponent } from "./protocols/protocol-meta/protocol-meta.component";
 import { PublicationsComponent } from "./publications/publications.component";
 import { PublicationComponent } from "./publications/publication/publication.component";
 import { ReleaseDateComponent } from "./release-date/release-date.component";
 import { SamplesComponent } from "./samples/samples.component";
 import { StatusComponent } from "./status/status.component";
+import { StudyGuideComponent } from "./study-guide/study-guide.component";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -92,6 +94,7 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     OrganismComponent,
     ProtocolsComponent,
     ProtocolComponent,
+    ProtocolMetaComponent,
     PublicationsComponent,
     PublicationComponent,
     ReleaseDateComponent,
@@ -112,7 +115,8 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     NoViolationsComponent,
     ValidationTaskBoxComponent,
     DeleteOverrideDialogComponent,
-    OverviewBadgesComponent
+    OverviewBadgesComponent,
+    StudyGuideComponent
   ],
   imports: [
     CommonModule,
@@ -169,6 +173,7 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     OrganismComponent,
     ProtocolsComponent,
     ProtocolComponent,
+    ProtocolMetaComponent,
     PublicationsComponent,
     PublicationComponent,
     ReleaseDateComponent,
@@ -189,7 +194,8 @@ import { ConfirmationDialogComponent } from "../shared/confirmation-dialog/confi
     NoViolationsComponent,
     ValidationTaskBoxComponent,
     DeleteOverrideDialogComponent,
-    OverviewBadgesComponent
+    OverviewBadgesComponent,
+    StudyGuideComponent
 
   ],
   providers: [

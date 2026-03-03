@@ -455,6 +455,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
         this.protocol.description,
         ValidateRules("description", this.fieldValidation("description")),
       ],
+      uri: [this.protocol.uri],
+      version: [this.protocol.version],
     });
   }
 
@@ -515,6 +517,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
     mtblProtocol.protocolType = new Ontology();
     mtblProtocol.protocolType.annotationValue = this.getFieldValue("name");
     mtblProtocol.parameters = this.getFieldValue("parameters");
+    mtblProtocol.uri = this.getFieldValue("uri");
+    mtblProtocol.version = this.getFieldValue("version");
     return { protocol: mtblProtocol.toJSON() };
   }
 
@@ -645,4 +649,53 @@ export class ProtocolComponent implements OnInit, OnChanges {
         this.selectedParameterValue = event.value;
       }
 
+      openUri(uri: string) {
+        if (!uri) return;
+        const url = /^(https?:\/\/)/i.test(uri) ? uri : `https://${uri}`;
+        window.open(url, '_blank', 'noopener');
+      }
+
+      getFieldMetadata(fieldId: string) {
+        const fieldMapping = {
+          'name': 'Study Protocol Name',
+          'description': 'Study Protocol Description',
+          'uri': 'Study Protocol URI',
+          'version': 'Study Protocol Version',
+          'parameterName': 'Study Protocol Parameter Name'
+        };
+        const fieldName = fieldMapping[fieldId] || fieldId;
+        return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+      }
+
+      getFieldHint(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.combinedDescription) {
+          return metadata.combinedDescription;
+        }
+        return this.fieldValidation(fieldId)?.description || '';
+      }
+
+      getFieldPlaceholder(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.placeholder) {
+          return metadata.placeholder;
+        }
+        return this.fieldValidation(fieldId)?.placeholder || '';
+      }
+
+      getFieldLabel(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.label) {
+          return metadata.label;
+        }
+        // Fallback to a prettified version of the field mapping if available
+        const fieldMapping = {
+          'name': 'Protocol Name',
+          'description': 'Protocol Description',
+          'uri': 'Protocol URI',
+          'version': 'Protocol Version',
+          'parameterName': 'Protocol Parameter Name'
+        };
+        return fieldMapping[fieldId] || fieldId;
+      }
 }

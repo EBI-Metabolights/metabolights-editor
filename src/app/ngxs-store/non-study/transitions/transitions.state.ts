@@ -103,23 +103,23 @@ export class TransitionsState {
     @Selector()
     static actionStack(state: TransitionStateModel) {
        return (stateContainer: string) => {
-        return state.intermittentRefreshActionStack.filter(action => action.includes(stateContainer));
+        return state?.intermittentRefreshActionStack?.filter(action => action.includes(stateContainer)) || [];
        }
     }
 
     @Selector()
     static loading(state: TransitionStateModel): boolean {
-        return state.loading
+        return state?.loading
     }
 
     @Selector()
     static loadingInformation(state: TransitionStateModel): string {
-        return state.loadingInformation
+        return state?.loadingInformation
     }
 
     @Selector()
     static currentTabIndex(state: TransitionStateModel): string {
-        return state.currentTabIndex
+        return state?.currentTabIndex
     }
 }
 

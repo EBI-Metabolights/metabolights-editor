@@ -1,0 +1,108 @@
+<div class="card mb-6" style="position: relative;">
+    <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px;"
+        (click)="openModal()">+ Add</button>
+    <header class="card-heading">
+        <p>
+            Funding
+            <mat-icon
+                [matTooltip]="'Provide information about the funding sources that supported this study, including organization names, ROR IDs, and grant identifiers'">help</mat-icon>
+        </p>
+    </header>
+    <div class="card-content">
+        <div class="funding-list">
+            <ng-container *ngFor="let funder of funders; let i = index">
+                <div class="box p-3 mb-4"
+                    *ngIf="funder?.fundingOrganization?.annotationValue && funder.fundingOrganization.annotationValue.trim() !== ''">
+                    <div class="columns is-vcentered is-mobile">
+                        <div class="column">
+                            <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
+                                <div class="is-size-6">
+                                    <span>Funder: </span>
+                                    <span class="has-text-weight-bold">
+                                        <a *ngIf="funder.fundingOrganization.termAccession; else noLink"
+                                            [href]="funder.fundingOrganization.termAccession" target="_blank"
+                                            class="has-text-link">
+                                            {{ funder.fundingOrganization.annotationValue }}
+                                        </a>
+                                        <ng-template #noLink>
+                                            {{ funder.fundingOrganization.annotationValue }}
+                                        </ng-template>
+                                    </span>
+                                </div>
+                                <div *ngIf="funder.grantIdentifier" class="is-size-6">
+                                    <span>Grant Identifier: </span>
+                                    <span class="has-text-weight-bold">{{ funder.grantIdentifier }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column is-narrow">
+                            <button class="edit-icon-button" (click)="editFunder(i, funder)" title="Edit Funding">
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button class="delete is-medium" (click)="removeFunder(i)" title="Remove Funding"></button>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <p *ngIf="!hasValidFunders" class="placeholder-text has-text-centered p-4">
+            <small>No funding information defined.</small>
+        </p>
+    </div>
+</div>
+
+<mtbls-modal [title]="editingIndex > -1 ? 'Edit Funding Details' : 'Add Funding Details'" [isModalOpen]="isModalOpen"
+    (closed)="closeModal()">
+    <div body>
+        <form [formGroup]="form">
+            <div class="columns is-multiline">
+                <div class="column is-12">
+                    <div class="field">
+                        <mat-form-field class="full-width is-small" appearance="outline">
+                            <mat-label>Funder Organization</mat-label>
+                            <input type="text" matInput formControlName="funderOrganization"
+                                [matAutocomplete]="funderAuto" placeholder="e.g. European Bioinformatics Institute" />
+                            <mat-autocomplete #funderAuto="matAutocomplete" [displayWith]="displayFunderName"
+                                (optionSelected)="onFunderSelected($event)">
+                                <mat-option *ngFor="let org of filteredFunderOrganizations$ | async" [value]="org">
+                                    <div class="is-size-7"><b>{{ org.name }}</b> - {{ org.id?.split('/').pop() ||
+                                        '(Unknown ID)' }}</div>
+                                    <div style="font-size: 11px; color: #666; line-height: 1.2;">{{ org.description
+                                        ||
+                                        '(No description available)' }}</div>
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <div class="field">
+                        <mat-form-field class="full-width is-small" appearance="outline">
+                            <mat-label>Funder ID</mat-label>
+                            <input matInput formControlName="funderId" placeholder="e.g. https://ror.org/02catss52" />
+                            <a matSuffix target="_blank" [href]="getFunderRorIdUrl()" class="search-link"
+                                title="Search ROR ID">
+                                <mat-icon>search</mat-icon>
+                            </a>
+                        </mat-form-field>
+                    </div>
+                </div>
+                <div class="column is-6">
+                    <div class="field">
+                        <mat-form-field class="full-width is-small" appearance="outline">
+                            <mat-label>Grant Identifier</mat-label>
+                            <input matInput type="text" formControlName="grantIdentifier"
+                                placeholder="e.g. Grant #12345">
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div footer>
+        <button class="button is-info" (click)="addFunder()" [disabled]="form.invalid">
+            {{ editingIndex > -1 ? 'Update Funding' : 'Add Funding' }}
+        </button>
+        <button class="button" style="margin-left:10px" (click)="closeModal()">Cancel</button>
+    </div>
+</mtbls-modal>

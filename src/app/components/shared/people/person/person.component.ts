@@ -5,6 +5,9 @@ import {
   Input,
   ViewChild,
   inject,
+  Output,
+  EventEmitter,
+  ChangeDetectorRef
 } from "@angular/core";
 import { Ontology } from "../../../../models/mtbl/mtbls/common/mtbls-ontology";
 import { MTBLSPerson } from "../../../../models/mtbl/mtbls/mtbls-person";
@@ -47,11 +50,14 @@ import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-
 })
 export class PersonComponent implements OnInit {
   @Input("value") person: MTBLSPerson;
+  @Input("mode") mode: 'store' | 'local' = 'store';
+  @Output() saved = new EventEmitter<any>();
+  @Output() deleted = new EventEmitter<any>();
 
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
   
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
+  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   
@@ -104,7 +110,8 @@ export class PersonComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private generalMetadataService: GeneralMetadataService,
-    private store: Store
+    private store: Store,
+    private cdr: ChangeDetectorRef
   ) {
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
         this.legacyControlLists = lists || {};
@@ -117,6 +124,7 @@ export class PersonComponent implements OnInit {
     this.toastrSettings$.subscribe((value) => {this.toastrSettings = value})
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      this.cdr.markForCheck();
     });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
@@ -149,11 +157,18 @@ export class PersonComponent implements OnInit {
     }
     this.subscription = this.generalMetadataService.messageSubject.subscribe((appMessage: AppMessage) => {
       this.message = appMessage;  
+      if (appMessage.type === 'add' || appMessage.type === 'update') {
+        this.isFormBusy = false;
+      }
       if (appMessage.status === 'success') {
-        this.refreshContacts(appMessage.message);
-        this.closeModal();
-        this.isDeleteModalOpen = false;
-        this.isApproveSubmitterModalOpen = false;
+        if (appMessage.type === 'add' || appMessage.type === 'update') {
+          this.refreshContacts(appMessage.message);
+          this.closeModal();
+          this.isDeleteModalOpen = false;
+          this.isApproveSubmitterModalOpen = false;
+        }
+      } else if (appMessage.status === 'error') {
+        toastr.error(appMessage.message, "Error", this.toastrSettings);
       }
     });
     this._controlList = this.controlList();
@@ -175,6 +190,31 @@ export class PersonComponent implements OnInit {
       this.form.patchValue({
         affiliation: org.name,
         rorid: org.id
+      });
+    }
+  }
+
+  autoMapAffiliation() {
+    const affiliation = this.form.get('affiliation')?.value;
+    const rorid = this.form.get('rorid')?.value;
+    
+    if (affiliation && affiliation.length >= 3 && !rorid) {
+      this.editorService.getRorOrganizations(affiliation).subscribe((res: any) => {
+        const docs = res?.response?.docs || [];
+        if (docs.length > 0) {
+          // Find best match: first priority is exact name, otherwise just take the first one
+          const bestMatch = docs.find(doc => doc.label?.toLowerCase() === affiliation.toLowerCase()) || docs[0];
+          
+          if (bestMatch) {
+            this.form.patchValue({
+              affiliation: bestMatch.label || bestMatch.name || affiliation,
+              rorid: bestMatch.iri || bestMatch.id
+            }, { emitEvent: false });
+            this.form.get('affiliation')?.markAsDirty();
+            this.form.get('rorid')?.markAsDirty();
+            this.cdr.detectChanges();
+          }
+        }
       });
     }
   }
@@ -282,6 +322,7 @@ export class PersonComponent implements OnInit {
     }
 
     this.initialiseForm();
+    this.autoMapAffiliation();
 
     // ensure roles control / ontology child are initialised with the current value
     try {
@@ -309,6 +350,10 @@ export class PersonComponent implements OnInit {
     this.isModalOpen = true;
     this.showOntology = true;
     this.updateValidatorsBasedOnRoles();
+    
+    // Mark all required fields as touched to show validation errors immediately
+    this.markRequiredFieldsAsTouched();
+    this.cdr.detectChanges();
   }
 
   toogleShowAdvanced() {
@@ -332,6 +377,16 @@ export class PersonComponent implements OnInit {
   }
 
   deleteNgxs() {
+    // Local mode: emit event instead of dispatching NGXS action
+    if (this.mode === 'local') {
+      this.deleted.emit(this.person);
+      this.isDeleteModalOpen = false;
+      this.isFormBusy = false;
+      this.closeModal();
+      return;
+    }
+
+    // Store mode: dispatch NGXS action
     const identifier = this.person.email !== "" ? this.person.email : null;
     const name = this.person.email === "" ? `${this.person.firstName}${this.person.lastName}` : null;
     const contactIndex = this.person.contactIndex || 0;
@@ -349,13 +404,16 @@ export class PersonComponent implements OnInit {
   }
 
   get validation() {
+    if (!this.validations) {
+      return {};
+    }
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
       while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
       return tempValidations;
     }
-    return this.validations[this.validationsId];
+    return this.validations ? this.validations[this.validationsId] : {};
   }
 
   fieldValidation(fieldId) {
@@ -414,6 +472,16 @@ export class PersonComponent implements OnInit {
   this.isFormBusy = true;
   const body = this.compileBody();
 
+  // Local mode: emit event instead of dispatching NGXS action
+  if (this.mode === 'local') {
+    const contactData = body.contacts[0];
+    this.saved.emit(contactData);
+    this.isFormBusy = false;
+    this.closeModal();
+    return;
+  }
+
+  // Store mode: dispatch NGXS actions
   if (!this.addNewPerson) {
     const { email, firstName, lastName, contactIndex } = this.person;
     const name = `${firstName}${lastName}`;
@@ -430,21 +498,16 @@ export class PersonComponent implements OnInit {
     }
 
     this.store.dispatch(updateAction).subscribe({
-        next: () => {
-          this.isFormBusy = false;  // Success handling
-        },
+        next: () => {},
         error: () => {
-          this.isFormBusy = false;  // Fallback
+          this.isFormBusy = false;
         },
       });
 
   } else {
     // Adding a new person
     this.store.dispatch(new People.Add(body)).subscribe({
-      next: () => {
-        // this.refreshContacts('Person Added.');
-        this.isFormBusy = false;
-      },
+      next: () => {},
       error: () => {
         this.isFormBusy = false;
       },
@@ -475,9 +538,10 @@ private updateValidatorsBasedOnRoles() {
     if (this._controlList?.renderAsDropdown) {
       this.isPiRole = rolesValue === 'Principal Investigator';
     }else{
-      this.isPiRole = rolesValue.some((role: any) =>
-        role.annotationValue?.includes('Principal Investigator')
-      );
+      this.isPiRole = rolesValue.some((role: any) => {
+        const val = typeof role === 'string' ? role : role?.annotationValue;
+        return val?.includes('Principal Investigator');
+      });
   }
     this.updatePiValidators(this.isPiRole);
   }
@@ -507,12 +571,14 @@ private updateValidatorsBasedOnRoles() {
       // ignore sync errors
     }
 
+    this.form.markAsDirty();
     this.updateValidatorsBasedOnRoles();
+    this.markRequiredFieldsAsTouched();
   }
 
 private updatePiValidators(isPi: boolean): void {
   const piFields = ['affiliation', 'email'];
-  const alwaysRequiredFields = ['firstName', 'lastName'];
+  const alwaysRequiredFields = ['firstName', 'lastName', 'roles'];
 
   // Helper to normalize validators to an array
   const getValidatorArray = (fieldControl: AbstractControl): any[] => {
@@ -545,6 +611,7 @@ private updatePiValidators(isPi: boolean): void {
         ...existingValidators.filter(v => v !== Validators.required),
         Validators.required
       ];
+      fieldControl.markAsTouched();
     } else {
       updatedValidators = existingValidators.filter(v => v !== Validators.required);
     }
@@ -572,6 +639,33 @@ private updatePiValidators(isPi: boolean): void {
   });
 
   this.form.updateValueAndValidity({ emitEvent: false });
+}
+
+private markRequiredFieldsAsTouched(): void {
+  if (!this.form) return;
+  
+  const alwaysRequiredFields = ['firstName', 'lastName', 'roles'];
+  const piRequiredFields = ['affiliation', 'email'];
+  
+  // Mark always required fields as touched
+  alwaysRequiredFields.forEach(fieldName => {
+    const control = this.form.get(fieldName);
+    if (control) {
+      control.markAsTouched();
+      control.updateValueAndValidity({ emitEvent: false });
+    }
+  });
+  
+  // Mark PI-specific fields as touched if user is PI
+  if (this.isPiRole) {
+    piRequiredFields.forEach(fieldName => {
+      const control = this.form.get(fieldName);
+      if (control) {
+        control.markAsTouched();
+        control.updateValueAndValidity({ emitEvent: false });
+      }
+    });
+  }
 }
 
 
@@ -751,6 +845,63 @@ private updatePiValidators(isPi: boolean): void {
     this._controlList = result;
     return result;
   }
-  
-}
 
+  getFieldMetadata(fieldId: string) {
+    const fieldMapping = {
+      'lastName': 'Study Person Last Name',
+      'firstName': 'Study Person First Name',
+      'midInitials': 'Study Person Mid Initials',
+      'email': 'Study Person Email',
+      'phone': 'Study Person Phone',
+      'fax': 'Study Person Fax',
+      'address': 'Study Person Address',
+      'affiliation': 'Study Person Affiliation',
+      'roles': 'Study Person Roles',
+      'orcid': 'Study Person ORCID',
+      'rorid': 'Study Person Affiliation ROR ID',
+      'alternativeEmail': 'Study Person Alternative Email'
+    };
+    const fieldName = fieldMapping[fieldId] || fieldId;
+    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+  }
+
+  getFieldHint(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.description || '';
+  }
+
+  getFieldPlaceholder(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.placeholder) {
+      return metadata.placeholder;
+    }
+    const validation = this.fieldValidation(fieldId);
+    return validation?.placeholder || '';
+  }
+
+  getFieldLabel(fieldId: string): string {
+    const metadata = this.getFieldMetadata(fieldId);
+    if (metadata && metadata.label) {
+      return metadata.label;
+    }
+    const fieldMapping = {
+      'lastName': 'Last Name',
+      'firstName': 'First Name',
+      'midInitials': 'Middle Initials',
+      'email': 'Email',
+      'phone': 'Phone',
+      'fax': 'Fax',
+      'address': 'Address',
+      'affiliation': 'Affiliation',
+      'roles': 'Roles',
+      'orcid': 'ORCID',
+      'rorid': 'ROR ID',
+      'alternativeEmail': 'Alternative Email'
+    };
+    return fieldMapping[fieldId] || fieldId;
+  }
+}

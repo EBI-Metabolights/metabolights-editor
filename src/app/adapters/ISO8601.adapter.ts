@@ -8,8 +8,11 @@ export class IsoDateAdapter extends DateAdapter<string> {
   }
 
   override parse(value: any): string | null {
-    if (typeof value === 'string' && !isNaN(Date.parse(value))) {
-      return value;
+    if (typeof value === 'string') {
+      return this.normalizeToYmd(value);
+    }
+    if (value instanceof Date && !isNaN(value.getTime())) {
+      return this.toYmd(value);
     }
     return null;
   }
@@ -18,8 +21,7 @@ export class IsoDateAdapter extends DateAdapter<string> {
     if (!date) {
       return '';
     }
-    const parsedDate = new Date(date);
-    return parsedDate.toISOString().split('T')[0]; // Return in YYYY-MM-DD format
+    return this.normalizeToYmd(date) || '';
   }
 
   override toIso8601(date: string): string {
@@ -27,50 +29,62 @@ export class IsoDateAdapter extends DateAdapter<string> {
   }
 
   fromIso8601(iso8601String: string): string | null {
-    return iso8601String;
+    return this.normalizeToYmd(iso8601String);
   }
 
   override isValid(date: string): boolean {
-    return !isNaN(Date.parse(date));
+    return this.parseAsLocalDate(date) !== null;
   }
 
   override createDate(year: number, month: number, date: number): string {
-    const isoString = new Date(year, month, date).toISOString();
-    return isoString.split('T')[0]; // Return in YYYY-MM-DD format
+    return this.toYmd(new Date(year, month, date));
   }
 
   override getYear(date: string): number {
-    return new Date(date).getFullYear();
+    const parsed = this.parseAsLocalDate(date);
+    return parsed ? parsed.getFullYear() : NaN;
   }
 
   override getMonth(date: string): number {
-    return new Date(date).getMonth();
+    const parsed = this.parseAsLocalDate(date);
+    return parsed ? parsed.getMonth() : NaN;
   }
 
   override getDate(date: string): number {
-    return new Date(date).getDate();
+    const parsed = this.parseAsLocalDate(date);
+    return parsed ? parsed.getDate() : NaN;
   }
 
   override getDayOfWeek(date: string): number {
-    return new Date(date).getDay();
+    const parsed = this.parseAsLocalDate(date);
+    return parsed ? parsed.getDay() : NaN;
   }
 
   override addCalendarYears(date: string, years: number): string {
-    const d = new Date(date);
+    const d = this.parseAsLocalDate(date);
+    if (!d) {
+      return date;
+    }
     d.setFullYear(d.getFullYear() + years);
-    return d.toISOString().split('T')[0];
+    return this.toYmd(d);
   }
 
   override addCalendarMonths(date: string, months: number): string {
-    const d = new Date(date);
+    const d = this.parseAsLocalDate(date);
+    if (!d) {
+      return date;
+    }
     d.setMonth(d.getMonth() + months);
-    return d.toISOString().split('T')[0];
+    return this.toYmd(d);
   }
 
   override addCalendarDays(date: string, days: number): string {
-    const d = new Date(date);
+    const d = this.parseAsLocalDate(date);
+    if (!d) {
+      return date;
+    }
     d.setDate(d.getDate() + days);
-    return d.toISOString().split('T')[0];
+    return this.toYmd(d);
   }
 
   getMonthNames(style: 'long' | 'short' | 'narrow'): string[] {
@@ -93,7 +107,8 @@ export class IsoDateAdapter extends DateAdapter<string> {
   }
 
   getYearName(date: string): string {
-    return new Date(date).getFullYear().toString();
+    const parsed = this.parseAsLocalDate(date);
+    return parsed ? parsed.getFullYear().toString() : '';
   }
 
   getFirstDayOfWeek(): number {
@@ -102,23 +117,72 @@ export class IsoDateAdapter extends DateAdapter<string> {
   }
 
   getNumDaysInMonth(date: string): number {
-    const d = new Date(date);
+    const d = this.parseAsLocalDate(date);
+    if (!d) {
+      return 0;
+    }
     return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
   }
 
   clone(date: string): string {
-    return new Date(date).toISOString();
+    return this.normalizeToYmd(date) || date;
   }
 
   today(): string {
-    return new Date().toISOString().split('T')[0];
+    return this.toYmd(new Date());
   }
 
   isDateInstance(obj: any): boolean {
-    return typeof obj === 'string' && !isNaN(Date.parse(obj));
+    return typeof obj === 'string' && this.parseAsLocalDate(obj) !== null;
   }
 
   invalid(): string {
     return 'Invalid Date';
+  }
+
+  private parseAsLocalDate(value: string): Date | null {
+    if (!value) {
+      return null;
+    }
+
+    const text = String(value).trim();
+    const ymdMatch = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (ymdMatch) {
+      const year = Number(ymdMatch[1]);
+      const month = Number(ymdMatch[2]) - 1;
+      const day = Number(ymdMatch[3]);
+      const parsed = new Date(year, month, day);
+      if (
+        parsed.getFullYear() === year &&
+        parsed.getMonth() === month &&
+        parsed.getDate() === day
+      ) {
+        return parsed;
+      }
+      return null;
+    }
+
+    const parsed = new Date(text);
+    if (isNaN(parsed.getTime())) {
+      return null;
+    }
+    return new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+  }
+
+  private normalizeToYmd(value: string): string | null {
+    const text = String(value).trim();
+    const match = text.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (match) {
+      return this.parseAsLocalDate(match[1]) ? match[1] : null;
+    }
+    const parsed = this.parseAsLocalDate(text);
+    return parsed ? this.toYmd(parsed) : null;
+  }
+
+  private toYmd(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }

@@ -1,15 +1,15 @@
 .material-modal-card {
-    width: 100%;
-    max-width: 900px;
-    margin: auto;
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 5px 5px -3px rgba(0,0,0,0.2),
-                0 8px 10px 1px rgba(0,0,0,0.14),
-                0 3px 14px 2px rgba(0,0,0,0.12);
-  }
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+    0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
 
 /* Header */
 .modal-header {
@@ -17,62 +17,76 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  /* border-bottom: 1px solid #ddd; */
+  flex-shrink: 0;
 }
 
 .modal-header h2 {
   margin: 0;
 }
 
-  .close-btn {
-    align-self: flex-end;
-    margin-top: 16px;
-  }
+.close-btn {
+  align-self: flex-end;
+  margin-top: 16px;
+}
 
-  .material-dialog-description {
-    margin: 8px 0 16px;
-    font-size: 0.95rem;
-    color: rgba(0,0,0,0.7);
-    line-height: 1.4;
-    padding-left: 3%;
-    padding-right: 3%;
-  }
+.material-dialog-description {
+  margin: 8px 0 16px;
+  font-size: 0.95rem;
+  color: rgba(0, 0, 0, 0.7);
+  line-height: 1.4;
+  padding-left: 3%;
+  padding-right: 3%;
+}
 
-  .flex-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
+.flex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
 
 
-  .blocks-container {
-    max-height: 50vh;
-    overflow-y: auto;
-    padding: 0rem 1rem;
-  }
+.blocks-container {
+  overflow-y: auto;
+  padding: 0rem 1rem;
+  flex: 1;
+  /* Allow to grow/shrink */
+  min-height: 0;
+  /* Important for flex items to scroll */
+}
 
 .mat-table {
-    width: 100%;
-  }
+  width: 100%;
+}
 
-  mat-card {
-    margin: 16px;
-    padding: 16px;
-  }
+mat-card {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  /* Limit height to viewport height */
+  overflow: hidden;
+}
 
-  .scrollable-table-container {
-    max-height: 900px;
-    /* min-width: 600px; */
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: block;
-  }
+.scrollable-table-container {
+  max-height: 900px;
+  /* min-width: 600px; */
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+}
+
 /* Content */
 
-.modal-content, .modal-card {
+.modal-content,
+.modal-card {
   width: 900px;
-  padding: 1rem;
+  padding: 0;
+  max-width: 900px;
+  overflow: hidden;
+  /* Hide outside scroll */
 }
+
 /* Modal Footer */
 .modal-footer {
   align-items: center;
@@ -87,21 +101,27 @@
   background-color: white;
 
 }
+
 .modal-footer .button:not(:last-child) {
-    margin-right: .5em;
+  margin-right: .5em;
 }
-.keep-right{
+
+.keep-right {
   justify-content: space-between;
 }
+
 .policy-frame {
   width: 100%;
 }
+
 .main-wrapper-modal {
- border: 1px solid #000;
+  border: 1px solid #000;
 }
-.hightlight-message{
+
+.hightlight-message {
   color: red;
 }
-.fit{
+
+.fit {
   display: flex;
 }

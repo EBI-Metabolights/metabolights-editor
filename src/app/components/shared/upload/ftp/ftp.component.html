@@ -3,9 +3,7 @@
     Private FTP Upload
   </button>
 </div>
-<small class="had-text-grey is-pulled-right"
-  ><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small
->
+<small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small>
 <div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
   <div class="modal-background"></div>
   <div class="modal-card">
@@ -17,9 +15,8 @@
         However, on must computers you have to install an FTP client first. If
         you are not familiar with using FTP from the command line, we can
         recommend the free
-        <a href="https://filezilla-project.org/" target="_blank"
-          >FileZilla tool</a
-        >. Please see the FAQ section on the FileZilla pages for specific
+        <a href="https://filezilla-project.org/" target="_blank">FileZilla tool</a>. Please see the FAQ section on the
+        FileZilla pages for specific
         details about how this software works.
       </p>
     </section>
@@ -43,41 +40,58 @@
       <!--Start of the ftp table-->
 
 
-      <table
-        class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth"
-      >
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <tbody>
           <tr>
             <th>Server (Host)</th>
             <td>
-              {{ details.server }}
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{{ details.server }}</span>
+                <mat-icon (click)="copyText(details.server)"
+                  style="cursor: pointer; font-size: 14px; width: 14px; height: 14px;"
+                  matTooltip="Copy Server">content_copy</mat-icon>
+              </div>
             </td>
           </tr>
           <tr>
             <th>Username</th>
             <td>
-              {{ details.user }}
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{{ details.user }}</span>
+                <mat-icon (click)="copyText(details.user)"
+                  style="cursor: pointer; font-size: 14px; width: 14px; height: 14px;"
+                  matTooltip="Copy Username">content_copy</mat-icon>
+              </div>
             </td>
           </tr>
           <tr>
             <th>Password</th>
             <td>
-              {{ details.secret }}
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{{ details.secret }}</span>
+                <mat-icon (click)="copyText(details.secret)"
+                  style="cursor: pointer; font-size: 14px; width: 14px; height: 14px;"
+                  matTooltip="Copy Password">content_copy</mat-icon>
+              </div>
             </td>
           </tr>
           <tr>
             <th>Remote folder (Remote site)</th>
-            <td>{{ uploadLocation$ | async }}</td>
+            <td>
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span>{{ uploadLocation$ | async }}</span>
+                <mat-icon (click)="copyText(uploadPath)" style="cursor: pointer; font-size: 14px; height: 14px;"
+                  matTooltip="Copy Remote Folder">content_copy</mat-icon>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
       <!--End of ftp table-->
       <div style="margin-top: 20px" class="panel-block notification is-primary">
         <small>
-          <i
-            ><mat-icon>info</mat-icon> You may close this modal and proceed to
-            the next steps while the files are being uploaded</i
-          >
+          <i><mat-icon>info</mat-icon> You may close this modal and proceed to
+            the next steps while the files are being uploaded</i>
         </small>
       </div>
     </section>

@@ -210,11 +210,11 @@ export class DescriptorsState {
 
     @Selector()
     static studyDesignDescriptors(state: DescriptorsStateModel): Ontology[] {
-        return state.designDescriptors
+        return state?.designDescriptors
     }
 
     @Selector()
     static studyFactors(state: DescriptorsStateModel): MTBLSFactor[] {
-        return state.factors
+        return state?.factors
     }
 }

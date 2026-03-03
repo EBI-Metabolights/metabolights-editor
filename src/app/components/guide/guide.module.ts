@@ -9,9 +9,9 @@ import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { BrowserModule } from "@angular/platform-browser";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { SharedModule } from "../shared/shared.module";
+import { MatAutocompleteModule } from "@angular/material/autocomplete";
+import { MatSelectModule } from "@angular/material/select";
 import { GuidedAssaysComponent } from "./assays/assays.component";
 import { CreateComponent } from "./create/create.component";
 import { InfoComponent } from "./info/info.component";
@@ -22,6 +22,7 @@ import { StudyModule } from "../study/study.module";
 import { RouterModule } from "@angular/router";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatTooltipModule } from "@angular/material/tooltip";
+import { MatStepperModule } from "@angular/material/stepper";
 
 @NgModule({ declarations: [
         GuidedAssaysComponent,
@@ -39,13 +40,11 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         ProgressComponent,
         RawUploadComponent,
     ], imports: [CommonModule,
-        BrowserModule,
         MatIconModule,
         FormsModule,
         SharedModule,
         StudyModule, // TODO: move the components we need for this GuideModule from StudyModule into Shared.
         ReactiveFormsModule,
-        BrowserAnimationsModule,
         MatProgressSpinnerModule,
         MatButtonModule,
         MatButtonToggleModule,
@@ -54,5 +53,8 @@ import { MatTooltipModule } from "@angular/material/tooltip";
         MatCheckboxModule,
         MatTooltipModule,
         MatInputModule,
+        MatAutocompleteModule,
+        MatSelectModule,
+        MatStepperModule,
         RouterModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
 export class GuideModule {}

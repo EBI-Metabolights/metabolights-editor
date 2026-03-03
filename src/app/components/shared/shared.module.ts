@@ -11,6 +11,7 @@ import { LoadingComponent } from "./loading/loading.component";
 import { NavBarComponent } from "./nav-bar/nav-bar.component";
 import { QuickLinkComponent } from "./quick-link/quick-link.component";
 import { UploadComponent } from "./upload/upload.component";
+import { ChecklistComponent } from "./checklist/checklist.component";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { AsperaDownloadComponent } from "./download/aspera/aspera.component";
 import { FtpDownloadComponent } from "./download/ftp/ftp.component";
@@ -42,7 +43,9 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { AddAssayComponent } from "./add-assay/add-assay.component";
 import { MatTableModule } from "@angular/material/table";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatButtonModule } from "@angular/material/button";
+import { MatCheckboxModule } from "@angular/material/checkbox";
 import { AuthGuard } from "src/app/auth-guard.service";
 import { EditorService } from "src/app/services/editor.service";
 import { AuthService } from "src/app/services/metabolights/auth.service";
@@ -55,7 +58,6 @@ import { QuillModule } from "ngx-quill";
 import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
 import { AsyncTaskComponent } from './async-task/async-task.component';
 import { AsyncStatusTransformPipe } from "./async-task/async-task-status-transform.pipe";
-import { BrowserModule } from "@angular/platform-browser";
 import { PaginatedTableComponent } from "./paginated-table/paginated-table.component";
 import { TableComponent } from "./table/table.component";
 import { PromptRefreshComponent } from "./messages/prompt-refresh/prompt-refresh.component";
@@ -66,10 +68,15 @@ import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.p
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { MatCardModule } from "@angular/material/card";
-import { MatDivider } from "@angular/material/divider";
+import { MatDividerModule } from "@angular/material/divider";
 import { FactorlistComponent } from "./factorlist/factorlist.component";
 import { DataPolicyModalComponent } from "./data-policy-modal/data-policy-modal.component";
 import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
+import { BrowserModule } from "@angular/platform-browser";
+import { FundingComponent } from './funding/funding.component';
+import { RelatedDatasetsComponent } from './related-datasets/related-datasets.component';
+import { ModalComponent } from './modal/modal.component';
+
 
 
 /**
@@ -97,6 +104,7 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     PaginatedTableComponent,
     TableComponent,
     UploadComponent,
+    ChecklistComponent,
     FTPUploadComponent,
     AsperaUploadComponent,
     DesignDescriptorsComponent,
@@ -118,7 +126,10 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     CurationStatusStarTransformPipe,
     FactorlistComponent,
     DataPolicyModalComponent,
-    DragAndDropComponent
+    DragAndDropComponent,
+    FundingComponent,
+    RelatedDatasetsComponent,
+    ModalComponent
   ],
   imports: [
     CommonModule,
@@ -138,17 +149,20 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     MatTableModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatSlideToggleModule,
     MatExpansionModule,
     MatTooltipModule,
     QuillModule,
     PromptRefreshComponent,
     MatCardModule,
     ConfirmationDialogComponent,
-    MatDivider
+    MatDividerModule,
+    MatCheckboxModule
   ],
   exports: [
     AddAssayComponent,
     ContentComponent,
+    ConfirmationDialogComponent,
     DeleteFileComponent,
     DirectoryComponent,
     DownloadComponent,
@@ -165,6 +179,7 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     PaginatedTableComponent,
     TableComponent,
     UploadComponent,
+    ChecklistComponent,
     FTPUploadComponent,
     AsperaUploadComponent,
     DesignDescriptorsComponent,
@@ -183,8 +198,12 @@ import { DragAndDropComponent } from "./drag-and-drop/drag-and-drop.component";
     CurationStatusStarTransformPipe,
     FactorlistComponent,
     DataPolicyModalComponent,
-    DragAndDropComponent
-
+    DragAndDropComponent,
+    FundingComponent,
+    RelatedDatasetsComponent,
+    ModalComponent,
+    MatCheckboxModule,
+    MatSlideToggleModule
   ],
   providers: [
     AuthGuard,

@@ -206,6 +206,7 @@ a.dropdown-item {
   background-color: #333;
   color: #fff;
 }
+
 .tags .tag {
   text-transform: none;
 }
@@ -259,7 +260,7 @@ a.dropdown-item {
 }
 
 .first-row {
-  background-color: rgba(220, 245, 249, 0.481); 
+  background-color: rgba(220, 245, 249, 0.481);
   font-style: italic;
 }
 
@@ -270,19 +271,23 @@ a.dropdown-item {
 .dismiss {
   position: absolute;
   right: 2%;
-  cursor: pointer; /* This gives you the little hand */
+  cursor: pointer;
+  /* This gives you the little hand */
 }
+
 .scroll-wrapper {
   overflow-x: auto;
   overflow-y: auto;
 }
 
 #wrapper1 {
-  height: 20px;
+  height: 32px;
 }
+
 #wrapper2 {
   height: auto !important;
 }
+
 .radio-tick {
   display: inline-block;
   width: 18px;
@@ -320,3 +325,148 @@ a.dropdown-item {
   text-align: center;
 }
 
+::ng-deep .mat-mdc-paginator {
+  font-size: 14px !important;
+  background: transparent !important;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  padding: 0 8px !important;
+  min-height: 48px !important;
+  flex-wrap: nowrap !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size {
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size-label {
+  margin: 0 8px 0 0 !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-form-field-subscript-wrapper {
+  display: none !important;
+}
+
+::ng-deep .mat-mdc-paginator-range-label {
+  margin: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size .mat-mdc-form-field {
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .mat-mdc-paginator-navigation-container {
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .small-toggle .mat-button-toggle-label-content {
+  line-height: 1.5 !important;
+  padding: 0 0.75em !important;
+  font-size: 0.75rem !important;
+  font-weight: bold !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}
+
+::ng-deep .small-toggle {
+  height: 2em !important;
+  align-items: center !important;
+  border-radius: 2px !important;
+  margin-right: 5px !important;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+}
+
+::ng-deep .small-toggle .mat-button-toggle-button {
+  height: 2em !important;
+  align-items: center !important;
+}
+
+.table-action-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.table-action-row > * {
+  display: inline-flex;
+  align-items: center;
+}
+
+.table-action-row .button.is-light {
+  color: #fff;
+  background-color: rgb(0, 209, 178);
+  border-color: rgb(0, 209, 178);
+}
+
+.table-action-row .button.is-light .mat-icon {
+  color: #fff;
+}
+
+.table-action-row .button.is-light:hover {
+  color: #fff;
+  background-color: rgb(0, 190, 162);
+  border-color: rgb(0, 190, 162);
+}
+
+::ng-deep .table-action-row .small-toggle {
+  border: 1px solid rgb(0, 209, 178) !important;
+}
+
+::ng-deep .table-action-row .small-toggle .mat-button-toggle-button {
+  background-color: #fff !important;
+}
+
+::ng-deep .table-action-row .small-toggle .mat-button-toggle-checked .mat-button-toggle-button {
+  background-color: rgb(0, 209, 178) !important;
+  color: #fff !important;
+}
+
+::ng-deep .table-action-row .small-toggle .mat-pseudo-checkbox-minimal::after,
+::ng-deep .table-action-row .small-toggle .mat-pseudo-checkbox-checked::after,
+::ng-deep .table-action-row .small-toggle .mat-pseudo-checkbox-indeterminate::after {
+  color: #fff !important;
+  border-color: #fff !important;
+}
+
+.table-edit-modal-card {
+  width: min(900px, 92vw);
+  max-height: 92vh;
+  height: auto;
+}
+
+.table-edit-modal-card .modal-card-body {
+  max-height: none;
+  overflow: visible;
+}
+
+.table-edit-modal-card .mat-mdc-form-field-hint-wrapper,
+.table-edit-modal-card mat-hint {
+  white-space: normal;
+}
+
+.add-rows-group {
+  width: 13% !important;
+  min-width: 145px;
+  max-width: 190px;
+  margin-bottom: 0 !important;
+}
+
+::ng-deep .small-toggle .mdc-button__label {
+  font-size: 0.75rem !important;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+}

@@ -1,35 +1,85 @@
 .mat-table {
-    width: 100%;
-  }
+  width: 100%;
+}
 
-  mat-card {
-    margin: 16px;
-    padding: 16px;
+.overrides-modal-card {
+  width: min(1100px, 88vw);
+  max-height: 88vh;
+  margin: 24px auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable-table-container {
+  max-height: calc(88vh - 88px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: block;
+}
+
+/* Modal Footer correction */
+.modal-card-foot {
+  background-color: white !important;
+  /* Ensure white background */
+  border-top: none;
+}
+
+/* Column Widths to ensure visibility */
+.mat-column-ruleId,
+.mat-column-title,
+.mat-column-newType,
+.mat-column-curator,
+.mat-column-comments,
+.mat-column-createdAt,
+.mat-column-actions {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.mat-column-actions {
+  justify-content: center;
+  flex: 0 0 90px;
+}
+
+/* Text Wrapping */
+.mat-header-cell,
+.mat-cell {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  word-break: break-word;
+}
+
+.wrap-text {
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.4;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+@media (max-width: 1024px) {
+  .overrides-modal-card {
+    width: 92vw;
+    margin: 16px auto;
+    padding: 10px;
   }
 
   .scrollable-table-container {
-    max-height: 900px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    display: block;
+    max-height: calc(90vh - 84px);
   }
-  /* Modal Footer */
-.modal-footer {
-  align-items: center;
-  background-color: #f5f5f5;
-  display: flex;
-  flex-shrink: 0;
-  justify-content: flex-start;
-  padding: 20px;
-  position: relative;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-  background-color: white;
+}
 
-}
-.modal-footer .button:not(:last-child) {
-    margin-right: .5em;
-}
-.keep-right{
-  justify-content: flex-end;
+@media (max-width: 768px) {
+  .overrides-modal-card {
+    width: 96vw;
+    max-height: 92vh;
+    margin: 12px auto;
+    padding: 8px;
+  }
+
+  .scrollable-table-container {
+    max-height: calc(92vh - 80px);
+  }
 }

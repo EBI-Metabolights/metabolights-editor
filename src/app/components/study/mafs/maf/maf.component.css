@@ -27,3 +27,8 @@
   line-height: 40px;
   border-radius: 50%;
 }
+
+/* Add spacing between form fields in modal */
+.modal-card-body .control {
+  margin-bottom: 12px;
+}

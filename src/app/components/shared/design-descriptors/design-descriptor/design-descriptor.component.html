@@ -1,14 +1,24 @@
-<div *ngIf="addNewDescriptor || descriptor == null; else showDescriptorDetails">
+<div *ngIf="(addNewDescriptor || descriptor == null) && mode !== 'local'; else showDescriptorDetails">
   <a class="button is-primary is-pulled-right is-small" (click)="openModal()">+ Add</a>
 </div>
 <ng-template #showDescriptorDetails>
-  <div class="control">
+  <div class="control" *ngIf="mode !== 'local'">
     <div class="tags has-addons" style="margin-bottom: 5px">
-      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()">
-        <i class="material-icons"> edit </i>
+      <span *ngIf="!isStudyReadOnly" class="tag is-primary clickable" (click)="openModal()"
+        title="Edit Design Descriptor">
+        <i class="material-icons" style="font-size: 16px;"> edit </i>
       </span>
-      <span class="tag is-default is-small">
-        <ontology-details [value]="descriptor"></ontology-details>
+      <span class="tag is-default is-small" style="height: auto; padding: 4px 10px; display: block;">
+        <span *ngIf="!isStudyReadOnly && getCategoryLabel(descriptor) as category" class="ml-1"><b>{{ category }}</b> :
+        </span>
+        <span class="descriptor-value">
+          <ontology-details [value]="descriptor"></ontology-details>
+          <span *ngIf="!isStudyReadOnly && isCuratorAdded(descriptor)" class="icon is-small has-text-info ml-1"
+            style="cursor: pointer;" matTooltip="Curated by metabolights">
+            <i class="material-icons" style="font-size: 16px;">info</i>
+          </span>
+        </span>
+
       </span>
     </div>
   </div>
@@ -40,35 +50,61 @@
 <div class="modal" [ngClass]="{ 'is-active': isModalOpen }">
   <form *ngIf="form" [formGroup]="form">
     <div class="modal-background"></div>
-    <div class="modal-card">
+    <div class="modal-card" [ngClass]="isCreationFlow ? '' : 'vw60'">
       <div *ngIf="isFormBusy" class="load-bar">
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <ng-container *ngIf="_controlList && !_controlList.renderAsDropdown; else dropdownField">
-          <mtbls-ontology #descriptorComponent [validations]="validation" [controlList]="controlList()"
-            (changed)="onChanges($event)" [values]="descriptorValuesForComponent()" [inline]="true"
-            [rule]="controlList().rule" [defaultOntologies]="controlList().defaultOntologies"
-            [label]="'Descriptor'"></mtbls-ontology>
-          <mat-error *ngIf="showError">
-            <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
-          </mat-error>
-        </ng-container>
+        <div [formGroup]="form">
+          <div class="columns is-variable is-2">
 
-        <ng-template #dropdownField>
-          <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('descriptor')">
-            <mat-select formControlName="descriptor" placeholder="Descriptor" (selectionChange)="onChanges($event)">
-              <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
-                {{ option.annotationValue }}
-              </mat-option>
-            </mat-select>
-            <mat-error *ngIf="showError">
-              <small>{{ form?.get('descriptor')?.errors?.descriptor?.error }}</small>
-            </mat-error>
-          </mat-form-field>
-        </ng-template>
+            <!-- Column 1: Group (Category) - Show First -->
+            <div class="column is-5" *ngIf="mode !== 'local'">
+              <div class="field">
+                <label class="label is-small">Group</label>
+                <div class="control">
+                  <mat-form-field class="full-width is-small" appearance="outline">
+                    <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
+                      placeholder="Select Group" required>
+                      <mat-option *ngFor="let cat of descriptorCategories" [value]="cat.id">
+                        {{ cat.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+            </div>
+
+            <!-- Column 2: Design Descriptor -->
+            <div class="column" [ngClass]="mode !== 'local' ? 'is-7' : 'is-12'">
+              <div class="field">
+                <label class="label is-small">Design Descriptor (Keyword)</label>
+                <div class="control">
+                  <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                      <mat-select formControlName="descriptor" placeholder="Select Keyword"
+                        (selectionChange)="onChanges($event.value)">
+                        <mat-option *ngFor="let val of _controlList.values" [value]="val.annotationValue">
+                          {{ val.annotationValue }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </span>
+                  <ng-template #ontologyField>
+                    <mtbls-ontology #descriptorComponent (changed)="onChanges($event)"
+                      [controlList]="{ name: controlListKey, values: _controlList?.values || [] }"
+                      [rule]="_controlList?.rule" [defaultOntologies]="_controlList?.defaultOntologies"
+                      [validations]="validation" [isRorSearch]="false" [isModal]="true" [inline]="true" [label]="''">
+                    </mtbls-ontology>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
       </section>
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
@@ -76,11 +112,7 @@
             <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <button
-              *ngIf="addNewDescriptor"
-              class="button is-primary is-pulled-left"
-              (click)="openImportModal()"
-            >
+            <button *ngIf="addNewDescriptor" class="button is-primary is-pulled-left" (click)="openImportModal()">
               <mat-icon>label</mat-icon> Import
             </button>
           </div>
@@ -116,7 +148,7 @@
         <div class="bar"></div>
       </div>
       <section class="modal-card-body">
-        <mat-form-field class="full-width">
+        <mat-form-field class="full-width" appearance="outline">
           <mat-label>Select Publication</mat-label>
           <mat-select (selectionChange)="getKeyWords()" [formControl]="selectedPublication" required>
             <mat-option> Please select </mat-option>
