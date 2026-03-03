@@ -941,6 +941,8 @@ export class CreateComponent implements OnInit {
       this.doiService.getArticleInfo(doiURL).subscribe((article) => {
         this.publicationTitle = article.title.trim();
         this.publicationAuthors = article.authorList.trim();
+        // default for valid DOI responses when upstream status is unavailable
+        this.applyPublicationStatus("Published");
       });
       this.europePMCService
         .getArticleInfo("DOI:" + doi)

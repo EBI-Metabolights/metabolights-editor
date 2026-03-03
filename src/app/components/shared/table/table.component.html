@@ -106,16 +106,17 @@
         [file]="data.file"
       ></mtbls-upload>
     </span> -->
-    <span *ngIf="data && data.file">
+    <span *ngIf="data && data.file" class="table-upload-controls">
       <mtbls-download [value]="data.file"></mtbls-download>
-      <a *ngIf="!isReadOnly" style="margin-left: 0.5rem;" (click)="setFilePattern(data.file);openUploadArea = true"
-        class="button is-small is-light" [ngClass]="size">
+      <a *ngIf="!isReadOnly" (click)="setFilePattern(data.file);openUploadArea = true"
+        class="button is-small is-light table-upload-trigger" [ngClass]="size">
         <mat-icon>cloud_upload</mat-icon> Upload
       </a>
-      <div *ngIf="openUploadArea" style="margin-top: 1rem;"> <app-drag-and-drop [iscloseable]="true"
-          [filePatternString]="filePatternString" (uploadComplete)="onUploadComplete($event)"
-          (closeUpload)="openUploadArea = false"></app-drag-and-drop> </div>
     </span>
+    <div *ngIf="data && data.file && openUploadArea" class="table-upload-drop-area">
+      <app-drag-and-drop [iscloseable]="true" [filePatternString]="filePatternString"
+        (uploadComplete)="onUploadComplete($event)" (closeUpload)="openUploadArea = false"></app-drag-and-drop>
+    </div>
     <span *ngIf="!isReadOnly && (
         selectedRows.length > 0 ||
         selectedColumns.length > 0 ||
