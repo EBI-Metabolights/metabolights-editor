@@ -260,7 +260,7 @@
 
   <!-- Edit column modal start -->
   <div class="modal prevent-deselect" [ngClass]="{ 'is-active': isEditColumnModalOpen }">
-    <form *ngIf="editColumnform" [formGroup]="editColumnform">
+    <form *ngIf="editColumnform" [formGroup]="editColumnform" (keydown.enter)="onModalEnter($event)">
       <div class="modal-background"></div>
       <div class="modal-card table-edit-modal-card">
         <div *ngIf="isFormBusy" class="load-bar">
@@ -287,7 +287,7 @@
                     <mat-form-field class="full-width" appearance="outline"
                       *ngIf="columnControlList(selectedColumn['header']).renderAsDropdown">
                       <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedColumn.header) }}">
-                        <mat-option *ngFor="let option of columnControlList(selectedColumn['header']).values"
+                        <mat-option *ngFor="let option of columnControlList(selectedColumn['header'])?.values"
                           [value]="option.annotationValue">
                           {{ option.annotationValue }}
                         </mat-option>
@@ -332,7 +332,7 @@
 
   <!-- edit cell modal start -->
   <div class="modal editModal prevent-deselect" *ngIf="isEditModalOpen" [ngClass]="{ 'is-active': isEditModalOpen }">
-    <form *ngIf="editCellform" [formGroup]="editCellform">
+    <form *ngIf="editCellform" [formGroup]="editCellform" (keydown.enter)="onModalEnter($event)">
       <div class="modal-background"></div>
       <div class="modal-card table-edit-modal-card">
         <div *ngIf="isFormBusy" class="load-bar">
