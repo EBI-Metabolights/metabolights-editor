@@ -371,35 +371,6 @@ export class PublicationComponent implements OnInit {
       this.doiService.getArticleInfo(doiURL).subscribe((article) => {
         this.setFieldValue("title", article.title.trim());
         this.setFieldValue("authorList", article.authorList.trim());
-
-        // prefer updating ontology component if present, otherwise update form control
-        const statusVals = ["Published"];
-        if (
-          this.statusComponent &&
-          typeof this.statusComponent.setValue === "function"
-        ) {
-          try {
-            this.statusComponent.setValue("Published");
-            if (
-              Array.isArray(this.statusComponent.values) &&
-              this.statusComponent.values.length
-            ) {
-              // keep statusVals in sync with component
-             
-            }
-          } catch (e) {
-            // ignore component update failure
-          }
-        }
-        if (this.form && this.form.controls && this.form.controls.status) {
-          // set the same value into the form control (array or object as expected)
-          this.form.controls.status.setValue(statusVals);
-          this.setDoiRequiredBasedOnStatus();
-          if (this.form.controls.doi) {
-            this.form.controls.doi.updateValueAndValidity();
-          }
-          this.form.updateValueAndValidity();
-        }
       });
       this.europePMCService
         .getArticleInfo("DOI:" + doi.replace("http://dx.doi.org/", ""))
@@ -407,6 +378,7 @@ export class PublicationComponent implements OnInit {
           if (article.doi === doi) {
             this.setFieldValue("pubMedID", article.pubMedID.trim());
             this.publicationAbstract = article.abstract;
+            this.applyPublicationStatus(article.status);
           }
         });
     }
@@ -443,25 +415,60 @@ export class PublicationComponent implements OnInit {
           this.setFieldValue("title", article.title.trim());
           this.setFieldValue("authorList", article.authorList.trim());
           this.setFieldValue("doi", article.doi.trim());
-
-          if (
-            this.statusComponent &&
-            typeof this.statusComponent.setValue === "function"
-          ) {
-            try {
-              this.statusComponent.setValue("Published");
-            } catch (e) {}
-          }
-          if (this.form && this.form.controls && this.form.controls.status) {
-            this.form.controls.status.setValue(["Published"]);
-            this.setDoiRequiredBasedOnStatus();
-            if (this.form.controls.doi) {
-              this.form.controls.doi.updateValueAndValidity();
-            }
-            this.form.updateValueAndValidity();
-          }
+          this.applyPublicationStatus(article.status);
           this.publicationAbstract = article.abstract;
         });
+    }
+  }
+
+  onIdentifierPaste(event: ClipboardEvent, field: "doi" | "pubMedID") {
+    if (!this.form) return;
+    const pastedText = event.clipboardData?.getData("text")?.trim();
+
+    if (pastedText) {
+      event.preventDefault();
+      this.setFieldValue(field, pastedText);
+      if (field === "doi") {
+        this.getArticleFromDOI();
+      } else {
+        this.getArticleFromPubMedID();
+      }
+      return;
+    }
+
+    // fallback for environments where clipboardData is unavailable
+    setTimeout(() => {
+      if (field === "doi") {
+        this.getArticleFromDOI();
+      } else {
+        this.getArticleFromPubMedID();
+      }
+    }, 0);
+  }
+
+  private applyPublicationStatus(statusFromResponse?: string) {
+    const statusLabel = (statusFromResponse || "Published").trim();
+    if (!statusLabel) return;
+
+    if (
+      this.statusComponent &&
+      typeof this.statusComponent.setValue === "function"
+    ) {
+      try {
+        this.statusComponent.setValue(statusLabel);
+      } catch (_) {}
+    }
+
+    if (this.form && this.form.controls && this.form.controls.status) {
+      const controlValue =
+        this._controlList?.renderAsDropdown ? statusLabel : [statusLabel];
+      this.form.controls.status.setValue(controlValue);
+      this.form.controls.status.markAsDirty();
+      this.setDoiRequiredBasedOnStatus();
+      if (this.form.controls.doi) {
+        this.form.controls.doi.updateValueAndValidity();
+      }
+      this.form.updateValueAndValidity();
     }
   }
 
