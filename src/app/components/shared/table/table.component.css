@@ -462,6 +462,29 @@ a.dropdown-item {
   margin-bottom: 0 !important;
 }
 
+.table-upload-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-upload-trigger {
+  margin-left: 0 !important;
+}
+
+.table-upload-drop-area {
+  flex: 0 0 100%;
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.table-upload-drop-area app-drag-and-drop {
+  display: block;
+  width: 100%
+}
+
 ::ng-deep .small-toggle .mdc-button__label {
   font-size: 0.75rem !important;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;

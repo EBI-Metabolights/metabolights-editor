@@ -26,9 +26,9 @@ export interface MAF {
 export interface MAFStateModel {
     mafs: Record<string, any>
 }
- const defaultState: MAFStateModel = {
+const defaultState: MAFStateModel = {
     mafs: {}
- }
+}
 
 
 @State<MAFStateModel>({
@@ -38,7 +38,7 @@ export interface MAFStateModel {
 @Injectable()
 export class MAFState {
 
-    constructor(private store: Store, private mafService: MafService) {}
+    constructor(private store: Store, private mafService: MafService) { }
 
     @Action(MAF.Set)
     SetStudyMAF(ctx: StateContext<MAFStateModel>, action: MAF.Set) {
@@ -62,55 +62,64 @@ export class MAFState {
                 const maf = {};
 
                 mcolumns.push({
-                  columnDef: "Structure",
-                  sticky: "true",
-                  header: "Structure",
-                  structure: true,
-                  cell: (element) => eval("element['database_identifier']"),
+                    columnDef: "Structure",
+                    sticky: "true",
+                    header: "Structure",
+                    structure: true,
+                    cell: (element) => eval("element['database_identifier']"),
                 });
 
                 Object.keys(mdata.header).forEach((key) => {
-                  const fn = "element['" + key + "']";
-                  mcolumns.push({
-                    columnDef: key, //.toLowerCase().split(" ").join("_")
-                    sticky: "false",
-                    header: key,
-                    cell: (element) => eval(fn),
-                  });
+                    const fn = "element['" + key + "']";
+                    mcolumns.push({
+                        columnDef: key, //.toLowerCase().split(" ").join("_")
+                        sticky: "false",
+                        header: key,
+                        cell: (element) => eval(fn),
+                    });
                 });
-
-                let mdisplayedColumns = mcolumns.map((a) => a.columnDef);
-                mdisplayedColumns.unshift("Select");
-                mdisplayedColumns.sort((a, b) => {
-                  // assert that the values are numbers, which they have to be as all header values in maf sheet objects are numbers.
-                  const assertA = mdata.header[a] as number;
-                  const assertB = mdata.header[b] as number;
-                  return assertA - assertB;
-                });
-                mdisplayedColumns = mdisplayedColumns.filter(
-                  (key) =>
-                    key.indexOf("Term Accession Number") < 0 &&
-                    key.indexOf("Term Source REF") < 0
-                );
 
                 const compactPriorityColumns = [
-                  "Structure",
-                  "metabolite_identification",
-                  "mass_to_charge",
-                  "retention_time",
-                  "chemical_shift",
-                  "multiplicity",
+                    "Structure",
+                    "metabolite_identification",
+                    "mass_to_charge",
+                    "retention_time",
+                    "chemical_shift",
+                    "multiplicity",
                 ];
-                const existingPriorityColumns = compactPriorityColumns.filter((column) =>
-                  mdisplayedColumns.includes(column)
+
+                let fullOrderedColumns = mcolumns.map((a) => a.columnDef);
+                fullOrderedColumns.unshift("Select");
+                fullOrderedColumns.sort((a, b) => ((mdata.header[a] as any) || 0) - ((mdata.header[b] as any) || 0));
+
+                const applyPriority = (cols: string[]) => {
+                    const move = (col: string, targetIndex: number) => {
+                        const idx = cols.indexOf(col);
+                        if (idx > -1 && idx !== targetIndex) {
+                            cols.splice(idx, 1);
+                            cols.splice(targetIndex, 0, col);
+                        }
+                    };
+                    let currentIndex = 1;
+                    compactPriorityColumns.forEach(pCol => {
+                        if (cols.includes(pCol)) {
+                            move(pCol, currentIndex);
+                            currentIndex++;
+                        }
+                    });
+                };
+
+                applyPriority(fullOrderedColumns);
+
+                let mdisplayedColumns = fullOrderedColumns.filter(
+                    (key) =>
+                        key.indexOf("Term Accession Number") < 0 &&
+                        key.indexOf("Term Source REF") < 0
                 );
-                const remainingColumns = mdisplayedColumns.filter(
-                  (column) => column !== "Select" && !compactPriorityColumns.includes(column)
-                );
-                mdisplayedColumns = ["Select", ...existingPriorityColumns, ...remainingColumns];
 
                 mdata["columns"] = mcolumns;
                 mdata["displayedColumns"] = mdisplayedColumns;
+                mdata["allColumns"] = fullOrderedColumns;
                 mdata["rows"] = mdata.data.rows;
                 mdata["file"] = action.filename;
                 delete mdata.data;
@@ -120,27 +129,27 @@ export class MAFState {
             },
             error: (error) => {
                 if (error.status === 404) {
-                    toastr.warning("'" +action.filename+ "' MAF file referenced in an assay does not exists.", "Error", {
-                    timeOut: "5000",
-                    positionClass: "toast-top-center",
-                    preventDuplicates: true,
-                    extendedTimeOut: 0,
-                    tapToDismiss: false,
-                  });
+                    toastr.warning("'" + action.filename + "' MAF file referenced in an assay does not exists.", "Error", {
+                        timeOut: "5000",
+                        positionClass: "toast-top-center",
+                        preventDuplicates: true,
+                        extendedTimeOut: 0,
+                        tapToDismiss: false,
+                    });
                 } else {
-                    toastr.warning("Unable to get '" +action.filename+ "' MAF file.", "Error", {
-                  timeOut: "5000",
-                  positionClass: "toast-top-center",
-                  preventDuplicates: true,
-                  extendedTimeOut: 0,
-                  tapToDismiss: false,
-                });
+                    toastr.warning("Unable to get '" + action.filename + "' MAF file.", "Error", {
+                        timeOut: "5000",
+                        positionClass: "toast-top-center",
+                        preventDuplicates: true,
+                        extendedTimeOut: 0,
+                        tapToDismiss: false,
+                    });
                 }
 
                 console.log("Unable to get MAF sheet")
                 console.log(error)
             }
-    });
+        });
 
 
     }

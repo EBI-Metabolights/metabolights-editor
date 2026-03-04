@@ -76,6 +76,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { FundingComponent } from './funding/funding.component';
 import { RelatedDatasetsComponent } from './related-datasets/related-datasets.component';
 import { ModalComponent } from './modal/modal.component';
+import { StudySubmissionChecklistComponent } from './study-submission-checklist/study-submission-checklist.component';
 
 
 
@@ -129,7 +130,8 @@ import { ModalComponent } from './modal/modal.component';
     DragAndDropComponent,
     FundingComponent,
     RelatedDatasetsComponent,
-    ModalComponent
+    ModalComponent,
+    StudySubmissionChecklistComponent
   ],
   imports: [
     CommonModule,
@@ -202,6 +204,7 @@ import { ModalComponent } from './modal/modal.component';
     FundingComponent,
     RelatedDatasetsComponent,
     ModalComponent,
+    StudySubmissionChecklistComponent,
     MatCheckboxModule,
     MatSlideToggleModule
   ],
@@ -215,4 +218,4 @@ import { ModalComponent } from './modal/modal.component';
     LabsWorkspaceService,
   ],
 })
-export class SharedModule {}
+export class SharedModule { }
