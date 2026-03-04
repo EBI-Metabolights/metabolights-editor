@@ -76,6 +76,8 @@ export class StudyComponent implements OnInit, OnDestroy {
   templateConfiguration: any = null;
   mhdAccession: string = null;
   isReadOnly = true;
+  isChecklistPopupOpen = false;
+  checklistStepExpandedIndex = 0;
 
   constructor(
     private store: Store,
@@ -233,6 +235,19 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     window.addEventListener("scroll", this.scrollFunction, true);
+  }
+
+  toggleChecklistPopup() {
+    this.isChecklistPopupOpen = !this.isChecklistPopupOpen;
+  }
+
+  closeChecklistPopup() {
+    this.isChecklistPopupOpen = false;
+  }
+
+  toggleChecklistStepExpand(index: number) {
+    this.checklistStepExpandedIndex =
+      this.checklistStepExpandedIndex === index ? -1 : index;
   }
 
   toggleMessage() {

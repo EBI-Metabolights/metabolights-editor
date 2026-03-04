@@ -13,7 +13,7 @@
     <div *ngIf="status == 'Public'" class="dropdown" [ngClass]="{ 'is-active': isDownloadDropdownActive }"
       #downloadDropdown>
       <div class="dropdown-trigger">
-        <button (click)="toggleDownloadDropdown()" class="button is-light">
+        <button (click)="toggleDownloadDropdown()" class="button is-light is-small">
           <span class="icon is-small">
             <mat-icon>cloud_download</mat-icon>
           </span>
@@ -36,7 +36,7 @@
       (complete)="loadFilesPassively()" [size]="'is'"></mtbls-upload>
 
     <span *ngIf="isSyncEnabled" class="refresh-button">
-      <a (click)="loadFilesPassively()" class="button is-light">
+      <a (click)="loadFilesPassively()" class="button is-light is-small">
         <mat-icon>refresh</mat-icon> Refresh
       </a>
       <span>
@@ -78,13 +78,13 @@
 
 
     <span *ngIf="isSyncEnabled && curator && !isReadOnly" class="is-pulled-rightn ml-auto">
-      <a *ngIf="access == null" (click)="getFolderStatus()" class="button is-light">
+      <a *ngIf="access == null" (click)="getFolderStatus()" class="button is-light is-small">
         <mat-icon>refresh</mat-icon> <small>FTP Folder Status</small>
       </a>
-      <a *ngIf="access == 'Read'" (click)="toggleFolderAccess()" class="button is-light">
+      <a *ngIf="access == 'Read'" (click)="toggleFolderAccess()" class="button is-light is-small">
         <mat-icon>lock</mat-icon> <small>READ ONLY ACCESS</small>
       </a>
-      <a *ngIf="access == 'Write'" (click)="toggleFolderAccess()" class="button is-light">
+      <a *ngIf="access == 'Write'" (click)="toggleFolderAccess()" class="button is-light is-small">
         <mat-icon>lock_open</mat-icon><small>READ WRITE ACCESS</small>
       </a>
     </span>
@@ -147,9 +147,9 @@
         <mtbls-download [value]="selectedDownloadFiles()" [selectedMetaFiles]="selectedMetaFiles"></mtbls-download>
       </span>
       <span *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right">
-        <small (click)="openDeleteConfirmation('meta', 'study')" style="font-size: 0.67em"
+        <small (click)="openDeleteConfirmation('meta', 'study')" 
           class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete
-          files</small>
+          files</small>&nbsp;
       </span>
     </p>
     <div class="panel-block">
@@ -233,13 +233,13 @@
         </label>
         <span *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
-            <small (click)="decompressFiles(selectedRawFiles)" style="font-size: 0.67em"
+            <small (click)="decompressFiles(selectedRawFiles)"
               class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip
               files</small>&nbsp;
           </span>
-          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" style="font-size: 0.67em"
+          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" 
             class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete
-            files</small>
+            files</small>&nbsp;
         </span>
       </p>
       <div class="panel-block">
@@ -294,9 +294,9 @@
           (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="" />&nbsp;&nbsp;DERIVED DATA
       </label>
       <span *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right">
-        <small (click)="openDeleteConfirmation('derived', 'study')" style="font-size: 0.67em"
+        <small (click)="openDeleteConfirmation('derived', 'study')" 
           class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete
-          files</small>
+          files</small>&nbsp;
       </span>
     </p>
     <div class="panel-block">

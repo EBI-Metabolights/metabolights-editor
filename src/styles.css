@@ -89,7 +89,7 @@
   font-size: 17px;
   position: fixed;
   right: -40px;
-  top: 45%;
+  top: 30%;
   font-family: "Roboto", helvetica, arial, sans-serif;
   z-index: 999;
 }
@@ -524,6 +524,31 @@ a.disabled {
   z-index: 10000 !important;
   bottom: 10px;
   right: 10px;
+}
+
+.checklist-contact-style {
+  position: fixed;
+  right: -40px;
+  top: 55%;
+  z-index: 999;
+}
+
+.contact-style-button {
+  height: 40px;
+  border: solid 1px #d3d3d3;
+  background: #ffffff;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
+  font-weight: 300;
+  line-height: 38px;
+  color: #626262;
+  font-size: 17px;
+  font-family: "Roboto", helvetica, arial, sans-serif;
+  transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -moz-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  border-radius: 0 !important;
 }
 
 .modal-ml-close {

@@ -16,6 +16,7 @@ export class QuickLinkComponent implements OnInit {
   @Input("icon") icon: string;
   @Input("text") text: string;
   @Input() className = "bottom-right";
+  @Input() buttonClass = "";
   requestedStudy: string = null;
 
   constructor(private router: Router) {

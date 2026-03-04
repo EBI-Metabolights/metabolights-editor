@@ -1,0 +1,162 @@
+<button *ngIf="!isReadOnly" id="checklistbutton" (click)="toggleChecklistPopup()">
+  <mat-icon class="mat-icon material-icons">checklist</mat-icon> Study Checklist
+</button>
+<div *ngIf="isChecklistPopupOpen" class="checklist-popup-overlay" (click)="closeChecklistPopup()"></div>
+<aside *ngIf="isChecklistPopupOpen" class="checklist-popup">
+  <header class="checklist-popup-header">
+    <span>Study Checklist</span>
+    <button class="checklist-popup-close" (click)="closeChecklistPopup()" aria-label="Close checklist">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+  <div class="checklist-popup-body">
+    <div class="publications-accordion">
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 0 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(0)">
+          <div class="accordion-head-main">
+            <span class="publication-index">1</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_blank" rel="noopener"
+                class="step-link">Complete 'Sample' metadata table</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 0 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 0">
+          <p class="is-size-7 mb-2">
+            Sample metadata should include a unique sample name, organism, organism part (for controls use e.g.
+            experimental blank and solvent) and sample type (i.e. control, experimental sample, QC). Further sample
+            descriptors should be included where available by selecting <b>+Factor</b> to add new columns (e.g. Gender,
+            Age, Treatment etc.).
+          </p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 1 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(1)">
+          <div class="accordion-head-main">
+            <span class="publication-index">2</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank" rel="noopener"
+                class="step-link">Complete 'Assay' metadata table(s) except raw/derived data filenames</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 1 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 1">
+          <p class="is-size-7">Describe the assay process for each control and sample. Multiple assays can be added per
+            study to reflect different analytical techniques or modalities.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 2 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(2)">
+          <div class="accordion-head-main">
+            <span class="publication-index">3</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" rel="noopener"
+                class="step-link">Upload raw & derived data files</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 2 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 2">
+          <p class="is-size-7">Upload your raw and derived data files to the study's FTP/Aspera folder. Ensure your
+            filenames are unique and consistently named.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 3 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(3)">
+          <div class="accordion-head-main">
+            <span class="publication-index">4</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" rel="noopener"
+                class="step-link">Add raw/derived data filenames to 'Assay' metadata tables(s)</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 3 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 3">
+          <p class="is-size-7">Associate your uploaded data files with the corresponding samples in the assay metadata
+            table by adding the filenames to the relevant columns.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 4 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(4)">
+          <div class="accordion-head-main">
+            <span class="publication-index">5</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/Protocol/" target="_blank" rel="noopener"
+                class="step-link">Complete the description of your study 'Protocols'</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 4 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 4">
+          <p class="is-size-7">Provide detailed descriptions for each experimental protocol used in your study, ensuring
+            clarity for future reproducibility.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 5 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(5)">
+          <div class="accordion-head-main">
+            <span class="publication-index">6</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="javascript:void(0)" class="step-link">Index 'Data Files' & run 'Study Validation'</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 5 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 5">
+          <p class="is-size-7">Trigger the file indexing in the 'Files' tab and run the automated validation to check
+            for any metadata or file consistency issues.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 6 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(6)">
+          <div class="accordion-head-main">
+            <span class="publication-index">7</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/#validate-study" target="_blank" rel="noopener"
+                class="step-link">Make amendments to correct any 'Validation Error'(s) & re-validate</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 6 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 6">
+          <p class="is-size-7">If the validation yields errors, make the necessary changes to your metadata or files in
+            the editor and re-run the validation until it passes.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item" [ngClass]="{ 'is-expanded': checklistStepExpandedIndex === 7 }">
+        <div class="accordion-header clickable" (click)="toggleChecklistStepExpand(7)">
+          <div class="accordion-head-main">
+            <span class="publication-index">8</span>
+            <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+            <h4 class="publication-title-compact">
+              <a href="https://ebi-metabolights.github.io/guides/#submission-process" target="_blank" rel="noopener"
+                class="step-link">Change study status to 'Private' (peer-review access only) or 'Public', when ready</a>
+            </h4>
+          </div>
+          <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 7 ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </div>
+        <div class="accordion-content" *ngIf="checklistStepExpandedIndex === 7">
+          <p class="is-size-7">Once your study is complete and validated, change its status in the 'Study Status'
+            section to make it available for peer review or the public.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
