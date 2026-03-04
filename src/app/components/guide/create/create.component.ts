@@ -752,17 +752,29 @@ export class CreateComponent implements OnInit {
     const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key => 
         this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
     );
-    const count = selectedCategoryKeys.length;
-    const techniqueLabel = this.selectedTechniquesLabel;
+    const categorySummary = this.getCategorySubmissionSummary(selectedCategoryKeys);
     
     this.confirmationTitle = "Confirm Submission";
-    if (count > 0) {
-        const studyText = count === 1 ? "study" : "studies";
-        this.confirmationMessage = `We will create the following ${count} MetaboLights ${count === 1 ? 'submission' : 'submissions'} for your ${techniqueLabel} ${studyText}. Are you sure to continue?`;
+    if (selectedCategoryKeys.length > 0) {
+        this.confirmationMessage = `We will create the following submissions under the specified study category: ${categorySummary}. This will allow you to add assay techniques under the selected study category. Are you sure you want to continue?`;
     } else {
         this.confirmationMessage = "Are you sure you would like to create this study?";
     }
     this.showConfirmationModal = true;
+  }
+
+  private getCategorySubmissionSummary(selectedCategoryKeys: string[]): string {
+    const summary = selectedCategoryKeys
+      .map((key) => {
+        const selectedAssays = this.studyAssaySelection[key] || [];
+        const count = selectedAssays.length;
+        const categoryLabel =
+          this.activeCategories?.find((c) => c.id === key)?.label || key;
+        return `${count} ${categoryLabel}`;
+      })
+      .filter((entry) => !entry.startsWith("0 "));
+
+    return summary.join(", ");
   }
 
   onConfirmSelection(confirmed: boolean) {
