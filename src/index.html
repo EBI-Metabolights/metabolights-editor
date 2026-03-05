@@ -1,154 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Metabolights Editor</title>
-    <base href="/metabolights/editor/" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+<head>
+  <meta charset="utf-8" />
+  <title>Metabolights Editor</title>
+  <base href="/metabolights/editor/" />
 
-    <link
-      href="https://fonts.googleapis.com/css?family=Roboto:300,400,700"
-      rel="stylesheet"
-    />
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" as="style"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <script
-      type="text/javascript"
-      src="//code.jquery.com/jquery-1.11.3.js"
-    ></script>
-    <script
-      type="text/javascript"
-      src="//code.jquery.com/ui/1.9.2/jquery-ui.min.js"
-      charset="utf-8"
-    ></script>
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" />
+  <link rel="preload"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    as="style" />
 
-    <script
-      type="text/javascript"
-      src="assets/aspera/asperaweb-4.js"
-      charset="utf-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="assets/aspera/connectinstaller-4.js"
-      charset="utf-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="assets/aspera/jquery-ui.js"
-      charset="utf-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="assets/aspera/jquery-namespace.js"
-      charset="utf-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="assets/aspera/ml-aspera-config.js"
-      charset="utf-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="assets/aspera/ml-aspera.js"
-      charset="utf-8"
-    ></script>
-    <script
-      type="text/javascript"
-      src="assets/aspera/install.js"
-      charset="utf-8"
-    ></script>
-    <!--google material icon styles-->
-    <style>
-      .material-symbols-outlined {
-        font-variation-settings:
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.js"></script>
+  <script type="text/javascript" src="//code.jquery.com/ui/1.9.2/jquery-ui.min.js" charset="utf-8"></script>
+
+  <script type="text/javascript" src="assets/aspera/asperaweb-4.js" charset="utf-8"></script>
+  <script type="text/javascript" src="assets/aspera/connectinstaller-4.js" charset="utf-8"></script>
+  <script type="text/javascript" src="assets/aspera/jquery-ui.js" charset="utf-8"></script>
+  <script type="text/javascript" src="assets/aspera/jquery-namespace.js" charset="utf-8"></script>
+  <script type="text/javascript" src="assets/aspera/ml-aspera-config.js" charset="utf-8"></script>
+  <script type="text/javascript" src="assets/aspera/ml-aspera.js" charset="utf-8"></script>
+  <script type="text/javascript" src="assets/aspera/install.js" charset="utf-8"></script>
+  <!--google material icon styles-->
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings:
         'FILL' 0,
         'wght' 400,
         'GRAD' 0,
         'opsz' 24
+    }
+  </style>
+  <!-- premium loader styles -->
+  <style type="text/css">
+    body,
+    html {
+      height: 100%;
+      margin: 0;
+      font-family: "Roboto", sans-serif;
+      background-color: #ffffff;
+    }
+
+    .app-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      width: 100vw;
+      background: #ffffff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+    }
+
+    .loader-content {
+      text-align: center;
+      max-width: 300px;
+      width: 100%;
+    }
+
+    .loader-logo {
+      width: 180px;
+      height: auto;
+      margin-bottom: 40px;
+      animation: pulse 2.5s ease-in-out infinite;
+      opacity: 0.9;
+    }
+
+    .loader-progress-container {
+      width: 100%;
+      height: 4px;
+      background-color: #f0f0f0;
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .loader-progress-bar {
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(90deg, #3676d9, #1fc3a7);
+      position: absolute;
+      left: -40%;
+      animation: progressMove 1.8s infinite ease-in-out;
+      box-shadow: 0 0 10px rgba(54, 118, 217, 0.3);
+    }
+
+    .loader-text {
+      font-size: 14px;
+      color: #666;
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      animation: fadeInOut 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.8;
       }
-      </style>
-    <!-- spinner styles -->
-    <style type="text/css">
-      body,
-      html {
-        height: 100%;
-        font-family: "Roboto", sans-serif;
+
+      50% {
+        transform: scale(1.05);
+        opacity: 1;
       }
-      .app-loading {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
+    }
+
+    @keyframes progressMove {
+      0% {
+        left: -40%;
       }
-      .app-loading .spinner {
-        height: 100px;
-        width: 100px;
-        animation: rotate 2s linear infinite;
-        transform-origin: center center;
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: auto;
+
+      50% {
+        left: 40%;
+        width: 60%;
       }
-      .app-loading .spinner .path {
-        stroke-dasharray: 1, 200;
-        stroke-dashoffset: 0;
-        animation: dash 1.5s ease-in-out infinite;
-        stroke-linecap: round;
-        stroke: #ddd;
+
+      100% {
+        left: 100%;
       }
-      @keyframes rotate {
-        100% {
-          transform: rotate(360deg);
-        }
+    }
+
+    @keyframes fadeInOut {
+
+      0%,
+      100% {
+        opacity: 0.6;
       }
-      @keyframes dash {
-        0% {
-          stroke-dasharray: 1, 200;
-          stroke-dashoffset: 0;
-        }
-        50% {
-          stroke-dasharray: 89, 200;
-          stroke-dashoffset: -35px;
-        }
-        100% {
-          stroke-dasharray: 89, 200;
-          stroke-dashoffset: -124px;
-        }
+
+      50% {
+        opacity: 1;
       }
-    </style>
-  </head>
-  <body>
-    <noscript>
-      <strong>
-        We're sorry but MetaboLights online submission and editor tool doesn't
-        work properly without JavaScript enabled. Please enable it to continue.
-      </strong>
-    </noscript>
-    <div>
-      <app-root>
-        <div class="app-loading">
-          <div class="logo"></div>
-          <svg class="spinner" viewBox="25 25 50 50">
-            <circle
-              class="path"
-              cx="50"
-              cy="50"
-              r="20"
-              fill="none"
-              stroke-width="2"
-              stroke-miterlimit="10"
-            />
-          </svg>
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>
+    <strong>
+      We're sorry but MetaboLights online submission and editor tool doesn't
+      work properly without JavaScript enabled. Please enable it to continue.
+    </strong>
+  </noscript>
+  <app-root>
+    <div class="app-loading">
+      <div class="loader-content">
+        <img src="assets/img/MetaboLightsLogo.png" alt="MetaboLights Logo" class="loader-logo" />
+        <div class="loader-progress-container">
+          <div class="loader-progress-bar"></div>
         </div>
-      </app-root>
+        <div class="loader-text">Initializing MetaboLights Editor...</div>
+      </div>
     </div>
-  </body>
+  </app-root>
+</body>
+
 </html>
