@@ -67,7 +67,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   isCurator = false;
   isOwner = false;
   validationStatus: ViolationType = null;
-  validationRunTime: string =  null;
+  validationRunTime: string = null;
   validationNeeded: boolean = false;
   permissions: StudyPermission = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
@@ -125,7 +125,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.studyObfuscationCode$.subscribe((value) => {
       this.obfuscationCode = value;
-      if(!this.obfuscationCode || this.obfuscationCode.length == 0) {
+      if (!this.obfuscationCode || this.obfuscationCode.length == 0) {
         this.permissions = this.store.snapshot().application.studyPermission
         this.obfuscationCode = this.permissions.obfuscationCode
       }
@@ -145,13 +145,13 @@ export class StudyComponent implements OnInit, OnDestroy {
       if (value !== null) {
         this.requestedStudy = value;
         this.isOwner = false;
-        if (this.permissions.submitterOfStudy){
+        if (this.permissions.submitterOfStudy) {
           this.isOwner = true;
         }
       }
     });
     this.endpoint = this.configService.config.endpoint;
-    if (this.configService.config.endpoint.endsWith("/") === false){
+    if (this.configService.config.endpoint.endsWith("/") === false) {
       this.endpoint = this.endpoint + "/";
     }
     this.investigationFailed$.subscribe((value) => {
@@ -272,9 +272,6 @@ export class StudyComponent implements OnInit, OnDestroy {
     );
     if (index === 5) {
       this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
-      if (document.getElementById("tab-content-wrapper")) {
-        document.getElementById("tab-content-wrapper").scrollIntoView();
-      }
     }
   }
 
@@ -317,9 +314,9 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   saveFunder(event) {
     if (event.index === -1) {
-        this.store.dispatch(new Funders.Add(event.funder));
+      this.store.dispatch(new Funders.Add(event.funder));
     } else {
-        this.store.dispatch(new Funders.Update(event.funder, event.index));
+      this.store.dispatch(new Funders.Update(event.funder, event.index));
     }
   }
 
@@ -329,9 +326,9 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   saveRelatedDataset(event) {
     if (event.index === -1) {
-        this.store.dispatch(new RelatedDatasets.Add(event.dataset));
+      this.store.dispatch(new RelatedDatasets.Add(event.dataset));
     } else {
-        this.store.dispatch(new RelatedDatasets.Update(event.dataset, event.index));
+      this.store.dispatch(new RelatedDatasets.Update(event.dataset, event.index));
     }
   }
 

@@ -232,42 +232,42 @@ export class DesignDescriptorComponent implements OnInit {
       this.loading = true;
       this.status = "";
       this.status = "Mapping keyword to an ontology term";
-        const validationType = this._controlList?.rule.validationType;
-        const ontologies = this._controlList?.rule?.ontologies || [];
-        const term = keyword;
-        const allowedParentOntologyTerms =
-          validationType === "child-ontology-term"
-            ? this._controlList.rule.allowedParentOntologyTerms
-            : undefined;
-        const ruleName = this._controlList?.rule?.ruleName || this._controlList?.defaultOntologies?.ruleName || "";
-        const fieldName = this._controlList?.rule?.fieldName || this._controlList?.defaultOntologies?.fieldName || "";
-        const isExactMatchRequired = true;
-        this.editorService
-          .searchOntologyTermsWithRuleV2(
-            term,
-            isExactMatchRequired,
-            ruleName,
-            fieldName,
-            validationType,
-            ontologies,
-            allowedParentOntologyTerms
-          )
-          .subscribe(
-            (response) => {
+      const validationType = this._controlList?.rule.validationType;
+      const ontologies = this._controlList?.rule?.ontologies || [];
+      const term = keyword;
+      const allowedParentOntologyTerms =
+        validationType === "child-ontology-term"
+          ? this._controlList.rule.allowedParentOntologyTerms
+          : undefined;
+      const ruleName = this._controlList?.rule?.ruleName || this._controlList?.defaultOntologies?.ruleName || "";
+      const fieldName = this._controlList?.rule?.fieldName || this._controlList?.defaultOntologies?.fieldName || "";
+      const isExactMatchRequired = true;
+      this.editorService
+        .searchOntologyTermsWithRuleV2(
+          term,
+          isExactMatchRequired,
+          ruleName,
+          fieldName,
+          validationType,
+          ontologies,
+          allowedParentOntologyTerms
+        )
+        .subscribe(
+          (response) => {
             if (response.content && response.content.result && response.content.result.length > 0) {
               const jsonConvert: JsonConvert = new JsonConvert();
               const tempOntTerm = new Ontology();
               const t = response.content.result[0];
-                  tempOntTerm.annotationValue = t.term;
-                  tempOntTerm.termAccession = t.termAccessionNumber;
-                  tempOntTerm.annotationDefinition = t.description || "";
-                  tempOntTerm.termSource = new OntologySourceReference();
-                  tempOntTerm.termSource.name = t.termSourceRef;
-                  tempOntTerm.termSource.description = t.description || "";
-                  tempOntTerm.termSource.file = "";
-                  tempOntTerm.termSource.version = "";
-                  tempOntTerm.termSource.provenance_name = "";
-                  tempOntTerm.comments = []; // Keep empty
+              tempOntTerm.annotationValue = t.term;
+              tempOntTerm.termAccession = t.termAccessionNumber;
+              tempOntTerm.annotationDefinition = t.description || "";
+              tempOntTerm.termSource = new OntologySourceReference();
+              tempOntTerm.termSource.name = t.termSourceRef;
+              tempOntTerm.termSource.description = t.description || "";
+              tempOntTerm.termSource.file = "";
+              tempOntTerm.termSource.version = "";
+              tempOntTerm.termSource.provenance_name = "";
+              tempOntTerm.comments = []; // Keep empty
               const descriptor = {
                 studyDesignDescriptor: jsonConvert.deserialize(
                   tempOntTerm,
@@ -275,26 +275,26 @@ export class DesignDescriptorComponent implements OnInit {
                 ),
               };
               this.status = "Adding keyword to the study design descriptors list";
-               this.loading = true;
-                this.isFormBusy = true;
+              this.loading = true;
+              this.isFormBusy = true;
               setTimeout(() => {
                 if (this.mode === 'local') {
-                    // Not supported in local mode via keyword selection yet unless refactored
-                    // But assume this flow is mostly for existing studies
-                    this.store.dispatch(
-                      new Descriptors.New(descriptor, this.studyId)
-                    );
+                  // Not supported in local mode via keyword selection yet unless refactored
+                  // But assume this flow is mostly for existing studies
+                  this.store.dispatch(
+                    new Descriptors.New(descriptor, this.studyId)
+                  );
                 } else {
-                    this.store.dispatch(
-                      new Descriptors.New(descriptor, this.studyId)
-                    );
+                  this.store.dispatch(
+                    new Descriptors.New(descriptor, this.studyId)
+                  );
                 }
 
-                  this.loading = false;
-                  this.isFormBusy = false;
-                  this.status = "Added keyword successfully";
+                this.loading = false;
+                this.isFormBusy = false;
+                this.status = "Added keyword successfully";
               }
-              , 100);
+                , 100);
             } else {
               this.status =
                 "Exact ontology match not found. Create new MetaboLights Ontology term";
@@ -319,21 +319,21 @@ export class DesignDescriptorComponent implements OnInit {
               this.loading = true;
               this.isFormBusy = true;
               setTimeout(() => {
-                if(this.mode === 'local') {
-                     // Not supported yet
-                    this.store.dispatch(
-                      new Descriptors.New(descriptor, this.studyId)
-                    );
+                if (this.mode === 'local') {
+                  // Not supported yet
+                  this.store.dispatch(
+                    new Descriptors.New(descriptor, this.studyId)
+                  );
                 } else {
-                    this.store.dispatch(
-                      new Descriptors.New(descriptor, this.studyId)
-                    );
+                  this.store.dispatch(
+                    new Descriptors.New(descriptor, this.studyId)
+                  );
                 }
-                  this.loading = false;
-                  this.isFormBusy = false;
-                  this.status = "Added keyword successfully";
+                this.loading = false;
+                this.isFormBusy = false;
+                this.status = "Added keyword successfully";
               }
-              , 100);
+                , 100);
             }
           });
     }
@@ -365,7 +365,7 @@ export class DesignDescriptorComponent implements OnInit {
 
         this.isDescriptorValid = !!val; // true if not null/empty
       }
-    } catch {}
+    } catch { }
   }
 
   openImportModal() {
@@ -381,7 +381,7 @@ export class DesignDescriptorComponent implements OnInit {
 
     let versionConfig = this.templateConfiguration.versions[version];
     if (!versionConfig && this.templateConfiguration.defaultTemplateVersion) {
-        versionConfig = this.templateConfiguration.versions[this.templateConfiguration.defaultTemplateVersion];
+      versionConfig = this.templateConfiguration.versions[this.templateConfiguration.defaultTemplateVersion];
     }
 
     if (!versionConfig) return;
@@ -421,8 +421,8 @@ export class DesignDescriptorComponent implements OnInit {
         // ... existing logic to validate rule ...
         const ruleSelectionInput = {
           isaFileType: isaFileType,
-          studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0) 
-            ? this.selectedStudyCategories[0] 
+          studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0)
+            ? this.selectedStudyCategories[0]
             : (typeof this.selectedStudyCategories === 'string' ? this.selectedStudyCategories : this.studyCategory),
           studyCreatedAt: this.studyCreatedAt || null,
           templateVersion: version,
@@ -456,10 +456,10 @@ export class DesignDescriptorComponent implements OnInit {
 
     // Add "Not Applicable" option
     this.descriptorCategories.unshift({
-        id: 'default',
-        label: '-- General Keywords --',
-        controlListKey: 'Study Design Type',
-        isaFileType: 'investigation'
+      id: 'default',
+      label: '-- General Keywords --',
+      controlListKey: 'Study Design Type',
+      isaFileType: 'investigation'
     });
   }
 
@@ -576,18 +576,18 @@ export class DesignDescriptorComponent implements OnInit {
 
   saveNgxs() {
     const descriptorValues = this.descriptorValuesForComponent();
-    
+
     if (this.mode === 'local') {
-         if (descriptorValues && descriptorValues.length > 0) {
-             const body = this.compileBody(descriptorValues[0]);
-             // Extract Ontology from body.studyDesignDescriptor
-             const ontology = body.studyDesignDescriptor;
-             this.saved.emit(ontology);
-             this.closeModal();
-         }
-         return;
+      if (descriptorValues && descriptorValues.length > 0) {
+        const body = this.compileBody(descriptorValues[0]);
+        // Extract Ontology from body.studyDesignDescriptor
+        const ontology = body.studyDesignDescriptor;
+        this.saved.emit(ontology);
+        this.closeModal();
+      }
+      return;
     }
-    
+
     if (!this.isStudyReadOnly && descriptorValues.length > 0) {
       this.isFormBusy = true;
       if (!this.addNewDescriptor) {
@@ -641,17 +641,17 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   deleteNgxs(value) {
-    if(this.mode === 'local') {
-          this.deleted.emit(this.descriptor);
-          this.isDeleteModalOpen = false;
-          return;
+    if (this.mode === 'local') {
+      this.deleted.emit(this.descriptor);
+      this.isDeleteModalOpen = false;
+      return;
     }
-    
+
     if (!this.isStudyReadOnly) {
       if (!value) {
         value = this.descriptor.annotationValue;
       }
-        this.store.dispatch(new Descriptors.Delete(value, this.studyId));
+      this.store.dispatch(new Descriptors.Delete(value, this.studyId));
     }
   }
 
@@ -732,6 +732,9 @@ export class DesignDescriptorComponent implements OnInit {
         studyDesignDescriptor.comments = [];
       }
       const isCurator = this.store.selectSnapshot(UserState.isCurator);
+      const studyPermission = this.store.selectSnapshot(ApplicationState.studyPermission);
+      const isOwner = studyPermission ? studyPermission.submitterOfStudy : false;
+
       // Remove existing source comment if any
       studyDesignDescriptor.comments = studyDesignDescriptor.comments.filter(
         (c) => c.name !== "Study Design Source"
@@ -739,11 +742,11 @@ export class DesignDescriptorComponent implements OnInit {
       studyDesignDescriptor.comments.push(
         new MTBLSComment(
           "Study Design Source",
-          isCurator ? "data-curation" : "submitter"
+          (isCurator && !isOwner) ? "data-curation" : "submitter"
         )
       );
     }
-    
+
     const body = {
       studyDesignDescriptor: studyDesignDescriptor,
     };
@@ -785,7 +788,7 @@ export class DesignDescriptorComponent implements OnInit {
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])) { }
       return tempValidations;
     }
     return this.validations ? this.validations[this.validationsId] : {};
@@ -793,7 +796,7 @@ export class DesignDescriptorComponent implements OnInit {
 
   controlList() {
     const listName = this.controlListKey || this.defaultControlListName;
-    
+
     if (
       this.defaultControlList.name !== listName &&
       this.editorService.defaultControlLists &&
@@ -819,8 +822,8 @@ export class DesignDescriptorComponent implements OnInit {
     }
 
     const ruleSelectionInput = {
-      studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0) 
-        ? this.selectedStudyCategories[0] 
+      studyCategory: (Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0)
+        ? this.selectedStudyCategories[0]
         : (typeof this.selectedStudyCategories === 'string' ? this.selectedStudyCategories : this.studyCategory),
       studyCreatedAt: this.studyCreatedAt,
       isaFileType: this.isaFileType ? this.isaFileType : "investigation",
@@ -889,7 +892,7 @@ export class DesignDescriptorComponent implements OnInit {
     try {
       const v =
         this.descriptorComponent &&
-        Array.isArray(this.descriptorComponent.values)
+          Array.isArray(this.descriptorComponent.values)
           ? this.descriptorComponent.values
           : this.form?.get("descriptor")?.value || [];
 
@@ -910,8 +913,8 @@ export class DesignDescriptorComponent implements OnInit {
         const match = candidates.find(
           (c: any) => (c.annotationValue || c.value || c.label) === str
         );
-        if (match) return [match]; 
-        return [{ annotationValue: str }]; 
+        if (match) return [match];
+        return [{ annotationValue: str }];
       }
 
       return Array.isArray(v) ? v : [v];
