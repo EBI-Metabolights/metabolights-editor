@@ -219,55 +219,55 @@ export class EditorService {
 
   }
 
-//   private loadAndMergeDevControlLists(): void {
-//   this.http.get<any>("/assets/control-lists.json").subscribe(
-//     (assetLists) => {
-//       try {
-//         // Get the existing state snapshot safely
-//         const existingState = this.store.selectSnapshot(ApplicationState.controlLists) || {};
+  //   private loadAndMergeDevControlLists(): void {
+  //   this.http.get<any>("/assets/control-lists.json").subscribe(
+  //     (assetLists) => {
+  //       try {
+  //         // Get the existing state snapshot safely
+  //         const existingState = this.store.selectSnapshot(ApplicationState.controlLists) || {};
 
-//         // Normalize the incoming asset payload (in case some fields are missing)
-//         const assetFull = assetLists?.controlLists
-//           ? assetLists
-//           : {
-//               controlLists: assetLists?.controlLists || assetLists || {},
-//               assayFileControls: assetLists?.assayFileControls || {},
-//               sampleFileControls: assetLists?.sampleFileControls || {},
-//               investigationFileControls: assetLists?.investigationFileControls || {},
-//               defaultOntologies: assetLists?.defaultOntologies || [],
-//               defaultOtherSources: assetLists?.defaultOtherSources || [],
-//             };
+  //         // Normalize the incoming asset payload (in case some fields are missing)
+  //         const assetFull = assetLists?.controlLists
+  //           ? assetLists
+  //           : {
+  //               controlLists: assetLists?.controlLists || assetLists || {},
+  //               assayFileControls: assetLists?.assayFileControls || {},
+  //               sampleFileControls: assetLists?.sampleFileControls || {},
+  //               investigationFileControls: assetLists?.investigationFileControls || {},
+  //               defaultOntologies: assetLists?.defaultOntologies || [],
+  //               defaultOtherSources: assetLists?.defaultOtherSources || [],
+  //             };
 
-//         // Create a new shallow-merged flat control list (immutable)
-//         const mergedFlat = {
-//           ...existingState.controlLists,
-//           ...assetFull.controlLists,
-//         };
+  //         // Create a new shallow-merged flat control list (immutable)
+  //         const mergedFlat = {
+  //           ...existingState.controlLists,
+  //           ...assetFull.controlLists,
+  //         };
 
-//         // Create a new merged full payload (immutable)
-//         const mergedFull = {
-//           ...existingState,
-//           ...assetFull,
-//           controlLists: mergedFlat,
-//         };
+  //         // Create a new merged full payload (immutable)
+  //         const mergedFull = {
+  //           ...existingState,
+  //           ...assetFull,
+  //           controlLists: mergedFlat,
+  //         };
 
-//         // Dispatch new immutable object → NGXS detects reference change
-//         this.store.dispatch(new DefaultControlLists.Set(structuredClone(mergedFull)));
+  //         // Dispatch new immutable object → NGXS detects reference change
+  //         this.store.dispatch(new DefaultControlLists.Set(structuredClone(mergedFull)));
 
-//       } catch (e) {
-//         console.error("Error merging control lists:", e);
-//         // Fallback: dispatch a minimal payload
-//         const fallbackFull =
-//           assetLists?.controlLists ? assetLists : { controlLists: assetLists || {} };
-//         this.store.dispatch(new DefaultControlLists.Set(structuredClone(fallbackFull)));
-//       }
-//     },
-//     (error) => {
-//       console.warn("Dev control list file not found — skipping", error);
-//       // Optional: handle gracefully
-//     }
-//   );
-// }
+  //       } catch (e) {
+  //         console.error("Error merging control lists:", e);
+  //         // Fallback: dispatch a minimal payload
+  //         const fallbackFull =
+  //           assetLists?.controlLists ? assetLists : { controlLists: assetLists || {} };
+  //         this.store.dispatch(new DefaultControlLists.Set(structuredClone(fallbackFull)));
+  //       }
+  //     },
+  //     (error) => {
+  //       console.warn("Dev control list file not found — skipping", error);
+  //       // Optional: handle gracefully
+  //     }
+  //   );
+  // }
 
 
   login(body) {
@@ -355,10 +355,10 @@ export class EditorService {
         `${this.configService.config.ws3URL}/public/v2/validations/configuration`,
         {
           headers: new HttpHeaders({
-              Accept: "application/json"
-            }),
-            observe: "body",
-          }
+            Accept: "application/json"
+          }),
+          observe: "body",
+        }
       )
       .pipe(catchError(this.dataService.handleError));
   }
@@ -458,7 +458,6 @@ export class EditorService {
     if (environment.useNewState) {
       this.store.dispatch(new BannerMessage.Get());
       this.store.dispatch(new MaintenanceMode.Get());
-      this.store.dispatch(new DefaultControlLists.Get());
 
     } else {
       this.getDefaultControlLists().subscribe({
@@ -691,6 +690,10 @@ export class EditorService {
         }
       });
     }
+  }
+
+  loadDefaultControlLists() {
+    return this.store.dispatch(new DefaultControlLists.Get()).toPromise();
   }
 
   // ADJUST POST STATE MIGRATION
@@ -1033,44 +1036,44 @@ export class EditorService {
     }
 
     return this.fetchIdentifierSources().pipe(
-        map(sources => {
-             const lowerQuery = query.toLowerCase();
-             return sources.filter(s =>
-                 (s.name && s.name.toLowerCase().indexOf(lowerQuery) !== -1) ||
-                 (s.prefix && s.prefix.toLowerCase().indexOf(lowerQuery) !== -1)
-             ).slice(0, 50); 
-        })
+      map(sources => {
+        const lowerQuery = query.toLowerCase();
+        return sources.filter(s =>
+          (s.name && s.name.toLowerCase().indexOf(lowerQuery) !== -1) ||
+          (s.prefix && s.prefix.toLowerCase().indexOf(lowerQuery) !== -1)
+        ).slice(0, 50);
+      })
     );
   }
 
   private fetchIdentifierSources(): Observable<any[]> {
-      if (this.identifierSourcesCache) {
-          return of(this.identifierSourcesCache);
-      }
+    if (this.identifierSourcesCache) {
+      return of(this.identifierSourcesCache);
+    }
 
-      // Public endpoint returns full dataset (~2MB)
-      const url = 'https://registry.api.identifiers.org/resolutionApi/getResolverDataset';
-      return this.http.get<any>(url).pipe(
-          map(response => {
-              const namespaces = response.payload?.namespaces || [];
-              return namespaces.map(ns => ({
-                  prefix: ns.prefix,
-                  name: ns.name,
-                  description: ns.description,
-                  sampleId: ns.sampleId,
-                  pattern: ns.pattern || '',
-                  urlPattern: ns.resources?.[0]?.urlPattern || '' 
-              })).filter(ns => ns.urlPattern); 
-          }),
-          map(sources => {
-              this.identifierSourcesCache = sources;
-              return sources;
-          }),
-          catchError(err => {
-              console.error('Error fetching identifier sources', err);
-              return of([]);
-          })
-      );
+    // Public endpoint returns full dataset (~2MB)
+    const url = 'https://registry.api.identifiers.org/resolutionApi/getResolverDataset';
+    return this.http.get<any>(url).pipe(
+      map(response => {
+        const namespaces = response.payload?.namespaces || [];
+        return namespaces.map(ns => ({
+          prefix: ns.prefix,
+          name: ns.name,
+          description: ns.description,
+          sampleId: ns.sampleId,
+          pattern: ns.pattern || '',
+          urlPattern: ns.resources?.[0]?.urlPattern || ''
+        })).filter(ns => ns.urlPattern);
+      }),
+      map(sources => {
+        this.identifierSourcesCache = sources;
+        return sources;
+      }),
+      catchError(err => {
+        console.error('Error fetching identifier sources', err);
+        return of([]);
+      })
+    );
   }
   /**
    * Fetches field metadata from templateConfiguration, combining description and examples,
@@ -1104,35 +1107,35 @@ export class EditorService {
       if (templates) {
         let headersList = null;
         if (templateName) {
-           headersList = templates[templateName];
-           if (!headersList) {
-             const matchingKey = Object.keys(templates).find(k => {
-               const normalizedK = k.toLowerCase().replace(/[-_ ]/g, "");
-               const normalizedT = templateName.toLowerCase().replace(/[-_ ]/g, "");
-               return normalizedK === normalizedT;
-             });
-             if (matchingKey) headersList = templates[matchingKey];
-           }
+          headersList = templates[templateName];
+          if (!headersList) {
+            const matchingKey = Object.keys(templates).find(k => {
+              const normalizedK = k.toLowerCase().replace(/[-_ ]/g, "");
+              const normalizedT = templateName.toLowerCase().replace(/[-_ ]/g, "");
+              return normalizedK === normalizedT;
+            });
+            if (matchingKey) headersList = templates[matchingKey];
+          }
         }
 
         const findInTemplate = (t) => {
           if (!t || !t.headers) return null;
           const target = strippedFieldName.toLowerCase();
-          
+
           // Check for suffix like .1, .2 to find the N-th occurrence
           const suffixMatch = fieldName?.match(/\.([0-9]+)$/);
           const occurrenceIndex = suffixMatch ? parseInt(suffixMatch[1], 10) : 0;
 
           const matches = t.headers.filter(h => {
-             const head = (h.columnHeader || h.fieldName || h.label || "")?.trim().toLowerCase();
-             if (head === target) return true;
-             // Try Param/Char/Factor variants
-             const paramValueHeader = `parameter value[${target}]`;
-             const charValueHeader = `characteristic[${target}]`;
-             const factorValueHeader = `factor value[${target}]`;
-             return head === paramValueHeader || head === charValueHeader || head === factorValueHeader;
+            const head = (h.columnHeader || h.fieldName || h.label || "")?.trim().toLowerCase();
+            if (head === target) return true;
+            // Try Param/Char/Factor variants
+            const paramValueHeader = `parameter value[${target}]`;
+            const charValueHeader = `characteristic[${target}]`;
+            const factorValueHeader = `factor value[${target}]`;
+            return head === paramValueHeader || head === charValueHeader || head === factorValueHeader;
           });
-          
+
           if (matches.length > occurrenceIndex) {
             return matches[occurrenceIndex];
           }
@@ -1140,56 +1143,56 @@ export class EditorService {
         };
 
         if (headersList) {
-           const template = headersList.find(t => String(t.version) === String(version)) || (headersList.length > 0 ? headersList[0] : null);
-           if (template) {
-             fieldDef = findInTemplate(template);
-           }
+          const template = headersList.find(t => String(t.version) === String(version)) || (headersList.length > 0 ? headersList[0] : null);
+          if (template) {
+            fieldDef = findInTemplate(template);
+          }
         } else {
-           // Search across all templates for this file type
-           for (const key of Object.keys(templates)) {
-              const list = templates[key];
-              const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
-              if (template) {
-                fieldDef = findInTemplate(template);
-                if (fieldDef) break;
-              }
-           }
+          // Search across all templates for this file type
+          for (const key of Object.keys(templates)) {
+            const list = templates[key];
+            const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
+            if (template) {
+              fieldDef = findInTemplate(template);
+              if (fieldDef) break;
+            }
+          }
         }
       }
     }
 
     // 2. Search in Investigation Templates if not found or if investigation fileType
     if (!fieldDef && (fileType === 'investigation' || !fileType)) {
-       const invTemplates = applicationTemplates?.investigationFileTemplates;
-        if (invTemplates) {
-           // Search in all investigation templates
-           for (const key of Object.keys(invTemplates)) {
-              const list = invTemplates[key];
-              const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
-              if (template && template.fields) {
-                const target = strippedFieldName.toLowerCase();
-                fieldDef = template.fields.find(f => {
-                   const field = (f.fieldName || "")?.trim().toLowerCase();
-                   const label = (f.label || "")?.trim().toLowerCase();
-                   const header = (f.columnHeader || "")?.trim().toLowerCase();
-                   return field === target || label === target || header === target;
-                });
-                if (fieldDef) break;
-              }
-           }
+      const invTemplates = applicationTemplates?.investigationFileTemplates;
+      if (invTemplates) {
+        // Search in all investigation templates
+        for (const key of Object.keys(invTemplates)) {
+          const list = invTemplates[key];
+          const template = list.find(t => String(t.version) === String(version)) || (list.length > 0 ? list[0] : null);
+          if (template && template.fields) {
+            const target = strippedFieldName.toLowerCase();
+            fieldDef = template.fields.find(f => {
+              const field = (f.fieldName || "")?.trim().toLowerCase();
+              const label = (f.label || "")?.trim().toLowerCase();
+              const header = (f.columnHeader || "")?.trim().toLowerCase();
+              return field === target || label === target || header === target;
+            });
+            if (fieldDef) break;
+          }
         }
+      }
     }
 
     // 3. Fallback to general configuration metadata (measurementTypes, omicsTypes, etc.)
     if (!fieldDef) {
-       // Search in measurementTypes, omicsTypes, studyCategories, etc. in root config
-       const categories = ['measurementTypes', 'omicsTypes', 'studyCategories', 'sampleFileTemplates', 'investigationFileTemplates'];
-       for (const cat of categories) {
-         if (config[cat] && config[cat][fieldName]) {
-           fieldDef = config[cat][fieldName];
-           break;
-         }
-       }
+      // Search in measurementTypes, omicsTypes, studyCategories, etc. in root config
+      const categories = ['measurementTypes', 'omicsTypes', 'studyCategories', 'sampleFileTemplates', 'investigationFileTemplates'];
+      for (const cat of categories) {
+        if (config[cat] && config[cat][fieldName]) {
+          fieldDef = config[cat][fieldName];
+          break;
+        }
+      }
     }
 
     // 4. Fallback to validations.json if still not found
@@ -1206,9 +1209,9 @@ export class EditorService {
     if (examples) {
       let examplesStr = '';
       if (Array.isArray(examples)) {
-          examplesStr = examples.map(e => (typeof e === 'object' ? JSON.stringify(e) : e)).join(', ');
+        examplesStr = examples.map(e => (typeof e === 'object' ? JSON.stringify(e) : e)).join(', ');
       } else {
-          examplesStr = examples;
+        examplesStr = examples;
       }
       combinedDescription += (description ? '\n\n' : '') + `Examples: ${examplesStr}`;
     }
@@ -1219,7 +1222,7 @@ export class EditorService {
       const index1 = cleanPlaceholder.toLowerCase().indexOf('(e.g.');
       const index2 = cleanPlaceholder.toLowerCase().indexOf('(example');
       const index3 = cleanPlaceholder.toLowerCase().indexOf('e.g.');
-      
+
       let splitIndex = -1;
       if (index1 !== -1) splitIndex = index1;
       else if (index2 !== -1) splitIndex = index2;
@@ -1251,21 +1254,21 @@ export class EditorService {
     if (!this.validations) return null;
     let validationsRoot = this.validations;
     if (validationsId) {
-       const keys = validationsId.split('.');
-       for (const key of keys) {
-         if (validationsRoot[key]) {
-           validationsRoot = validationsRoot[key];
-         } else {
-           break;
-         }
-       }
+      const keys = validationsId.split('.');
+      for (const key of keys) {
+        if (validationsRoot[key]) {
+          validationsRoot = validationsRoot[key];
+        } else {
+          break;
+        }
+      }
     }
 
     if (!validationsRoot) return null;
 
     // If it's a flat object (like 'study'), just return the field if it exists
     if (validationsRoot[fieldName]) {
-       return validationsRoot[fieldName];
+      return validationsRoot[fieldName];
     }
 
     // Common column stripping for matching
@@ -1273,22 +1276,22 @@ export class EditorService {
     let innerName = formatted;
     const match = formatted.match(/\[(.*?)\]/);
     if (match) {
-        innerName = match[1];
+      innerName = match[1];
     }
     const targetHeaders = [fieldName, formatted, innerName].map(h => h.toLowerCase());
 
     // If it has 'default_order' (like assays.assay), search there
     if (validationsRoot.default_order && Array.isArray(validationsRoot.default_order)) {
-       return validationsRoot.default_order.find(col => {
-         const entryHeader = (col.header || "").toLowerCase();
-         const entryColDef = (col.columnDef || "").toLowerCase();
-         return targetHeaders.includes(entryHeader) || targetHeaders.includes(entryColDef);
-       });
+      return validationsRoot.default_order.find(col => {
+        const entryHeader = (col.header || "").toLowerCase();
+        const entryColDef = (col.columnDef || "").toLowerCase();
+        return targetHeaders.includes(entryHeader) || targetHeaders.includes(entryColDef);
+      });
     }
 
     // Recursive search if not found in root or default_order? 
     // Usually for study.people.person we need the specific path.
-    
+
     return null;
   }
 
@@ -1306,7 +1309,7 @@ export class EditorService {
   updateAssayComments(studyId: string, assayName: string, payload: any): Observable<any> {
     const url = `${this.configService.config.metabolightsWSURL.baseURL}/studies/${studyId}/assays/comments`;
     const updatedPayload = {
-        ...payload
+      ...payload
     };
     const headers = httpOptions.headers.set("x-assay-file-name", assayName);
     return this.http.patch(url, updatedPayload, { headers }).pipe(

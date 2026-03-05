@@ -1,5 +1,5 @@
 
-import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
+import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule, isDevMode, APP_INITIALIZER, Injector } from "@angular/core";
@@ -66,15 +66,20 @@ import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
-// import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
-export function configLoader(injector: Injector): () => Promise<any> {
-  return () => injector.get(ConfigurationService).loadConfiguration();
+export function appInitializer(injector: Injector): () => Promise<any> {
+    return async () => {
+        const configService = injector.get(ConfigurationService);
+        const editorService = injector.get(EditorService);
+        await configService.loadConfiguration();
+        await editorService.loadDefaultControlLists();
+    };
 }
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppComponent,
         StudyComponent,
         PublicStudyComponent,
@@ -86,7 +91,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         FooterComponent,
         GuidesComponent,
         DataPolicyComponent,
-        DatasetLicenseStaticPageComponent    ],
+        DatasetLicenseStaticPageComponent],
     exports: [FooterComponent],
     bootstrap: [AppComponent], imports: [BrowserModule,
         StudyModule,
@@ -126,10 +131,6 @@ export function configLoader(injector: Injector): () => Promise<any> {
             ValidationState,
             StudyCreationState
         ], { developmentMode: true }),
-        // NgxsReduxDevtoolsPluginModule.forRoot({
-        //         disabled: false,
-        //         maxAge: 25
-        //         }),
         QuillModule.forRoot({
             modules: {
                 clipboard: {
@@ -137,11 +138,11 @@ export function configLoader(injector: Injector): () => Promise<any> {
                 },
             },
         }),
-        ], providers: [
+    ], providers: [
         AuthGuard,
         {
             provide: APP_INITIALIZER,
-            useFactory: configLoader,
+            useFactory: appInitializer,
             deps: [Injector],
             multi: true,
         },
@@ -159,17 +160,18 @@ export function configLoader(injector: Injector): () => Promise<any> {
         { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
         {
             provide: APP_BASE_HREF,
             useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
             deps: [PlatformLocation]
         },
         provideHttpClient(withInterceptorsFromDi())
-    ] })
+    ]
+})
 export class AppModule {
-  constructor(
-  ) {
+    constructor(
+    ) {
 
-  }
+    }
 }
