@@ -1,10 +1,13 @@
 import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { tap } from "rxjs/operators";
 import { StudyPermission } from "../../../services/headers";
-import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand,
-  SetReadonly, SetSelectedLanguage, SetStudyError,
-  SetTransferStatus,
-  StatusNS,
-  StudyPermissionNS} from "./application.actions";
+import {
+    BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand,
+    SetReadonly, SetSelectedLanguage, SetStudyError,
+    SetTransferStatus,
+    StatusNS,
+    StudyPermissionNS
+} from "./application.actions";
 import { Injectable } from "@angular/core";
 import { ApplicationService } from "src/app/services/decomposed/application.service";
 import { TransferStatus } from "src/app/services/transfer-healthcheck.service";
@@ -40,7 +43,7 @@ export interface ApplicationStateModel {
     controlLists: Record<string, any[]>,
     applicationTemplates: Record<string, any[]>,
     investigationFailed: boolean,
-    readonly: boolean
+    readonly: boolean,
     isProtocolsExpanded: boolean,
     toastrSettings: Record<string, any>,
     transferStatus: TransferStatus,
@@ -53,7 +56,7 @@ export interface ApplicationStateModel {
     defaults: {
         editorVersion: {
             version: "",
-            releaseName:""
+            releaseName: ""
         },
         backendVersion: {
             about: {
@@ -83,7 +86,7 @@ export interface ApplicationStateModel {
             preventDuplicates: true,
             extendedTimeOut: 0,
             tapToDismiss: false,
-          },
+        },
         transferStatus: {
             privateFtp: {
                 online: null
@@ -101,7 +104,7 @@ export interface ApplicationStateModel {
 })
 export class ApplicationState {
 
-    constructor(private applicationService: ApplicationService) {}
+    constructor(private applicationService: ApplicationService) { }
 
     @Action(SetStudyError)
     SetError(ctx: StateContext<ApplicationStateModel>, action: SetStudyError) {
@@ -171,18 +174,18 @@ export class ApplicationState {
             },
             (error) => {
                 const missingno = {
-                    about:{
-                        app:{
+                    about: {
+                        app: {
                             version: "",
                             name: ""
-                          },
-                          api:{
+                        },
+                        api: {
                             name: "",
                             version: "",
-                          }
+                        }
                     }
 
-                  };
+                };
                 ctx.dispatch(new BackendVersion.Set(missingno))
             }
         )
@@ -277,31 +280,32 @@ export class ApplicationState {
 
     @Action(DefaultControlLists.Get)
     GetDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Get) {
-        this.applicationService.getDefaultControlLists().subscribe({
-            next: (response) => {
-                ctx.dispatch(new DefaultControlLists.Set(response.content));
-            },
-            error: (error) => {
-                console.error(`Unable to get default control lists: ${error}`)
-                ctx.dispatch(new DefaultControlLists.Set({}));
-            }
-          }
-        )
+        return this.applicationService.getDefaultControlLists().pipe(
+            tap({
+                next: (response) => {
+                    ctx.dispatch(new DefaultControlLists.Set(response.content));
+                },
+                error: (error) => {
+                    console.error(`Unable to get default control lists: ${error}`)
+                    ctx.dispatch(new DefaultControlLists.Set({}));
+                }
+            })
+        );
     }
 
-@Action(DefaultControlLists.Set)
-  setDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
-    const payload = action.lists || {};
-    const state = ctx.getState();
+    @Action(DefaultControlLists.Set)
+    setDefaultControlLists(ctx: StateContext<ApplicationStateModel>, action: DefaultControlLists.Set) {
+        const payload = action.lists || {};
+        const state = ctx.getState();
 
-    const incomingFlat: Record<string, any[]> = {controls:  payload.controls}
+        const incomingFlat: Record<string, any[]> = { controls: payload.controls }
 
-    ctx.setState({
-        ...state,
-        applicationTemplates: payload.templates,
-        controlLists: incomingFlat
-    });
-  }
+        ctx.setState({
+            ...state,
+            applicationTemplates: payload.templates,
+            controlLists: incomingFlat
+        });
+    }
 
     @Selector()
     static applicationTemplates(state: ApplicationStateModel) {
@@ -372,7 +376,7 @@ export class ApplicationState {
     }
 
     @Action(SetTransferStatus)
-    SetTransferStatus({getState, setState}: StateContext<ApplicationStateModel>, {status}: SetTransferStatus) {
+    SetTransferStatus({ getState, setState }: StateContext<ApplicationStateModel>, { status }: SetTransferStatus) {
         const state = getState()
         setState({
             ...state,
@@ -384,7 +388,7 @@ export class ApplicationState {
     static transferStatus(state: ApplicationStateModel) {
         return state?.transferStatus
     }
-    
+
     @Selector()
     static message(state: ApplicationStateModel) {
         return state?.statusMessage;
@@ -410,4 +414,5 @@ export class ApplicationState {
             statusType: null
         });
     }
+
 }
