@@ -53,7 +53,7 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
-import { EditTableDirective } from "src/app/directives/edit-table.directive";
+
 import { QuillModule } from "ngx-quill";
 import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
 import { AsyncTaskComponent } from './async-task/async-task.component';
@@ -116,7 +116,7 @@ import { StudySubmissionChecklistComponent } from './study-submission-checklist/
     PersonComponent,
     OntologyComponent,
     OntologyDetailsComponent,
-    EditTableDirective,
+
     NoStudyPageComponent,
     AsyncTaskComponent,
     AsyncStatusTransformPipe,

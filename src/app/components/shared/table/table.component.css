@@ -129,6 +129,10 @@ th span {
   overflow: auto;
 }
 
+#div2:focus {
+  outline: none;
+}
+
 .top-scroll-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -398,7 +402,7 @@ a.dropdown-item {
   gap: 8px;
 }
 
-.table-action-row > * {
+.table-action-row>* {
   display: inline-flex;
   align-items: center;
 }

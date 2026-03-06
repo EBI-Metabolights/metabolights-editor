@@ -344,6 +344,42 @@ export class TableComponent
     }
   }
 
+  @HostListener("window:copy", ["$event"])
+  onWindowCopy(e: ClipboardEvent) {
+    if (this.shouldHandleClipboardEvent(e)) {
+      this.onCopy(e);
+    }
+  }
+
+  @HostListener("window:paste", ["$event"])
+  onWindowPaste(e: ClipboardEvent) {
+    if (this.shouldHandleClipboardEvent(e)) {
+      this.onPaste(e);
+    }
+  }
+
+  @HostListener("window:cut", ["$event"])
+  onWindowCut(e: ClipboardEvent) {
+    if (this.shouldHandleClipboardEvent(e)) {
+      this.onCut(e);
+    }
+  }
+
+  shouldHandleClipboardEvent(e: Event): boolean {
+    const target = e.target as HTMLElement;
+    const isInput =
+      ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName) ||
+      target.isContentEditable;
+
+    if (isInput) return false;
+
+    return (
+      this.selectedCells.length > 0 ||
+      this.selectedColumns.length > 0 ||
+      this.selectedRows.length > 0
+    );
+  }
+
   isFirstRow(row: any): boolean {
     return this.dataSource.data.indexOf(row) === 0;
   }
@@ -462,14 +498,17 @@ export class TableComponent
   }
 
   onCopy(e) {
+    e.preventDefault();
     this.copyCellContent(e);
   }
 
   onCut(e) {
+    e.preventDefault();
     this.cutCellContent(e);
   }
 
   onPaste(e) {
+    e.preventDefault();
     this.savePastedCellContent(e, null);
   }
 
@@ -533,13 +572,17 @@ export class TableComponent
           });
         }
       }
-      const navigator = window.navigator;
-      navigator.clipboard.writeText(content).then(
-        () => { },
-        (err) => {
-          console.error("Async: Could not copy text: ", err);
-        }
-      );
+      if (e && e.clipboardData) {
+        e.clipboardData.setData("text/plain", content);
+      } else {
+        const navigator = window.navigator;
+        navigator.clipboard.writeText(content).then(
+          () => { },
+          (err) => {
+            console.error("Async: Could not copy text: ", err);
+          }
+        );
+      }
     }
   }
 
@@ -1462,6 +1505,9 @@ export class TableComponent
   }
 
   headerClick(column: any, event) {
+    if (this.div2 && this.div2.nativeElement) {
+      this.div2.nativeElement.focus();
+    }
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;
@@ -1510,6 +1556,9 @@ export class TableComponent
   }
 
   rowClick(row: any, event: MouseEvent) {
+    if (this.div2 && this.div2.nativeElement) {
+      this.div2.nativeElement.focus();
+    }
     const entryIndex = row.index;
     const rowNamesArray: number[] = this.tableData.data.rows.map((e) => e.index);
     const rowIndex = this.selectedRows.indexOf(entryIndex);
@@ -1564,6 +1613,9 @@ export class TableComponent
 
 
   cellClick(row: any, column: any, event) {
+    if (this.div2 && this.div2.nativeElement) {
+      this.div2.nativeElement.focus();
+    }
     if (event.altKey) {
       this.selectedCells.push([column.columnDef, row.index]);
     } else {
@@ -2366,7 +2418,6 @@ export class TableComponent
 
       if (this.div2) {
         this.div2.nativeElement.style.width = `${tableWidth}px`;
-        this.div2.nativeElement.style.overflowX = overflowStyle;
       }
 
       const div1 = document.getElementById("div1");
