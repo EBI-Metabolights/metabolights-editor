@@ -143,6 +143,17 @@
       }
     }
   </style>
+  <script type="text/javascript">
+    (function() {
+      if (window.location.href.indexOf('/login') !== -1) {
+        document.documentElement.style.setProperty('--loader-display', 'none');
+        // We'll also add a style to hide it immediately
+        var style = document.createElement('style');
+        style.innerHTML = '.app-loading { display: none !important; }';
+        document.head.appendChild(style);
+      }
+    })();
+  </script>
 </head>
 
 <body>
