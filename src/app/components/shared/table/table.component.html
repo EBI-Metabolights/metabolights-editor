@@ -178,10 +178,9 @@
   </div>
 
   <div #wrapper2 id="wrapper2" class="scroll-wrapper" (scroll)="onWrapper2Scroll($event)">
-    <div id="div2" class="mat-elevation-z1 prevent-deselect">
+    <div #div2 id="div2" tabindex="0" class="mat-elevation-z1 prevent-deselect">
       <!--table start-->
-      <table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)"
-        class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
+      <table class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
         <ng-container matColumnDef="Select" sticky>
           <th (click)="toggleSelectAll()" class="clickable table-selector" mat-header-cell *matHeaderCellDef>
             <span *ngIf="!isReadOnly && hasRows" class="radio-tick" [class.selected]="isAllSelected()"></span>
@@ -202,14 +201,14 @@
             {{ formatHeader(column.header) }}
           </th>
           <ng-container *ngIf="!column.structure; else isStructure">
-            <td (keydown)="onKeyDown($event)" (dblclick)="editCell(row, column, $event)"
-              (click)="cellClick(row, column, $event)" class="clickable mlc-table"
-              [ngClass]="{ selected: isSelected(row, column) }" mat-cell *matCellDef="let row">
+            <td (dblclick)="editCell(row, column, $event)" (click)="cellClick(row, column, $event)"
+              class="clickable mlc-table" [ngClass]="{ selected: isSelected(row, column) }" mat-cell
+              *matCellDef="let row">
               {{ row[column.header] }}
             </td>
           </ng-container>
           <ng-template #isStructure>
-            <td (keydown)="onKeyDown($event)" class="mlc-table" mat-cell *matCellDef="let row">
+            <td class="mlc-table" mat-cell *matCellDef="let row">
               <span *ngIf="isChEBIId(row['database_identifier']); else notChEBIId">
                 <ng-container *ngIf="!imageErrorMap.get(row['database_identifier']); else noStructure">
                   <img appLazyLoad width="200" height="200" [src]="getStructureUrl(row)" alt="Chemical structure"
