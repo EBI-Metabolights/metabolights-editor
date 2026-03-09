@@ -9,12 +9,15 @@
   </header>
   <div class="card-content" #descriptionToCopy *ngIf="description != undefined" matTooltip="Click in here to edit"
     [matTooltipDisabled]="isReadOnly">
-    <span *ngIf="description != ''; else emptyDescription">
-      <p [innerHTML]="displayDescription" class="clickable" [ngClass]="{ 'placeholder-text': isPlaceholder() }"
-        (click)="openModal()"></p>
+    <span *ngIf="description != ''; else emptyDescription" [ngClass]="{ 'placeholder-text': isPlaceholder() }">
+      <mtbls-content class="clickable" (editContent)="openModal()" [count]="500" [message]="displayDescription"
+        [value]="displayDescription">
+      </mtbls-content>
     </span>
     <ng-template #emptyDescription>
-      <p [innerHTML]="displayDescription" class="clickable placeholder-text" (click)="openModal()"></p>
+      <mtbls-content class="clickable placeholder-text" (editContent)="openModal()" [count]="500"
+        [message]="displayDescription" [value]="displayDescription">
+      </mtbls-content>
     </ng-template>
   </div>
 </div>
