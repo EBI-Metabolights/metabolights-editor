@@ -1,0 +1,41 @@
+<div class="columns" style="min-height: 100vh; margin: 60px 0">
+    <div class="column is-8 is-offset-2">
+        <div style="margin: 0 0 20px 0">
+            <article class="message is-info has-shadow">
+                <div class="message-header">
+                    <p>
+                        <span class="material-icons">info</span>&nbsp;{{ study }} Submission Not Yet Complete
+                    </p>
+                </div>
+                <div class="message-body">
+                    <div class="container">
+
+                        <p>The MetaboLights study <strong>{{ study }}</strong> is currently being processed or has not
+                            yet completed its initial validation/setup.</p>
+                        <br>
+                        <b>What does this mean?</b>
+                        <br>
+                        <ul class="ml">
+                            <li>Our automated systems are currently assigning stable accession numbers or finalizing the
+                                internal directory structure for your study.</li>
+                            <li>The study will soon be available in your console for full editing.</li>
+                        </ul>
+                        <br>
+                        <b>What can you do?</b>
+                        <br>
+                        <ul class="ml">
+                            <li>Please wait for a few minutes and refresh your study console.</li>
+                            <li>If the study remains in this state for an extended period, please contact the
+                                MetaboLights team at <span class="email">metabolights-help&#64;ebi.ac.uk</span>.</li>
+                        </ul>
+                        <br>
+                        <div class="buttons">
+                            <a class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
+                            <a class="button is-default ml" (click)="homePage()"> MetaboLights Home </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>
