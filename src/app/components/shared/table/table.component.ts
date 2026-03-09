@@ -994,7 +994,7 @@ export class TableComponent
       if (this.view === 'compact') {
         this.displayedTableColumns = Array.from(this.data.displayedColumns || []);
       } else {
-        this.displayedTableColumns = Array.from(this.data.allColumns || Object.keys(this.data.header || {}));
+        this.displayedTableColumns = Object.keys(this.data.header || {});
       }
 
       if (this.isReadOnly) {
