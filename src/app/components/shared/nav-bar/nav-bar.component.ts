@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, inject } from "@angular/core";
+import Swal from "sweetalert2";
 import { EditorService } from "../../../services/editor.service";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -34,7 +35,6 @@ export class NavBarComponent implements OnInit {
   studyId: string;
   obfuscationCode: string;
   reviewerLink: string = null;
-  versionShown = false;
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -90,11 +90,19 @@ export class NavBarComponent implements OnInit {
       }
     });
   }
-  showVersion() {
-    this.versionShown = true
-  }
   logOut() {
-    this.editorService.logout(true);
+    Swal.fire({
+      title: "Logout",
+      text: "Are you sure you want to log out?",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel"
+    }).then((willLogout) => {
+      if (willLogout.value) {
+        this.editorService.logout(true);
+      }
+    });
   }
 
   backToMetabolights() {
@@ -105,7 +113,7 @@ export class NavBarComponent implements OnInit {
     this.router.navigate(["/console"]);
   }
   redirectToProfile() {
-    window.location.href = this.configService.config.auth.profileUrl
+    window.open(this.configService.config.auth.profileUrl, "_blank");
   }
 
   updatePreviewEnabled() {

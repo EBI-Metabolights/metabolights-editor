@@ -17,7 +17,7 @@ import { firstValueFrom } from "rxjs";
 @Injectable({
   providedIn: "root",
 })
-export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
+export class AuthGuard extends KeycloakAuthGuard implements OnInit {
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
@@ -28,17 +28,18 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
     private store: Store,
     protected readonly keycloak: KeycloakService
   ) {
-      super(router, keycloak)
+    super(router, keycloak)
   }
 
   public async isAccessAllowed(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
-  )
-  {
+  ) {
     const isAnonymousStudyUrl =
       state.url.startsWith("/MTBLS") ||
       state.url.startsWith("/REQ") ||
+      state.url.startsWith("/study/MTBLS") ||
+      state.url.startsWith("/study/REQ") ||
       state.url.startsWith("/reviewer");
 
     if (!this.authenticated) {
@@ -49,7 +50,7 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
       this.keycloak.login()
       return false;
     }
-    if(this.authenticated && state.url.startsWith("/console")) {
+    if (this.authenticated && state.url.startsWith("/console")) {
       return true
     }
     if (this.authenticated) {
@@ -63,8 +64,7 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
 
   async cccanActivate(
     route: ActivatedRouteSnapshot, state: RouterStateSnapshot
-  )
-  {
+  ) {
     const url: string = state.url;
     let studyIdentifier;
     let isPrivateWithMTBLSAccession = false;
@@ -132,9 +132,14 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
       obfuscationCode = url.split("/")[1].split("?")[0].replace("reviewer", "");
     } else if (url.startsWith("/study/")) {
       this.editorService.setRedirectUrl(url);
-      const errorCode = "E-0001-001";
-      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-      return false;
+      const studyIdFromUrl = url.split("/")[2]?.split("?")[0];
+      if (studyIdFromUrl && (studyIdFromUrl.startsWith("MTBLS") || studyIdFromUrl.startsWith("REQ"))) {
+        studyIdentifier = studyIdFromUrl;
+      } else {
+        const errorCode = "E-0001-001";
+        this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+        return false;
+      }
     }
 
     const baseUrl = this.configService.config.metabolightsWSURL.baseURL;
@@ -147,13 +152,19 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
     if (permissionUrl === null) {
       return false;
     }
-    const studyPermission =  await firstValueFrom(this.http.get<StudyPermission>(permissionUrl,
+    const studyPermission = await firstValueFrom(this.http.get<StudyPermission>(permissionUrl,
       {
         headers: httpOptions.headers,
         observe: "body",
       }
     ));
     // this.store.dispatch(new StudyPermissionNS.Set(studyPermission))
+
+    // REQxxx to MTBLSxxx Redirection
+    if (studyIdentifier && studyIdentifier.startsWith("REQ") && studyPermission.studyId && studyPermission.studyId.startsWith("MTBLS")) {
+      this.router.navigate(['/study', studyPermission.studyId]);
+      return false;
+    }
 
     if (!studyPermission.studyId) {
       this.editorService.setRedirectUrl(url);
@@ -168,8 +179,15 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
         return false;
       }
       return true;
+    } else {
+      // Improved redirection logic: REQ studies or Ownership
+      if ((studyIdentifier && studyIdentifier.startsWith("REQ")) || (studyPermission.studyId && studyPermission.studyId.startsWith("REQ")) || studyPermission.submitterOfStudy) {
+        this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyIdentifier || studyPermission.studyId } });
+      } else {
+        this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier || studyPermission.studyId } });
+      }
+      return false;
     }
-    return false;
 
   }
   async checkStudyObfuscationCode(url: string, obfuscationCode: string, state: RouterStateSnapshot, studyId: string) {
@@ -219,10 +237,10 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
     const regEx = new RegExp('^((MTBLS[1-9][0-9]{0,10})|(REQ[0-9]{1,20}))($|\\?)', 'g');
     const studyIdResults = studyId.match(regEx);
     if (studyIdResults === null || studyIdResults.length === 0) {
-        this.editorService.setRedirectUrl(url)
-        const errorCode = "E-0001-003";
-        this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-        return false;
+      this.editorService.setRedirectUrl(url)
+      const errorCode = "E-0001-003";
+      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+      return false;
     }
 
     let studyIdentifier = studyIdResults[0];
@@ -239,6 +257,13 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
 
     const isPublic = studyPermission.studyStatus.toUpperCase() === "PUBLIC";
     const isCurator = studyPermission.userRole == "ROLE_SUPER_USER";
+
+    // REQxxx to MTBLSxxx Redirection
+    if (studyIdentifier && studyIdentifier.startsWith("REQ") && studyPermission.studyId && studyPermission.studyId.startsWith("MTBLS")) {
+      this.router.navigate(['/study', studyPermission.studyId]);
+      return false;
+    }
+
     if (url.startsWith("/MTBLS")) {
       const isCuratorKey = this.configService.config.endpoint + "/isCurator"
 
@@ -253,7 +278,11 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
       }
       if (isPrivateWithMTBLSAccession) {
         this.editorService.setRedirectUrl(url)
-        this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
+        if (studyIdentifier.startsWith("REQ") || studyPermission.submitterOfStudy) {
+          this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyIdentifier } });
+        } else {
+          this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
+        }
         return false;
       }
 
@@ -267,19 +296,27 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
         this.store.dispatch(new StudyPermissionNS.Set(permissions))
         return true;
       } else {
-        if (url.startsWith("/study/MTBLS") && studyPermission.view === false ){
+        if (url.startsWith("/study/MTBLS") && studyPermission.view === false) {
           this.editorService.setRedirectUrl(url)
-          const errorCode = "E-0001-004";
-          if (isPrivateWithMTBLSAccession){
+          if (isPrivateWithMTBLSAccession) {
             this.router.navigate([url.replace("/study/", "/")]);
             return false
           }
-          this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+          if (studyPermission.submitterOfStudy) {
+            this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyIdentifier } });
+          } else {
+            this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
+          }
+          return false
+        }
+        if (url.startsWith("/study/REQ") && studyPermission.view === false) {
+          this.editorService.setRedirectUrl(url)
+          this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyIdentifier } });
           return false
         }
         if (studyPermission.submitterOfStudy === true && studyPermission.view === true && url.startsWith("/study/MTBLS")) {
           this.editorService.setRedirectUrl(url)
-          this.router.navigate([url.replace("/study","")]);
+          this.router.navigate([url.replace("/study", "")]);
           return false;
         }
         if (studyPermission.userName == null || studyPermission.userName.length === 0) {
@@ -287,8 +324,11 @@ export class AuthGuard  extends KeycloakAuthGuard implements OnInit{
           this.router.navigate(["/login"]);
         } else {
           this.editorService.setRedirectUrl(url)
-          const errorCode = "E-0001-004";
-          this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
+          if (studyIdentifier.startsWith("REQ") || studyPermission.submitterOfStudy) {
+            this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyIdentifier } });
+          } else {
+            this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
+          }
         }
         return false;
       }

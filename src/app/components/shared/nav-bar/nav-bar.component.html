@@ -1,71 +1,48 @@
-<nav
-  class="navbar is-link is-fixed-top"
-  role="navigation"
-  aria-label="dropdown navigation"
->
+<nav class="navbar is-link is-fixed-top" role="navigation" aria-label="dropdown navigation">
   <div class="navbar-menu">
     <div class="navbar-start">
-      <a
-        (click)="backToMetabolights()"
-        class="navbar-item"
-      >
+      <a (click)="backToMetabolights()" class="navbar-item">
         <span class="material-icons"> keyboard_backspace </span>&nbsp;Back to MetaboLights
-        <span *ngIf="environmentName != null || environmentName.length > 0" style="margin-left: 16px; color: orange"
-        > &nbsp;(Environment: {{ environmentName }} hosted on {{ endpoint }})</span
-      >
+        <!-- <span *ngIf="environmentName != null || environmentName.length > 0" style="margin-left: 16px; color: orange">
+          &nbsp;(Environment: {{ environmentName }} hosted on {{ endpoint }})</span> -->
       </a>
       <ng-template #studyStatus>
-        <a
-          *ngIf="router.url != '/console' && router.url != '/guide/create'"
-          class="navbar-item"
-        >
-          {{ studyId }}&emsp;<span
-            *ngIf="studyId"
-            class="tag is-normal is-rounded"
-            >PRIVATE</span
-          >
+        <a *ngIf="router.url != '/console' && router.url != '/guide/create'" class="navbar-item">
+          {{ studyId }}&emsp;<span *ngIf="studyId" class="tag is-normal is-rounded">PRIVATE</span>
         </a>
-        <a
-          *ngIf="router.url == '/console' || router.url == '/guide/create'"
-          class="navbar-item"
-        >
-          <img
-            height="20px"
-            src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-          />&nbsp;MetaboLights&nbsp;Study Editor
+        <a *ngIf="router.url == '/console' || router.url == '/guide/create'" class="navbar-item">
+          <img height="20px" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />&nbsp;MetaboLights&nbsp;Study Editor
         </a>
       </ng-template>
 
     </div>
     <div class="navbar-end">
-      <mtbls-about class="version" [apiVersion]="apiVersion" [editorVersion]="editorVersion" [isModalOpen]="versionShown"></mtbls-about>
+      <a (click)="redirectToConsole()" class="navbar-item" *ngIf="router.url != '/console'">
+        <i class="material-icons">list</i>&nbsp;My studies
+      </a>
+
+      <a *ngIf="previewEnabled" target="_blank" href="{{ reviewerLink }}" class="navbar-item">
+        <i class="material-icons">visibility</i>&nbsp;Preview
+      </a>
 
       <div class="navbar-item has-dropdown is-hoverable is-right">
         <a class="navbar-link" aria-haspopup="true" aria-expanded="false">
-          <span class="icon"><i class="material-icons">menu</i></span>
+          <span class="icon" style="margin-right: 2px;"><i class="material-icons">account_circle</i></span> My Account
         </a>
 
         <div class="navbar-dropdown is-right">
-          <a (click)="redirectToConsole()" class="navbar-item">
-            <i class="material-icons">list</i>&nbsp;My studies
-          </a>
           <a (click)="redirectToProfile()" class="navbar-item">
             <i class="material-icons">account_circle</i>&nbsp;My profile
-          </a>
-          <a
-            *ngIf="previewEnabled"
-            target="_blank"
-            href="{{ reviewerLink }}"
-            class="navbar-item"
-          >
-            <i class="material-icons">visibility</i>&nbsp;Preview
           </a>
 
           <hr class="navbar-divider" />
 
-           <a (click)="showVersion()" class="navbar-item">
-            <i class="material-icons">info</i>&nbsp;Version
-           </a>
+          <mtbls-about [apiVersion]="apiVersion" [editorVersion]="editorVersion"></mtbls-about>
+
+          <a href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!"
+            class="navbar-item">
+            <i class="material-icons">mail</i>&nbsp;Contact Us
+          </a>
 
           <a (click)="logOut()" class="navbar-item">
             <i class="material-icons">exit_to_app</i>&nbsp;Logout

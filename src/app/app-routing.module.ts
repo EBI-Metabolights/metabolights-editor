@@ -25,6 +25,7 @@ import { GuidedAssaysComponent } from "./components/guide/assays/assays.componen
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { NoStudyPageComponent } from "./components/shared/errors/no-study-page/no-study-page.component";
 import { StudyNotPublicComponent } from "./components/shared/errors/study-not-public/study-not-public.component";
+import { StudyNotCompletedComponent } from "./components/shared/errors/study-not-completed/study-not-completed.component";
 import { DataPolicyComponent } from "./components/public/data-policy/data-policy.component";
 import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-license-static/dataset-license-static.component";
 
@@ -73,8 +74,8 @@ const routes: Routes = [
   { path: "guides", component: GuidesComponent },
   { path: "guides/:tab", component: GuidesComponent },
   { path: "guides/:tab/:section", component: GuidesComponent },
-  { path: "datapolicy", component: DataPolicyComponent},
-  { path: "license", component: DatasetLicenseStaticPageComponent},
+  { path: "datapolicy", component: DataPolicyComponent },
+  { path: "license", component: DatasetLicenseStaticPageComponent },
 
   { path: "", redirectTo: "console", pathMatch: "full" },
   { path: "console", canActivate: [AuthGuard], component: ConsoleComponent },
@@ -128,7 +129,8 @@ const routes: Routes = [
   },
   { path: "study", redirectTo: "console", pathMatch: "full" },
   { path: "study-not-found", component: NoStudyPageComponent },
-  { path: "study-not-public", component: StudyNotPublicComponent},
+  { path: "study-not-public", component: StudyNotPublicComponent },
+  { path: "study-not-completed", component: StudyNotCompletedComponent },
   { path: "page-not-found", component: PageNotFoundComponent },
   { matcher: publicStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
   { matcher: reviewerStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
@@ -139,4 +141,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes, {})],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

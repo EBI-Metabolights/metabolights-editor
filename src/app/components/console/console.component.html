@@ -1,6 +1,6 @@
 <nav-bar :mode="light"></nav-bar>
 <a href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!"
-  id="fixedbutton"><mat-icon class="mat-icon material-icons">Feedback</mat-icon> Contact us
+  id="fixedbutton"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us
 </a>
 <div class="columns" style="min-height: 100vh; margin: 60px 0">
   <div class="column is-8 is-offset-2">
@@ -32,7 +32,7 @@
     <nav class="panel has-background-white">
       <p class="panel-heading">
         <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
-        <span style="margin-left: 10px">My Studies - {{ loginName }}
+        <span style="margin-left: 10px">My Studies - {{ loginName }}<span *ngIf="curator"> (Curator)</span>
           <small *ngIf="studies.length > 0">({{ studies.length }})</small></span>
         <span class="is-pulled-right" *ngIf="!underMaintenance">
           <small style="font-size: 0.8em !important"><mtbls-help target="createStudy"></mtbls-help></small>&nbsp;
