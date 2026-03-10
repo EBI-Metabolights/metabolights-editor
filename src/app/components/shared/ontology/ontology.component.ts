@@ -8,6 +8,7 @@ import {
   EventEmitter,
   ViewChild,
   ElementRef,
+  HostListener,
 } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER, R } from "@angular/cdk/keycodes";
@@ -105,8 +106,25 @@ export class OntologyComponent implements OnInit, OnChanges {
     private editorService: EditorService,
     private configService: ConfigurationService,
     private store: Store,
-    private ontTrackerService: OntologyComponentTrackerService
+    private ontTrackerService: OntologyComponentTrackerService,
+    private elementRef: ElementRef
   ) {}
+
+  @HostListener("document:click", ["$event"])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.valueInput || !this.valueInput.panelOpen) {
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+    const isInsideComponent = this.elementRef.nativeElement.contains(target);
+    const isInsideAutocompletePanel = !!target.closest(".mat-autocomplete-panel");
+    if (!isInsideComponent && !isInsideAutocompletePanel) {
+      this.valueInput.closePanel();
+    }
+  }
 
   join(path1: string, path2: string) {
     if (path2.startsWith("/")) {
@@ -427,6 +445,22 @@ export class OntologyComponent implements OnInit, OnChanges {
     this.values = values;
   }
 
+  reset() {
+    this.values = [];
+    this.valueCtrl.setValue("", { emitEvent: false });
+    if (this.inputRef?.nativeElement) {
+      this.inputRef.nativeElement.value = "";
+    }
+    this.showSearchMore = false;
+    this.noResultsFound = false;
+    this.getDefaultTerms();
+    this.setCurrentOptions(this.allvalues);
+    this.emptyError.emit(true);
+    if (this.valueInput?.panelOpen) {
+      this.valueInput.closePanel();
+    }
+  }
+
   optionSelected(selected: MatAutocompleteSelectedEvent) {
     if (selected.option.value !== '__SEARCH_MORE__' && selected.option.value !== null && selected.option.value !== undefined) {
       this.setValue(selected.option.value);
@@ -574,15 +608,6 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (!termExists) {
       this.values = [value];
     }
-  }
-
-  reset() {
-    this.values = [];
-    this.valueCtrl.setValue(null);
-    if (this.inputRef?.nativeElement) {
-      this.inputRef.nativeElement.value = '';
-    }
-    // this.valueCtrl.enable();
   }
 
   triggerChanges() {
