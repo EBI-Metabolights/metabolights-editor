@@ -239,6 +239,17 @@ export class TableComponent
   statusMessage: string;
   statusType: string;
 
+  private orderRowsByIndex(rows: any[]): any[] {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return rows;
+    }
+    const hasIndex = rows.every((row) => row && typeof row.index === "number");
+    if (!hasIndex) {
+      return rows;
+    }
+    return [...rows].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  }
+
   constructor(
     private clipboardService: ClipboardService,
     private fb: UntypedFormBuilder,
@@ -434,7 +445,9 @@ export class TableComponent
       this._defaultOntologiesCache.clear();
 
       this.hit = true;
-      this.fullRows = this.data.rows;
+      const orderedRows = this.orderRowsByIndex(this.data.rows);
+      this.data.rows = orderedRows;
+      this.fullRows = orderedRows;
       this.refreshDisplayedColumns();
       this.dataSource = new MatTableDataSource(this.fullRows);
 
@@ -1110,7 +1123,7 @@ export class TableComponent
   }
 
   applyFilter(filterValue: string) {
-    this.dataSource.data = this.tableData.data.rows;
+    this.dataSource.data = this.data?.rows || [];
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
@@ -1213,7 +1226,7 @@ export class TableComponent
       });
       this.dataSource.data = data;
     } else {
-      this.dataSource.data = this.data.data.rows;
+      this.dataSource.data = this.data?.rows || [];
     }
   }
 
@@ -2202,6 +2215,13 @@ export class TableComponent
       });
 
       this.editColumnform.markAsDirty();
+
+      if (this.isCellTypeOntology) {
+        setTimeout(() => {
+          const editOntologyColumn = this.getOntologyComponentValue("editOntologyColumn");
+          editOntologyColumn?.reset();
+        });
+      }
     }
   }
 
