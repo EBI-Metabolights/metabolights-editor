@@ -130,7 +130,7 @@
 
   <mat-divider class="file-divider" [inset]="true"></mat-divider>
   <div *ngIf="!isReadOnly" class="notification is-warning message">
-    <small>This section shows your metadata files (‘ISA METADATA’). Metadata can be edited online or downloaded, edited
+    <small>This section shows study metadata (‘ISA METADATA’) and result files. Metadata and result files can be edited online or downloaded, edited
       locally (e.g., MS Excel) and re-uploaded. Please note, do not change filenames, extensions, encodings,
       etc.</small>
   </div>
@@ -141,7 +141,7 @@
       [attr.marginTop]="!isReadOnly ? '35' : '0'" isReadOnly>
       <label class="section-header">
         <input [checked]="filteredMetaFiles.length == selectedMetaFiles.length"
-          (change)="selectFiles($event, 'meta', null, true)" type="checkbox" name="" />&nbsp;&nbsp;ISA METADATA
+          (change)="selectFiles($event, 'meta', null, true)" type="checkbox" name="" />&nbsp;&nbsp;METADATA & RESULT FILES
       </label>
       <span class="is-pulled-right">
         <mtbls-download [value]="selectedDownloadFiles()" [selectedMetaFiles]="selectedMetaFiles"></mtbls-download>
@@ -154,7 +154,7 @@
     </p>
     <div class="panel-block">
       <mat-form-field class="full-width is-small" appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Search metadata</mat-label>
+        <mat-label>Search metadata/result files</mat-label>
         <input matInput (keyup)="applyFilter($event, 'meta')" placeholder="e.g. filename">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
