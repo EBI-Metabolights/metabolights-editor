@@ -211,6 +211,7 @@
                 </div>
 
                 <span *ngIf="form.get('description')">
+                  <label>Protocol Description <span class="required-asterisk">*</span></label>
                   <!-- <div *ngIf="form.get('description').value != ''" class="is-clearfix">
                     </div>  -->
                   <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px"
@@ -310,7 +311,7 @@
                       form.get('description').dirty &&
                       form.get('description').errors.description
                     ">
-                    {{ form.get("description").errors.description.error }}
+                    <small>{{ form.get("description").errors.description.error }}</small>
                   </mat-error>
                 </span>
 

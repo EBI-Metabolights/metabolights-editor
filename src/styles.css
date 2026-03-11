@@ -89,7 +89,7 @@
   font-size: 17px;
   position: fixed;
   right: -40px;
-  top: 30%;
+  top: 250px;
   font-family: "Roboto", helvetica, arial, sans-serif;
   z-index: 999;
 }
@@ -671,7 +671,7 @@ element.style {
 
 .tags .tag {
   margin-bottom: 1.5rem;
-  text-transform: capitalize;
+  text-transform: none;
 }
 
 .card-heading {
@@ -945,7 +945,86 @@ element.style {
   border-right: 1px solid #dbdbdb;
 }
 
-.copy-btn {
-  float: right;
-  cursor: pointer;
+
+.required-asterisk {
+  color: red;
+  margin-left: 2px;
+}
+
+
+/* Premium Loader Styles */
+.loader-content {
+  text-align: center;
+  max-width: 300px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.loader-logo {
+  width: 180px;
+  height: auto;
+  margin-bottom: 40px;
+  animation: pulse 2.5s ease-in-out infinite;
+  opacity: 0.9;
+}
+
+.loader-progress-container {
+  width: 100%;
+  height: 4px;
+  background-color: #f0f0f0;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.loader-progress-bar {
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, #3676d9, #1fc3a7);
+  position: absolute;
+  left: -40%;
+  animation: progressMove 1.8s infinite ease-in-out;
+  box-shadow: 0 0 10px rgba(54, 118, 217, 0.3);
+}
+
+.loader-text {
+  font-size: 14px;
+  color: #666;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  animation: fadeInOut 2s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes progressMove {
+  0% {
+    left: -40%;
+  }
+  50% {
+    left: 40%;
+    width: 60%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
 }

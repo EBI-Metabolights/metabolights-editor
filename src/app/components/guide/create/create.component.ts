@@ -394,10 +394,34 @@ export class CreateComponent implements OnInit {
   }
 
 
+  toggleCategory(category: any, event: any = null) {
+    const categoryId = category.id;
+    const isCurrentlySelected = this.studyAssaySelection[categoryId]?.length === category.assayTypes.length && category.assayTypes.length > 0;
+    
+    // If event is provided (from checkbox change), use its value. 
+    // Otherwise (from box click), toggle current state.
+    const shouldSelect = event ? event.target.checked : !isCurrentlySelected;
+
+    if (shouldSelect) {
+      // Select all assay types for this category
+      this.studyAssaySelection[categoryId] = [...category.assayTypes];
+      if (!this.selectedCategories.includes(categoryId)) {
+        this.selectedCategories.push(categoryId);
+      }
+    } else {
+      // Deselect all
+      this.studyAssaySelection[categoryId] = [];
+      this.selectedCategories = this.selectedCategories.filter(c => c !== categoryId);
+    }
+    this.updateSelectionStatus();
+  }
+
   toggleAssay(category: string, assayType: string, event: any) {
     if (!this.studyAssaySelection[category]) this.studyAssaySelection[category] = [];
     if (event.target.checked) {
-      this.studyAssaySelection[category].push(assayType);
+      if (!this.studyAssaySelection[category].includes(assayType)) {
+        this.studyAssaySelection[category].push(assayType);
+      }
     } else {
       this.studyAssaySelection[category] = this.studyAssaySelection[category].filter(a => a !== assayType);
     }
@@ -507,6 +531,12 @@ export class CreateComponent implements OnInit {
     return status === "published" || status === "preprint";
   }
 
+  get isAuthorRequired(): boolean {
+    if (!this.publicationStatus || this.publicationStatus.length === 0) return false;
+    const status = this.publicationStatus[0].annotationValue?.toLowerCase();
+    return status !== "in preparation" && status !== "learning material";
+  }
+
   get isValidDoi(): boolean {
     const doi = this.publicationDoi ? this.publicationDoi.trim() : "";
     if (doi === "") return true;
@@ -571,9 +601,10 @@ export class CreateComponent implements OnInit {
 
   get isStep3Valid(): boolean {
     const isDoiOk = this.isDoiRequired ? (this.publicationDoi && this.publicationDoi.trim() !== "") : true;
+    const isAuthorOk = this.isAuthorRequired ? (this.publicationAuthors && this.publicationAuthors.trim() !== "") : true;
     return !!(this.publicationStatus && this.publicationStatus.length > 0 &&
       this.publicationTitle && this.publicationTitle.trim() !== "" &&
-      this.publicationAuthors && this.publicationAuthors.trim() !== "" &&
+      isAuthorOk &&
       isDoiOk &&
       this.doiErrorMessage === "");
   }
@@ -711,17 +742,17 @@ export class CreateComponent implements OnInit {
 
     // Section 3: Publication
     const publicationOk = !!(this.publicationStatus && this.publicationStatus.length > 0 &&
-      this.publicationTitle && this.publicationTitle.trim() !== "" &&
-      this.publicationAuthors && this.publicationAuthors.trim() !== "");
+      this.publicationTitle && this.publicationTitle.trim() !== "");
+    const authorOk = this.isAuthorRequired ? (!!this.publicationAuthors && this.publicationAuthors.trim() !== "") : true;
     const doiOk = this.isDoiRequired ? (!!this.publicationDoi && this.publicationDoi.trim() !== "" && this.doiErrorMessage === "") : true;
 
     items.push({
       id: "publication",
       label: "Publication Details",
-      isValid: publicationOk && doiOk,
+      isValid: publicationOk && authorOk && doiOk,
       isRequired: true,
       section: 3,
-      error: !publicationOk ? "Enter mandatory publication details" : (!doiOk ? (this.doiErrorMessage || "DOI is required") : null)
+      error: !publicationOk ? "Enter mandatory publication details" : (!authorOk ? "Publication authors are required" : (!doiOk ? (this.doiErrorMessage || "DOI is required") : null))
     });
 
     return items;
@@ -766,13 +797,10 @@ export class CreateComponent implements OnInit {
   private getCategorySubmissionSummary(selectedCategoryKeys: string[]): string {
     const summary = selectedCategoryKeys
       .map((key) => {
-        const selectedAssays = this.studyAssaySelection[key] || [];
-        const count = selectedAssays.length;
         const categoryLabel =
           this.activeCategories?.find((c) => c.id === key)?.label || key;
-        return `${count} ${categoryLabel}`;
-      })
-      .filter((entry) => !entry.startsWith("0 "));
+        return categoryLabel;
+      });
 
     return summary.join(", ");
   }
