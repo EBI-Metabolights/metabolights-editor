@@ -27,22 +27,21 @@
                 <div class="category-box mb-3 clickable" *ngFor="let cat of activeCategories"
                   (click)="toggleCategory(cat)"
                   [class.is-selected]="studyAssaySelection[cat.id]?.length === cat.assayTypes.length && cat.assayTypes.length > 0">
-                  <div class="columns is-vcentered">
-                    <div class="column is-4 py-1">
-                      <label class="checkbox is-size-7 beautified-checkbox category-selection-label mb-0" (click)="$event.stopPropagation()">
+                  <div class="category-flex-row">
+                    <div class="category-label-wrapper">
+                      <label class="checkbox is-size-7 beautified-checkbox category-selection-label mb-0"
+                        (click)="$event.stopPropagation()">
                         <input type="checkbox" (change)="toggleCategory(cat, $event)"
                           [checked]="studyAssaySelection[cat.id]?.length === cat.assayTypes.length && cat.assayTypes.length > 0">
                         <span class="checkmark"></span>
-                        <span class="has-text-weight-bold has-text-grey">{{cat.label}}</span>
+                        <span class="has-text-weight-bold">{{cat.label}}</span>
                       </label>
                     </div>
-                    <div class="column py-1">
-                      <div class="assay-techniques-tags is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
-                        <span *ngFor="let assayType of cat.assayTypes"
-                          class="tag is-light is-rounded assay-technique-tag">
-                          {{assayType}}
-                        </span>
-                      </div>
+                    <div class="category-techniques-wrapper">
+                      <span *ngFor="let assayType of cat.assayTypes"
+                        class="tag is-light is-rounded assay-technique-tag">
+                        {{assayType}}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -175,7 +174,7 @@
             <hr>
             <!-- Factors, Descriptors, Contacts -->
             <div class="columns is-multiline">
-              <div class="column is-12">
+              <div class="column is-12" style="display: none;">
                 <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors</h3>
                 <div class="box p-3 is-clearfix" style="position: relative;">
                   <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "

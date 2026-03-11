@@ -5,7 +5,7 @@
     <p>
       Publications
       <span *ngIf="!isReadOnly"><mat-icon
-          [matTooltip]="'The act of publishing, and also any copies issued for public distribution'">help</mat-icon></span>
+          [matTooltip]="'Details of the publication associated with the study including title, authors and status (tentative)'">help</mat-icon></span>
     </p>
   </header>
   <div class="card-content" *ngIf="publications && publications.length > 0; else noPublicationsFound">
