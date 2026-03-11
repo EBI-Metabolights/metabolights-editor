@@ -22,11 +22,10 @@
         </span>
         <a *ngIf="!isStudyReadOnly" style="margin-right: 10px" (click)="openModal(protocol)"
           class="button is-light is-pulled-right is-small"><mat-icon>edit</mat-icon> Edit Description</a>
-        <span class="copy-btn mtbls-button" (click)="copyContent()"><mat-icon
+        <span class="copy-btn mtbls-button is-pulled-right" (click)="copyContent()" style="cursor: pointer;"><mat-icon
             matTooltip="Copy content">content_copy</mat-icon></span>
-        <div *ngIf="protocolInGuides">
-          <br>
-          <small class="guide-text"> <i> {{ guideText}} </i></small>
+        <div *ngIf="protocolInGuides" style="clear: both; padding-top: 5px;">
+          <span class="guide-text">{{ guideText }}</span>
         </div>
       </span>
 
@@ -146,7 +145,8 @@
           <div class="control" *ngIf="protocol.version">
             <div class="tags has-addons">
               <span class="tag is-light" style="border: 1px solid #dbdbdb; border-right: none;">Protocol Version</span>
-              <span class="tag is-white" style="border: 1px solid #dbdbdb;text-transform: none;">{{ protocol.version }}</span>
+              <span class="tag is-white" style="border: 1px solid #dbdbdb;text-transform: none;">{{ protocol.version
+                }}</span>
             </div>
           </div>
         </div>
