@@ -7,6 +7,9 @@ import { Component, Input } from '@angular/core';
 })
 export class StudySubmissionChecklistComponent {
     @Input() isReadOnly: boolean = false;
+    @Input() set isOpen(value: boolean) {
+        this.isChecklistPopupOpen = value;
+    }
 
     isChecklistPopupOpen = false;
     checklistStepExpandedIndex = 0;

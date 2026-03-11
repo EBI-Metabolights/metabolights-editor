@@ -1,12 +1,9 @@
-<div *ngIf="data" class="columns is-vcentered" style="padding: 10px 0 10px 0">
-  <span class="column is-4 fadeIn nmrl">
+<div *ngIf="data" class="table-header-container" style="padding: 10px 0 10px 0">
+  <div class="fadeIn nmrl">
     <span class="has-text-grey">
       <small>File: {{ data.file }}</small>
     </span>
-  </span>
-  <span class="column is-8 fadeIn has-text-right nmrl">
-    <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
-  </span>
+  </div>
 </div>
 <div *ngIf="!isReadOnly" class="my-2">
   <div *ngIf="hasAnyMissingValues()" class="notification is-warning">
@@ -114,8 +111,9 @@
       </a>
     </span>
     <div *ngIf="data && data.file && openUploadArea" class="table-upload-drop-area">
-      <app-drag-and-drop [iscloseable]="true" [filePatternString]="filePatternString"
-        (uploadComplete)="onUploadComplete($event)" (closeUpload)="openUploadArea = false"></app-drag-and-drop>
+      <app-drag-and-drop [iscloseable]="true" [filePatternString]="filePatternString" [label]="getUploadLabel()"
+        [hint]="getUploadHint()" (uploadComplete)="onUploadComplete($event)"
+        (closeUpload)="openUploadArea = false"></app-drag-and-drop>
     </div>
     <span *ngIf="!isReadOnly && (
         selectedRows.length > 0 ||
@@ -156,6 +154,9 @@
         (keydown)="onKeydown($event, $event.target.value)" placeholder="Filter" />
     </mat-form-field>
   </span>
+</div>
+<div class="fadeIn has-text-right nmrl">
+  <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
 </div>
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">

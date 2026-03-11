@@ -35,7 +35,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <mat-label>Study Description</mat-label>
+                <mat-label>Study Description <span class="required-asterisk">*</span></mat-label>
 
                 <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px" formControlName="description"
                   [placeholder]="validation.placeholder">

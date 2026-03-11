@@ -212,7 +212,7 @@
   <!--ISA Metadata upload area -->
   <div *ngIf="!isReadOnly" style="margin-bottom: 1rem;">
     <app-drag-and-drop (uploadComplete)="onUploadComplete($event)" [iscloseable]="false"
-      filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$"></app-drag-and-drop>
+      filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$" label="files" hint=" (metadata or result files only)"></app-drag-and-drop>
   </div>
   <!--ISA Metadata panel end -->
   <mat-divider class="file-divider" [inset]="true"></mat-divider>

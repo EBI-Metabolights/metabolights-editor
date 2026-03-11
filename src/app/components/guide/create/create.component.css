@@ -221,6 +221,7 @@ hr {
   border-radius: 8px;
   padding: 1rem;
   transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .category-box:hover {
@@ -250,6 +251,32 @@ hr {
   display: flex;
   align-items: center;
   cursor: pointer;
+}
+
+.category-selection-label {
+  display: flex !important;
+  align-items: center;
+  font-weight: 600;
+  color: #4a4a4a;
+}
+
+.category-selection-label .checkmark {
+  margin-top: -2px;
+}
+
+.assay-technique-tag {
+  background-color: #f0f4f4 !important;
+  color: #00796b !important;
+  border: 1px solid #e0e7e7 !important;
+  font-size: 0.7rem !important;
+  padding: 0.5rem 0.75rem !important;
+  height: auto !important;
+  font-weight: 500;
+}
+
+.category-box.is-selected {
+  border-color: #26a69a;
+  background-color: #f4fbfb;
 }
 
 .dropdown-col {

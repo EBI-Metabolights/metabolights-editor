@@ -748,6 +748,28 @@ export class TableComponent
     }
   }
 
+  getUploadLabel(): string {
+    if (this.validationsId === "samples") {
+      return "sample file";
+    } else if (this.validationsId === "assays") {
+      return "assay files";
+    } else if (this.validationsId === "maf") {
+      return "maf files";
+    }
+    return "files";
+  }
+
+  getUploadHint(): string {
+    if (
+      this.validationsId === "samples" ||
+      this.validationsId === "assays" ||
+      this.validationsId === "maf"
+    ) {
+      return "";
+    }
+    return " (metadata only)";
+  }
+
   detectFileColumns() {
     Object.keys(this.data.header).forEach((col) => {
       if (
