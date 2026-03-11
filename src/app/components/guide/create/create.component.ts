@@ -397,7 +397,7 @@ export class CreateComponent implements OnInit {
   toggleCategory(category: any, event: any = null) {
     const categoryId = category.id;
     const isCurrentlySelected = this.studyAssaySelection[categoryId]?.length === category.assayTypes.length && category.assayTypes.length > 0;
-    
+
     // If event is provided (from checkbox change), use its value. 
     // Otherwise (from box click), toggle current state.
     const shouldSelect = event ? event.target.checked : !isCurrentlySelected;
@@ -726,19 +726,21 @@ export class CreateComponent implements OnInit {
     });
 
     const activeCategories = this.activeDesignDescriptorCategories || [];
-    const missingDescriptors = activeCategories.filter(cat => {
-      const minRequired = Number(cat.min) || 0;
-      return minRequired > 0 && this.getDescriptorsByCategory(cat.id).length < minRequired;
-    });
+    if (activeCategories.some(cat => Number(cat.min) > 0)) {
+      const missingDescriptors = activeCategories.filter(cat => {
+        const minRequired = Number(cat.min) || 0;
+        return minRequired > 0 && this.getDescriptorsByCategory(cat.id).length < minRequired;
+      });
 
-    items.push({
-      id: "descriptors",
-      label: "Mandatory Descriptors",
-      isValid: missingDescriptors.length === 0,
-      isRequired: true,
-      section: 2,
-      error: missingDescriptors.length > 0 ? `Missing ${missingDescriptors.map(m => m.label).join(", ")}` : null
-    });
+      items.push({
+        id: "descriptors",
+        label: "Descriptors",
+        isValid: missingDescriptors.length === 0,
+        isRequired: true,
+        section: 2,
+        error: missingDescriptors.length > 0 ? `Missing ${missingDescriptors.map(m => m.label).join(", ")}` : null
+      });
+    }
 
     // Section 3: Publication
     const publicationOk = !!(this.publicationStatus && this.publicationStatus.length > 0 &&

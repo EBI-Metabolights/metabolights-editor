@@ -279,6 +279,25 @@ hr {
   background-color: #f4fbfb;
 }
 
+.category-flex-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.category-label-wrapper {
+  flex: 0 0 160px;
+  min-width: 160px;
+}
+
+.category-techniques-wrapper {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .dropdown-col {
   max-width: 300px;
 }
