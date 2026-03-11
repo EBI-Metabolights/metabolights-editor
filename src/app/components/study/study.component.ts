@@ -46,6 +46,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  loading$: Observable<boolean> = inject(Store).select(TransitionsState.loading);
 
   revisionNumber = null;
   revisionDatetime = null;
@@ -77,7 +78,6 @@ export class StudyComponent implements OnInit, OnDestroy {
   mhdAccession: string = null;
   isReadOnly = true;
   isChecklistPopupOpen = false;
-  checklistStepExpandedIndex = 0;
 
   constructor(
     private store: Store,
@@ -139,6 +139,9 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        if (!this.isReadOnly && this.tab === "overview") {
+          this.isChecklistPopupOpen = true;
+        }
       }
     });
     this.studyIdentifier$.subscribe((value) => {
@@ -223,6 +226,9 @@ export class StudyComponent implements OnInit, OnDestroy {
       } else {
         this.requestedTab = 0;
         this.tab = "overview";
+        if (!this.isReadOnly) {
+          this.isChecklistPopupOpen = true;
+        }
       }
       this.selectCurrentTab(this.requestedTab, this.tab);
     });
@@ -235,19 +241,6 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     window.addEventListener("scroll", this.scrollFunction, true);
-  }
-
-  toggleChecklistPopup() {
-    this.isChecklistPopupOpen = !this.isChecklistPopupOpen;
-  }
-
-  closeChecklistPopup() {
-    this.isChecklistPopupOpen = false;
-  }
-
-  toggleChecklistStepExpand(index: number) {
-    this.checklistStepExpandedIndex =
-      this.checklistStepExpandedIndex === index ? -1 : index;
   }
 
   toggleMessage() {

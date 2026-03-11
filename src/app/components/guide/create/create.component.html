@@ -24,21 +24,24 @@
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
               <div class="category-rows-container mt-4">
-                <div class="category-box mb-3" *ngFor="let cat of activeCategories">
+                <div class="category-box mb-3 clickable" *ngFor="let cat of activeCategories"
+                  (click)="toggleCategory(cat)"
+                  [class.is-selected]="studyAssaySelection[cat.id]?.length === cat.assayTypes.length && cat.assayTypes.length > 0">
                   <div class="columns is-vcentered">
-                    <div class="column is-2 py-1">
-                      <span class="is-size-7 has-text-weight-bold has-text-grey">{{cat.label}}</span>
+                    <div class="column is-4 py-1">
+                      <label class="checkbox is-size-7 beautified-checkbox category-selection-label mb-0" (click)="$event.stopPropagation()">
+                        <input type="checkbox" (change)="toggleCategory(cat, $event)"
+                          [checked]="studyAssaySelection[cat.id]?.length === cat.assayTypes.length && cat.assayTypes.length > 0">
+                        <span class="checkmark"></span>
+                        <span class="has-text-weight-bold has-text-grey">{{cat.label}}</span>
+                      </label>
                     </div>
                     <div class="column py-1">
-                      <div class="assay-types-list is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
-                        <div *ngFor="let assayType of cat.assayTypes">
-                          <label class="checkbox is-size-7 beautified-checkbox assay-type-label mb-0">
-                            <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
-                              [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
-                            <span class="checkmark"></span>
-                            {{assayType}}
-                          </label>
-                        </div>
+                      <div class="assay-techniques-tags is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
+                        <span *ngFor="let assayType of cat.assayTypes"
+                          class="tag is-light is-rounded assay-technique-tag">
+                          {{assayType}}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -282,18 +285,8 @@
                   </mat-form-field>
                 </div>
 
-                <!-- Row 1: Authors and Status -->
+                <!-- Row 1: Status and Authors (Swapped) -->
                 <div class="columns mb-3">
-                  <div class="column is-6 pb-0">
-                    <div class="field">
-                      <mat-form-field class="full-width" appearance="outline">
-                        <mat-label>Publication Authors</mat-label>
-                        <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors"
-                          required>
-                        <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
-                      </mat-form-field>
-                    </div>
-                  </div>
                   <div class="column is-6 pb-0">
                     <div class="field">
                       <div class="control">
@@ -324,6 +317,16 @@
                           </div>
                         </ng-template>
                       </div>
+                    </div>
+                  </div>
+                  <div class="column is-6 pb-0">
+                    <div class="field">
+                      <mat-form-field class="full-width" appearance="outline">
+                        <mat-label>Publication Authors<span class="has-error"
+                            *ngIf="isAuthorRequired">*</span></mat-label>
+                        <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors">
+                        <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
+                      </mat-form-field>
                     </div>
                   </div>
                 </div>
@@ -408,7 +411,7 @@
                   <div class="created-studies-list box py-4 px-5 "
                     style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
                     <div *ngFor="let studyId of createdStudies" class="is-flex is-align-items-center">
-                      <span class="material-symbols-outlined has-text-success is-size-5 mr-3">check</span>
+                      <span class="material-symbols-outlined has-text-success is-size-5 mr-3">task</span>
                       <div class="is-size-6">
                         <span class="has-text-weight-bold">{{ studyId }}</span>:
                         <span class="is-italic has-text-grey-dark">{{ createdStudiesDetails[studyId] }}</span>
@@ -430,7 +433,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(0)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">1</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_blank"
                           class="step-link">Complete 'Sample'
@@ -483,7 +486,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(1)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">2</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank"
                           class="step-link">Complete 'Assay'
@@ -527,7 +530,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(2)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">3</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
                           class="step-link">Upload raw &
@@ -567,7 +570,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(3)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">4</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" class="step-link">Add
                           raw/derived
@@ -604,7 +607,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(4)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">5</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Protocol/" target="_blank"
                           class="step-link">Complete the
@@ -643,7 +646,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(5)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">6</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="javascript:void(0)" class="step-link">Index 'Data Files' & run 'Study Validation'</a>
                       </h4>
@@ -674,7 +677,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(6)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">7</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/#validate-study" target="_blank"
                           class="step-link">Make
@@ -710,7 +713,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(7)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">8</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/#submission-process" target="_blank"
                           class="step-link">Change
