@@ -152,7 +152,10 @@
                         <mat-label>{{ field.label }}</mat-label>
                         <input matInput [formControlName]="field.key" type="text" [placeholder]="field.label"
                           [required]="field.required">
-                        <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                        <mat-hint>
+                          <span *ngIf="field.description">{{ field.description }}</span>
+                          <b *ngIf="field.required">&nbsp;(required)</b>
+                        </mat-hint>
                       </mat-form-field>
                     </div>
 
@@ -165,7 +168,10 @@
                               <mat-label>{{ field.label }}</mat-label>
                               <input matInput [formControlName]="field.key" type="text" placeholder="Value"
                                 [required]="field.required">
-                              <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                              <mat-hint>
+                                <span *ngIf="field.description">{{ field.description }}</span>
+                                <b *ngIf="field.required">&nbsp;(required)</b>
+                              </mat-hint>
                             </mat-form-field>
                           </ng-container>
                           <ng-template #mainOntologyField>

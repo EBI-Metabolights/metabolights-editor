@@ -282,6 +282,7 @@
                       [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
                       [values]="[]" [inline]="true" [rule]="columnControlList(selectedColumn['header'])?.rule"
                       [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])"
+                      [isRequired]="isFieldRequired(selectedColumn['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <ng-template #dropdownField>
@@ -295,7 +296,7 @@
                       </mat-select>
                       <mat-hint>
                         {{ getColumnTooltip(selectedColumn['header']) }}
-                        <b *ngIf="isFieldRequired(selectedColumn['header'])">(required)</b>
+                        <b *ngIf="isFieldRequired(selectedColumn['header'])">&nbsp;(required)</b>
                       </mat-hint>
                     </mat-form-field>
                     <mat-form-field class="full-width" appearance="outline"
@@ -303,7 +304,7 @@
                       <input class="no-scroll" formControlName="cell" matInput />
                       <mat-hint>
                         {{ getColumnTooltip(selectedColumn['header']) }}
-                        <b *ngIf="isFieldRequired(selectedColumn['header'])">(required)</b>
+                        <b *ngIf="isFieldRequired(selectedColumn['header'])">&nbsp;(required)</b>
                       </mat-hint>
                     </mat-form-field>
                   </ng-template>
@@ -355,6 +356,7 @@
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
                       [rule]="columnControlList(selectedCell['column']['header']).rule"
                       [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"
+                      [isRequired]="isFieldRequired(selectedCell['column']['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="isCellTypeFile">
@@ -367,7 +369,7 @@
                       </mat-select>
                       <mat-hint>
                         {{ getColumnTooltip(selectedCell['column']['header']) }}
-                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">(required)</b>
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
                       </mat-hint>
                     </mat-form-field>
                   </div>
@@ -380,6 +382,7 @@
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
                       [rule]="columnControlList(selectedCell['column']['header']).rule"
                       [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"
+                      [isRequired]="isFieldRequired(selectedCell['column']['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
@@ -394,7 +397,7 @@
                       </mat-select>
                       <mat-hint>
                         {{ getColumnTooltip(selectedCell['column']['header']) }}
-                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">(required)</b>
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
                       </mat-hint>
                     </mat-form-field>
                   </div>
@@ -405,7 +408,7 @@
                       <input class="no-scroll" formControlName="cell" matInput />
                       <mat-hint>
                         {{ getColumnTooltip(selectedCell['column']['header']) }}
-                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">(required)</b>
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
                       </mat-hint>
                       <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
                         Please enter a valid URL
