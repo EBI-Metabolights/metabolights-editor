@@ -1209,11 +1209,13 @@ export class EditorService {
     if (examples) {
       let examplesStr = '';
       if (Array.isArray(examples)) {
-        examplesStr = examples.map(e => (typeof e === 'object' ? JSON.stringify(e) : e)).join(', ');
+        examplesStr = examples.map(e => (typeof e === 'object' ? JSON.stringify(e) : String(e))).filter(e => e.trim()).join(', ');
       } else {
-        examplesStr = examples;
+        examplesStr = String(examples).trim();
       }
-      combinedDescription += (description ? '\n\n' : '') + `Examples: ${examplesStr}`;
+      if (examplesStr) {
+        combinedDescription += (description ? '\n\n' : '') + `Examples: ${examplesStr}`;
+      }
     }
 
     let cleanPlaceholder = fieldDef.placeholder || fieldDef.columnHeader || fieldDef.fieldName || fieldName;
