@@ -545,8 +545,8 @@ export class AddAssayComponent implements OnInit, OnChanges {
                     // START: ValidationObj Cleanup
                     // Ensure description is set in the object if not present
                     if (!validationObj.description) validationObj.description = description;
-                    // Ensure is-required is set (defaulting to colDef if not in ontology-details)
-                    if (!validationObj['is-required']) validationObj['is-required'] = isRequired ? 'true' : 'false';
+                    // Force is-required to follow the configuration (colDef)
+                    validationObj['is-required'] = isRequired ? 'true' : 'false';
                     // END: ValidationObj Cleanup
 
                     // Resolve Rule with proper selection input
