@@ -10,31 +10,33 @@ function strip(html) {
 
 export function ValidateRules(field: string, validation: any): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
+    if (!validation || !validation.rules) {
+      return null;
+    }
     const value = control.value;
     let invalid = false;
     let errorMessage = "";
 
     validation.rules.forEach((rule) => {
-      if (value !== null) {
-        switch (rule.condition) {
-          case "min": {
-            if (
-              strip(value.toString()).length < rule.value &&
-              JSON.parse(validation["is-required"])
-            ) {
-              invalid = true;
-              errorMessage = errorMessage + rule.error;
-            }
-            break;
+      const valStr = value !== null && value !== undefined ? value.toString() : "";
+      const strippedValue = strip(valStr).trim();
+      
+      switch (rule.condition) {
+        case "min": {
+          const isRequired = validation["is-required"] === true || validation["is-required"] === "true";
+          if (strippedValue.length < rule.value && isRequired) {
+            invalid = true;
+            errorMessage = errorMessage + rule.error;
           }
-          case "pattern": {
-            const re = new RegExp(rule.value, "i");
-            if (!re.test(value)) {
-              invalid = true;
-              errorMessage = errorMessage + rule.error;
-            }
-            break;
+          break;
+        }
+        case "pattern": {
+          const re = new RegExp(rule.value, "i");
+          if (!re.test(valStr)) {
+            invalid = true;
+            errorMessage = errorMessage + rule.error;
           }
+          break;
         }
       }
     });
