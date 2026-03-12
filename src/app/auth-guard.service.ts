@@ -171,7 +171,7 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
        return false;
     }
 
-    if (!studyPermission || !studyPermission.studyId || (!studyPermission.view && !studyPermission.edit)) {
+    if (!studyPermission || !studyPermission.studyId) {
       this.editorService.setRedirectUrl(url);
       this.router.navigate(["/study-not-found"], { queryParams: { studyIdentifier: studyIdentifier || obfuscationCode } });
       return false;
@@ -184,7 +184,6 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
     }
 
     const isPublic = studyPermission.studyStatus?.toUpperCase() === "PUBLIC";
-    const isPrivateOrProvisional = studyPermission.studyStatus?.toUpperCase() === "PRIVATE" || studyPermission.studyStatus?.toUpperCase() === "PROVISIONAL";
 
     if (isEditRequest) {
       if (!this.authenticated) {
@@ -198,12 +197,14 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
         if (isPublic) {
           this.router.navigate(['/' + studyPermission.studyId]);
           return false;
-        } else if (isPrivateOrProvisional) {
-          if (studyPermission.firstPrivateDate) {
-            this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyPermission.studyId } });
-          } else {
-            this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyPermission.studyId, isAccessioned: studyPermission.studyId.startsWith("MTBLS") } });
-          }
+        } else {
+          const isAccessioned = !!studyPermission.firstPrivateDate;
+          this.router.navigate(["/study-not-completed"], {
+            queryParams: {
+              studyIdentifier: studyPermission.studyId,
+              isAccessioned: isAccessioned
+            }
+          });
           return false;
         }
       }
@@ -218,15 +219,13 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
         return true;
       } else {
         // No View permission
-        if (isPrivateOrProvisional) {
-          if (studyPermission.firstPrivateDate) {
-            this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyPermission.studyId } });
-          } else {
-            this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyPermission.studyId, isAccessioned: studyPermission.studyId.startsWith("MTBLS") } });
+        const isAccessioned = !!studyPermission.firstPrivateDate;
+        this.router.navigate(["/study-not-completed"], {
+          queryParams: {
+            studyIdentifier: studyPermission.studyId,
+            isAccessioned: isAccessioned
           }
-        } else {
-          this.router.navigate(["/study-not-found"], { queryParams: { studyIdentifier: studyPermission.studyId } });
-        }
+        });
         return false;
       }
     }
