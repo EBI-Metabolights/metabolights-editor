@@ -90,12 +90,21 @@ export class MafComponent implements AfterContentInit {
     const dbId = this.form.get("databaseId").value;
     if (dbId && dbId !== "") {
       if (dbId.toLowerCase().indexOf("chebi") > -1) {
-        this.currentID = dbId.split(":")[1];
+        if (dbId.indexOf(":") > -1) {
+          this.currentID = dbId.split(":")[1];
+        } else {
+          this.currentID = dbId.replace(/chebi/i, "");
+        }
+      } else if (!isNaN(dbId)) {
+        this.currentID = dbId;
+      } else {
+        this.currentID = null;
       }
     } else {
       this.currentID = null;
     }
   }
+
 
   nextRow() {
     if (this.currentRow < this.mafTable.data.rows.length) {

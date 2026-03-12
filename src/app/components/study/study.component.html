@@ -116,6 +116,18 @@
     </div>
     <span *ngIf="requestedStudy != undefined">
       <div *ngIf="!studyError" id="meta" class="field is-grouped is-grouped-multiline px-20 mb-10">
+        <div class="control" *ngIf="requestedStudy">
+          <div class="tags has-addons">
+            <span class="tag is-dark">Accession</span>
+            <span class="tag" 
+              [class.is-primary]="status == 'In Review' || status == 'Private'"
+              [class.is-warning]="status == 'Provisional'"
+              [class.is-success]="status == 'Public'">
+              {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession + ' (' + requestedStudy + ')' : requestedStudy }}
+            </span>
+          </div>
+        </div>&emsp;
+
         <div class="control" *ngIf="studyCategory">
           <div class="tags has-addons">
             <span class="tag is-dark">Category</span>
