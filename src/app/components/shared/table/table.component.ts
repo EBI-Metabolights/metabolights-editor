@@ -133,7 +133,6 @@ export class TableComponent
   ];
 
   private toastrSettings: Record<string, any> = null;
-  private lastTableWidth = 0;
   private isSyncing = false;
 
   private studyId: string;
@@ -2448,22 +2447,25 @@ export class TableComponent
       this.wrapper2.nativeElement.style.overflowX = overflowStyle;
     }
 
+    // Reset explicit widths prior to recalculating the layout dimensions
+    if (this.div2) {
+      this.div2.nativeElement.style.width = "";
+    }
+    const div1 = document.getElementById("div1");
+    if (div1) div1.style.width = "";
+
     // Get the real rendered width of the table
     const tableEl = this.wrapper2?.nativeElement.querySelector("table");
     if (!tableEl) return;
 
+    // Force reflow and get correct width based on current view/columns
     const tableWidth = tableEl.scrollWidth;
 
-    // Update only if width has changed (to avoid infinite loop in AfterViewChecked)
-    if (tableWidth !== this.lastTableWidth) {
-      this.lastTableWidth = tableWidth;
-
-      if (this.div2) {
-        this.div2.nativeElement.style.width = `${tableWidth}px`;
-      }
-
-      const div1 = document.getElementById("div1");
-      if (div1) div1.style.width = `${tableWidth}px`;
+    if (this.div2) {
+      this.div2.nativeElement.style.width = `${tableWidth}px`;
+    }
+    if (div1) {
+      div1.style.width = `${tableWidth}px`;
     }
   }
 
