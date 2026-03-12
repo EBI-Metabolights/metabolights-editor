@@ -21,6 +21,12 @@
         </div>
         <div *ngIf="messageExpanded" class="message-body">
           {{ messageContent }}
+          <br><br>
+          <div class="buttons">
+            <a *ngIf="isAuthenticated" class="button is-info is-small" (click)="backToConsole()"> Back to My Studies </a>
+            <a *ngIf="!isAuthenticated" class="button is-info is-small" (click)="login()"> Login </a>
+            <a class="button is-default is-small ml" (click)="homePage()"> MetaboLights Home </a>
+          </div>
         </div>
       </article>
     </div>

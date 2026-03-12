@@ -70,6 +70,7 @@ export interface StudyPermission {
   edit: boolean;
   view: boolean;
   delete: boolean;
+  firstPrivateDate: string | null;
   reason: string;
   scopes: ResourceScopeMap
 }
