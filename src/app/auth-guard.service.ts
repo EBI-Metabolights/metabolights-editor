@@ -115,19 +115,23 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
    * @returns boolean indicating whether the user is logged in.
    */
   async checkUrlAndLogin(url: string, state: RouterStateSnapshot, isPrivateWithMTBLSAccession: boolean) {
-
     let studyIdentifier = null;
     let obfuscationCode = null;
+    let isEditRequest = false;
+
     if (url.startsWith("/MTBLS")) {
       studyIdentifier = url.split("/")[1];
     } else if (url.startsWith("/REQ")) {
       studyIdentifier = url.split("/")[1];
     } else if (url.startsWith("/study/MTBLS")) {
       studyIdentifier = url.split("/")[2];
+      isEditRequest = true;
     } else if (url.startsWith("/study/guide/")) {
       studyIdentifier = url.split("/")[3];
+      isEditRequest = true;
     } else if (url.startsWith("/study/REQ")) {
       studyIdentifier = url.split("/")[2];
+      isEditRequest = true;
     } else if (url.startsWith("/reviewer")) {
       obfuscationCode = url.split("/")[1].split("?")[0].replace("reviewer", "");
     } else if (url.startsWith("/study/")) {
@@ -135,6 +139,7 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
       const studyIdFromUrl = url.split("/")[2]?.split("?")[0];
       if (studyIdFromUrl && (studyIdFromUrl.startsWith("MTBLS") || studyIdFromUrl.startsWith("REQ"))) {
         studyIdentifier = studyIdFromUrl;
+        isEditRequest = true;
       } else {
         const errorCode = "E-0001-001";
         this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
@@ -152,13 +157,25 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
     if (permissionUrl === null) {
       return false;
     }
-    const studyPermission = await firstValueFrom(this.http.get<StudyPermission>(permissionUrl,
-      {
-        headers: httpOptions.headers,
-        observe: "body",
-      }
-    ));
-    // this.store.dispatch(new StudyPermissionNS.Set(studyPermission))
+
+    let studyPermission: StudyPermission = null;
+    try {
+      studyPermission = await firstValueFrom(this.http.get<StudyPermission>(permissionUrl,
+        {
+          headers: httpOptions.headers,
+          observe: "body",
+        }
+      ));
+    } catch (error) {
+       this.router.navigate(["/study-not-found"], { queryParams: { code: "E-0001-002" } });
+       return false;
+    }
+
+    if (!studyPermission || !studyPermission.studyId || (!studyPermission.view && !studyPermission.edit)) {
+      this.editorService.setRedirectUrl(url);
+      this.router.navigate(["/study-not-found"], { queryParams: { studyIdentifier: studyIdentifier || obfuscationCode } });
+      return false;
+    }
 
     // REQxxx to MTBLSxxx Redirection
     if (studyIdentifier && studyIdentifier.startsWith("REQ") && studyPermission.studyId && studyPermission.studyId.startsWith("MTBLS")) {
@@ -166,29 +183,55 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
       return false;
     }
 
-    if (!studyPermission.studyId) {
-      this.editorService.setRedirectUrl(url);
-      const errorCode = "E-0001-002";
-      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-      return false;
-    }
-    if (studyPermission.view) {
-      if (url.startsWith("/reviewer")) {
-        const params = { reviewCode: obfuscationCode };
-        this.router.navigate(["/" + studyPermission.studyId + "/files"], { queryParams: params });
+    const isPublic = studyPermission.studyStatus?.toUpperCase() === "PUBLIC";
+    const isPrivateOrProvisional = studyPermission.studyStatus?.toUpperCase() === "PRIVATE" || studyPermission.studyStatus?.toUpperCase() === "PROVISIONAL";
+
+    if (isEditRequest) {
+      if (!this.authenticated) {
+        this.editorService.setRedirectUrl(url);
+        this.keycloak.login();
         return false;
       }
-      return true;
-    } else {
-      // Improved redirection logic: REQ studies or Ownership
-      if ((studyIdentifier && studyIdentifier.startsWith("REQ")) || (studyPermission.studyId && studyPermission.studyId.startsWith("REQ")) || studyPermission.submitterOfStudy) {
-        this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyIdentifier || studyPermission.studyId } });
+      if (studyPermission.edit) {
+        return true;
       } else {
-        this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier || studyPermission.studyId } });
+        if (isPublic) {
+          this.router.navigate(['/' + studyPermission.studyId]);
+          return false;
+        } else if (isPrivateOrProvisional) {
+          if (studyPermission.firstPrivateDate) {
+            this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyPermission.studyId } });
+          } else {
+            this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyPermission.studyId, isAccessioned: studyPermission.studyId.startsWith("MTBLS") } });
+          }
+          return false;
+        }
       }
-      return false;
+    } else {
+      // View Request
+      if (studyPermission.view) {
+        if (url.startsWith("/reviewer")) {
+          const params = { reviewCode: obfuscationCode };
+          this.router.navigate(["/" + studyPermission.studyId + "/files"], { queryParams: params });
+          return false;
+        }
+        return true;
+      } else {
+        // No View permission
+        if (isPrivateOrProvisional) {
+          if (studyPermission.firstPrivateDate) {
+            this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyPermission.studyId } });
+          } else {
+            this.router.navigate(["/study-not-completed"], { queryParams: { studyIdentifier: studyPermission.studyId, isAccessioned: studyPermission.studyId.startsWith("MTBLS") } });
+          }
+        } else {
+          this.router.navigate(["/study-not-found"], { queryParams: { studyIdentifier: studyPermission.studyId } });
+        }
+        return false;
+      }
     }
 
+    return false;
   }
   async checkStudyObfuscationCode(url: string, obfuscationCode: string, state: RouterStateSnapshot, studyId: string) {
     const studyPermission = await this.editorService.getStudyPermissionByObfuscationCode(obfuscationCode);

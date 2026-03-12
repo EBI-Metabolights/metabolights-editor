@@ -5,6 +5,8 @@ import { EditorService } from 'src/app/services/editor.service';
 import { environment } from 'src/environments/environment';
 import { Loading } from 'src/app/ngxs-store/non-study/transitions/transitions.actions';
 import { Store } from '@ngxs/store';
+import { ConfigurationService } from 'src/app/configuration.service';
+import { KeycloakService } from 'keycloak-angular';
 
 @Component({
   selector: 'app-no-study-page',
@@ -15,19 +17,32 @@ export class NoStudyPageComponent implements OnInit {
   messageHeader = "Study page not found";
   messageContent = "Error while loading study. Possible reasons: 1) Study accesion number is not valid or it is not public or editable.";
   messageExpanded = true;
+  isAuthenticated = false;
+  metabolightsWebsiteUrl = "";
+
   constructor(
     private store: Store,
     private route: ActivatedRoute,
     private router: Router,
     private errorMessageService: ErrorMessageService,
-    private editorService: EditorService
-) {}
+    private editorService: EditorService,
+    private configService: ConfigurationService,
+    private keycloak: KeycloakService
+) {
+    const url = this.configService.config.endpoint;
+    if (url.endsWith("/")) {
+        this.metabolightsWebsiteUrl = url.slice(0, -1);
+    } else {
+        this.metabolightsWebsiteUrl = url;
+    }
+}
   toggleMessage() {
     this.messageExpanded = !this.messageExpanded;
   }
-  ngOnInit() {
+  async ngOnInit() {
 
     this.store.dispatch(new Loading.Disable())
+    this.isAuthenticated = await this.keycloak.isLoggedIn();
 
       this.route.queryParams.subscribe((params) => {
         const errorCode = params.code ?? "";
@@ -44,6 +59,18 @@ export class NoStudyPageComponent implements OnInit {
         }
         this.messageHeader = header;
       });
+  }
+
+  homePage() {
+    window.location.href = this.metabolightsWebsiteUrl;
+  }
+
+  backToConsole() {
+    this.router.navigate(['/console']);
+  }
+
+  login() {
+    this.keycloak.login();
   }
 
 }

@@ -4,7 +4,7 @@
             <article class="message is-info has-shadow">
                 <div class="message-header">
                     <p>
-                        <span class="material-icons">info</span>&nbsp;{{ study }} Submission Not Yet Complete
+                        <span class="material-icons">info</span>&nbsp;{{ study }} {{ isAccessioned ? 'Accessioned but Submission Not Yet Complete' : 'Submission Not Yet Complete' }}
                     </p>
                 </div>
                 <div class="message-body">
@@ -30,7 +30,8 @@
                         </ul>
                         <br>
                         <div class="buttons">
-                            <a class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
+                            <a *ngIf="isAuthenticated" class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
+                            <a *ngIf="!isAuthenticated" class="button is-info" (click)="login()"> Login </a>
                             <a class="button is-default ml" (click)="homePage()"> MetaboLights Home </a>
                         </div>
                     </div>
