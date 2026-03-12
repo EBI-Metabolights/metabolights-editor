@@ -36,11 +36,12 @@
         <div class="columns">
           <div class="column" *ngIf="currentID; else noImage">
             <img width="100%" [src]="
-                'https://www.ebi.ac.uk/chebi/backend/api/public/structure/' +
+                'https://www.ebi.ac.uk/chebi/backend/api/public/compound/' +
                 currentID +
-                '/'
+                '/structure/?width=300&height=300'
               " alt="" />
           </div>
+
           <ng-template #noImage>
             <p class="has-text-centered noImg">
               <i class="has-text-light-gray"><small>Structure unavailable</small></i>
