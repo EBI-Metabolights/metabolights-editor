@@ -71,13 +71,18 @@
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Accession</span>
-                    <span class="tag is-link">{{ getDisplayAccession(study) }}</span>
+                    <span class="tag" 
+                      [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'"
+                      [class.is-success]="study.status == 'Public'">
+                      {{ getDisplayAccession(study) }}
+                    </span>
                   </div>
                 </div>
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Category</span>
-                    <span class="tag is-info">{{ getStudyCategoryLabel(study.studyCategory) }}</span>
+                    <span class="tag is-link">{{ getStudyCategoryLabel(study.studyCategory) }}</span>
                   </div>
                 </div>
                 <div class="control py-1 mb0">
@@ -109,13 +114,13 @@
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag  is-dark">Release date</span>
-                    <span class="tag is-info">{{ study["releaseDate"] }}</span>
+                    <span class="tag is-link">{{ study["releaseDate"] }}</span>
                   </div>
                 </div>
                 <div *ngIf="study.revisionNumber > 1" class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Revision</span>
-                    <span class="tag is-info"> {{ study.revisionDatetime | date: 'yyyy-MM-dd' }} ({{
+                    <span class="tag is-link"> {{ study.revisionDatetime | date: 'yyyy-MM-dd' }} ({{
                       study.revisionNumber }})</span>
                   </div>
                 </div>

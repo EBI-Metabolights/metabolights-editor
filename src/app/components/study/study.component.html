@@ -119,7 +119,10 @@
         <div class="control" *ngIf="requestedStudy">
           <div class="tags has-addons">
             <span class="tag is-dark">Accession</span>
-            <span class="tag is-link">
+            <span class="tag" 
+              [class.is-primary]="status == 'In Review' || status == 'Private'"
+              [class.is-warning]="status == 'Provisional'"
+              [class.is-success]="status == 'Public'">
               {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession + ' (' + requestedStudy + ')' : requestedStudy }}
             </span>
           </div>
