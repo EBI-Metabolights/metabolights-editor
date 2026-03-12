@@ -58,11 +58,8 @@
           <span class="panel-block">
             <span class="px-2 py-1">
               <h2 class="has-text-weight-bold">
-                <b>{{ getDisplayAccession(study) }}:
-                  <span *ngIf="
-                      study.title.replace(' ', '') == '';
-                      else noStudyTitle
-                    ">
+                <b>
+                  <span *ngIf="study.title.replace(' ', '') == ''; else noStudyTitle">
                     <i class="has-text-grey-lighter">No title specified</i>
                   </span>
                   <ng-template #noStudyTitle>
@@ -71,6 +68,12 @@
                 </b>
               </h2>
               <div id="meta" class="field is-grouped is-grouped-multiline py-0">
+                <div class="control py-1 mb0">
+                  <div class="tags has-addons">
+                    <span class="tag is-dark">Accession</span>
+                    <span class="tag is-link">{{ getDisplayAccession(study) }}</span>
+                  </div>
+                </div>
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Category</span>
