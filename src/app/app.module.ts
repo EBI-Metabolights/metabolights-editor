@@ -66,6 +66,8 @@ import { DataPolicyComponent } from './components/public/data-policy/data-policy
 import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
 import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import { filter, switchMap, take } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -75,35 +77,36 @@ export function configLoader(injector: Injector): () => Promise<any> {
 
 function initializeKeycloak(keycloak: KeycloakService, configService: ConfigurationService) {
   return () =>
-    configService.configLoaded$.subscribe( (value) => {
-      if (value) {
+    firstValueFrom(
+      configService.configLoaded$.pipe(
+        filter((value) => value === true),
+        take(1),
+        switchMap(() =>
           keycloak.init({
-              config: {
-                url: configService.config.auth.url,
-                realm: configService.config.auth.realm,
-                clientId: configService.config.auth.clientId
-              },
-              initOptions: {
-                onLoad: 'check-sso',
-                silentCheckSsoRedirectUri: configService.config.auth.silentCheckSsoRedirectUri,
-                redirectUri: configService.config.auth.redirectUri,
-              },
-              shouldAddToken: (request) => {
-                if (configService.config) {
-                  const { url } = request;
-                  const targetUrl = url;
-                  const endpointWs = configService?.config?.metabolightsWSURL.baseURL;
-                  const endpointWs3 = configService?.config?.ws3URL;
-                  return targetUrl.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3)
-                }
-                return false;
+            config: {
+              url: configService.config.auth.url,
+              realm: configService.config.auth.realm,
+              clientId: configService.config.auth.clientId
+            },
+            initOptions: {
+              onLoad: 'check-sso',
+              silentCheckSsoRedirectUri: configService.config.auth.silentCheckSsoRedirectUri,
+              redirectUri: configService.config.auth.redirectUri,
+            },
+            shouldAddToken: (request) => {
+              if (configService.config) {
+                const { url } = request;
+                const targetUrl = url;
+                const endpointWs = configService?.config?.metabolightsWSURL.baseURL;
+                const endpointWs3 = configService?.config?.ws3URL;
+                return targetUrl.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3)
               }
-            });
-      }
-    }
-
+              return false;
+            }
+          })
+        )
+      )
     );
-  
 }
 
 @NgModule({
