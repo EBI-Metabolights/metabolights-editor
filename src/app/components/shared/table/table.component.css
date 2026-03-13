@@ -497,3 +497,9 @@ a.dropdown-item {
   letter-spacing: normal !important;
   text-transform: none !important;
 }
+
+.required-asterisk {
+  color: #ff3860;
+  margin-left: 2px;
+  font-weight: bold;
+}

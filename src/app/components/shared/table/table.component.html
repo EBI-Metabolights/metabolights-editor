@@ -207,6 +207,7 @@
             [matTooltip]="getColumnTooltip(column.header)" class="headercell clickable hover-highlight mlc-table"
             mat-header-cell *matHeaderCellDef mat-sort-header>
             {{ formatHeader(column.header) }}
+            <span *ngIf="isFieldRequired(column.header)" class="required-asterisk">*</span>
           </th>
           <ng-container *ngIf="!column.structure; else isStructure">
             <td (dblclick)="editCell(row, column, $event)" (click)="cellClick(row, column, $event)"
