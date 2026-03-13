@@ -15,6 +15,7 @@
       <span *ngIf="mafData">
         <mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateMAFSheet()" (rowEdit)="openRowEditModal($event)"
           [tableData]="mafData" validationsId="maf" [enableControlList]="false"
+          [tableDescription]="tableDescription" [tableDescriptionUrl]="tableDescriptionUrl"
           (refreshTableData)="autoPopulate(false)"></mtbls-table>
       </span>
     </div>

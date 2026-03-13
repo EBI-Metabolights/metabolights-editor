@@ -5,6 +5,13 @@
     </span>
   </div>
 </div>
+<div *ngIf="!isReadOnly && tableDescription" class="notification is-primary mb-2">
+  <small><mat-icon>info</mat-icon> {{ tableDescription }}
+    <br />
+    <b *ngIf="tableDescriptionUrl">Please see the <a [href]="tableDescriptionUrl" target="_BLANK">Guides</a> for more
+      information on how to complete your Metabolites section.</b>
+  </small>
+</div>
 <div *ngIf="!isReadOnly" class="my-2">
   <div *ngIf="hasAnyMissingValues()" class="notification is-warning">
     <small>The terms below are provided in your table but do not have associated

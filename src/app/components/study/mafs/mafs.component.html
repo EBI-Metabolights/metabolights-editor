@@ -7,7 +7,7 @@
         style="margin-bottom: 0; padding-bottom: 0"
       >
         <ul>
-          <span *ngFor="let maf of mafs; let i = index">
+          <span *ngFor="let maf of mafs; let i = index; trackBy: trackByFn">
             <li
               (click)="selectCurrentSubTab(i)"
               [ngClass]="{ 'is-active': currentSubIndex == i }"
@@ -18,7 +18,7 @@
         </ul>
       </div>
     </div>
-    <span *ngFor="let maf of mafs; let i = index">
+    <span *ngFor="let maf of mafs; let i = index; trackBy: trackByFn">
       <span *ngIf="currentSubIndex == i">
         <mtbls-maf [value]="maf"></mtbls-maf>
       </span>

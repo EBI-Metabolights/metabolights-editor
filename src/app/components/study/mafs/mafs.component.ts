@@ -5,6 +5,7 @@ import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { AssayState } from "src/app/ngxs-store/study/assay/assay.state";
 import { IAssay } from "src/app/models/mtbl/mtbls/interfaces/assay.interface";
+import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { MAFState } from "src/app/ngxs-store/study/maf/maf.state";
 
 @Component({
@@ -19,6 +20,7 @@ export class MafsComponent implements OnInit {
   studyAssays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyMAFs$: Observable<Record<string, any>> = inject(Store).select(MAFState.mafs);
+  readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
 
 
   assays: any = [];
@@ -28,6 +30,7 @@ export class MafsComponent implements OnInit {
   currentSubIndex = 0;
   loading = false;
   requestedStudy: string = null;
+  isReadOnly = false;
 
   constructor(public router: Router) {}
 
@@ -47,6 +50,12 @@ export class MafsComponent implements OnInit {
 
     this.assayFiles$.subscribe((assayfiles) => {
       this.studyAssayFiles = assayfiles;
+    });
+
+    this.readonly$.subscribe((value) => {
+      if (value !== null) {
+        this.isReadOnly = value;
+      }
     });
 
     // eslint-disable-next-line @typescript-eslint/indent
@@ -103,11 +112,12 @@ export class MafsComponent implements OnInit {
     }
 
     this.studyMAFs$.subscribe((value) => {
-      if (this.mafNames) {
-        if (this.mafs.length > 0) { this.mafs = []}
-        this.mafNames.forEach((mafFile) => {
-          this.mafs.push(value[mafFile]);
-        });
+      if (this.mafNames && value) {
+        const newMafs = this.mafNames.map(mafFile => value[mafFile]);
+        // Update the array without clearing it to help Angular track changes
+        if (JSON.stringify(this.mafs) !== JSON.stringify(newMafs)) {
+          this.mafs = newMafs;
+        }
       }
       if (value && this.mafNames.length === 0) {
         if (this.router.url.indexOf("metabolites") > -1) {
@@ -115,6 +125,10 @@ export class MafsComponent implements OnInit {
         }
       }
     });
+  }
+
+  trackByFn(index, item) {
+    return item.data.file;
   }
 
   selectCurrentSubTab(i) {

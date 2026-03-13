@@ -35,6 +35,9 @@ export class MafComponent implements AfterContentInit {
   form: UntypedFormGroup;
   currentIndex = 0;
 
+  tableDescription = 'Please complete the table below to describe the metabolites (results). Please include all metabolites / unknowns / features identified with information such as identifiers, measurements (e.g., mass-to-charge ratio, chemical shift, etc), confidence and intensities / abundances (column V+). This information often can be simply copied and pasted, for example, from software outputs.';
+  tableDescriptionUrl = 'https://ebi-metabolights.github.io/guides/MAF/';
+
   rowsToUpdate = [];
   inProgress = true;
 
