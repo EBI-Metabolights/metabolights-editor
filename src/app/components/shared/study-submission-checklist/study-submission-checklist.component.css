@@ -122,9 +122,10 @@
   flex: 1 1 auto;
   margin: 0 !important;
   font-weight: 600;
-  overflow: hidden;
   font-size: 0.95rem;
   color: #333;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .accordion-content {
@@ -162,4 +163,29 @@
 
 .accordion-header:hover .publication-title-compact {
   color: #26a69a;
+}
+
+.help-link {
+  color: #999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.help-link:hover {
+  color: #26a69a !important;
+}
+
+.help-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.step-link {
+  cursor: pointer;
 }
