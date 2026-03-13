@@ -61,7 +61,7 @@ export class DownloadComponent implements OnInit {
       one_time_token: string;
     }
     const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token"
-    if (this.studyStatus.toLowerCase() == "provisional") {
+    if (this.studyStatus && this.studyStatus.toLowerCase() == "provisional") {
       this.http.get<OneTimeTokenResponse>(oneTimeTokenUrl, httpOptions).subscribe(
         {
           next: (response) => { window.open(url + "&passcode=" + response.one_time_token, '_blank'); },
@@ -93,7 +93,7 @@ export class DownloadComponent implements OnInit {
       one_time_token: string;
     }
     const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token"
-    if (this.studyStatus.toLowerCase() == "provisional") {
+    if (this.studyStatus && this.studyStatus.toLowerCase() == "provisional") {
       this.http.get<OneTimeTokenResponse>(oneTimeTokenUrl, httpOptions).subscribe(
         {
           next: (response) => { this.metabolightsService.openTextFileInNewTab(url + "&passcode=" + response.one_time_token); },
