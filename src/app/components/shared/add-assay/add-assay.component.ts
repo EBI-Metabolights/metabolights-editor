@@ -523,8 +523,9 @@ export class AddAssayComponent implements OnInit, OnChanges {
                         }
                     }
 
-                    // Resolve Description and Validation Object
-                    let description = colDef.description;
+                    // Resolve Description and Validation Object using centralized service
+                    const fieldMetadata = this.editorService.getFieldMetadata(colDef.columnHeader, 'assay', assayType);
+                    let description = fieldMetadata?.description || colDef.description;
                     let validationObj: any = {
                         description: description,
                         'is-required': isRequired ? 'true' : 'false'
@@ -533,9 +534,13 @@ export class AddAssayComponent implements OnInit, OnChanges {
                     if (this.validations) {
                         const validationEntry = this.getValidationDefinition(colDef.columnHeader, assayType);
                         if (validationEntry) {
-                            description = validationEntry['ontology-details']?.description || validationEntry.description || description;
+                            // Prioritize configuration description (from fieldMetadata) over validation entry
+                            description = description || validationEntry['ontology-details']?.description || validationEntry.description;
                             if (validationEntry['ontology-details']) {
-                                validationObj = validationEntry['ontology-details'];
+                                validationObj = { ...validationEntry['ontology-details'] };
+                                if (fieldMetadata?.description) {
+                                  validationObj.description = fieldMetadata.description;
+                                }
                             } else {
                                 validationObj.description = description;
                             }
