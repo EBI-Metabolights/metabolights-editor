@@ -82,6 +82,8 @@ export class TableComponent
   @Input("enableControlList") enableControlList = true;
   @Input("templateRowPresent") templateRowPresent: boolean = false;
   @Input() showAddSample = false;
+  @Input() tableDescription: string = null;
+  @Input() tableDescriptionUrl: string = null;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;

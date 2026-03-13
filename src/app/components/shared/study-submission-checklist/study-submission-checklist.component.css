@@ -123,8 +123,6 @@
   margin: 0 !important;
   font-weight: 600;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 0.95rem;
   color: #333;
 }
