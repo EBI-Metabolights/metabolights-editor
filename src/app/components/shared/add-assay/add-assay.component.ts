@@ -525,7 +525,7 @@ export class AddAssayComponent implements OnInit, OnChanges {
 
                     // Resolve Description and Validation Object using centralized service
                     const fieldMetadata = this.editorService.getFieldMetadata(colDef.columnHeader, 'assay', assayType);
-                    let description = fieldMetadata?.description || colDef.description;
+                    let description = fieldMetadata?.combinedDescription || colDef.description;
                     let validationObj: any = {
                         description: description,
                         'is-required': isRequired ? 'true' : 'false'
@@ -538,8 +538,8 @@ export class AddAssayComponent implements OnInit, OnChanges {
                             description = description || validationEntry['ontology-details']?.description || validationEntry.description;
                             if (validationEntry['ontology-details']) {
                                 validationObj = { ...validationEntry['ontology-details'] };
-                                if (fieldMetadata?.description) {
-                                  validationObj.description = fieldMetadata.description;
+                                if (fieldMetadata?.combinedDescription) {
+                                  validationObj.description = fieldMetadata.combinedDescription;
                                 }
                             } else {
                                 validationObj.description = description;
