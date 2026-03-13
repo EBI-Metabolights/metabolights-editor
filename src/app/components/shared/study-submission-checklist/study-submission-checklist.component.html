@@ -17,8 +17,12 @@
             <span class="publication-index">1</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(1, 'samples'); $event.stopPropagation()" class="step-link">Complete 'Sample'
+                metadata table</span>
               <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_blank" rel="noopener"
-                class="step-link">Complete 'Sample' metadata table</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 0 ? 'expand_less' : 'expand_more'
@@ -60,8 +64,12 @@
             <span class="publication-index">2</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(2, 'assays'); $event.stopPropagation()" class="step-link">Complete 'Assay'
+                metadata table(s) except raw/derived data filenames</span>
               <a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank" rel="noopener"
-                class="step-link">Complete 'Assay' metadata table(s) except raw/derived data filenames</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 1 ? 'expand_less' : 'expand_more'
@@ -97,8 +105,12 @@
             <span class="publication-index">3</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(5, 'files'); $event.stopPropagation()" class="step-link">Upload raw & derived
+                data files</span>
               <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" rel="noopener"
-                class="step-link">Upload raw & derived data files</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 2 ? 'expand_less' : 'expand_more'
@@ -132,8 +144,12 @@
             <span class="publication-index">4</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(2, 'assays'); $event.stopPropagation()" class="step-link">Add raw/derived data
+                filenames to 'Assay' metadata tables(s)</span>
               <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" rel="noopener"
-                class="step-link">Add raw/derived data filenames to 'Assay' metadata tables(s)</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 3 ? 'expand_less' : 'expand_more'
@@ -163,8 +179,12 @@
             <span class="publication-index">5</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(3, 'protocols'); $event.stopPropagation()" class="step-link">Complete the
+                description of your study 'Protocols'</span>
               <a href="https://ebi-metabolights.github.io/guides/Protocol/" target="_blank" rel="noopener"
-                class="step-link">Complete the description of your study 'Protocols'</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 4 ? 'expand_less' : 'expand_more'
@@ -196,7 +216,12 @@
             <span class="publication-index">6</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
-              <a href="javascript:void(0)" class="step-link">Index 'Data Files' & run 'Study Validation'</a>
+              <span (click)="selectTab(5, 'files'); $event.stopPropagation()" class="step-link">Index 'Data Files' & run
+                'Study Validation'</span>
+              <a href="https://ebi-metabolights.github.io/guides/#validate-study" target="_blank" rel="noopener"
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 5 ? 'expand_less' : 'expand_more'
@@ -223,8 +248,12 @@
             <span class="publication-index">7</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(6, 'validations'); $event.stopPropagation()" class="step-link">Make amendments to
+                correct any 'Validation Error'(s) & re-validate</span>
               <a href="https://ebi-metabolights.github.io/guides/#validate-study" target="_blank" rel="noopener"
-                class="step-link">Make amendments to correct any 'Validation Error'(s) & re-validate</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 6 ? 'expand_less' : 'expand_more'
@@ -252,8 +281,12 @@
             <span class="publication-index">8</span>
             <span class="material-symbols-outlined mr-3 has-text-success">task</span>
             <h4 class="publication-title-compact">
+              <span (click)="selectTab(0, 'overview'); $event.stopPropagation()" class="step-link">Change study status
+                to 'Private' (peer-review access only) or 'Public', when ready</span>
               <a href="https://ebi-metabolights.github.io/guides/#submission-process" target="_blank" rel="noopener"
-                class="step-link">Change study status to 'Private' (peer-review access only) or 'Public', when ready</a>
+                class="help-link ml-2" (click)="$event.stopPropagation()">
+                <mat-icon class="help-icon">open_in_new</mat-icon>
+              </a>
             </h4>
           </div>
           <mat-icon class="expand-icon">{{ checklistStepExpandedIndex === 7 ? 'expand_less' : 'expand_more'
