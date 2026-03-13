@@ -153,7 +153,7 @@
                         <input matInput [formControlName]="field.key" type="text" [placeholder]="field.label"
                           [required]="field.required">
                         <mat-hint>
-                          <span *ngIf="field.description">{{ field.description }}</span>
+                          <span *ngIf="field.description" style="white-space: pre-wrap;">{{ field.description }}</span>
                           <b *ngIf="field.required">&nbsp;(required)</b>
                         </mat-hint>
                       </mat-form-field>
@@ -169,7 +169,7 @@
                               <input matInput [formControlName]="field.key" type="text" placeholder="Value"
                                 [required]="field.required">
                               <mat-hint>
-                                <span *ngIf="field.description">{{ field.description }}</span>
+                                <span *ngIf="field.description" style="white-space: pre-wrap;">{{ field.description }}</span>
                                 <b *ngIf="field.required">&nbsp;(required)</b>
                               </mat-hint>
                             </mat-form-field>

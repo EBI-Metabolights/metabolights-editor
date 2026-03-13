@@ -1184,13 +1184,20 @@ export class EditorService {
     }
 
     // 3. Fallback to general configuration metadata (measurementTypes, omicsTypes, etc.)
-    if (!fieldDef) {
+    // 3. Fallback to general configuration metadata (measurementTypes, omicsTypes, etc.) if still no match OR if match has no description
+    if (!fieldDef || !fieldDef.description) {
       // Search in measurementTypes, omicsTypes, studyCategories, etc. in root config
       const categories = ['measurementTypes', 'omicsTypes', 'studyCategories', 'sampleFileTemplates', 'investigationFileTemplates'];
       for (const cat of categories) {
         if (config[cat] && config[cat][fieldName]) {
-          fieldDef = config[cat][fieldName];
-          break;
+            const catMatch = config[cat][fieldName];
+            if (!fieldDef) {
+                fieldDef = catMatch;
+            } else if (catMatch.description) {
+                // If template match was found but has no description, use description from global cat if available
+                fieldDef = { ...fieldDef, description: catMatch.description, examples: catMatch.examples || fieldDef.examples };
+            }
+            break;
         }
       }
     }
