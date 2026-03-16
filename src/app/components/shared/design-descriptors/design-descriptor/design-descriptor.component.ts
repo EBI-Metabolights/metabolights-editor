@@ -343,6 +343,9 @@ export class DesignDescriptorComponent implements OnInit {
     if (this.descriptor === null) {
       this.addNewDescriptor = true;
     }
+    if (this.mode === 'local') {
+      this.validationsId = "assayDesignDescriptors";
+    }
   }
 
   onChanges(e) {
