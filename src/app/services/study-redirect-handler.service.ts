@@ -70,12 +70,16 @@ export class StudyRedirectHandlerService {
         // If authenticated:
         if (studyMetadata.edit) {
           // If user has Edit Permission -> redirect to Study Edit Page URL
-          // (Assuming true allows routing to proceed, or explicit navigation to the edit page)
-          this.router.navigate(['/study', studyMetadata.studyId]);
-          return true;
+          // Avoid infinite loop if we are already on the correct path
+          const targetUrl = `/study/${studyMetadata.studyId}`;
+          if (parsedUrl.originalUrl.startsWith(targetUrl)) {
+            return true;
+          }
+          this.router.navigate([targetUrl]);
+          return false;
         } else {
           // If user does NOT have Edit Permission -> evaluate Study Status
-          this.evaluateStudyStatus(studyMetadata, isAuthenticated);
+          this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
           return false;
         }
       }
@@ -88,16 +92,20 @@ export class StudyRedirectHandlerService {
         // If authenticated:
         if (studyMetadata.view) {
           // If user has View Permission -> redirect to Study View Page URL
-          this.router.navigate(['/' + studyMetadata.studyId]);
-          return true;
+          const targetUrl = `/${studyMetadata.studyId}`;
+          if (parsedUrl.originalUrl.startsWith(targetUrl)) {
+             return true;
+          }
+          this.router.navigate([targetUrl]);
+          return false;
         } else {
           // If not, evaluate Study Status
-          this.evaluateStudyStatus(studyMetadata, isAuthenticated);
+          this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
           return false;
         }
       } else {
         // If unauthenticated: evaluate public/private status and completed/not-completed logic
-        this.evaluateStudyStatus(studyMetadata, isAuthenticated);
+        this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
         return false;
       }
     }
@@ -114,7 +122,7 @@ export class StudyRedirectHandlerService {
    * @param studyMetadata Resolved study metadata
    * @param isAuthenticated Authentication status of the user
    */
-  private evaluateStudyStatus(studyMetadata: StudyPermission | any, isAuthenticated: boolean): void {
+  private evaluateStudyStatus(studyMetadata: StudyPermission | any, isAuthenticated: boolean, originalUrl: string): void {
     
     // Derived values mapped from typical metadata fields
     const isPublic = studyMetadata.studyStatus?.toLowerCase() === 'public';
@@ -122,19 +130,18 @@ export class StudyRedirectHandlerService {
     const hasFirstPrivateDate = !!studyMetadata.firstPrivateDate && studyMetadata.firstPrivateDate.trim() !== '';
     
     // Domain logic: "If study is not completed (accessioned but incomplete):"
-    // Assuming 'accessioned' maps to 'hasFirstPrivateDate', and 'incomplete' implies a specific status 
-    // flag or simply not completely public/private. Modify this mapping as required by backend fields.
     const isNotCompleted = hasFirstPrivateDate && studyMetadata.studyStatus?.toLowerCase() === 'provisional'; 
 
     if (isNotCompleted) {
+      const targetPath = '/study-not-completed';
+      if (originalUrl.startsWith(targetPath)) return;
+
       if (isAuthenticated) {
-        // If authenticated -> redirect to study-not-completed with actions: My Studies, MetaboLights Home
-        this.router.navigate(['/study-not-completed'], {
+        this.router.navigate([targetPath], {
           queryParams: { studyIdentifier: studyMetadata.studyId, actions: 'mystudies,home' }
         });
       } else {
-        // If unauthenticated -> redirect to study-not-completed with actions: Login, MetaboLights Home
-        this.router.navigate(['/study-not-completed'], {
+        this.router.navigate([targetPath], {
           queryParams: { studyIdentifier: studyMetadata.studyId, actions: 'login,home' }
         });
       }
@@ -142,21 +149,29 @@ export class StudyRedirectHandlerService {
     }
 
     if (isPublic) {
+      const targetPath = '/' + studyMetadata.studyId;
+      if (originalUrl.startsWith(targetPath)) return;
+
       // If study is public -> redirect to Study View Page URL
-      this.router.navigate(['/' + studyMetadata.studyId]);
+      this.router.navigate([targetPath]);
       return; 
     }
 
     if (isPrivate || hasFirstPrivateDate) {
+      const targetPath = '/study-not-public';
+      if (originalUrl.startsWith(targetPath)) return;
+
       // If study is private or has non-empty first_private_date -> redirect to study-not-public
-      this.router.navigate(['/study-not-public'], {
+      this.router.navigate([targetPath], {
         queryParams: { studyIdentifier: studyMetadata.studyId }
       });
       return; 
     }
 
     // Unhandled fallback scenario (optional)
-    this.router.navigate(['/page-not-found']);
+    if (!originalUrl.startsWith('/page-not-found')) {
+       this.router.navigate(['/page-not-found']);
+    }
   }
 
 
