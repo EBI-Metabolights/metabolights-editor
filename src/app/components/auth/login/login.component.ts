@@ -68,7 +68,13 @@ export class LoginComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.store.dispatch(new Loading.Disable())
+    this.store.dispatch(new Loading.Disable());
+    const isLoggedIn = await this.keycloak.isLoggedIn();
+    if (!isLoggedIn) {
+      await this.keycloak.login();
+    } else {
+       this.router.navigate([this.editorService.getRedirectUrl()]);
+    }
   }
 
     // this.form = this.fb.group({
