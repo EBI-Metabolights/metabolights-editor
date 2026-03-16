@@ -1190,14 +1190,14 @@ export class EditorService {
       const categories = ['measurementTypes', 'omicsTypes', 'studyCategories', 'sampleFileTemplates', 'investigationFileTemplates'];
       for (const cat of categories) {
         if (config[cat] && config[cat][fieldName]) {
-            const catMatch = config[cat][fieldName];
-            if (!fieldDef) {
-                fieldDef = catMatch;
-            } else if (catMatch.description) {
-                // If template match was found but has no description, use description from global cat if available
-                fieldDef = { ...fieldDef, description: catMatch.description, examples: catMatch.examples || fieldDef.examples };
-            }
-            break;
+          const catMatch = config[cat][fieldName];
+          if (!fieldDef) {
+            fieldDef = catMatch;
+          } else if (catMatch.description) {
+            // If template match was found but has no description, use description from global cat if available
+            fieldDef = { ...fieldDef, description: catMatch.description, examples: catMatch.examples || fieldDef.examples };
+          }
+          break;
         }
       }
     }
@@ -1327,5 +1327,14 @@ export class EditorService {
         return this.dataService.handleError(err);
       })
     );
+  }
+
+  /**
+   * Checks if the study status is provisional or restricted.
+   * @param status The study status to check.
+   * @returns True if the status is 'Provisional', empty, null, or undefined.
+   */
+  isRestrictedResource(status: string): boolean {
+    return !status || status.trim() === "" || status.toLowerCase() === "provisional";
   }
 }
