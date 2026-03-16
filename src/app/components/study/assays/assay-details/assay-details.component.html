@@ -3,6 +3,14 @@
     <div class="panel-block-wrapper">
       <span *ngIf="assay; else loadingDetail">
 
+        <div *ngIf="!isReadOnly" class="notification is-primary mb-4" style="margin-top: 15px;">
+          <small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. Please add additional
+            assays as needed - positive and negative, reverse phase and HILIC, 1D and 2D, etc. <span
+              *ngIf="templateRowPresent">The first row in light blue is an example row. It is not included in the assay
+              or ‘ISA METADATA’.</span> <b> <br>Please see the <a href="{{ guidesUrl }}/Assay/#assay_overview"
+                target="_blank">Guides</a> for more information on how to complete your Assays section.</b></small>
+        </div>
+
         <span class="column is-12 nprl nmrl fadeIn">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -14,10 +22,7 @@
               <span *ngIf="omicsType" class="tag is-link is-light">{{ omicsType }}</span>
             </div>
             <div *ngIf="!isReadOnly">
-              <a (click)="openAddSamplesModal()" class="button is-small is-primary">
-                <mat-icon>add</mat-icon> Samples
-              </a>
-              &nbsp;
+
               <a (click)="openEditAssayModal()" class="button is-small is-primary">
                 <mat-icon>edit</mat-icon> Edit Assay
               </a>
@@ -60,16 +65,11 @@
             </div>
           </div>
         </span>
-        <div *ngIf="!isReadOnly" class="notification is-primary">
-          <small><mat-icon>info</mat-icon> Please complete the table below to describe the assay. Please add additional
-            assays as needed - positive and negative, reverse phase and HILIC, 1D and 2D, etc. <span
-              *ngIf="templateRowPresent">The first row in light blue is an example row. It is not included in the assay
-              or ‘ISA METADATA’.</span> <b> <br>Please see the <a href="{{ guidesUrl }}/Assay/#assay_overview"
-                target="_blank">Guides</a> for more information on how to complete your Assays section.</b></small>
-        </div>
+
         <span *ngIf="assay">
           <mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateAssaySheet()" [tableData]="assay"
             [templateRowPresent]="templateRowPresent" validationsId="assays"
+            [showAddSample]="true" (addSampleClick)="openAddSamplesModal()"
             (refreshTableData)="refreshData()"></mtbls-table>
         </span>
       </span>

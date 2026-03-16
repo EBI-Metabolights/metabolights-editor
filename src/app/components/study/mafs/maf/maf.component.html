@@ -1,4 +1,11 @@
 <span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn p2" style="padding-left: .75rem;">
+  <div *ngIf="tableDescription" class="notification is-primary mb-2">
+    <small><mat-icon>info</mat-icon> {{ tableDescription }}
+      <br />
+      <b *ngIf="tableDescriptionUrl">Please see the <a [href]="tableDescriptionUrl" target="_BLANK">Guides</a> for more
+        information on how to complete your Metabolites section.</b>
+    </small>
+  </div>
   <span *ngIf="mafData && mafData.data.rows && mafData.data.rows.length > 0">
     <a (click)="autoPopulate(true)" class="button is-small is-light">
       <span><mat-icon>search</mat-icon>Compound Search</span> </a>&nbsp;

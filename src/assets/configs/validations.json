@@ -197,7 +197,7 @@
                     "rules": [
                         {
                             "condition": "pattern",
-                            "value": "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$", 
+                            "value": "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$",
                             "error": "Please provide a valid email address for the contact. eg:'name@something.somewhere'",
                             "type": "string"
                         }
@@ -215,7 +215,7 @@
                     "rules": [
                         {
                             "condition": "pattern",
-                            "value": "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$", 
+                            "value": "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$",
                             "error": "Please provide a valid email address for the contact. eg:'name@something.somewhere'",
                             "type": "string"
                         }
@@ -305,7 +305,7 @@
                     "rules": [
                         {
                             "condition": "pattern",
-                            "value": "^(https:\\/\\/ror\\.org\\/[0-9a-z]{9}|https:\\/\\/www\\.wikidata\\.org\\/wiki\\/Q[1-9][0-9]{0,19})$", 
+                            "value": "^(https:\\/\\/ror\\.org\\/[0-9a-z]{9}|https:\\/\\/www\\.wikidata\\.org\\/wiki\\/Q[1-9][0-9]{0,19})$",
                             "error": "Please provide a valid affliation Research Organization Registry(ROR) Id. Format: 'https://ror.org/02catss52'",
                             "type": "string"
                         }
@@ -422,7 +422,31 @@
             "is-read-only": "false",
             "is-hidden": "false",
             "technique": "mass spectrometry|NMR spectroscopy",
-            "description": "Add terms describing study design type eg. Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolites",
+            "description": "Add keywords describing study design, biological context, analytical approach e.g., Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolites",
+            "placeholder": "Metabolomics, Lipidomics",
+            "rules": [
+                {
+                    "condition": "min",
+                    "value": "5",
+                    "error": "Please provide a valid ontology term for the factor. This should be a minimum of 5 characters long",
+                    "type": "string"
+                }
+            ],
+            "recommended-ontologies": {
+                "is-forced-ontology": "false",
+                "ontology": {
+                    "url": "/ebi-internal/ontology?branch=Study%20Design%20Type&term=",
+                    "allowFreeText": true
+                }
+            }
+        },
+        "assayDesignDescriptors": {
+            "data-type": "ontology",
+            "is-required": "false",
+            "is-read-only": "false",
+            "is-hidden": "false",
+            "technique": "mass spectrometry|NMR spectroscopy",
+            "description": "Add keywords describing assay design, instrument settings, analysis approach e.g., data-independent acquisition, collision-induced dissociation, ion mobility, profile spectrum",
             "placeholder": "Metabolomics, Lipidomics",
             "rules": [
                 {
@@ -1723,7 +1747,7 @@
                     "data-type": "ontology",
                     "techniqueNames": [
                         "LCMS"
-                        ],
+                    ],
                     "ontology-details": {
                         "data-type": "ontology",
                         "is-required": "true",
@@ -1749,7 +1773,7 @@
                     "data-type": "ontology",
                     "techniqueNames": [
                         "GCMS"
-                        ],
+                    ],
                     "ontology-details": {
                         "data-type": "ontology",
                         "is-required": "true",
