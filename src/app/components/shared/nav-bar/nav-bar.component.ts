@@ -9,6 +9,7 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { Store } from "@ngxs/store";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 @Component({
     selector: "nav-bar",
     templateUrl: "./nav-bar.component.html",
@@ -35,6 +36,8 @@ export class NavBarComponent implements OnInit {
   studyId: string;
   obfuscationCode: string;
   reviewerLink: string = null;
+  user$: Observable<any> = inject(Store).select(UserState.user);
+
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -51,8 +54,13 @@ export class NavBarComponent implements OnInit {
   ngOnInit() {
     this.endpoint = this.configService.config.endpoint;
     this.setUpSubscriptionsNgxs();
-
-
+    // this.keycloak.isLoggedIn().then((loggedIn) => {
+    //   if (loggedIn) {
+    //     this.keycloak.loadUserProfile().then((profile) => {
+    //       this.user = profile;
+    //     });
+    //   }
+    // });
   }
 
   setUpSubscriptionsNgxs() {
