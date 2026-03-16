@@ -48,8 +48,9 @@ export class DownloadComponent implements OnInit {
 
   ngOnInit() { }
 
-  private isProvisionalStudy(): boolean {
-    return (this.studyStatus || "").toLowerCase() === "provisional";
+  private isRestrictedResource(): boolean {
+    const normalizedStatus = (this.studyStatus || "").toLowerCase();
+    return !normalizedStatus || normalizedStatus === "provisional";
   }
 
   async getDownloadLink() {
@@ -65,7 +66,7 @@ export class DownloadComponent implements OnInit {
       one_time_token: string;
     }
     const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token"
-    if (this.isProvisionalStudy()) {
+    if (this.isRestrictedResource()) {
       this.http.get<OneTimeTokenResponse>(oneTimeTokenUrl, httpOptions).subscribe(
         {
           next: (response) => { window.open(url + "&passcode=" + response.one_time_token, '_blank'); },
@@ -97,7 +98,7 @@ export class DownloadComponent implements OnInit {
       one_time_token: string;
     }
     const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token"
-    if (this.isProvisionalStudy()) {
+    if (this.isRestrictedResource()) {
       this.http.get<OneTimeTokenResponse>(oneTimeTokenUrl, httpOptions).subscribe(
         {
           next: (response) => { this.metabolightsService.openTextFileInNewTab(url + "&passcode=" + response.one_time_token); },
