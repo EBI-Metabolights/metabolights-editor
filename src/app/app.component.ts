@@ -6,7 +6,11 @@ import jwtDecode from "jwt-decode";
 import { MtblsJwtPayload } from "./services/headers";
 import { Store } from "@ngxs/store";
 import { environment } from "src/environments/environment";
+import { AuthService } from "./services/auth.service";
 import { BackendVersion, EditorVersion } from "./ngxs-store/non-study/application/application.actions";
+import { KeycloakEventType, KeycloakService } from "keycloak-angular";
+import { Owner, User } from "./ngxs-store/non-study/user/user.actions";
+import { SetLoadingInfo } from "./ngxs-store/non-study/transitions/transitions.actions";
 
 export let browserRefresh = false;
 
@@ -22,7 +26,9 @@ export class AppComponent implements OnInit {
     private router: Router,
     private elementRef: ElementRef,
     private editorService: EditorService,
-    private store: Store
+    private store: Store,
+    private keycloak: KeycloakService,
+    private authService: AuthService
   ) {
 
     this.subscription = router.events.subscribe((e) => {
@@ -36,7 +42,40 @@ export class AppComponent implements OnInit {
     await this.editorService.updateSession();
 
     const url = this.router.routerState.snapshot.url;
-    this.editorService.setRedirectUrl(url)
+    this.editorService.setRedirectUrl(url);
+
+    // Sync Keycloak session with MetaboLights backend profile
+    this.keycloak.keycloakEvents$.subscribe(async (event) => {
+      if (
+        event.type === KeycloakEventType.OnAuthSuccess ||
+        event.type === KeycloakEventType.OnAuthRefreshSuccess ||
+        event.type === KeycloakEventType.OnReady
+      ) {
+        const loggedIn = await this.keycloak.isLoggedIn();
+        if (loggedIn) {
+          try {
+            const profile = await this.keycloak.loadUserProfile();
+            const token = await this.keycloak.getToken();
+            
+            this.editorService.getAuthenticatedUser(token, profile.username).subscribe((user) => {
+              const owner: Owner = {
+                apiToken: user.apiToken,
+                role: user.role,
+                email: user.email || profile.email || profile.username || 'Unknown',
+                status: user.status || 'ACTIVE',
+                partner: user.partner || false,
+                firstName: user.firstName || profile.firstName,
+                lastName: user.lastName || profile.lastName,
+              };
+              this.store.dispatch(new User.Set(owner));
+              this.authService.storeApiToken(user.apiToken);
+            });
+          } catch (error) {
+            console.error("Failed to sync user profile:", error);
+          }
+        }
+      }
+    });
 
     // const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
     // const user = this.elementRef.nativeElement.getAttribute("mtblsuser");

@@ -61,6 +61,7 @@ import { StudyCreationState } from "./ngxs-store/non-study/study-creation/study-
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
+import { HeaderInterceptor } from './services/interceptors/header.interceptor';
 import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.service';
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
@@ -194,7 +195,7 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
       useClass: LoggingMiddleware,
       multi: true,
     },
-    // { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
