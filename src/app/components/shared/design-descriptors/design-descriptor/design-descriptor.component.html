@@ -80,7 +80,8 @@
             <!-- Column 2: Design Descriptor -->
             <div class="column" [ngClass]="mode !== 'local' ? 'is-7' : 'is-12'">
               <div class="field">
-                <label class="label is-small">Design Descriptor (Keyword)</label>
+                <label class="label is-small" *ngIf="mode === 'local'">Descriptor (Keyword)</label>
+                <label class="label is-small" *ngIf="mode !== 'local'">Design Descriptor (Keyword)</label>
                 <div class="control">
                   <span *ngIf="_controlList && _controlList.renderAsDropdown; else ontologyField">
                     <mat-form-field class="full-width is-small" appearance="outline">
@@ -112,7 +113,7 @@
             <button *ngIf="!addNewDescriptor" class="button is-danger is-pulled-left" (click)="confirmDelete()">
               <mat-icon>delete</mat-icon>
             </button>
-            <button *ngIf="addNewDescriptor" class="button is-primary is-pulled-left" (click)="openImportModal()">
+            <button *ngIf="addNewDescriptor && mode !== 'local'" class="button is-primary is-pulled-left" (click)="openImportModal()">
               <mat-icon>label</mat-icon> Import
             </button>
           </div>
