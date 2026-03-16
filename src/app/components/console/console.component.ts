@@ -76,33 +76,6 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   ngOnInit() {
- this.keycloak.keycloakEvents$.subscribe(event => {
-      switch (event.type) {
-
-        case KeycloakEventType.OnAuthSuccess:
-        case KeycloakEventType.OnAuthRefreshSuccess:
-        case KeycloakEventType.OnReady:
-          if (this.keycloak.isLoggedIn()) {
-            this.loggedIn = true;
-            this.keycloak.loadUserProfile().then((profile) => {
-              const owner: Owner = {
-                apiToken: '',
-                role: 0,
-                email: profile.email || profile.username || 'Unknown',
-                status: 'ACTIVE',
-                partner: false,
-                firstName: profile.firstName,
-                lastName: profile.lastName,
-              };
-              this.store.dispatch(new User.Set(owner));
-              this.store.dispatch(new SetLoadingInfo("Loading user studies"));
-              this.store.dispatch(new User.Studies.Get());
-            });
-          }
-          break;
-      }
-    }
-    );
     this.editorService.updateHistory(this.route.snapshot);
 
     this.bannerMessage$.subscribe((value) => {

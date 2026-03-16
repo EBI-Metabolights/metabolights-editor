@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { KeycloakService } from 'keycloak-angular';
+import { ConfigurationService } from '../configuration.service';
 import { EditorService } from './editor.service';
 import { StudyPermission } from './headers';
 
@@ -21,7 +22,8 @@ export class StudyRedirectHandlerService {
   constructor(
     private router: Router,
     private keycloak: KeycloakService,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private configService: ConfigurationService
   ) { }
 
   /**
@@ -63,7 +65,10 @@ export class StudyRedirectHandlerService {
 
       if (!isAuthenticated) {
         // If unauthenticated -> redirect to Keycloak with a redirect URL pointing to the Study Edit Path
-        const redirectUri = window.location.origin + parsedUrl.originalUrl;
+        // Ensure we include the baseHref for the redirect URI
+        const baseHref = this.configService.baseHref || '/';
+        const cleanedBaseHref = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
+        const redirectUri = window.location.origin + cleanedBaseHref + parsedUrl.originalUrl;
         await this.keycloak.login({ redirectUri });
         return false;
       } else {
@@ -197,19 +202,23 @@ export class StudyRedirectHandlerService {
     }
 
     // Extract Obfuscation code from reviewer path
-    if (url.startsWith('/reviewer')) {
-       parsed.obfuscationCode = url.split('/')[1].split('?')[0].replace('reviewer', '');
+    // We check for startsWith with and without baseHref for resilience
+    const baseHref = this.configService.baseHref || '/';
+    const cleanedUrl = url.startsWith(baseHref) ? url.substring(baseHref.length - (baseHref.endsWith('/') ? 1 : 0)) : url;
+
+    if (cleanedUrl.startsWith('/reviewer')) {
+       parsed.obfuscationCode = cleanedUrl.split('/')[1].split('?')[0].replace('reviewer', '');
        parsed.accessMode = 'view';
     }
 
     // Determine Access Mode (view/edit) & extract Study ID
     // E.g.: /study/MTBLS123 (Edit) vs /MTBLS123 (View)
-    if (url.startsWith('/study/MTBLS') || url.startsWith('/study/REQ') || url.startsWith('/study/guide/')) {
+    if (cleanedUrl.startsWith('/study/MTBLS') || cleanedUrl.startsWith('/study/REQ') || cleanedUrl.startsWith('/study/guide/')) {
         parsed.accessMode = 'edit';
-        parsed.studyId = this.extractIdFromSegments(url);
-    } else if (url.startsWith('/MTBLS') || url.startsWith('/REQ')) {
+        parsed.studyId = this.extractIdFromSegments(cleanedUrl);
+    } else if (cleanedUrl.startsWith('/MTBLS') || cleanedUrl.startsWith('/REQ')) {
         parsed.accessMode = 'view';
-        parsed.studyId = this.extractIdFromSegments(url);
+        parsed.studyId = this.extractIdFromSegments(cleanedUrl);
     }
 
     return parsed;
