@@ -26,9 +26,14 @@
       </a>
 
       <div class="navbar-item has-dropdown is-hoverable is-right">
-        <a class="navbar-link" aria-haspopup="true" aria-expanded="false">
-          <span class="icon" style="margin-right: 2px;"><i class="material-icons">account_circle</i></span> My Account
+        <a class="navbar-link" aria-haspopup="true" aria-expanded="false" *ngIf="user$ | async as user; else defaultAccount">
+          <span class="icon" style="margin-right: 2px;"><i class="material-icons">account_circle</i></span> {{ user.firstName || user.email }}
         </a>
+        <ng-template #defaultAccount>
+          <a class="navbar-link" aria-haspopup="true" aria-expanded="false">
+            <span class="icon" style="margin-right: 2px;"><i class="material-icons">account_circle</i></span> My Account
+          </a>
+        </ng-template>
 
         <div class="navbar-dropdown is-right">
           <a (click)="redirectToProfile()" class="navbar-item">

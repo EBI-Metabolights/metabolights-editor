@@ -70,7 +70,7 @@ export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
 }
 
 const routes: Routes = [
-  { path: "login", component: LoginComponent },
+  { path: "login", redirectTo: "", pathMatch: "full" },
   { path: "guides", component: GuidesComponent },
   { path: "guides/:tab", component: GuidesComponent },
   { path: "guides/:tab/:section", component: GuidesComponent },
