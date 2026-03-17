@@ -978,10 +978,9 @@ export class EditorService {
     const encodedQuery = encodeURIComponent(query);
 
     const url = `https://www.ebi.ac.uk/ols4/api/search` +
-      `?q=${encodedQuery}` +
+      `?q=${encodedQuery}*` +
       `&ontology=ror` +
-      `&fieldList=ontology_prefix,iri,label,synonym,description` +
-      `&queryFields=label,iri,synonym`;
+      `&fieldList=ontology_prefix,iri,label,synonym,related_synonyms,description`;
 
     return this.dataService.getRorid(url);
   }
