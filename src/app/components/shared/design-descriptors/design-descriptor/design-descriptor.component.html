@@ -63,7 +63,10 @@
             <!-- Column 1: Group (Category) - Show First -->
             <div class="column is-5" *ngIf="mode !== 'local'">
               <div class="field">
-                <label class="label is-small">Group</label>
+                <label class="label is-small">Group
+                  <mat-icon *ngIf="selectedCategory?.description" [matTooltip]="selectedCategory.description"
+                    class="info-icon ml-1" style="font-size: 14px; vertical-align: middle;">help</mat-icon>
+                </label>
                 <div class="control">
                   <mat-form-field class="full-width is-small" appearance="outline">
                     <mat-select formControlName="descriptorCategory" (selectionChange)="onCategoryChange($event.value)"
