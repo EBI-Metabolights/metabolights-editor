@@ -44,11 +44,14 @@ export class StudyRedirectHandlerService {
     // 3. Resolve study metadata using the Study Service
     const studyMetadata = await this.resolveStudyMetadata(parsedUrl);
 
-    // 4. Check if the Study ID exists in the database
+    // 4. Check if we actually have a target to resolve (Study ID or Codes)
+    const hasTarget = !!parsedUrl.studyId || !!parsedUrl.obfuscationCode || !!parsedUrl.reviewCode;
+
+    // 5. Check if the Study ID exists in the database
     const studyExists = !!studyMetadata && !!studyMetadata.studyId;
 
-    if (!studyExists) {
-      // If the study does NOT exist:
+    if (hasTarget && !studyExists) {
+      // If the study was targeted but does NOT exist:
       if (!isAuthenticated) {
         // If unauthenticated -> redirect to study-not-found with actions: Login, MetaboLights Home
         this.router.navigate(['/study-not-found'], { queryParams: { actions: 'login,home' } });
@@ -59,8 +62,8 @@ export class StudyRedirectHandlerService {
       return false; // Do NOT proceed further
     }
 
-    // 5. If study EXISTS, check Access Mode:
-    if (parsedUrl.accessMode === 'edit') {
+    // 6. If study EXISTS or no specific target was found (like /guide/create), evaluate:
+    if (parsedUrl.accessMode === 'edit' && studyExists) {
       // A. Access Mode = EDIT
 
       if (!isAuthenticated) {
@@ -115,8 +118,8 @@ export class StudyRedirectHandlerService {
       }
     }
 
-    // Fallback if the URL could not be parsed into a known mode
-    return false;
+    // Fallback if the URL could not be parsed into a known study mode or is a general authenticated page
+    return isAuthenticated;
   }
 
 
@@ -214,6 +217,9 @@ export class StudyRedirectHandlerService {
     // Determine Access Mode (view/edit) & extract Study ID
     // E.g.: /study/MTBLS123 (Edit) vs /MTBLS123 (View)
     if (cleanedUrl.startsWith('/study/MTBLS') || cleanedUrl.startsWith('/study/REQ') || cleanedUrl.startsWith('/study/guide/')) {
+        parsed.accessMode = 'edit';
+        parsed.studyId = this.extractIdFromSegments(cleanedUrl);
+    } else if (cleanedUrl.startsWith('/guide/')) {
         parsed.accessMode = 'edit';
         parsed.studyId = this.extractIdFromSegments(cleanedUrl);
     } else if (cleanedUrl.startsWith('/MTBLS') || cleanedUrl.startsWith('/REQ')) {
