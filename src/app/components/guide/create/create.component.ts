@@ -373,6 +373,7 @@ export class CreateComponent implements OnInit {
       return {
         id: item.id,
         label: meta?.label || item.id,
+        description: meta?.description || null,
         controlListKey: controlListKey,
         min: item.min,
         isaFileType: isaFileType
@@ -845,7 +846,7 @@ export class CreateComponent implements OnInit {
       firstName: this.currentUser?.firstName || '',
       lastName: this.currentUser?.lastName || '',
       email: this.currentUser?.email || '',
-      affiliation: this.currentUser?.affiliation || '',
+      affiliation: '',
       address: '',
       orcid: this.currentUser?.orcid || '',
       roles: [],

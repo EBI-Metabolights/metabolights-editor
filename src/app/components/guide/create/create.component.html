@@ -200,8 +200,11 @@
                     <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
                       (click)="descRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-6 mb-2" style="margin-right: 60px;">{{category.label}} <span
-                        *ngIf="category.min > 0">(at least {{category.min}})<span class="has-error">*</span></span></h6>
+                    <h6 class="title is-6 mb-2" style="margin-right: 60px;">{{category.label}}
+                      <mat-icon *ngIf="category.description" [matTooltip]="category.description" class="info-icon ml-1"
+                        style="font-size: 14px; vertical-align: middle;">help</mat-icon>
+                      <span *ngIf="category.min > 0">(at least {{category.min}})<span class="has-error">*</span></span>
+                    </h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
                         class="tag is-primary is-light is-medium">
@@ -489,7 +492,7 @@
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank"
                           class="step-link">Complete 'Assay'
-                          metadata table(s) except raw/derived data filenames</a>
+                          metadata table(s) except data file names</a>
                       </h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 1 ? 'expand_less' : 'expand_more'
@@ -498,26 +501,32 @@
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 1">
                     <p class="is-size-7 mb-2">Every sample referenced in your sample sheet should be referenced in one
                       or more
-                      'Assay' tables. Leave <strong>Raw Spectral Data File</strong> and <strong>Derived Spectral Data
-                        File</strong> empty for now (completed in step 4). Key fields include:</p>
+                      'Assay' tables. Leave Data File columns empty for now (completed in step 4). Key fields vary by
+                      technology:</p>
+                    <p class="is-size-7 mb-1"><strong>LC-MS / GC-MS assays:</strong></p>
                     <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
                       <li><strong>Chromatography</strong> &mdash; instrument (manufacturer + model), column model (with
                         dimensions), column type (e.g., reverse phase, HILIC).</li>
                       <li><strong>Mass spectrometry</strong> &mdash; instrument, ion source, mass analyzer, scan
                         polarity, and m/z
                         range.</li>
-                      <li><strong>Protocol REF cells</strong> &mdash; must match their section name exactly (e.g.,
-                        <code>Extraction</code>, <code>Chromatography</code>, <code>Mass spectrometry</code>,
-                        <code>Data transformation</code>, <code>Metabolite identification</code>), please do not edit
-                        these
-                        columns.
-                      </li>
+                      <li>Use one assay per polarity &mdash; do not mix positive and negative in the same 'Assay'
+                        sheet. Specify <code>alternating</code> only if using polarity switching within a single
+                        injection.</li>
                     </ul>
-                    <br />
-                    <p class="is-size-7">Use one assay per polarity &mdash; do not mix positive and negative in the same
-                      'Assay'
-                      sheet. Specify <code>alternating</code> only if using polarity switching within a single
-                      injection.</p>
+                    <p class="is-size-7 mb-1"><strong>NMR assays:</strong></p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>NMR sample</strong> &mdash; tube type, solvent, pH, temperature.</li>
+                      <li><strong>NMR spectroscopy</strong> &mdash; instrument (with frequency), probe, number of
+                        transients, pulse sequence, magnetic field strength.</li>
+                    </ul>
+                    <p class="is-size-7 mb-1"><strong>All assay types:</strong></p>
+                    <ul class="is-size-7 ml-8 mb-1" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Protocol REF</strong> cells must match their section name exactly (e.g., Extraction,
+                        Chromatography, Mass spectrometry, NMR spectroscopy, Data transformation, Metabolite
+                        identification).</li>
+                      <li>Do not remove columns, change column order, or alter headers.</li>
+                    </ul>
                     <br />
                     <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank"
                         rel="noopener">Assay guide &rarr;</a></p>
@@ -532,31 +541,31 @@
                       <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
-                          class="step-link">Upload raw &
-                          derived data files</a>
+                          class="step-link">Upload data files</a>
                       </h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 2 ? 'expand_less' : 'expand_more'
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 2">
-                    <p class="is-size-7 mb-2">Upload your instrument raw files and/or open-format derived files (e.g.,
-                      <code>.mzML</code>) via Aspera or FTP.
-                    </p>
+                    <p class="is-size-7 mb-2">Upload your instrument raw files and, where available, open-format derived
+                      files via Aspera or FTP.</p>
                     <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
-                      <li>File names must contain only letters (a&ndash;z, A&ndash;Z), numbers (0&ndash;9), hyphens (-),
-                        underscores (_), or dots (.). Spaces are not accepted.</li>
-                      <li>Raw data folders (<code>.d</code>, <code>.raw</code>, NMR folders) must each be compressed
-                        individually
-                        as <code>.zip</code> before upload. A single zip containing multiple raw folders is not
-                        accepted.</li>
-                      <li>Accepted raw formats: <code>.baf</code>, <code>.d</code>, <code>.raw</code>,
-                        <code>.wiff</code> +
-                        <code>.wiff.scan</code>, <code>.fid</code>, <code>.ser</code>, and others.
-                      </li>
-                      <li>Accepted derived formats: <code>.mzML</code>, <code>.mzXML</code>, <code>.cdf</code>,
-                        <code>.nmrML</code>, <code>.imzML</code>, and others.
-                      </li>
+                      <li><strong>File names</strong> must contain only letters (a&ndash;z, A&ndash;Z), numbers
+                        (0&ndash;9), hyphens (-), underscores (_), or dots (.). Spaces are not accepted.</li>
+                      <li><strong>Raw data folders</strong> (e.g., <code>.d</code>, <code>.raw</code>, or any NMR raw data folder) must
+                        each be compressed individually as <code>.zip</code> before upload, <a
+                          href="https://ebi-metabolights.github.io/guides/Files/#compression" target="_blank">click here
+                          for guidance</a>. A single zip containing multiple folders is not accepted.</li>
+                      <li><strong>Accepted raw formats</strong> include: <code>.d</code>,
+                        <code>.raw</code>, <code>.wiff</code> + <code>.wiff.scan</code>, <code>.fid</code>,
+                        <code>.ser</code>, <code>.lcd</code>, <code>.smp</code>, and others.</li>
+                      <li><strong>Accepted derived formats</strong> include: <code>.mzML</code>, <code>.mzXML</code>,
+                        <code>.imzML</code>, <code>.cdf</code>, <code>.nmrML</code>, and others. Note that some formats
+                        (e.g., <code>.mgf</code>, <code>.msp</code>, <code>.xlsx</code>, <code>.cef</code>) are not
+                        accepted alone and must accompany spectrum/chromatogram data.</li>
+                      <li><strong>Where an instrument raw file is not available</strong> (e.g., some non-MS
+                        chromatographic detectors), it is acceptable to submit the open-format file only.</li>
                     </ul>
                     <br />
                     <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
@@ -572,8 +581,7 @@
                       <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" class="step-link">Add
-                          raw/derived
-                          data filenames to 'Assay' metadata tables(s)</a>
+                          raw/derived data filenames to 'Assay' metadata table(s)</a>
                       </h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 3 ? 'expand_less' : 'expand_more'
@@ -587,14 +595,20 @@
                       <li>e.g., <code>FILES/RAW_FILES/sample1.raw.zip</code></li>
                       <li>e.g., <code>FILES/DERIVED_FILES/sample1.mzML</code></li>
                     </ul>
-                    <br />
-                    <p class="is-size-7">Every sample must have at least one of <strong>Raw</strong> or <strong>Derived
-                        Spectral
-                        Data File</strong> referenced. For <code>.wiff</code>/<code>.wiff.scan</code> datasets, add an
-                      extra 'Raw
-                      Spectral Data File' column so both files are referenced. Verify that all referenced files exist in
-                      your
-                      uploaded study folder.</p>
+                    <p class="is-size-7 mb-2"><strong>MS assays</strong> require at least one of
+                      <strong>Raw Spectral Data File</strong> or <strong>Derived Spectral Data File</strong> per sample.
+                      For <code>.wiff</code>/<code>.wiff.scan</code> datasets, add an extra 'Raw Spectral Data File'
+                      column so both files are referenced.</p>
+                    <p class="is-size-7 mb-2"><strong>NMR assays</strong> may include three file types per sample:</p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Free Induction Decay Data File</strong> &mdash; raw NMR data (e.g., sample1.zip).</li>
+                      <li><strong>Acquisition Parameter Data File</strong> &mdash; acquisition parameters (e.g.,
+                        acqus.txt).</li>
+                      <li><strong>Derived Spectral Data File</strong> &mdash; converted format if available (e.g.,
+                        .nmrML).</li>
+                    </ul>
+                    <p class="is-size-7">Verify that all referenced files exist in your uploaded study folder and that
+                      paths match exactly.</p>
                     <br />
                     <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
                         rel="noopener">Files guide &rarr;</a></p>
