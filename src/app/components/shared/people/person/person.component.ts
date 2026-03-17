@@ -276,8 +276,9 @@ export class PersonComponent implements OnInit {
     this.filteredOrganizations$ = this.form.get('affiliation')!.valueChanges.pipe(
     debounceTime(600),
     distinctUntilChanged(),
-    switchMap((query: string) => {
-      if (!query || query.length < 3) {
+    switchMap((query: any) => {
+      // If it's an object (selected from autocomplete) or too short, return empty
+      if (typeof query !== 'string' || !query || query.length < 3) {
         return of([]);
       }
 
@@ -286,10 +287,30 @@ export class PersonComponent implements OnInit {
           const docs = res?.response?.docs || [];
 
           const items = docs.map((doc: any) => {
+            const label = doc.label || '';
+            const allNames: string[] = Array.from(new Set([
+              label,
+              ...(doc.synonym || []),
+              ...(doc.related_synonyms || [])
+            ])).filter(n => !!n);
+
+            const isAscii = (str: string) => /^[\x00-\x7F]*$/.test(str);
+            const queryLower = query.toLowerCase();
+            let bestName = label;
+
+            // If the primary label is not pure ASCII (likely non-English), 
+            // try to find an ASCII synonym that matches the query.
+            if (!isAscii(label)) {
+              const asciiSynonym = allNames.find(n => isAscii(n) && n.toLowerCase().includes(queryLower));
+              if (asciiSynonym) {
+                bestName = asciiSynonym;
+              }
+            }
+
             return {
               id: doc.iri,
-              name: doc.label || '(Unknown name)',
-              synonyms: doc.synonym || [],
+              name: bestName,
+              synonyms: allNames,
               description: doc.description?.[0] || '',
               ontology_prefix: doc.ontology_prefix
             };
@@ -322,7 +343,6 @@ export class PersonComponent implements OnInit {
     }
 
     this.initialiseForm();
-    this.autoMapAffiliation();
 
     // ensure roles control / ontology child are initialised with the current value
     try {

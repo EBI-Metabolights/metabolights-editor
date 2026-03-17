@@ -452,6 +452,7 @@ export class DesignDescriptorComponent implements OnInit {
       return {
         id: item.id,
         label: meta?.label || item.id,
+        description: meta?.description || null,
         controlListKey: controlListKey,
         isaFileType: isaFileType,
       };
