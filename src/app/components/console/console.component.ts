@@ -42,7 +42,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   messageExpanded = false;
   curator = false;
   provisionalStudies: any = [];
-  user=null;
+  user = null;
   loginName = "";
   isConfirmationModalOpen = false;
   baseHref: string;
@@ -144,8 +144,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
     });
     this.templateConfiguration$.subscribe(config => {
-      if(config) {
-          this.studyCategoriesMetadata = config.studyCategories || {};
+      if (config) {
+        this.studyCategoriesMetadata = config.studyCategories || {};
       }
     });
   }
