@@ -19,10 +19,6 @@ export class ToastrService {
   constructor() { }
 
   pop(message: string, type: ToastrType, title?: string): void {
-    const args: any[] = [message];
-    if (title !== undefined) args.push(title)
-    args.push(this.defaultSettings);
-    console.log(...args);
-    toastr[type.toLowerCase()](...args);
+    toastr[type.toLowerCase()](message, title, this.defaultSettings);
   }
 }
