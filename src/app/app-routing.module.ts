@@ -34,7 +34,7 @@ export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
   if (url === null || url.length === 0) {
     return null;
   }
-  const reg = /reviewer(.*)$/;
+  const reg = /^reviewer(.*)$/;
   const param = url[0].toString();
 
   if (param.match(reg)) {
@@ -54,7 +54,7 @@ export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
   if (url === null || url.length === 0) {
     return null;
   }
-  const reg = /([MTBLS|mtbls])([0-9]+)(.*)$/;
+  const reg = /^(MTBLS|mtbls|REQ|req)[0-9]+(.*)$/;
   const param = url[0].toString();
 
   if (param.match(reg)) {

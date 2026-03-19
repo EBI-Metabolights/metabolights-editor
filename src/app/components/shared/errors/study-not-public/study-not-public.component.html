@@ -33,13 +33,18 @@
                     <li>Please check again later or contact the submitter(s) or MetaboLights team to see when it will be public.</li>
                 </ul>
                 <br>
-                <b>If you are submitter of this study:</b>
-                <ul class="ml">
-                    <li>You can update your study (e.g., publication DOI, public release date, etc.) or make it public.</li>
-                    <br>
-                    <a class="button is-info" (click)="login()" > Login </a>
-                     <a class="button is-info ml" (click)="homePage()" > MetaboLights Home Page </a>
-                </ul>
+                <div *ngIf="isAuthenticated && isOwner">
+                    <b>If you are submitter of this study:</b>
+                    <ul class="ml">
+                        <li>You can update your study (e.g., publication DOI, public release date, etc.) or make it public.</li>
+                        <br>
+                    </ul>
+                </div>
+                <div class="buttons">
+                    <a *ngIf="isAuthenticated" class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
+                    <a *ngIf="!isAuthenticated" class="button is-info" (click)="login()"> Login </a>
+                    <a class="button is-default ml" (click)="homePage()"> MetaboLights Home Page </a>
+                </div>
             </div>
           </div>
         </article>

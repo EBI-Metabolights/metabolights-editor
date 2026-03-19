@@ -19,6 +19,7 @@ export class StudyNotCompletedComponent implements OnInit {
     metabolightsWebsiteUrl = ""
     isAuthenticated = false;
     isAccessioned = false;
+    isOwner = false;
 
     constructor(
         private store: Store,
@@ -41,6 +42,7 @@ export class StudyNotCompletedComponent implements OnInit {
         this.route.queryParams.subscribe((params) => {
             this.study = params.studyIdentifier;
             this.isAccessioned = params.isAccessioned === 'true';
+            this.isOwner = params.isOwner === 'true' || params.isOwner === true;
         });
     }
 

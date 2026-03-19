@@ -38,87 +38,70 @@ export class StudyRedirectHandlerService {
     // 1. Parse the incoming Study URL and extract parameters
     const parsedUrl = this.parseStudyUrl(url);
 
-    // 2. Check authentication status: authenticated or not
+    // 2. Check authentication status
     const isAuthenticated = await this.keycloak.isLoggedIn();
 
-    // 3. Resolve study metadata using the Study Service
+    // 3. Resolve study metadata
     const studyMetadata = await this.resolveStudyMetadata(parsedUrl);
 
-    // 4. Check if we actually have a target to resolve (Study ID or Codes)
+    // 4. Check if we actually have a target to resolve
     const hasTarget = !!parsedUrl.studyId || !!parsedUrl.obfuscationCode || !!parsedUrl.reviewCode;
 
-    // 5. Check if the Study ID exists in the database
+    // 5. Check if the Study ID exists
     const studyExists = !!studyMetadata && !!studyMetadata.studyId;
 
     if (hasTarget && !studyExists) {
-      // If the study was targeted but does NOT exist:
       if (!isAuthenticated) {
-        // If unauthenticated -> redirect to study-not-found with actions: Login, MetaboLights Home
         this.router.navigate(['/study-not-found'], { queryParams: { actions: 'login,home' } });
       } else {
-        // If authenticated -> redirect to study-not-found with actions: My Studies, MetaboLights Home
         this.router.navigate(['/study-not-found'], { queryParams: { actions: 'mystudies,home' } });
       }
-      return false; // Do NOT proceed further
+      return false;
     }
 
-    // 6. If study EXISTS or no specific target was found (like /guide/create), evaluate:
+    // 6. Access Control Logic
     if (parsedUrl.accessMode === 'edit' && studyExists) {
-      // A. Access Mode = EDIT
-
       if (!isAuthenticated) {
-        // If unauthenticated -> redirect to Keycloak with a redirect URL pointing to the Study Edit Path
-        // Ensure we include the baseHref for the redirect URI
         const baseHref = this.configService.baseHref || '/';
         const cleanedBaseHref = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
         const redirectUri = window.location.origin + cleanedBaseHref + parsedUrl.originalUrl;
         await this.keycloak.login({ redirectUri });
         return false;
       } else {
-        // If authenticated:
-        if (studyMetadata.edit) {
-          // If user has Edit Permission -> redirect to Study Edit Page URL
-          // Avoid infinite loop if we are already on the correct path
+        // Owner Edit Permission Check
+        const isOwnerEdit = studyMetadata.edit || 
+           (studyMetadata.submitterOfStudy && (studyMetadata.studyStatus?.toLowerCase() === 'private' || studyMetadata.studyStatus?.toLowerCase() === 'provisional'));
+        
+        if (isOwnerEdit) {
           const targetUrl = `/study/${studyMetadata.studyId}`;
-          if (parsedUrl.originalUrl.startsWith(targetUrl)) {
+          if (parsedUrl.originalUrl.split('?')[0] === targetUrl) {
             return true;
           }
           this.router.navigate([targetUrl]);
           return false;
         } else {
-          // If user does NOT have Edit Permission -> evaluate Study Status
-          this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
-          return false;
+          return this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
         }
       }
 
-    } else if (parsedUrl.accessMode === 'view') {
-      // B. Access Mode = VIEW
+    } else if (parsedUrl.accessMode === 'view' || parsedUrl.obfuscationCode || parsedUrl.reviewCode) {
 
-      // Check authentication:
-      if (isAuthenticated) {
-        // If authenticated:
-        if (studyMetadata.view) {
-          // If user has View Permission -> redirect to Study View Page URL
-          const targetUrl = `/${studyMetadata.studyId}`;
-          if (parsedUrl.originalUrl.startsWith(targetUrl)) {
-             return true;
-          }
-          this.router.navigate([targetUrl]);
-          return false;
-        } else {
-          // If not, evaluate Study Status
-          this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
-          return false;
+      // If user has View Permission (Public study or valid Reviewer Code)
+      if (studyMetadata && studyMetadata.view) {
+        const targetUrl = `/${studyMetadata.studyId}`;
+        // If we are already on the view page (or a sub-tab), allow access
+        if (parsedUrl.originalUrl.startsWith(targetUrl) && !parsedUrl.originalUrl.startsWith('/study/')) {
+           return true;
         }
-      } else {
-        // If unauthenticated: evaluate public/private status and completed/not-completed logic
-        this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
+        // Otherwise redirect to the view page
+        this.router.navigate([targetUrl]);
         return false;
       }
+
+      // If no direct view permission, evaluate status (private/provisional/etc)
+      return this.evaluateStudyStatus(studyMetadata, isAuthenticated, parsedUrl.originalUrl);
     }
 
-    // Fallback if the URL could not be parsed into a known study mode or is a general authenticated page
     return isAuthenticated;
   }
 
@@ -130,56 +113,57 @@ export class StudyRedirectHandlerService {
    * @param studyMetadata Resolved study metadata
    * @param isAuthenticated Authentication status of the user
    */
-  private evaluateStudyStatus(studyMetadata: StudyPermission | any, isAuthenticated: boolean, originalUrl: string): void {
+  private evaluateStudyStatus(studyMetadata: StudyPermission | any, isAuthenticated: boolean, originalUrl: string): boolean {
     
     // Derived values mapped from typical metadata fields
-    const isPublic = studyMetadata.studyStatus?.toLowerCase() === 'public';
-    const isPrivate = studyMetadata.studyStatus?.toLowerCase() === 'private';
+    const status = studyMetadata.studyStatus?.toLowerCase();
+    const isPublic = status === 'public';
+    const isPrivate = status === 'private';
+    const isProvisional = status === 'provisional';
     const hasFirstPrivateDate = !!studyMetadata.firstPrivateDate && studyMetadata.firstPrivateDate.trim() !== '';
     
     // Domain logic: "If study is not completed (accessioned but incomplete):"
-    const isNotCompleted = hasFirstPrivateDate && studyMetadata.studyStatus?.toLowerCase() === 'provisional'; 
+    const isNotCompleted = isProvisional || (hasFirstPrivateDate && status === 'provisional'); 
 
     if (isNotCompleted) {
       const targetPath = '/study-not-completed';
-      if (originalUrl.startsWith(targetPath)) return;
+      if (originalUrl.startsWith(targetPath)) return true; // Allow guard on this page
 
       if (isAuthenticated) {
         this.router.navigate([targetPath], {
-          queryParams: { studyIdentifier: studyMetadata.studyId, actions: 'mystudies,home' }
+          queryParams: { studyIdentifier: studyMetadata.studyId, isOwner: studyMetadata.submitterOfStudy, actions: 'mystudies,home' }
         });
       } else {
         this.router.navigate([targetPath], {
-          queryParams: { studyIdentifier: studyMetadata.studyId, actions: 'login,home' }
+          queryParams: { studyIdentifier: studyMetadata.studyId, isOwner: false, actions: 'login,home' }
         });
       }
-      return; 
+      return false; 
     }
 
     if (isPublic) {
       const targetPath = '/' + studyMetadata.studyId;
-      if (originalUrl.startsWith(targetPath)) return;
+      if (originalUrl.startsWith(targetPath) && !originalUrl.startsWith('/study/')) return true;
 
-      // If study is public -> redirect to Study View Page URL
       this.router.navigate([targetPath]);
-      return; 
+      return false; 
     }
 
     if (isPrivate || hasFirstPrivateDate) {
       const targetPath = '/study-not-public';
-      if (originalUrl.startsWith(targetPath)) return;
+      if (originalUrl.startsWith(targetPath)) return true;
 
-      // If study is private or has non-empty first_private_date -> redirect to study-not-public
       this.router.navigate([targetPath], {
-        queryParams: { studyIdentifier: studyMetadata.studyId }
+        queryParams: { studyIdentifier: studyMetadata.studyId, isOwner: studyMetadata.submitterOfStudy }
       });
-      return; 
+      return false; 
     }
 
-    // Unhandled fallback scenario (optional)
+    // Unhandled fallback scenario
     if (!originalUrl.startsWith('/page-not-found')) {
        this.router.navigate(['/page-not-found']);
     }
+    return false;
   }
 
 

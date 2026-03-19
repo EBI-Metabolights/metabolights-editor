@@ -14,9 +14,9 @@ export class ErrorMessageService {
     });
     this.messages.set("E-0001-002",
       {
-        header: "Metabolights server response error",
+        header: "Study not found",
         input: "",
-        content: "Error while checking study permission."
+        content: "We could not find the study you are trying to access. Please double-check the study ID and try again. If the issue persists, contact the MetaboLights team for assistance."
       });
     this.messages.set("E-0001-003",
       {
