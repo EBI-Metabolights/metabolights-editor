@@ -396,8 +396,8 @@ export class ValidationState {
             return { warnings: 0, errors: 0 };
         }
         return {
-            warnings: state.reportV2.messages.violations.filter(val => val.type === 'ERROR').length,
-            errors: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length
+            warnings: state.reportV2.messages.violations.filter(val => val.type === 'WARNING').length,
+            errors: state.reportV2.messages.violations.filter(val => val.type === 'ERROR').length
         }
     }
 

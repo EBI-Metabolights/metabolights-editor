@@ -61,7 +61,7 @@ export class OverrideModalComponent implements OnInit, OnChanges {
 
   initializeForm(): void {
     this.options = this.formBuilder.group({
-      type: [(this.violation.overridden ? this.violation.type : 'WARNING') || "WARNING"], // Use default if violation is undefined
+      type: [(this.violation?.overridden ? this.violation?.type : 'WARNING') || "WARNING"], // Use default if violation is undefined
       enabled: [this.violation?.overridden || true], // Default to false
       comments: [this.violation?.overrideComment || ""],
     });
@@ -87,6 +87,7 @@ export class OverrideModalComponent implements OnInit, OnChanges {
     let actionClass = null;
     this.violation.overridden ? actionClass = ValidationReportV2.Override.Update : actionClass = ValidationReportV2.Override.Create;
     this.store.dispatch(new actionClass(this.studyId, override));
+    this.close();
   }
 
   openDeleteDialog() {
