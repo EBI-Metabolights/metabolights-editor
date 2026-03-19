@@ -35,16 +35,20 @@ export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
     return null;
   }
   const reg = /^reviewer(.*)$/;
-  const param = url[0].toString();
-
-  if (param.match(reg)) {
-    let data = null;
-    if (url[1]) {
-      data = { consumed: url, posParams: { study: url[0], tab: url[1] } };
-    } else {
-      data = { consumed: url, posParams: { study: url[0], tab: "descriptors" } };
+  
+  for (let i = 0; i < url.length; i++) {
+    const param = url[i].toString();
+    if (param.match(reg)) {
+      const consumed = url.slice(0, i + 1);
+      const posParams: any = { study: url[i] };
+      if (url[i + 1]) {
+        consumed.push(url[i + 1]);
+        posParams.tab = url[i + 1];
+      } else {
+        posParams.tab = new UrlSegment("descriptors", {});
+      }
+      return { consumed, posParams };
     }
-    return data;
   }
   return null;
 }
@@ -55,16 +59,20 @@ export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
     return null;
   }
   const reg = /^(MTBLS|mtbls|REQ|req)[0-9]+(.*)$/;
-  const param = url[0].toString();
-
-  if (param.match(reg)) {
-    let data = null;
-    if (url[1]) {
-      data = { consumed: url, posParams: { study: url[0], tab: url[1] } };
-    } else {
-      data = { consumed: url, posParams: { study: url[0], tab: "descriptors" } };
+  
+  for (let i = 0; i < url.length; i++) {
+    const param = url[i].toString();
+    if (param.match(reg)) {
+      const consumed = url.slice(0, i + 1);
+      const posParams: any = { study: url[i] };
+      if (url[i + 1]) {
+        consumed.push(url[i + 1]);
+        posParams.tab = url[i + 1];
+      } else {
+        posParams.tab = new UrlSegment("descriptors", {});
+      }
+      return { consumed, posParams };
     }
-    return data;
   }
   return null;
 }
