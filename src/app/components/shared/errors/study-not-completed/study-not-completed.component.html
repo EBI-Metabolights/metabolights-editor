@@ -13,22 +13,26 @@
                         <p>The MetaboLights study <strong>{{ study }}</strong> is currently being processed or has not
                             yet completed its initial validation/setup.</p>
                         <br>
-                        <b>What does this mean?</b>
-                        <br>
-                        <ul class="ml">
-                            <li>Our automated systems are currently assigning stable accession numbers or finalizing the
-                                internal directory structure for your study.</li>
-                            <li>The study will soon be available in your console for full editing.</li>
-                        </ul>
-                        <br>
-                        <b>What can you do?</b>
-                        <br>
-                        <ul class="ml">
-                            <li>Please wait for a few minutes and refresh your study console.</li>
-                            <li>If the study remains in this state for an extended period, please contact the
-                                MetaboLights team at <span class="email">metabolights-help&#64;ebi.ac.uk</span>.</li>
-                        </ul>
-                        <br>
+                        <div *ngIf="isAuthenticated && isOwner">
+                            <b>What does this mean?</b>
+                            <br>
+                            <ul class="ml">
+                                <li>The study does not assigned a stable accession number yet.</li>
+                            </ul>
+                            <br>
+                            <b>What can you do?</b>
+                            <br>
+                            <ul class="ml">
+                                <li>Once it passes the validation process, you can change the study status from Provisional to Private to assign an accession number.</li>
+                                <li>If the study remains in this state for an extended period, please contact the
+                                    MetaboLights team at <span class="email">metabolights-help&#64;ebi.ac.uk</span>.</li>
+                            </ul>
+                            <br>
+                        </div>
+                        <div *ngIf="!isOwner">
+                            <p>This study is currently being processed by the curators or is in a provisional state. Access is restricted to study owners only at this time.</p>
+                            <br>
+                        </div>
                         <div class="buttons">
                             <a *ngIf="isAuthenticated" class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
                             <a *ngIf="!isAuthenticated" class="button is-info" (click)="login()"> Login </a>

@@ -14,8 +14,8 @@ import { KeycloakService } from 'keycloak-angular';
   styleUrls: ['./no-study-page.component.css']
 })
 export class NoStudyPageComponent implements OnInit {
-  messageHeader = "Study page not found";
-  messageContent = "Error while loading study. Possible reasons: 1) Study accesion number is not valid or it is not public or editable.";
+  messageHeader = "Study not found";
+  messageContent = "We could not find the study you are trying to access. Please double-check the study ID and try again. If the issue persists, contact the MetaboLights team for assistance.";
   messageExpanded = true;
   isAuthenticated = false;
   metabolightsWebsiteUrl = "";
@@ -48,8 +48,8 @@ export class NoStudyPageComponent implements OnInit {
         const errorCode = params.code ?? "";
 
         const message = this.errorMessageService.getErrorMessage(errorCode);
-        const header = message?.header ?? "Study page not found";
-        const content = message?.content ?? "Error while loading study.";
+        const header = message?.header ?? "Study not found";
+        const content = message?.content ?? "We could not find the study you are trying to access. Please double-check the study ID and try again. If the issue persists, contact the MetaboLights team for assistance.";
         const url = this.editorService.getRedirectUrl() ?? "";
         if (url !== "") {
           const path = url.split("?")[0];
