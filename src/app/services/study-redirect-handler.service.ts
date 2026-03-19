@@ -93,6 +93,18 @@ export class StudyRedirectHandlerService {
         if (parsedUrl.originalUrl.startsWith(targetUrl) && !parsedUrl.originalUrl.startsWith('/study/')) {
            return true;
         }
+
+        // Handle reviewer links: redirect from /reviewer<code> to /<studyId>?reviewCode=<code>
+        if (parsedUrl.obfuscationCode) {
+           this.router.navigate([targetUrl], { queryParams: { reviewCode: parsedUrl.obfuscationCode } });
+           return false;
+        }
+
+        // Handle existing reviewCode query params (if not already caught by startsWith above)
+        if (parsedUrl.reviewCode) {
+           return true;
+        }
+
         // Otherwise redirect to the view page
         this.router.navigate([targetUrl]);
         return false;
@@ -119,11 +131,15 @@ export class StudyRedirectHandlerService {
     const status = studyMetadata.studyStatus?.toLowerCase();
     const isPublic = status === 'public';
     const isPrivate = status === 'private';
-    const isProvisional = status === 'provisional';
+    const isProvisional = status === 'provisional' || status === 'provisional study' || !status;
+    const studyId = studyMetadata.studyId || '';
+    const isReqId = studyId.toUpperCase().startsWith('REQ');
+
     const hasFirstPrivateDate = !!studyMetadata.firstPrivateDate && studyMetadata.firstPrivateDate.trim() !== '';
     
     // Domain logic: "If study is not completed (accessioned but incomplete):"
-    const isNotCompleted = isProvisional || (hasFirstPrivateDate && status === 'provisional'); 
+    // We treat it as not completed if status is provisional, empty, or it's a REQ ID that isn't explicitly public/private
+    const isNotCompleted = isProvisional || (isReqId && !isPublic && !isPrivate); 
 
     if (isNotCompleted) {
       const targetPath = '/study-not-completed';
@@ -193,22 +209,26 @@ export class StudyRedirectHandlerService {
     const baseHref = this.configService.baseHref || '/';
     const cleanedUrl = url.startsWith(baseHref) ? url.substring(baseHref.length - (baseHref.endsWith('/') ? 1 : 0)) : url;
 
-    if (cleanedUrl.startsWith('/reviewer')) {
-       parsed.obfuscationCode = cleanedUrl.split('/')[1].split('?')[0].replace('reviewer', '');
+    if (cleanedUrl.toLowerCase().startsWith('/reviewer')) {
+       parsed.obfuscationCode = cleanedUrl.split('/')[1].split('?')[0].replace(/reviewer/i, '');
        parsed.accessMode = 'view';
     }
 
     // Determine Access Mode (view/edit) & extract Study ID
     // E.g.: /study/MTBLS123 (Edit) vs /MTBLS123 (View)
-    if (cleanedUrl.startsWith('/study/MTBLS') || cleanedUrl.startsWith('/study/REQ') || cleanedUrl.startsWith('/study/guide/')) {
+    const upperCleanedUrl = cleanedUrl.toUpperCase();
+    if (upperCleanedUrl.includes('/STUDY/MTBLS') || upperCleanedUrl.includes('/STUDY/REQ') || upperCleanedUrl.includes('/STUDY/GUIDE/')) {
         parsed.accessMode = 'edit';
         parsed.studyId = this.extractIdFromSegments(cleanedUrl);
-    } else if (cleanedUrl.startsWith('/guide/')) {
+    } else if (upperCleanedUrl.includes('/GUIDE/')) {
         parsed.accessMode = 'edit';
         parsed.studyId = this.extractIdFromSegments(cleanedUrl);
-    } else if (cleanedUrl.startsWith('/MTBLS') || cleanedUrl.startsWith('/REQ')) {
-        parsed.accessMode = 'view';
-        parsed.studyId = this.extractIdFromSegments(cleanedUrl);
+    } else {
+        const potentialId = this.extractIdFromSegments(cleanedUrl);
+        if (potentialId) {
+            parsed.studyId = potentialId;
+            parsed.accessMode = 'view';
+        }
     }
 
     return parsed;
@@ -220,8 +240,9 @@ export class StudyRedirectHandlerService {
   private extractIdFromSegments(url: string): string | null {
       const parts = url.split('/');
       for (const part of parts) {
-          if (part && (part.startsWith('MTBLS') || part.startsWith('REQ'))) {
-              return part.split('?')[0]; // strip query string if appended
+          const upperPart = part.toUpperCase();
+          if (upperPart && (upperPart.startsWith('MTBLS') || upperPart.startsWith('REQ'))) {
+              return upperPart.split('?')[0]; // normalizing to uppercase for backend compatibility
           }
       }
       return null;
@@ -234,14 +255,14 @@ export class StudyRedirectHandlerService {
    */
   private async resolveStudyMetadata(parsedUrl: ParsedStudyUrl): Promise<StudyPermission | null> {
     try {
-      if (parsedUrl.studyId) {
-        // Retrieve permissions via the specific Study ID
-        // Note: this should return null or handle gracefully if the study doesn't exist
-        return await this.editorService.getStudyPermissionByStudyId(parsedUrl.studyId);
-      } else if (parsedUrl.obfuscationCode || parsedUrl.reviewCode) {
+      if (parsedUrl.obfuscationCode || parsedUrl.reviewCode) {
         // Retrieve permissions using Review or Obfuscation code
         const code = parsedUrl.obfuscationCode || parsedUrl.reviewCode;
         return await this.editorService.getStudyPermissionByObfuscationCode(code!);
+      } else if (parsedUrl.studyId) {
+        // Retrieve permissions via the specific Study ID
+        // Note: this should return null or handle gracefully if the study doesn't exist
+        return await this.editorService.getStudyPermissionByStudyId(parsedUrl.studyId);
       }
     } catch (e) {
       console.warn("Error fetching study metadata, treating as non-existent.", e);
