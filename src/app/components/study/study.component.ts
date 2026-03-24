@@ -46,6 +46,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
+  loading$: Observable<boolean> = inject(Store).select(TransitionsState.loading);
   studyPermission$: Observable<StudyPermission> = inject(Store).select(GeneralMetadataState.studyPermission);
 
   revisionNumber = null;
@@ -68,15 +69,17 @@ export class StudyComponent implements OnInit, OnDestroy {
   isCurator = false;
   isOwner = false;
   validationStatus: ViolationType = null;
-  validationRunTime: string =  null;
+  validationRunTime: string = null;
   validationNeeded: boolean = false;
   studyPermission: StudyPermission = null;
+  permissions: StudyPermission = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
   studyCategory = "";
   sampleTemplate = "";
   templateConfiguration: any = null;
   mhdAccession: string = null;
   isReadOnly = true;
+  isChecklistPopupOpen = false;
 
   constructor(
     private store: Store,
@@ -94,6 +97,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.templateConfiguration = value;
     });
     this.studyPermission = this.store.snapshot().application.studyPermission;
+    this.permissions = this.studyPermission;
     this.obfuscationCode = this.studyPermission?.obfuscationCode || null;
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
@@ -112,6 +116,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.studyPermission$.subscribe((value) => {
         this.studyPermission = value;
+        this.permissions = value;
         this.isOwner = false;
         this.obfuscationCode = null
         if (this.studyPermission) {
@@ -134,6 +139,10 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.studyObfuscationCode$.subscribe((value) => {
       this.obfuscationCode = value;
+      if (!this.obfuscationCode || this.obfuscationCode.length == 0) {
+        this.permissions = this.store.snapshot().application.studyPermission
+        this.obfuscationCode = this.permissions ? this.permissions.obfuscationCode : null;
+      }
     });
     this.bannerMessage$.subscribe((value) => {
       this.banner = value;
@@ -144,15 +153,22 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
+        if (!this.isReadOnly && this.tab === "overview") {
+          this.isChecklistPopupOpen = true;
+        }
       }
     });
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
+        this.isOwner = false;
+        if (this.permissions && this.permissions.submitterOfStudy) {
+          this.isOwner = true;
+        }
       }
     });
     this.endpoint = this.configService.config.endpoint;
-    if (this.configService.config.endpoint.endsWith("/") === false){
+    if (this.configService.config.endpoint.endsWith("/") === false) {
       this.endpoint = this.endpoint + "/";
     }
     this.investigationFailed$.subscribe((value) => {
@@ -224,6 +240,9 @@ export class StudyComponent implements OnInit, OnDestroy {
       } else {
         this.requestedTab = 0;
         this.tab = "overview";
+        if (!this.isReadOnly) {
+          this.isChecklistPopupOpen = true;
+        }
       }
       this.selectCurrentTab(this.requestedTab, this.tab);
     });
@@ -260,9 +279,6 @@ export class StudyComponent implements OnInit, OnDestroy {
     );
     if (index === 5) {
       this.store.dispatch(new ValidationReport.Get(this.requestedStudy))
-      if (document.getElementById("tab-content-wrapper")) {
-        document.getElementById("tab-content-wrapper").scrollIntoView();
-      }
     }
   }
 
@@ -305,9 +321,9 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   saveFunder(event) {
     if (event.index === -1) {
-        this.store.dispatch(new Funders.Add(event.funder));
+      this.store.dispatch(new Funders.Add(event.funder));
     } else {
-        this.store.dispatch(new Funders.Update(event.funder, event.index));
+      this.store.dispatch(new Funders.Update(event.funder, event.index));
     }
   }
 
@@ -317,9 +333,9 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   saveRelatedDataset(event) {
     if (event.index === -1) {
-        this.store.dispatch(new RelatedDatasets.Add(event.dataset));
+      this.store.dispatch(new RelatedDatasets.Add(event.dataset));
     } else {
-        this.store.dispatch(new RelatedDatasets.Update(event.dataset, event.index));
+      this.store.dispatch(new RelatedDatasets.Update(event.dataset, event.index));
     }
   }
 

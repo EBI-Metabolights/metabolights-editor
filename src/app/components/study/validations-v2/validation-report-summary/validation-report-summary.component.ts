@@ -178,6 +178,9 @@ export class ValidationReportSummaryComponent implements OnInit, AfterViewInit, 
   }
 
   convertToSwimlaneFormat() {
+    this.errorsGraphItems = [];
+    this.warningsGraphItems = [];
+    this.bothGraphItems = [];
     this.addItems(this.errors, this.errorsGraphItems);
     this.addItems(this.warnings, this.warningsGraphItems);
     this.addItems(this.both, this.bothGraphItems);

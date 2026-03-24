@@ -11,7 +11,6 @@ import { LoginComponent } from "./components/auth/login/login.component";
 import { ConsoleComponent } from "./components/console/console.component";
 
 import { StudyComponent } from "./components/study/study.component";
-import { StudyGuideComponent } from "./components/study/study-guide/study-guide.component";
 
 import { PublicStudyComponent } from "./components/public/study/study.component";
 
@@ -31,7 +30,7 @@ import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-l
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url === null || url.length === 0) {
+  if (url === null || url.length === 0 || url[0].path.toLowerCase() === 'guide') {
     return null;
   }
   const reg = /^reviewer(.*)$/;
@@ -55,7 +54,7 @@ export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url === null || url.length === 0) {
+  if (url === null || url.length === 0 || url[0].path.toLowerCase() === 'guide') {
     return null;
   }
   const reg = /^(MTBLS|mtbls|REQ|req)[0-9]+(.*)$/;
@@ -124,11 +123,6 @@ const routes: Routes = [
     component: GuidedAssaysComponent,
   },
 
-  {
-    path: "study/guide/:id",
-    canActivate: [AuthGuard],
-    component: StudyGuideComponent,
-  },
   { path: "study/:id", canActivate: [AuthGuard], component: StudyComponent },
   {
     path: "study/:id/:tab",

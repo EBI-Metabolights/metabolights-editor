@@ -77,6 +77,7 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
 
   ngOnInit() {
     this.editorService.updateHistory(this.route.snapshot);
+    this.baseHref = this.editorService.configService.baseHref;
 
     this.bannerMessage$.subscribe((value) => {
       this.banner = value;
@@ -210,6 +211,11 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
       return sampleType.charAt(0).toUpperCase() + sampleType.slice(1);
     }
     return 'Other';
+  }
+
+  get editorBasePath(): string {
+    const base = this.baseHref || "/";
+    return base.endsWith("/") ? base : `${base}/`;
   }
 
   studyClick(study: IStudyDetail, view: string) {

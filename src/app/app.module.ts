@@ -72,8 +72,17 @@ import { firstValueFrom } from 'rxjs';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
-export function configLoader(injector: Injector): () => Promise<any> {
-  return () => injector.get(ConfigurationService).loadConfiguration();
+export function appInitializer(injector: Injector): () => Promise<any> {
+    return async () => {
+        const configService = injector.get(ConfigurationService);
+        const editorService = injector.get(EditorService);
+        await configService.loadConfiguration();
+        try {
+            await editorService.loadDefaultControlLists();
+        } catch (err) {
+            console.warn('Could not load default control lists during initialization (this is expected if not logged in):', err);
+        }
+    };
 }
 
 function initializeKeycloak(keycloak: KeycloakService, configService: ConfigurationService) {
@@ -173,7 +182,7 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
   ], providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: configLoader,
+      useFactory: appInitializer,
       deps: [Injector],
       multi: true,
     },
@@ -208,8 +217,8 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
   ]
 })
 export class AppModule {
-  constructor(
-  ) {
+    constructor(
+    ) {
 
-  }
+    }
 }

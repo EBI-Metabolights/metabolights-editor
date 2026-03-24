@@ -72,6 +72,9 @@ export class ValidationTaskBoxComponent implements OnInit {
     this.currentTask$.subscribe((task) => {
       if (task !== null) {
         this.currentTaskState = task;
+        if (['INITIATED', 'STARTED', 'PENDING'].includes(task.ws3TaskStatus) && !this.taskStarted) {
+          this.executePolling(task.id);
+        }
       }
     })
 
@@ -103,52 +106,39 @@ export class ValidationTaskBoxComponent implements OnInit {
 
   // we also need this to subscribe to validation task updates so that the user doesnt have to do it.
   startValidationTask() {
-    const deposedTaskId = this.currentTaskState.id;
+    this.isInitiated = true;
+    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).subscribe({
+      error: (error) => {
+        this.isInitiated = false;
+      }
+    });
+  }
 
-    this.store.dispatch(new ValidationReportV2.InitialiseValidationTask(false, this.studyId)).pipe( // currently proxying, this will not work outside of dev
-      tap(() => {
-        this.isInitiated = true
-
-      })
+  executePolling(taskId: string) {
+    this.taskStarted = true;
+    const timer = interval(1000);
+    timer.pipe(
+      takeWhile(value => ["SUCCESS", "FAILURE", "ERROR"].includes(this.currentTaskState.ws3TaskStatus) === false),
     ).subscribe({
-      next: (next) => {
-        const taskSub = this.store.selectOnce(ValidationState.currentValidationTask)
-        let newTask: ValidationTask | null = null
-
-        /**
-         * Below we are defining an observable, which emits every 1 seconds. We also modify this Observable using pipe,
-         * and the operators takeWhile and tap. We use these operators to make the following modifications:
-         *  takeWhile: automatically close the subscription once a task has completed, by checking whether the current task state is a termination state.
-         *  tap: Add the side effect of assigning a value to newTask via selectOnce, if one hasn't been already. newTask.id is used in every subsequent
-         *    validation get action,  and the value that we receive has been previously set in the handler of InitialiseValidationTask.
-         */
-        const timer = interval(1000);
-        const responseSubscription = timer.pipe(
-          takeWhile(value => ["SUCCESS", "FAILURE", "ERROR"].includes(this.currentTaskState.ws3TaskStatus) === false /*&& this.currentTaskState.id === deposedTaskId*/),
-          tap(() => {
-            if (newTask === null) taskSub.subscribe(task => newTask = task)
-          })
-        )
-
-        responseSubscription.subscribe({
-          next: () => {
-            this.taskStarted = true;
-            this.store.dispatch(new ValidationReportV2.Get(this.studyId, newTask.id))},
-          error: () => console.log('Unexpected error in Validation task component'),
-          complete: () => {
-            this.isInitiated = false;
-            this.taskStarted = false;
-            this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
-            // if the modifiers array is not empty, we show the info modal
-            if (this.modifierMetadataFileUpdates.length > 0) {
-              this.showModal = true; // Show the Info modal
-            }
-
-            console.debug('finished & subscription closed.') }
-      })
-
+      next: () => {
+        this.store.dispatch(new ValidationReportV2.Get(this.studyId, taskId))
       },
-      error: (error) => {},
+      error: () => {
+        console.log('Unexpected error in Validation task component');
+        this.taskStarted = false;
+        this.isInitiated = false;
+      },
+      complete: () => {
+        this.isInitiated = false;
+        this.taskStarted = false;
+        this.store.dispatch(new ValidationReportV2.History.Get(this.studyId));
+        // if the modifiers array is not empty, we show the info modal
+        if (this.modifierMetadataFileUpdates.length > 0) {
+          this.showModal = true; // Show the Info modal
+        }
+
+        console.debug('finished & subscription closed.')
+      }
     })
   }
 

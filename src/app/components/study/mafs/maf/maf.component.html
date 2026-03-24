@@ -1,7 +1,14 @@
-<span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn p2">
+<span *ngIf="!isReadOnly" class="column is-12 nprl nmrl fadeIn p2" style="padding-left: .75rem;">
+  <div *ngIf="tableDescription" class="notification is-primary mb-2">
+    <small><mat-icon>info</mat-icon> {{ tableDescription }}
+      <br />
+      <b *ngIf="tableDescriptionUrl">Please see the <a [href]="tableDescriptionUrl" target="_BLANK">Guides</a> for more
+        information on how to complete your Metabolites section.</b>
+    </small>
+  </div>
   <span *ngIf="mafData && mafData.data.rows && mafData.data.rows.length > 0">
     <a (click)="autoPopulate(true)" class="button is-small is-light">
-      <span><mat-icon>add</mat-icon>Compound Search</span> </a>&nbsp;
+      <span><mat-icon>search</mat-icon>Compound Search</span> </a>&nbsp;
     <a (click)="autoPopulate(false)" class="button is-small is-light">
       <span><mat-icon>refresh</mat-icon>Auto Populate</span>
     </a>
@@ -15,6 +22,7 @@
       <span *ngIf="mafData">
         <mtbls-table [fileTypes]="fileTypes" (rowsUpdated)="validateMAFSheet()" (rowEdit)="openRowEditModal($event)"
           [tableData]="mafData" validationsId="maf" [enableControlList]="false"
+          [tableDescription]="tableDescription" [tableDescriptionUrl]="tableDescriptionUrl"
           (refreshTableData)="autoPopulate(false)"></mtbls-table>
       </span>
     </div>
@@ -36,11 +44,12 @@
         <div class="columns">
           <div class="column" *ngIf="currentID; else noImage">
             <img width="100%" [src]="
-                'https://www.ebi.ac.uk/chebi/backend/api/public/structure/' +
+                'https://www.ebi.ac.uk/chebi/backend/api/public/compound/' +
                 currentID +
-                '/'
+                '/structure/?width=300&height=300'
               " alt="" />
           </div>
+
           <ng-template #noImage>
             <p class="has-text-centered noImg">
               <i class="has-text-light-gray"><small>Structure unavailable</small></i>

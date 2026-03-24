@@ -19,21 +19,21 @@ export class SamplesService extends BaseConfigDependentService {
 
   //private id: string;
   public samplesColumnOrder: Record<string, any> = {
-    "Sample Name": 1,
-    "Characteristics[Organism]": 2,
-    "Characteristics[Organism part]": 3,
-    "Characteristics[Variant]": 4,
-    "Characteristics[Sample type]": 5,
-    "Protocol REF": 6,
-    "Source Name": 7,
+    "Protocol REF": 1,
+    "Source Name": 2,
+    "Sample Name": 3,
+    "Characteristics[Organism]": 4,
+    "Characteristics[Organism part]": 5,
+    "Characteristics[Variant]": 6,
+    "Characteristics[Sample type]": 7,
   };
   public loadingMessage: string = "Loading samples data."
   public sampleSheetMissingPopupMessage: string = "Sample Sheet missing. Please upload sample sheet or contact Metabolights Help."
-  
+
 
   constructor(
-    http: HttpClient, configService: ConfigurationService, private tableService: TableService, store: Store) {  
-      super(http, configService, store);
+    http: HttpClient, configService: ConfigurationService, private tableService: TableService, store: Store) {
+    super(http, configService, store);
   }
 
   getTable(filename, suppliedId): Observable<ITableWrapper> {
@@ -64,5 +64,5 @@ export class SamplesService extends BaseConfigDependentService {
 
 
 
-  
+
 }

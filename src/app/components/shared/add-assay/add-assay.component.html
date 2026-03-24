@@ -79,7 +79,8 @@
                 <p>
                   Assay Descriptors
                   <span>
-                    <mat-icon matTooltip="Assay Design Descriptors describe the study">help</mat-icon>
+                    <mat-icon
+                      matTooltip="Descriptors are the keywords you would use to describe the assay">help</mat-icon>
                   </span>
                 </p>
                 <button class="button is-primary is-small"
@@ -109,7 +110,7 @@
                     </div>
                   </div>
                   <ng-template #noDescriptors>
-                    <p class="has-text-grey is-size-7 is-italic m-0" style="text-align: center;">No assay design
+                    <p class="has-text-grey is-size-7 is-italic m-0" style="text-align: center;">No assay
                       descriptors added.</p>
                   </ng-template>
                 </div>
@@ -151,7 +152,10 @@
                         <mat-label>{{ field.label }}</mat-label>
                         <input matInput [formControlName]="field.key" type="text" [placeholder]="field.label"
                           [required]="field.required">
-                        <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                        <mat-hint>
+                          <span *ngIf="field.description" style="white-space: pre-wrap;">{{ field.description }}</span>
+                          <b *ngIf="field.required">&nbsp;(required)</b>
+                        </mat-hint>
                       </mat-form-field>
                     </div>
 
@@ -164,7 +168,10 @@
                               <mat-label>{{ field.label }}</mat-label>
                               <input matInput [formControlName]="field.key" type="text" placeholder="Value"
                                 [required]="field.required">
-                              <mat-hint *ngIf="field.description">{{ field.description }}</mat-hint>
+                              <mat-hint>
+                                <span *ngIf="field.description" style="white-space: pre-wrap;">{{ field.description }}</span>
+                                <b *ngIf="field.required">&nbsp;(required)</b>
+                              </mat-hint>
                             </mat-form-field>
                           </ng-container>
                           <ng-template #mainOntologyField>

@@ -24,22 +24,24 @@
                 <span *ngIf="!isAnyAssaySelected" class="is-italic">(At least one selection is required)</span>
               </p>
               <div class="category-rows-container mt-4">
-                <div class="category-box mb-3" *ngFor="let cat of activeCategories">
-                  <div class="columns is-vcentered">
-                    <div class="column is-2 py-1">
-                      <span class="is-size-7 has-text-weight-bold has-text-grey">{{cat.label}}</span>
+                <div class="category-box mb-3 clickable" *ngFor="let cat of activeCategories"
+                  (click)="toggleCategory(cat)"
+                  [class.is-selected]="studyAssaySelection[cat.id]?.length === cat.assayTypes.length && cat.assayTypes.length > 0">
+                  <div class="category-flex-row">
+                    <div class="category-label-wrapper">
+                      <label class="checkbox is-size-7 beautified-checkbox category-selection-label mb-0"
+                        (click)="$event.stopPropagation()">
+                        <input type="checkbox" (change)="toggleCategory(cat, $event)"
+                          [checked]="studyAssaySelection[cat.id]?.length === cat.assayTypes.length && cat.assayTypes.length > 0">
+                        <span class="checkmark"></span>
+                        <span class="has-text-weight-bold">{{cat.label}}</span>
+                      </label>
                     </div>
-                    <div class="column py-1">
-                      <div class="assay-types-list is-flex is-flex-wrap-wrap" style="gap: 0.5rem;">
-                        <div *ngFor="let assayType of cat.assayTypes">
-                          <label class="checkbox is-size-7 beautified-checkbox assay-type-label mb-0">
-                            <input type="checkbox" (change)="toggleAssay(cat.id, assayType, $event)"
-                              [checked]="studyAssaySelection[cat.id]?.includes(assayType)">
-                            <span class="checkmark"></span>
-                            {{assayType}}
-                          </label>
-                        </div>
-                      </div>
+                    <div class="category-techniques-wrapper">
+                      <span *ngFor="let assayType of cat.assayTypes"
+                        class="tag is-light is-rounded assay-technique-tag">
+                        {{assayType}}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -172,8 +174,8 @@
             <hr>
             <!-- Factors, Descriptors, Contacts -->
             <div class="columns is-multiline">
-              <div class="column is-12">
-                <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors</h3>
+              <div class="column is-12" style="display: none;">
+                <h3 class="title is-5 has-text-weight-bold mb-4">Study Factors(Sample Group</h3>
                 <div class="box p-3 is-clearfix" style="position: relative;">
                   <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
                     (click)="factorRef.openModal()">+
@@ -198,8 +200,11 @@
                     <button class="button is-primary is-small" style="position: absolute; top: 12px; right: 12px; "
                       (click)="descRef.openModal()">+
                       Add</button>
-                    <h6 class="title is-6 mb-2" style="margin-right: 60px;">{{category.label}} <span
-                        *ngIf="category.min > 0">(at least {{category.min}})<span class="has-error">*</span></span></h6>
+                    <h6 class="title is-6 mb-2" style="margin-right: 60px;">{{category.label}}
+                      <mat-icon *ngIf="category.description" [matTooltip]="category.description" class="info-icon ml-1"
+                        style="font-size: 14px; vertical-align: middle;">help</mat-icon>
+                      <span *ngIf="category.min > 0">(at least {{category.min}})<span class="has-error">*</span></span>
+                    </h6>
                     <div class="tags mb-2" style="margin-right: 60px;">
                       <span *ngFor="let desc of getDescriptorsByCategory(category.id); let i = index"
                         class="tag is-primary is-light is-medium">
@@ -282,18 +287,8 @@
                   </mat-form-field>
                 </div>
 
-                <!-- Row 1: Authors and Status -->
+                <!-- Row 1: Status and Authors (Swapped) -->
                 <div class="columns mb-3">
-                  <div class="column is-6 pb-0">
-                    <div class="field">
-                      <mat-form-field class="full-width" appearance="outline">
-                        <mat-label>Publication Authors</mat-label>
-                        <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors"
-                          required>
-                        <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
-                      </mat-form-field>
-                    </div>
-                  </div>
                   <div class="column is-6 pb-0">
                     <div class="field">
                       <div class="control">
@@ -326,6 +321,16 @@
                       </div>
                     </div>
                   </div>
+                  <div class="column is-6 pb-0">
+                    <div class="field">
+                      <mat-form-field class="full-width" appearance="outline">
+                        <mat-label>Publication Authors<span class="has-error"
+                            *ngIf="isAuthorRequired">*</span></mat-label>
+                        <input matInput type="text" [(ngModel)]="publicationAuthors" placeholder="Publication Authors">
+                        <mat-hint>{{ fieldValidation('publications.publication.authorList').description }}</mat-hint>
+                      </mat-form-field>
+                    </div>
+                  </div>
                 </div>
 
                 <!-- Row 2: DOI and PubMed ID -->
@@ -337,8 +342,8 @@
                           [color]="(isDoiRequired && !publicationDoi) ? 'warn' : 'primary'">
                           <mat-label>DOI</mat-label>
                           <input matInput type="text" [(ngModel)]="publicationDoi" placeholder="DOI"
-                            [required]="isDoiRequired" (blur)="getArticleFromDOI()"
-                            (keydown.enter)="getArticleFromDOI()">
+                            [required]="isDoiRequired" (paste)="onPublicationIdentifierPaste($event, 'doi')"
+                            (blur)="getArticleFromDOI()" (keydown.enter)="getArticleFromDOI()">
                           <mat-hint>{{ fieldValidation('publications.publication.doi').description }}
                             <span *ngIf="isDoiRequired"><b>(required)</b></span>
                           </mat-hint>
@@ -355,7 +360,8 @@
                         <mat-form-field class="full-width" appearance="outline">
                           <mat-label>PubMed ID</mat-label>
                           <input matInput type="text" [(ngModel)]="publicationPubmedId" placeholder="PubMed ID"
-                            (blur)="getArticleFromPubMedID()" (keydown.enter)="getArticleFromPubMedID()">
+                            (paste)="onPublicationIdentifierPaste($event, 'pubMedID')" (blur)="getArticleFromPubMedID()"
+                            (keydown.enter)="getArticleFromPubMedID()">
                           <mat-hint>{{ fieldValidation('publications.publication.pubmedId').description }}</mat-hint>
                         </mat-form-field>
                       </div>
@@ -407,9 +413,9 @@
                   <div class="created-studies-list box py-4 px-5 "
                     style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
                     <div *ngFor="let studyId of createdStudies" class="is-flex is-align-items-center">
-                      <span class="material-symbols-outlined has-text-success is-size-5 mr-3">check</span>
+                      <span class="material-symbols-outlined has-text-success is-size-5 mr-3">task</span>
                       <div class="is-size-6">
-                        <span class="has-text-link has-text-weight-bold">{{ studyId }}</span>:
+                        <span class="has-text-weight-bold">{{ studyId }}</span>:
                         <span class="is-italic has-text-grey-dark">{{ createdStudiesDetails[studyId] }}</span>
                       </div>
                     </div>
@@ -429,7 +435,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(0)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">1</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Sample/" target="_blank"
                           class="step-link">Complete 'Sample'
@@ -441,11 +447,39 @@
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 0">
                     <p class="is-size-7 mb-2">
-                      Sample metadata should include a unique sample name, organism, organism part (for controls use
-                      e.g. experimental blank and solvent) and sample type (i.e. control, experimental sample, QC).
-                      Further sample descriptors should be included where available by selecting <b>+Factor</b> to add
-                      new columns (e.g. Gender, Age, Treatment etc.).
+                      Populate the sample sheet (<code>s_MTBLSxxx.txt</code>) with all required fields for every sample
+                      and
+                      control in your study:
                     </p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Source Name</strong> &mdash; subject identifier or parent entity; repeat Sample Name
+                        if not
+                        applicable.</li>
+                      <li><strong>Characteristics[Organism]</strong> &mdash; scientific taxonomy name (e.g., <em>Homo
+                          sapiens</em>), not generic terms like "human" or "mouse." Pair with ontology fields (Term
+                        Source REF,
+                        Term Accession Number).</li>
+                      <li><strong>Characteristics[Organism part]</strong> &mdash; tissue/fluid/fraction etc. sampled
+                        (e.g., blood
+                        plasma, whole organism, cell culture); or for controls use appropriate terms (e.g.,
+                        <em>solvent</em>).
+                      </li>
+                      <li><strong>Sample Name</strong> &mdash; unique per sample; typically aligns with raw data
+                        filenames.</li>
+                      <li><strong>At least one Factor</strong> &mdash; use the "+Factor" button to add columns
+                        describing your
+                        experimental groups (e.g., Treatment, Genotype, Timepoint).</li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7">
+                      Do not remove columns, change column order, or alter headers. We recommend adding a few samples
+                      via the
+                      online editor first (to select correct ontology terms), then downloading, completing in Excel, and
+                      re-uploading.
+                    </p>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Sample/"
+                        target="_blank" rel="noopener">Sample guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -454,19 +488,48 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(1)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">2</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank"
                           class="step-link">Complete 'Assay'
-                          metadata table(s) except raw/derived data filenames</a>
+                          metadata table(s) except data file names</a>
                       </h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 1 ? 'expand_less' : 'expand_more'
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 1">
-                    <p class="is-size-7">Describe the assay process for each control and sample. Multiple assays can be
-                      added per study to reflect different analytical techniques or modalities.</p>
+                    <p class="is-size-7 mb-2">Every sample referenced in your sample sheet should be referenced in one
+                      or more
+                      'Assay' tables. Leave Data File columns empty for now (completed in step 4). Key fields vary by
+                      technology:</p>
+                    <p class="is-size-7 mb-1"><strong>LC-MS / GC-MS assays:</strong></p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Chromatography</strong> &mdash; instrument (manufacturer + model), column model (with
+                        dimensions), column type (e.g., reverse phase, HILIC).</li>
+                      <li><strong>Mass spectrometry</strong> &mdash; instrument, ion source, mass analyzer, scan
+                        polarity, and m/z
+                        range.</li>
+                      <li>Use one assay per polarity &mdash; do not mix positive and negative in the same 'Assay'
+                        sheet. Specify <code>alternating</code> only if using polarity switching within a single
+                        injection.</li>
+                    </ul>
+                    <p class="is-size-7 mb-1"><strong>NMR assays:</strong></p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>NMR sample</strong> &mdash; tube type, solvent, pH, temperature.</li>
+                      <li><strong>NMR spectroscopy</strong> &mdash; instrument (with frequency), probe, number of
+                        transients, pulse sequence, magnetic field strength.</li>
+                    </ul>
+                    <p class="is-size-7 mb-1"><strong>All assay types:</strong></p>
+                    <ul class="is-size-7 ml-8 mb-1" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Protocol REF</strong> cells must match their section name exactly (e.g., Extraction,
+                        Chromatography, Mass spectrometry, NMR spectroscopy, Data transformation, Metabolite
+                        identification).</li>
+                      <li>Do not remove columns, change column order, or alter headers.</li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Assay/" target="_blank"
+                        rel="noopener">Assay guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -475,19 +538,38 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(2)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">3</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
-                          class="step-link">Upload raw &
-                          derived data files</a>
+                          class="step-link">Upload data files</a>
                       </h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 2 ? 'expand_less' : 'expand_more'
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 2">
-                    <p class="is-size-7">Upload your raw and derived data files to the study's FTP/Aspera folder. Ensure
-                      your filenames are unique and consistently named.</p>
+                    <p class="is-size-7 mb-2">Upload your instrument raw files and, where available, open-format derived
+                      files via Aspera or FTP.</p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>File names</strong> must contain only letters (a&ndash;z, A&ndash;Z), numbers
+                        (0&ndash;9), hyphens (-), underscores (_), or dots (.). Spaces are not accepted.</li>
+                      <li><strong>Raw data folders</strong> (e.g., <code>.d</code>, <code>.raw</code>, or any NMR raw data folder) must
+                        each be compressed individually as <code>.zip</code> before upload, <a
+                          href="https://ebi-metabolights.github.io/guides/Files/#compression" target="_blank">click here
+                          for guidance</a>. A single zip containing multiple folders is not accepted.</li>
+                      <li><strong>Accepted raw formats</strong> include: <code>.d</code>,
+                        <code>.raw</code>, <code>.wiff</code> + <code>.wiff.scan</code>, <code>.fid</code>,
+                        <code>.ser</code>, <code>.lcd</code>, <code>.smp</code>, and others.</li>
+                      <li><strong>Accepted derived formats</strong> include: <code>.mzML</code>, <code>.mzXML</code>,
+                        <code>.imzML</code>, <code>.cdf</code>, <code>.nmrML</code>, and others. Note that some formats
+                        (e.g., <code>.mgf</code>, <code>.msp</code>, <code>.xlsx</code>, <code>.cef</code>) are not
+                        accepted alone and must accompany spectrum/chromatogram data.</li>
+                      <li><strong>Where an instrument raw file is not available</strong> (e.g., some non-MS
+                        chromatographic detectors), it is acceptable to submit the open-format file only.</li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
+                        rel="noopener">Files guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -496,19 +578,40 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(3)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">4</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank" class="step-link">Add
-                          raw/derived
-                          data filenames to 'Assay' metadata tables(s)</a>
+                          raw/derived data filenames to 'Assay' metadata table(s)</a>
                       </h4>
                     </div>
                     <mat-icon class="expand-icon">{{ doneStepExpandedIndex === 3 ? 'expand_less' : 'expand_more'
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 3">
-                    <p class="is-size-7">Associate your uploaded data files with the corresponding samples in the assay
-                      metadata table by adding the filenames to the relevant columns.</p>
+                    <p class="is-size-7 mb-2">Enter the full path of each file in the corresponding assay columns,
+                      always prefixed
+                      with <code>FILES/</code>:</p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li>e.g., <code>FILES/RAW_FILES/sample1.raw.zip</code></li>
+                      <li>e.g., <code>FILES/DERIVED_FILES/sample1.mzML</code></li>
+                    </ul>
+                    <p class="is-size-7 mb-2"><strong>MS assays</strong> require at least one of
+                      <strong>Raw Spectral Data File</strong> or <strong>Derived Spectral Data File</strong> per sample.
+                      For <code>.wiff</code>/<code>.wiff.scan</code> datasets, add an extra 'Raw Spectral Data File'
+                      column so both files are referenced.</p>
+                    <p class="is-size-7 mb-2"><strong>NMR assays</strong> may include three file types per sample:</p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Free Induction Decay Data File</strong> &mdash; raw NMR data (e.g., sample1.zip).</li>
+                      <li><strong>Acquisition Parameter Data File</strong> &mdash; acquisition parameters (e.g.,
+                        acqus.txt).</li>
+                      <li><strong>Derived Spectral Data File</strong> &mdash; converted format if available (e.g.,
+                        .nmrML).</li>
+                    </ul>
+                    <p class="is-size-7">Verify that all referenced files exist in your uploaded study folder and that
+                      paths match exactly.</p>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Files/" target="_blank"
+                        rel="noopener">Files guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -517,9 +620,9 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(4)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">5</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
-                        <a href="https://ebi-metabolights.github.io/guides/Protocols/" target="_blank"
+                        <a href="https://ebi-metabolights.github.io/guides/Protocol/" target="_blank"
                           class="step-link">Complete the
                           description of your study 'Protocols'</a>
                       </h4>
@@ -528,8 +631,26 @@
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 4">
-                    <p class="is-size-7">Provide detailed descriptions for each experimental protocol used in your
-                      study, ensuring clarity for future reproducibility.</p>
+                    <p class="is-size-7 mb-2">Provide detailed, reproducible descriptions for each protocol section:</p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li><strong>Sample collection</strong> &mdash; origin, treatment, time points, collection and
+                        storage.</li>
+                      <li><strong>Extraction</strong> &mdash; preparation methods, control samples (pooled QC, blanks,
+                        standards).
+                      </li>
+                      <li><strong>Chromatography</strong> &mdash; instrument, column, mobile phase/gradient,
+                        temperatures, flow
+                        rate, injection volume.</li>
+                      <li><strong>Mass spectrometry (or NMR spectroscopy)</strong> &mdash; instrument, ion source/probe,
+                        ionisation mode, m/z range, acquisition method.</li>
+                      <li><strong>Data transformation</strong> &mdash; software, pipelines, processing steps.</li>
+                      <li><strong>Metabolite identification</strong> &mdash; software, reference databases, annotation
+                        workflow.
+                      </li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/Protocol/"
+                        target="_blank" rel="noopener">Protocol guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -538,7 +659,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(5)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">6</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="javascript:void(0)" class="step-link">Index 'Data Files' & run 'Study Validation'</a>
                       </h4>
@@ -547,8 +668,19 @@
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 5">
-                    <p class="is-size-7">Trigger the file indexing in the 'Files' tab and run the automated validation
-                      to check for any metadata or file consistency issues.</p>
+                    <p class="is-size-7 mb-2">After uploading, synchronise your files with the study on the Files tab:
+                    </p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li>Click <strong>Index Data Files</strong> to sync uploaded raw/derived data into the study.</li>
+                      <li>Click <strong>Synchronise Metadata Files</strong> to read in any uploaded metadata files (or
+                        use the
+                        Drag &amp; Drop feature for metadata).</li>
+                      <li>Wait for both processes to complete &mdash; status indicators will update automatically.</li>
+                      <li>Go to the Study Validations tab and click <strong>Start Validation</strong>.</li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/#validate-study"
+                        target="_blank" rel="noopener">Validation guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -558,7 +690,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(6)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">7</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/#validate-study" target="_blank"
                           class="step-link">Make
@@ -569,8 +701,23 @@
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 6">
-                    <p class="is-size-7">If the validation yields errors, make the necessary changes to your metadata or
-                      files in the editor and re-run the validation until it passes.</p>
+                    <p class="is-size-7 mb-2">Review errors and warnings across all validation sections.</p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li>Address all <strong>errors</strong> and as many warnings as possible, then re-run validation
+                        &mdash; it
+                        must be re-triggered after every edit. Download the validation report for a full breakdown. If
+                        you need
+                        help, contact <a
+                          href="mailto:metabolights-help&#64;ebi.ac.uk">metabolights-help&#64;ebi.ac.uk</a>.</li>
+                      <li>Validation must pass without returning 'Error'(s) before the study can be promoted to
+                        'Private' and
+                        subsequently 'Public' status. Validation 'Warning'(s) are advisory only and do not prevent study
+                        status
+                        progression.</li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/#validate-study"
+                        target="_blank" rel="noopener">Validation guide &rarr;</a></p>
                   </div>
                 </div>
 
@@ -579,7 +726,7 @@
                   <div class="accordion-header clickable" (click)="toggleDoneStepExpand(7)">
                     <div style="display: flex; align-items: center; min-width: 90%;">
                       <span class="publication-index">8</span>
-                      <span class="material-symbols-outlined mr-3 has-text-success">check</span>
+                      <span class="material-symbols-outlined mr-3 has-text-success">task</span>
                       <h4 class="publication-title-compact">
                         <a href="https://ebi-metabolights.github.io/guides/#submission-process" target="_blank"
                           class="step-link">Change
@@ -590,8 +737,27 @@
                       }}</mat-icon>
                   </div>
                   <div class="accordion-content" *ngIf="doneStepExpandedIndex === 7">
-                    <p class="is-size-7">Once your study is complete and validated, change its status in the 'Study
-                      Status' section to make it available for peer review or the public.</p>
+                    <p class="is-size-7 mb-2">Once validation passes, change status from Provisional &rarr; Private to:
+                    </p>
+                    <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
+                      <li>Obtain a permanent <code>MTBLSxxx</code> accession number (use this in your manuscript, not
+                        the
+                        temporary <code>REQxxx</code>).</li>
+                      <li>Generate a private, read-only Reviewer Link to share with journals and collaborators.</li>
+                    </ul>
+                    <br />
+                    <p class="is-size-7 mb-2">Study status is changed by click 'Status [Provisional/Private]' in the top
+                      left of
+                      the study editor and making a selection from the drop-down box.</p>
+                    <br />
+                    <p class="is-size-7">To make further edits after going Private, temporarily revert to Provisional,
+                      make
+                      changes, re-validate, and return to Private. When ready (e.g. on publication of an associated
+                      manuscript),
+                      it must be changed to 'Public'.</p>
+                    <br />
+                    <p class="is-size-7 pt-2"><a href="https://ebi-metabolights.github.io/guides/#submission-process"
+                        target="_blank" rel="noopener">Quick Start guide &rarr;</a></p>
                   </div>
                 </div>
               </div>
@@ -602,8 +768,8 @@
                 <div class="column is-narrow" *ngFor="let studyId of createdStudies">
                   <button class="button is-primary px-6" (click)="navigateToStudy(studyId)">
                     {{ studyId }} <span class="material-symbols-outlined">
-arrow_right_alt
-</span>
+                      arrow_right_alt
+                    </span>
                   </button>
                 </div>
               </div>

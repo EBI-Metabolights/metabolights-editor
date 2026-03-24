@@ -34,7 +34,13 @@ export class StudyRedirectHandlerService {
    * @returns Resolves to a boolean (true if access is granted seamlessly, false if redirected)
    */
   public async handleRedirectFlow(url: string): Promise<boolean> {
-    
+
+    // 0. Quick bypass for general management paths (like /guide/info/ or /guide/create)
+    // These should not be processed for study-specific redirection.
+    if (url.toUpperCase().includes('GUIDE')) {
+      return true;
+    }
+
     // 1. Parse the incoming Study URL and extract parameters
     const parsedUrl = this.parseStudyUrl(url);
 
@@ -62,10 +68,12 @@ export class StudyRedirectHandlerService {
     // 6. Access Control Logic
     if (parsedUrl.accessMode === 'edit' && studyExists) {
       if (!isAuthenticated) {
-        const baseHref = this.configService.baseHref || '/';
-        const cleanedBaseHref = baseHref.endsWith('/') ? baseHref.slice(0, -1) : baseHref;
-        const redirectUri = window.location.origin + cleanedBaseHref + parsedUrl.originalUrl;
-        await this.keycloak.login({ redirectUri });
+        const redirectUri = this.configService.config?.auth?.redirectUri;
+        if (redirectUri) {
+          await this.keycloak.login({ redirectUri });
+        } else {
+          await this.keycloak.login();
+        }
         return false;
       } else {
         // Owner Edit Permission Check
@@ -73,6 +81,10 @@ export class StudyRedirectHandlerService {
            (studyMetadata.submitterOfStudy && (studyMetadata.studyStatus?.toLowerCase() === 'private' || studyMetadata.studyStatus?.toLowerCase() === 'provisional'));
         
         if (isOwnerEdit) {
+          // If already on a guide path, allow it without redirecting to the default overview
+          if (url.toUpperCase().includes('GUIDE')) {
+            return true;
+          }
           const targetUrl = `/study/${studyMetadata.studyId}`;
           if (parsedUrl.originalUrl.split('?')[0] === targetUrl) {
             return true;

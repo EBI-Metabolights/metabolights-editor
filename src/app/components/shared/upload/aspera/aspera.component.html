@@ -15,9 +15,8 @@
         Aspera is a fast way of transferring files. Aspera lets you control the
         transfer rate to better suit your internet connection. You can also stop
         the transfer, and later resume where you left off. <br /><br />
-        Note that Aspera is a plugin that you have to install in your browser.
-        Please make sure you have privileges to install the Aspera plugin,
-        contact your local IT support if you can not install this plugin.
+        For more information on how to use Aspera for transferring files, please refer to our 
+        <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files" target="_blank">Help Documentation</a>.
       </p>
     </section>
     <footer class="modal-card-foot">
@@ -40,12 +39,6 @@
             [ngClass]="{ 'is-active': selectedTab == 'plugin' }"
           >
             <a>Aspera Connect transfer plug-in</a>
-          </li>
-          <li
-            (click)="changeTab('cmdline')"
-            [ngClass]="{ 'is-active': selectedTab == 'cmdline' }"
-          >
-            <a>Aspera Command line client</a>
           </li>
         </ul>
       </div>
@@ -75,83 +68,25 @@
                 ><a
                   href="https://www.ibm.com/products/aspera/downloads#cds"
                   target="_blank"
-                  >Install ASPERA Connect</a
+                  >Install IBM ASPERA Connect</a
                 ></b
               > | <b
                 ><a
                   href="https://www.ibm.com/docs/en/aspera-connect/"
                   target="_blank"
-                  >ASPERA Connect Documentation</a
+                  >IBM ASPERA Connect Documentation</a
                 ></b
               ></small
             >
           </div>
         </div>
-        <div
-          *ngIf="selectedTab == 'cmdline'"
-          class="content-wrapper ng-star-inserted"
-        >
-          <code>
-            $ ascp -QT -P 33001 -L- -l 300M &lt; your_local_data_folder &gt;
-            {{ validation.aspera.user }}&#64;{{
-              validation.aspera.server
-            }}:{{ uploadPath }}
-          </code>
-          <div
-            class="panel-block notification is-primary"
-            style="margin-top: 10px; margin-bottom: 10px"
-          >
-            <small class="is-tiny">
-              Aspera Password:
-              <b>{{
-                validation.aspera.secret
-              }}</b></small
-            >
-          </div>
-          <small>
-            <b>Step 1: Install Aspera ascp command line client</b><br />
-            The Aspera ascp command line client can be downloaded
-            <i
-              ><a
-                href="http://downloads.asperasoft.com/downloads"
-                target="_blank"
-                >here</a
-              ></i
-            >. Please select *Aspera Connect*. The ascp command line client is
-            distributed as part of the aspera connect high-performance transfer
-            browser plug-in and is free to use.<br /><br /><b
-              >Step 2: Navigate to the folder where the Aspera command line
-              client program ascp is installed.</b
-            ><br />
-            The location of the 'ascp' program in the filesystem:<br />
-            <span class="col-md-12">
-              <p>
-                <b>Mac:</b> on the desktop go
-                <code
-                  >cd /Applications/Aspera\
-                  Connect.app/Contents/Resources/</code
-                >
-                there you'll see the command line utilities where you're going
-                to use 'ascp'.
-              </p>
-              <p>
-                <b>Windows:</b> the downloaded files are a bit hidden. For
-                instance in Windows7 the ascp.exe is located in the users home
-                directory in:
-                <code
-                  >AppData\Local\Programs\Aspera\Aspera
-                  Connect\bin\ascp.exe</code
-                >
-              </p>
-              <p>
-                <b>Linux:</b> should be in your user's home directory,
-                <code>cd /home/username/.aspera/connect/bin/</code> there you'll
-                see the command line utilities where you're going to use 'ascp'.
-              </p>
-            </span>
-          </small>
-        </div>
       </span>
+      <div>
+        <p>
+          For more information on how to use Aspera for uploading files, please refer to our 
+          <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files" target="_blank">Help Documentation</a>.
+        </p>
+      </div>
       <div class="panel-block notification is-primary" style="margin-top: 20px">
         <small class="is-tiny">
           <i>

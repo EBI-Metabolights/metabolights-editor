@@ -22,11 +22,10 @@
         </span>
         <a *ngIf="!isStudyReadOnly" style="margin-right: 10px" (click)="openModal(protocol)"
           class="button is-light is-pulled-right is-small"><mat-icon>edit</mat-icon> Edit Description</a>
-        <span class="copy-btn mtbls-button" (click)="copyContent()"><mat-icon
+        <span class="copy-btn mtbls-button is-pulled-right" (click)="copyContent()" style="cursor: pointer;"><mat-icon
             matTooltip="Copy content">content_copy</mat-icon></span>
-        <div *ngIf="protocolInGuides">
-          <br>
-          <small class="guide-text"> <i> {{ guideText}} </i></small>
+        <div *ngIf="protocolInGuides" style="clear: both; padding-top: 5px;">
+          <span class="guide-text">{{ guideText }}</span>
         </div>
       </span>
 
@@ -132,12 +131,12 @@
               <span class="tag is-light" style="border: 1px solid #dbdbdb; border-right: none;">Protocol URI</span>
               <a *ngIf="protocol.uri.toLowerCase().includes('http')" class="tag is-white"
                 (click)="openUri(protocol.uri)"
-                style="cursor: pointer; text-decoration: underline; border: 1px solid #dbdbdb;">
+                style="cursor: pointer; text-decoration: underline; border: 1px solid #dbdbdb;text-transform: none;">
                 {{ protocol.uri }}
                 <mat-icon style="font-size: 14px; height: 14px; width: 14px; margin-left: 4px;">open_in_new</mat-icon>
               </a>
               <span *ngIf="!protocol.uri.toLowerCase().includes('http')" class="tag is-white"
-                style="border: 1px solid #dbdbdb;">
+                style="border: 1px solid #dbdbdb;text-transform: none;">
                 {{ protocol.uri }}
               </span>
             </div>
@@ -146,7 +145,8 @@
           <div class="control" *ngIf="protocol.version">
             <div class="tags has-addons">
               <span class="tag is-light" style="border: 1px solid #dbdbdb; border-right: none;">Protocol Version</span>
-              <span class="tag is-white" style="border: 1px solid #dbdbdb;">{{ protocol.version }}</span>
+              <span class="tag is-white" style="border: 1px solid #dbdbdb;text-transform: none;">{{ protocol.version
+                }}</span>
             </div>
           </div>
         </div>
@@ -205,12 +205,12 @@
                   </mat-error>
                 </mat-form-field>
                 <div *ngIf="guideText !== ''">
-                  <div>&nbsp;</div>
                   <span><i>{{guideText}}</i></span>
                   <div>&nbsp;</div>
                 </div>
 
                 <span *ngIf="form.get('description')">
+                  <label>Protocol Description <span class="required-asterisk">*</span></label>
                   <!-- <div *ngIf="form.get('description').value != ''" class="is-clearfix">
                     </div>  -->
                   <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px"
@@ -310,7 +310,7 @@
                       form.get('description').dirty &&
                       form.get('description').errors.description
                     ">
-                    {{ form.get("description").errors.description.error }}
+                    <small>{{ form.get("description").errors.description.error }}</small>
                   </mat-error>
                 </span>
 

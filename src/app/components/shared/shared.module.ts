@@ -53,7 +53,7 @@ import { MetabolightsService } from "src/app/services/metabolights/metabolights.
 import { DOIService } from "src/app/services/publications/doi.service";
 import { EuropePMCService } from "src/app/services/publications/europePMC.service";
 import { LabsWorkspaceService } from "src/app/services/labs-workspace.service";
-import { EditTableDirective } from "src/app/directives/edit-table.directive";
+
 import { QuillModule } from "ngx-quill";
 import { NoStudyPageComponent } from './errors/no-study-page/no-study-page.component';
 import { AsyncTaskComponent } from './async-task/async-task.component';
@@ -76,6 +76,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { FundingComponent } from './funding/funding.component';
 import { RelatedDatasetsComponent } from './related-datasets/related-datasets.component';
 import { ModalComponent } from './modal/modal.component';
+import { StudySubmissionChecklistComponent } from './study-submission-checklist/study-submission-checklist.component';
 
 
 
@@ -115,7 +116,7 @@ import { ModalComponent } from './modal/modal.component';
     PersonComponent,
     OntologyComponent,
     OntologyDetailsComponent,
-    EditTableDirective,
+
     NoStudyPageComponent,
     AsyncTaskComponent,
     AsyncStatusTransformPipe,
@@ -129,7 +130,8 @@ import { ModalComponent } from './modal/modal.component';
     DragAndDropComponent,
     FundingComponent,
     RelatedDatasetsComponent,
-    ModalComponent
+    ModalComponent,
+    StudySubmissionChecklistComponent
   ],
   imports: [
     CommonModule,
@@ -202,6 +204,7 @@ import { ModalComponent } from './modal/modal.component';
     FundingComponent,
     RelatedDatasetsComponent,
     ModalComponent,
+    StudySubmissionChecklistComponent,
     MatCheckboxModule,
     MatSlideToggleModule
   ],
@@ -215,4 +218,4 @@ import { ModalComponent } from './modal/modal.component';
     LabsWorkspaceService,
   ],
 })
-export class SharedModule {}
+export class SharedModule { }

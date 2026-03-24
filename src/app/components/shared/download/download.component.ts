@@ -9,6 +9,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { httpOptions } from "src/app/services/headers";
 import { HttpClient } from "@angular/common/http";
 import * as toastr from "toastr";
+import { EditorService } from "src/app/services/editor.service";
 
 @Component({
   selector: "mtbls-download",
@@ -31,7 +32,8 @@ export class DownloadComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private configService: ConfigurationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private editorService: EditorService
   ) {
     this.setUpSubscriptionsNgxs();
   }
@@ -61,7 +63,7 @@ export class DownloadComponent implements OnInit {
       one_time_token: string;
     }
     const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token"
-    if (this.studyStatus.toLowerCase() == "provisional") {
+    if (this.isRestrictedResource(this.studyStatus)) {
       this.http.get<OneTimeTokenResponse>(oneTimeTokenUrl, httpOptions).subscribe(
         {
           next: (response) => { window.open(url + "&passcode=" + response.one_time_token, '_blank'); },
@@ -93,7 +95,7 @@ export class DownloadComponent implements OnInit {
       one_time_token: string;
     }
     const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token"
-    if (this.studyStatus.toLowerCase() == "provisional") {
+    if (this.isRestrictedResource(this.studyStatus)) {
       this.http.get<OneTimeTokenResponse>(oneTimeTokenUrl, httpOptions).subscribe(
         {
           next: (response) => { this.metabolightsService.openTextFileInNewTab(url + "&passcode=" + response.one_time_token); },
@@ -113,4 +115,7 @@ export class DownloadComponent implements OnInit {
     }
   }
 
+  isRestrictedResource(status: string): boolean {
+    return !status || status.trim() === "" || status.toLowerCase() === "provisional";
+  }
 }

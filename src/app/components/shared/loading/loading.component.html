@@ -1,20 +1,12 @@
-<!--<div class="modal" [ngClass]="{ 'is-active': (isLoading | async) }">-->
-  <div class="modal" [ngClass]="{ 'is-active': (loading$ | async) }">
-
+<div class="modal" [ngClass]="{ 'is-active': (loading$ | async) }">
   <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body vc vh50 has-text-centered">
-      <span>
-        <img src="{{ baseHref }}assets/img/loading.svg" /> <br />
-        <br />
-        <small>
-          <p class="has-text-info">
-            <!-- <mat-icon>comment</mat-icon>{{ loadingInformation | async }} -->
-            <mat-icon>comment</mat-icon>{{ loadingInformation$ | async }}
-
-          </p>
-        </small>
-      </span>
-    </section>
+  <div class="modal-content vc">
+    <div class="loader-content">
+      <img [src]="baseHref + 'assets/img/MetaboLightsLogo.png'" alt="MetaboLights Logo" class="loader-logo" />
+      <div class="loader-progress-container">
+        <div class="loader-progress-bar"></div>
+      </div>
+      <div class="loader-text">{{ loadingInformation$ | async }}</div>
+    </div>
   </div>
 </div>

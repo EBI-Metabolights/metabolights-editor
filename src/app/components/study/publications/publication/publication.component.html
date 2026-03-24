@@ -176,7 +176,7 @@
           </mat-form-field>
           <mat-form-field class="half-width" appearance="outline">
             <mat-label>{{getFieldLabel('doi')}}<span class="has-error">*</span></mat-label>
-            <input class="no-scroll" formControlName="doi" [tabIndex]="3" (blur)="getArticleFromDOI()"
+            <input class="no-scroll" formControlName="doi" [tabIndex]="3" (paste)="onIdentifierPaste($event, 'doi')" (blur)="getArticleFromDOI()"
               (keydown.enter)="getArticleFromDOI()" matInput [placeholder]="getFieldPlaceholder('doi')" />
             <mat-hint>{{ getFieldHint("doi") }}
             </mat-hint>
@@ -193,7 +193,7 @@
         <div class="form-row" style="padding-bottom: 0;">
           <mat-form-field class="half-width" appearance="outline">
             <mat-label>{{getFieldLabel('pubMedID')}}</mat-label>
-            <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (blur)="getArticleFromPubMedID()"
+            <input class="no-scroll" [tabIndex]="4" formControlName="pubMedID" (paste)="onIdentifierPaste($event, 'pubMedID')" (blur)="getArticleFromPubMedID()"
               (keydown.enter)="getArticleFromPubMedID()" matInput [placeholder]="getFieldPlaceholder('pubMedID')" />
             <mat-hint>{{ getFieldHint("pubMedID") }}</mat-hint>
             <mat-error *ngIf="
@@ -216,10 +216,8 @@
               </ng-container>
 
               <ng-template #dropdownField>
-                <mat-form-field class="full-width" appearance="outline"
-                  *ngIf="_controlList?.values?.length && form.get('status')">
-                  <mat-label>Status<span class="has-error">*</span></mat-label>
-                  <mat-select formControlName="status" placeholder="Status">
+                <mat-form-field class="full-width" *ngIf="_controlList?.values?.length && form.get('status')">
+                  <mat-select formControlName="status" placeholder="Status" (selectionChange)="onChanges($event)">
                     <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
                       {{ option.annotationValue }}
                     </mat-option>

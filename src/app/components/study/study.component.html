@@ -4,6 +4,7 @@
     requestedStudy
   " id="fixedbutton"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us
 </a>
+<mtbls-study-submission-checklist *ngIf="!(loading$ | async)" [isReadOnly]="isReadOnly" [isOpen]="isChecklistPopupOpen"></mtbls-study-submission-checklist>
 <!--main study component container start-->
 <div class="container">
   <div id="status-board" *ngIf="studyError">
@@ -114,44 +115,66 @@
       </div>
     </div>
     <span *ngIf="requestedStudy != undefined">
-      <div *ngIf="!studyError" id="meta" class="field is-grouped is-grouped-multiline px-20 mb-10">
-        <div class="control" *ngIf="studyCategory">
-          <div class="tags has-addons">
-            <span class="tag is-dark">Category</span>
-            <span class="tag is-link">
-              {{ getCategoryLabel(studyCategory) }}
-            </span>
-          </div>
-        </div>&emsp;
+      <div *ngIf="!studyError" id="meta" class="px-20 mb-10">
+        <!-- Row 1 -->
+        <div class="field is-grouped is-grouped-multiline mb-2">
+          <div class="control" *ngIf="requestedStudy">
+            <div class="tags has-addons">
+              <span class="tag is-dark">Accession</span>
+              <span class="tag" 
+                [class.is-primary]="status == 'In Review' || status == 'Private'"
+                [class.is-warning]="status == 'Provisional'"
+                [class.is-success]="status == 'Public'">
+                {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession : requestedStudy }}
+              </span>
+            </div>
+          </div>&emsp;
 
-        <mtbls-status></mtbls-status>
+          <div class="control" *ngIf="studyCategory && getCategoryLabel(studyCategory) !== 'MTBLS' && getCategoryLabel(studyCategory) !== 'Other'">
+            <div class="tags has-addons">
+              <span class="tag is-dark">Category</span>
+              <span class="tag is-link">
+                {{ getCategoryLabel(studyCategory) }}
+              </span>
+            </div>
+          </div>&emsp;
 
-        <span *ngIf="status == 'Public' || status == 'In Review' || status == 'Private'">
-          <curation-status></curation-status>
-        </span>&emsp;
+          <div class="control" *ngIf="mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy">
+            <div class="tags has-addons">
+              <span class="tag is-dark">MTBLS Accession</span>
+              <span class="tag"
+                [class.is-primary]="status == 'In Review' || status == 'Private'"
+                [class.is-warning]="status == 'Provisional'"
+                [class.is-success]="status == 'Public'">
+                {{ requestedStudy }}
+              </span>
+            </div>
+          </div>&emsp;
 
-        <mtbls-release-date></mtbls-release-date>&emsp;
+          <mtbls-dataset-license></mtbls-dataset-license>
+        </div>
 
-        <!-- <div class="control" *ngIf="sampleTemplate">
-          <div class="tags has-addons">
-            <span class="tag is-dark">Sample Type</span>
-            <span class="tag is-link">
-              {{ sampleTemplate }}
-            </span>
-          </div>
-        </div>&emsp; -->
+        <!-- Row 2 -->
+        <div class="field is-grouped is-grouped-multiline">
+          <mtbls-status></mtbls-status>&emsp;
 
-        <span *ngIf="revisionNumber && revisionNumber > 1">
-          <div class="tags has-addons">
-            <span class="tag is-dark">Revision</span>
+          <span *ngIf="status == 'Public' || status == 'In Review' || status == 'Private'">
+            <curation-status></curation-status>
+          </span>&emsp;
 
-            <span class="tag is-link">
-              {{ revisionDatetime ? (revisionDatetime | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }})
-            </span>
-          </div>
-        </span>&emsp;
+          <mtbls-release-date></mtbls-release-date>&emsp;
 
-        <mtbls-dataset-license></mtbls-dataset-license>&emsp;
+          <span *ngIf="revisionNumber && revisionNumber > 1">
+            <div class="tags has-addons">
+              <span class="tag is-dark">Revision</span>
+
+              <span class="tag is-link">
+                {{ revisionDatetime ? (revisionDatetime | date: 'yyyy-MM-dd') : ''}} ({{ revisionNumber }})
+              </span>
+            </div>
+          </span>
+        </div>
+      
 
         <!--Start of validation label-->
         <!-- <div *ngIf="validationStatus !== null">
@@ -295,8 +318,6 @@
         </div>
       </div>
       <quick-link path="guide/info" icon="view_carousel" text="Guided submission"></quick-link>
-      <quick-link *ngIf="!isReadOnly" className="third-bottom-right" path="study/guide" icon="school"
-        text="Study Guide"></quick-link>
     </span>
   </div>
 </div>

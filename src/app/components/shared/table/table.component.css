@@ -129,6 +129,10 @@ th span {
   overflow: auto;
 }
 
+#div2:focus {
+  outline: none;
+}
+
 .top-scroll-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -398,7 +402,7 @@ a.dropdown-item {
   gap: 8px;
 }
 
-.table-action-row > * {
+.table-action-row>* {
   display: inline-flex;
   align-items: center;
 }
@@ -462,6 +466,29 @@ a.dropdown-item {
   margin-bottom: 0 !important;
 }
 
+.table-upload-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-upload-trigger {
+  margin-left: 0 !important;
+}
+
+.table-upload-drop-area {
+  flex: 0 0 100%;
+  width: 100%;
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.table-upload-drop-area app-drag-and-drop {
+  display: block;
+  width: 100%
+}
+
 ::ng-deep .small-toggle .mdc-button__label {
   font-size: 0.75rem !important;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif !important;
@@ -469,4 +496,10 @@ a.dropdown-item {
   line-height: 1.5 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
+}
+
+.required-asterisk {
+  color: #ff3860;
+  margin-left: 2px;
+  font-weight: bold;
 }

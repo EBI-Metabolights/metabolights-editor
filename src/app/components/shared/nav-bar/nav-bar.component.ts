@@ -121,7 +121,7 @@ export class NavBarComponent implements OnInit {
     this.router.navigate(["/console"]);
   }
   redirectToProfile() {
-    window.open(this.configService.config.auth.profileUrl, "_blank");
+    window.location.href = this.configService.config.auth.profileUrl;
   }
 
   updatePreviewEnabled() {
