@@ -141,7 +141,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.obfuscationCode = value;
       if (!this.obfuscationCode || this.obfuscationCode.length == 0) {
         this.permissions = this.store.snapshot().application.studyPermission
-        this.obfuscationCode = this.permissions.obfuscationCode
+        this.obfuscationCode = this.permissions ? this.permissions.obfuscationCode : null;
       }
     });
     this.bannerMessage$.subscribe((value) => {
@@ -162,7 +162,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       if (value !== null) {
         this.requestedStudy = value;
         this.isOwner = false;
-        if (this.permissions.submitterOfStudy) {
+        if (this.permissions && this.permissions.submitterOfStudy) {
           this.isOwner = true;
         }
       }
