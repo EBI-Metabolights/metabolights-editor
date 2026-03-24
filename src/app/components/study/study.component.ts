@@ -72,6 +72,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationRunTime: string = null;
   validationNeeded: boolean = false;
   studyPermission: StudyPermission = null;
+  permissions: StudyPermission = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
   studyCategory = "";
   sampleTemplate = "";
@@ -96,6 +97,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.templateConfiguration = value;
     });
     this.studyPermission = this.store.snapshot().application.studyPermission;
+    this.permissions = this.studyPermission;
     this.obfuscationCode = this.studyPermission?.obfuscationCode || null;
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
@@ -114,6 +116,7 @@ export class StudyComponent implements OnInit, OnDestroy {
     });
     this.studyPermission$.subscribe((value) => {
         this.studyPermission = value;
+        this.permissions = value;
         this.isOwner = false;
         this.obfuscationCode = null
         if (this.studyPermission) {

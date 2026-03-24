@@ -77,7 +77,11 @@ export function appInitializer(injector: Injector): () => Promise<any> {
         const configService = injector.get(ConfigurationService);
         const editorService = injector.get(EditorService);
         await configService.loadConfiguration();
-        await editorService.loadDefaultControlLists();
+        try {
+            await editorService.loadDefaultControlLists();
+        } catch (err) {
+            console.warn('Could not load default control lists during initialization (this is expected if not logged in):', err);
+        }
     };
 }
 
@@ -178,7 +182,7 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
   ], providers: [
     {
       provide: APP_INITIALIZER,
-      useFactory: configLoader,
+      useFactory: appInitializer,
       deps: [Injector],
       multi: true,
     },

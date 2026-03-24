@@ -78,8 +78,7 @@ export class EditorService {
 
   study: MTBLSStudy;
   baseHref: string;
-  private redirectUrl = "";
-  private redirectUrlKey = this.configService.config.endpoint + "/RedirectUrl"
+  private _redirectUrl = "";
 
   currentStudyIdentifier: string = null;
   validations: any = {};
@@ -119,22 +118,35 @@ export class EditorService {
     // load dev control-lists (asset) and merge into NGXS without overwriting existing controlLists
     // this.loadAndMergeDevControlLists();
   }
+  private getRedirectUrlKey(): string {
+    const endpoint = this.configService.config?.endpoint || "";
+    return `${endpoint}/RedirectUrl`;
+  }
   setRedirectUrl(newRedirectUrl) {
-    if (newRedirectUrl && newRedirectUrl.length > 0 && !newRedirectUrl.startsWith(this.configService.config.redirectURL)) {
-      localStorage.setItem(this.redirectUrlKey, newRedirectUrl);
+    if (newRedirectUrl && newRedirectUrl.length > 0 && !newRedirectUrl.startsWith(this.configService.config?.redirectURL || "")) {
+      localStorage.setItem(this.getRedirectUrlKey(), newRedirectUrl);
     } else {
       console.log("Errror")
     }
   }
+  get redirectUrl(): string {
+    return this.getRedirectUrl();
+  }
+  set redirectUrl(newRedirectUrl: string) {
+    this.setRedirectUrl(newRedirectUrl);
+    this._redirectUrl = this.getRedirectUrl();
+  }
   getRedirectUrl() {
-    this.redirectUrl = localStorage.getItem(this.redirectUrlKey);
-    if (!this.redirectUrl) {
-      return this.configService.config.redirectURL;
+    this._redirectUrl = localStorage.getItem(this.getRedirectUrlKey());
+    if (!this._redirectUrl) {
+      return this.configService.config?.redirectURL || "";
     }
-    return this.redirectUrl
+    return this._redirectUrl
   }
   resetRedirectUrl() {
-    localStorage.setItem(this.redirectUrlKey, this.configService.config.redirectURL);
+    if (this.configService.config?.redirectURL) {
+      localStorage.setItem(this.getRedirectUrlKey(), this.configService.config.redirectURL);
+    }
   }
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((settings) => { this.toastrSettings = settings });

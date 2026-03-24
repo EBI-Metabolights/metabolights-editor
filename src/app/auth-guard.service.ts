@@ -5,7 +5,7 @@ import { EditorService } from "./services/editor.service";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 
-import { httpOptions, StudyPermission } from "./services/headers";
+import { httpOptions, MtblsJwtPayload, StudyPermission } from "./services/headers";
 import { HttpClient } from "@angular/common/http";
 
 import { ErrorMessageService } from "./services/error-message.service";
@@ -15,6 +15,7 @@ import { StudyPermissionNS } from "./ngxs-store/non-study/application/applicatio
 import { KeycloakAuthGuard, KeycloakEventType, KeycloakService } from "keycloak-angular";
 import { firstValueFrom } from "rxjs";
 import { StudyRedirectHandlerService } from "./services/study-redirect-handler.service";
+import jwtDecode from "jwt-decode";
 @Injectable({
   providedIn: "root",
 })

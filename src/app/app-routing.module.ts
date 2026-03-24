@@ -30,7 +30,7 @@ import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-l
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url === null || url.length === 0) {
+  if (url === null || url.length === 0 || url[0].path.toLowerCase() === 'guide') {
     return null;
   }
   const reg = /^reviewer(.*)$/;
@@ -54,7 +54,7 @@ export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url === null || url.length === 0) {
+  if (url === null || url.length === 0 || url[0].path.toLowerCase() === 'guide') {
     return null;
   }
   const reg = /^(MTBLS|mtbls|REQ|req)[0-9]+(.*)$/;
