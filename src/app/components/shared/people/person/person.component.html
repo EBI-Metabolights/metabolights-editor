@@ -198,11 +198,10 @@
             <mat-hint>
               {{ getFieldHint("email") }}
             </mat-hint>
-            <mat-error *ngIf="
-                form.get('email').errors &&
-                form.get('email').dirty &&
-                form.get('email').errors.email
-              ">
+            <mat-error *ngIf="form.get('email')?.hasError('required')">
+              Email is required
+            </mat-error>
+            <mat-error *ngIf="form.get('email')?.hasError('email')">
               {{ form.get("email").errors.email.error }}
             </mat-error>
           </mat-form-field>
@@ -297,11 +296,10 @@
             <mat-hint>
               {{ getFieldHint("affiliation") }}
             </mat-hint>
-            <mat-error *ngIf="
-                form.get('affiliation').errors &&
-                form.get('affiliation').dirty &&
-                form.get('affiliation').errors.affiliation
-              ">
+            <mat-error *ngIf="form.get('affiliation')?.hasError('required')">
+              Affiliation is required
+            </mat-error>
+            <mat-error *ngIf="form.get('affiliation')?.hasError('affiliation')">
               {{ form.get("affiliation").errors.affiliation.error }}
             </mat-error>
           </mat-form-field>

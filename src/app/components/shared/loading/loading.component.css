@@ -1,13 +1,35 @@
 .modal-background {
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.modal {
+  z-index: 99999 !important;
+  transition: visibility 0.3s, opacity 0.3s ease-in-out;
+  opacity: 0;
+  visibility: hidden;
+  display: flex !important; /* Ensure it stays flex but hidden */
+}
+
+.modal.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal-content {
+  overflow: visible !important;
 }
 
 .vc {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100vh !important;
+  width: 100vw !important;
 }
 
-.vh50 {
-  min-height: 50vh;
+.no-shadow {
+  box-shadow: none !important;
+  border: none !important;
 }

@@ -9,12 +9,15 @@
   </header>
   <div class="card-content" #descriptionToCopy *ngIf="description != undefined" matTooltip="Click in here to edit"
     [matTooltipDisabled]="isReadOnly">
-    <span *ngIf="description != ''; else emptyDescription">
-      <p [innerHTML]="displayDescription" class="clickable" [ngClass]="{ 'placeholder-text': isPlaceholder() }"
-        (click)="openModal()"></p>
+    <span *ngIf="description != ''; else emptyDescription" [ngClass]="{ 'placeholder-text': isPlaceholder() }">
+      <mtbls-content class="clickable" (editContent)="openModal()" [count]="500" [message]="displayDescription"
+        [value]="displayDescription">
+      </mtbls-content>
     </span>
     <ng-template #emptyDescription>
-      <p [innerHTML]="displayDescription" class="clickable placeholder-text" (click)="openModal()"></p>
+      <mtbls-content class="clickable placeholder-text" (editContent)="openModal()" [count]="500"
+        [message]="displayDescription" [value]="displayDescription">
+      </mtbls-content>
     </ng-template>
   </div>
 </div>
@@ -32,7 +35,7 @@
           <div class="field-body">
             <div class="field">
               <div class="control">
-                <mat-label>Study Description</mat-label>
+                <mat-label>Study Description <span class="required-asterisk">*</span></mat-label>
 
                 <quill-editor (onEditorCreated)="setEditor($event)" style="height: 250px" formControlName="description"
                   [placeholder]="validation.placeholder">

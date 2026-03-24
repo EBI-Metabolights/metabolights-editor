@@ -72,8 +72,13 @@ import { firstValueFrom } from 'rxjs';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
-export function configLoader(injector: Injector): () => Promise<any> {
-  return () => injector.get(ConfigurationService).loadConfiguration();
+export function appInitializer(injector: Injector): () => Promise<any> {
+    return async () => {
+        const configService = injector.get(ConfigurationService);
+        const editorService = injector.get(EditorService);
+        await configService.loadConfiguration();
+        await editorService.loadDefaultControlLists();
+    };
 }
 
 function initializeKeycloak(keycloak: KeycloakService, configService: ConfigurationService) {
@@ -208,8 +213,8 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
   ]
 })
 export class AppModule {
-  constructor(
-  ) {
+    constructor(
+    ) {
 
-  }
+    }
 }

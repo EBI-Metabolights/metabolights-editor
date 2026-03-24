@@ -2,6 +2,7 @@
 <a href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool feedback!"
   id="fixedbutton"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us
 </a>
+<mtbls-study-submission-checklist [isReadOnly]="false"></mtbls-study-submission-checklist>
 <div class="columns" style="min-height: 100vh; margin: 60px 0">
   <div class="column is-8 is-offset-2">
 
@@ -57,11 +58,8 @@
           <span class="panel-block">
             <span class="px-2 py-1">
               <h2 class="has-text-weight-bold">
-                <b>{{ getDisplayAccession(study) }}:
-                  <span *ngIf="
-                      study.title.replace(' ', '') == '';
-                      else noStudyTitle
-                    ">
+                <b>
+                  <span *ngIf="study.title.replace(' ', '') == ''; else noStudyTitle">
                     <i class="has-text-grey-lighter">No title specified</i>
                   </span>
                   <ng-template #noStudyTitle>
@@ -72,8 +70,30 @@
               <div id="meta" class="field is-grouped is-grouped-multiline py-0">
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
+                    <span class="tag is-dark">Accession</span>
+                    <span class="tag" 
+                      [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'"
+                      [class.is-success]="study.status == 'Public'">
+                      {{ (study.mhdAccession && study.mhdAccession !== '' && study.mhdAccession !== study.accession) ? study.mhdAccession : study.accession }}
+                    </span>
+                  </div>
+                </div>
+                <div class="control py-1 mb0" *ngIf="study.studyCategory && getStudyCategoryLabel(study.studyCategory) !== 'MTBLS' && getStudyCategoryLabel(study.studyCategory) !== 'Other'">
+                  <div class="tags has-addons">
                     <span class="tag is-dark">Category</span>
-                    <span class="tag is-info">{{ getStudyCategoryLabel(study.studyCategory) }}</span>
+                    <span class="tag is-link">{{ getStudyCategoryLabel(study.studyCategory) }}</span>
+                  </div>
+                </div>
+                <div class="control py-1 mb0" *ngIf="study.mhdAccession && study.mhdAccession !== '' && study.mhdAccession !== study.accession">
+                  <div class="tags has-addons">
+                    <span class="tag is-dark">MTBLS Accession</span>
+                    <span class="tag"
+                      [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'"
+                      [class.is-success]="study.status == 'Public'">
+                      {{ study.accession }}
+                    </span>
                   </div>
                 </div>
                 <div class="control py-1 mb0">
@@ -95,28 +115,19 @@
                   </div>
                 </div>
 
-                <!-- <div class="control py-0 mb0">
-                  <div class="tags has-addons">
-                    <span class="tag is-dark">Sample type</span>
-                    <span class="tag is-info">{{ getSampleTypeLabel(study.sampleTemplate) }}</span>
-                  </div>
-                </div> -->
-
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
-                    <span class="tag  is-dark">Release date</span>
-                    <span class="tag is-info">{{ study["releaseDate"] }}</span>
+                    <span class="tag is-dark">Release date</span>
+                    <span class="tag is-link">{{ study["releaseDate"] }}</span>
                   </div>
                 </div>
-                <div *ngIf="study.revisionNumber > 1" class="control py-0 mb0">
+                <div *ngIf="study.revisionNumber > 1" class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Revision</span>
-                    <span class="tag is-info"> {{ study.revisionDatetime | date: 'yyyy-MM-dd' }} ({{
+                    <span class="tag is-link"> {{ study.revisionDatetime | date: 'yyyy-MM-dd' }} ({{
                       study.revisionNumber }})</span>
                   </div>
                 </div>
-
-
               </div>
               <div class="full-width">
                 <p *ngIf="study.description.replace(' ', '') != ''" style="padding-bottom: 10px">

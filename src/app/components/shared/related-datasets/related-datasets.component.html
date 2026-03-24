@@ -3,9 +3,9 @@
         (click)="openModal()">+ Add</button>
     <header class="card-heading">
         <p>
-            Related datasets
+            Related Datasets
             <mat-icon
-                [matTooltip]="'Link to related datasets in other repositories that are associated with this study, such as genomics, proteomics, or other omics data'">help</mat-icon>
+                [matTooltip]="'Link to datasets in other repositories related to the study (e.g., genomics, proteomics or other omics data)'">help</mat-icon>
         </p>
     </header>
     <div class="card-content">
@@ -16,21 +16,21 @@
                     <div class="columns is-vcentered is-mobile">
                         <div class="column">
                             <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                                <div class="is-size-6">
+                                <div *ngIf="dataset.repository" class="is-size-6">
                                     <span>Repository: </span>
+                                    <span class="has-text-weight-bold">{{ dataset.repository }}</span>
+                                </div>
+                                <div class="is-size-6">
+                                    <span>Accession: </span>
                                     <span class="has-text-weight-bold">
-                                        <a *ngIf="dataset.repository && dataset.url; else noLink" [href]="dataset.url"
+                                        <a *ngIf="dataset.accession && dataset.url; else noLink" [href]="dataset.url"
                                             target="_blank" class="has-text-link">
-                                            {{ dataset.repository }}
+                                            {{ dataset.accession }}
                                         </a>
                                         <ng-template #noLink>
-                                            {{ dataset.repository }}
+                                            {{ dataset.accession }}
                                         </ng-template>
                                     </span>
-                                </div>
-                                <div *ngIf="dataset.accession" class="is-size-6">
-                                    <span>Accession: </span>
-                                    <span class="has-text-weight-bold">{{ dataset.accession }}</span>
                                 </div>
                             </div>
                         </div>

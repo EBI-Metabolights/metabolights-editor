@@ -1,87 +1,3 @@
-.message-header {
-  align-items: center;
-  background-color: #eef6fc;
-  border-radius: 0;
-  color: #174287;
-  display: flex;
-  font-weight: 700;
-  justify-content: space-between;
-  line-height: 1.25;
-  padding: 0.75em 1em;
-  position: relative;
-}
-
-.message-body {
-  border-color: #dbdbdb;
-  border-radius: 0px;
-  border-style: solid;
-  border-width: 0;
-  color: #4a4a4a;
-  padding: 1.25em 1.5em;
-}
-
-.message {
-  background-color: #ffffffb5;
-  border-radius: 0px;
-  border: 1px solid #cce9ff;
-}
-
-.files-tab {
-  padding: 0px;
-}
-
-.banner {
-  font-size: 14px;
-  color: red;
-  background-color: cornsilk;
-  border: 1px solid #cce9ff;
-  border-radius: 5px;
-  padding: 5px;
-}
-
-.has-warning a {
-  color: #b34700 !important;
-  font-weight: bold;
-
-}
-
-.has-error a {
-  color: red !important;
-  font-weight: bold;
-
-}
-
-.validation-warning-icon {
-  margin-left: 0.3rem;
-  color: #ff5722;
-  font-weight: bold;
-}
-
-.tabs li.is-active a {
-  background-color: aliceblue;
-  border-bottom-color: #3273dc;
-  color: #3273dc;
-}
-
-.tabs ul {
-  flex-wrap: wrap;
-  border-bottom-style: solid;
-  border-bottom-width: 1px;
-  border-bottom-color: #dbdbdb;
-}
-
-.tabs li {
-  margin-bottom: -1px;
-}
-
-.tab-icon {
-  font-size: 18px;
-  height: 18px;
-  width: 18px;
-  vertical-align: bottom;
-  margin-right: 5px;
-}
-
 #checklistbutton {
   height: 40px;
   border: solid 1px #d3d3d3;
@@ -99,7 +15,7 @@
   font-size: 17px;
   position: fixed;
       right: -57px;
-    top: 52%;
+    top: 400px;
   font-family: "Roboto", helvetica, arial, sans-serif;
   z-index: 999;
   cursor: pointer;
@@ -206,11 +122,10 @@
   flex: 1 1 auto;
   margin: 0 !important;
   font-weight: 600;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: 0.95rem;
   color: #333;
+  white-space: normal;
+  word-break: break-word;
 }
 
 .accordion-content {
@@ -250,16 +165,27 @@
   color: #26a69a;
 }
 
-@media screen and (max-width: 768px) {
-  .tabs a {
-    padding: 0.5em 0.75em;
-    font-size: 0.9rem;
-  }
+.help-link {
+  color: #999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  transition: color 0.2s ease;
+  cursor: pointer;
+  margin-left: 8px;
+}
 
-  .tab-icon {
-    margin-right: 3px;
-    font-size: 16px;
-    height: 16px;
-    width: 16px;
-  }
+.help-link:hover {
+  color: #26a69a !important;
+}
+
+.help-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.step-link {
+  cursor: pointer;
 }

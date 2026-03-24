@@ -65,7 +65,7 @@
 <div *ngIf="violations.length > 0; else noViolations">
   <div *ngIf="filteredViolations.length > 0; else noViolationsForFilterSelection">
     <div *ngFor="let violation of filteredViolations; let i = index;">
-      <validation-v2-detail  [violation]="violation" [studyId]="studyId"></validation-v2-detail>
+      <validation-v2-detail  *ngIf="studyId"[violation]="violation" [studyId]="studyId"></validation-v2-detail>
       <br>
   </div>
 

@@ -11,7 +11,6 @@ import { LoginComponent } from "./components/auth/login/login.component";
 import { ConsoleComponent } from "./components/console/console.component";
 
 import { StudyComponent } from "./components/study/study.component";
-import { StudyGuideComponent } from "./components/study/study-guide/study-guide.component";
 
 import { PublicStudyComponent } from "./components/public/study/study.component";
 
@@ -124,11 +123,6 @@ const routes: Routes = [
     component: GuidedAssaysComponent,
   },
 
-  {
-    path: "study/guide/:id",
-    canActivate: [AuthGuard],
-    component: StudyGuideComponent,
-  },
   { path: "study/:id", canActivate: [AuthGuard], component: StudyComponent },
   {
     path: "study/:id/:tab",

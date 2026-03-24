@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession, UserStudyPermission } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, SampleSheetFilename, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession, UserStudyPermission } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -46,6 +46,7 @@ export interface GeneralMetadataStateModel {
     firstPrivateDate: string;
     firstPublicDate: string;
     sampleTemplate: string;
+    sampleSheetFilename: string;
     templateVersion: string;
     studyCategory: string;
     studyCreatedAt: string;
@@ -79,6 +80,7 @@ const defaultState: GeneralMetadataStateModel = {
     firstPrivateDate: null,
     firstPublicDate: null,
     sampleTemplate: null,
+    sampleSheetFilename: null,
     templateVersion: null,
     studyCategory: null,
     studyCreatedAt: null,
@@ -100,7 +102,7 @@ export class GeneralMetadataState {
         private datasetLicenseService: DatasetLicenseService,
         private store: Store,
         private router: Router
-        ) {
+    ) {
     }
 
     @Action(GetGeneralMetadata)
@@ -108,7 +110,7 @@ export class GeneralMetadataState {
         this.generalMetadataService.getStudyGeneralMetadata(action.studyId).pipe(take(1)).subscribe({
             next: (gm_response) => {
                 const state = ctx.getState();
-                if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId))}
+                if (state.id === null) { ctx.dispatch(new Identifier.Set(action.studyId)) }
                 if (state.id !== action.studyId) ctx.dispatch(new Identifier.Set(action.studyId));
                 this.store.dispatch(new SetStudyError(false));
                 this.store.dispatch(new SetLoadingInfo("Loading investigation details"));
@@ -143,6 +145,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new FirstPrivateDate.Set(gm_response.mtblsStudy.firstPrivateDate));
                 ctx.dispatch(new FirstPublicDate.Set(gm_response.mtblsStudy.firstPublicDate));
                 ctx.dispatch(new SampleTemplate.Set(gm_response.mtblsStudy.sampleTemplate));
+                ctx.dispatch(new SampleSheetFilename.Set(gm_response.isaInvestigation?.studies?.[0]?.filename || null));
                 ctx.dispatch(new StudyCreatedAt.Set(gm_response.mtblsStudy.createdAt));
                 ctx.dispatch(new StudyCategory.Set(gm_response.mtblsStudy.studyCategory));
                 ctx.dispatch(new TemplateVersion.Set(gm_response.mtblsStudy.templateVersion));
@@ -150,18 +153,18 @@ export class GeneralMetadataState {
                 ctx.dispatch(new UserStudyPermission.Set(gm_response.mtblsStudy.studyPermission));
                 
                 ctx.dispatch(new DatasetLicenseNS.SetDatasetLicense(
-                  {
-                    name: gm_response.mtblsStudy.datasetLicense,
-                    version: "",
-                    agreed: gm_response.mtblsStudy.datasetLicense ? true : false,
-                    agreeingUser: "",
-                    licenseUrl: gm_response.mtblsStudy.datasetLicenseUrl
-                  } ));
-                
+                    {
+                        name: gm_response.mtblsStudy.datasetLicense,
+                        version: "",
+                        agreed: gm_response.mtblsStudy.datasetLicense ? true : false,
+                        agreeingUser: "",
+                        licenseUrl: gm_response.mtblsStudy.datasetLicenseUrl
+                    }));
+
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
-                ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people ));
-                
+                ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people));
+
                 // Parse Funders
                 const comments = gm_response.isaInvestigation.studies[0].comments || [];
                 ctx.patchState({ comments }); // Store raw comments for later use
@@ -169,7 +172,7 @@ export class GeneralMetadataState {
                 const funderNames = comments.find(c => c.name === 'Funder')?.value.split(';') || [];
                 const funderIds = comments.find(c => c.name === 'Funder ROR ID')?.value.split(';') || [];
                 const grantIds = comments.find(c => c.name === 'Grant Identifier')?.value.split(';') || [];
-                
+
                 const funders = funderNames.map((name, i) => ({
                     fundingOrganization: {
                         annotationValue: name,
@@ -183,14 +186,14 @@ export class GeneralMetadataState {
                 const relatedAccessions = comments.find(c => c.name === 'Related Data Accession')?.value.split(';') || [];
                 const relatedRepos = comments.find(c => c.name === 'Related Data Repository')?.value.split(';') || [];
                 const relatedUrls = comments.find(c => c.name === 'Related Data URL')?.value.split(';') || [];
-                
+
                 const relatedDatasets = relatedAccessions.map((acc, i) => ({
                     accession: acc,
                     repository: relatedRepos[i] || '',
                     url: relatedUrls[i] || ''
                 }));
                 ctx.patchState({ relatedDatasets });
-                
+
 
                 this.store.dispatch(new Operations.GetFreshFilesList(false, action.readonly, action.studyId));
 
@@ -211,7 +214,8 @@ export class GeneralMetadataState {
                 }
 
 
-            }})
+            }
+        })
     }
 
     @Action(Identifier.Set)
@@ -254,7 +258,7 @@ export class GeneralMetadataState {
     @Action(StudyAbstract.Update)
     UpdateAbstract(ctx: StateContext<GeneralMetadataStateModel>, action: StudyAbstract.Update) {
         const state = ctx.getState();
-        this.generalMetadataService.updateAbstract({description: action.description}, state.id).subscribe(
+        this.generalMetadataService.updateAbstract({ description: action.description }, state.id).subscribe(
             (response) => {
                 ctx.dispatch(new StudyAbstract.Set(response.description));
             },
@@ -361,7 +365,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             publicFtpUrl: action.publicFtpUrl
-      });
+        });
     }
 
     @Action(PublicHttpUrl.Set)
@@ -370,7 +374,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             publicHttpUrl: action.publicHttpUrl
-      });
+        });
     }
 
     @Action(PublicGlobusUrl.Set)
@@ -379,7 +383,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             publicGlobusUrl: action.publicGlobusUrl
-      });
+        });
     }
 
     @Action(FirstPrivateDate.Set)
@@ -388,7 +392,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             firstPrivateDate: action.firstPrivateDate
-      });
+        });
     }
 
     @Action(FirstPublicDate.Set)
@@ -397,7 +401,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             firstPublicDate: action.firstPublicDate
-      });
+        });
     }
 
     @Action(SampleTemplate.Set)
@@ -406,7 +410,16 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             sampleTemplate: action.sampleTemplate
-      });
+        });
+    }
+
+    @Action(SampleSheetFilename.Set)
+    SetSampleSheetFilename(ctx: StateContext<GeneralMetadataStateModel>, action: SampleSheetFilename.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            sampleSheetFilename: action.sampleSheetFilename
+        });
     }
 
     @Action(StudyCreatedAt.Set)
@@ -415,7 +428,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             studyCreatedAt: action.studyCreatedAt
-      });
+        });
     }
 
     @Action(UserStudyPermission.Set)
@@ -433,7 +446,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             studyCategory: action.studyCategory
-      });
+        });
     }
 
     @Action(TemplateVersion.Set)
@@ -442,7 +455,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             templateVersion: action.templateVersion
-      });
+        });
     }
 
     @Action(PublicAsperaPath.Set)
@@ -451,7 +464,7 @@ export class GeneralMetadataState {
         ctx.setState({
             ...state,
             publicAsperaPath: action.publicAsperaPath
-      });
+        });
     }
 
     @Action(MhdAccession.Set)
@@ -497,8 +510,8 @@ export class GeneralMetadataState {
     UpdatePublication(ctx: StateContext<GeneralMetadataStateModel>, action: Publications.Update) {
         const state = ctx.getState();
         this.generalMetadataService.updatePublication(action.title, action.publication, state.id).subscribe(
-        (response) => {
-            ctx.dispatch(new Publications.Set([response], false, true, action.title))
+            (response) => {
+                ctx.dispatch(new Publications.Set([response], false, true, action.title))
             }
         )
 
@@ -509,13 +522,13 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.deletePublication(action.title, state.id).subscribe(
             (response) => {
-                    ctx.dispatch(new Publications.Get());
-                },
+                ctx.dispatch(new Publications.Get());
+            },
             (error) => {
                 console.log(`Unable to delete publication ${action.title}`);
                 console.error(error);
             }
-            )
+        )
     }
 
     @Action(Publications.Set)
@@ -527,14 +540,14 @@ export class GeneralMetadataState {
             temp.push(jsonConvert.deserialize(publication, MTBLSPublication));
         });
         if (action.extend) temp = temp.concat(state.publications);
-        if (action.update){
+        if (action.update) {
             let existingPublications = []
             existingPublications = existingPublications.concat(state.publications);
             existingPublications = existingPublications.filter(pub => pub.title !== action.oldTitle);
             temp = temp.concat(existingPublications);
             temp.sort((a, b) => {
                 return a.title[0].localeCompare(b.title[0]);
-              });
+            });
         }
         ctx.setState({
             ...state,
@@ -588,16 +601,16 @@ export class GeneralMetadataState {
             },
             (error) => {
                 console.log("Could not add new study person.");
-                const errorsArray: string[] = 
-                (error.error?.errors && Array.isArray(error.error.errors))
-                    ? error.error.errors
-                    : [error.message || 'Could not add new study person'];
+                const errorsArray: string[] =
+                    (error.error?.errors && Array.isArray(error.error.errors))
+                        ? error.error.errors
+                        : [error.message || 'Could not add new study person'];
 
                 this.generalMetadataService.emitMessage({
                     type: 'add',
                     status: 'error',
                     message: errorsArray.join(', ')
-                });  
+                });
             }
         )
     }
@@ -621,18 +634,18 @@ export class GeneralMetadataState {
             },
             (error) => {
                 console.log("Could not update study person");
-                
-                const errorsArray: string[] = 
-                (error.error?.errors && Array.isArray(error.error.errors))
-                    ? error.error.errors
-                    : [error.message || 'Could not update study person'];
+
+                const errorsArray: string[] =
+                    (error.error?.errors && Array.isArray(error.error.errors))
+                        ? error.error.errors
+                        : [error.message || 'Could not update study person'];
 
                 this.generalMetadataService.emitMessage({
                     type: 'update',
                     status: 'error',
                     message: errorsArray.join(', ')
-                });  
-                
+                });
+
             }
         )
     }
@@ -651,16 +664,16 @@ export class GeneralMetadataState {
             },
             (error) => {
                 console.log(`Unable to delete study person ${action.fullName}`);
-                const errorsArray: string[] = 
-                (error.error?.errors && Array.isArray(error.error.errors))
-                    ? error.error.errors
-                    : [error.message || `Unable to delete study person ${action.fullName}`];
+                const errorsArray: string[] =
+                    (error.error?.errors && Array.isArray(error.error.errors))
+                        ? error.error.errors
+                        : [error.message || `Unable to delete study person ${action.fullName}`];
 
                 this.generalMetadataService.emitMessage({
                     type: 'delete',
                     status: 'error',
                     message: errorsArray.join(', ')
-                });  
+                });
             }
         )
     }
@@ -670,26 +683,26 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         this.generalMetadataService.makePersonSubmitter(action.email, state.id).subscribe(
             (response) => {
-               this.generalMetadataService.emitMessage({
+                this.generalMetadataService.emitMessage({
                     type: 'makesubmitter',
                     status: 'success',
                     message: 'Person deleted successfully!'
-                }); 
+                });
             },
             (error) => {
                 console.log("Unable to make person submitter");
-                const errorsArray: string[] = 
-                (error.error?.errors && Array.isArray(error.error.errors))
-                    ? error.error.errors
-                    : [error.message || 'Unable to make person submitter'];
+                const errorsArray: string[] =
+                    (error.error?.errors && Array.isArray(error.error.errors))
+                        ? error.error.errors
+                        : [error.message || 'Unable to make person submitter'];
 
                 this.generalMetadataService.emitMessage({
                     type: 'makesubmitter',
                     status: 'error',
                     message: errorsArray.join(', ')
-                });  
+                });
             }
-            )
+        )
     }
 
 
@@ -700,20 +713,20 @@ export class GeneralMetadataState {
             (response) => {
                 const state = ctx.getState();
 
-                if (response.hasOwnProperty("revision_number")){
-                  const revisionNumber = response["revision_number"]
-                  if (state.revisionNumber !== revisionNumber) {
-                    ctx.dispatch(new RevisionNumber.Set(revisionNumber));
-                  }
+                if (response.hasOwnProperty("revision_number")) {
+                    const revisionNumber = response["revision_number"]
+                    if (state.revisionNumber !== revisionNumber) {
+                        ctx.dispatch(new RevisionNumber.Set(revisionNumber));
+                    }
                 }
-                if (response.hasOwnProperty("status")){
+                if (response.hasOwnProperty("status")) {
                     ctx.dispatch(new RevisionStatus.Set(response["status"]));
                 }
-                if (response.hasOwnProperty("revision_datetime")){
-                  const revisionDatetime = response["revision_datetime"]
-                  if (state.revisionDatetime !== revisionDatetime) {
-                    ctx.dispatch(new RevisionDateTime.Set(revisionDatetime));
-                  }
+                if (response.hasOwnProperty("revision_datetime")) {
+                    const revisionDatetime = response["revision_datetime"]
+                    if (state.revisionDatetime !== revisionDatetime) {
+                        ctx.dispatch(new RevisionDateTime.Set(revisionDatetime));
+                    }
                 }
             }
         )
@@ -726,32 +739,32 @@ export class GeneralMetadataState {
             (response) => {
                 const state = ctx.getState();
                 let updated_study_id = state.id;
-                if (response.hasOwnProperty("assigned_study_id")){
-                  updated_study_id = response["assigned_study_id"]
-                  if (state.id !== updated_study_id) {
-                    ctx.dispatch(new Identifier.Set(updated_study_id));
-                  }
+                if (response.hasOwnProperty("assigned_study_id")) {
+                    updated_study_id = response["assigned_study_id"]
+                    if (state.id !== updated_study_id) {
+                        ctx.dispatch(new Identifier.Set(updated_study_id));
+                    }
                 }
                 let assigned_status = action.status;
-                if (response.hasOwnProperty("assigned_status")){
-                  assigned_status = response["assigned_status"]
+                if (response.hasOwnProperty("assigned_status")) {
+                    assigned_status = response["assigned_status"]
                 }
                 if (assigned_status !== state.status) {
-                  ctx.dispatch(new StudyStatus.Set(assigned_status));
+                    ctx.dispatch(new StudyStatus.Set(assigned_status));
                 }
-                if (response.hasOwnProperty("ftp_folder_path")){
-                  const ftpFolderPath = response["ftp_folder_path"]
-                  ctx.dispatch(new UploadLocation.Set(ftpFolderPath));
+                if (response.hasOwnProperty("ftp_folder_path")) {
+                    const ftpFolderPath = response["ftp_folder_path"]
+                    ctx.dispatch(new UploadLocation.Set(ftpFolderPath));
                 }
-                if (response.hasOwnProperty("obfuscation_code")){
-                  const obfuscationCode = response["obfuscation_code"]
-                  ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
+                if (response.hasOwnProperty("obfuscation_code")) {
+                    const obfuscationCode = response["obfuscation_code"]
+                    ctx.dispatch(new ObfuscationCode.Set(obfuscationCode));
                 }
                 const readOnlySub = this.store.select(state => state.ApplicationState && state.ApplicationState.readonly).pipe(take(1))
                 readOnlySub.subscribe((ro) => {
                     this.store.dispatch(new User.Studies.Get())
                     ctx.dispatch(new GetGeneralMetadata(updated_study_id, ro));
-                    
+
                     if (state.id !== updated_study_id) {
                         this.router.navigate(['/study', updated_study_id]);
                     }
@@ -762,32 +775,32 @@ export class GeneralMetadataState {
     }
 
     @Action(DatasetLicenseNS.ConfirmAgreement)
-    ConfirmAgreement({dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.ConfirmAgreement) {
+    ConfirmAgreement({ dispatch }: StateContext<GeneralMetadataStateModel>, { studyId }: DatasetLicenseNS.ConfirmAgreement) {
         this.datasetLicenseService.confirmLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
                 dispatch(new DatasetLicenseNS.SetDatasetLicense(licenseResponse.content.dataset))
             },
-            error: (error) => {console.error(`Unable to confirm license agreement: ${error}`)}
+            error: (error) => { console.error(`Unable to confirm license agreement: ${error}`) }
 
         })
     }
 
     @Action(DatasetLicenseNS.SetDatasetLicense)
-    SetDatasetLicense( {patchState}: StateContext<GeneralMetadataStateModel>, {license}: DatasetLicenseNS.SetDatasetLicense) {
+    SetDatasetLicense({ patchState }: StateContext<GeneralMetadataStateModel>, { license }: DatasetLicenseNS.SetDatasetLicense) {
         patchState({
             datasetLicense: license
         });
     }
 
     @Action(DatasetLicenseNS.GetDatasetLicense)
-    GetDatasetLicense( {dispatch}: StateContext<GeneralMetadataStateModel>, {studyId}: DatasetLicenseNS.GetDatasetLicense) {
+    GetDatasetLicense({ dispatch }: StateContext<GeneralMetadataStateModel>, { studyId }: DatasetLicenseNS.GetDatasetLicense) {
         this.datasetLicenseService.getLicenseAgreement(studyId).subscribe({
             next: (licenseResponse) => {
                 let dataset = null;
-                licenseResponse.content.dataset == null ? dataset = {name: "", version: "", agreed: false, agreeingUser: "", licenseUrl: ""} : dataset = licenseResponse.content.dataset;
+                licenseResponse.content.dataset == null ? dataset = { name: "", version: "", agreed: false, agreeingUser: "", licenseUrl: "" } : dataset = licenseResponse.content.dataset;
                 dispatch(new DatasetLicenseNS.SetDatasetLicense(dataset));
             },
-            error: (error) => {console.error(`Unable to retrieve dataset license: ${error}`);}
+            error: (error) => { console.error(`Unable to retrieve dataset license: ${error}`); }
         })
     }
 
@@ -899,6 +912,10 @@ export class GeneralMetadataState {
         return state?.sampleTemplate
     }
     @Selector()
+    static sampleSheetFilename(state: GeneralMetadataStateModel): string {
+        return state.sampleSheetFilename
+    }
+    @Selector()
     static templateVersion(state: GeneralMetadataStateModel): string {
         return state?.templateVersion
     }
@@ -919,7 +936,7 @@ export class GeneralMetadataState {
     static mhdAccession(state: GeneralMetadataStateModel): string {
         return state?.mhdAccession
     }
-    
+
     @Action(Funders.Get)
     GetFunders(ctx: StateContext<GeneralMetadataStateModel>, action: Funders.Get) {
         // Already handled by GetStudyGeneralMetadata as it parses from comments
@@ -931,7 +948,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         const currentFunders = state.funders || [];
         const newFunders = [...currentFunders, action.body];
-        
+
         ctx.patchState({ funders: newFunders });
         this.saveFundersToComments(ctx, newFunders);
     }
@@ -963,7 +980,7 @@ export class GeneralMetadataState {
         const state = ctx.getState();
         const currentDatasets = state.relatedDatasets || [];
         const newDatasets = [...currentDatasets, action.body];
-        
+
         ctx.patchState({ relatedDatasets: newDatasets });
         this.saveRelatedDatasetsToComments(ctx, newDatasets);
     }
@@ -994,7 +1011,7 @@ export class GeneralMetadataState {
     private saveFundersToComments(ctx: StateContext<GeneralMetadataStateModel>, funders: any[]) {
         const state = ctx.getState();
         const studyId = state.id;
-        
+
         const names = funders.map(f => f.fundingOrganization.annotationValue).join(';');
         const rorIds = funders.map(f => f.fundingOrganization.termAccession).join(';');
         const grants = funders.map(f => f.grantIdentifier).join(';');
@@ -1010,7 +1027,7 @@ export class GeneralMetadataState {
                 // Remove existing ones from local state to merge
                 allComments = allComments.filter(c => !['Funder', 'Funder ROR ID', 'Grant Identifier'].includes(c.name));
                 allComments = [...allComments, ...relevantComments];
-                
+
                 ctx.patchState({ comments: allComments });
                 toastr.success('Funding details updated.', "Success");
             },
@@ -1043,7 +1060,7 @@ export class GeneralMetadataState {
                 allComments = [...allComments, ...relevantComments];
 
                 ctx.patchState({ comments: allComments });
-                toastr.success('Related datasets updated.', "Success");
+                toastr.success('Related Datasets updated.', "Success");
             },
             (error) => {
                 console.error("Failed to update related datasets comments", error);

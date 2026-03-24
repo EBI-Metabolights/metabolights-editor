@@ -8,6 +8,7 @@ import {
   EventEmitter,
   ViewChild,
   ElementRef,
+  HostListener,
 } from "@angular/core";
 import { UntypedFormGroup } from "@angular/forms";
 import { COMMA, ENTER, R } from "@angular/cdk/keycodes";
@@ -65,6 +66,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input() unitId: string;
   @Input("label") label: string;
   @Input() rule: FieldValueValidation | null = null;
+  @Input() isRequired: boolean = false;
   @Input() hasError: boolean = false;
   @ViewChild('input', { static: false }) inputRef!: ElementRef<HTMLInputElement>;
   @Output() changed = new EventEmitter<any>();
@@ -98,15 +100,31 @@ export class OntologyComponent implements OnInit, OnChanges {
   ontologyDetails: any = {};
   readonly = false;
   baseHref: string;
-  isRequired: boolean = false;
   fadeState: "in" | "out" = "out";
 
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
     private store: Store,
-    private ontTrackerService: OntologyComponentTrackerService
+    private ontTrackerService: OntologyComponentTrackerService,
+    private elementRef: ElementRef
   ) {}
+
+  @HostListener("document:click", ["$event"])
+  onDocumentClick(event: MouseEvent) {
+    if (!this.valueInput || !this.valueInput.panelOpen) {
+      return;
+    }
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+    const isInsideComponent = this.elementRef.nativeElement.contains(target);
+    const isInsideAutocompletePanel = !!target.closest(".mat-autocomplete-panel");
+    if (!isInsideComponent && !isInsideAutocompletePanel) {
+      this.valueInput.closePanel();
+    }
+  }
 
   join(path1: string, path2: string) {
     if (path2.startsWith("/")) {
@@ -143,7 +161,7 @@ export class OntologyComponent implements OnInit, OnChanges {
         this.endPoints = this.validations["recommended-ontologies"].ontology;
       }
     }
-    this.isRequired = this.validations?.["is-required"] === "true" || this.validations?.["is-required"] === true;
+    this.isRequired = this.isRequired || this.validations?.["is-required"] === "true" || this.validations?.["is-required"] === true;
     this.isFormBusy = false;
     this.searchedMore = false;
     this.getDefaultTerms();
@@ -405,7 +423,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges) {
       this.values = this.values.filter((val) => val !== null);
       if (changes.validations) {
-        this.isRequired = this.validations?.["is-required"] === "true" || this.validations?.["is-required"] === true;
+        this.isRequired = this.isRequired || this.validations?.["is-required"] === "true" || this.validations?.["is-required"] === true;
         if (this.validations?.["recommended-ontologies"]) {
           this.isforcedOntology = this.validations["recommended-ontologies"]["is-forced-ontology"];
           this.url = this.validations["recommended-ontologies"].ontology.url;
@@ -425,6 +443,22 @@ export class OntologyComponent implements OnInit, OnChanges {
 
   setValues(values) {
     this.values = values;
+  }
+
+  reset() {
+    this.values = [];
+    this.valueCtrl.setValue("", { emitEvent: false });
+    if (this.inputRef?.nativeElement) {
+      this.inputRef.nativeElement.value = "";
+    }
+    this.showSearchMore = false;
+    this.noResultsFound = false;
+    this.getDefaultTerms();
+    this.setCurrentOptions(this.allvalues);
+    this.emptyError.emit(true);
+    if (this.valueInput?.panelOpen) {
+      this.valueInput.closePanel();
+    }
   }
 
   optionSelected(selected: MatAutocompleteSelectedEvent) {
@@ -574,15 +608,6 @@ export class OntologyComponent implements OnInit, OnChanges {
     if (!termExists) {
       this.values = [value];
     }
-  }
-
-  reset() {
-    this.values = [];
-    this.valueCtrl.setValue(null);
-    if (this.inputRef?.nativeElement) {
-      this.inputRef.nativeElement.value = '';
-    }
-    // this.valueCtrl.enable();
   }
 
   triggerChanges() {

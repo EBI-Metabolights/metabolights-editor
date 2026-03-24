@@ -35,6 +35,9 @@ export class MafComponent implements AfterContentInit {
   form: UntypedFormGroup;
   currentIndex = 0;
 
+  tableDescription = 'Please complete the table below to describe the metabolites (results). Please include all metabolites / unknowns / features identified with information such as identifiers, measurements (e.g., mass-to-charge ratio, chemical shift, etc), confidence and intensities / abundances (column V+). This information often can be simply copied and pasted, for example, from software outputs.';
+  tableDescriptionUrl = 'https://ebi-metabolights.github.io/guides/MAF/';
+
   rowsToUpdate = [];
   inProgress = true;
 
@@ -90,12 +93,21 @@ export class MafComponent implements AfterContentInit {
     const dbId = this.form.get("databaseId").value;
     if (dbId && dbId !== "") {
       if (dbId.toLowerCase().indexOf("chebi") > -1) {
-        this.currentID = dbId.split(":")[1];
+        if (dbId.indexOf(":") > -1) {
+          this.currentID = dbId.split(":")[1];
+        } else {
+          this.currentID = dbId.replace(/chebi/i, "");
+        }
+      } else if (!isNaN(dbId)) {
+        this.currentID = dbId;
+      } else {
+        this.currentID = null;
       }
     } else {
       this.currentID = null;
     }
   }
+
 
   nextRow() {
     if (this.currentRow < this.mafTable.data.rows.length) {
