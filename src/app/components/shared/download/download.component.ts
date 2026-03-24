@@ -119,8 +119,4 @@ export class DownloadComponent implements OnInit {
       this.metabolightsService.openTextFileInNewTab(url);
     }
   }
-
-  isRestrictedResource(status: string): boolean {
-    return !status || status.trim() === "" || status.toLowerCase() === "provisional";
-  }
 }
