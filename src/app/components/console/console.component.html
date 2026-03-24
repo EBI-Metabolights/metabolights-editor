@@ -33,7 +33,7 @@
     <nav class="panel has-background-white">
       <p class="panel-heading">
         <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
-        <span style="margin-left: 10px">My Studies - {{ loginName }}
+        <span style="margin-left: 10px">My Studies - {{ loginName }}<span *ngIf="curator"> (Curator)</span>
           <small *ngIf="studies.length > 0">({{ studies.length }})</small></span>
         <span class="is-pulled-right" *ngIf="!underMaintenance">
           <small style="font-size: 0.8em !important"><mtbls-help target="createStudy"></mtbls-help></small>&nbsp;

@@ -253,7 +253,7 @@
         <span *ngFor="let file of filteredRawFiles">
           <mtbls-directory [category]="raw" [level]="0" [parent]="''" [file]="file"
             [collapse]="autoCollapsedFolder(file)" [deletionEnabled]="false" [downloadEnabled]="false"
-            [downloadContents]="false" [readonlyFolder]="true" [showReferencedFiles]="true"
+            [downloadContents]="true" [readonlyFolder]="true" [showReferencedFiles]="true"
             (fileDeleted)="handleDeletedFile($event, rawFiles, filteredRawFiles, selectedRawFiles)"></mtbls-directory>
         </span>
       </span>
