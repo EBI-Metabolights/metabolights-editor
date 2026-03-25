@@ -1,5 +1,5 @@
 <div [ngClass]="{ 'hover-highlight': !isReadOnly }" class="px-20 mtbls-section">
-  <span class="copy-btn" (click)="copyTitle()"><mat-icon matTooltip="Copy content" style="float: right;">content_copy</mat-icon></span>
+  <span class="copy-btn" (click)="copyTitle()"><mat-icon matTooltip="Copy content" class="copy-icon">content_copy</mat-icon></span>
   <h2 #contentToCopy class="title is-3">
     <b>
       <span [innerHTML]="title" class="clickable" (click)="openModal()"

@@ -198,6 +198,10 @@ a.dropdown-item {
   margin-left: 0px;
 }
 
+.required-asterisk {
+  color: #c00000;
+}
+
 .row-selector {
   width: 10px;
 }
