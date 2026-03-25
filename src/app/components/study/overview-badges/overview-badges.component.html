@@ -5,19 +5,52 @@
 
         <!-- Left Column -->
         <div class="study-meta-left">
-            <mtbls-status></mtbls-status>
-            <curation-status></curation-status>
-            <mtbls-release-date></mtbls-release-date>
-
-            <span *ngIf="revisionNumber && revisionNumber > 1">
-                <div class="tags has-addons">
-                    <span class="tag is-dark">Revision</span>
-                    <span class="tag is-link">
-                        {{ revisionDatetime ? (revisionDatetime | date: 'yyyy-MM-dd') : '' }} ({{ revisionNumber }})
-                    </span>
+            <div class="study-meta-row">
+                <div class="control" *ngIf="requestedStudy">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">Accession</span>
+                        <span class="tag" [class.is-primary]="status == 'In Review' || status == 'Private'"
+                            [class.is-warning]="status == 'Provisional'" [class.is-success]="status == 'Public'">
+                            {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession : requestedStudy }}
+                        </span>
+                    </div>
                 </div>
-            </span>
-            <mtbls-dataset-license></mtbls-dataset-license>
+                <div class="control" *ngIf="showCategory">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">Category</span>
+                        <span class="tag is-link">
+                            {{ categoryLabel }}
+                        </span>
+                    </div>
+                </div>
+                <div class="control" *ngIf="mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">MTBLS Accession</span>
+                        <span class="tag" [class.is-primary]="status == 'In Review' || status == 'Private'"
+                            [class.is-warning]="status == 'Provisional'" [class.is-success]="status == 'Public'">
+                            {{ requestedStudy }}
+                        </span>
+                    </div>
+                </div>
+                <mtbls-dataset-license></mtbls-dataset-license>
+            </div>
+
+            <div class="study-meta-row">
+                <mtbls-status></mtbls-status>
+                <span *ngIf="status == 'Public' || status == 'In Review' || status == 'Private'">
+                    <curation-status></curation-status>
+                </span>
+                <mtbls-release-date></mtbls-release-date>
+
+                <span *ngIf="revisionNumber && revisionNumber > 1">
+                    <div class="tags has-addons">
+                        <span class="tag is-dark">Revision</span>
+                        <span class="tag is-link">
+                            {{ revisionDatetime ? (revisionDatetime | date: 'yyyy-MM-dd') : '' }} ({{ revisionNumber }})
+                        </span>
+                    </div>
+                </span>
+            </div>
         </div>
 
 
