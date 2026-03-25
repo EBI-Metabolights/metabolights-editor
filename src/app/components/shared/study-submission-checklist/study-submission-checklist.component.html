@@ -1,13 +1,22 @@
 <button *ngIf="!isReadOnly" id="checklistbutton" (click)="toggleChecklistPopup()">
   <mat-icon class="mat-icon material-icons">checklist</mat-icon> Study Checklist
 </button>
-<div *ngIf="isChecklistPopupOpen" class="checklist-popup-overlay" (click)="closeChecklistPopup()"></div>
-<aside *ngIf="isChecklistPopupOpen" class="checklist-popup">
+<div
+  class="checklist-popup-overlay"
+  [class.is-open]="isChecklistPopupOpen"
+  (click)="closeChecklistPopup()"
+></div>
+<aside class="checklist-popup" [class.is-open]="isChecklistPopupOpen">
+  <button
+    class="checklist-popup-toggle"
+    [class.is-open]="isChecklistPopupOpen"
+    (click)="closeChecklistPopup()"
+    aria-label="Close checklist"
+  >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
   <header class="checklist-popup-header">
     <span>Study Checklist</span>
-    <button class="checklist-popup-close" (click)="closeChecklistPopup()" aria-label="Close checklist">
-      <mat-icon>close</mat-icon>
-    </button>
   </header>
   <div class="checklist-popup-body">
     <div class="publications-accordion">

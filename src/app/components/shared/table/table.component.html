@@ -156,8 +156,15 @@
     </mat-form-field>
   </span>
 </div>
-<div class="fadeIn has-text-right nmrl">
-  <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
+<div class="columns is-vcentered nmrl fadeIn">
+  <span class="column is-6">
+    <small class="has-text-grey">
+      An asterisk (<span class="required-asterisk">*</span>) denotes a mandatory field
+    </small>
+  </span>
+  <span class="column is-6 has-text-right">
+    <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
+  </span>
 </div>
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
