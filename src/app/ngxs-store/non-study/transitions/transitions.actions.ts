@@ -22,6 +22,16 @@ export class SetTabIndex {
     constructor(public index: string) {}
 }
 
+export class SetChecklistSeen {
+    static readonly type = '[transitions] Set Checklist Seen';
+    constructor(public seen: boolean) {}
+}
+
+export class SetChecklistStudyId {
+    static readonly type = '[transitions] Set Checklist Study Id';
+    constructor(public studyId: string) {}
+}
+
 export namespace IntermittentRefreshActionStack {
 
     export class Sync {
@@ -29,5 +39,3 @@ export namespace IntermittentRefreshActionStack {
         constructor(public actionStack: string[]) {}
     }
 }
-
-
