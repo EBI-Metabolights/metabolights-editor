@@ -76,6 +76,7 @@ export class EuropePMCService extends DataService {
         pubMedID: article.pmid,
         doi: article.doi,
         abstract: article.abstractText,
+        status: this.extractPublicationStatus(article),
       };
     } else {
       return {
@@ -85,7 +86,26 @@ export class EuropePMCService extends DataService {
         pubMedID: "",
         doi: "",
         abstract: "",
+        status: "",
       };
     }
+  }
+
+  private extractPublicationStatus(article: any): string {
+    const candidates: string[] = [];
+    if (article?.pubType) candidates.push(String(article.pubType));
+    if (Array.isArray(article?.pubTypeList?.pubType)) {
+      article.pubTypeList.pubType.forEach((t: any) => candidates.push(String(t)));
+    }
+    if (article?.source) candidates.push(String(article.source));
+    if (article?.journalInfo?.journal?.title) {
+      candidates.push(String(article.journalInfo.journal.title));
+    }
+
+    const normalized = candidates.map((v) => v.toLowerCase());
+    const hasPreprint = normalized.some(
+      (v) => v.includes("preprint") || v === "ppr"
+    );
+    return hasPreprint ? "Preprint" : "Published";
   }
 }

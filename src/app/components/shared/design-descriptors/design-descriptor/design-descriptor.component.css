@@ -6,3 +6,20 @@
 .pointer {
   cursor: pointer;
 }
+
+.badge {
+  background-color: #1976d2;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0 4px;
+  border-radius: 4px;
+  vertical-align: super;
+}
+
+.help-icon, .info-icon {
+  font-size: 14px;
+  vertical-align: middle;
+  color: #26a69a;
+  cursor: help;
+}

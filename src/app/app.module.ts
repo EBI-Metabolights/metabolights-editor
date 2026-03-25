@@ -1,5 +1,5 @@
 
-import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
+import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule, isDevMode, APP_INITIALIZER, Injector } from "@angular/core";
@@ -22,6 +22,7 @@ import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { MatAutocompleteModule } from "@angular/material/autocomplete";
 import { MatChipsModule } from "@angular/material/chips";
 import { MatCheckboxModule } from "@angular/material/checkbox";
+import { MatStepperModule } from "@angular/material/stepper";
 
 import { MatTableModule } from "@angular/material/table";
 import { MatPaginatorModule } from "@angular/material/paginator";
@@ -57,6 +58,7 @@ import { SampleState } from "./ngxs-store/study/samples/samples.state";
 import { ProtocolsState } from "./ngxs-store/study/protocols/protocols.state";
 import { DescriptorsState } from "./ngxs-store/study/descriptors/descriptors.state";
 import { ValidationState } from "./ngxs-store/study/validation/validation.state";
+import { StudyCreationState } from "./ngxs-store/non-study/study-creation/study-creation.state";
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
@@ -67,11 +69,17 @@ import { DatasetLicenseStaticPageComponent } from './components/public/dataset-l
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
-export function configLoader(injector: Injector): () => Promise<any> {
-  return () => injector.get(ConfigurationService).loadConfiguration();
+export function appInitializer(injector: Injector): () => Promise<any> {
+    return async () => {
+        const configService = injector.get(ConfigurationService);
+        const editorService = injector.get(EditorService);
+        await configService.loadConfiguration();
+        await editorService.loadDefaultControlLists();
+    };
 }
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppComponent,
         StudyComponent,
         PublicStudyComponent,
@@ -83,7 +91,7 @@ export function configLoader(injector: Injector): () => Promise<any> {
         FooterComponent,
         GuidesComponent,
         DataPolicyComponent,
-        DatasetLicenseStaticPageComponent    ],
+        DatasetLicenseStaticPageComponent],
     exports: [FooterComponent],
     bootstrap: [AppComponent], imports: [BrowserModule,
         StudyModule,
@@ -105,7 +113,9 @@ export function configLoader(injector: Injector): () => Promise<any> {
         MatButtonToggleModule,
         MatCheckboxModule,
         MatTableModule,
+
         MatDividerModule,
+        MatStepperModule,
         DragDropModule,
         NgxsModule.forRoot([
             GeneralMetadataState,
@@ -118,7 +128,8 @@ export function configLoader(injector: Injector): () => Promise<any> {
             SampleState,
             ProtocolsState,
             DescriptorsState,
-            ValidationState
+            ValidationState,
+            StudyCreationState
         ], { developmentMode: true }),
         QuillModule.forRoot({
             modules: {
@@ -127,11 +138,11 @@ export function configLoader(injector: Injector): () => Promise<any> {
                 },
             },
         }),
-        ], providers: [
+    ], providers: [
         AuthGuard,
         {
             provide: APP_INITIALIZER,
-            useFactory: configLoader,
+            useFactory: appInitializer,
             deps: [Injector],
             multi: true,
         },
@@ -149,17 +160,18 @@ export function configLoader(injector: Injector): () => Promise<any> {
         { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
         { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
         {
             provide: APP_BASE_HREF,
             useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
             deps: [PlatformLocation]
         },
         provideHttpClient(withInterceptorsFromDi())
-    ] })
+    ]
+})
 export class AppModule {
-  constructor(
-  ) {
+    constructor(
+    ) {
 
-  }
+    }
 }

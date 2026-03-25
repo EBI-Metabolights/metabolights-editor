@@ -382,7 +382,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   saveNgxs() {
     if (!this.isStudyReadOnly) {
-      if (this.getFieldValue("description")) {
+      if (this.form.valid) {
         this.isFormBusy = true;
         if (!this.addNewProtocol) { // If we are updating an exisiting protocol
           this.store.dispatch(new Protocols.Update(this.protocol.name, this.compileBody())).subscribe(
@@ -410,7 +410,9 @@ export class ProtocolComponent implements OnInit, OnChanges {
           )
         }
       } else {
-        alert("Protocol description cannot be empty");
+        this.form.get("description").markAsDirty();
+        this.form.get("description").markAsTouched();
+        this.form.updateValueAndValidity();
       }
     }
   }
@@ -445,6 +447,34 @@ export class ProtocolComponent implements OnInit, OnChanges {
       mtblsProtocol.parameters = [];
       this.protocol = mtblsProtocol;
     }
+
+    let descriptionValidation = this.fieldValidation("description");
+    if (!descriptionValidation) {
+      descriptionValidation = { rules: [] };
+    } else {
+      descriptionValidation = { ...descriptionValidation };
+      if (!descriptionValidation.rules) {
+        descriptionValidation.rules = [];
+      } else {
+        descriptionValidation.rules = [...descriptionValidation.rules];
+      }
+    }
+    
+    let minRule = descriptionValidation.rules.find((r) => r.condition === "min");
+    if (!minRule) {
+      descriptionValidation.rules.push({
+        condition: "min",
+        value: 40,
+        error: "Protocol description must be at least 40 characters long",
+      });
+    } else {
+      if (minRule.value === 0 || minRule.value === 1) {
+        minRule.value = 40;
+      }
+      minRule.error = `Protocol description must be at least ${minRule.value} characters long`;
+    }
+    descriptionValidation["is-required"] = "true";
+
     this.form = this.fb.group({
       name: [
         { value: this.protocol.name, disabled: this.required },
@@ -453,8 +483,10 @@ export class ProtocolComponent implements OnInit, OnChanges {
       parameters: [this.protocol.parameters],
       description: [
         this.protocol.description,
-        ValidateRules("description", this.fieldValidation("description")),
+        ValidateRules("description", descriptionValidation),
       ],
+      uri: [this.protocol.uri],
+      version: [this.protocol.version],
     });
   }
 
@@ -515,6 +547,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
     mtblProtocol.protocolType = new Ontology();
     mtblProtocol.protocolType.annotationValue = this.getFieldValue("name");
     mtblProtocol.parameters = this.getFieldValue("parameters");
+    mtblProtocol.uri = this.getFieldValue("uri");
+    mtblProtocol.version = this.getFieldValue("version");
     return { protocol: mtblProtocol.toJSON() };
   }
 
@@ -645,4 +679,53 @@ export class ProtocolComponent implements OnInit, OnChanges {
         this.selectedParameterValue = event.value;
       }
 
+      openUri(uri: string) {
+        if (!uri) return;
+        const url = /^(https?:\/\/)/i.test(uri) ? uri : `https://${uri}`;
+        window.open(url, '_blank', 'noopener');
+      }
+
+      getFieldMetadata(fieldId: string) {
+        const fieldMapping = {
+          'name': 'Study Protocol Name',
+          'description': 'Study Protocol Description',
+          'uri': 'Study Protocol URI',
+          'version': 'Study Protocol Version',
+          'parameterName': 'Study Protocol Parameter Name'
+        };
+        const fieldName = fieldMapping[fieldId] || fieldId;
+        return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+      }
+
+      getFieldHint(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.combinedDescription) {
+          return metadata.combinedDescription;
+        }
+        return this.fieldValidation(fieldId)?.description || '';
+      }
+
+      getFieldPlaceholder(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.placeholder) {
+          return metadata.placeholder;
+        }
+        return this.fieldValidation(fieldId)?.placeholder || '';
+      }
+
+      getFieldLabel(fieldId: string): string {
+        const metadata = this.getFieldMetadata(fieldId);
+        if (metadata && metadata.label) {
+          return metadata.label;
+        }
+        // Fallback to a prettified version of the field mapping if available
+        const fieldMapping = {
+          'name': 'Protocol Name',
+          'description': 'Protocol Description',
+          'uri': 'Protocol URI',
+          'version': 'Protocol Version',
+          'parameterName': 'Protocol Parameter Name'
+        };
+        return fieldMapping[fieldId] || fieldId;
+      }
 }

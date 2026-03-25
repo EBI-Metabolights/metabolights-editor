@@ -67,8 +67,7 @@ import {
   styleUrls: ["./table.component.css"],
 })
 export class TableComponent
-  implements OnInit, AfterViewInit, AfterViewChecked, OnChanges
-{
+  implements OnInit, AfterViewInit, AfterViewChecked, OnChanges {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
@@ -82,6 +81,9 @@ export class TableComponent
   @Input("validationsId") validationsId: any;
   @Input("enableControlList") enableControlList = true;
   @Input("templateRowPresent") templateRowPresent: boolean = false;
+  @Input() showAddSample = false;
+  @Input() tableDescription: string = null;
+  @Input() tableDescriptionUrl: string = null;
 
   @ViewChildren(OntologyComponent)
   ontologyComponents: QueryList<OntologyComponent>;
@@ -90,11 +92,12 @@ export class TableComponent
   @Output() rowsUpdated = new EventEmitter<any>();
   @Output() rowEdit = new EventEmitter<any>();
   @Output() refreshTableData = new EventEmitter<void>();
+  @Output() addSampleClick = new EventEmitter<void>();
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
   editorValidationRules$: Observable<Record<string, any>> = inject(
     Store
-  ).select(ValidationState.rules);
+  ).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(
     ApplicationState.readonly
   );
@@ -132,7 +135,6 @@ export class TableComponent
   ];
 
   private toastrSettings: Record<string, any> = null;
-  private lastTableWidth = 0;
   private isSyncing = false;
 
   private studyId: string;
@@ -159,8 +161,8 @@ export class TableComponent
   lastColSelection = null;
 
   displayedTableColumns: any = [];
-  isRequiredField:boolean = false;
-  isEmptyOntology:boolean = false;
+  isRequiredField: boolean = false;
+  isEmptyOntology: boolean = false;
   ontologyCols: any = {};
   fileColumns: any = [];
   controlListColumns: Map<string, any> = new Map<string, any>();
@@ -199,10 +201,11 @@ export class TableComponent
   selectedMissingKey = null;
   selectedMissingVal = null;
   isEditColumnMissingModalOpen = false;
-  assayTechnique: { name: string; sub: string; main: string } = {
+  assayTechnique: { name: string; sub: string; main: string; template: string } = {
     name: null,
     sub: null,
     main: null,
+    template: null,
   };
   stableColumns: any = ["Protocol REF", "Metabolite Assignment File"];
   ontologies = [];
@@ -220,8 +223,15 @@ export class TableComponent
   tableTypeValue: string = "";
   openUploadArea: boolean = false;
   filePatternString: string = "^([asi]_.+.txt|m_.+.tsv)$";
-  imageErrorMap = new Map<string, boolean>(); 
+  imageErrorMap = new Map<string, boolean>();
   private legacyControlLists: Record<string, any[]> | null = null;
+
+  // Caches for unstable objects to prevent infinite loops in change detection
+  private _columnControlListCache = new Map<string, any>();
+  private _columnValidationsCache = new Map<string, any>();
+  private _columnMetadataCache = new Map<string, any>();
+  private _defaultOntologiesCache = new Map<string, any[]>();
+  private readonly EMPTY_ARRAY = [];
 
   private studyCategory: StudyCategoryStr = null;
   private templateVersion: string = null;
@@ -229,6 +239,17 @@ export class TableComponent
   private studyCreatedAt: any;
   statusMessage: string;
   statusType: string;
+
+  private orderRowsByIndex(rows: any[]): any[] {
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return rows;
+    }
+    const hasIndex = rows.every((row) => row && typeof row.index === "number");
+    if (!hasIndex) {
+      return rows;
+    }
+    return [...rows].sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
+  }
 
   constructor(
     private clipboardService: ClipboardService,
@@ -255,15 +276,13 @@ export class TableComponent
     if (this.data) {
       this.columnHidden = this.data.columns_hidden;
       this.sampleAbundance = this.data.sample_abundance;
-      const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
+      const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file;
       if (localStorage.getItem(fileKey) !== null) {
         this.view = localStorage.getItem(fileKey);
-        if (this.view === "expanded") {
-          this.displayedTableColumns = Object.keys(this.data.header);
-        }
       } else {
         localStorage.setItem(fileKey, "compact");
       }
+      this.refreshDisplayedColumns();
       this.tableTypeValue = this.getTableTypeVal(this.data.file);
     }
   }
@@ -289,7 +308,7 @@ export class TableComponent
     this.toastrSettings$.subscribe((value) => (this.toastrSettings = value));
 
     this.studyIdentifier$.pipe(filter(value => value !== null)).subscribe((value) => {
-        this.studyId = value;
+      this.studyId = value;
     });
     this.sampleTemplate$.subscribe((value) => {
       this.sampleTemplate = value;
@@ -311,6 +330,9 @@ export class TableComponent
     });
     this.editorValidationRules$.subscribe((value) => {
       this.validations = value;
+      if (this.data && this.data.header && this.controlListColumns.size === 0) {
+        this.detectControlListColumns();
+      }
     });
     this.studyFiles$.subscribe((value) => {
       if (value) {
@@ -327,12 +349,47 @@ export class TableComponent
 
   @HostListener("window:keydown", ["$event"])
   handleDeleteKeydown(event: KeyboardEvent) {
-    //console.log(`event key: ${event.key}`)
     if (["Delete", "Backspace"].includes(event.key) && !this.isEditModalOpen) {
       // reusing an existing method to delete cell content by instead pasting empty strings
       if (this.selectedCells.length > 0)
         this.savePastedCellContent(new ClipboardEvent("paste"), null, true);
     }
+  }
+
+  @HostListener("window:copy", ["$event"])
+  onWindowCopy(e: ClipboardEvent) {
+    if (this.shouldHandleClipboardEvent(e)) {
+      this.onCopy(e);
+    }
+  }
+
+  @HostListener("window:paste", ["$event"])
+  onWindowPaste(e: ClipboardEvent) {
+    if (this.shouldHandleClipboardEvent(e)) {
+      this.onPaste(e);
+    }
+  }
+
+  @HostListener("window:cut", ["$event"])
+  onWindowCut(e: ClipboardEvent) {
+    if (this.shouldHandleClipboardEvent(e)) {
+      this.onCut(e);
+    }
+  }
+
+  shouldHandleClipboardEvent(e: Event): boolean {
+    const target = e.target as HTMLElement;
+    const isInput =
+      ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName) ||
+      target.isContentEditable;
+
+    if (isInput) return false;
+
+    return (
+      this.selectedCells.length > 0 ||
+      this.selectedColumns.length > 0 ||
+      this.selectedRows.length > 0
+    );
   }
 
   isFirstRow(row: any): boolean {
@@ -382,8 +439,16 @@ export class TableComponent
     this.deSelect();
     this.data = this.tableData.data;
     if (this.data) {
+      // Clear caches for new data
+      this._columnControlListCache.clear();
+      this._columnValidationsCache.clear();
+      this._columnMetadataCache.clear();
+      this._defaultOntologiesCache.clear();
+
       this.hit = true;
-      this.fullRows = this.data.rows;
+      const orderedRows = this.orderRowsByIndex(this.data.rows);
+      this.data.rows = orderedRows;
+      this.fullRows = orderedRows;
       this.refreshDisplayedColumns();
       this.dataSource = new MatTableDataSource(this.fullRows);
 
@@ -429,20 +494,35 @@ export class TableComponent
 
       this.setupPaginator();
       this.detectFileColumns();
+
+      // Ensure assayTechnique is extracted early for metadata fetching
+      if (this.getIsaFileType(this.data.file) === "assay") {
+        const result = this.tableData.meta || this.assayService.extractAssayDetails(this.tableData, this.studyId);
+        if (result) {
+          this.assayTechnique.name = result.assayTechnique?.name;
+          this.assayTechnique.sub = result.assaySubTechnique?.name;
+          this.assayTechnique.main = result.assayMainTechnique?.name;
+          this.assayTechnique.template = result.template || result.assaySubTechnique?.template;
+        }
+      }
+
       this.validateTableOntologyColumns();
       this.refreshDisplayedColumns();
     }
   }
 
   onCopy(e) {
+    e.preventDefault();
     this.copyCellContent(e);
   }
 
   onCut(e) {
+    e.preventDefault();
     this.cutCellContent(e);
   }
 
   onPaste(e) {
+    e.preventDefault();
     this.savePastedCellContent(e, null);
   }
 
@@ -506,13 +586,17 @@ export class TableComponent
           });
         }
       }
-      const navigator = window.navigator;
-      navigator.clipboard.writeText(content).then(
-        () => {},
-        (err) => {
-          console.error("Async: Could not copy text: ", err);
-        }
-      );
+      if (e && e.clipboardData) {
+        e.clipboardData.setData("text/plain", content);
+      } else {
+        const navigator = window.navigator;
+        navigator.clipboard.writeText(content).then(
+          () => { },
+          (err) => {
+            console.error("Async: Could not copy text: ", err);
+          }
+        );
+      }
     }
   }
 
@@ -540,11 +624,11 @@ export class TableComponent
       : '';
   }
   onImageError(row: any): void {
-  const id = row?.['database_identifier'];
-  if (id) {
-    this.imageErrorMap.set(id, true); // mark this ID as failed
+    const id = row?.['database_identifier'];
+    if (id) {
+      this.imageErrorMap.set(id, true); // mark this ID as failed
+    }
   }
-}
   savePastedCellContent(e, pvalue, deleting: boolean = false) {
     const cellsToUpdate = [];
     if (!this.isEditModalOpen) {
@@ -665,6 +749,28 @@ export class TableComponent
     }
   }
 
+  getUploadLabel(): string {
+    if (this.validationsId === "samples") {
+      return "sample file";
+    } else if (this.validationsId === "assays") {
+      return "assay files";
+    } else if (this.validationsId === "maf") {
+      return "maf files";
+    }
+    return "files";
+  }
+
+  getUploadHint(): string {
+    if (
+      this.validationsId === "samples" ||
+      this.validationsId === "assays" ||
+      this.validationsId === "maf"
+    ) {
+      return "";
+    }
+    return " (metadata only)";
+  }
+
   detectFileColumns() {
     Object.keys(this.data.header).forEach((col) => {
       if (
@@ -679,6 +785,11 @@ export class TableComponent
   }
 
   detectControlListColumns() {
+    // Clear caches as validations are being re-evaluated
+    this._columnControlListCache.clear();
+    this._columnValidationsCache.clear();
+    this._defaultOntologiesCache.clear();
+
     Object.keys(this.data.header).forEach((col) => {
       const formattedColumnName = col.replace(/\.[0-9]+$/, "");
 
@@ -757,7 +868,7 @@ export class TableComponent
           col,
           Object.freeze({
             ...existing, // Keep old validations for display
-            rule, 
+            rule,
             // "data-type": isOntologyType ? "ontology" : rule.validationType,
             renderAsDropdown: rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required"
           })
@@ -783,69 +894,135 @@ export class TableComponent
   }
 
   columnControlList(header) {
-    if (
-      this.enableControlList &&
-      this.controlListColumns.size === 0 &&
-      this.data &&
-      this.data.header
-    ) {
-      this.detectControlListColumns();
+    if (!header) {
+      return {};
     }
-  if (this.enableControlList && header && this.controlListNames.has(header)) {
-    const controlList = this.controlLists.get(header);
-    const colData = this.controlListColumns.get(header);
-    if (controlList) {
-      return {
-        ...controlList,
-        renderAsDropdown: colData?.renderAsDropdown || false,
-        rule: colData?.rule || null,
-      };
-    } else if (colData) {
-      return {
-        name: header,
-        values: [],
-        renderAsDropdown: colData?.renderAsDropdown || false,
-        rule: colData?.rule || null,
-      };
+
+    // Check cache first
+    if (this._columnControlListCache.has(header)) {
+      return this._columnControlListCache.get(header);
     }
+
+    let result = {};
+    if (this.enableControlList && (this.controlListNames.has(header) || this.controlListColumns.has(header) || this.controlLists.has(header))) {
+      const controlList = this.controlLists.get(header);
+      const colData = this.controlListColumns.get(header);
+      if (controlList) {
+        result = {
+          ...controlList,
+          renderAsDropdown: colData?.renderAsDropdown || false,
+          rule: colData?.rule || null,
+        };
+      } else if (colData) {
+        result = {
+          name: header,
+          values: [],
+          renderAsDropdown: colData?.renderAsDropdown || false,
+          rule: colData?.rule || null,
+        };
+      }
+    } else if (this.enableControlList) {
+      result = this.defaultControlList;
+    }
+
+    // Cache the result
+    this._columnControlListCache.set(header, result);
+    return result;
   }
-  if (this.enableControlList) {
-    return this.defaultControlList;
-  }
-  return {};
-}
 
 
   columnValidations(header) {
+    if (!header) {
+      return {};
+    }
+
+    // Check cache
+    if (this._columnValidationsCache.has(header)) {
+      return this._columnValidationsCache.get(header);
+    }
+
+    let result: any = {};
+
     if (
       this.enableControlList &&
-      header &&
-      this.controlListColumns.size > 0 &&
       this.controlListColumns.has(header)
     ) {
-      const colData = this.controlListColumns.get(header)["ontology-details"];
-      this.isRequiredField = this.controlListColumns.get(header)["ontology-details"]["is-required"] == "true";
-      return colData;
+      const colVal = this.controlListColumns.get(header);
+      let colData = colVal?.["ontology-details"];
+
+      // If we have a validation rule but no description in colData, look it up in global validations
+      if (!colData?.description && this.validation?.default_order) {
+        const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+        // Extract the part inside Parameter Value[...] if applicable
+        let innerName = formattedColumnName;
+        const match = formattedColumnName.match(/\[(.*?)\]/);
+        if (match) {
+          innerName = match[1];
+        }
+
+        const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+
+        const techniquePrefix = (this.technique || "").replace("-", "_").toUpperCase() + "_";
+
+        // 1. Try to find an entry that matches both technique and header in columnDef
+        let validationEntry = this.validation.default_order.find(entry => {
+          const entryColDef = (entry.columnDef || "").toUpperCase();
+          const entryHeader = (entry.header || "").toLowerCase();
+          return entryColDef.startsWith(techniquePrefix) && targetHeaders.includes(entryHeader);
+        });
+
+        // 2. Fallback
+        if (!validationEntry) {
+          validationEntry = this.validation.default_order.find(entry =>
+            targetHeaders.includes((entry.header || "").toLowerCase()) ||
+            targetHeaders.includes((entry.columnDef || "").toLowerCase())
+          );
+        }
+
+        if (validationEntry) {
+          const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
+          if (ruleDesc) {
+            colData = { ...(colData || {}), description: ruleDesc };
+          }
+        }
+      }
+      // Note: Removed side-effect setting this.isRequiredField here. it is handled in editCell/editColumn
+      result = colData || {};
+    } else if (this.enableControlList) {
+      result = this.validations?.default_ontology_validation?.["ontology-details"] || {};
     }
-    if (this.enableControlList) {
-      return this.validations.default_ontology_validation["ontology-details"];
+
+    // Add prioritized metadata (Configuration over validations.json)
+    const metadata = this.getColumnMetadata(header);
+    if (metadata) {
+      result = { ...result };
+      if (metadata.combinedDescription) {
+        result.description = (result.description || "") + (result.description ? " " : "") + metadata.combinedDescription;
+      }
+      if (metadata.required !== undefined) {
+        result["is-required"] = metadata.required;
+      }
     }
-    return {};
+
+    // Cache the result
+    this._columnValidationsCache.set(header, result);
+    return result;
+  }
+
+  onViewChange(value: string) {
+    this.view = value;
+    const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file;
+    localStorage.setItem(fileKey, this.view);
+    this.refreshDisplayedColumns();
+    setTimeout(() => this.updateScrollBehavior());
   }
 
   toggleView() {
-    const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file
     if (this.view === "compact") {
-      this.view = "expanded";
-      localStorage.setItem(fileKey, "expanded");
+      this.onViewChange("expanded");
     } else {
-      this.view = "compact";
-      localStorage.setItem(fileKey, "compact");
+      this.onViewChange("compact");
     }
-    this.refreshDisplayedColumns();
-
-    // After toggling, check if scroll is really needed
-    setTimeout(() => this.updateScrollBehavior());
   }
 
   refreshDisplayedColumns() {
@@ -969,7 +1146,7 @@ export class TableComponent
   }
 
   applyFilter(filterValue: string) {
-    this.dataSource.data = this.tableData.data.rows;
+    this.dataSource.data = this.data?.rows || [];
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
@@ -1009,6 +1186,47 @@ export class TableComponent
     return s;
   }
 
+  getColumnMetadata(header: string) {
+    if (!header || !this.data || !this.data.file) {
+      return null;
+    }
+
+    // Check cache
+    if (this._columnMetadataCache.has(header)) {
+      return this._columnMetadataCache.get(header);
+    }
+
+    const fileTypeRaw = this.getTableType(this.data.file);
+    const fileType: IsaTabFileType = fileTypeRaw === 'samples' ? 'sample' : fileTypeRaw as IsaTabFileType;
+
+    // For assay files, attempt to resolve the assay type (templateName)
+    let templateName = null;
+    if (fileType === 'assay') {
+      // Prioritize template (e.g. "LC-MS") over tech name (e.g. "LCMS")
+      templateName = this.assayTechnique?.template || this.assayTechnique?.name || null;
+    }
+
+    const metadata = this.editorService.getFieldMetadata(header, fileType, templateName, this.validationsId);
+    this._columnMetadataCache.set(header, metadata);
+    return metadata;
+  }
+
+  getColumnTooltip(header: string): string {
+    const metadata = this.getColumnMetadata(header);
+    if (metadata && metadata.combinedDescription) {
+      return metadata.combinedDescription;
+    }
+
+    // Fallback to existing validation-based description
+    const validation = this.columnValidations(header);
+    return validation?.description || '';
+  }
+
+  isFieldRequired(header: string): boolean {
+    const metadata = this.getColumnMetadata(header);
+    return metadata?.required === true;
+  }
+
   getDataString(row) {
     let rowString = "";
     Object.keys(row).forEach(
@@ -1031,7 +1249,7 @@ export class TableComponent
       });
       this.dataSource.data = data;
     } else {
-      this.dataSource.data = this.data.data.rows;
+      this.dataSource.data = this.data?.rows || [];
     }
   }
 
@@ -1095,7 +1313,7 @@ export class TableComponent
         new actionClass(this.data.file, { data: rows }, null, this.studyId)
       )
       .subscribe({
-        next: () => {},
+        next: () => { },
         error: (error) => {
           this.isFormBusy = false;
         },
@@ -1291,7 +1509,7 @@ export class TableComponent
     );
   }
 
-   isSelected(row, column) {
+  isSelected(row, column) {
 
     if (!row) return false;
 
@@ -1323,6 +1541,9 @@ export class TableComponent
   }
 
   headerClick(column: any, event) {
+    if (this.div2 && this.div2.nativeElement) {
+      this.div2.nativeElement.focus();
+    }
     this.selectedCells = [];
     this.selectedRows = [];
     const entryIndex = column.columnDef;
@@ -1371,6 +1592,9 @@ export class TableComponent
   }
 
   rowClick(row: any, event: MouseEvent) {
+    if (this.div2 && this.div2.nativeElement) {
+      this.div2.nativeElement.focus();
+    }
     const entryIndex = row.index;
     const rowNamesArray: number[] = this.tableData.data.rows.map((e) => e.index);
     const rowIndex = this.selectedRows.indexOf(entryIndex);
@@ -1425,6 +1649,9 @@ export class TableComponent
 
 
   cellClick(row: any, column: any, event) {
+    if (this.div2 && this.div2.nativeElement) {
+      this.div2.nativeElement.focus();
+    }
     if (event.altKey) {
       this.selectedCells.push([column.columnDef, row.index]);
     } else {
@@ -1441,6 +1668,10 @@ export class TableComponent
       this.isEditModalOpen = true;
       this.selectedCell["row"] = row;
       this.selectedCell["column"] = column;
+
+      // Calculate isRequiredField for the selected column
+      const metadata = this.getColumnMetadata(column.header);
+      this.isRequiredField = metadata?.required === true;
 
       // if (this.fileColumns.indexOf(column.header) > -1) {
       //   this.isCellTypeFile = true;
@@ -1530,7 +1761,7 @@ export class TableComponent
         },
       ];
 
-    // ONTOLOGY cell (either dropdown or autocomplete)
+      // ONTOLOGY cell (either dropdown or autocomplete)
     } else if (this.enableControlList && this.isCellTypeOntology) {
       // Dropdown flow for selected-ontology-term
       if (controlList && controlList.renderAsDropdown) {
@@ -1565,10 +1796,10 @@ export class TableComponent
           editOntComp?.values?.[0] ??
           (this.editCellform?.get("cell")?.value
             ? {
-                annotationValue: this.editCellform.get("cell").value,
-                termAccession: "",
-                termSource: { name: "" },
-              }
+              annotationValue: this.editCellform.get("cell").value,
+              termAccession: "",
+              termSource: { name: "" },
+            }
             : null);
 
         if (this.isRequiredField && (!selectedOntology || !selectedOntology.annotationValue)) {
@@ -1598,7 +1829,7 @@ export class TableComponent
         ];
       }
 
-    // FILE or plain cell
+      // FILE or plain cell
     } else if (this.enableControlList && this.isCellTypeFile) {
       cellsToUpdate = [
         {
@@ -1699,7 +1930,7 @@ export class TableComponent
       )
       .subscribe({
         next: (completed) => {
-           if (this.statusType == 'success') {
+          if (this.statusType == 'success') {
             toastr.success(this.statusMessage, this.statusType, this.toastrSettings);
           }
           this.closeEditMissingColValModal();
@@ -1864,7 +2095,7 @@ export class TableComponent
       this.selectedCellOntology = null;
     }
   }
- 
+
   cellOntologyValue() {
     const data = this.data.header[this.selectedCell["column"].header];
     let columnIndex = 0;
@@ -1898,41 +2129,84 @@ export class TableComponent
   }
 
   getValidationDefinition(header) {
+    if (!header) return null;
+
     let selectedColumn = null;
+    let techniqueSpecificColumn = null;
+
+    // Resolve technique if likely an assay file
     if (
       this.tableData?.data?.file &&
       this.tableData.data.file.startsWith("a_") &&
       this.assayTechnique.name === null
     ) {
-      const result = this.assayService.extractAssayDetails(
+      const result = this.tableData.meta || this.assayService.extractAssayDetails(
         this.tableData,
         this.studyId
       );
-      this.assayTechnique.name = result.assayTechnique?.name;
-      this.assayTechnique.sub = result.assaySubTechnique?.name;
-      this.assayTechnique.main = result.assayMainTechnique?.name;
+      if (result) {
+        this.assayTechnique.name = result.assayTechnique?.name;
+        this.assayTechnique.sub = result.assaySubTechnique?.name;
+        this.assayTechnique.main = result.assayMainTechnique?.name;
+        this.assayTechnique.template = result.template || result.assaySubTechnique?.template;
+      }
     }
-    // const tableTechnique = this.tableData.meta?.assayTechnique?.name;
-    let techniqueSpecificColumn = null;
-    this.validation.default_order.forEach((col) => {
-      if (col.header === header) {
-        if (
-          this.assayTechnique.name !== null &&
-          "techniqueNames" in col &&
-          col["techniqueNames"] &&
-          col["techniqueNames"].length > 0
-        ) {
-          if (col["techniqueNames"].indexOf(this.assayTechnique.name) > -1) {
-            selectedColumn = col;
-            if (techniqueSpecificColumn === null) {
+
+    const currentTechnique = this.assayTechnique.name;
+    const techniquePrefix = currentTechnique
+      ? (currentTechnique.replace(/-/g, "_").toUpperCase() + "_")
+      : "";
+
+    // Prepare target headers (current header, stripped header, inner Parameter Value)
+    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
+    let innerName = formattedColumnName;
+    const match = formattedColumnName.match(/\[(.*?)\]/);
+    if (match) {
+      innerName = match[1];
+    }
+    // Comparison set: original, formatted, inner (all lowercased)
+    const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
+
+    // Iterate through validations
+    if (this.validation && this.validation.default_order) {
+      this.validation.default_order.forEach((col) => {
+        const entryHeader = (col.header || "").toLowerCase();
+        const entryColDef = (col.columnDef || "").toUpperCase();
+
+        // 1. Check if this entry matches our column header
+        const isHeaderMatch = targetHeaders.includes(entryHeader);
+
+        // 2. Check if this entry is intended for our specific technique
+        const isTechniqueMatch = techniquePrefix && entryColDef.startsWith(techniquePrefix);
+
+        // 3. Fallback: check if columnDef matches our header (sometimes used)
+        const isColDefMatch = targetHeaders.includes((col.columnDef || "").toLowerCase());
+
+        if (isHeaderMatch || isColDefMatch) {
+          // If we already have a technique-specific match, don't overwrite it with a generic one
+          if (techniqueSpecificColumn) return;
+
+          // If this validation entry has specific technique names listed
+          if (
+            currentTechnique &&
+            col["techniqueNames"] &&
+            col["techniqueNames"].length > 0
+          ) {
+            if (col["techniqueNames"].indexOf(currentTechnique) > -1) {
+              // Strict technique match found in list
               techniqueSpecificColumn = col;
             }
+          } else if (isTechniqueMatch) {
+            // Implicit technique match via columnDef prefix
+            techniqueSpecificColumn = col;
+          } else {
+            // Generic match
+            selectedColumn = col;
           }
-        } else {
-          selectedColumn = col;
         }
-      }
-    });
+      });
+    }
+
     return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
   }
 
@@ -1948,6 +2222,10 @@ export class TableComponent
 
       this.selectedColumn = column;
 
+      // Calculate isRequiredField for the selected column
+      const metadata = this.getColumnMetadata(column.header);
+      this.isRequiredField = metadata?.required === true;
+
       if (
         this.enableControlList &&
         this.ontologyColumns.indexOf(column.header) > -1
@@ -1960,6 +2238,13 @@ export class TableComponent
       });
 
       this.editColumnform.markAsDirty();
+
+      if (this.isCellTypeOntology) {
+        setTimeout(() => {
+          const editOntologyColumn = this.getOntologyComponentValue("editOntologyColumn");
+          editOntologyColumn?.reset();
+        });
+      }
     }
   }
 
@@ -2044,11 +2329,20 @@ export class TableComponent
       );
   }
 
+  get technique(): string {
+    const filename = this.data?.file || "";
+    const parts = filename.split("_");
+    if (parts.length >= 3 && parts[0] === 'a') {
+      return parts[2];
+    }
+    return null;
+  }
+
   get validation() {
     if (this.validationsId.includes(".")) {
       const arr = this.validationsId.split(".");
       let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
+      while (arr.length && (tempValidations = tempValidations[arr.shift()])) { }
       return tempValidations;
     }
     return this.validations[this.validationsId];
@@ -2078,14 +2372,14 @@ export class TableComponent
         sOntology.annotationValue = this.data.rows[firstCell[1]][firstCell[0]];
         sOntology.termAccession =
           this.data.rows[firstCell[1]][
-            this.data.columns[columnIndex + 2].header
+          this.data.columns[columnIndex + 2].header
           ];
         sOntology.termSource = new OntologySourceReference();
         sOntology.termSource.description = "";
         sOntology.termSource.file = "";
         sOntology.termSource.name =
           this.data.rows[firstCell[1]][
-            this.data.columns[columnIndex + 1].header
+          this.data.columns[columnIndex + 1].header
           ];
         sOntology.termSource.provenance_name = "";
         sOntology.termSource.version = "";
@@ -2121,7 +2415,14 @@ export class TableComponent
     );
   }
 
-  onChanges() {}
+  onChanges(event) {
+    // Update form control when ontology changes in column edit modal
+    if (Array.isArray(event) && this.editColumnform) {
+      const value = event.length > 0 ? event[0].annotationValue : '';
+      this.editColumnform.get('cell')?.setValue(value);
+      this.editColumnform.markAsDirty();
+    }
+  }
 
   triggerChanges() {
     this.updated.emit();
@@ -2148,23 +2449,25 @@ export class TableComponent
       this.wrapper2.nativeElement.style.overflowX = overflowStyle;
     }
 
+    // Reset explicit widths prior to recalculating the layout dimensions
+    if (this.div2) {
+      this.div2.nativeElement.style.width = "";
+    }
+    const div1 = document.getElementById("div1");
+    if (div1) div1.style.width = "";
+
     // Get the real rendered width of the table
     const tableEl = this.wrapper2?.nativeElement.querySelector("table");
     if (!tableEl) return;
 
+    // Force reflow and get correct width based on current view/columns
     const tableWidth = tableEl.scrollWidth;
 
-    // Update only if width has changed (to avoid infinite loop in AfterViewChecked)
-    if (tableWidth !== this.lastTableWidth) {
-      this.lastTableWidth = tableWidth;
-
-      if (this.div2) {
-        this.div2.nativeElement.style.width = `${tableWidth}px`;
-        this.div2.nativeElement.style.overflowX = overflowStyle;
-      }
-
-      const div1 = document.getElementById("div1");
-      if (div1) div1.style.width = `${tableWidth}px`;
+    if (this.div2) {
+      this.div2.nativeElement.style.width = `${tableWidth}px`;
+    }
+    if (div1) {
+      div1.style.width = `${tableWidth}px`;
     }
   }
 
@@ -2206,65 +2509,74 @@ export class TableComponent
     // handle uploaded files
     this.refreshTableData.emit();
   }
- getDefaultOntologies(header: string): string[] {
-  const fileType = this.getIsaFileType(this.data.file); 
-  const fileTypeKey = `${fileType}FileControls`; 
-
-  if (
-    this.legacyControlLists &&
-    this.legacyControlLists.controls &&
-    this.legacyControlLists.controls[fileTypeKey] &&
-    this.legacyControlLists.controls[fileTypeKey].__default__
-  ) {
-    let defaultRule = this.legacyControlLists.controls[fileTypeKey].__default__[0];
-   
-    if (header.includes("Factor Value[") && fileType === "sample") {
-      defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_factor_value__
-?.[0];
+  getDefaultOntologies(header: string): string[] {
+    if (this._defaultOntologiesCache.has(header)) {
+      return this._defaultOntologiesCache.get(header);
     }
 
-    if (header.includes("Characteristics[") && fileType === "sample") {
-      defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_characteristic__?.[0];
+    const fileType = this.getIsaFileType(this.data.file);
+    const fileTypeKey = `${fileType}FileControls`;
+
+    if (
+      this.legacyControlLists &&
+      this.legacyControlLists.controls &&
+      this.legacyControlLists.controls[fileTypeKey] &&
+      this.legacyControlLists.controls[fileTypeKey].__default__
+    ) {
+      let defaultRule = this.legacyControlLists.controls[fileTypeKey].__default__[0];
+
+      if (header.includes("Factor Value[") && fileType === "sample") {
+        defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_factor_value__
+          ?.[0];
+      }
+
+      if (header.includes("Characteristics[") && fileType === "sample") {
+        defaultRule = this.legacyControlLists.controls[fileTypeKey].__default_characteristic__?.[0];
+      }
+
+      if (defaultRule) {
+        this._defaultOntologiesCache.set(header, defaultRule);
+        return defaultRule;
+      }
     }
-    return defaultRule;
+
+    this._defaultOntologiesCache.set(header, this.EMPTY_ARRAY);
+    return this.EMPTY_ARRAY;
   }
-
-  return [];
-}
-onEmptyError(isEmpty: boolean) {
+  onEmptyError(isEmpty: boolean) {
     this.isEmptyOntology = isEmpty;
   }
 
-private getSelectableRowIndexes(): number[] {
-  if (!this.tableData?.data?.rows) return [];
+  private getSelectableRowIndexes(): number[] {
+    if (!this.tableData?.data?.rows) return [];
 
-  const allIndexes = this.tableData.data.rows.map(r => r.index);
+    const allIndexes = this.tableData.data.rows.map(r => r.index);
 
-  if (this.getTableType(this.data.file) === 'assay') {
-    const firstRowObj = this.tableData.data.rows.find(r => this.isFirstRow(r));
-    if (firstRowObj) {
-      return allIndexes.filter(idx => idx !== firstRowObj.index);
+    if (this.getTableType(this.data.file) === 'assay' && this.templateRowPresent) {
+      const firstRowObj = this.tableData.data.rows.find(r => this.isFirstRow(r));
+      if (firstRowObj) {
+        return allIndexes.filter(idx => idx !== firstRowObj.index);
+      }
+    }
+
+    return allIndexes;
+  }
+
+  isAllSelected(): boolean {
+    const selectable = this.getSelectableRowIndexes();
+    if (selectable.length === 0) return false;
+    return selectable.every(idx => this.selectedRows.includes(idx));
+  }
+
+  toggleSelectAll(): void {
+    const selectable = this.getSelectableRowIndexes();
+
+    if (this.isAllSelected()) {
+      this.selectedRows = this.selectedRows.filter(idx => !selectable.includes(idx));
+    } else {
+      this.selectedRows = Array.from(new Set([...this.selectedRows, ...selectable]));
     }
   }
-
-  return allIndexes;
-}
-
-isAllSelected(): boolean {
-  const selectable = this.getSelectableRowIndexes();
-  if (selectable.length === 0) return false;
-  return selectable.every(idx => this.selectedRows.includes(idx));
-}
-
-toggleSelectAll(): void {
-  const selectable = this.getSelectableRowIndexes();
-
-  if (this.isAllSelected()) {
-    this.selectedRows = this.selectedRows.filter(idx => !selectable.includes(idx));
-  } else {
-    this.selectedRows = Array.from(new Set([ ...this.selectedRows, ...selectable ]));
-  }
-}
   get hasRows(): boolean {
     const rows = this.tableData?.data?.rows;
 

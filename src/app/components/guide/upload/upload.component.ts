@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
@@ -18,6 +18,9 @@ import { Operations } from "src/app/ngxs-store/study/files/files.actions";
   styleUrls: ["./upload.component.css"],
 })
 export class RawUploadComponent implements OnInit {
+  @Input() hideNav = false;
+  @Output() next = new EventEmitter<void>();
+
 
   user$: Observable<Owner> = inject(Store).select(UserState.user);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
@@ -37,7 +40,9 @@ export class RawUploadComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private store: Store
   ) {
-    this.editorService.initialiseStudy(this.route);
+    if(this.route.snapshot.paramMap.get('id')) {
+      this.editorService.initialiseStudy(this.route);
+    }
 
     this.setUpSubscriptionsNgxs();
     
@@ -64,14 +69,16 @@ export class RawUploadComponent implements OnInit {
   }
 
   refreshFiles() {
-    this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
+    if (this.requestedStudy) {
+      this.store.dispatch(new Operations.GetFreshFilesList(true, false, this.requestedStudy));
+    }
   }
 
   copyFilesAndProceed() {
-    // this.isLoading = true;
-    // this.editorService.syncStudyFiles({ files: [] }).subscribe((resp) => {
-      // this.isLoading = false;
-      this.router.navigate(["/guide/meta", this.requestedStudy]);
-    // });
+    if (this.hideNav) {
+      this.next.emit();
+    } else {
+      this.router.navigate(["/study", this.requestedStudy]);
+    }
   }
 }

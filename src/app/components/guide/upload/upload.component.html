@@ -1,29 +1,17 @@
-<nav-bar :mode="light"></nav-bar>
-<mtbls-progress [study]="requestedStudy" [step]="2"></mtbls-progress>
-<quick-link
-  path="study"
-  icon="chrome_reader_mode"
-  text="Study overview"
-></quick-link>
+<nav-bar mode="light" *ngIf="!hideNav"></nav-bar>
+<mtbls-progress [study]="requestedStudy" [step]="5" [hidePublicationStep]="true" *ngIf="!hideNav"></mtbls-progress>
+<quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
 <div class="columns">
   <div class="column is-half is-offset-one-quarter mb-5">
     <div>&nbsp;</div>
     <nav class="panel has-background-white">
       <div class="panel-heading">
-        <img
-          style="height: 32px"
-          class="is-pulled-left"
-          src="{{ baseHref }}assets/img/MetaboLightsLogo.png"
-        />
-        <span style="margin-left: 10px">{{ requestedStudy }}</span
-        >: Upload files
+        <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
+        <span style="margin-left: 10px">{{ requestedStudy }}</span>: Upload files
       </div>
       <div class="panel-block bg-white">
         <div class="column">
-          <mtbls-aspera
-            [type]="'any'"
-            [allowMultipleSelection]="true"
-          ></mtbls-aspera>
+          <mtbls-aspera [type]="'any'" [allowMultipleSelection]="true"></mtbls-aspera>
         </div>
       </div>
       <div class="panel-block bg-white">
@@ -44,25 +32,18 @@
       <p class="panel-heading">
         <small>Study files</small>
         <span class="is-pulled-right">
-          <a
-            target="_blank"
-            (click)="refreshFiles()"
-            class="button is-small is-light"
-          >
+          <a target="_blank" (click)="refreshFiles()" class="button is-small is-light">
             <mat-icon>refresh</mat-icon> refresh
           </a>
         </span>
       </p>
       <div class="panel-block has-background-white">
-        <span
-          *ngIf="
+        <span *ngIf="
             files &&
               ((files.latest && files.latest.length > 0) ||
                 (files.study && files.study.length > 0));
             else noUploadFiles
-          "
-          class="w100"
-        >
+          " class="w100">
           <span *ngIf="files.latest.length > 0">
             <small class="has-text-grey">RECENTLY UPDATED FILES</small>
             <span *ngFor="let file of files.latest">
@@ -82,9 +63,7 @@
                     </span>
                   </div>
                   <div class="column is-two-fifths has-text-right">
-                    <span class="is-pulled-right has-text-grey"
-                      ><small>{{ file.createdAt }}</small></span
-                    >
+                    <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt }}</small></span>
                   </div>
                 </div>
               </a>
@@ -110,9 +89,7 @@
                     </span>
                   </div>
                   <div class="column is-two-fifths has-text-right">
-                    <span class="is-pulled-right has-text-grey"
-                      ><small>{{ file.createdAt }}</small></span
-                    >
+                    <span class="is-pulled-right has-text-grey"><small>{{ file.createdAt }}</small></span>
                   </div>
                 </div>
               </a>
@@ -125,11 +102,7 @@
               <span>
                 <small class="has-text-grey"><i>No files</i></small>
                 <br /><br />
-                <a
-                  target="_blank"
-                  (click)="refreshFiles()"
-                  class="button is-small is-light"
-                >
+                <a target="_blank" (click)="refreshFiles()" class="button is-small is-light">
                   <mat-icon>refresh</mat-icon> refresh
                 </a>
               </span>
@@ -138,25 +111,15 @@
         </ng-template>
       </div>
       <div style="border-radius: 0" class="panel-block notification is-primary">
-        <small class="is-tiny"
-          ><mat-icon>info</mat-icon>&nbsp;Please use the
+        <small class="is-tiny"><mat-icon>info</mat-icon>&nbsp;Please use the
           <mat-icon>refresh</mat-icon> refresh button on the right to see the
-          files that has been updated.</small
-        >
+          files that has been updated.</small>
       </div>
     </nav>
     <nav class="panel has-background-white">
       <div class="panel-block">
-        <button
-          (click)="copyFilesAndProceed()"
-          class="button is-success is-fullwidth is-fullwidth"
-        >
-          <mat-spinner
-            [diameter]="20"
-            [strokeWidth]="3"
-            *ngIf="isLoading"
-          ></mat-spinner
-          >&nbsp;Next
+        <button (click)="copyFilesAndProceed()" class="button is-success is-fullwidth is-fullwidth">
+          <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
         </button>
       </div>
     </nav>

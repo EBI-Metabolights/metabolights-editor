@@ -18,7 +18,7 @@ export class AssaysComponent {
   isReadOnly = false;
 
   assays: any = [];
-  studyAssayFiles: any = [];
+  studyAssayFiles: any = null;
   currentSubIndex = 0;
   assaysNames: any = [];
 

@@ -21,6 +21,8 @@ interface UploadFile {
 export class DragAndDropComponent implements OnInit  {
   @Input() iscloseable: Boolean = false;
   @Input() filePatternString: string ="^([asi]_.+\.txt|m_.+\.tsv)$";
+  @Input() label: string ="files";
+  @Input() hint: string =" (metadata only)";
   @Output() closeUpload = new EventEmitter<void>();
   @Output() uploadComplete = new EventEmitter<UploadFile[]>();
 

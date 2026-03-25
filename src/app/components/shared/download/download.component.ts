@@ -9,6 +9,7 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { httpOptions } from "src/app/services/headers";
 import { HttpClient } from "@angular/common/http";
 import * as toastr from "toastr";
+import { EditorService } from "src/app/services/editor.service";
 
 @Component({
   selector: "mtbls-download",
@@ -31,7 +32,8 @@ export class DownloadComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private configService: ConfigurationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private editorService: EditorService
   ) {
     this.setUpSubscriptionsNgxs();
   }
@@ -117,5 +119,4 @@ export class DownloadComponent implements OnInit {
       this.metabolightsService.openTextFileInNewTab(url);
     }
   }
-
 }

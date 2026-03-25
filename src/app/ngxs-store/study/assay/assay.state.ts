@@ -49,7 +49,6 @@ export class AssayState {
 
     @Action(AssayList.Get)
     GetAssayList(ctx: StateContext<AssayStateModel>, action: AssayList.Get) {
-        this.store.dispatch(new SetLoadingInfo(this.assaysService.loadingMessage));
         if (action.id) {
             this.generalMetadataService.getStudyGeneralMetadata(action.id).pipe(take(1)).subscribe(
                 (response) => {
@@ -139,15 +138,47 @@ export class AssayState {
                         cell: (element) => eval(fn),
                     });
                 });
-                let displayedColumns = columns.map((a) => a.columnDef);
-                displayedColumns.unshift("Select");
-                displayedColumns = displayedColumns.filter(
+                const compactPriorityColumns = [
+                    "Sample Name",
+                    "Raw Spectral Data File",
+                    "Free Induction Decay Data File",
+                    "Acquisition Parameter Data File",
+                    "Derived Spectral Data File"
+                ];
+
+                let displayedColumns = [];
+                let fullOrderedColumns = columns.map((a) => a.columnDef);
+                fullOrderedColumns.unshift("Select");
+                fullOrderedColumns.sort((a, b) => ((data.header[a] as any) || 0) - ((data.header[b] as any) || 0));
+
+                const applyPriority = (cols: string[]) => {
+                    const move = (col: string, targetIndex: number) => {
+                        const idx = cols.indexOf(col);
+                        if (idx > -1 && idx !== targetIndex) {
+                            cols.splice(idx, 1);
+                            cols.splice(targetIndex, 0, col);
+                        }
+                    };
+                    let currentIndex = 1;
+                    compactPriorityColumns.forEach(pCol => {
+                        if (cols.includes(pCol)) {
+                            move(pCol, currentIndex);
+                            currentIndex++;
+                        }
+                    });
+                };
+
+                applyPriority(fullOrderedColumns);
+
+                displayedColumns = fullOrderedColumns.filter(
                     (key) =>
                         key.indexOf("Term Accession Number") < 0 &&
                         key.indexOf("Term Source REF") < 0
                 );
+
                 data["columns"] = columns;
                 data["displayedColumns"] = displayedColumns;
+                data["allColumns"] = fullOrderedColumns;
                 data["file"] = action.assaySheetFilename;
                 data.data.rows ? (data["rows"] = data.data.rows) : (data["rows"] = []);
                 delete data.data;
@@ -362,12 +393,12 @@ export class AssayState {
 
     @Selector()
     static assayList(state: AssayStateModel): IAssay[] {
-        return state.assayList
+        return state?.assayList
     }
 
     @Selector()
     static assays(state: AssayStateModel): Record<string, any> {
-        return state.assays
+        return state?.assays
     }
 
 }

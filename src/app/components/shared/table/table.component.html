@@ -1,13 +1,11 @@
-<div *ngIf="data" class="columns is-vcentered">
-  <span class="column is-6 fadeIn nmrl">
+<div *ngIf="data" class="table-header-container" style="padding: 10px 0 10px 0">
+  <div class="fadeIn nmrl">
     <span class="has-text-grey">
       <small>File: {{ data.file }}</small>
     </span>
-  </span>
-  <span class="column is-6 fadeIn has-text-right nmrl">
-    <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
-  </span>
+  </div>
 </div>
+
 <div *ngIf="!isReadOnly" class="my-2">
   <div *ngIf="hasAnyMissingValues()" class="notification is-warning">
     <small>The terms below are provided in your table but do not have associated
@@ -58,20 +56,6 @@
       </span>
     </span>
   </div>
-  <div *ngIf="factors && factors.length > 0" class="notification is-primary">
-    <div id="meta">
-      <span>
-        <p>
-          <small><b>Factors</b>:</small>
-          <span class="content">
-            <div *ngFor="let factor of factors">
-              <mtbls-factorlist [value]="factor"></mtbls-factorlist>
-            </div>
-          </span>
-        </p>
-      </span>
-    </div>
-  </div>
 
 </div>
 
@@ -92,13 +76,16 @@
     padding: 10px;
     border: 1px solid rgba(0, 0, 0, 0.03);
   " marginTop="50">
-  <span class="column is-12 fadeIn nmrl">
-    <a class="button is-small is-light" (click)="toggleView()">
-      <span *ngIf="view == 'compact'; else expandedTable"> Expand Table </span>
-      <ng-template #expandedTable> Compact Table </ng-template>
+  <span class="column is-12 fadeIn nmrl table-action-row">
+    <mat-button-toggle-group [value]="view" (change)="onViewChange($event.value)" class="small-toggle"
+      appearance="legacy" name="viewMode" aria-label="Table View">
+      <mat-button-toggle value="compact">Compact</mat-button-toggle>
+      <mat-button-toggle value="expanded">Expand</mat-button-toggle>
+    </mat-button-toggle-group>
+    <a *ngIf="!isReadOnly && showAddSample" (click)="addSampleClick.emit()" class="button is-small is-light">
+      <mat-icon>add</mat-icon> Samples
     </a>
-    &nbsp;
-    <div *ngIf="!isReadOnly" style="display: inline-flex; width: 13%" class="field has-addons">
+    <div *ngIf="!isReadOnly" class="field has-addons add-rows-group">
       <p class="control">
         <input [(ngModel)]="rowsToAdd" class="input is-small" type="text" />
       </p>
@@ -107,8 +94,8 @@
           <mat-icon>add</mat-icon> Rows
         </a>
       </p>
+
     </div>
-    &nbsp;
     <!-- <span *ngIf="data">
       <mtbls-upload
         [fileTypes]="fileTypes"
@@ -117,18 +104,18 @@
         [file]="data.file"
       ></mtbls-upload>
     </span> -->
-    &nbsp;
-    <span *ngIf="data && data.file">
+    <span *ngIf="data && data.file" class="table-upload-controls">
       <mtbls-download [value]="data.file"></mtbls-download>
-      <a *ngIf="!isReadOnly" style="margin-left: 0.5rem;" (click)="setFilePattern(data.file);openUploadArea = true"
-        class="button is-small is-light" [ngClass]="size">
+      <a *ngIf="!isReadOnly" (click)="setFilePattern(data.file);openUploadArea = true"
+        class="button is-small is-light table-upload-trigger" [ngClass]="size">
         <mat-icon>cloud_upload</mat-icon> Upload
       </a>
-      <div *ngIf="openUploadArea" style="margin-top: 1rem;"> <app-drag-and-drop [iscloseable]="true"
-          [filePatternString]="filePatternString" (uploadComplete)="onUploadComplete($event)"
-          (closeUpload)="openUploadArea = false"></app-drag-and-drop> </div>
     </span>
-    &nbsp;
+    <div *ngIf="data && data.file && openUploadArea" class="table-upload-drop-area">
+      <app-drag-and-drop [iscloseable]="true" [filePatternString]="filePatternString" [label]="getUploadLabel()"
+        [hint]="getUploadHint()" (uploadComplete)="onUploadComplete($event)"
+        (closeUpload)="openUploadArea = false"></app-drag-and-drop>
+    </div>
     <span *ngIf="!isReadOnly && (
         selectedRows.length > 0 ||
         selectedColumns.length > 0 ||
@@ -162,11 +149,15 @@
 </div>
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
-    <mat-form-field class="full-width bback">
+    <mat-form-field class="full-width bback" appearance="outline">
+      <mat-label>Filter</mat-label>
       <input autocomplete="off" matInput (keyup)="applyFilter($event.target.value)"
         (keydown)="onKeydown($event, $event.target.value)" placeholder="Filter" />
     </mat-form-field>
   </span>
+</div>
+<div class="fadeIn has-text-right nmrl">
+  <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
 </div>
 <div class="menu-bar columns">
   <span class="column is-12 is-paddingless nmrl">
@@ -189,10 +180,9 @@
   </div>
 
   <div #wrapper2 id="wrapper2" class="scroll-wrapper" (scroll)="onWrapper2Scroll($event)">
-    <div id="div2" class="mat-elevation-z1 prevent-deselect">
+    <div #div2 id="div2" tabindex="0" class="mat-elevation-z1 prevent-deselect">
       <!--table start-->
-      <table editTable (copy)="onCopy($event)" (paste)="onPaste($event)" (cut)="onCut($event)"
-        class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
+      <table class="mat-elevation-z1 tableclass" [dataSource]="dataSource" matSort mat-table>
         <ng-container matColumnDef="Select" sticky>
           <th (click)="toggleSelectAll()" class="clickable table-selector" mat-header-cell *matHeaderCellDef>
             <span *ngIf="!isReadOnly && hasRows" class="radio-tick" [class.selected]="isAllSelected()"></span>
@@ -200,26 +190,28 @@
           <td (dblclick)="editRow(row)" (click)="rowClick(row, $event)" class="clickable row-selector" mat-cell
             *matCellDef="let row">
 
-            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && isFirstRow(row))" class="radio-tick"
-              [class.selected]="isSelected(row, null)">
+            <span *ngIf="!isReadOnly && !(getTableType(data.file) === 'assay' && templateRowPresent && isFirstRow(row))"
+              class="radio-tick" [class.selected]="isSelected(row, null)">
             </span>
           </td>
         </ng-container>
 
         <ng-container *ngFor="let column of data.columns" [sticky]="column.sticky" [matColumnDef]="column.columnDef">
           <th (click)="headerClick(column, $event)" (dblclick)="editColumn(column, $event)"
-            class="headercell clickable hover-highlight mlc-table" mat-header-cell *matHeaderCellDef mat-sort-header>
+            [matTooltip]="getColumnTooltip(column.header)" class="headercell clickable hover-highlight mlc-table"
+            mat-header-cell *matHeaderCellDef mat-sort-header>
             {{ formatHeader(column.header) }}
+            <span *ngIf="isFieldRequired(column.header)" class="required-asterisk">*</span>
           </th>
           <ng-container *ngIf="!column.structure; else isStructure">
-            <td (keydown)="onKeyDown($event)" (dblclick)="editCell(row, column, $event)"
-              (click)="cellClick(row, column, $event)" class="clickable mlc-table"
-              [ngClass]="{ selected: isSelected(row, column) }" mat-cell *matCellDef="let row">
+            <td (dblclick)="editCell(row, column, $event)" (click)="cellClick(row, column, $event)"
+              class="clickable mlc-table" [ngClass]="{ selected: isSelected(row, column) }" mat-cell
+              *matCellDef="let row">
               {{ row[column.header] }}
             </td>
           </ng-container>
           <ng-template #isStructure>
-            <td (keydown)="onKeyDown($event)" class="mlc-table" mat-cell *matCellDef="let row">
+            <td class="mlc-table" mat-cell *matCellDef="let row">
               <span *ngIf="isChEBIId(row['database_identifier']); else notChEBIId">
                 <ng-container *ngIf="!imageErrorMap.get(row['database_identifier']); else noStructure">
                   <img appLazyLoad width="200" height="200" [src]="getStructureUrl(row)" alt="Chemical structure"
@@ -273,7 +265,7 @@
   <div class="modal prevent-deselect" [ngClass]="{ 'is-active': isEditColumnModalOpen }">
     <form *ngIf="editColumnform" [formGroup]="editColumnform" (keydown.enter)="onModalEnter($event)">
       <div class="modal-background"></div>
-      <div class="modal-card">
+      <div class="modal-card table-edit-modal-card">
         <div *ngIf="isFormBusy" class="load-bar">
           <div class="bar"></div>
           <div class="bar"></div>
@@ -292,10 +284,11 @@
                       [controlList]="columnControlList(selectedColumn['header'])" (changed)="onChanges($event)"
                       [values]="[]" [inline]="true" [rule]="columnControlList(selectedColumn['header'])?.rule"
                       [defaultOntologies]="getDefaultOntologies(selectedColumn['header'])"
+                      [isRequired]="isFieldRequired(selectedColumn['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <ng-template #dropdownField>
-                    <mat-form-field class="full-width"
+                    <mat-form-field class="full-width" appearance="outline"
                       *ngIf="columnControlList(selectedColumn['header']).renderAsDropdown">
                       <mat-select formControlName="cell" placeholder="{{ formatHeader(selectedColumn.header) }}">
                         <mat-option *ngFor="let option of columnControlList(selectedColumn['header'])?.values"
@@ -303,10 +296,18 @@
                           {{ option.annotationValue }}
                         </mat-option>
                       </mat-select>
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedColumn['header']) }}
+                        <b *ngIf="isFieldRequired(selectedColumn['header'])">&nbsp;(required)</b>
+                      </mat-hint>
                     </mat-form-field>
-                    <mat-form-field class="full-width"
+                    <mat-form-field class="full-width" appearance="outline"
                       *ngIf="!columnControlList(selectedColumn['header']).renderAsDropdown && !isCellTypeOntology">
                       <input class="no-scroll" formControlName="cell" matInput />
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedColumn['header']) }}
+                        <b *ngIf="isFieldRequired(selectedColumn['header'])">&nbsp;(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                   </ng-template>
                 </div>
@@ -337,7 +338,7 @@
   <div class="modal editModal prevent-deselect" *ngIf="isEditModalOpen" [ngClass]="{ 'is-active': isEditModalOpen }">
     <form *ngIf="editCellform" [formGroup]="editCellform" (keydown.enter)="onModalEnter($event)">
       <div class="modal-background"></div>
-      <div class="modal-card">
+      <div class="modal-card table-edit-modal-card">
         <div *ngIf="isFormBusy" class="load-bar">
           <div class="bar"></div>
           <div class="bar"></div>
@@ -357,16 +358,21 @@
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
                       [rule]="columnControlList(selectedCell['column']['header']).rule"
                       [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"
+                      [isRequired]="isFieldRequired(selectedCell['column']['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="isCellTypeFile">
-                    <mat-form-field class="full-width">
+                    <mat-form-field class="full-width" appearance="outline">
                       <mat-select formControlName="cell"
                         placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
                         <mat-option *ngFor="let file of getFiles(selectedCell['column']['header'])" [value]="file.file">
                           {{ file.file }}
                         </mat-option>
                       </mat-select>
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedCell['column']['header']) }}
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                   </div>
                   <div
@@ -378,11 +384,12 @@
                       (changed)="onEditCellChanges($event)" [values]="[selectedCellOntology]" [inline]="true"
                       [rule]="columnControlList(selectedCell['column']['header']).rule"
                       [defaultOntologies]="getDefaultOntologies(selectedCell['column']['header'])"
+                      [isRequired]="isFieldRequired(selectedCell['column']['header'])"
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
-                    <mat-form-field class="full-width">
+                    <mat-form-field class="full-width" appearance="outline">
                       <mat-select formControlName="cell"
                         placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
                         <mat-option *ngFor="let option of columnControlList(selectedCell['column']['header']).values"
@@ -390,13 +397,21 @@
                           {{ option.annotationValue }}
                         </mat-option>
                       </mat-select>
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedCell['column']['header']) }}
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
+                      </mat-hint>
                     </mat-form-field>
                   </div>
                   <div
                     *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
                     <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
-                    <mat-form-field class="full-width">
+                    <mat-form-field class="full-width" appearance="outline">
                       <input class="no-scroll" formControlName="cell" matInput />
+                      <mat-hint>
+                        {{ getColumnTooltip(selectedCell['column']['header']) }}
+                        <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
+                      </mat-hint>
                       <mat-error *ngIf="editCellform.get('cell')?.hasError('invalidUrl')">
                         Please enter a valid URL
                       </mat-error>

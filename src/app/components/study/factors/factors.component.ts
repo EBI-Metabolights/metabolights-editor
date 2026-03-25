@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, Input, Output, EventEmitter } from "@angular/core";
 import { Store } from "@ngxs/store";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { MTBLSFactor } from "src/app/models/mtbl/mtbls/mtbls-factor";
@@ -18,6 +18,11 @@ export class FactorsComponent implements OnInit {
 
   isReadOnly = false;
   factors: any = null;
+
+  @Input() isSampleSheet = false;
+  @Input() unSelectedFactors: MTBLSFactor[] = [];
+  @Output() addFactorToSampleSheet = new EventEmitter<any>();
+  @Output() addFactorToSampleSheetUnitInclusive = new EventEmitter<any>();
 
   constructor() {
     this.setUpConstructorSubscriptionNgxs();
