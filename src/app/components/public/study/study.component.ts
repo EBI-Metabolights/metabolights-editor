@@ -342,7 +342,7 @@ export class PublicStudyComponent implements OnInit {
     }
     const label = this.getCategoryLabel(this.studyCategory);
     this.categoryLabel = label;
-    this.showCategory = label !== "MTBLS" && label !== "Other";
+    this.showCategory = label !== "MTBLS";
   }
 
   updateCurationStatus() {
