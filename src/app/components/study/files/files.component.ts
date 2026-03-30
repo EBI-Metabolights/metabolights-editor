@@ -42,6 +42,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   @Input("validations") validations: any;
 
   @ViewChild('downloadDropdown') dropdownRef!: ElementRef;
+  @ViewChild('metadataUploadArea') metadataUploadArea!: ElementRef;
 
   containerHeight: any = 279;
 
@@ -193,7 +194,13 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   }
 
 
-toggleDownloadDropdown() {
+  scrollToMetadataUpload() {
+    if (this.metadataUploadArea) {
+      this.metadataUploadArea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  toggleDownloadDropdown() {
   this.isDownloadDropdownActive = !this.isDownloadDropdownActive;
 }
 

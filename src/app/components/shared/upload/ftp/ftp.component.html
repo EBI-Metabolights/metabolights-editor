@@ -1,46 +1,49 @@
-<div class="field">
-  <button (click)="openUploadModal()" class="button is-link is-fullwidth">
-    Private FTP Upload
-  </button>
-</div>
-<small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small>
-<div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
-      <p>
-        <b>FTP Upload</b><br /><br />
-        FTP can be used on any computer, either directly from the command line
-        or through a graphical user interface. <br />
-        However, on must computers you have to install an FTP client first. If
-        you are not familiar with using FTP from the command line, we can
-        recommend the free
-        <a href="https://filezilla-project.org/" target="_blank">FileZilla tool</a>. Please see the FAQ section on the
-        FileZilla pages for specific
-        details about how this software works.
-      </p>
-    </section>
-    <footer class="modal-card-foot">
-      <div class="columns is-gapless full-width">
-        <div class="column is-full has-text-right">
-          <button (click)="toggleHelp()" class="button is-default">
-            Close
-          </button>
+<div *ngIf="!hideButton">
+  <div class="field">
+    <button (click)="openUploadModal()" class="button is-link is-fullwidth">
+      Private FTP Upload
+    </button>
+  </div>
+  <small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small>
+  <div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <section class="modal-card-body">
+        <p>
+          <b>FTP Upload</b><br /><br />
+          FTP can be used on any computer, either directly from the command line
+          or through a graphical user interface. <br />
+          However, on must computers you have to install an FTP client first. If
+          you are not familiar with using FTP from the command line, we can
+          recommend the free
+          <a href="https://filezilla-project.org/" target="_blank">FileZilla tool</a>. Please see the FAQ section on the
+          FileZilla pages for specific
+          details about how this software works.
+        </p>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div class="column is-full has-text-right">
+            <button (click)="toggleHelp()" class="button is-default">
+              Close
+            </button>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
   </div>
 </div>
 
-<div class="modal" [ngClass]="{ 'is-active': isFTPUploadModalOpen }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
+<div *ngIf="hideButton || isFTPUploadModalOpen" [ngClass]="{ 'modal': !hideButton, 'is-active': isFTPUploadModalOpen && !hideButton }">
+  <div *ngIf="!hideButton" class="modal-background" (click)="closeUploadModal()"></div>
+  <div [ngClass]="{ 'modal-card': !hideButton }">
+    <header *ngIf="!hideButton" class="modal-card-head">
+      <p class="modal-card-title">Private FTP Upload</p>
+    </header>
+    <section [ngClass]="{ 'modal-card-body': !hideButton }">
       Using FTP Client:
       <!--Start of the ftp table-->
-
-
-      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth mt-2">
         <tbody>
           <tr>
             <th>Server (Host)</th>
@@ -79,8 +82,8 @@
             <th>Remote folder (Remote site)</th>
             <td>
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span>{{ uploadLocation$ | async }}</span>
-                <mat-icon (click)="copyText(uploadPath)" style="cursor: pointer; font-size: 14px; height: 14px;"
+                <span>{{ (uploadLocation$ | async) + subfolder }}</span>
+                <mat-icon (click)="copyText((uploadPath + subfolder))" style="cursor: pointer; font-size: 14px; height: 14px;"
                   matTooltip="Copy Remote Folder">content_copy</mat-icon>
               </div>
             </td>
@@ -88,14 +91,14 @@
         </tbody>
       </table>
       <!--End of ftp table-->
-      <div style="margin-top: 20px" class="panel-block notification is-primary">
+      <div style="margin-top: 20px" class="panel-block notification has-background-white-ter has-text-grey-dark">
         <small>
-          <i><mat-icon>info</mat-icon> You may close this modal and proceed to
+          <i><mat-icon style="font-size: 16px; height: 16px; width: 16px;">info</mat-icon> You may close this modal and proceed to
             the next steps while the files are being uploaded</i>
         </small>
       </div>
     </section>
-    <footer class="modal-card-foot">
+    <footer *ngIf="!hideButton" class="modal-card-foot">
       <div class="columns is-gapless full-width">
         <div class="column is-full has-text-right">
           <button (click)="closeUploadModal()" class="button is-default">

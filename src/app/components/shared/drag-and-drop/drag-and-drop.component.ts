@@ -23,6 +23,7 @@ export class DragAndDropComponent implements OnInit  {
   @Input() filePatternString: string ="^([asi]_.+\.txt|m_.+\.tsv)$";
   @Input() label: string ="files";
   @Input() hint: string =" (metadata only)";
+  @Input() directory: string = "";
   @Output() closeUpload = new EventEmitter<void>();
   @Output() uploadComplete = new EventEmitter<UploadFile[]>();
 
@@ -129,7 +130,7 @@ uploadFiles() {
       // Prerequisite succeeded, proceed with uploading all files
       const uploadPromises = this.files.map(file => {
         return new Promise<void>((resolve, reject) => {
-          this.filesService.uploadFile(this.studyId, file.file).subscribe({
+          this.filesService.uploadFile(this.studyId, file.file, this.directory).subscribe({
             next: (progress) => {
               file.progress = progress.progress;
               if (progress.success) {

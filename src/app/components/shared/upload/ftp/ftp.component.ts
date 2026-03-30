@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, Input } from "@angular/core";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
 import { UntypedFormBuilder } from "@angular/forms";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -19,6 +19,9 @@ import { EditorService } from "../../../../services/editor.service";
   styleUrls: ["./ftp.component.css"],
 })
 export class FTPUploadComponent implements OnInit {
+
+  @Input() subfolder: string = '';
+  @Input() hideButton: boolean = false;
 
   uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);

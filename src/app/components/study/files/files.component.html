@@ -32,8 +32,8 @@
         </div>
       </div>
     </div>
-    <mtbls-upload *ngIf="isSyncEnabled && !isReadOnly" class="upload-button" [type]="'any'" [multiple]="true" [mode]="'button'"
-      (complete)="loadFilesPassively()" [size]="'is'"></mtbls-upload>
+    <mtbls-upload *ngIf="isSyncEnabled && !isReadOnly" class="upload-button" [type]="'any'" [multiple]="true"
+      [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" (scrollRequested)="scrollToMetadataUpload()"></mtbls-upload>
 
     <span *ngIf="isSyncEnabled" class="refresh-button">
       <a (click)="loadFilesPassively()" class="button is-light is-small">
@@ -130,7 +130,8 @@
 
   <mat-divider class="file-divider" [inset]="true"></mat-divider>
   <div *ngIf="!isReadOnly" class="notification is-warning message">
-    <small>This section shows study metadata (‘ISA METADATA’) and result files. Metadata and result files can be edited online or downloaded, edited
+    <small>This section shows study metadata (‘ISA METADATA’) and result files. Metadata and result files can be edited
+      online or downloaded, edited
       locally (e.g., MS Excel) and re-uploaded. Please note, do not change filenames, extensions, encodings,
       etc.</small>
   </div>
@@ -144,11 +145,12 @@
           (change)="selectFiles($event, 'meta', null, true)" type="checkbox" name="" />&nbsp;&nbsp;METADATA FILES
       </label>
       <span class="is-pulled-right">
-        <mtbls-download [value]="selectedDownloadFiles('meta')" [selectedMetaFiles]="selectedMetaFiles"></mtbls-download>
+        <mtbls-download [value]="selectedDownloadFiles('meta')"
+          [selectedMetaFiles]="selectedMetaFiles"></mtbls-download>
       </span>
       <span *ngIf="selectedMetaFiles.length > 0 && !isReadOnly" class="is-pulled-right">
-        <small (click)="openDeleteConfirmation('meta', 'study')" 
-          class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete
+        <small (click)="openDeleteConfirmation('meta', 'study')" class="button is-light is-small"><mat-icon
+            style="font-size: 16px">delete</mat-icon> Delete
           files</small>&nbsp;
       </span>
     </p>
@@ -220,11 +222,12 @@
           (change)="selectFiles($event, 'result', null, true)" type="checkbox" name="" />&nbsp;&nbsp;RESULT FILES
       </label>
       <span class="is-pulled-right">
-        <mtbls-download [value]="selectedDownloadFiles('result')" [selectedMetaFiles]="selectedResultFiles"></mtbls-download>
+        <mtbls-download [value]="selectedDownloadFiles('result')"
+          [selectedMetaFiles]="selectedResultFiles"></mtbls-download>
       </span>
       <span *ngIf="selectedResultFiles.length > 0 && !isReadOnly" class="is-pulled-right">
-        <small (click)="openDeleteConfirmation('result', 'study')" 
-          class="button is-light is-small"><mat-icon style="font-size: 16px">delete</mat-icon> Delete
+        <small (click)="openDeleteConfirmation('result', 'study')" class="button is-light is-small"><mat-icon
+            style="font-size: 16px">delete</mat-icon> Delete
           files</small>&nbsp;
       </span>
     </p>
@@ -286,9 +289,10 @@
     </ng-template>
   </nav>
   <!--ISA Metadata upload area -->
-  <div *ngIf="!isReadOnly" style="margin-bottom: 1rem;">
+  <div #metadataUploadArea *ngIf="!isReadOnly" style="margin-bottom: 1rem;">
     <app-drag-and-drop (uploadComplete)="onUploadComplete($event)" [iscloseable]="false"
-      filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$" label="files" hint=" (metadata or result files only)"></app-drag-and-drop>
+      filePatternString="^([asi]_.+\.txt|m_.+\.tsv)$" label="files"
+      hint=" (metadata or result files only)"></app-drag-and-drop>
   </div>
   <!--ISA Metadata panel end -->
   <mat-divider class="file-divider" [inset]="true"></mat-divider>
@@ -309,11 +313,11 @@
         </label>
         <span *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
-            <small (click)="decompressFiles(selectedRawFiles)"
-              class="button is-light is-small"><mat-icon style="font-size: 14px">library_books</mat-icon> Unzip
+            <small (click)="decompressFiles(selectedRawFiles)" class="button is-light is-small"><mat-icon
+                style="font-size: 14px">library_books</mat-icon> Unzip
               files</small>&nbsp;
           </span>
-          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')" 
+          <small *ngIf="!isReadOnly" (click)="openDeleteConfirmation('raw', 'study')"
             class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete
             files</small>&nbsp;
         </span>
@@ -370,8 +374,8 @@
           (change)="selectFiles($event, 'derived', null, true)" type="checkbox" name="" />&nbsp;&nbsp;DERIVED DATA
       </label>
       <span *ngIf="selectedDerivedFiles.length > 0 && !isReadOnly" class="is-pulled-right">
-        <small (click)="openDeleteConfirmation('derived', 'study')" 
-          class="button is-light is-small"><mat-icon style="font-size: 14px">delete</mat-icon> Delete
+        <small (click)="openDeleteConfirmation('derived', 'study')" class="button is-light is-small"><mat-icon
+            style="font-size: 14px">delete</mat-icon> Delete
           files</small>&nbsp;
       </span>
     </p>
