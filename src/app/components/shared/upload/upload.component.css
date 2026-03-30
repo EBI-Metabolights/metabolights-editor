@@ -1,30 +1,70 @@
 .upload-zone {
-  min-height: 10vh;
-  background-color: #f1f1f4;
-  border: 2px dotted #cecece;
-  border-radius: 4px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    min-height: 10vh;
+    background-color: #f1f1f4;
+    border: 2px dotted #cecece;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .upload-zone:hover {
-  border: 2px dotted #333;
-  cursor: pointer;
+    border: 2px dotted #333;
+    cursor: pointer;
 }
 
 .upload-zone p {
-  padding-top: 20vh;
-  text-align: center;
-  color: #cecece;
+    padding-top: 20vh;
+    text-align: center;
+    color: #cecece;
 }
 
 .is-divider,
 .is-divider-vertical {
-  display: block;
-  position: relative;
-  border-top: 0.1rem solid #dbdbdb;
-  height: 0.1rem;
-  margin: 0 0 2rem 0;
-  text-align: center;
+    display: block;
+    position: relative;
+    border-top: 0.1rem solid #dbdbdb;
+    height: 0.1rem;
+    margin: 0 0 2rem 0;
+    text-align: center;
+}
+
+.box.is-clickable {
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #dbdbdb;
+}
+
+.box.is-clickable:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+    border-color: #3273dc;
+    background-color: #f9f9f9;
+}
+
+.box.is-clickable mat-icon {
+    transition: transform 0.2s ease-in-out;
+}
+
+.box.is-clickable:hover mat-icon {
+    transform: scale(1.1);
+}
+
+.buttons .button.is-medium {
+    justify-content: flex-start;
+    padding-left: 1.5rem;
+    height: auto;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.buttons .button.is-medium:hover {
+    background-color: #f5f5f5;
+    border-color: #3273dc;
 }

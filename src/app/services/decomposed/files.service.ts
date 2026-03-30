@@ -89,10 +89,13 @@ export class FilesService extends BaseConfigDependentService {
     return data;
   }
 
-  uploadFile(studyId: string, file: File): Observable<{ progress: number; success?: boolean; error?: string }> {
+  uploadFile(studyId: string, file: File, directory: string = ''): Observable<{ progress: number; success?: boolean; error?: string }> {
     const formData = new FormData();
     formData.append('file', file, file.name);
-    const uploadUrl = `${this.url.baseURL}/studies/${studyId}/drag-drop-upload`;
+    let uploadUrl = `${this.url.baseURL}/studies/${studyId}/drag-drop-upload`;
+    if (directory) {
+      uploadUrl += `?directory=${encodeURIComponent(directory)}`;
+    }
     return this.http.post(uploadUrl, formData, {
       reportProgress: true,
       observe: 'events'

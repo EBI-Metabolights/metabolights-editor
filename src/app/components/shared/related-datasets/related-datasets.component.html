@@ -16,9 +16,13 @@
                     <div class="columns is-vcentered is-mobile">
                         <div class="column">
                             <div class="is-flex is-align-items-center is-flex-wrap-wrap" style="gap: 1rem;">
-                                <div *ngIf="dataset.repository" class="is-size-6">
+                                <div *ngIf="dataset.repository" class="is-size-6 is-flex is-align-items-center">
                                     <span>Repository: </span>
-                                    <span class="has-text-weight-bold">{{ dataset.repository }}</span>
+                                    <span class="has-text-weight-bold ml-1">&nbsp;{{ dataset.repository }}</span>
+                                    <mat-icon *ngIf="dataset.dataDescription" [matTooltip]="dataset.dataDescription"
+                                        class="has-text-info ml-1" style="font-size: 18px; cursor: help;">
+                                        info
+                                    </mat-icon>
                                 </div>
                                 <div class="is-size-6">
                                     <span>Accession: </span>
@@ -76,6 +80,17 @@
                         <mat-error *ngIf="form.get('identifier').hasError('pattern')">
                             Invalid format for selected repository.
                         </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </div>
+        <div class="columns is-multiline">
+            <div class="column is-12">
+                <div class="field">
+                    <mat-form-field class="full-width is-small" appearance="outline">
+                        <mat-label>Repository Data Description</mat-label>
+                        <textarea matInput formControlName="repositoryDataDescription"
+                            placeholder="e.g. This dataset contains genomics data related to the metabolomics study."></textarea>
                     </mat-form-field>
                 </div>
             </div>

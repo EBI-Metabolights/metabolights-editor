@@ -42,11 +42,13 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   @Input("validations") validations: any;
 
   @ViewChild('downloadDropdown') dropdownRef!: ElementRef;
+  @ViewChild('metadataUploadArea') metadataUploadArea!: ElementRef;
 
   containerHeight: any = 279;
 
   rawFiles: any[] = [];
   metaFiles: any[] = [];
+  resultFiles: any[] = [];
   auditFiles: any[] = [];
   derivedFiles: any[] = [];
   uploadFiles: any[] = [];
@@ -56,6 +58,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   rawFilesLoading = false;
   validationsId = "upload";
   filteredMetaFiles: any[] = [];
+  filteredResultFiles: any[] = [];
   filteredRawFiles: any[] = [];
   filteredAuditFiles: any[] = [];
   filteredDerivedFiles: any[] = [];
@@ -63,6 +66,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   filteredUploadFiles: any[] = [];
 
   selectedMetaFiles: any[] = [];
+  selectedResultFiles: any[] = [];
   selectedRawFiles: any[] = [];
   selectedAuditFiles: any[] = [];
   selectedDerivedFiles: any[] = [];
@@ -190,7 +194,13 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   }
 
 
-toggleDownloadDropdown() {
+  scrollToMetadataUpload() {
+    if (this.metadataUploadArea) {
+      this.metadataUploadArea.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  toggleDownloadDropdown() {
   this.isDownloadDropdownActive = !this.isDownloadDropdownActive;
 }
 
@@ -229,19 +239,35 @@ closeGlobusModal() {
     this.isDeleteModalOpen = false;
   }
 
-  selectedDownloadFiles() {
-    if (this.selectedMetaFiles.length > 0) {
-      let files = "";
-      this.selectedMetaFiles.forEach((f) => {
-        if (files === "") {
-          files = f.file;
-        } else {
-          files = files + "|" + f.file;
-        }
-      });
-      return files;
-    } else {
-      return "metadata";
+  selectedDownloadFiles(category: string) {
+    if (category === 'meta') {
+      if (this.selectedMetaFiles.length > 0) {
+        let files = "";
+        this.selectedMetaFiles.forEach((f) => {
+          if (files === "") {
+            files = f.file;
+          } else {
+            files = files + "|" + f.file;
+          }
+        });
+        return files;
+      } else {
+        return "metadata";
+      }
+    } else if (category === 'result') {
+      if (this.selectedResultFiles.length > 0) {
+        let files = "";
+        this.selectedResultFiles.forEach((f) => {
+          if (files === "") {
+            files = f.file;
+          } else {
+            files = files + "|" + f.file;
+          }
+        });
+        return files;
+      } else {
+        return "metadata";
+      }
     }
   }
 
@@ -249,6 +275,8 @@ closeGlobusModal() {
     if (this.selectedCategory !== null) {
       if (this.selectedCategory === "meta") {
         this.executeDelete(this.selectedMetaFiles, this.filteredMetaFiles, this.metaFiles);
+      } else if (this.selectedCategory === "result") {
+        this.executeDelete(this.selectedResultFiles, this.filteredResultFiles, this.resultFiles);
       } else if (this.selectedCategory === "audit") {
         this.executeDelete(this.selectedAuditFiles, this.filteredAuditFiles, this.auditFiles);
       } else if (this.selectedCategory === "derived") {
@@ -263,12 +291,14 @@ closeGlobusModal() {
 
   resetData() {
     this.filteredMetaFiles = [];
+    this.filteredResultFiles = [];
     this.filteredRawFiles = [];
     this.filteredAuditFiles = [];
     this.filteredDerivedFiles = [];
     this.filteredUploadFiles = [];
 
     this.selectedMetaFiles = [];
+    this.selectedResultFiles = [];
     this.selectedRawFiles = [];
     this.selectedAuditFiles = [];
     this.selectedDerivedFiles = [];
@@ -366,6 +396,8 @@ closeGlobusModal() {
           this.selectedUploadFiles = this.filteredUploadFiles.slice();
         } else if (category === "meta") {
           this.selectedMetaFiles = this.filteredMetaFiles.slice();
+        } else if (category === "result") {
+          this.selectedResultFiles = this.filteredResultFiles.slice();
         }
       } else {
         if (category === "raw") {
@@ -378,6 +410,8 @@ closeGlobusModal() {
           this.selectedUploadFiles = [];
         } else if (category === "meta") {
           this.selectedMetaFiles = [];
+        } else if (category === "result") {
+          this.selectedResultFiles = [];
         }
       }
     } else {
@@ -401,6 +435,10 @@ closeGlobusModal() {
         } else if (category === "meta") {
           this.selectedMetaFiles = this.selectedMetaFiles.concat(
             this.filteredMetaFiles.filter((f) => f.file === file.file)
+          );
+        } else if (category === "result") {
+          this.selectedResultFiles = this.selectedResultFiles.concat(
+            this.filteredResultFiles.filter((f) => f.file === file.file)
           );
         }
       } else {
@@ -442,6 +480,12 @@ closeGlobusModal() {
           const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
           if (indexOfSelectedFileName > -1) {
             this.selectedMetaFiles.splice(indexOfSelectedFileName, 1);
+          }
+        } else if (category === "result") {
+          const selectedFileNames = this.selectedResultFiles.map((r) => r.file);
+          const indexOfSelectedFileName = selectedFileNames.indexOf(file.file);
+          if (indexOfSelectedFileName > -1) {
+            this.selectedResultFiles.splice(indexOfSelectedFileName, 1);
           }
         }
       }
@@ -514,6 +558,12 @@ closeGlobusModal() {
       });
     } else if (category === "meta") {
       this.selectedMetaFiles.forEach((f) => {
+        if (f.file === filename) {
+          isFileChecked = true;
+        }
+      });
+    } else if (category === "result") {
+      this.selectedResultFiles.forEach((f) => {
         if (f.file === filename) {
           isFileChecked = true;
         }
@@ -598,8 +648,13 @@ closeGlobusModal() {
         this.rawFiles.push(file);
         this.filteredRawFiles.push(file);
       } else if (file.type.indexOf("metadata") > -1) {
-        this.metaFiles.push(file);
-        this.filteredMetaFiles.push(file);
+        if (file.file.toLowerCase().endsWith(".maf") || (file.file.toLowerCase().startsWith("m_") && file.file.toLowerCase().endsWith(".tsv"))) {
+          this.resultFiles.push(file);
+          this.filteredResultFiles.push(file);
+        } else {
+          this.metaFiles.push(file);
+          this.filteredMetaFiles.push(file);
+        }
       } else if (file.type === "audit") {
         this.auditFiles.push(file);
         this.filteredAuditFiles.push(file);
@@ -626,6 +681,8 @@ closeGlobusModal() {
     const term = event.target.value;
     if (target === "meta") {
       this.filteredMetaFiles = this.aFilter(term, this.metaFiles);
+    } else if (target === "result") {
+      this.filteredResultFiles = this.aFilter(term, this.resultFiles);
     } else if (target === "audit") {
       this.filteredAuditFiles = this.aFilter(term, this.auditFiles);
     } else if (target === "raw") {
@@ -748,8 +805,13 @@ closeGlobusModal() {
       this.rawFiles.push(file);
       this.filteredRawFiles.push(file);
     } else if (file.type.indexOf("metadata") > -1) {
-      this.metaFiles.push(file);
-      this.filteredMetaFiles.push(file);
+      if (file.file.toLowerCase().endsWith(".maf") || (file.file.toLowerCase().startsWith("m_") && file.file.toLowerCase().endsWith(".tsv"))) {
+        this.resultFiles.push(file);
+        this.filteredResultFiles.push(file);
+      } else {
+        this.metaFiles.push(file);
+        this.filteredMetaFiles.push(file);
+      }
     } else if (file.type === "audit") {
       this.auditFiles.push(file);
       this.filteredAuditFiles.push(file);
