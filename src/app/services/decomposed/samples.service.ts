@@ -27,7 +27,7 @@ export class SamplesService extends BaseConfigDependentService {
     "Characteristics[Variant]": 6,
     "Characteristics[Sample type]": 7,
   };
-  public loadingMessage: string = "Loading samples data."
+  public loadingMessage: string = "Loading metadata files...";
   public sampleSheetMissingPopupMessage: string = "Sample Sheet missing. Please upload sample sheet or contact Metabolights Help."
 
 
