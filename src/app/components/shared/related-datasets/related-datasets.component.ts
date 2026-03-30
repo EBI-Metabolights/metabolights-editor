@@ -28,7 +28,8 @@ export class RelatedDatasetsComponent implements OnInit {
   ngOnInit() {
     this.form = this.fb.group({
       identifierSource: ['', Validators.required],
-      identifier: ['', Validators.required]
+      identifier: ['', Validators.required],
+      repositoryDataDescription: ['']
     });
 
     this.filteredIdentifierSources$ = this.form.get('identifierSource').valueChanges.pipe(
@@ -77,7 +78,8 @@ export class RelatedDatasetsComponent implements OnInit {
       };
       this.form.patchValue({
           identifierSource: sourceObject,
-          identifier: dataset.accession
+          identifier: dataset.accession,
+          repositoryDataDescription: dataset.dataDescription || ''
       });
   }
 
@@ -105,7 +107,8 @@ export class RelatedDatasetsComponent implements OnInit {
       const newDataset = {
           repository: typeof source === 'object' ? source.name : source,
           accession: identifier,
-          url: constructedUrl 
+          url: constructedUrl,
+          dataDescription: formValue.repositoryDataDescription
       };
 
       this.saved.emit({ dataset: newDataset, index: this.editingIndex });
