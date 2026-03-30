@@ -504,7 +504,7 @@ export class EditorService {
         const isCuratorKey = this.configService.config.endpoint + "/isCurator"
         const usernameKey = this.configService.config.endpoint + "/username"
         const apiTokenKey = this.configService.config.endpoint + "/apiToken"
-        const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+        const jwtExpirationTimeKey = "jwtExpirationTime"
 
         const isCurator = user.role === 1 ? "true" : "false";
         localStorage.setItem(isCuratorKey, isCurator);
@@ -555,7 +555,7 @@ export class EditorService {
       // localStorage.removeItem(this.configService.config.endpoint + "/jwt");
       localStorage.removeItem("jwt");
       localStorage.removeItem(this.configService.config.endpoint + "/username");
-      localStorage.removeItem(this.configService.config.endpoint + "/jwtExpirationTime");
+      localStorage.removeItem("jwtExpirationTime");
       localStorage.removeItem(this.configService.config.endpoint + "/user");
       localStorage.removeItem(this.configService.config.endpoint + "/isCurator");
       localStorage.removeItem(this.configService.config.endpoint + "/userToken");
@@ -575,7 +575,7 @@ export class EditorService {
     // const jwtKey = this.configService.config.endpoint + "/jwt"
     const jwtKey = "jwt"
     const usernameKey = this.configService.config.endpoint + "/username"
-    const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+    const jwtExpirationTimeKey = "jwtExpirationTime"
 
     localStorage.setItem(jwtKey, jwtToken);
 
