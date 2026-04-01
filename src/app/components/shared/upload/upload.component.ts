@@ -28,6 +28,7 @@ export class UploadComponent implements OnInit {
   selectedMethod: 'aspera' | 'browser' | 'ftp' | null = null;
   selectedFtpCategory: any = null;
   showAsperaHelp = false;
+  showFtpHelp = false;
 
   categories = [
     { id: 'metadata', label: 'Metadata/Result', directory: '' },
@@ -61,6 +62,10 @@ export class UploadComponent implements OnInit {
 
   toggleAsperaHelp() {
     this.showAsperaHelp = !this.showAsperaHelp;
+  }
+
+  toggleFtpHelp() {
+    this.showFtpHelp = !this.showFtpHelp;
   }
 
   resetSelection() {

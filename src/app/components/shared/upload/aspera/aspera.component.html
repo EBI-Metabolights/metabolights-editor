@@ -4,7 +4,8 @@
       Aspera Upload
     </button>
   </div>
-  <small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small>
+  <small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help
+    </a>&emsp;</small>
   <div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -14,9 +15,11 @@
           Aspera is a fast way of transferring files. Aspera lets you control the
           transfer rate to better suit your internet connection. You can also stop
           the transfer, and later resume where you left off. <br /><br />
-          You can use Aspera to upload <b>all types of study data</b>, including Metadata, Raw Data, Derived Data, and Supplementary files. <br /><br />
-          For more information on how to use Aspera for transferring files, please refer to our 
-          <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files" target="_blank">Help Documentation</a>.
+          You can use Aspera to upload <b>all types of study data</b>, including Metadata, Raw Data, Derived Data, and
+          Supplementary files. <br /><br />
+          For more information on how to use Aspera for transferring files, please refer to our
+          <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files"
+            target="_blank">Help Documentation</a>.
         </p>
       </section>
       <footer class="modal-card-foot">
@@ -30,7 +33,8 @@
   </div>
 </div>
 
-<div *ngIf="hideButton || isAsperaUploadModalOpen" [ngClass]="{ 'modal': !hideButton, 'is-active': isAsperaUploadModalOpen && !hideButton }">
+<div *ngIf="hideButton || isAsperaUploadModalOpen"
+  [ngClass]="{ 'modal': !hideButton, 'is-active': isAsperaUploadModalOpen && !hideButton }">
   <div *ngIf="!hideButton" class="modal-background" (click)="closeUploadModal()"></div>
   <div [ngClass]="{ 'modal-card': !hideButton }">
     <header *ngIf="!hideButton" class="modal-card-head">
