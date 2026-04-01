@@ -458,3 +458,7 @@ hr {
   color: #333;
   margin-left: 4px;
 }
+
+.equal-height-box {
+  height: 100%;
+}

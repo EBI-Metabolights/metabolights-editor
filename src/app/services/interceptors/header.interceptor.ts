@@ -38,9 +38,10 @@ export class HeaderInterceptor implements HttpInterceptor {
     if (isMtblsWs || isMtblsWs3) {
       const accessToken = this.auth.getAccessToken();
       const userToken = this.auth.getApiToken();
+      const isPublic = fullUrl.includes('/public/');
       let headers: any = {};
 
-      if (accessToken) {
+      if (accessToken && !isPublic) {
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
 
@@ -49,7 +50,7 @@ export class HeaderInterceptor implements HttpInterceptor {
         headers["Obfuscation-Code"] = reviewCode;
       }
 
-      if (userToken !== null && userToken.length > 0) {
+      if (userToken !== null && userToken.length > 0 && !isPublic) {
         headers["User-Token"] = userToken;
       }
 

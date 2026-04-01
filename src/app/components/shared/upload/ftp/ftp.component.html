@@ -79,11 +79,14 @@
             </td>
           </tr>
           <tr>
-            <th>Remote folder (Remote site)</th>
+            <th>
+              Remote folder (Remote site)
+              <mat-icon (click)="refresh()" style="cursor: pointer; font-size: 14px; width: 14px; height: 14px; vertical-align: middle; margin-left: 5px;" matTooltip="Refresh folder path">refresh</mat-icon>
+            </th>
             <td>
               <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span>{{ (uploadLocation$ | async) + subfolder }}</span>
-                <mat-icon (click)="copyText((uploadPath + subfolder))" style="cursor: pointer; font-size: 14px; height: 14px;"
+                <span>{{ ((uploadLocation$ | async) !== null && (uploadLocation$ | async) !== undefined) ? ((uploadLocation$ | async) + subfolder) : 'Loading...' }}</span>
+                <mat-icon (click)="copyText((uploadPath ? (uploadPath + subfolder) : ''))" style="cursor: pointer; font-size: 14px; height: 14px;"
                   matTooltip="Copy Remote Folder">content_copy</mat-icon>
               </div>
             </td>

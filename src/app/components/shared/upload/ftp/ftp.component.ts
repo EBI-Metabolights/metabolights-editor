@@ -7,6 +7,9 @@ import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { EditorService } from "../../../../services/editor.service";
 
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Operations } from "src/app/ngxs-store/study/files/files.actions";
+
  export interface FtpDetails {
   user: string;
   secret: string;
@@ -44,7 +47,8 @@ export class FTPUploadComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private store: Store
   ) {
     this.setUpSubscriptionsNgxs();
   }
@@ -63,6 +67,13 @@ export class FTPUploadComponent implements OnInit {
         }
       }
     })
+  }
+
+  refresh() {
+    const studyId = this.store.selectSnapshot(GeneralMetadataState.id);
+    if (studyId) {
+      this.store.dispatch(new Operations.GetFreshFilesList(true, false, studyId));
+    }
   }
 
   copyText(text: string) {

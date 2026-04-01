@@ -520,14 +520,15 @@ export class EditorService {
       return;
     }
 
-    this.validationService.getValidationRules().subscribe( {
+    this.validationService.getValidationRules().subscribe({
       next: (validations) => {
         this.store.dispatch(new SetLoadingInfo("Loading study validations"))
         this.store.dispatch(new EditorValidationRules.Set(validations))
       },
       error: (err) => {
         console.log(err);
-      }}
+      }
+    }
     );
   }
 
