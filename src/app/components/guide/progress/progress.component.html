@@ -1,19 +1,38 @@
 <div class="steps is-small">
-  <div class="step-item" [ngClass]="{ 'is-active': step == 1, 'is-completed': step > 1 }">
+  <!-- Step 0: Prerequisites -->
+  <div class="step-item" [ngClass]="{ 'is-active': step == 0, 'is-completed': step > 0 }">
     <div class="step-marker">
       <span class="icon">
+        <i class="fa fa-info"></i>
+      </span>
+    </div>
+    <div class="step-details">
+      <p class="step-title">
+        <a [ngClass]="{ 'has-text-grey': step > 0 && !allowBackward }" (click)="redirectTo('prerequisites', null, 0)">
+          Prerequisites
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Step 1: Details -->
+  <div class="step-item" [ngClass]="{ 'is-active': step == 1, 'is-completed': step > 1 }">
+    <div class="step-marker">
+      <span class="icon" *ngIf="step > 1">
         <i class="fa fa-check"></i>
       </span>
     </div>
     <div class="step-details">
-      <p *ngIf="!study" class="step-title">New Submission → Start</p>
+      <p *ngIf="!study" class="step-title">Submission Details</p>
       <p *ngIf="study" class="step-title">
-        <a [ngClass]="{ 'has-text-grey': step < 2 || (step > 1 && !allowBackward) }"
+        <a [ngClass]="{ 'has-text-grey': step < 1 || (step > 1 && !allowBackward) }"
           (click)="redirectTo('info', null, 1)">
           Submission Details </a>
       </p>
     </div>
   </div>
+
+  <!-- Step 2: Description -->
   <div class="step-item" [ngClass]="{ 'is-active': step == 2, 'is-completed': step > 2 }">
     <div class="step-marker"></div>
     <div class="step-details">
@@ -23,6 +42,8 @@
       </p>
     </div>
   </div>
+
+  <!-- Step 3: Publication -->
   <div *ngIf="!hidePublicationStep" class="step-item" [ngClass]="{ 'is-active': step == 3, 'is-completed': step > 3 }">
     <div class="step-marker"></div>
     <div class="step-details">
@@ -33,6 +54,19 @@
       </p>
     </div>
   </div>
+
+  <!-- Step 4: Integrated Upload (Specific for creation flow) -->
+  <div *ngIf="hideAssayStep && hideUploadStep" class="step-item" [ngClass]="{ 'is-active': step == 4, 'is-completed': step > 4 }">
+    <div class="step-marker"></div>
+    <div class="step-details">
+      <p class="step-title">
+        <a [ngClass]="{ 'has-text-grey': step < 4 || (step > 4 && !allowBackward) }"
+           (click)="redirectTo('upload', null, 4)">Upload Files</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Legacy Steps (Assays/Upload for editor guide) -->
   <div *ngIf="!hideAssayStep" class="step-item" [ngClass]="{ 'is-active': step == 4, 'is-completed': step > 4 }">
     <div class="step-marker"></div>
     <div class="step-details">
@@ -54,8 +88,10 @@
       </p>
     </div>
   </div>
+
+  <!-- Step 5: Done -->
   <div class="step-item"
-    [ngClass]="{ 'is-active': step == 4 && hideAssayStep && hideUploadStep, 'is-completed': step > 4 && hideAssayStep && hideUploadStep }">
+    [ngClass]="{ 'is-active': step == 5, 'is-completed': step > 5 }">
     <div class="step-marker"></div>
     <div class="step-details">
       <p class="step-title">Done</p>

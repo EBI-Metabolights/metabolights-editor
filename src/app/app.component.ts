@@ -86,6 +86,9 @@ export class AppComponent implements OnInit {
           partner: user.content.partner || false,
           firstName: user.content.firstName || profile.firstName,
           lastName: user.content.lastName || profile.lastName,
+          affiliation: user.content.affiliation || '',
+          address: user.content.address || '',
+          orcid: user.content.orcid || profile.attributes?.orcid?.[0] || '',
         };
         this.store.dispatch(new User.Set(owner));
         

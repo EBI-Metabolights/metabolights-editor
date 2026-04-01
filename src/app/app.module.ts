@@ -73,16 +73,16 @@ import { firstValueFrom } from 'rxjs';
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
 export function appInitializer(injector: Injector): () => Promise<any> {
-    return async () => {
-        const configService = injector.get(ConfigurationService);
-        const editorService = injector.get(EditorService);
-        await configService.loadConfiguration();
-        try {
-            await editorService.loadDefaultControlLists();
-        } catch (err) {
-            console.warn('Could not load default control lists during initialization (this is expected if not logged in):', err);
-        }
-    };
+  return async () => {
+    const configService = injector.get(ConfigurationService);
+    const editorService = injector.get(EditorService);
+    await configService.loadConfiguration();
+    try {
+      await editorService.loadDefaultControlLists();
+    } catch (err) {
+      console.warn('Could not load default control lists during initialization (this is expected if not logged in):', err);
+    }
+  };
 }
 
 function initializeKeycloak(keycloak: KeycloakService, configService: ConfigurationService) {
@@ -109,7 +109,9 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
                 const targetUrl = url;
                 const endpointWs = configService?.config?.metabolightsWSURL.baseURL;
                 const endpointWs3 = configService?.config?.ws3URL;
-                return targetUrl.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3)
+                const isPublic = targetUrl.includes('/public/');
+
+                return (targetUrl.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3)) && !isPublic;
               }
               return false;
             }
@@ -170,7 +172,8 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
       SampleState,
       ProtocolsState,
       DescriptorsState,
-      ValidationState
+      ValidationState,
+      StudyCreationState
     ], { developmentMode: true }),
     QuillModule.forRoot({
       modules: {
@@ -217,8 +220,8 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
   ]
 })
 export class AppModule {
-    constructor(
-    ) {
+  constructor(
+  ) {
 
-    }
+  }
 }

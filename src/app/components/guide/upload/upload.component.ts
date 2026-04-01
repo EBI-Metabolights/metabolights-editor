@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, Input, Output, EventEmitter } from "@angular/core";
+import { Component, inject, OnInit, OnChanges, SimpleChanges, Input, Output, EventEmitter } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Router } from "@angular/router";
 import { EditorService } from "./../../../services/editor.service";
@@ -19,7 +19,9 @@ import { Operations } from "src/app/ngxs-store/study/files/files.actions";
 })
 export class RawUploadComponent implements OnInit {
   @Input() hideNav = false;
+  @Input() studyId: string = null;
   @Output() next = new EventEmitter<void>();
+  @Output() back = new EventEmitter<void>();
 
 
   user$: Observable<Owner> = inject(Store).select(UserState.user);
@@ -55,14 +57,23 @@ export class RawUploadComponent implements OnInit {
       this.user.checked = true;
     });
     this.studyIdentifier$.subscribe((value) => {
-      this.requestedStudy = value;
+      this.requestedStudy = this.studyId || value;
     });
     this.studyFiles$.subscribe((value) => {
       this.files = value;
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.refreshFiles();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.studyId && changes.studyId.currentValue) {
+      this.requestedStudy = changes.studyId.currentValue;
+      this.refreshFiles();
+    }
+  }
 
   isFolder(file) {
     return file.directory;
@@ -80,5 +91,9 @@ export class RawUploadComponent implements OnInit {
     } else {
       this.router.navigate(["/study", this.requestedStudy]);
     }
+  }
+
+  goBack() {
+    this.back.emit();
   }
 }

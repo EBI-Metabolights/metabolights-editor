@@ -19,6 +19,9 @@ export class UploadComponent implements OnInit {
   };
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
+  @Input() isEmbedded: boolean = false;
+  @Input() id: string = null;
+  @Input() showBrowserUpload: boolean = true;
   @Output() scrollRequested = new EventEmitter<void>();
 
   isUploadModalOpen = false;
@@ -45,6 +48,9 @@ export class UploadComponent implements OnInit {
       this.selectedMethod = method;
       if (method === 'ftp') {
         this.selectedFtpCategory = this.categories[0];
+      }
+      if (this.isEmbedded) {
+        this.isUploadModalOpen = true;
       }
     }
   }
