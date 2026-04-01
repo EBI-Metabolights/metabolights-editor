@@ -68,7 +68,6 @@
       </article>
     </ng-template>
   </div>
-  <br><br>
   <div id="status-board" *ngIf="status == 'Public' && curationRequest  == 'NO_CURATION'">
     <article class="message is-success">
       <div class="message-body">
@@ -130,7 +129,7 @@
             </div>
           </div>&emsp;
 
-          <div class="control" *ngIf="studyCategory && getCategoryLabel(studyCategory) !== 'MTBLS' && getCategoryLabel(studyCategory) !== 'Other'">
+          <div class="control" *ngIf="studyCategory && getCategoryLabel(studyCategory) !== 'MTBLS'">
             <div class="tags has-addons">
               <span class="tag is-dark">Category</span>
               <span class="tag is-link">

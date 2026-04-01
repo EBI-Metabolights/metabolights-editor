@@ -479,7 +479,7 @@
     </div>
     <span *ngIf="filteredUploadFiles.length > 0">
       <span *ngFor="let file of filteredUploadFiles">
-        <mtbls-directory [category]="upload" [level]="0" [parent]="''" [file]="file" [deletionEnabled]="true"
+        <mtbls-directory [category]="upload" [level]="0" [parent]="''" [file]="file" [deletionEnabled]="deletionEnabled(file)"
           [downloadEnabled]="false" [downloadContents]="false" [readonlyFolder]="false" [location]="ftpLocation"
           (fileDeleted)="handleDeletedFile($event, uploadFiles, filteredUploadFiles, selectedUploadFiles)"></mtbls-directory>
       </span>
