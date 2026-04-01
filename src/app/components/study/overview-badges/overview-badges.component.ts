@@ -8,6 +8,10 @@ import { ViolationType } from '../validations-v2/interfaces/validation-report.ty
 })
 export class OverviewBadgesComponent {
 
+  @Input() requestedStudy: string;
+  @Input() mhdAccession: string;
+  @Input() categoryLabel: string;
+  @Input() showCategory: boolean = false;
   @Input() studyError: boolean;
   @Input() revisionDatetime: string;
   @Input() revisionNumber: number;

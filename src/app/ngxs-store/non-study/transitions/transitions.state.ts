@@ -1,13 +1,15 @@
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { IntermittentRefreshActionStack, Loading, SetLoadingInfo, SetTabIndex } from "./transitions.actions";
+import { IntermittentRefreshActionStack, Loading, SetChecklistSeen, SetChecklistStudyId, SetLoadingInfo, SetTabIndex } from "./transitions.actions";
 
 
 export interface TransitionStateModel {
     loading: boolean,
     loadingInformation: string,
     currentTabIndex: string,
-    intermittentRefreshActionStack: string[]
+    intermittentRefreshActionStack: string[],
+    checklist_seen: boolean,
+    checklist_study_id: string | null
 }
 
 @State<TransitionStateModel>({
@@ -16,7 +18,9 @@ export interface TransitionStateModel {
         loading: true,
         loadingInformation: "",
         currentTabIndex: "0",
-        intermittentRefreshActionStack: []
+        intermittentRefreshActionStack: [],
+        checklist_seen: false,
+        checklist_study_id: null
     }
 })
 @Injectable()
@@ -62,6 +66,24 @@ export class TransitionsState {
             ...state,
             currentTabIndex: action.index
         })
+    }
+
+    @Action(SetChecklistSeen)
+    setChecklistSeen(ctx: StateContext<TransitionStateModel>, action: SetChecklistSeen) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            checklist_seen: action.seen
+        });
+    }
+
+    @Action(SetChecklistStudyId)
+    setChecklistStudyId(ctx: StateContext<TransitionStateModel>, action: SetChecklistStudyId) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            checklist_study_id: action.studyId
+        });
     }
 
     @Action(Loading.Toggle)
@@ -144,5 +166,14 @@ export class TransitionsState {
     static currentTabIndex(state: TransitionStateModel): string {
         return state?.currentTabIndex
     }
-}
 
+    @Selector()
+    static checklistSeen(state: TransitionStateModel): boolean {
+        return !!state?.checklist_seen
+    }
+
+    @Selector()
+    static checklistStudyId(state: TransitionStateModel): string | null {
+        return state?.checklist_study_id || null
+    }
+}

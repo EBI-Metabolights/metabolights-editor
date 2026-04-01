@@ -452,24 +452,29 @@ export class MetabolightsService extends DataService {
    */
   getOntologyDetails(value): Observable<any> {
     let ontologyUrl = this.url.ontologyDetails;
-    if (ontologyUrl.endsWith("/") === false){
+    if (ontologyUrl.endsWith("/") === false) {
       ontologyUrl = ontologyUrl + "/";
     }
     if (value.termSource.name === undefined || value.termSource.name === "") {
       console.log("Empty ontology for accession" + value);
     }
+
+    const isRor = value.termSource.name === "ROR" || value.termSource.name === "ror";
+    const endpoint = isRor ? "individuals" : "terms";
+
     const url =
-    ontologyUrl +
+      ontologyUrl +
       value.termSource.name +
-      "/terms/" +
+      "/" + endpoint + "/" +
       encodeURI(encodeURIComponent(value.termAccession));
+
     const mtblsPrefix = "http://www.ebi.ac.uk/metabolights/ontology/";
     if (value?.termSource?.name === "MTBLS" && value?.termAccession?.startsWith(mtblsPrefix)) {
       const parts = value.termAccession.split("/");
 
-      const mtblsUrl =  this.url.baseURL
-                      + "/mtbls-ontology/terms/"
-                      + parts[(parts.length - 1)] ;
+      const mtblsUrl = this.url.baseURL
+        + "/mtbls-ontology/terms/"
+        + parts[(parts.length - 1)];
 
       return this.http.get(mtblsUrl).pipe(
 
@@ -483,7 +488,7 @@ export class MetabolightsService extends DataService {
               ontology_prefix: "MTBLS",
               short_form: parts[(parts.length - 1)],
               id: parts[(parts.length - 1)].replace("_", ":"),
-              annotation : {}
+              annotation: {}
             };
             return result;
           }

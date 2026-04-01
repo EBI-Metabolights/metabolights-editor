@@ -34,11 +34,13 @@ export class PublicStudyComponent implements OnInit {
   studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
   studyStatus$: Observable<string> = inject(Store).select(GeneralMetadataState.status);
   curationRequest$: Observable<string> = inject(Store).select(GeneralMetadataState.curationRequest);
+  studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
   revisionNumber$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionNumber);
   revisionDatetime$: Observable<string> = inject(Store).select(GeneralMetadataState.revisionDatetime);
   revisionStatus$: Observable<number> = inject(Store).select(GeneralMetadataState.revisionStatus);
   studyReviewerLink$: Observable<string> = inject(Store).select(GeneralMetadataState.reviewerLink);
   investigationFailed$: Observable<boolean> = inject(Store).select(ApplicationState.investigationFailed);
+  templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   studyPermission$: Observable<StudyPermission> = inject(Store).select(GeneralMetadataState.studyPermission);
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
@@ -71,6 +73,10 @@ export class PublicStudyComponent implements OnInit {
   obfuscationCode: string = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
   mhdAccession: string = null;
+  studyCategory: string = "";
+  templateConfiguration: any = null;
+  categoryLabel: string = "";
+  showCategory = false;
   private loadMode: "public" | "review" = "public";
   private subscriptionsInitialized = false;
   constructor(
@@ -149,6 +155,18 @@ export class PublicStudyComponent implements OnInit {
     this.studyIdentifier$.subscribe((value) => {
       if (value !== null) {
         this.requestedStudy = value;
+      }
+    });
+
+    this.templateConfiguration$.subscribe((value) => {
+      this.templateConfiguration = value;
+      this.updateCategoryLabel();
+    });
+
+    this.studyCategory$.subscribe((value) => {
+      if (value !== null) {
+        this.studyCategory = value;
+        this.updateCategoryLabel();
       }
     });
 
@@ -318,6 +336,24 @@ export class PublicStudyComponent implements OnInit {
   }
 
   // this.studyValidation ? this.validationMessageTransform.transform(this.studyValidation.status) : "";
+
+  private getCategoryLabel(id: string): string {
+    if (this.templateConfiguration && this.templateConfiguration.studyCategories) {
+      return this.templateConfiguration.studyCategories[id]?.label || id;
+    }
+    return id;
+  }
+
+  private updateCategoryLabel() {
+    if (!this.studyCategory) {
+      this.categoryLabel = "";
+      this.showCategory = false;
+      return;
+    }
+    const label = this.getCategoryLabel(this.studyCategory);
+    this.categoryLabel = label;
+    this.showCategory = label !== "MTBLS";
+  }
 
   updateCurationStatus() {
     if (this.curationRequest === "NO_CURATION") {

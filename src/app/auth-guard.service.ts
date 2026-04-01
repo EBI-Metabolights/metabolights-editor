@@ -296,7 +296,7 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
     // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
     const jwtTokenKey = "jwt"
     const userKey = this.configService.config.endpoint + "/user"
-    const jwtExpirationTimeKey = this.configService.config.endpoint + "/jwtExpirationTime"
+    const jwtExpirationTimeKey = "jwtExpirationTime"
     if (localStorage.getItem(jwtTokenKey) === null) {
       return SessionStatus.NoRecord;
     }
