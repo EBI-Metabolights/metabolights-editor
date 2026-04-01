@@ -95,12 +95,11 @@ export class CreateComponent implements OnInit {
   contacts: any[] = [];
   editingContactIndex: number = -1;
   private isManualDelete = false;
-  private isPrimaryContactInitialized = false;
   descriptorControlLists: any = {};
 
   studyCreationForm: UntypedFormGroup;
   selectedCreateOption = 2;
-  currentSubStep = 1;
+  currentSubStep = 0;
   checklistSectionLabels: Record<number, string> = {
     1: "Step 1: Submission Details",
     2: "Step 2: Study Description",
@@ -152,6 +151,9 @@ export class CreateComponent implements OnInit {
     this.description$.subscribe(v => this.studyDescription = v);
     this.user$.subscribe(user => {
       this.currentUser = user;
+      if (this.currentUser && (!this.contacts || this.contacts.length === 0) && !this.isManualDelete) {
+        this.initializePrimaryContact();
+      }
     });
     this.store.select(ValidationState.studyRules).subscribe((value) => {
       if (value) {
@@ -505,7 +507,6 @@ export class CreateComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.isPrimaryContactInitialized = false;
     this.store.dispatch(new Loading.Disable());
     this.store.dispatch(new StudyCreation.Reset());
   }
@@ -811,10 +812,6 @@ export class CreateComponent implements OnInit {
   onConfirmSelection(confirmed: boolean) {
     this.showConfirmationModal = false;
     if (confirmed) {
-      if (this.contacts.length === 0) {
-        this.initializePrimaryContact();
-      }
-
       const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key =>
         this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
       );
@@ -832,28 +829,25 @@ export class CreateComponent implements OnInit {
 
 
   initializePrimaryContact() {
-    // Create primary contact from Current User
-    if (this.isPrimaryContactInitialized) return;
-
+    // Create primary contact from Current User if they don't exist in the list
     if (this.currentUser && this.currentUser.email) {
-      const exists = this.contacts.some(c => c.email === this.currentUser.email);
-      if (exists) {
-        this.isPrimaryContactInitialized = true;
-        return;
+      if (this.contacts && this.contacts.length > 0) {
+        const exists = this.contacts.some(c => c.email === this.currentUser.email);
+        if (exists) return;
       }
+      
+      const newContact = {
+        firstName: this.currentUser?.firstName || '',
+        lastName: this.currentUser?.lastName || '',
+        email: this.currentUser?.email || '',
+        affiliation: this.currentUser?.affiliation || '',
+        address: this.currentUser?.address || '',
+        orcid: this.currentUser?.orcid || '',
+        roles: [],
+        comments: []
+      };
+      this.store.dispatch(new StudyCreation.AddContact(newContact));
     }
-    const newContact = {
-      firstName: this.currentUser?.firstName || '',
-      lastName: this.currentUser?.lastName || '',
-      email: this.currentUser?.email || '',
-      affiliation: '',
-      address: '',
-      orcid: this.currentUser?.orcid || '',
-      roles: [],
-      comments: []
-    };
-    this.isPrimaryContactInitialized = true;
-    this.store.dispatch(new StudyCreation.AddContact(newContact));
   }
 
   // --- Reused Component Helper Methods ---
@@ -1178,6 +1172,7 @@ export class CreateComponent implements OnInit {
         this.store.dispatch(new DatasetLicenseNS.ConfirmAgreement(res.new_study));
         this.store.dispatch(new User.Studies.Get());
         this.newStudy = res.new_study;
+        this.editorService.loadStudyNgxs(res.new_study, false);
 
         if (res.studies) {
           this.createdStudiesDetails = res.studies;
@@ -1188,9 +1183,16 @@ export class CreateComponent implements OnInit {
         }
 
         this.isLoading = false;
+        
+        const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key =>
+           this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
+        );
 
-        // Transition to the "Done" guide step
-        this.currentSubStep = 4;
+        if (selectedCategoryKeys.length > 1) {
+           this.currentSubStep = 5; // Done (success screen)
+        } else {
+           this.currentSubStep = 4; // Upload
+        }
       },
       error: (err) => {
         toastr.error("Study creation error.", "Error", {

@@ -14,6 +14,7 @@ import { Identifier } from "src/app/ngxs-store/study/general-metadata/general-me
 import { RevisionStatusTransformPipe } from "../shared/pipes/revision-status-transform.pipe";
 import { CurationStatusTransformPipe } from "../shared/pipes/curation-status-transform.pipe";
 import { CurationStatusStarTransformPipe } from "../shared/pipes/curation-status-star-transform.pipe";
+import { KeycloakEventType, KeycloakService } from "keycloak-angular";
 
 
 /* eslint-disable @typescript-eslint/dot-notation */
@@ -41,23 +42,25 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   messageExpanded = false;
   curator = false;
   provisionalStudies: any = [];
-  user=null;
+  user = null;
   loginName = "";
   isConfirmationModalOpen = false;
   baseHref: string;
   banner: string = null;
   underMaintenance = false;
   partner: boolean = false;
-
+  loggedIn = false;
   constructor(
     private route: ActivatedRoute,
     public router: Router,
     public http: HttpClient,
     private store: Store,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private keycloak: KeycloakService
   ) {
+
     this.route.queryParams.subscribe((params) => {
-      if (params.reload) {
+      if (params.reload && this.loggedIn) {
         this.store.dispatch(new User.Studies.Get());
         this.baseHref = this.editorService.configService.baseHref;
       }
@@ -73,8 +76,8 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
   }
 
   ngOnInit() {
-
     this.editorService.updateHistory(this.route.snapshot);
+    this.baseHref = this.editorService.configService.baseHref;
 
     this.bannerMessage$.subscribe((value) => {
       this.banner = value;
@@ -123,20 +126,27 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
       this.partner = this.user?.partner ?? false;
     });
     this.userStudies$.subscribe((value) => {
-      if (value === null) {
-        this.store.dispatch(new SetLoadingInfo("Loading user studies"))
-        this.store.dispatch(new User.Studies.Get())
-      } else {
-        this.editorService.toggleLoading(false);
-        this.studies = value;
+      if (this.keycloak.isLoggedIn()) {
+        if (value === null) {
+          this.store.dispatch(new SetLoadingInfo("Loading user studies"))
+          this.store.dispatch(new User.Studies.Get())
+        } else {
+          this.editorService.toggleLoading(false);
+          this.studies = value;
 
-        this.filteredStudies = this.studies;
+          this.filteredStudies = this.studies;
+          this.loadingStudies = false;
+        }
+      } else {
         this.loadingStudies = false;
+        this.studies = []
       }
+
+
     });
     this.templateConfiguration$.subscribe(config => {
-      if(config) {
-          this.studyCategoriesMetadata = config.studyCategories || {};
+      if (config) {
+        this.studyCategoriesMetadata = config.studyCategories || {};
       }
     });
   }
@@ -201,6 +211,11 @@ export class ConsoleComponent implements OnInit, AfterContentInit {
       return sampleType.charAt(0).toUpperCase() + sampleType.slice(1);
     }
     return 'Other';
+  }
+
+  get editorBasePath(): string {
+    const base = this.baseHref || "/";
+    return base.endsWith("/") ? base : `${base}/`;
   }
 
   studyClick(study: IStudyDetail, view: string) {

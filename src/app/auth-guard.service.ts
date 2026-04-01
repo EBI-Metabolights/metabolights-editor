@@ -5,146 +5,68 @@ import { EditorService } from "./services/editor.service";
 import { SessionStatus } from "./models/mtbl/mtbls/enums/session-status.enum";
 import { ConfigurationService } from "./configuration.service";
 
-import jwtDecode from "jwt-decode";
-import { httpOptions, MtblsJwtPayload } from "./services/headers";
+import { httpOptions, MtblsJwtPayload, StudyPermission } from "./services/headers";
 import { HttpClient } from "@angular/common/http";
 
 import { ErrorMessageService } from "./services/error-message.service";
 import { environment } from "src/environments/environment";
 import { Store } from "@ngxs/store";
 import { StudyPermissionNS } from "./ngxs-store/non-study/application/application.actions";
+import { KeycloakAuthGuard, KeycloakEventType, KeycloakService } from "keycloak-angular";
+import { firstValueFrom } from "rxjs";
+import { StudyRedirectHandlerService } from "./services/study-redirect-handler.service";
+import jwtDecode from "jwt-decode";
 @Injectable({
   providedIn: "root",
 })
-export class AuthGuard  implements OnInit {
-
+export class AuthGuard extends KeycloakAuthGuard implements OnInit {
   constructor(
     private editorService: EditorService,
     private configService: ConfigurationService,
-    private router: Router,
+    protected router: Router,
     private route: ActivatedRoute,
     private http: HttpClient,
     private errorMessageService: ErrorMessageService,
-    private store: Store
-  ) { }
+    private store: Store,
+    protected readonly keycloak: KeycloakService,
+    private redirectHandler: StudyRedirectHandlerService
+  ) {
+    super(router, keycloak)
+  }
 
-
-  async canActivate(
+  public async isAccessAllowed(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ) {
-    const url: string = state.url;
-    let studyIdentifier;
-    let isPrivateWithMTBLSAccession = false;
-    if (url.startsWith("/MTBLS")) {
-      studyIdentifier = url.split("/")[1];
-      isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
+    if (state.url.startsWith("/console")) {
+      if (!this.authenticated) {
+        this.editorService.setRedirectUrl(state.url);
+        await this.keycloak.login();
+        return false;
+      }
+      return true;
     }
-    else if (url.startsWith("/study/MTBLS")) {
-      studyIdentifier = url.split("/")[2];
-      isPrivateWithMTBLSAccession = await this.handlePrivate(studyIdentifier)
+
+    if (state.url.startsWith('/login')) {
+      return true;
     }
-    const continueProcess = await this.checkAuthenticationRequest(state);
-    if (continueProcess === false) {
-      if (isPrivateWithMTBLSAccession) this.router.navigate(["/study-not-public"], { queryParams: { studyIdentifier: studyIdentifier } });
-      return false;
-    }
-    return await this.checkUrlAndLogin(url, state, isPrivateWithMTBLSAccession);
+
+    // Delegate ALL study-related redirect logic to the new handler
+    return await this.redirectHandler.handleRedirectFlow(state.url);
+  }
+
+  async cccanActivate(
+    route: ActivatedRouteSnapshot, state: RouterStateSnapshot
+  ) {
+    return await this.isAccessAllowed(route, state);
   }
 
   async handlePrivate(studyIdentifier): Promise<boolean> {
     const perms = await this.editorService.getStudyPermissionByStudyId(studyIdentifier);
-    const allEmptyOrFalse = (obj: Record<string, any>): boolean =>
-      Object.entries(obj)
-        .filter(([key]) => key !== 'studyId')       // skip studyId
-        .every(([, val]) => val === '' || val === false);
-    const priv = allEmptyOrFalse(perms)
-    console.log(priv);
-    return priv;
+    return perms.view === null || !perms.view
   }
 
-  async checkAuthenticationRequest(state: RouterStateSnapshot) {
-    try {
-      let loginOneTimeToken = null;
-      if (state.root.queryParamMap.has("loginOneTimeToken") === false) {
-        return true;
-      }
-
-      loginOneTimeToken = state.root.queryParamMap.get("loginOneTimeToken");
-      this.editorService.updateHistory(state.root);
-      if (loginOneTimeToken === "") {
-        this.editorService.redirectUrl = state.url;
-        this.router.navigate(["/login"]);
-        return false;
-      }
-      const loginOneTimeTokenKey = this.configService.config.endpoint + "/loginOneTimeToken"
-      const localLoginOneTimeToken = localStorage.getItem(loginOneTimeTokenKey);
-
-      if (localLoginOneTimeToken === loginOneTimeToken) {
-        return true;
-      }
-      const jwt = await this.editorService.getJwtWithOneTimeToken(loginOneTimeToken);
-      let decoded = null;
-      try {
-        decoded = jwtDecode<MtblsJwtPayload>(jwt);
-      } catch (err) {
-      }
-      if (decoded === null) {
-        this.editorService.redirectUrl = state.url;
-        this.router.navigate(["/login"]);
-        return false;
-      }
-      // const jwtTokenKey = this.configService.config.endpoint + "/jwt"
-      const jwtTokenKey = "jwt"
-      const localJwt = localStorage.getItem(jwtTokenKey);
-
-      if (localJwt !== null && jwt === localJwt) {
-        return true;
-      }
-
-      const userName = decoded.email;
-
-      if (localJwt === null) {
-        this.editorService.redirectUrl = state.url;
-        await this.editorService.loginWithJwt(jwt, userName);
-        const loginOneTimeToken = this.configService.config.endpoint + "/loginOneTimeToken"
-        localStorage.setItem(loginOneTimeTokenKey, loginOneTimeToken);
-        toastr.success(userName + "is logged in successfully.", "Metabolights Editor session is activated.", {
-          timeOut: "5000",
-          positionClass: "toast-top-center",
-          preventDuplicates: true,
-          extendedTimeOut: 0,
-          tapToDismiss: false,
-        });
-      } else {
-        let localDecoded = null;
-        try {
-          localDecoded = jwtDecode<MtblsJwtPayload>(localJwt);
-        } catch (err) {
-        }
-        const currentUser = localDecoded.email;
-        if (currentUser !== userName) {
-          this.editorService.clearSessionData();
-          await this.editorService.loginWithJwt(jwt, userName);
-          toastr.info("User: " + userName, "Session is swithed to other user.", {
-            timeOut: "5000",
-            positionClass: "toast-top-center",
-            preventDuplicates: true,
-            extendedTimeOut: 0,
-            tapToDismiss: false,
-          });
-        }
-      }
-      return true;
-    } catch (err) {
-      this.editorService.redirectUrl = state.url;
-      const errorCode = "E-0001-001";
-      this.router.navigate(["/study-not-found"], { queryParams: { code: errorCode } });
-      return false;
-    }
-  }
-
-  async canActivateChild(
+  async ccanActivateChild(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ) {

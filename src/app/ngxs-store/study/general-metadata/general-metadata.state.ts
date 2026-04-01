@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, SampleSheetFilename, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, SampleSheetFilename, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession, UserStudyPermission } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -19,6 +19,7 @@ import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
 import { User } from "../../non-study/user/user.actions";
 import { DatasetLicense, DatasetLicenseService } from "src/app/services/decomposed/dataset-license.service";
+import { StudyPermission } from "src/app/services/headers";
 
 
 export interface GeneralMetadataStateModel {
@@ -53,6 +54,7 @@ export interface GeneralMetadataStateModel {
     relatedDatasets: any[];
     mhdAccession: string;
     comments: any[];
+    studyPermission: StudyPermission;
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -85,7 +87,8 @@ const defaultState: GeneralMetadataStateModel = {
     funders: [],
     relatedDatasets: [],
     mhdAccession: null,
-    comments: []
+    comments: [],
+    studyPermission: null
 }
 
 @State<GeneralMetadataStateModel>({
@@ -147,6 +150,8 @@ export class GeneralMetadataState {
                 ctx.dispatch(new StudyCategory.Set(gm_response.mtblsStudy.studyCategory));
                 ctx.dispatch(new TemplateVersion.Set(gm_response.mtblsStudy.templateVersion));
                 ctx.dispatch(new MhdAccession.Set(gm_response.mtblsStudy.mhdAccession));
+                ctx.dispatch(new UserStudyPermission.Set(gm_response.mtblsStudy.studyPermission));
+                
                 ctx.dispatch(new DatasetLicenseNS.SetDatasetLicense(
                     {
                         name: gm_response.mtblsStudy.datasetLicense,
@@ -181,11 +186,13 @@ export class GeneralMetadataState {
                 const relatedAccessions = comments.find(c => c.name === 'Related Data Accession')?.value.split(';') || [];
                 const relatedRepos = comments.find(c => c.name === 'Related Data Repository')?.value.split(';') || [];
                 const relatedUrls = comments.find(c => c.name === 'Related Data URL')?.value.split(';') || [];
+                const relatedDescriptions = comments.find(c => c.name === 'Repository Data Description')?.value.split(';') || [];
 
                 const relatedDatasets = relatedAccessions.map((acc, i) => ({
                     accession: acc,
                     repository: relatedRepos[i] || '',
-                    url: relatedUrls[i] || ''
+                    url: relatedUrls[i] || '',
+                    dataDescription: relatedDescriptions[i] || ''
                 }));
                 ctx.patchState({ relatedDatasets });
 
@@ -424,6 +431,15 @@ export class GeneralMetadataState {
             ...state,
             studyCreatedAt: action.studyCreatedAt
         });
+    }
+
+    @Action(UserStudyPermission.Set)
+    SetStudyPermission(ctx: StateContext<GeneralMetadataStateModel>, action: UserStudyPermission.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            studyPermission: action.studyPermission
+      });
     }
 
     @Action(StudyCategory.Set)
@@ -910,6 +926,10 @@ export class GeneralMetadataState {
         return state?.studyCategory
     }
     @Selector()
+    static studyPermission(state: GeneralMetadataStateModel): StudyPermission {
+        return state.studyPermission
+    }
+    @Selector()
     static studyCreatedAt(state: GeneralMetadataStateModel): string {
         return state?.studyCreatedAt
     }
@@ -1028,17 +1048,19 @@ export class GeneralMetadataState {
         const accessions = datasets.map(d => d.accession).join(';');
         const repos = datasets.map(d => d.repository).join(';');
         const urls = datasets.map(d => d.url || '').join(';');
+        const descriptions = datasets.map(d => d.dataDescription || '').join(';');
 
         const relevantComments = [];
         if (accessions) relevantComments.push({ name: 'Related Data Accession', value: accessions });
         if (repos) relevantComments.push({ name: 'Related Data Repository', value: repos });
         if (urls) relevantComments.push({ name: 'Related Data URL', value: urls });
+        if (descriptions) relevantComments.push({ name: 'Repository Data Description', value: descriptions });
 
         this.generalMetadataService.updateComments(relevantComments, studyId).subscribe(
             (response) => {
                 let allComments = [...(state.comments || [])];
                 // Remove existing ones from local state to merge
-                allComments = allComments.filter(c => !['Related Data Accession', 'Related Data Repository', 'Related Data URL'].includes(c.name));
+                allComments = allComments.filter(c => !['Related Data Accession', 'Related Data Repository', 'Related Data URL', 'Repository Data Description'].includes(c.name));
                 allComments = [...allComments, ...relevantComments];
 
                 ctx.patchState({ comments: allComments });

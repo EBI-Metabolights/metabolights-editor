@@ -38,6 +38,7 @@ export class AsperaUploadComponent implements OnInit {
     extensions: ["*"],
   };
   @Input("file") file: any = null;
+  @Input() hideButton: boolean = false;
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
 
   isAsperaUploadModalOpen = false;
@@ -58,7 +59,7 @@ export class AsperaUploadComponent implements OnInit {
     private metabolightsService: MetabolightsService,
     private editorService: EditorService,
     private configService: ConfigurationService
-  ) {}
+  ) { }
 
   setUpSubscriptionsNgxs() {
     this.uploadLocation$.subscribe((value) => {
@@ -115,9 +116,9 @@ export class AsperaUploadComponent implements OnInit {
           transfer.uuid === this.currentTransferId &&
             "completed" === t.status &&
             (console.log("Upload completed"),
-            console.log("Sync started"),
-            this.allowMultipleSelection
-              ? this.editorService
+              console.log("Sync started"),
+              this.allowMultipleSelection
+                ? this.editorService
                   .syncStudyFiles({
                     files: [],
                   })
@@ -126,7 +127,7 @@ export class AsperaUploadComponent implements OnInit {
                       this.complete.emit(),
                       console.log("Sync complete");
                   })
-              : this.editorService
+                : this.editorService
                   .syncStudyFiles({
                     files: [
                       {
@@ -182,18 +183,18 @@ export class AsperaUploadComponent implements OnInit {
     this.asperaWeb.initSession(),
       "folder" === t
         ? this.asperaWeb.showSelectFolderDialog(
-            {
-              success: function (t) {
-                this.buildUploadSpec(t);
-              }.bind(this),
-              error(t) {
-                console.error(t);
-              },
+          {
+            success: function (t) {
+              this.buildUploadSpec(t);
+            }.bind(this),
+            error(t) {
+              console.error(t);
             },
-            {
-              allowMultipleSelection: this.allowMultipleSelection,
-            }
-          )
+          },
+          {
+            allowMultipleSelection: this.allowMultipleSelection,
+          }
+        )
         : (console.log(this.fileTypes),
           this.asperaWeb.showSelectFileDialog(
             {

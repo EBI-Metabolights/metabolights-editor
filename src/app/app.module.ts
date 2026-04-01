@@ -45,7 +45,6 @@ import { DOIService } from "./services/publications/doi.service";
 import { AuthService } from "./services/metabolights/auth.service";
 import { EuropePMCService } from "./services/publications/europePMC.service";
 import { LabsWorkspaceService } from "./services/labs-workspace.service";
-import { HeaderInterceptor } from "./services/interceptors/header.interceptor";
 import { NGXS_PLUGINS, NgxsModule } from "@ngxs/store";
 import { TransitionsState } from "./ngxs-store/non-study/transitions/transitions.state";
 import { UserState } from "./ngxs-store/non-study/user/user.state";
@@ -62,116 +61,167 @@ import { StudyCreationState } from "./ngxs-store/non-study/study-creation/study-
 import { DescriptorInterceptor } from "./services/interceptors/descriptor.interceptor";
 import { FactorInterceptor } from "./services/interceptors/factor.interceptor";
 import { AuthInterceptor } from './services/interceptors/auth.interceptor';
+import { HeaderInterceptor } from './services/interceptors/header.interceptor';
 import { LoggingMiddleware } from './ngxs-store/study-update-action-interceptor.service';
 import { DataPolicyComponent } from './components/public/data-policy/data-policy.component';
 import { MatDividerModule } from '@angular/material/divider';
 import { DatasetLicenseStaticPageComponent } from './components/public/dataset-license-static/dataset-license-static.component';
+import { KeycloakAngularModule, KeycloakService } from 'keycloak-angular';
+import { filter, switchMap, take } from 'rxjs/operators';
+import { firstValueFrom } from 'rxjs';
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable @typescript-eslint/naming-convention */
 export function appInitializer(injector: Injector): () => Promise<any> {
-    return async () => {
-        const configService = injector.get(ConfigurationService);
-        const editorService = injector.get(EditorService);
-        await configService.loadConfiguration();
-        await editorService.loadDefaultControlLists();
-    };
+  return async () => {
+    const configService = injector.get(ConfigurationService);
+    const editorService = injector.get(EditorService);
+    await configService.loadConfiguration();
+    try {
+      await editorService.loadDefaultControlLists();
+    } catch (err) {
+      console.warn('Could not load default control lists during initialization (this is expected if not logged in):', err);
+    }
+  };
+}
+
+function initializeKeycloak(keycloak: KeycloakService, configService: ConfigurationService) {
+  return () =>
+    firstValueFrom(
+      configService.configLoaded$.pipe(
+        filter((value) => value === true),
+        take(1),
+        switchMap(() =>
+          keycloak.init({
+            config: {
+              url: configService.config.auth.url,
+              realm: configService.config.auth.realm,
+              clientId: configService.config.auth.clientId
+            },
+            initOptions: {
+              onLoad: 'check-sso',
+              silentCheckSsoRedirectUri: configService.config.auth.silentCheckSsoRedirectUri,
+              redirectUri: configService.config.auth.redirectUri,
+            },
+            shouldAddToken: (request) => {
+              if (configService.config) {
+                const { url } = request;
+                const targetUrl = url;
+                const endpointWs = configService?.config?.metabolightsWSURL.baseURL;
+                const endpointWs3 = configService?.config?.ws3URL;
+                const isPublic = targetUrl.includes('/public/');
+
+                return (targetUrl.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3)) && !isPublic;
+              }
+              return false;
+            }
+          })
+        )
+      )
+    );
 }
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        StudyComponent,
-        PublicStudyComponent,
-        LoginComponent,
-        ConsoleComponent,
-        PublicStudyComponent,
-        LazyLoadImagesDirective,
-        HeaderComponent,
-        FooterComponent,
-        GuidesComponent,
-        DataPolicyComponent,
-        DatasetLicenseStaticPageComponent],
-    exports: [FooterComponent],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        StudyModule,
-        SharedModule,
-        GuideModule,
-        AppRoutingModule,
-        FormsModule,
-        ReactiveFormsModule,
-        BrowserAnimationsModule,
-        MatProgressSpinnerModule,
-        MatInputModule,
-        MatAutocompleteModule,
-        MatPaginatorModule,
-        MatSelectModule,
-        MatIconModule,
-        MatChipsModule,
-        MatDatepickerModule,
-        MatNativeDateModule,
-        MatButtonToggleModule,
-        MatCheckboxModule,
-        MatTableModule,
-
-        MatDividerModule,
-        MatStepperModule,
-        DragDropModule,
-        NgxsModule.forRoot([
-            GeneralMetadataState,
-            UserState,
-            TransitionsState,
-            ApplicationState,
-            FilesState,
-            AssayState,
-            MAFState,
-            SampleState,
-            ProtocolsState,
-            DescriptorsState,
-            ValidationState,
-            StudyCreationState
-        ], { developmentMode: true }),
-        QuillModule.forRoot({
-            modules: {
-                clipboard: {
-                    matchVisual: false,
-                },
-            },
-        }),
-    ], providers: [
-        AuthGuard,
-        {
-            provide: APP_INITIALIZER,
-            useFactory: appInitializer,
-            deps: [Injector],
-            multi: true,
+  declarations: [
+    AppComponent,
+    StudyComponent,
+    PublicStudyComponent,
+    LoginComponent,
+    ConsoleComponent,
+    PublicStudyComponent,
+    LazyLoadImagesDirective,
+    HeaderComponent,
+    FooterComponent,
+    GuidesComponent,
+    DataPolicyComponent,
+    DatasetLicenseStaticPageComponent],
+  exports: [FooterComponent],
+  bootstrap: [AppComponent],
+  imports: [
+    KeycloakAngularModule,
+    BrowserModule,
+    StudyModule,
+    SharedModule,
+    GuideModule,
+    AppRoutingModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatProgressSpinnerModule,
+    MatInputModule,
+    MatAutocompleteModule,
+    MatPaginatorModule,
+    MatSelectModule,
+    MatIconModule,
+    MatChipsModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonToggleModule,
+    MatCheckboxModule,
+    MatTableModule,
+    MatDividerModule,
+    DragDropModule,
+    NgxsModule.forRoot([
+      GeneralMetadataState,
+      UserState,
+      TransitionsState,
+      ApplicationState,
+      FilesState,
+      AssayState,
+      MAFState,
+      SampleState,
+      ProtocolsState,
+      DescriptorsState,
+      ValidationState,
+      StudyCreationState
+    ], { developmentMode: true }),
+    QuillModule.forRoot({
+      modules: {
+        clipboard: {
+          matchVisual: false,
         },
-        EditorService,
-        MetabolightsService,
-        EuropePMCService,
-        DOIService,
-        AuthService,
-        LabsWorkspaceService,
-        {
-            provide: NGXS_PLUGINS,
-            useClass: LoggingMiddleware,
-            multi: true,
-        },
-        { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-        {
-            provide: APP_BASE_HREF,
-            useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
-            deps: [PlatformLocation]
-        },
-        provideHttpClient(withInterceptorsFromDi())
-    ]
+      },
+    }),
+  ], providers: [
+    {
+      provide: APP_INITIALIZER,
+      useFactory: appInitializer,
+      deps: [Injector],
+      multi: true,
+    },
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeKeycloak,
+      multi: true,
+      deps: [KeycloakService, ConfigurationService]
+    },
+    AuthGuard,
+    EditorService,
+    MetabolightsService,
+    EuropePMCService,
+    DOIService,
+    AuthService,
+    LabsWorkspaceService,
+    {
+      provide: NGXS_PLUGINS,
+      useClass: LoggingMiddleware,
+      multi: true,
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    {
+      provide: APP_BASE_HREF,
+      useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),
+      deps: [PlatformLocation]
+    },
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 })
 export class AppModule {
-    constructor(
-    ) {
+  constructor(
+  ) {
 
-    }
+  }
 }

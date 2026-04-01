@@ -1,114 +1,91 @@
-<div class="field">
-  <button (click)="openUploadModal()" class="button is-link is-fullwidth">
-    Aspera Upload
-  </button>
-</div>
-<small class="had-text-grey is-pulled-right"
-  ><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help </a>&emsp;</small
->
-<div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
-      <p>
-        <b>Aspera Upload</b><br /><br />
-        Aspera is a fast way of transferring files. Aspera lets you control the
-        transfer rate to better suit your internet connection. You can also stop
-        the transfer, and later resume where you left off. <br /><br />
-        For more information on how to use Aspera for transferring files, please refer to our 
-        <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files" target="_blank">Help Documentation</a>.
-      </p>
-    </section>
-    <footer class="modal-card-foot">
-      <div class="columns is-gapless full-width">
-        <div (click)="toggleHelp()" class="column is-full has-text-right">
-          <button class="button is-default">Close</button>
+<div *ngIf="!hideButton">
+  <div class="field">
+    <button (click)="openUploadModal()" class="button is-link is-fullwidth">
+      Aspera Upload
+    </button>
+  </div>
+  <small class="had-text-grey is-pulled-right"><a (click)="toggleHelp()"><mat-icon>help</mat-icon> Help
+    </a>&emsp;</small>
+  <div class="modal" [ngClass]="{ 'is-active': displayHelpModal }">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <section class="modal-card-body">
+        <p>
+          <b>Aspera Upload</b><br /><br />
+          Aspera is a fast way of transferring files. Aspera lets you control the
+          transfer rate to better suit your internet connection. You can also stop
+          the transfer, and later resume where you left off. <br /><br />
+          You can use Aspera to upload <b>all types of study data</b>, including Metadata, Raw Data, Derived Data, and
+          Supplementary files. <br /><br />
+          For more information on how to use Aspera for transferring files, please refer to our
+          <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files"
+            target="_blank">Help Documentation</a>.
+        </p>
+      </section>
+      <footer class="modal-card-foot">
+        <div class="columns is-gapless full-width">
+          <div (click)="toggleHelp()" class="column is-full has-text-right">
+            <button class="button is-default">Close</button>
+          </div>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </div>
   </div>
 </div>
-<div class="modal" [ngClass]="{ 'is-active': isAsperaUploadModalOpen }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <section class="modal-card-body">
-      <div class="tabs is-toggle is-fullwidth">
+
+<div *ngIf="hideButton || isAsperaUploadModalOpen"
+  [ngClass]="{ 'modal': !hideButton, 'is-active': isAsperaUploadModalOpen && !hideButton }">
+  <div *ngIf="!hideButton" class="modal-background" (click)="closeUploadModal()"></div>
+  <div [ngClass]="{ 'modal-card': !hideButton }">
+    <header *ngIf="!hideButton" class="modal-card-head">
+      <p class="modal-card-title">Aspera Upload</p>
+    </header>
+    <section [ngClass]="{ 'modal-card-body': !hideButton }">
+      <div class="tabs is-toggle is-fullwidth is-small">
         <ul>
-          <li
-            (click)="changeTab('plugin')"
-            [ngClass]="{ 'is-active': selectedTab == 'plugin' }"
-          >
+          <li (click)="changeTab('plugin')" [ngClass]="{ 'is-active': selectedTab == 'plugin' }">
             <a>Aspera Connect transfer plug-in</a>
           </li>
         </ul>
       </div>
       <span>
-        <div
-          *ngIf="selectedTab == 'plugin'"
-          class="content-wrapper has-text-centered vc"
-        >
+        <div *ngIf="selectedTab == 'plugin'" class="content-wrapper has-text-centered vc">
           <div>
-            <br /><img
-              src="assets/img/aspera.jpeg"
-              style="height: 100px"
-            /><br /><br />
+            <br /><img src="assets/img/aspera.jpeg" style="height: 100px" /><br /><br />
             <span>
               <button (click)="upload('file')" class="button is-success">
-                Upload file<span *ngIf="allowMultipleSelection">s</span>
+                <mat-icon class="mr-2">file_upload</mat-icon>Upload file<span *ngIf="allowMultipleSelection">s</span>
               </button>
             </span>
             &nbsp;
             <span *ngIf="allowMultipleSelection">
               <button (click)="upload('folder')" class="button is-success">
-                Upload folder<span *ngIf="allowMultipleSelection">s</span>
+                <mat-icon class="mr-2">folder</mat-icon>Upload folder<span *ngIf="allowMultipleSelection">s</span>
               </button>
             </span>
-            <br /><br /><br /><small class="has-text-grey"
-              ><b
-                ><a
-                  href="https://www.ibm.com/products/aspera/downloads#cds"
-                  target="_blank"
-                  >Install IBM ASPERA Connect</a
-                ></b
-              > | <b
-                ><a
-                  href="https://www.ibm.com/docs/en/aspera-connect/"
-                  target="_blank"
-                  >IBM ASPERA Connect Documentation</a
-                ></b
-              ></small
-            >
+            <br /><br /><br /><small class="has-text-grey"><b><a
+                  href="https://www.ibm.com/products/aspera/downloads#cds" target="_blank">Install IBM ASPERA
+                  Connect</a></b> | <b><a href="https://www.ibm.com/docs/en/aspera-connect/" target="_blank">IBM ASPERA
+                  Connect Documentation</a></b></small>
           </div>
         </div>
       </span>
-      <div>
-        <p>
-          For more information on how to use Aspera for uploading files, please refer to our 
-          <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files" target="_blank">Help Documentation</a>.
-        </p>
-      </div>
-      <div class="panel-block notification is-primary" style="margin-top: 20px">
+      <div class="panel-block notification has-background-white-ter has-text-grey-dark" style="margin-top: 20px">
         <small class="is-tiny">
           <i>
-            <mat-icon
-              class="mat-icon notranslate material-icons mat-icon-no-color"
-              role="img"
-              aria-hidden="true"
-              >info</mat-icon
-            >
+            <mat-icon style="font-size: 16px; height: 16px; width: 16px;" class="mr-1">info</mat-icon>
             You may close this modal and proceed to the next steps while the
             files are being uploaded
           </i>
         </small>
       </div>
     </section>
-    <footer class="modal-card-foot">
+    <footer *ngIf="!hideButton" class="modal-card-foot">
       <div class="columns is-gapless full-width">
         <div class="column is-two-third">
           <mtbls-help target="aspera">
             <span class="clickable">
-              Video tutorial <i class="material-icons"> help_outline </i></span
-            >
+              Video tutorial <i class="material-icons"> help_outline </i></span>
             <div class="modal">
               <div class="modal-background"></div>
               <div class="modal-card">
@@ -123,17 +100,10 @@
                 <footer class="modal-card-foot buttons is-right">
                   <div class="columns is-gapless full-width">
                     <div class="column is-two-third">
-                      <a
-                        class="button is-default"
-                        href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool/editor feedback!"
-                      >
-                        <mat-icon
-                          class="mat-icon material-icons notranslate mat-icon-no-color"
-                          role="img"
-                          style="font-size: 0.93em"
-                          aria-hidden="true"
-                          >Contact us</mat-icon
-                        >
+                      <a class="button is-default"
+                        href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool/editor feedback!">
+                        <mat-icon class="mat-icon material-icons notranslate mat-icon-no-color" role="img"
+                          style="font-size: 0.93em" aria-hidden="true">Contact us</mat-icon>
                         Feedback
                       </a>
                     </div>
@@ -146,10 +116,7 @@
             </div>
           </mtbls-help>
         </div>
-        <div
-          (click)="closeUploadModal()"
-          class="column is-one-third has-text-right"
-        >
+        <div (click)="closeUploadModal()" class="column is-one-third has-text-right">
           <button class="button is-default">Close</button>
         </div>
       </div>

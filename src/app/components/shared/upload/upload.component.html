@@ -1,30 +1,215 @@
-<a (click)="openUploadModal()" class="button is-light is-small" [ngClass]="size">
-  <mat-icon>cloud_upload</mat-icon> Upload
-</a>
-<div class="modal" [ngClass]="{ 'is-active': isUploadModalOpen }">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title">Upload folders / files</p>
-    </header>
-    <section class="modal-card-body" v-if="validations">
-      <mtbls-aspera
-        [fileTypes]="fileTypes"
-        [type]="type"
-        [allowMultipleSelection]="allowMultipleSelection"
-        [file]="file"
-        (complete)="uploadComplete()"
-      ></mtbls-aspera>
-      <mtbls-ftp></mtbls-ftp>
-    </section>
-    <footer class="modal-card-foot">
-      <div class="columns is-gapless full-width">
-        <div class="column is-full has-text-right">
-          <button (click)="closeUploadModal()" class="button is-default">
-            Close
-          </button>
+<!-- Inline View (Selection Tiles on page if embedded) -->
+<div *ngIf="isEmbedded && !isUploadModalOpen" class="columns is-multiline">
+    <div class="column" [ngClass]="showBrowserUpload ? 'is-4' : 'is-6'">
+        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
+            <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-link">cloud_upload</mat-icon>
+            <p class="title is-6 mt-2">
+                Aspera Upload
+                <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
+                    <mat-icon
+                        style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                </a>
+            </p>
+            <p class="subtitle is-7">Fast transfer for large files/folders</p>
         </div>
-      </div>
-    </footer>
-  </div>
+    </div>
+    <div class="column is-4" *ngIf="showBrowserUpload">
+        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
+            <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-info">file_upload</mat-icon>
+            <p class="title is-6 mt-2">File Upload (Browser)</p>
+            <p class="subtitle is-7">Direct browser-based upload</p>
+        </div>
+    </div>
+    <div class="column" [ngClass]="showBrowserUpload ? 'is-4' : 'is-6'">
+        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('ftp')">
+            <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-grey">vpn_key</mat-icon>
+            <p class="title is-6 mt-2">
+                Private FTP
+                <a (click)="$event.stopPropagation(); toggleFtpHelp()" class="has-text-grey ml-1">
+                    <mat-icon
+                        style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                </a>
+            </p>
+            <p class="subtitle is-7">Manual upload via FTP client (e.g. FileZilla)</p>
+        </div>
+    </div>
+
+    <!-- Help Overlays for Selection (Embedded View) -->
+    <div class="column is-12" *ngIf="showAsperaHelp || showFtpHelp">
+        <!-- Aspera Help -->
+        <div *ngIf="showAsperaHelp" class="notification has-background-white-ter has-text-grey-darker p-4 border-light">
+            <button class="delete" (click)="toggleAsperaHelp()"></button>
+            <p class="has-text-weight-bold mb-2">Aspera Upload Guidance</p>
+            <p class="is-size-7">Aspera is a high-speed file transfer tool. It requires the <b>Aspera Connect</b> plugin
+                to be installed in your browser.</p>
+            <p class="is-size-7 mt-2">
+                <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files"
+                    target="_blank" class="has-text-link">Full Guide</a>
+            </p>
+        </div>
+        <!-- FTP Help -->
+        <div *ngIf="showFtpHelp" class="notification has-background-white-ter has-text-grey-darker p-4 border-light">
+            <button class="delete" (click)="toggleFtpHelp()"></button>
+            <p class="has-text-weight-bold mb-2">Private FTP Guidance</p>
+            <p class="is-size-7">Private FTP allows you to upload files using an external client like <b>FileZilla</b>.
+                It's useful for large datasets or batch transfers.</p>
+            <p class="is-size-7 mt-2">
+                <a href="https://ebi-metabolights.github.io/guides/Files/#2-ftp-client-alternative-for-large-set-of-files"
+                    target="_blank" class="has-text-link">Full Guide</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Button View (Standard mode) -->
+<div *ngIf="!isEmbedded">
+    <a (click)="openUploadModal()" class="button is-light is-small" [ngClass]="size">
+        <mat-icon>cloud_upload</mat-icon> Upload
+    </a>
+</div>
+
+<!-- The Shared Modal -->
+<div class="modal" [ngClass]="{ 'is-active': isUploadModalOpen }">
+    <div class="modal-background" (click)="closeUploadModal()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">
+                <span *ngIf="!selectedMethod">Select Upload Method</span>
+                <span *ngIf="selectedMethod">
+                    {{ selectedMethod === 'ftp' ? 'Private FTP' : 'Aspera' }} Upload
+                    <a *ngIf="selectedMethod === 'aspera'" (click)="toggleAsperaHelp()" class="has-text-grey ml-1">
+                        <mat-icon style="font-size: 16px; vertical-align: middle;">help_outline</mat-icon>
+                    </a>
+                </span>
+            </p>
+            <button class="delete" aria-label="close" (click)="closeUploadModal()"></button>
+        </header>
+        <section class="modal-card-body">
+
+            <!-- Step 1: Selection (Only shown inside modal if NOT embedded) -->
+            <div *ngIf="!isEmbedded && !selectedMethod" class="columns is-multiline">
+                <div class="column is-4">
+                    <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
+                        <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                            class="has-text-link">cloud_upload</mat-icon>
+                        <p class="title is-6 mt-2">
+                            Aspera Upload
+                            <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
+                                <mat-icon
+                                    style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                            </a>
+                        </p>
+                        <p class="subtitle is-7">Fast transfer for large files/folders</p>
+                    </div>
+                </div>
+                <div class="column is-4" *ngIf="showBrowserUpload">
+                    <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
+                        <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                            class="has-text-info">file_upload</mat-icon>
+                        <p class="title is-6 mt-2">File Upload (Browser)</p>
+                        <p class="subtitle is-7">Direct browser-based upload</p>
+                    </div>
+                </div>
+                <div class="column is-4">
+                    <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('ftp')">
+                        <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                            class="has-text-grey">vpn_key</mat-icon>
+                        <p class="title is-6 mt-2">
+                            Private FTP
+                            <a (click)="$event.stopPropagation(); toggleFtpHelp()" class="has-text-grey ml-1">
+                                <mat-icon
+                                    style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                            </a>
+                        </p>
+                        <p class="subtitle is-7">Manual upload via FTP client (e.g. FileZilla)</p>
+                    </div>
+                </div>
+
+                <!-- Help Overlays for Selection (Modal View) -->
+                <div class="column is-12" *ngIf="showAsperaHelp || showFtpHelp">
+                    <!-- Aspera Help -->
+                    <div *ngIf="showAsperaHelp"
+                        class="notification has-background-white-ter has-text-grey-darker p-4 border-light">
+                        <button class="delete" (click)="toggleAsperaHelp()"></button>
+                        <p class="has-text-weight-bold mb-2">Aspera Upload Guidance</p>
+                        <p class="is-size-7">Aspera is a high-speed file transfer tool. It requires the <b>Aspera
+                                Connect</b> plugin to be installed in your browser.</p>
+                        <p class="is-size-7 mt-2">
+                            <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files"
+                                target="_blank" class="has-text-link">Full Guide</a>
+                        </p>
+                    </div>
+                    <!-- FTP Help -->
+                    <div *ngIf="showFtpHelp"
+                        class="notification has-background-white-ter has-text-grey-darker p-4 border-light">
+                        <button class="delete" (click)="toggleFtpHelp()"></button>
+                        <p class="has-text-weight-bold mb-2">Private FTP Guidance</p>
+                        <p class="is-size-7">Private FTP allows you to upload files using an external client like
+                            <b>FileZilla</b>. It's useful for large datasets or batch transfers.</p>
+                        <p class="is-size-7 mt-2">
+                            <a href="https://ebi-metabolights.github.io/guides/Files/#2-ftp-client-alternative-for-large-set-of-files"
+                                target="_blank" class="has-text-link">Full Guide</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Execution (Aspera/FTP only) -->
+            <div *ngIf="selectedMethod">
+                <!-- Aspera -->
+                <div *ngIf="selectedMethod === 'aspera'">
+                    <div *ngIf="showAsperaHelp" class="notification is-light is-size-7 mb-4">
+                        <button class="delete" (click)="toggleAsperaHelp()"></button>
+                        <p class="has-text-weight-bold mb-1">Aspera Connect Help</p>
+                        Aspera is a high-speed file transfer tool. It requires the <b>Aspera Connect</b> plugin to be
+                        installed in your browser.
+                        <a href="https://ebi-metabolights.github.io/guides/Files/#1-aspera-connect-plugin-recommended-for-small-set-of-files"
+                            target="_blank" class="has-text-link">Help Guide</a>
+                    </div>
+                    <mtbls-aspera [fileTypes]="fileTypes" [type]="type"
+                        [allowMultipleSelection]="allowMultipleSelection" [file]="file" [hideButton]="true"
+                        (complete)="uploadComplete()">
+                    </mtbls-aspera>
+                </div>
+
+                <!-- FTP tabbed view -->
+                <div *ngIf="selectedMethod === 'ftp'">
+                    <p class="is-size-7 has-text-weight-bold mb-2">Using FTP Client:</p>
+                    <br />
+                    <div class="tabs is-toggle is-fullwidth is-small mb-4">
+                        <ul>
+                            <li *ngFor="let cat of categories"
+                                [ngClass]="{ 'is-active': selectedFtpCategory?.id === cat.id }">
+                                <a (click)="selectFtpCategory(cat)">
+                                    <span>{{ cat.label }}</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- FTP details for standard categories -->
+                    <div *ngIf="showFtpHelp" class="notification is-light is-size-7 mb-4">
+                        <button class="delete" (click)="toggleFtpHelp()"></button>
+                        <p class="has-text-weight-bold mb-1">FTP Client Setup</p>
+                        Use the credentials below in an FTP client (like <b>FileZilla</b>). Choose the relevant
+                        subfolder (Raw, Derived, etc.) to target specific datasets.
+                        <a href="https://ebi-metabolights.github.io/guides/Files/#2-ftp-client-alternative-for-large-set-of-files"
+                            target="_blank" class="has-text-link">Full Guide</a>
+                    </div>
+                    <mtbls-ftp [subfolder]="selectedFtpCategory?.directory" [hideButton]="true"></mtbls-ftp>
+                </div>
+            </div>
+        </section>
+        <footer class="modal-card-foot">
+            <div class="columns is-gapless full-width">
+                <div class="column is-half">
+                    <button *ngIf="selectedMethod && !isEmbedded" (click)="resetSelection()" class="button is-light">
+                        <mat-icon>arrow_back</mat-icon> Back
+                    </button>
+                </div>
+                <div class="column is-half has-text-right">
+                    <button (click)="closeUploadModal()" class="button">Close</button>
+                </div>
+            </div>
+        </footer>
+    </div>
 </div>

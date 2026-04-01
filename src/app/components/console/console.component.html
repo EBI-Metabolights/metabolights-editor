@@ -33,11 +33,11 @@
     <nav class="panel has-background-white">
       <p class="panel-heading">
         <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
-        <span style="margin-left: 10px">My Studies - {{ loginName }}
+        <span style="margin-left: 10px">My Studies - {{ loginName }}<span *ngIf="curator"> (Curator)</span>
           <small *ngIf="studies.length > 0">({{ studies.length }})</small></span>
         <span class="is-pulled-right" *ngIf="!underMaintenance">
           <small style="font-size: 0.8em !important"><mtbls-help target="createStudy"></mtbls-help></small>&nbsp;
-          <a [class.disabled]="loadingStudies" (click)="createNewStudy()" class="button is-success is-small"><b>+ Create
+          <a [class.disabled]="loadingStudies" (click)="createNewStudy()" class="button is-primary is-small"><b>+ Create
               New Study</b></a>
         </span>
       </p>
@@ -71,11 +71,10 @@
                 <div class="control py-1 mb0">
                   <div class="tags has-addons">
                     <span class="tag is-dark">Accession</span>
-                    <span class="tag" 
-                      [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
-                      [class.is-warning]="study.status == 'Provisional'"
-                      [class.is-success]="study.status == 'Public'">
-                      {{ (study.mhdAccession && study.mhdAccession !== '' && study.mhdAccession !== study.accession) ? study.mhdAccession : study.accession }}
+                    <span class="tag" [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'" [class.is-success]="study.status == 'Public'">
+                      {{ (study.mhdAccession && study.mhdAccession !== '' && study.mhdAccession !== study.accession) ?
+                      study.mhdAccession : study.accession }}
                     </span>
                   </div>
                 </div>
@@ -85,13 +84,12 @@
                     <span class="tag is-link">{{ getStudyCategoryLabel(study.studyCategory) }}</span>
                   </div>
                 </div>
-                <div class="control py-1 mb0" *ngIf="study.mhdAccession && study.mhdAccession !== '' && study.mhdAccession !== study.accession">
+                <div class="control py-1 mb0"
+                  *ngIf="study.mhdAccession && study.mhdAccession !== '' && study.mhdAccession !== study.accession">
                   <div class="tags has-addons">
                     <span class="tag is-dark">MTBLS Accession</span>
-                    <span class="tag"
-                      [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
-                      [class.is-warning]="study.status == 'Provisional'"
-                      [class.is-success]="study.status == 'Public'">
+                    <span class="tag" [class.is-primary]="study.status == 'In Review' || study.status == 'Private'"
+                      [class.is-warning]="study.status == 'Provisional'" [class.is-success]="study.status == 'Public'">
                       {{ study.accession }}
                     </span>
                   </div>
@@ -139,7 +137,8 @@
                   <small>
                     <mat-icon>view_carousel</mat-icon> Guided submission
                   </small> </a>&nbsp;
-                <a (click)="studyClick(study)" [routerLink]="['/study', study.accession]" class="button is-rounded">
+                <a (click)="studyClick(study)" [routerLink]="['/study', study.accession, 'overview']"
+                  class="button is-rounded">
                   <small>
                     <mat-icon>chrome_reader_mode</mat-icon> Study overview
                   </small>
@@ -184,7 +183,7 @@
       <footer class="modal-card-foot">
         <div class="columns is-gapless full-width">
           <div class="column is-half">
-            <button (click)="closeConfirmation()" class="button is-info">
+            <button (click)="closeConfirmation()" class="button">
               <p *ngIf="provisionalStudies.length < 2 ">
                 Cancel
               </p>
@@ -194,7 +193,7 @@
             </button>
           </div>
           <div *ngIf="provisionalStudies.length < 2 || curator || partner" class="column is-half has-text-right">
-            <a [routerLink]="['/guide/create']" class="button is-success">Create new</a>
+            <a [routerLink]="['/guide/create']" class="button is-primary">Create new</a>
           </div>
         </div>
       </footer>

@@ -1,0 +1,46 @@
+<div class="columns" style="min-height: 100vh; margin: 60px 0">
+    <div class="column is-8 is-offset-2">
+        <div style="margin: 0 0 20px 0">
+            <article class="message is-info has-shadow">
+                <div class="message-header">
+                    <p>
+                        <span class="material-icons">info</span>&nbsp;{{ study }} {{ isAccessioned ? 'Accessioned but Submission Not Yet Complete' : 'Submission Not Yet Complete' }}
+                    </p>
+                </div>
+                <div class="message-body">
+                    <div class="container">
+
+                        <p>The MetaboLights study <strong>{{ study }}</strong> is currently being processed or has not
+                            yet completed its initial validation/setup.</p>
+                        <br>
+                        <div *ngIf="isAuthenticated && isOwner">
+                            <b>What does this mean?</b>
+                            <br>
+                            <ul class="ml">
+                                <li>The study does not assigned a stable accession number yet.</li>
+                            </ul>
+                            <br>
+                            <b>What can you do?</b>
+                            <br>
+                            <ul class="ml">
+                                <li>Once it passes the validation process, you can change the study status from Provisional to Private to assign an accession number.</li>
+                                <li>If the study remains in this state for an extended period, please contact the
+                                    MetaboLights team at <span class="email">metabolights-help&#64;ebi.ac.uk</span>.</li>
+                            </ul>
+                            <br>
+                        </div>
+                        <div *ngIf="!isOwner">
+                            <p>This study is currently being processed by the curators or is in a provisional state. Access is restricted to study owners only at this time.</p>
+                            <br>
+                        </div>
+                        <div class="buttons">
+                            <a *ngIf="isAuthenticated" class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
+                            <a *ngIf="!isAuthenticated" class="button is-info" (click)="login()"> Login </a>
+                            <a class="button is-default ml" (click)="homePage()"> MetaboLights Home </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </div>
+</div>

@@ -47,6 +47,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   loading$: Observable<boolean> = inject(Store).select(TransitionsState.loading);
+  studyPermission$: Observable<StudyPermission> = inject(Store).select(GeneralMetadataState.studyPermission);
 
   revisionNumber = null;
   revisionDatetime = null;
@@ -70,6 +71,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   validationStatus: ViolationType = null;
   validationRunTime: string = null;
   validationNeeded: boolean = false;
+  studyPermission: StudyPermission = null;
   permissions: StudyPermission = null;
   revisionStatusTransform = new RevisionStatusTransformPipe()
   studyCategory = "";
@@ -94,8 +96,9 @@ export class StudyComponent implements OnInit, OnDestroy {
     this.templateConfiguration$.subscribe((value) => {
       this.templateConfiguration = value;
     });
-    this.permissions = this.store.snapshot().application.studyPermission
-    this.obfuscationCode = this.permissions.obfuscationCode
+    this.studyPermission = this.store.snapshot().application.studyPermission;
+    this.permissions = this.studyPermission;
+    this.obfuscationCode = this.studyPermission?.obfuscationCode || null;
     this.baseHref = this.configService.baseHref;
     this.editorService.initialiseStudy(this.route);
     this.revisionNumber$.subscribe((value) => {
@@ -111,7 +114,18 @@ export class StudyComponent implements OnInit, OnDestroy {
         this.revisionDatetime = value;
       }
     });
-
+    this.studyPermission$.subscribe((value) => {
+        this.studyPermission = value;
+        this.permissions = value;
+        this.isOwner = false;
+        this.obfuscationCode = null
+        if (this.studyPermission) {
+          this.obfuscationCode = this.studyPermission.obfuscationCode;
+          if (this.studyPermission.submitterOfStudy){
+            this.isOwner = true;
+          }
+        }
+    });
     this.revisionStatus$.subscribe((value) => {
       if (value !== null) {
         this.revisionStatus = this.revisionStatusTransform.transform(value);
@@ -127,7 +141,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       this.obfuscationCode = value;
       if (!this.obfuscationCode || this.obfuscationCode.length == 0) {
         this.permissions = this.store.snapshot().application.studyPermission
-        this.obfuscationCode = this.permissions.obfuscationCode
+        this.obfuscationCode = this.permissions ? this.permissions.obfuscationCode : null;
       }
     });
     this.bannerMessage$.subscribe((value) => {
@@ -148,7 +162,7 @@ export class StudyComponent implements OnInit, OnDestroy {
       if (value !== null) {
         this.requestedStudy = value;
         this.isOwner = false;
-        if (this.permissions.submitterOfStudy) {
+        if (this.permissions && this.permissions.submitterOfStudy) {
           this.isOwner = true;
         }
       }

@@ -19,11 +19,59 @@ export class UploadComponent implements OnInit {
   };
 
   @Output() complete = new EventEmitter<any>(); // eslint-disable-line @angular-eslint/no-output-native
+  @Input() isEmbedded: boolean = false;
+  @Input() id: string = null;
+  @Input() showBrowserUpload: boolean = true;
+  @Output() scrollRequested = new EventEmitter<void>();
+
   isUploadModalOpen = false;
+  selectedMethod: 'aspera' | 'browser' | 'ftp' | null = null;
+  selectedFtpCategory: any = null;
+  showAsperaHelp = false;
+  showFtpHelp = false;
 
-  constructor(private fb: UntypedFormBuilder) {}
+  categories = [
+    { id: 'metadata', label: 'Metadata/Result', directory: '' },
+    { id: 'raw', label: 'Raw Data', directory: '/RAW_FILES' },
+    { id: 'derived', label: 'Derived Data', directory: '/DERIVED_FILES' },
+    { id: 'supplementary', label: 'Supplementary', directory: '/SUPPLEMENTARY_FILES' }
+  ];
 
-  ngOnInit() {}
+  constructor(private fb: UntypedFormBuilder) { }
+
+  ngOnInit() { }
+
+  selectMethod(method: 'aspera' | 'browser' | 'ftp') {
+    if (method === 'browser') {
+      this.closeUploadModal();
+      this.scrollRequested.emit();
+    } else {
+      this.selectedMethod = method;
+      if (method === 'ftp') {
+        this.selectedFtpCategory = this.categories[0];
+      }
+      if (this.isEmbedded) {
+        this.isUploadModalOpen = true;
+      }
+    }
+  }
+
+  selectFtpCategory(category: any) {
+    this.selectedFtpCategory = category;
+  }
+
+  toggleAsperaHelp() {
+    this.showAsperaHelp = !this.showAsperaHelp;
+  }
+
+  toggleFtpHelp() {
+    this.showFtpHelp = !this.showFtpHelp;
+  }
+
+  resetSelection() {
+    this.selectedMethod = null;
+    this.showAsperaHelp = false;
+  }
 
   uploadComplete() {
     this.complete.emit();
@@ -36,5 +84,6 @@ export class UploadComponent implements OnInit {
 
   closeUploadModal() {
     this.isUploadModalOpen = false;
+    this.resetSelection();
   }
 }

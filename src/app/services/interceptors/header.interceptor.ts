@@ -26,17 +26,41 @@ export class HeaderInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler) {
     const endpointWs = this.configService?.config?.metabolightsWSURL.baseURL;
     const origin = this.configService.config?.origin;
-    const targetUrl = origin + req.url;
     const endpointWs3 = this.configService?.config?.ws3URL;
+
+    // Normalize the URL to be absolute for comparison
+    const fullUrl = req.url.startsWith('http') ? req.url : origin + req.url;
+
     let modifiedReq = req;
-    if (endpointWs && (req.url.startsWith(endpointWs) || targetUrl.startsWith(endpointWs3))) {
+    const isMtblsWs = endpointWs && fullUrl.startsWith(endpointWs);
+    const isMtblsWs3 = endpointWs3 && fullUrl.startsWith(endpointWs3);
+
+    if (isMtblsWs || isMtblsWs3) {
       const accessToken = this.auth.getAccessToken();
+      const userToken = this.auth.getApiToken();
+      const isPublic = fullUrl.includes('/public/');
+      let headers: any = {};
+
+      if (accessToken && !isPublic) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
+      }
+
+      const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
+      if (reviewCode) {
+        headers["Obfuscation-Code"] = reviewCode;
+      }
+
+      if (userToken !== null && userToken.length > 0 && !isPublic) {
+        headers["User-Token"] = userToken;
+      }
+
+      if (Object.keys(headers).length > 0) {
+        modifiedReq = req.clone({
+          setHeaders: headers
+        });
+      }
 
       if (accessToken) {
-        modifiedReq = req.clone({
-          setHeaders: { Authorization: `Bearer ${accessToken}` }
-        });
-
         return next.handle(modifiedReq).pipe(
           catchError(error => {
             if (error instanceof HttpErrorResponse && error.status === 401) {
@@ -45,23 +69,6 @@ export class HeaderInterceptor implements HttpInterceptor {
             return throwError(() => error);
           })
         );
-      }
-      const reviewCode = this.activatedRoute.snapshot.queryParams["reviewCode"];
-      if (reviewCode) {
-        modifiedReq = req.clone({
-          setHeaders: {
-            "Obfuscation-Code": reviewCode,
-          },
-        });
-      }
-
-      const userToken = this.auth.getApiToken();
-      if (userToken !== null && userToken.length > 0) {
-        modifiedReq = req.clone({
-          setHeaders: {
-            "User-Token": userToken,
-          },
-        });
       }
     }
 

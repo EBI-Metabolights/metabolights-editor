@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from "@angular/core";
+import { Component, inject, OnInit, Input } from "@angular/core";
 import { MetabolightsService } from "../../../../services/metabolights/metabolights.service";
 import { UntypedFormBuilder } from "@angular/forms";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
@@ -6,6 +6,9 @@ import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { EditorService } from "../../../../services/editor.service";
+
+import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
+import { Operations } from "src/app/ngxs-store/study/files/files.actions";
 
  export interface FtpDetails {
   user: string;
@@ -19,6 +22,9 @@ import { EditorService } from "../../../../services/editor.service";
   styleUrls: ["./ftp.component.css"],
 })
 export class FTPUploadComponent implements OnInit {
+
+  @Input() subfolder: string = '';
+  @Input() hideButton: boolean = false;
 
   uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
@@ -41,7 +47,8 @@ export class FTPUploadComponent implements OnInit {
   constructor(
     private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
-    private editorService: EditorService
+    private editorService: EditorService,
+    private store: Store
   ) {
     this.setUpSubscriptionsNgxs();
   }
@@ -60,6 +67,13 @@ export class FTPUploadComponent implements OnInit {
         }
       }
     })
+  }
+
+  refresh() {
+    const studyId = this.store.selectSnapshot(GeneralMetadataState.id);
+    if (studyId) {
+      this.store.dispatch(new Operations.GetFreshFilesList(true, false, studyId));
+    }
   }
 
   copyText(text: string) {

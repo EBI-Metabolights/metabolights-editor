@@ -7,6 +7,7 @@ import { SamplesService } from "src/app/services/decomposed/samples.service";
 import { take } from "rxjs/operators";
 import { StatusNS } from "../../non-study/application/application.actions";
 import { GeneralMetadataState } from "../general-metadata/general-metadata.state";
+import { FilesState } from "../files/files.state";
 
 // we should type the below properly once we get a better handle on what the data looks like
 export interface SamplesStateModel {
@@ -31,9 +32,17 @@ export class SampleState {
   @Action(Samples.Get)
   GetStudySamples(ctx: StateContext<SamplesStateModel>, action: Samples.Get) {
     const sampleSheetFromInvestigation = this.store.selectSnapshot(GeneralMetadataState.sampleSheetFilename);
-    const sampleSheetFilename = sampleSheetFromInvestigation && sampleSheetFromInvestigation.startsWith("s_")
+    let sampleSheetFilename = sampleSheetFromInvestigation && sampleSheetFromInvestigation.startsWith("s_")
       ? sampleSheetFromInvestigation
       : null;
+
+    // Fallback: if not in investigation metadata yet, check the file list
+    if (!sampleSheetFilename) {
+      const sampleSheetFromFileList = this.store.selectSnapshot(FilesState.getSampleSheet);
+      if (sampleSheetFromFileList) {
+        sampleSheetFilename = sampleSheetFromFileList.file;
+      }
+    }
 
     if (sampleSheetFilename) {
       this.store.dispatch(new SetLoadingInfo(this.samplesService.loadingMessage));

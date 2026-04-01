@@ -1,10 +1,10 @@
 <div class="columns" style="min-height: 100vh; margin: 60px 0">
     <div class="column is-8 is-offset-2">
       <div style="margin: 0 0 20px 0">
-        <article class="message is-small has-shadow">
+        <article class="message is-info has-shadow">
           <div  class="message-header">
             <p>
-              <span class="material-icons">error</span>&nbsp;{{ study }} is not public.
+              <span class="material-icons">info</span>&nbsp;{{ study }} is not public.
             </p>
           </div>
           <div  class="message-body">
@@ -33,13 +33,18 @@
                     <li>Please check again later or contact the submitter(s) or MetaboLights team to see when it will be public.</li>
                 </ul>
                 <br>
-                <b>If you are submitter of this study:</b>
-                <ul class="ml">
-                    <li>You can update your study (e.g., publication DOI, public release date, etc.) or make it public.</li>
-                    <br>
-                    <a class="button is-info" (click)="login()" > Login </a>
-                     <a class="button is-info ml" (click)="homePage()" > MetaboLights Home Page </a>
-                </ul>
+                <div *ngIf="isAuthenticated && isOwner">
+                    <b>If you are submitter of this study:</b>
+                    <ul class="ml">
+                        <li>You can update your study (e.g., publication DOI, public release date, etc.) or make it public.</li>
+                        <br>
+                    </ul>
+                </div>
+                <div class="buttons">
+                    <a *ngIf="isAuthenticated" class="button is-info" (click)="backToConsole()"> Back to My Studies </a>
+                    <a *ngIf="!isAuthenticated" class="button is-info" (click)="login()"> Login </a>
+                    <a class="button is-default ml" (click)="homePage()"> MetaboLights Home Page </a>
+                </div>
             </div>
           </div>
         </article>
