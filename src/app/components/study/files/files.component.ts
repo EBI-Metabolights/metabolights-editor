@@ -1,5 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import { Component, OnInit, Input, OnChanges, inject, AfterViewInit, ViewChild, ElementRef, HostListener } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { ConfigurationService } from "src/app/configuration.service";
+import { httpOptions } from "src/app/services/headers";
 import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { MetabolightsService } from "../../../services/metabolights/metabolights.service";
@@ -36,6 +38,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   publicFtpUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicFtpUrl);
   publicGlobusUrl$: Observable<string> = inject(Store).select(GeneralMetadataState.publicGlobusUrl);
   privateFtpAccessible$: Observable<boolean> = inject(Store).select(FilesState.privateFtpAccessible);
+  obfuscationCode$: Observable<string> = inject(Store).select(FilesState.obfuscationCode);
 
 
 
@@ -85,6 +88,7 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   publicHttpUrl: string = null;
   publicFtpUrl: string = null;
   publicGlobusUrl: string = null;
+  obfuscationCode: string = null;
 
   requestedStudy: string = null;
 
@@ -111,7 +115,9 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
     private dataService: MetabolightsService,
     private platformLocation: PlatformLocation,
     private transferHealthcheckService: TransferHealthcheckService,
-    private store: Store
+    private store: Store,
+    private http: HttpClient,
+    private configService: ConfigurationService
   ) {
     this.baseHref = this.platformLocation.getBaseHrefFromDOM();
   }
@@ -191,6 +197,9 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
         this.publicGlobusUrl = value;
       }
     )
+    this.obfuscationCode$.subscribe((value) => {
+      this.obfuscationCode = value;
+    });
   }
 
 
@@ -202,6 +211,44 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
 
   toggleDownloadDropdown() {
   this.isDownloadDropdownActive = !this.isDownloadDropdownActive;
+}
+
+downloadMetadata() {
+  this.isDownloadDropdownActive = false;
+  const files = [];
+
+  this.metaFiles.forEach(f => files.push(f.file));
+  this.resultFiles.forEach(f => files.push(f.file));
+
+  if (files.length > 0) {
+    const metadataFiles = files.join("|");
+    this.downloadWithToken(metadataFiles);
+  } else {
+    toastr.error("No metadata files found to download.", "Error");
+  }
+}
+
+async downloadWithToken(file: string) {
+  let url = this.configService.config.metabolightsWSURL.baseURL + "/studies/" + this.requestedStudy + "/download";
+  if (this.obfuscationCode) {
+    url += "/" + this.obfuscationCode;
+  }
+  url += "?file=" + file;
+
+  const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token";
+
+  if (!this.status || this.status.trim() === "" || this.status.toLowerCase() === "provisional") {
+    this.http.get<{ one_time_token: string }>(oneTimeTokenUrl, httpOptions).subscribe({
+      next: (response) => {
+        window.open(url + "&passcode=" + response.one_time_token, "_blank");
+      },
+      error: (err) => {
+        toastr.error("Failed to create download link.", "Error");
+      },
+    });
+  } else {
+    window.open(url, "_blank");
+  }
 }
 
 

@@ -197,3 +197,7 @@ img {
   max-width: 250px; /* adjust as needed */
   width: max-content;
 }
+
+.clickable {
+  cursor: pointer;
+}

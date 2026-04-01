@@ -10,30 +10,29 @@
 
   <div class="buttons-container">
 
-    <div *ngIf="status == 'Public'" class="dropdown" [ngClass]="{ 'is-active': isDownloadDropdownActive }"
-      #downloadDropdown>
+    <div class="dropdown" [ngClass]="{ 'is-active': isDownloadDropdownActive }" #downloadDropdown>
       <div class="dropdown-trigger">
         <button (click)="toggleDownloadDropdown()" class="button is-light is-small">
           <span class="icon is-small">
             <mat-icon>cloud_download</mat-icon>
           </span>
           <span>Download</span>
-
         </button>
       </div>
       <div class="dropdown-menu" role="menu">
         <div class="dropdown-content">
-          <a class="dropdown-item" target="_blank" [href]="publicHttpUrl">Browse Files</a>
-          <a class="dropdown-item" target="_blank" [href]="publicFtpUrl">FTP Download</a>
-          <a class="dropdown-item" (click)="onAsperaDownload()">Aspera Download</a>
-          <a class="dropdown-item" target="_blank" (click)="onGlobusDownload()">Globus Download
-
-          </a>
+          <a class="dropdown-item clickable" (click)="downloadMetadata()">Download Metadata</a>
+          <a *ngIf="status == 'Public'" class="dropdown-item" target="_blank" [href]="publicHttpUrl">Browse Files</a>
+          <a *ngIf="status == 'Public'" class="dropdown-item" target="_blank" [href]="publicFtpUrl">FTP Download</a>
+          <a *ngIf="status == 'Public'" class="dropdown-item" (click)="onAsperaDownload()">Aspera Download</a>
+          <a *ngIf="status == 'Public'" class="dropdown-item" target="_blank" (click)="onGlobusDownload()">Globus
+            Download</a>
         </div>
       </div>
     </div>
     <mtbls-upload *ngIf="isSyncEnabled && !isReadOnly" class="upload-button" [type]="'any'" [multiple]="true"
-      [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'" (scrollRequested)="scrollToMetadataUpload()"></mtbls-upload>
+      [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'"
+      (scrollRequested)="scrollToMetadataUpload()"></mtbls-upload>
 
     <span *ngIf="isSyncEnabled" class="refresh-button">
       <a (click)="loadFilesPassively()" class="button is-light is-small">
