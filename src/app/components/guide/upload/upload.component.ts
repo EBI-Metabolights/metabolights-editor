@@ -65,7 +65,6 @@ export class RawUploadComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.refreshFiles();
   }
 
   ngOnChanges(changes: SimpleChanges) {
