@@ -3,7 +3,7 @@ import { Router } from "@angular/router";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person";
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication";
-import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, SampleSheetFilename, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession, UserStudyPermission } from "./general-metadata.actions";
+import { CurationRequest, DatasetLicenseNS, GetGeneralMetadata, Identifier, People, Publications, ResetGeneralMetadataState, SetStudyReviewerLink, SetStudySubmissionDate, StudyAbstract, StudyReleaseDate, StudyStatus, Title, RevisionNumber, RevisionDateTime, RevisionStatus, PublicFtpUrl, PublicHttpUrl, PublicGlobusUrl, PublicAsperaPath, RevisionComment, RevisionTaskMessage, FirstPrivateDate, FirstPublicDate, SampleTemplate, SampleSheetFilename, StudyCategory, TemplateVersion, StudyCreatedAt, Funders, RelatedDatasets, MhdAccession, UserStudyPermission, StudySubmitters } from "./general-metadata.actions";
 import { Injectable } from "@angular/core";
 import { GeneralMetadataService } from "src/app/services/decomposed/general-metadata.service";
 import { Loading, SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
@@ -55,6 +55,7 @@ export interface GeneralMetadataStateModel {
     mhdAccession: string;
     comments: any[];
     studyPermission: StudyPermission;
+    submitters: any[];
 }
 const defaultState: GeneralMetadataStateModel = {
     id: null,
@@ -88,7 +89,8 @@ const defaultState: GeneralMetadataStateModel = {
     relatedDatasets: [],
     mhdAccession: null,
     comments: [],
-    studyPermission: null
+    studyPermission: null,
+    submitters: []
 }
 
 @State<GeneralMetadataStateModel>({
@@ -164,6 +166,7 @@ export class GeneralMetadataState {
                 ctx.dispatch(new SetStudyReviewerLink(gm_response.mtblsStudy.reviewerLink));
                 ctx.dispatch(new Publications.Set(gm_response.isaInvestigation.studies[0].publications));
                 ctx.dispatch(new People.Set(gm_response.isaInvestigation.studies[0].people));
+                ctx.dispatch(new StudySubmitters.Set(gm_response.mtblsStudy.submitters || []));
 
                 // Parse Funders
                 const comments = gm_response.isaInvestigation.studies[0].comments || [];
@@ -440,6 +443,15 @@ export class GeneralMetadataState {
             ...state,
             studyPermission: action.studyPermission
       });
+    }
+
+    @Action(StudySubmitters.Set)
+    SetStudySubmitters(ctx: StateContext<GeneralMetadataStateModel>, action: StudySubmitters.Set) {
+        const state = ctx.getState();
+        ctx.setState({
+            ...state,
+            submitters: action.submitters
+        });
     }
 
     @Action(StudyCategory.Set)

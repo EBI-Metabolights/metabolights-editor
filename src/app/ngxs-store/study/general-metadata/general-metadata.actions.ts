@@ -233,6 +233,13 @@ export namespace RevisionTaskMessage {
 
 }
 
+export namespace StudySubmitters {
+    export class Set {
+        static readonly type = '[general] Set Study Submitters'
+        constructor(public submitters: any[]) {}
+    }
+}
+
 export class SetStudyReviewerLink {
     static readonly type = '[general] Set Study Reviewer Link'
     constructor(public link: string) {}
