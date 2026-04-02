@@ -9,6 +9,7 @@ export interface Owner {
     affiliation?: string;
     address?: string;
     orcid?: string;
+    globus_username?: string;
 }
 
 export namespace User {

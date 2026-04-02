@@ -89,6 +89,7 @@ export class AppComponent implements OnInit {
           affiliation: user.content.affiliation || '',
           address: user.content.address || '',
           orcid: user.content.orcid || profile.attributes?.orcid?.[0] || '',
+          globus_username: user.content.globus_username || profile.attributes?.globus_username?.[0] || '',
         };
         this.store.dispatch(new User.Set(owner));
         

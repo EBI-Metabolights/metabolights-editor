@@ -25,7 +25,7 @@ export class UploadComponent implements OnInit {
   @Output() scrollRequested = new EventEmitter<void>();
 
   isUploadModalOpen = false;
-  selectedMethod: 'aspera' | 'browser' | 'ftp' | null = null;
+  selectedMethod: 'aspera' | 'browser' | 'ftp' | 'globus' | null = null;
   selectedFtpCategory: any = null;
   showAsperaHelp = false;
   showFtpHelp = false;
@@ -41,7 +41,7 @@ export class UploadComponent implements OnInit {
 
   ngOnInit() { }
 
-  selectMethod(method: 'aspera' | 'browser' | 'ftp') {
+  selectMethod(method: 'aspera' | 'browser' | 'ftp' | 'globus') {
     if (method === 'browser') {
       this.closeUploadModal();
       this.scrollRequested.emit();

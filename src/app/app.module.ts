@@ -102,6 +102,7 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
               onLoad: 'check-sso',
               silentCheckSsoRedirectUri: configService.config.auth.silentCheckSsoRedirectUri,
               redirectUri: configService.config.auth.redirectUri,
+              checkLoginIframe: false,
             },
             shouldAddToken: (request) => {
               if (configService.config) {
