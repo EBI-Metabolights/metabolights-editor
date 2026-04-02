@@ -4,7 +4,8 @@
 <ng-template #showPersonDetails>
   <span class="clickable" (click)="openModal()">
     {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
-  <span *ngIf="person.roles[0]?.annotationValue.includes('Principal Investigator')" class="badge">PI</span>
+  <span *ngIf="isSubmitter()" class="badge">S</span>
+  <span *ngIf="isPI()" class="badge" style="margin-left: 4px;">PI</span>
 </ng-template>
 
 <div class="modal" [ngClass]="{ 'is-active': isDeleteModalOpen }">
@@ -165,7 +166,7 @@
             <mat-form-field class="full-width" appearance="outline"
               *ngIf="_controlList?.values?.length && form.get('roles')">
               <mat-select formControlName="roles" [placeholder]="getFieldPlaceholder('roles')"
-                (selectionChange)="onChanges($event)">
+                (selectionChange)="onChanges($event)" multiple>
                 <mat-option *ngFor="let option of _controlList.values" [value]="option.annotationValue">
                   {{ option.annotationValue }}
                 </mat-option>
