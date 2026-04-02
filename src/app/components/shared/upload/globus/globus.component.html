@@ -27,26 +27,36 @@
             </div>
 
             <ng-container *ngIf="permissionStatus !== 'loading'">
-                <!-- Status Tag -->
-                <span class="tag is-medium is-rounded px-4 mr-4"
-                    [ngClass]="{'is-success is-light': permissionStatus === 'enabled', 'is-danger is-light': permissionStatus === 'disabled'}">
-                    <mat-icon *ngIf="permissionStatus === 'enabled'" class="mr-2"
-                        style="font-size: 20px; width: 20px; height: 20px;">check_circle</mat-icon>
-                    <mat-icon *ngIf="permissionStatus === 'disabled'" class="mr-2"
-                        style="font-size: 20px; width: 20px; height: 20px;">cancel</mat-icon>
-                    <span class="has-text-weight-bold">
-                        {{ permissionStatus === 'enabled' ? 'Enabled' : 'Disabled' }}
-                    </span>
-                </span>
+                <!-- Dual Button Toggle Group (Segmented Control) -->
+                <div *ngIf="user?.globus_username; else usernameRequired" class="field has-addons dual-toggle-group">
+                    <p class="control">
+                        <button class="button is-rounded is-flex is-align-items-center px-5" 
+                            [ngClass]="permissionStatus === 'enabled' ? 'is-success' : 'active-none'"
+                            (click)="togglePermission('enabled')"
+                            [disabled]="permissionStatus === 'loading'">
+                            <mat-icon class="mr-2" style="font-size: 20px; width: 20px; height: 20px;">check_circle</mat-icon>
+                            <span class="has-text-weight-bold transition-text">Enabled</span>
+                        </button>
+                    </p>
+                    <p class="control">
+                        <button class="button is-rounded is-flex is-align-items-center px-5" 
+                            [ngClass]="permissionStatus === 'disabled' ? 'is-danger' : 'active-none'"
+                            (click)="togglePermission('disabled')"
+                            [disabled]="permissionStatus === 'loading'">
+                            <mat-icon class="mr-2" style="font-size: 20px; width: 20px; height: 20px;">cancel</mat-icon>
+                            <span class="has-text-weight-bold transition-text">Disabled</span>
+                        </button>
+                    </p>
+                </div>
 
-                <!-- Toggle Button -->
-                <mat-slide-toggle *ngIf="user?.globus_username" [color]="'primary'"
-                    [checked]="permissionStatus === 'enabled'" (change)="togglePermission($event)">
-                </mat-slide-toggle>
-
-                <span *ngIf="!user?.globus_username" class="has-text-grey-light ml-4 is-size-7 italic">
-                    (Username required in profile)
-                </span>
+                <ng-template #usernameRequired>
+                    <div class="permission-toggle-container is-flex is-align-items-center is-disabled">
+                        <span class="has-text-grey-light is-size-7 italic">
+                            <mat-icon class="mr-1" style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;">warning</mat-icon>
+                            (Username required)
+                        </span>
+                    </div>
+                </ng-template>
             </ng-container>
 
         </div>
@@ -59,14 +69,15 @@
         <div class="columns is-vcentered mt-3">
             <div class="column is-4 has-text-weight-medium">Globus Study Folder URL</div>
             <div class="column is-8 is-flex is-align-items-center">
-                <a [href]="globusPermissions.file_manager_url" target="_blank" class="is-size-7"
-                    style="word-break: break-all;">
-                    {{ globusPermissions.file_manager_url }}
-                </a>
-                <button class="button is-small is-dark ml-3 px-2 py-0" style="height: 24px;"
-                    (click)="copyToClipboard(globusPermissions.file_manager_url)">
-                    Copy
-                </button>
+                <span class="is-size-7" style="word-break: break-all;">
+                    <a [href]="globusPermissions?.permissions?.[0]?.file_manager_url" target="_blank">
+                        {{ globusPermissions?.permissions?.[0]?.file_manager_url }}
+                    </a>&nbsp;
+                    <mat-icon class="clickable-icon has-text-grey" 
+                        style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;"
+                        (click)="copyToClipboard(globusPermissions?.permissions?.[0]?.file_manager_url)"
+                        matTooltip="Copy URL">content_copy</mat-icon>
+                </span>
             </div>
         </div>
 
@@ -74,12 +85,12 @@
             <div class="column is-4 has-text-weight-medium">Globus Collection Folder</div>
             <div class="column is-8 is-flex is-align-items-center">
                 <span class="is-size-7" style="word-break: break-all;">
-                    {{ globusPermissions.path }}
+                    {{ globusPermissions?.permissions?.[0]?.path }}&nbsp;
+                    <mat-icon class="clickable-icon has-text-grey"
+                        style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;"
+                        (click)="copyToClipboard(globusPermissions?.permissions?.[0]?.path)"
+                        matTooltip="Copy Path">content_copy</mat-icon>
                 </span>
-                <button class="button is-small is-dark ml-3 px-2 py-0" style="height: 24px;"
-                    (click)="copyToClipboard(globusPermissions.path)">
-                    Copy
-                </button>
             </div>
         </div>
     </ng-container>

@@ -85,7 +85,7 @@
             <p class="modal-card-title">
                 <span *ngIf="!selectedMethod">Select Upload Method</span>
                 <span *ngIf="selectedMethod">
-                    {{ selectedMethod === 'ftp' ? 'Private FTP' : 'Aspera' }} Upload
+                    {{ selectedMethod === 'ftp' ? 'Private FTP' : (selectedMethod === 'globus' ? 'Globus' : 'Aspera') }} Upload
                     <a *ngIf="selectedMethod === 'aspera'" (click)="toggleAsperaHelp()" class="has-text-grey ml-1">
                         <mat-icon style="font-size: 16px; vertical-align: middle;">help_outline</mat-icon>
                     </a>

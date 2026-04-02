@@ -9,6 +9,7 @@ import { ConfigurationService } from 'src/app/configuration.service';
 import { Store } from '@ngxs/store';
 import { UserState } from 'src/app/ngxs-store/non-study/user/user.state';
 import { AuthService } from '../auth.service';
+import { FilesState } from 'src/app/ngxs-store/study/files/files.state';
 
 
 @Injectable({
@@ -130,17 +131,17 @@ export class FilesService extends BaseConfigDependentService {
   }
 
   getGlobusPermissions(studyId: string): Observable<any> {
-    const globusUrl = this.url.baseURL + `/studies/${studyId}/globus-permission`;
+    const globusUrl = this.url.baseURL + `/${studyId}/globus-permission`;
     return this.http.get(globusUrl, this.getGlobusHttpOptions()).pipe(catchError(this.handleError));
   }
 
   enableGlobusPermissions(studyId: string): Observable<any> {
-    const globusUrl = this.url.baseURL + `/studies/${studyId}/globus-permission?access-type=read-write`;
+    const globusUrl = this.url.baseURL + `/${studyId}/globus-permission?access-type=read-write`;
     return this.http.put(globusUrl, {}, this.getGlobusHttpOptions()).pipe(catchError(this.handleError));
   }
 
   disableGlobusPermissions(studyId: string): Observable<any> {
-    const globusUrl = this.url.baseURL + `/studies/${studyId}/globus-permission`;
+    const globusUrl = this.url.baseURL + `/${studyId}/globus-permission`;
     return this.http.delete(globusUrl, this.getGlobusHttpOptions()).pipe(catchError(this.handleError));
   }
 
@@ -150,15 +151,11 @@ export class FilesService extends BaseConfigDependentService {
   }
 
   private getGlobusHttpOptions() {
-    let token = this.authService.getApiToken();
-    if (!token || token === '') {
-      const user = this.store.selectSnapshot(UserState.user);
-      token = user?.apiToken;
-    }
+    const token = this.authService.getAccessToken();
     return {
       headers: new HttpHeaders({
         'Accept': 'application/json',
-        'User-Token': token ?? ''
+        'Authorization': `Bearer ${token}`
       })
     };
   }

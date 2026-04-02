@@ -3,3 +3,69 @@
 .word-break-all {
     word-break: break-all;
 }
+
+/* Dual Button Segmented Control */
+.dual-toggle-group {
+    background-color: #f1f3f5;
+    padding: 3px;
+    border-radius: 50px;
+}
+
+.dual-toggle-group .button {
+    border-radius: 50px !important;
+    border: none !important;
+    transition: all 0.25s ease-in-out;
+    height: 38px;
+    font-size: 0.95rem;
+}
+
+.dual-toggle-group .button.active-none {
+    background-color: transparent !important;
+    color: #b5b5b5 !important;
+}
+
+.dual-toggle-group .button.active-none mat-icon {
+    color: #dbdbdb !important;
+}
+
+.dual-toggle-group .button.active-none:hover {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.dual-toggle-group .button.is-success {
+    background-color: #48c78e !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(72, 199, 142, 0.3);
+}
+
+.dual-toggle-group .button.is-danger {
+    background-color: #f14668 !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(241, 70, 104, 0.3);
+}
+
+.transition-text {
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Inline Clickable Icons */
+.clickable-icon {
+    cursor: pointer;
+    transition: color 0.2s ease;
+    opacity: 0.7;
+}
+
+.clickable-icon:hover {
+    color: #3273dc !important;
+    opacity: 1;
+}
+
+/* Fallback for username required */
+.permission-toggle-container.is-disabled {
+    background-color: #fff5f5;
+    border: 1px solid #f14668;
+    border-radius: 50px;
+    padding: 6px 20px;
+    display: inline-flex;
+}

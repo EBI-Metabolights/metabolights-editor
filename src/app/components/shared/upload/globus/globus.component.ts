@@ -44,9 +44,10 @@ export class GlobusUploadComponent implements OnInit {
     this.permissionStatus = 'loading';
     this.filesService.getGlobusPermissions(this.studyId).subscribe(
       (response: any) => {
-        if (response && response.content && response.content.length > 0) {
+        // Only enable if content exists AND there is at least one permission in the array
+        if (response?.content?.length > 0 && response.content[0].permissions?.length > 0) {
           this.permissionStatus = 'enabled';
-          this.globusPermissions = response.content[0].permissions[0];
+          this.globusPermissions = response.content[0];
         } else {
           this.permissionStatus = 'disabled';
           this.globusPermissions = null;
@@ -60,8 +61,11 @@ export class GlobusUploadComponent implements OnInit {
     );
   }
 
-  togglePermission(event?: any) {
+  togglePermission(targetState?: 'enabled' | 'disabled') {
     if (this.permissionStatus === 'loading') return;
+    
+    // If target state is already current state, do nothing
+    if (targetState && this.permissionStatus === targetState) return;
 
     if (this.permissionStatus === 'enabled') {
       this.permissionStatus = 'loading';
@@ -69,7 +73,7 @@ export class GlobusUploadComponent implements OnInit {
         () => {
           this.fetchGlobusPermissions();
         },
-        (error) => {
+        (error: any) => {
           toastr.error("Failed to disable Globus permission.", "Error");
           this.fetchGlobusPermissions(); // refresh state
         }
@@ -88,7 +92,7 @@ export class GlobusUploadComponent implements OnInit {
         () => {
           this.fetchGlobusPermissions();
         },
-        (error) => {
+        (error: any) => {
           toastr.error("Failed to enable Globus permission.", "Error");
           this.fetchGlobusPermissions(); // refresh state
         }
