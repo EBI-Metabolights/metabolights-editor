@@ -28,12 +28,12 @@
 
             <ng-container *ngIf="permissionStatus !== 'loading'">
                 <!-- Dual Button Toggle Group (Segmented Control) -->
-                <div *ngIf="user?.globus_username; else usernameRequired" class="field has-addons dual-toggle-group">
-                    <p class="control">
+                <div class="field has-addons dual-toggle-group">
+                    <p class="control" [matTooltip]="!user?.globus_username ? 'Provide Globus username to enable Globus permission' : ''" [matTooltipPosition]="'above'">
                         <button class="button is-rounded is-flex is-align-items-center px-5" 
                             [ngClass]="permissionStatus === 'enabled' ? 'is-success' : 'active-none'"
                             (click)="togglePermission('enabled')"
-                            [disabled]="permissionStatus === 'loading'">
+                            [disabled]="permissionStatus === 'loading' || !user?.globus_username">
                             <mat-icon class="mr-2" style="font-size: 20px; width: 20px; height: 20px;">check_circle</mat-icon>
                             <span class="has-text-weight-bold transition-text">Enabled</span>
                         </button>
@@ -48,15 +48,6 @@
                         </button>
                     </p>
                 </div>
-
-                <ng-template #usernameRequired>
-                    <div class="permission-toggle-container is-flex is-align-items-center is-disabled">
-                        <span class="has-text-grey-light is-size-7 italic">
-                            <mat-icon class="mr-1" style="font-size: 16px; width: 16px; height: 16px; vertical-align: middle;">warning</mat-icon>
-                            (Username required)
-                        </span>
-                    </div>
-                </ng-template>
             </ng-container>
 
         </div>

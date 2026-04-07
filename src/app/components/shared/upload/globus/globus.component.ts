@@ -79,14 +79,13 @@ export class GlobusUploadComponent implements OnInit {
         }
       );
     } else {
-      this.permissionStatus = 'loading';
       const username = this.user?.globus_username;
-      
       if (!username) {
-        toastr.error("No Globus username provided. Please update your profile.", "Error");
-        this.permissionStatus = 'disabled';
+        toastr.error("Provide Globus username in your profile to enable Globus permission.", "Error");
+        this.permissionStatus = "disabled";
         return;
       }
+      this.permissionStatus = "loading";
 
       this.filesService.enableGlobusPermissions(this.studyId).subscribe(
         () => {
