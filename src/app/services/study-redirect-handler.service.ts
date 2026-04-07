@@ -68,12 +68,10 @@ export class StudyRedirectHandlerService {
     // 6. Access Control Logic
     if (parsedUrl.accessMode === 'edit' && studyExists) {
       if (!isAuthenticated) {
-        const redirectUri = this.configService.config?.auth?.redirectUri;
-        if (redirectUri) {
-          await this.keycloak.login({ redirectUri });
-        } else {
-          await this.keycloak.login();
-        }
+        this.editorService.setRedirectUrl(url);
+        // Use current URL as redirect target to go directly back to the study
+        const redirectUri = window.location.href;
+        await this.keycloak.login({ redirectUri });
         return false;
       } else {
         // Owner Edit Permission Check

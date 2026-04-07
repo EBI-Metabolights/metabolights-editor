@@ -66,6 +66,7 @@ import { RevisionStatusTransformPipe } from "./pipes/revision-status-transform.p
 import { CurationStatusStarTransformPipe } from "./pipes/curation-status-star-transform.pipe";
 import { CurationStatusTransformPipe } from "./pipes/curation-status-transform.pipe";
 import { GlobusDownloadComponent } from "./download/globus/globus.component";
+import { GlobusUploadComponent } from "./upload/globus/globus.component";
 import { ConfirmationDialogComponent } from "./confirmation-dialog/confirmation-dialog.component";
 import { MatCardModule } from "@angular/material/card";
 import { MatDividerModule } from "@angular/material/divider";
@@ -108,6 +109,7 @@ import { StudySubmissionChecklistComponent } from './study-submission-checklist/
     ChecklistComponent,
     FTPUploadComponent,
     AsperaUploadComponent,
+    GlobusUploadComponent,
     DesignDescriptorsComponent,
     DesignDescriptorComponent,
     TitleComponent,
@@ -184,6 +186,7 @@ import { StudySubmissionChecklistComponent } from './study-submission-checklist/
     ChecklistComponent,
     FTPUploadComponent,
     AsperaUploadComponent,
+    GlobusUploadComponent,
     DesignDescriptorsComponent,
     DesignDescriptorComponent,
     TitleComponent,

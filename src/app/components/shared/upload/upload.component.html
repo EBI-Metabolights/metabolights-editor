@@ -1,6 +1,6 @@
 <!-- Inline View (Selection Tiles on page if embedded) -->
 <div *ngIf="isEmbedded && !isUploadModalOpen" class="columns is-multiline">
-    <div class="column" [ngClass]="showBrowserUpload ? 'is-4' : 'is-6'">
+    <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
         <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
             <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-link">cloud_upload</mat-icon>
             <p class="title is-6 mt-2">
@@ -13,14 +13,14 @@
             <p class="subtitle is-7">Fast transfer for large files/folders</p>
         </div>
     </div>
-    <div class="column is-4" *ngIf="showBrowserUpload">
+    <div class="column is-3" *ngIf="showBrowserUpload">
         <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
             <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-info">file_upload</mat-icon>
             <p class="title is-6 mt-2">File Upload (Browser)</p>
             <p class="subtitle is-7">Direct browser-based upload</p>
         </div>
     </div>
-    <div class="column" [ngClass]="showBrowserUpload ? 'is-4' : 'is-6'">
+    <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
         <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('ftp')">
             <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-grey">vpn_key</mat-icon>
             <p class="title is-6 mt-2">
@@ -31,6 +31,15 @@
                 </a>
             </p>
             <p class="subtitle is-7">Manual upload via FTP client (e.g. FileZilla)</p>
+        </div>
+    </div>
+    <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
+        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('globus')">
+            <img src="assets/img/logo_globus-solid.svg" style="width: 48px; height: 48px;" alt="Globus Logo"/>
+            <p class="title is-6 mt-2">
+                Globus
+            </p>
+            <p class="subtitle is-7">Data Transfer With Globus</p>
         </div>
     </div>
 
@@ -76,7 +85,7 @@
             <p class="modal-card-title">
                 <span *ngIf="!selectedMethod">Select Upload Method</span>
                 <span *ngIf="selectedMethod">
-                    {{ selectedMethod === 'ftp' ? 'Private FTP' : 'Aspera' }} Upload
+                    {{ selectedMethod === 'ftp' ? 'Private FTP' : (selectedMethod === 'globus' ? 'Globus' : 'Aspera') }} Upload
                     <a *ngIf="selectedMethod === 'aspera'" (click)="toggleAsperaHelp()" class="has-text-grey ml-1">
                         <mat-icon style="font-size: 16px; vertical-align: middle;">help_outline</mat-icon>
                     </a>
@@ -88,7 +97,7 @@
 
             <!-- Step 1: Selection (Only shown inside modal if NOT embedded) -->
             <div *ngIf="!isEmbedded && !selectedMethod" class="columns is-multiline">
-                <div class="column is-4">
+                <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
                     <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
                         <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
                             class="has-text-link">cloud_upload</mat-icon>
@@ -102,7 +111,7 @@
                         <p class="subtitle is-7">Fast transfer for large files/folders</p>
                     </div>
                 </div>
-                <div class="column is-4" *ngIf="showBrowserUpload">
+                <div class="column is-3" *ngIf="showBrowserUpload">
                     <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
                         <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
                             class="has-text-info">file_upload</mat-icon>
@@ -110,7 +119,7 @@
                         <p class="subtitle is-7">Direct browser-based upload</p>
                     </div>
                 </div>
-                <div class="column is-4">
+                <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
                     <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('ftp')">
                         <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
                             class="has-text-grey">vpn_key</mat-icon>
@@ -122,6 +131,13 @@
                             </a>
                         </p>
                         <p class="subtitle is-7">Manual upload via FTP client (e.g. FileZilla)</p>
+                    </div>
+                </div>
+                <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
+                    <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('globus')">
+                        <img src="assets/img/logo_globus-solid.svg" style="width: 48px; height: 48px;" alt="Globus Logo"/>
+                        <p class="title is-6 mt-2">Globus</p>
+                        <p class="subtitle is-7">Data Transfer With Globus</p>
                     </div>
                 </div>
 
@@ -154,8 +170,12 @@
                 </div>
             </div>
 
-            <!-- Step 2: Execution (Aspera/FTP only) -->
+            <!-- Step 2: Execution (Aspera/FTP/Globus only) -->
             <div *ngIf="selectedMethod">
+                <!-- Globus -->
+                <div *ngIf="selectedMethod === 'globus'">
+                    <mtbls-upload-globus></mtbls-upload-globus>
+                </div>
                 <!-- Aspera -->
                 <div *ngIf="selectedMethod === 'aspera'">
                     <div *ngIf="showAsperaHelp" class="notification is-light is-size-7 mb-4">

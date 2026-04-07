@@ -69,11 +69,11 @@ export class AppComponent implements OnInit {
       this.authService.storeTokens({ access_token: token, refresh_token: '' });
 
       const profile = await this.keycloak.loadUserProfile();
-      
+
       // Clear any stale apiToken to prevent HeaderInterceptor from sending it
       // and causing a 500 error on the /user endpoint in normal browser tabs
       this.authService.clearApiToken();
-      
+
       const user: any = await firstValueFrom(this.editorService.getAuthenticatedUser(token, profile.username));
 
 
@@ -89,12 +89,13 @@ export class AppComponent implements OnInit {
           affiliation: user.content.affiliation || '',
           address: user.content.address || '',
           orcid: user.content.orcid || profile.attributes?.orcid?.[0] || '',
+          globus_username: user.content.globus_username || profile.attributes?.globus_username?.[0] || '',
         };
         this.store.dispatch(new User.Set(owner));
-        
+
         const decodedToken: any = jwtDecode(token);
         const isCurator = user.content.role === 1 || decodedToken.role === 1 || false;
-        
+
         this.authService.storeUserLocalStorage({
           apiToken: user.content.apiToken,
           isCurator: isCurator,
@@ -116,7 +117,7 @@ export class AppComponent implements OnInit {
           lastName: profile.lastName || decodedToken.family_name,
         };
         this.store.dispatch(new User.Set(owner));
-        
+
         this.authService.storeUserLocalStorage({
           isCurator: isCurator,
           user: owner.email,
@@ -127,46 +128,46 @@ export class AppComponent implements OnInit {
     } catch (error) {
       console.error("Failed to sync user profile:", error);
     }
-    
+
     // Always update session (even if unauthenticated) but wait forauth status to resolve
     await this.editorService.updateSession();
   }
 
   // const jwt = this.elementRef.nativeElement.getAttribute("mtblsjwt");
-    // const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
+  // const user = this.elementRef.nativeElement.getAttribute("mtblsuser");
 
-    // // const isOwner = this.elementRef.nativeElement.getAttribute("isOwner");
-    // // const isCurator = this.elementRef.nativeElement.getAttribute("isCurator");
+  // // const isOwner = this.elementRef.nativeElement.getAttribute("isOwner");
+  // // const isCurator = this.elementRef.nativeElement.getAttribute("isCurator");
 
-    // const mtblsid = this.elementRef.nativeElement.getAttribute("mtblsid");
-    // const obfuscationcode =
-    //   this.elementRef.nativeElement.getAttribute("obfuscationcode");
-    // const redirectUrl = this.editorService.getRedirectUrl();
-    // const url = this.router.routerState.snapshot.url
-    // if (redirectUrl){
+  // const mtblsid = this.elementRef.nativeElement.getAttribute("mtblsid");
+  // const obfuscationcode =
+  //   this.elementRef.nativeElement.getAttribute("obfuscationcode");
+  // const redirectUrl = this.editorService.getRedirectUrl();
+  // const url = this.router.routerState.snapshot.url
+  // if (redirectUrl){
 
-    //   if (url === "/login" ){
-    //     this.router.navigate([redirectUrl]);
-    //   } else {
-    //     this.editorService.setRedirectUrl(url);
-    //   }
-    //   return;
-    // }
-    // if (jwt && jwt !== "" && user && user !== "") {
-    //   localStorage.setItem("mtblsuser", user);
-    //   localStorage.setItem("mtblsjwt", jwt);
-    // } else if (
-    //   mtblsid &&
-    //   mtblsid !== "" &&
-    //   obfuscationcode &&
-    //   obfuscationcode !== ""
-    // ) {
-    //   localStorage.setItem("mtblsid", mtblsid);
-    //   localStorage.setItem("obfuscationcode", obfuscationcode);
-    // } else {
-    //   localStorage.removeItem("mtblsjwt");
-    //   localStorage.removeItem("mtblsuser");
-    // }
-    //  this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
+  //   if (url === "/login" ){
+  //     this.router.navigate([redirectUrl]);
+  //   } else {
+  //     this.editorService.setRedirectUrl(url);
+  //   }
+  //   return;
+  // }
+  // if (jwt && jwt !== "" && user && user !== "") {
+  //   localStorage.setItem("mtblsuser", user);
+  //   localStorage.setItem("mtblsjwt", jwt);
+  // } else if (
+  //   mtblsid &&
+  //   mtblsid !== "" &&
+  //   obfuscationcode &&
+  //   obfuscationcode !== ""
+  // ) {
+  //   localStorage.setItem("mtblsid", mtblsid);
+  //   localStorage.setItem("obfuscationcode", obfuscationcode);
+  // } else {
+  //   localStorage.removeItem("mtblsjwt");
+  //   localStorage.removeItem("mtblsuser");
+  // }
+  //  this.store.dispatch(new GuidesMappings.Get()); // to load the guides we first load the mappings
 
 }
