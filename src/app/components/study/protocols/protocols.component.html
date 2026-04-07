@@ -2,8 +2,6 @@
   <div>
     <div class="mtbls-section">
       <h6 class="mb10">
-        <span style="font-size: 0.8em"><mtbls-help *ngIf="!isStudyReadOnly"
-            target="protocols"></mtbls-help></span>&nbsp;
         <a (click)="toggleExpand()" style="margin-right: 10px; margin-left: 10px"
           class="button is-default is-pulled-right is-small">
           <div *ngIf="!expand; else expandSections">
