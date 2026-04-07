@@ -42,15 +42,6 @@ export class LoginComponent implements OnInit {
     // this.environmentName = this.environmentName.replace("/", "");
     this.keycloak.keycloakEvents$.subscribe(event => {
       switch (event.type) {
-
-        case KeycloakEventType.OnAuthSuccess:
-          this.router.navigate([this.editorService.getRedirectUrl()]);
-          break;
-
-        case KeycloakEventType.OnAuthRefreshSuccess:
-          this.router.navigate([this.editorService.getRedirectUrl()]);
-          break;
-
         case KeycloakEventType.OnAuthRefreshError:
           break;
 

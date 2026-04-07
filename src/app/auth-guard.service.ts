@@ -41,7 +41,8 @@ export class AuthGuard extends KeycloakAuthGuard implements OnInit {
     if (state.url.startsWith("/console")) {
       if (!this.authenticated) {
         this.editorService.setRedirectUrl(state.url);
-        await this.keycloak.login();
+        const redirectUri = window.location.href;
+        await this.keycloak.login({ redirectUri });
         return false;
       }
       return true;

@@ -122,13 +122,38 @@ export class EditorService {
     const endpoint = this.configService.config?.endpoint || "";
     return `${endpoint}/RedirectUrl`;
   }
-  setRedirectUrl(newRedirectUrl) {
-    if (newRedirectUrl && newRedirectUrl.length > 0 && !newRedirectUrl.startsWith(this.configService.config?.redirectURL || "")) {
-      localStorage.setItem(this.getRedirectUrlKey(), newRedirectUrl);
-    } else {
-      console.log("Errror")
-    }
+  
+  isHighValueUrl(url: string): boolean {
+    if (!url) return false;
+    const upperUrl = url.toUpperCase();
+    return upperUrl.includes('MTBLS') || upperUrl.includes('REQ') || upperUrl.includes('/STUDY/');
   }
+
+  setRedirectUrl(newRedirectUrl) {
+    if (!newRedirectUrl || newRedirectUrl.length === 0) {
+      return;
+    }
+
+    const defaultRedirect = this.configService.config?.redirectURL || "";
+    const isHighValue = this.isHighValueUrl(newRedirectUrl);
+    
+    // Skip if it's the default redirect page
+    if (newRedirectUrl.startsWith(defaultRedirect)) {
+       return;
+    }
+
+    const currentSaved = localStorage.getItem(this.getRedirectUrlKey());
+    const currentIsHighValue = this.isHighValueUrl(currentSaved);
+
+    // If we have a high-value URL already, don't overwrite it with a generic one (like '/' or '/console')
+    if (currentIsHighValue && !isHighValue) {
+       return;
+    }
+
+    // Otherwise, save it
+    localStorage.setItem(this.getRedirectUrlKey(), newRedirectUrl);
+  }
+
   get redirectUrl(): string {
     return this.getRedirectUrl();
   }
