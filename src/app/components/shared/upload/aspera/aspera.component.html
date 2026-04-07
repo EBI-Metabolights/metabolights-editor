@@ -83,38 +83,6 @@
     <footer *ngIf="!hideButton" class="modal-card-foot">
       <div class="columns is-gapless full-width">
         <div class="column is-two-third">
-          <mtbls-help target="aspera">
-            <span class="clickable">
-              Video tutorial <i class="material-icons"> help_outline </i></span>
-            <div class="modal">
-              <div class="modal-background"></div>
-              <div class="modal-card">
-                <section class="modal-card-body">
-                  <div class="has-text-centered">
-                    <video controls="" width="100%">
-                      <source type="video/mp4" src="{{ this.videoURL }}" />
-                      Your browser does not support HTML5 video.
-                    </video>
-                  </div>
-                </section>
-                <footer class="modal-card-foot buttons is-right">
-                  <div class="columns is-gapless full-width">
-                    <div class="column is-two-third">
-                      <a class="button is-default"
-                        href="mailto:metabolights-help@ebi.ac.uk?subject=MetaboLights online submission tool/editor feedback!">
-                        <mat-icon class="mat-icon material-icons notranslate mat-icon-no-color" role="img"
-                          style="font-size: 0.93em" aria-hidden="true">Contact us</mat-icon>
-                        Feedback
-                      </a>
-                    </div>
-                    <div class="column is-one-third has-text-right">
-                      <button class="button is-info">OK</button>
-                    </div>
-                  </div>
-                </footer>
-              </div>
-            </div>
-          </mtbls-help>
         </div>
         <div (click)="closeUploadModal()" class="column is-one-third has-text-right">
           <button class="button is-default">Close</button>
