@@ -3,8 +3,8 @@
 </span>
 <ng-template #showPersonDetails>
   <span class="clickable" (click)="openModal()">
-    {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }}</span>
-  <span *ngIf="isSubmitter()" class="badge">S</span>
+    {{ person.firstName }} {{ person.midInitials }} {{ person.lastName }} </span>
+  <span *ngIf="isSubmitter()" class="badgesubmitter">S</span>
   <span *ngIf="isPI()" class="badge" style="margin-left: 4px;">PI</span>
 </ng-template>
 
