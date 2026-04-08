@@ -106,10 +106,10 @@
 
   <!--ftp management component start-->
   <div class="container parent resync-section">
-    <app-rsync *ngIf="isSyncEnabled" title="Metadata Files"
+    <app-rsync *ngIf="isSyncEnabled" title="Metadata & Result Files"
       helpMessage="Check your study FTP folder and synchronise your study metadata (i_Investigation.txt, a_*.txt, s_*.txt, m_*.tsv) files from FTP folder to your study folder."
       [studyId]="studyIdentifier" sourceStagingArea="ftp-private" targetStagingArea="rw-study" syncType="metadata"
-      startSyncLabel="Synchronise Metadata Files" runSyncOnCluster="false" runDryRunOnCluster="false"
+      startSyncLabel="Synchronise Metadata & Result Files" runSyncOnCluster="false" runDryRunOnCluster="false"
       pollingInterval=5000 (filesSynchronized)="onFilesSynchronized($event)"></app-rsync>
 
     <app-rsync *ngIf="isSyncEnabled" title="Data Files"
@@ -207,7 +207,7 @@
       </span>
     </span>
     <ng-template #noMetaData>
-      <a class="panel-block"> No metadata files </a>
+      <a class="panel-block has-text-centered"> No metadata files </a>
     </ng-template>
   </nav>
 
@@ -284,7 +284,7 @@
       </span>
     </span>
     <ng-template #noResultData>
-      <a class="panel-block"> No result files </a>
+      <a class="panel-block has-text-centered"> No result files </a>
     </ng-template>
   </nav>
   <!--ISA Metadata upload area -->
@@ -308,7 +308,7 @@
       <p class="panel-heading" style="z-index: 1000;" sticky [spacer]="spacer2"
         [attr.marginTop]="!isReadOnly ? '35' : '0'">
         <!-- <input [checked]="filteredRawFiles.length == selectedRawFiles.length" (change)="selectFiles($event, 'raw', null, true)" type="checkbox" name="">&nbsp;&nbsp; -->
-        <label class="section-header">RAW / DERIVED FILES
+        <label class="section-header">DATA FILES
         </label>
         <span *ngIf="selectedRawFiles.length > 0" class="is-pulled-right">
           <span *ngIf="containsZipFiles(selectedRawFiles)">
@@ -479,8 +479,9 @@
     </div>
     <span *ngIf="filteredUploadFiles.length > 0">
       <span *ngFor="let file of filteredUploadFiles">
-        <mtbls-directory [category]="upload" [level]="0" [parent]="''" [file]="file" [deletionEnabled]="deletionEnabled(file)"
-          [downloadEnabled]="false" [downloadContents]="false" [readonlyFolder]="false" [location]="ftpLocation"
+        <mtbls-directory [category]="upload" [level]="0" [parent]="''" [file]="file"
+          [deletionEnabled]="deletionEnabled(file)" [downloadEnabled]="false" [downloadContents]="false"
+          [readonlyFolder]="false" [location]="ftpLocation"
           (fileDeleted)="handleDeletedFile($event, uploadFiles, filteredUploadFiles, selectedUploadFiles)"></mtbls-directory>
       </span>
     </span>

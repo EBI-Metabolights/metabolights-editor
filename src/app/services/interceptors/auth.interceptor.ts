@@ -9,11 +9,15 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { EditorService } from '../editor.service';
 import * as toastr from 'toastr'
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private editorService: EditorService
+  ) {}
 
   intercept(
     req: HttpRequest<any>,
@@ -25,6 +29,7 @@ export class AuthInterceptor implements HttpInterceptor {
           console.debug('Unauthorized request detected:', error);
           
           if (!req.url.includes('/validations/configuration')) {
+            this.editorService.setRedirectUrl(this.router.url);
             this.router.navigate(['/login']);
             toastr.info("Your session has expired and you have been logged out.",{
               timeOut: "5000",

@@ -208,10 +208,10 @@ function initializeKeycloak(keycloak: KeycloakService, configService: Configurat
       useClass: LoggingMiddleware,
       multi: true,
     },
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: HeaderInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: DescriptorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: FactorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     {
       provide: APP_BASE_HREF,
       useFactory: (pl: PlatformLocation) => pl.getBaseHrefFromDOM(),

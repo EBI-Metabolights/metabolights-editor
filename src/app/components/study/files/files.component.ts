@@ -678,8 +678,10 @@ closeGlobusModal() {
   sortFiles(data) {
     this.rawFiles = [];
     this.metaFiles = [];
+    this.resultFiles = [];
     this.auditFiles = [];
     this.derivedFiles = [];
+    this.filteredResultFiles = [];
     this.uploadFiles = data.latest;
     this.filteredUploadFiles = this.uploadFiles;
     this.filesLoading = false;
@@ -828,6 +830,7 @@ closeGlobusModal() {
   // Clear main arrays
   this.rawFiles = [];
   this.metaFiles = [];
+  this.resultFiles = [];
   this.auditFiles = [];
   this.derivedFiles = [];
   this.uploadFiles = data.latest;
@@ -838,6 +841,7 @@ closeGlobusModal() {
   // Clear filtered arrays to avoid duplicates
   this.filteredRawFiles = [];
   this.filteredMetaFiles = [];
+  this.filteredResultFiles = [];
   this.filteredAuditFiles = [];
   this.filteredDerivedFiles = [];
   this.filteredDerivedDataFiles = [];

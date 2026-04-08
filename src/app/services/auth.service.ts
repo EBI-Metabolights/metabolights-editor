@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { AuthTokens } from '../models/mtbl/mtbls/auth.model';
 import { ConfigurationService } from '../configuration.service';
 import init from 'multicast-dns';
@@ -63,8 +63,12 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthTokens> {
-    // With Keycloak, token refresh is handled internally by KeycloakService
-    return null;
+    return from(this.keycloak.updateToken(20)).pipe(
+      map(() => ({
+        access_token: this.keycloak.getKeycloakInstance().token,
+        refresh_token: this.keycloak.getKeycloakInstance().refreshToken
+      }))
+    );
   }
 
   logout(): void {
