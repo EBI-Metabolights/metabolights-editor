@@ -17,6 +17,7 @@ import { SyncEvent } from "./rsync/rsync.component";
 import { TransferHealthcheckService, TransferStatus } from "src/app/services/transfer-healthcheck.service";
 import { SetTransferStatus } from "src/app/ngxs-store/non-study/application/application.actions";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { UploadComponent } from "../../shared/upload/upload.component";
 declare let AW4: any;
 
 
@@ -45,7 +46,9 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   @Input("validations") validations: any;
 
   @ViewChild('downloadDropdown') dropdownRef!: ElementRef;
+  @ViewChild('uploadDropdown') uploadDropdownRef!: ElementRef;
   @ViewChild('metadataUploadArea') metadataUploadArea!: ElementRef;
+  @ViewChild('uploadComponent') uploadComponent!: UploadComponent;
 
   containerHeight: any = 279;
 
@@ -105,6 +108,9 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   transferStatus: TransferStatus = null;
 
   isDownloadDropdownActive = false;
+  isUploadDropdownActive = false;
+  uploadShowBrowser = true;
+  uploadBrowserFirst = false;
   isAsperaModalActive = false;
   isGlobusModalActive = false;
 
@@ -143,6 +149,11 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
         this.dropdownRef &&
         !this.dropdownRef.nativeElement.contains(event.target)) {
       this.isDownloadDropdownActive = false;
+        }
+    if (this.isUploadDropdownActive &&
+        this.uploadDropdownRef &&
+        !this.uploadDropdownRef.nativeElement.contains(event.target)) {
+      this.isUploadDropdownActive = false;
         }
 
   }
@@ -211,6 +222,24 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
 
   toggleDownloadDropdown() {
   this.isDownloadDropdownActive = !this.isDownloadDropdownActive;
+}
+
+toggleUploadDropdown() {
+  this.isUploadDropdownActive = !this.isUploadDropdownActive;
+}
+
+openMetadataUpload() {
+  this.isUploadDropdownActive = false;
+  this.uploadShowBrowser = true;
+  this.uploadBrowserFirst = true;
+  this.uploadComponent.openUploadModal();
+}
+
+openDataUpload() {
+  this.isUploadDropdownActive = false;
+  this.uploadShowBrowser = false;
+  this.uploadBrowserFirst = false;
+  this.uploadComponent.openUploadModal();
 }
 
 downloadMetadata() {

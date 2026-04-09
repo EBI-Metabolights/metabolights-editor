@@ -1,25 +1,49 @@
 <!-- Inline View (Selection Tiles on page if embedded) -->
 <div *ngIf="isEmbedded && !isUploadModalOpen" class="columns is-multiline">
-    <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
-        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
-            <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-link">cloud_upload</mat-icon>
-            <p class="title is-6 mt-2">
-                Aspera Upload
-                <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
-                    <mat-icon
-                        style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
-                </a>
-            </p>
-            <p class="subtitle is-7">Fast transfer for large files/folders</p>
+    <ng-container *ngIf="browserFirst">
+        <div class="column is-3" *ngIf="showBrowserUpload">
+            <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
+                <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-info">file_upload</mat-icon>
+                <p class="title is-6 mt-2">File Upload (Browser)</p>
+                <p class="subtitle is-7">Direct browser-based upload</p>
+            </div>
         </div>
-    </div>
-    <div class="column is-3" *ngIf="showBrowserUpload">
-        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
-            <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-info">file_upload</mat-icon>
-            <p class="title is-6 mt-2">File Upload (Browser)</p>
-            <p class="subtitle is-7">Direct browser-based upload</p>
+        <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
+            <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
+                <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-link">cloud_upload</mat-icon>
+                <p class="title is-6 mt-2">
+                    Aspera Upload
+                    <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
+                        <mat-icon
+                            style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                    </a>
+                </p>
+                <p class="subtitle is-7">Fast transfer for large files/folders</p>
+            </div>
         </div>
-    </div>
+    </ng-container>
+    <ng-container *ngIf="!browserFirst">
+        <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
+            <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
+                <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-link">cloud_upload</mat-icon>
+                <p class="title is-6 mt-2">
+                    Aspera Upload
+                    <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
+                        <mat-icon
+                            style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                    </a>
+                </p>
+                <p class="subtitle is-7">Fast transfer for large files/folders</p>
+            </div>
+        </div>
+        <div class="column is-3" *ngIf="showBrowserUpload">
+            <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
+                <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-info">file_upload</mat-icon>
+                <p class="title is-6 mt-2">File Upload (Browser)</p>
+                <p class="subtitle is-7">Direct browser-based upload</p>
+            </div>
+        </div>
+    </ng-container>
     <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
         <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('ftp')">
             <mat-icon style="font-size: 48px; width: 48px; height: 48px;" class="has-text-grey">vpn_key</mat-icon>
@@ -71,7 +95,7 @@
 </div>
 
 <!-- Simple Button View (Standard mode) -->
-<div *ngIf="!isEmbedded">
+<div *ngIf="!isEmbedded && mode === 'button'">
     <a (click)="openUploadModal()" class="button is-light is-small" [ngClass]="size">
         <mat-icon>cloud_upload</mat-icon> Upload
     </a>
@@ -97,28 +121,54 @@
 
             <!-- Step 1: Selection (Only shown inside modal if NOT embedded) -->
             <div *ngIf="!isEmbedded && !selectedMethod" class="columns is-multiline">
-                <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
-                    <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
-                        <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
-                            class="has-text-link">cloud_upload</mat-icon>
-                        <p class="title is-6 mt-2">
-                            Aspera Upload
-                            <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
-                                <mat-icon
-                                    style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
-                            </a>
-                        </p>
-                        <p class="subtitle is-7">Fast transfer for large files/folders</p>
+                <ng-container *ngIf="browserFirst">
+                    <div class="column is-3" *ngIf="showBrowserUpload">
+                        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
+                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                                class="has-text-info">file_upload</mat-icon>
+                            <p class="title is-6 mt-2">File Upload (Browser)</p>
+                            <p class="subtitle is-7">Direct browser-based upload</p>
+                        </div>
                     </div>
-                </div>
-                <div class="column is-3" *ngIf="showBrowserUpload">
-                    <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
-                        <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
-                            class="has-text-info">file_upload</mat-icon>
-                        <p class="title is-6 mt-2">File Upload (Browser)</p>
-                        <p class="subtitle is-7">Direct browser-based upload</p>
+                    <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
+                        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
+                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                                class="has-text-link">cloud_upload</mat-icon>
+                            <p class="title is-6 mt-2">
+                                Aspera Upload
+                                <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
+                                    <mat-icon
+                                        style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                                </a>
+                            </p>
+                            <p class="subtitle is-7">Fast transfer for large files/folders</p>
+                        </div>
                     </div>
-                </div>
+                </ng-container>
+                <ng-container *ngIf="!browserFirst">
+                    <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
+                        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('aspera')">
+                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                                class="has-text-link">cloud_upload</mat-icon>
+                            <p class="title is-6 mt-2">
+                                Aspera Upload
+                                <a (click)="$event.stopPropagation(); toggleAsperaHelp()" class="has-text-grey ml-1">
+                                    <mat-icon
+                                        style="font-size: 18px; width: 18px; height: 18px; vertical-align: middle;">help_outline</mat-icon>
+                                </a>
+                            </p>
+                            <p class="subtitle is-7">Fast transfer for large files/folders</p>
+                        </div>
+                    </div>
+                    <div class="column is-3" *ngIf="showBrowserUpload">
+                        <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('browser')">
+                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;"
+                                class="has-text-info">file_upload</mat-icon>
+                            <p class="title is-6 mt-2">File Upload (Browser)</p>
+                            <p class="subtitle is-7">Direct browser-based upload</p>
+                        </div>
+                    </div>
+                </ng-container>
                 <div class="column" [ngClass]="showBrowserUpload ? 'is-3' : 'is-4'">
                     <div class="box has-text-centered is-clickable h-100" (click)="selectMethod('ftp')">
                         <mat-icon style="font-size: 48px; width: 48px; height: 48px;"

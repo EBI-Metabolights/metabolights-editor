@@ -6,7 +6,8 @@
 
 /* Dual Button Segmented Control */
 .dual-toggle-group {
-    background-color: #f1f3f5;
+    background-color: white;
+    border: 1px solid #e2e8f0;
     padding: 3px;
     border-radius: 50px;
 }
@@ -20,16 +21,16 @@
 }
 
 .dual-toggle-group .button.active-none {
-    background-color: transparent !important;
-    color: #b5b5b5 !important;
+    background-color: white !important;
+    color: black !important;
 }
 
 .dual-toggle-group .button.active-none mat-icon {
-    color: #dbdbdb !important;
+    color: black !important;
 }
 
 .dual-toggle-group .button.active-none:hover {
-    background-color: rgba(0, 0, 0, 0.05) !important;
+    background-color: #f5f5f5 !important;
 }
 
 .dual-toggle-group .button.is-success {
