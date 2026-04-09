@@ -17,6 +17,9 @@
             <mat-icon>cloud_download</mat-icon>
           </span>
           <span>Download</span>
+          <span class="icon is-small">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </span>
         </button>
       </div>
       <div class="dropdown-menu" role="menu">
@@ -30,9 +33,32 @@
         </div>
       </div>
     </div>
-    <mtbls-upload *ngIf="isSyncEnabled && !isReadOnly" class="upload-button" [type]="'any'" [multiple]="true"
-      [mode]="'button'" (complete)="loadFilesPassively()" [size]="'is'"
-      (scrollRequested)="scrollToMetadataUpload()"></mtbls-upload>
+    <div class="dropdown upload-button" [ngClass]="{ 'is-active': isUploadDropdownActive }" #uploadDropdown>
+      <div class="dropdown-trigger">
+        <button (click)="toggleUploadDropdown()" class="button is-light is-small" [disabled]="!isSyncEnabled || isReadOnly">
+          <span class="icon is-small">
+            <mat-icon>cloud_upload</mat-icon>
+          </span>
+          <span>Upload</span>
+          <span class="icon is-small">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+          </span>
+        </button>
+      </div>
+      <div class="dropdown-menu" id="dropdown-menu-upload" role="menu">
+        <div class="dropdown-content">
+          <a class="dropdown-item clickable" (click)="openMetadataUpload()">Upload Metadata/Result files</a>
+          <a class="dropdown-item clickable" (click)="openDataUpload()">Upload Data files</a>
+        </div>
+      </div>
+    </div>
+    <mtbls-upload #uploadComponent mode="none"
+      [showBrowserUpload]="uploadShowBrowser" 
+      [browserFirst]="uploadBrowserFirst"
+      [type]="'any'" [multiple]="true"
+      (scrollRequested)="scrollToMetadataUpload()"
+      (complete)="onUploadComplete($event)">
+    </mtbls-upload>
 
     <span *ngIf="isSyncEnabled" class="refresh-button">
       <a (click)="loadFilesPassively()" class="button is-light is-small">

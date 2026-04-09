@@ -22,6 +22,7 @@ export class UploadComponent implements OnInit {
   @Input() isEmbedded: boolean = false;
   @Input() id: string = null;
   @Input() showBrowserUpload: boolean = true;
+  @Input() browserFirst: boolean = false;
   @Output() scrollRequested = new EventEmitter<void>();
 
   isUploadModalOpen = false;
