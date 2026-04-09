@@ -64,7 +64,7 @@
   <span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
 
-<div *ngIf="!isReadOnly && !dismissed && sampleAbundance" class="notification is-primary">
+<div *ngIf="!dismissed && sampleAbundance" class="notification is-primary">
   <small><mat-icon>info</mat-icon> Per sample abundance data present, click to download.
   </small><span (click)="dismissed = true" class="dismiss"><mat-icon>close</mat-icon></span>
 </div>
