@@ -275,7 +275,7 @@ export class TableComponent
     }
     if (this.data) {
       this.columnHidden = this.data.columns_hidden;
-      this.sampleAbundance = this.data.sample_abundance;
+      this.updateSampleAbundanceFlag();
       const fileKey = this.editorService.configService.config.endpoint + "/" + this.data.file;
       if (localStorage.getItem(fileKey) !== null) {
         this.view = localStorage.getItem(fileKey);
@@ -337,6 +337,7 @@ export class TableComponent
     this.studyFiles$.subscribe((value) => {
       if (value) {
         this.files = value.study;
+        this.updateSampleAbundanceFlag();
       }
     });
     this.readonly$.subscribe((value) => {
@@ -439,6 +440,7 @@ export class TableComponent
     this.deSelect();
     this.data = this.tableData.data;
     if (this.data) {
+      this.updateSampleAbundanceFlag();
       // Clear caches for new data
       this._columnControlListCache.clear();
       this._columnValidationsCache.clear();
@@ -2437,6 +2439,42 @@ export class TableComponent
       this.initialise();
       this.triggerChanges();
     }
+  }
+
+  private updateSampleAbundanceFlag(): void {
+    if (!this.data) return;
+    if (this.data.sample_abundance === true) {
+      this.sampleAbundance = true;
+      return;
+    }
+    this.sampleAbundance = this.hasSampleAbundanceFile(this.data.file);
+  }
+
+  private hasSampleAbundanceFile(mafFile: string): boolean {
+    if (!mafFile || !Array.isArray(this.files)) return false;
+    const mafStem = mafFile.replace(/\.(tsv|txt|csv)$/i, "").toLowerCase();
+    const flatFiles = this.flattenStudyFiles(this.files);
+    return flatFiles.some((entry) => {
+      if (!entry || entry.directory || !entry.file) return false;
+      const name = String(entry.file).toLowerCase();
+      if (!name.includes("abundance")) return false;
+      if (mafStem && name.includes(mafStem)) return true;
+      return /sample[_-]?abundance/.test(name) || /_abundance\.(tsv|txt|csv)$/.test(name);
+    });
+  }
+
+  private flattenStudyFiles(files: any[]): any[] {
+    const output: any[] = [];
+    const stack = Array.isArray(files) ? [...files] : [];
+    while (stack.length > 0) {
+      const item = stack.shift();
+      if (!item) continue;
+      output.push(item);
+      if (Array.isArray(item.files) && item.files.length > 0) {
+        stack.push(...item.files);
+      }
+    }
+    return output;
   }
 
   private updateScrollBehavior(): void {
