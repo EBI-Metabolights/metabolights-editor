@@ -1,31 +1,18 @@
 <nav-bar mode="light" *ngIf="!hideNav"></nav-bar>
 <mtbls-progress [study]="requestedStudy" [step]="5" [hidePublicationStep]="true" *ngIf="!hideNav"></mtbls-progress>
 <quick-link path="study" icon="chrome_reader_mode" text="Study overview"></quick-link>
-<div class="columns">
-  <div class="column is-half is-offset-one-quarter mb-5">
-    <div>&nbsp;</div>
+<div [ngClass]="{'columns': !hideNav }">
+  <div [ngClass]="{'column is-half is-offset-one-quarter mb-5': !hideNav }">
+    <div *ngIf="!hideNav">&nbsp;</div>
     <nav class="panel has-background-white">
       <div class="panel-heading">
         <img style="height: 32px" class="is-pulled-left" src="{{ baseHref }}assets/img/MetaboLightsLogo.png" />
         <span style="margin-left: 10px">{{ requestedStudy }}</span>: Upload files
       </div>
-      <div class="panel-block bg-white">
-        <div class="column">
-          <mtbls-aspera [type]="'any'" [allowMultipleSelection]="true"></mtbls-aspera>
-        </div>
+      <div class="panel-block bg-white" style="display: block; padding-top: 1.5rem; padding-bottom: 1.5rem;">
+        <mtbls-upload [isEmbedded]="true" [id]="requestedStudy" [showBrowserUpload]="false"></mtbls-upload>
       </div>
-      <div class="panel-block bg-white">
-        <div class="column">
-          <mtbls-ftp></mtbls-ftp>
-        </div>
-      </div>
-      <div style="border-radius: 0" class="panel-block notification is-primary">
-        <small class="is-tiny">
-          <mat-icon>info</mat-icon>&nbsp;You can come back to this page and
-          upload files at any time, you do not have to complete the file upload
-          at this stage.
-        </small>
-      </div>
+
     </nav>
     <div>&nbsp;</div>
     <nav class="panel bg-white">
@@ -116,13 +103,15 @@
           files that has been updated.</small>
       </div>
     </nav>
-    <nav class="panel has-background-white">
-      <div class="panel-block">
-        <button (click)="copyFilesAndProceed()" class="button is-success is-fullwidth is-fullwidth">
-          <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>&nbsp;Next
+    <div class="field is-grouped is-pulled-right mt-6">
+
+      <div class="control">
+        <button (click)="copyFilesAndProceed()" class="button is-primary">
+          <mat-spinner [diameter]="20" [strokeWidth]="3" *ngIf="isLoading"></mat-spinner>Continue
         </button>
       </div>
-    </nav>
+    </div>
+    <div class="is-clearfix"></div>
     <div>&nbsp;</div>
     <div>&nbsp;</div>
   </div>

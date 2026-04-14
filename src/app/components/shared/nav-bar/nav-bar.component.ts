@@ -1,4 +1,5 @@
 import { Component, OnInit, Input, inject } from "@angular/core";
+import Swal from "sweetalert2";
 import { EditorService } from "../../../services/editor.service";
 import { Router } from "@angular/router";
 import { ConfigurationService } from "src/app/configuration.service";
@@ -8,10 +9,12 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { Store } from "@ngxs/store";
 import { ApplicationState, MtblsBackendVersion, MtblsEditorVersion } from "src/app/ngxs-store/non-study/application/application.state";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
+import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
 @Component({
-  selector: "nav-bar",
-  templateUrl: "./nav-bar.component.html",
-  styleUrls: ["./nav-bar.component.css"],
+    selector: "nav-bar",
+    templateUrl: "./nav-bar.component.html",
+    styleUrls: ["./nav-bar.component.css"],
+    standalone: false
 })
 export class NavBarComponent implements OnInit {
   @Input("mode") mode: any;
@@ -33,6 +36,8 @@ export class NavBarComponent implements OnInit {
   studyId: string;
   obfuscationCode: string;
   reviewerLink: string = null;
+  user$: Observable<any> = inject(Store).select(UserState.user);
+
   constructor(
     public router: Router,
     private editorService: EditorService,
@@ -49,8 +54,13 @@ export class NavBarComponent implements OnInit {
   ngOnInit() {
     this.endpoint = this.configService.config.endpoint;
     this.setUpSubscriptionsNgxs();
-
-
+    // this.keycloak.isLoggedIn().then((loggedIn) => {
+    //   if (loggedIn) {
+    //     this.keycloak.loadUserProfile().then((profile) => {
+    //       this.user = profile;
+    //     });
+    //   }
+    // });
   }
 
   setUpSubscriptionsNgxs() {
@@ -88,9 +98,19 @@ export class NavBarComponent implements OnInit {
       }
     });
   }
-
   logOut() {
-    this.editorService.logout(true);
+    Swal.fire({
+      title: "Logout",
+      text: "Are you sure you want to log out?",
+      showCancelButton: true,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "Yes",
+      cancelButtonText: "Cancel"
+    }).then((willLogout) => {
+      if (willLogout.value) {
+        this.editorService.logout(true);
+      }
+    });
   }
 
   backToMetabolights() {
@@ -100,6 +120,10 @@ export class NavBarComponent implements OnInit {
   redirectToConsole() {
     this.router.navigate(["/console"]);
   }
+  redirectToProfile() {
+    window.location.href = this.configService.config.auth.profileUrl;
+  }
+
   updatePreviewEnabled() {
     this.previewEnabled = this.mode != 'light' && this.studyStatus != 'Provisional';
   }
@@ -112,8 +136,8 @@ export class NavBarComponent implements OnInit {
         }
       } if (this.studyStatus == "Public") {
         this.reviewerLink = this.baseHref + this.studyId;
-      } 
-    } 
+      }
+    }
 
   }
 }

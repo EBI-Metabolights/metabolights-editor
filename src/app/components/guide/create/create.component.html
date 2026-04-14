@@ -4,13 +4,137 @@
     (stepClick)="onStepClick($event)" [allowBackward]="currentSubStep < 4" [hidePublicationStep]="false"
     [hideAssayStep]="true" [hideUploadStep]="true"></mtbls-progress>
 
-  <div class="columns is-centered mt-4" *ngIf="currentSubStep < 4">
+  <div class="columns is-centered mt-4" *ngIf="currentSubStep >= 1 && currentSubStep < 4">
     <div class="column is-10">
       <mtbls-checklist [items]="checklistItems" [sectionLabels]="checklistSectionLabels"></mtbls-checklist>
     </div>
   </div>
 
   <div [ngSwitch]="currentSubStep">
+    <!-- Step 0: Prerequisites & Guide -->
+    <div *ngSwitchCase="0">
+      <div class="columns is-centered mt-4">
+        <div class="column is-10">
+          <div class="box p-6">
+            <h2 class="title is-4 has-text-weight-bold mb-5">Prerequisites & Guide for Study Submission</h2>
+
+            <div class="notification is-info is-light mb-5">
+              <p class="is-size-6">
+                Before you begin your submission, please ensure you have the following information and files ready.
+                Prepared data ensures a smooth and efficient submission process.
+              </p>
+            </div>
+
+            <div class="columns is-multiline">
+              <!-- Section 1: Metadata -->
+              <div class="column is-6">
+                <div class="box p-5 equal-height-box">
+                  <h3 class="title is-5 has-text-weight-bold mb-4">
+                    <mat-icon class="mr-2" style="vertical-align: middle; color: #4a4a4a;">description</mat-icon>
+                    Metadata Requirements
+                  </h3>
+                  <ul class="is-size-6 custom-bullets" style="list-style-type: disc; padding-left: 1.5rem;">
+                    <li><strong>Principal Investigator</strong> contact details (Affiliation, Email, ORCID).</li>
+                    <li><strong>Study Title</strong> (min 25 characters) and <strong>Abstract/Description</strong> (min
+                      60 characters).</li>
+                    <li><strong>Protocol Descriptions</strong>: Sample collection, extraction, chromatography/NMR, etc.
+                    </li>
+                    <li><strong>Associated Publications</strong>: DOI or PubMed ID if available.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Section 2: Data Prep -->
+              <div class="column is-6">
+                <div class="box p-5 equal-height-box">
+                  <h3 class="title is-5 has-text-weight-bold mb-4">
+                    <mat-icon class="mr-2" style="vertical-align: middle; color: #4a4a4a;">cloud_upload</mat-icon> Data
+                    File Preparation
+                  </h3>
+                  <ul class="is-size-6 custom-bullets" style="list-style-type: disc; padding-left: 1.5rem;">
+                    <li><strong>Metadata Files</strong>: ISA-Tab format (Investigation, Study, Assay files).</li>
+                    <li><strong>Raw Data Files</strong>: Proprietary instrument formats (e.g., .raw, .d, .wiff).</li>
+                    <li><strong>Derived Data Files</strong>: Open formats (e.g., .mzML, .nmrML) are highly encouraged.
+                    </li>
+                    <li><strong>Naming Conventions</strong>: Use only alphanumeric characters, underscores, and dots.
+                      <b>No spaces.</b></li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Section 3: Upload Guide (Mimicking UploadComponent UI) -->
+              <div class="column is-12 mt-4">
+                <div class="box p-5">
+                  <h3 class="title is-5 has-text-weight-bold mb-5">
+                    <mat-icon class="mr-2" style="vertical-align: middle; color: #4a4a4a;">drive_file_move</mat-icon>
+                    How to upload files?
+                  </h3>
+
+                  <div class="columns is-multiline mb-4">
+                    <div class="column is-3">
+                      <div
+                        class="box has-text-centered has-background-white-ter py-6 px-4 shadow-none border-none equal-height-box">
+                        <mat-icon
+                          style="font-size: 44px; width: 44px; height: 44px; display: block; margin: 0 auto 15px;"
+                          class="has-text-link">cloud_upload</mat-icon>
+                        <p class="title is-6 mb-1" style="display: block;">Aspera Upload</p>
+                        <p class="subtitle is-7 mb-0" style="display: block; line-height: 1.4; color: #666;">High-speed
+                          transfer for large files and folders</p>
+                      </div>
+                    </div>
+                    <div class="column is-3">
+                      <div
+                        class="box has-text-centered has-background-white-ter py-6 px-4 shadow-none border-none equal-height-box">
+                        <mat-icon
+                          style="font-size: 44px; width: 44px; height: 44px; display: block; margin: 0 auto 15px;"
+                          class="has-text-info">file_upload</mat-icon>
+                        <p class="title is-6 mb-1" style="display: block;">File Upload</p>
+                        <p class="subtitle is-7 mb-0" style="display: block; line-height: 1.4; color: #666;">Direct
+                          browser-based upload for smaller metadata/result files</p>
+                      </div>
+                    </div>
+                    <div class="column is-3">
+                      <div
+                        class="box has-text-centered has-background-white-ter py-6 px-4 shadow-none border-none equal-height-box">
+                        <mat-icon
+                          style="font-size: 44px; width: 44px; height: 44px; display: block; margin: 0 auto 15px;"
+                          class="has-text-grey">vpn_key</mat-icon>
+                        <p class="title is-6 mb-1" style="display: block;">Private FTP</p>
+                        <p class="subtitle is-7 mb-0" style="display: block; line-height: 1.4; color: #666;">Standard
+                          protocol for bulk uploads and automated pipelines</p>
+                      </div>
+                    </div>
+                    <div class="column is-3">
+                      <div
+                        class="box has-text-centered has-background-white-ter py-6 px-4 shadow-none border-none equal-height-box">
+                        <img src="assets/img/logo_globus-solid.svg"
+                          style="width: 44px; height: 44px; display: block; margin: 0 auto 15px;" alt="Globus Logo" />
+                        <p class="title is-6 mb-1" style="display: block;">Globus</p>
+                        <p class="subtitle is-7 mb-0" style="display: block; line-height: 1.4; color: #666;">Secure and
+                          reliable data transfer with Globus</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <hr class="my-4" style="background-color: rgba(0,0,0,0.05);">
+                  <p class="is-size-7 has-text-centered">
+                    For a detailed guide on preparing and uploading your files, please visit our
+                    <a href="https://ebi-metabolights.github.io/guides/Files/#uploading-to-ftp-folder" target="_blank"
+                      class="has-text-link has-text-weight-bold">Official Documentation &rarr;</a>
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="field mt-6 has-text-centered">
+              <button class="button is-primary is-medium px-6" (click)="currentSubStep = 1">
+                Get Started with Submission
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Step 1: Submission Details -->
     <div *ngSwitchCase="1">
       <div class="columns is-centered mt-4">
@@ -127,10 +251,12 @@
             </div>
             <div class="field is-grouped is-pulled-right mt-4">
               <div class="control">
+                <button class="button is-light" (click)="currentSubStep = 0">Back</button>
+              </div>
+              <div class="control">
                 <button class="button is-primary" (click)="currentSubStep = 2"
                   [disabled]="!isStep1Valid">Continue</button>
               </div>
-
             </div>
             <div class="is-clearfix">
             </div>
@@ -398,14 +524,33 @@
       </div>
     </div>
 
-    <!-- Step 4: Done (Guide) -->
+    <!-- Step 4: Upload Study Files (Integrated) -->
     <div *ngSwitchCase="4">
+      <div class="columns is-centered mt-4">
+        <div class="column is-10 pb-6">
+          <div class="box p-6">
+            <h2 class="title is-4 has-text-weight-bold mb-4">Upload Study Files</h2>
+            <div class="notification is-info is-light mb-5">
+              <p>Your study <strong>{{ newStudy }}</strong> has been created successfully. Now, please select an upload
+                method to transfer your data and metadata files.</p>
+            </div>
+
+            <div class="mt-4">
+              <raw-upload [hideNav]="true" [studyId]="newStudy" (next)="currentSubStep = 5" (back)="currentSubStep = 3"></raw-upload>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Done (Success Guide) -->
+    <div *ngSwitchCase="5">
       <div class="columns is-centered mt-4">
         <div class="column is-10 pb-6">
           <div class="box p-6">
             <div class="has-text-centered mb-5">
               <span class="material-symbols-outlined is-size-1 has-text-success mb-2">check</span>
-              <h2 class="title is-4 has-text-weight-bold">Study Creation successful</h2>
+              <h2 class="title is-4 has-text-weight-bold">Study Submission Initialized</h2>
 
               <div class="mt-5 mb-5 is-flex is-justify-content-center" style="flex-direction: column"
                 *ngIf="createdStudiesDetails">
@@ -425,9 +570,8 @@
             </div>
 
             <div class="box mt-6">
-              <h3 class="title is-6 has-text-weight-bold mb-3">To complete your submission(s):</h3>
-              <p class="is-size-6 mb-3">Please follow these essential steps in the study editor to prepare your
-                submission for curation.</p>
+              <h3 class="title is-6 has-text-weight-bold mb-3">Next Steps to complete your submission:</h3>
+
               <div class="publications-accordion">
                 <!-- Step 1: Samples -->
                 <div class="accordion-item" [ngClass]="{ 'is-expanded': doneStepExpandedIndex === 0 }">
@@ -552,17 +696,20 @@
                     <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
                       <li><strong>File names</strong> must contain only letters (a&ndash;z, A&ndash;Z), numbers
                         (0&ndash;9), hyphens (-), underscores (_), or dots (.). Spaces are not accepted.</li>
-                      <li><strong>Raw data folders</strong> (e.g., <code>.d</code>, <code>.raw</code>, or any NMR raw data folder) must
+                      <li><strong>Raw data folders</strong> (e.g., <code>.d</code>, <code>.raw</code>, or any NMR raw
+                        data folder) must
                         each be compressed individually as <code>.zip</code> before upload, <a
                           href="https://ebi-metabolights.github.io/guides/Files/#compression" target="_blank">click here
                           for guidance</a>. A single zip containing multiple folders is not accepted.</li>
                       <li><strong>Accepted raw formats</strong> include: <code>.d</code>,
                         <code>.raw</code>, <code>.wiff</code> + <code>.wiff.scan</code>, <code>.fid</code>,
-                        <code>.ser</code>, <code>.lcd</code>, <code>.smp</code>, and others.</li>
+                        <code>.ser</code>, <code>.lcd</code>, <code>.smp</code>, and others.
+                      </li>
                       <li><strong>Accepted derived formats</strong> include: <code>.mzML</code>, <code>.mzXML</code>,
                         <code>.imzML</code>, <code>.cdf</code>, <code>.nmrML</code>, and others. Note that some formats
                         (e.g., <code>.mgf</code>, <code>.msp</code>, <code>.xlsx</code>, <code>.cef</code>) are not
-                        accepted alone and must accompany spectrum/chromatogram data.</li>
+                        accepted alone and must accompany spectrum/chromatogram data.
+                      </li>
                       <li><strong>Where an instrument raw file is not available</strong> (e.g., some non-MS
                         chromatographic detectors), it is acceptable to submit the open-format file only.</li>
                     </ul>
@@ -597,7 +744,8 @@
                     <p class="is-size-7 mb-2"><strong>MS assays</strong> require at least one of
                       <strong>Raw Spectral Data File</strong> or <strong>Derived Spectral Data File</strong> per sample.
                       For <code>.wiff</code>/<code>.wiff.scan</code> datasets, add an extra 'Raw Spectral Data File'
-                      column so both files are referenced.</p>
+                      column so both files are referenced.
+                    </p>
                     <p class="is-size-7 mb-2"><strong>NMR assays</strong> may include three file types per sample:</p>
                     <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
                       <li><strong>Free Induction Decay Data File</strong> &mdash; raw NMR data (e.g., sample1.zip).</li>
@@ -671,7 +819,7 @@
                     </p>
                     <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
                       <li>Click <strong>Index Data Files</strong> to sync uploaded raw/derived data into the study.</li>
-                      <li>Click <strong>Synchronise Metadata Files</strong> to read in any uploaded metadata files (or
+                      <li>Click <strong>Synchronise Metadata & Result Files</strong> to read in any uploaded metadata files (or
                         use the
                         Drag &amp; Drop feature for metadata).</li>
                       <li>Wait for both processes to complete &mdash; status indicators will update automatically.</li>
@@ -766,7 +914,7 @@
               <div class="columns is-multiline" style="margin: 0;justify-content: flex-end;">
                 <div class="column is-narrow" *ngFor="let studyId of createdStudies">
                   <button class="button is-primary px-6" (click)="navigateToStudy(studyId)">
-                    {{ studyId }} <span class="material-symbols-outlined">
+                    Proceed to Study: {{ studyId }} <span class="material-symbols-outlined">
                       arrow_right_alt
                     </span>
                   </button>

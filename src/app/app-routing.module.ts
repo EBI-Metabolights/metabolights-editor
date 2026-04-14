@@ -24,56 +24,65 @@ import { GuidedAssaysComponent } from "./components/guide/assays/assays.componen
 import { GuidesComponent } from "./components/public/guides/guides.component";
 import { NoStudyPageComponent } from "./components/shared/errors/no-study-page/no-study-page.component";
 import { StudyNotPublicComponent } from "./components/shared/errors/study-not-public/study-not-public.component";
+import { StudyNotCompletedComponent } from "./components/shared/errors/study-not-completed/study-not-completed.component";
 import { DataPolicyComponent } from "./components/public/data-policy/data-policy.component";
 import { DatasetLicenseStaticPageComponent } from "./components/public/dataset-license-static/dataset-license-static.component";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function reviewerStudyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url === null || url.length === 0) {
+  if (url === null || url.length === 0 || url[0].path.toLowerCase() === 'guide') {
     return null;
   }
-  const reg = /reviewer(.*)$/;
-  const param = url[0].toString();
-
-  if (param.match(reg)) {
-    let data = null;
-    if (url[1]) {
-      data = { consumed: url, posParams: { study: url[0], tab: url[1] } };
-    } else {
-      data = { consumed: url, posParams: { study: url[0], tab: "descriptors" } };
+  const reg = /^reviewer(.*)$/;
+  
+  for (let i = 0; i < url.length; i++) {
+    const param = url[i].toString();
+    if (param.match(reg)) {
+      const consumed = url.slice(0, i + 1);
+      const posParams: any = { study: url[i] };
+      if (url[i + 1]) {
+        consumed.push(url[i + 1]);
+        posParams.tab = url[i + 1];
+      } else {
+        posParams.tab = new UrlSegment("descriptors", {});
+      }
+      return { consumed, posParams };
     }
-    return data;
   }
   return null;
 }
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function publicStudyMatcher(url: UrlSegment[]): UrlMatchResult {
-  if (url === null || url.length === 0) {
+  if (url === null || url.length === 0 || url[0].path.toLowerCase() === 'guide') {
     return null;
   }
-  const reg = /([MTBLS|mtbls])([0-9]+)(.*)$/;
-  const param = url[0].toString();
-
-  if (param.match(reg)) {
-    let data = null;
-    if (url[1]) {
-      data = { consumed: url, posParams: { study: url[0], tab: url[1] } };
-    } else {
-      data = { consumed: url, posParams: { study: url[0], tab: "descriptors" } };
+  const reg = /^(MTBLS|mtbls|REQ|req)[0-9]+(.*)$/;
+  
+  for (let i = 0; i < url.length; i++) {
+    const param = url[i].toString();
+    if (param.match(reg)) {
+      const consumed = url.slice(0, i + 1);
+      const posParams: any = { study: url[i] };
+      if (url[i + 1]) {
+        consumed.push(url[i + 1]);
+        posParams.tab = url[i + 1];
+      } else {
+        posParams.tab = new UrlSegment("descriptors", {});
+      }
+      return { consumed, posParams };
     }
-    return data;
   }
   return null;
 }
 
 const routes: Routes = [
-  { path: "login", canActivate: [AuthGuard], component: LoginComponent },
+  { path: "login", component: LoginComponent },
   { path: "guides", component: GuidesComponent },
   { path: "guides/:tab", component: GuidesComponent },
   { path: "guides/:tab/:section", component: GuidesComponent },
-  { path: "datapolicy", component: DataPolicyComponent},
-  { path: "license", component: DatasetLicenseStaticPageComponent},
+  { path: "datapolicy", component: DataPolicyComponent },
+  { path: "license", component: DatasetLicenseStaticPageComponent },
 
   { path: "", redirectTo: "console", pathMatch: "full" },
   { path: "console", canActivate: [AuthGuard], component: ConsoleComponent },
@@ -122,7 +131,8 @@ const routes: Routes = [
   },
   { path: "study", redirectTo: "console", pathMatch: "full" },
   { path: "study-not-found", component: NoStudyPageComponent },
-  { path: "study-not-public", component: StudyNotPublicComponent},
+  { path: "study-not-public", component: StudyNotPublicComponent },
+  { path: "study-not-completed", component: StudyNotCompletedComponent },
   { path: "page-not-found", component: PageNotFoundComponent },
   { matcher: publicStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
   { matcher: reviewerStudyMatcher, canActivate: [AuthGuard], component: PublicStudyComponent },
@@ -133,4 +143,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes, {})],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

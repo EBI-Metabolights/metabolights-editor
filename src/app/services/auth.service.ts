@@ -1,19 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { BehaviorSubject, from, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { AuthTokens } from '../models/mtbl/mtbls/auth.model';
 import { ConfigurationService } from '../configuration.service';
 import init from 'multicast-dns';
+import { KeycloakService } from 'keycloak-angular';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private accessTokenKey = null;
-  private refreshTokenKey = null;
+  private accessTokenKey = "jwt";
   private apiTokenKey = null;
+  private isCuratorKey = null;
+  private userKey = null;
+  private usernameKey = null;
+  private jwtExpirationTimeKey = null;
+
   private isLoggedInSubject = new BehaviorSubject<boolean>(this.hasTokens());
   isLoggedIn$ = this.isLoggedInSubject.asObservable();
   private refreshTokenUrl = null;
@@ -23,13 +28,19 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private configService: ConfigurationService,
+    private readonly keycloak: KeycloakService
   ) {
     configService.configLoaded$.subscribe((value) => {
       if (value) {
-        // this.accessTokenKey = this.configService.config.endpoint + "/jwt"
         this.accessTokenKey = "jwt"
-        this.refreshTokenKey = this.configService.config.endpoint + "/refreshToken"
-        this.apiTokenKey = this.configService.config.endpoint + "/apiToken"
+
+        const endpoint = this.configService.config.endpoint.replace(/\/$/, '');
+        this.apiTokenKey = endpoint + "/apiToken"
+        this.isCuratorKey = endpoint + "/isCurator"
+        this.userKey = endpoint + "/user"
+        this.usernameKey = endpoint + "/username"
+        this.jwtExpirationTimeKey = endpoint + "/jwtExpirationTime"
+
         const rootUrl = this.configService.config
         this.loginUrl = rootUrl.metabolightsWSURL.baseURL + "/auth/login";
         this.loginUrl = rootUrl.metabolightsWSURL.baseURL + "/auth/logout";
@@ -52,27 +63,16 @@ export class AuthService {
   }
 
   refreshToken(): Observable<AuthTokens> {
-    if (this.initiated) {
-      const refresh_token = this.getRefreshToken();
-
-      return this.http.post<AuthTokens>(this.refreshTokenUrl, {
-        jwt: refresh_token
-      }).pipe(
-        tap(tokens => this.storeTokens(tokens))
-      );
-    }
-    return null;
+    return from(this.keycloak.updateToken(20)).pipe(
+      map(() => ({
+        access_token: this.keycloak.getKeycloakInstance().token,
+        refresh_token: this.keycloak.getKeycloakInstance().refreshToken
+      }))
+    );
   }
 
   logout(): void {
     if (this.initiated) {
-      const refresh_token = this.getRefreshToken();
-
-      this.http.post(this.logoutUrl, { refresh_token }).subscribe({
-        next: () => { },
-        error: () => { }
-      });
-
       this.clearTokens();
       this.isLoggedInSubject.next(false);
     }
@@ -83,22 +83,53 @@ export class AuthService {
   // ───────────────────────────────────────────────
   storeTokens(tokens: AuthTokens): void {
     localStorage.setItem(this.accessTokenKey, tokens.access_token);
-    localStorage.setItem(this.refreshTokenKey, tokens.refresh_token);
     this.isLoggedInSubject.next(true);
   }
 
-  storeApiToken(apiToken: string): void {
-    localStorage.setItem(this.apiTokenKey, apiToken);
+  storeUserLocalStorage(data: {
+    apiToken?: string;
+    isCurator?: boolean;
+    user?: string;
+    username?: string;
+    jwtExpirationTime?: number;
+  }): void {
+    this.configService.configLoaded$.subscribe((loaded) => {
+      if (loaded) {
+        if (data.apiToken) localStorage.setItem(this.apiTokenKey, data.apiToken);
+        if (data.isCurator !== undefined) localStorage.setItem(this.isCuratorKey, data.isCurator.toString());
+        if (data.user) localStorage.setItem(this.userKey, data.user);
+        if (data.username) localStorage.setItem(this.usernameKey, data.username);
+        if (data.jwtExpirationTime) localStorage.setItem(this.jwtExpirationTimeKey, data.jwtExpirationTime.toString());
+      }
+    });
   }
 
   clearTokens(): void {
     localStorage.removeItem(this.accessTokenKey);
-    localStorage.removeItem(this.refreshTokenKey);
-    localStorage.removeItem(this.apiTokenKey);
+    this.configService.configLoaded$.subscribe((loaded) => {
+      if (loaded) {
+        // Clean up old refreshToken if it exists
+        const endpoint = this.configService.config.endpoint.replace(/\/$/, '');
+        localStorage.removeItem(endpoint + "/refreshToken");
+        localStorage.removeItem(this.apiTokenKey);
+        localStorage.removeItem(this.isCuratorKey);
+        localStorage.removeItem(this.userKey);
+        localStorage.removeItem(this.usernameKey);
+        localStorage.removeItem(this.jwtExpirationTimeKey);
+      }
+    });
+  }
+
+  clearApiToken(): void {
+    this.configService.configLoaded$.subscribe((loaded) => {
+      if (loaded) {
+        localStorage.removeItem(this.apiTokenKey);
+      }
+    });
   }
 
   hasTokens(): boolean {
-    return !!this.getAccessToken() && !!this.getRefreshToken();
+    return !!this.getAccessToken();
   }
 
   getAccessToken(): string | null {
@@ -110,6 +141,6 @@ export class AuthService {
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem(this.refreshTokenKey);
+    return null;
   }
 }

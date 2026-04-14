@@ -57,6 +57,7 @@ export class PersonComponent implements OnInit {
   @ViewChild(OntologyComponent) rolesComponent: OntologyComponent;
   
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  studySubmitters$: Observable<any[]> = inject(Store).select(state => state.general?.submitters);
   editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
@@ -105,6 +106,7 @@ export class PersonComponent implements OnInit {
   studyCategory: any;
   templateVersion: any;
   studyCreatedAt: any;
+  studySubmitters: any[] = [];
   _controlList: any = null;
   constructor(
     private fb: UntypedFormBuilder,
@@ -149,6 +151,40 @@ export class PersonComponent implements OnInit {
         this.studyCreatedAt$.subscribe((value) => {
           this.studyCreatedAt = value;
         });
+        this.studySubmitters$.subscribe((value) => {
+          this.studySubmitters = value || [];
+        });
+  }
+
+  isPI(): boolean {
+    if (!this.person || !this.person.roles) return false;
+    return this.person.roles.some((role: any) => {
+      const val = typeof role === 'string' ? role : role?.annotationValue;
+      return val?.includes('Principal Investigator');
+    });
+  }
+
+  isSubmitter(): boolean {
+    if (!this.person) return false;
+
+    // Check if email matches any submitter
+    if (this.studySubmitters && this.studySubmitters.length > 0 && this.person.email) {
+      const email = this.person.email.toLowerCase().trim();
+      return this.studySubmitters.some((sub: any) => {
+        if (!sub) return false;
+        
+        if (typeof sub === 'string') {
+          return sub.toLowerCase().trim() === email;
+        }
+
+        const subUserName = (sub.userName || sub.username || '').toLowerCase().trim();
+        const subEmail = (sub.email || '').toLowerCase().trim();
+
+        return (subUserName === email || subEmail === email);
+      });
+    }
+
+    return false;
   }
 
   ngOnInit() {

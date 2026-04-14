@@ -1,17 +1,16 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, OnInit, Input, Output } from "@angular/core";
 
 @Component({
-  selector: "mtbls-about",
-  templateUrl: "./about.component.html",
-  styleUrls: ["./about.component.css"],
+    selector: "mtbls-about",
+    templateUrl: "./about.component.html",
+    styleUrls: ["./about.component.css"],
+    standalone: false
 })
 export class AboutComponent implements OnInit {
   @Input("editorVersion") editorVersion: string;
   @Input("apiVersion") apiVersion: string;
-
-  isModalOpen = false;
-
-
+  @Input("isModalOpen") isModalOpen: boolean = false;
+  
   ngOnInit() {
   }
 

@@ -3,6 +3,7 @@ import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.i
 import { MTBLSPerson } from "src/app/models/mtbl/mtbls/mtbls-person"
 import { MTBLSPublication } from "src/app/models/mtbl/mtbls/mtbls-publication"
 import { DatasetLicense } from "src/app/services/decomposed/dataset-license.service"
+import { StudyPermission } from "src/app/services/headers"
 
 export interface Title {
     title: string
@@ -165,6 +166,12 @@ export namespace StudyCreatedAt {
       constructor(public studyCreatedAt: string) {}
   }
 }
+export namespace UserStudyPermission {
+  export class Set{
+      static readonly type = '[general] Set study permission'
+      constructor(public studyPermission: StudyPermission) {}
+  }
+}
 export namespace StudyCategory {
   export class Set{
       static readonly type = '[general] Set Study Category'
@@ -224,6 +231,13 @@ export namespace RevisionTaskMessage {
       constructor(public revisionTaskMessage: string) {}
   }
 
+}
+
+export namespace StudySubmitters {
+    export class Set {
+        static readonly type = '[general] Set Study Submitters'
+        constructor(public submitters: any[]) {}
+    }
 }
 
 export class SetStudyReviewerLink {
