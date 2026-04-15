@@ -33,7 +33,7 @@
         </div>
       </div>
     </div>
-    <div class="dropdown upload-button" [ngClass]="{ 'is-active': isUploadDropdownActive }" #uploadDropdown>
+    <div *ngIf="!isReadOnly" class="dropdown upload-button" [ngClass]="{ 'is-active': isUploadDropdownActive }" #uploadDropdown>
       <div class="dropdown-trigger">
         <button (click)="toggleUploadDropdown()" class="button is-light is-small" [disabled]="!isSyncEnabled || isReadOnly">
           <span class="icon is-small">

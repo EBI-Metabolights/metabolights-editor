@@ -266,18 +266,14 @@ async downloadWithToken(file: string) {
 
   const oneTimeTokenUrl = this.configService.config.metabolightsWSURL.baseURL + "/auth/create-onetime-token";
 
-  if (!this.status || this.status.trim() === "" || this.status.toLowerCase() === "provisional") {
-    this.http.get<{ one_time_token: string }>(oneTimeTokenUrl, httpOptions).subscribe({
-      next: (response) => {
-        window.open(url + "&passcode=" + response.one_time_token, "_blank");
-      },
-      error: (err) => {
-        toastr.error("Failed to create download link.", "Error");
-      },
-    });
-  } else {
-    window.open(url, "_blank");
-  }
+  this.http.get<{ one_time_token: string }>(oneTimeTokenUrl, httpOptions).subscribe({
+    next: (response) => {
+      window.open(url + "&passcode=" + response.one_time_token, "_blank");
+    },
+    error: (err) => {
+      toastr.error("Failed to create download link.", "Error");
+    },
+  });
 }
 
 
