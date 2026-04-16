@@ -61,27 +61,24 @@ export class GlobusUploadComponent implements OnInit {
     );
   }
 
-  togglePermission(targetState?: 'enabled' | 'disabled') {
-    if (this.permissionStatus === 'loading') return;
-    
-    // If target state is already current state, do nothing
-    if (targetState && this.permissionStatus === targetState) return;
+  togglePermission() {
+    if (this.permissionStatus === "loading") return;
 
-    if (this.permissionStatus === 'enabled') {
-      this.permissionStatus = 'loading';
+    if (this.permissionStatus === "enabled") {
+      this.permissionStatus = "loading";
       this.filesService.disableGlobusPermissions(this.studyId).subscribe(
         () => {
           this.fetchGlobusPermissions();
         },
         (error: any) => {
-          toastr.error("Failed to disable Globus permission.", "Error");
+          toastr.error("Failed to deactivate Globus permission.", "Error");
           this.fetchGlobusPermissions(); // refresh state
         }
       );
     } else {
       const username = this.user?.globus_username;
       if (!username) {
-        toastr.error("Provide Globus username in your profile to enable Globus permission.", "Error");
+        toastr.error("Provide Globus username in your profile to activate Globus permission.", "Error");
         this.permissionStatus = "disabled";
         return;
       }
@@ -92,7 +89,7 @@ export class GlobusUploadComponent implements OnInit {
           this.fetchGlobusPermissions();
         },
         (error: any) => {
-          toastr.error("Failed to enable Globus permission.", "Error");
+          toastr.error("Failed to activate Globus permission.", "Error");
           this.fetchGlobusPermissions(); // refresh state
         }
       );
