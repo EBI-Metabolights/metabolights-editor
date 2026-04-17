@@ -3,6 +3,7 @@ import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
 import { Owner } from "src/app/ngxs-store/non-study/user/user.actions";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
+import { ConfigurationService } from "src/app/configuration.service";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { FilesService } from "src/app/services/decomposed/files.service";
 import * as toastr from "toastr";
@@ -21,10 +22,14 @@ export class GlobusUploadComponent implements OnInit {
 
   permissionStatus: 'enabled' | 'disabled' | 'loading' = 'loading';
   globusPermissions: any = null;
+  profileUrl: string = null;
 
   constructor(
-    private filesService: FilesService
-  ) {}
+    private filesService: FilesService,
+    private configService: ConfigurationService
+  ) {
+    this.profileUrl = this.configService.config.auth.profileUrl;
+  }
 
   ngOnInit() {
     this.user$.subscribe((user) => {
@@ -78,7 +83,7 @@ export class GlobusUploadComponent implements OnInit {
     } else {
       const username = this.user?.globus_username;
       if (!username) {
-        toastr.error("Provide Globus username in your profile to activate Globus permission.", "Error");
+        toastr.error("Provide Globus identity in your profile to activate Globus permission.", "Error");
         this.permissionStatus = "disabled";
         return;
       }
