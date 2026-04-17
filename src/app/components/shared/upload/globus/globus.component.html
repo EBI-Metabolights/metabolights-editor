@@ -1,16 +1,13 @@
 <div class="box">
     <div class="columns is-vcentered">
-        <div class="column is-4 has-text-weight-medium">Globus Username</div>
+        <div class="column is-4 has-text-weight-medium">Globus Identity</div>
         <div class="column is-8">
             <span *ngIf="user?.globus_username; else noGlobusUser" class="is-size-5 has-text-grey-dark">
                 {{ user?.globus_username }}
             </span>
             <ng-template #noGlobusUser>
                 <div class="has-text-danger is-flex is-align-items-center">
-                    <mat-icon class="mr-2">warning</mat-icon> No globus username provided.
-                    <mat-icon class="ml-2 has-text-grey"
-                        style="font-size: 18px; width: 18px; height: 18px; cursor: help;"
-                        matTooltip="Globus username should be updated in the profile page. ">help_outline</mat-icon>
+                    <mat-icon class="mr-2">warning</mat-icon> No Globus Identity provided.
                 </div>
             </ng-template>
         </div>
@@ -55,7 +52,9 @@
             <span class="is-size-7">
                 To create a globus account, please visit Globus website
                 <a href="https://www.globusid.org/" target="_blank"
-                    class="has-text-weight-bold">(https://www.globusid.org/)</a>
+                    class="has-text-weight-bold">(https://www.globusid.org/)</a>.
+                Globus identity should be updated in the <a [href]="profileUrl" class="has-text-weight-bold">profile
+                    page</a>.
             </span>
         </div>
     </div>
