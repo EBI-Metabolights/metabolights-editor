@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import Swal from 'sweetalert2';
 import { GeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.state';
 import { FilesService } from 'src/app/services/decomposed/files.service';
+import { ResetFilesState } from 'src/app/ngxs-store/study/files/files.actions';
+import { Identifier, ResetGeneralMetadataState } from 'src/app/ngxs-store/study/general-metadata/general-metadata.actions';
 
 interface UploadFile {
   error: any;
@@ -28,6 +30,7 @@ export class DragAndDropComponent implements OnInit  {
   @Output() uploadComplete = new EventEmitter<UploadFile[]>();
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
+  private store = inject(Store);
 
   files: UploadFile[] = [];
   isDragOver = false;
@@ -95,17 +98,19 @@ export class DragAndDropComponent implements OnInit  {
           Swal.fire('Invalid File', `File "${file.name}" does not contain the study identifier "${this.studyId}" and will be skipped.`, 'error');
           continue;
         }
-        if (this.files.find(f => f.name === file.name && f.size === file.size)) {
-          // Skip duplicates
-          continue;
-        }
-        this.files.push({
+        const existingIndex = this.files.findIndex(f => f.name === file.name);
+        const newUploadFile = {
           file,
           name: file.name,
           size: file.size,
           progress: 0,
           error: undefined
-        });
+        };
+        if (existingIndex > -1) {
+          this.files[existingIndex] = newUploadFile;
+        } else {
+          this.files.push(newUploadFile);
+        }
       }
     }
   }
@@ -118,11 +123,20 @@ export class DragAndDropComponent implements OnInit  {
     this.files.splice(index, 1);
   }
 
-uploadFiles() {
-  if (this.uploading || this.files.length === 0) {
-    return;
-  }
-  this.uploading = true;
+  uploadFiles() {
+    if (this.uploading || this.files.length === 0) {
+      return;
+    }
+    this.uploading = true;
+
+    // Reset targeted NGXS states before upload to ensure UI reflects latest changes on reload
+    // Preserve studyId to avoid breaking subsequent API calls
+    const currentStudyId = this.studyId;
+    this.store.dispatch(new ResetFilesState());
+    this.store.dispatch(new ResetGeneralMetadataState());
+    if (currentStudyId) {
+      this.store.dispatch(new Identifier.Set(currentStudyId));
+    }
 
   // Call prerequisite API once before uploading all files
   this.filesService.createAuditFolder(this.studyId).subscribe({

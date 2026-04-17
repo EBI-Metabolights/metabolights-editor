@@ -235,12 +235,10 @@
               </ul>
               <ul class="nav navbar-nav cnav navbar-right">
                 <li *ngIf="authUser && authUser.firstName">
-                  <a href="{{ metabolightsWebsiteUrl }}/useroptions">{{
-                    authUser.firstName
-                  }}</a>
+                  <a href="{{ metabolightsWebsiteUrl }}/useroptions">My Studies</a>
                 </li>
                 <li *ngIf="!authUser || !authUser.firstName">
-                  <a href="{{ metabolightsWebsiteUrl }}/login">Login</a>
+                  <a href="{{ metabolightsWebsiteUrl }}/login">My Studies</a>
                 </li>
               </ul>
             </span>
@@ -276,13 +274,11 @@
               <ul class="nav navbar-nav cnav navbar-right">
                 <span *ngIf="authUser; else noUser">
                   <li>
-                    <a href="{{ metabolightsWebsiteUrl }}/useroptions">{{
-                      authUser.firstName
-                    }}</a>
+                    <a href="{{ metabolightsWebsiteUrl }}/useroptions">My Studies</a>
                   </li>
                 </span>
                 <ng-template #noUser>
-                  <li><a href="{{ metabolightsWebsiteUrl }}/login">Login</a></li>
+                  <li><a href="{{ metabolightsWebsiteUrl }}/login">My Studies</a></li>
                 </ng-template>
               </ul>
             </span>
