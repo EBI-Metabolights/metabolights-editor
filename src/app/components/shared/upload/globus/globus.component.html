@@ -14,7 +14,7 @@
     </div>
 
     <!-- Toggle Permissions section -->
-    <div class="columns is-vcentered mt-3">
+    <div *ngIf="user?.globus_username" class="columns is-vcentered mt-3">
         <div class="column is-4 has-text-weight-medium">Globus Permission</div>
         <div class="column is-8 is-flex is-align-items-center">
 
@@ -32,13 +32,14 @@
                         <mat-icon style="font-size: 20px; width: 20px; height: 20px;" class="mr-1">
                             {{ permissionStatus === 'enabled' ? 'check_circle' : 'cancel' }}
                         </mat-icon>
-                        {{ permissionStatus === 'enabled' ? 'Activated' : 'Deactivated' }}
+                        {{ studyId }} is {{ permissionStatus === 'enabled' ? 'linked to Globus account' : 'not linked to
+                        Globus account' }}
                     </span>
 
                     <!-- Single Action Button (hidden if no username) -->
                     <button *ngIf="user?.globus_username" (click)="togglePermission()"
                         class="button is-primary is-small is-flex is-align-items-center px-4">
-                        {{ permissionStatus === 'enabled' ? 'Deactivate' : 'Activate' }}
+                        {{ permissionStatus === 'enabled' ? 'Unlink' : 'Link' }}
                     </button>
                 </div>
             </ng-container>
@@ -46,15 +47,15 @@
     </div>
 
     <!-- Help message for missing username -->
-    <div *ngIf="!user?.globus_username" class="py-2 px-3 mt-3 ml-2">
+    <div *ngIf="!user?.globus_username" class="notification is-light py-3 px-4 mt-4">
         <div class="is-flex is-align-items-start">
-            <mat-icon class="mr-2 has-text-info" style="font-size: 18px; width: 18px; height: 18px;">info</mat-icon>
+            <mat-icon class="mr-2 has-text-info" style="font-size: 20px; width: 20px; height: 20px;">info</mat-icon>
             <span class="is-size-7">
-                To create a globus account, please visit Globus website
-                <a href="https://app.globus.org/" target="_blank"
-                    class="has-text-weight-bold">(https://app.globus.org/)</a>.
-                Globus identity should be updated in the <a [href]="profileUrl" class="has-text-weight-bold">profile
-                    page</a>.
+                If you don't have a Globus account, please visit the
+                <a href="https://app.globus.org/" target="_blank" class="has-text-weight-bold">Globus website</a>
+                and create one. <br />
+                If you already have a Globus account, please update your Globus identity on the
+                <a [href]="profileUrl" class="has-text-weight-bold">profile page</a>.
             </span>
         </div>
     </div>
