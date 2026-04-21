@@ -57,7 +57,8 @@
                     <li><strong>Derived Data Files</strong>: Open formats (e.g., .mzML, .nmrML) are highly encouraged.
                     </li>
                     <li><strong>Naming Conventions</strong>: Use only alphanumeric characters, underscores, and dots.
-                      <b>No spaces.</b></li>
+                      <b>No spaces.</b>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -536,7 +537,8 @@
             </div>
 
             <div class="mt-4">
-              <raw-upload [hideNav]="true" [studyId]="newStudy" (next)="currentSubStep = 5" (back)="currentSubStep = 3"></raw-upload>
+              <raw-upload [hideNav]="true" [studyId]="newStudy" (next)="currentSubStep = 5"
+                (back)="currentSubStep = 3"></raw-upload>
             </div>
           </div>
         </div>
@@ -819,7 +821,8 @@
                     </p>
                     <ul class="is-size-7 ml-8 mb-2" style="list-style-type: disc; padding-left: 1rem;">
                       <li>Click <strong>Index Data Files</strong> to sync uploaded raw/derived data into the study.</li>
-                      <li>Click <strong>Synchronise Metadata & Result Files</strong> to read in any uploaded metadata files (or
+                      <li>Click <strong>Synchronise Metadata & Result Files</strong> to read in any uploaded metadata
+                        files (or
                         use the
                         Drag &amp; Drop feature for metadata).</li>
                       <li>Wait for both processes to complete &mdash; status indicators will update automatically.</li>

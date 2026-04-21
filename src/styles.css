@@ -72,27 +72,58 @@
   padding: 30px 30px 80px 30px;
 }
 
-#fixedbutton {
-  height: 40px;
+.sidebar-fixed-button {
+  height: 38px;
+  width: 170px;
   border: solid 1px #d3d3d3;
   background: #ffffff;
-  -webkit-transform: rotate(-90deg);
-  padding-right: 10px;
-  padding-left: 10px;
-  font-weight: 300;
-  line-height: 38px;
-  color: #626262;
+  padding: 0 12px;
+  font-weight: 400;
+  line-height: 36px;
+  color: #555;
   transform: rotate(-90deg);
   -ms-transform: rotate(-90deg);
   -moz-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
   text-align: center;
-  font-size: 17px;
+  font-size: 13px;
   position: fixed;
-  right: -40px;
-  top: 250px;
+  right: -66px;
   font-family: "Roboto", helvetica, arial, sans-serif;
   z-index: 999;
+  cursor: pointer;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 4px 4px 0 0;
 }
+
+.sidebar-fixed-button:hover {
+  right: -60px;
+  background-color: #f8f9fa;
+  color: #000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-fixed-button mat-icon {
+  font-size: 18px;
+}
+
+#fixedbutton {
+  top: 250px;
+}
+
+#guidedsubmissionbutton {
+  top: 600px;
+}
+
+#checklistbutton {
+  top: 425px;
+}
+
 
 .tags .tag {
   margin-bottom: 0.5rem !important;
@@ -997,10 +1028,13 @@ element.style {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.8;
   }
+
   50% {
     transform: scale(1.05);
     opacity: 1;
@@ -1011,19 +1045,24 @@ element.style {
   0% {
     left: -40%;
   }
+
   50% {
     left: 40%;
     width: 60%;
   }
+
   100% {
     left: 100%;
   }
 }
 
 @keyframes fadeInOut {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 1;
   }

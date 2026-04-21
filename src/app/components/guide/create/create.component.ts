@@ -835,7 +835,7 @@ export class CreateComponent implements OnInit {
         const exists = this.contacts.some(c => c.email === this.currentUser.email);
         if (exists) return;
       }
-      
+
       const newContact = {
         firstName: this.currentUser?.firstName || '',
         lastName: this.currentUser?.lastName || '',
@@ -1183,15 +1183,15 @@ export class CreateComponent implements OnInit {
         }
 
         this.isLoading = false;
-        
+
         const selectedCategoryKeys = Object.keys(this.studyAssaySelection).filter(key =>
-           this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
+          this.studyAssaySelection[key] && this.studyAssaySelection[key].length > 0
         );
 
         if (selectedCategoryKeys.length > 1) {
-           this.currentSubStep = 5; // Done (success screen)
+          this.currentSubStep = 5; // Done (success screen)
         } else {
-           this.currentSubStep = 4; // Upload
+          this.currentSubStep = 4; // Upload
         }
       },
       error: (err) => {

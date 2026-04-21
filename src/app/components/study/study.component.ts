@@ -78,7 +78,7 @@ export class StudyComponent implements OnInit, OnDestroy {
   sampleTemplate = "";
   templateConfiguration: any = null;
   mhdAccession: string = null;
-  isReadOnly = true;
+  isReadOnly = false;
   isChecklistPopupOpen = false;
 
   constructor(
@@ -115,16 +115,16 @@ export class StudyComponent implements OnInit, OnDestroy {
       }
     });
     this.studyPermission$.subscribe((value) => {
-        this.studyPermission = value;
-        this.permissions = value;
-        this.isOwner = false;
-        this.obfuscationCode = null
-        if (this.studyPermission) {
-          this.obfuscationCode = this.studyPermission.obfuscationCode;
-          if (this.studyPermission.submitterOfStudy){
-            this.isOwner = true;
-          }
+      this.studyPermission = value;
+      this.permissions = value;
+      this.isOwner = false;
+      this.obfuscationCode = null
+      if (this.studyPermission) {
+        this.obfuscationCode = this.studyPermission.obfuscationCode;
+        if (this.studyPermission.submitterOfStudy) {
+          this.isOwner = true;
         }
+      }
     });
     this.revisionStatus$.subscribe((value) => {
       if (value !== null) {
@@ -259,6 +259,10 @@ export class StudyComponent implements OnInit, OnDestroy {
 
   toggleMessage() {
     this.messageExpanded = !this.messageExpanded;
+  }
+
+  navigateToGuidedSubmission() {
+    this.router.navigate(["guide/info", this.requestedStudy]);
   }
 
   selectCurrentTab(index, tab) {

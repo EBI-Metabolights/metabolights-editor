@@ -2,9 +2,14 @@
 <a [href]="
     'mailto:metabolights-help@ebi.ac.uk?subject=Regarding study - ' +
     requestedStudy
-  " id="fixedbutton"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us
+  " id="fixedbutton" class="sidebar-fixed-button"><mat-icon class="mat-icon material-icons">feedback</mat-icon> Contact us
 </a>
-<mtbls-study-submission-checklist *ngIf="!(loading$ | async)" [isReadOnly]="isReadOnly" [isOpen]="isChecklistPopupOpen"></mtbls-study-submission-checklist>
+<button id="guidedsubmissionbutton" class="sidebar-fixed-button" (click)="navigateToGuidedSubmission()" *ngIf="requestedStudy">
+  <mat-icon class="mat-icon material-icons">view_carousel</mat-icon> Guided submission
+</button>
+
+<mtbls-study-submission-checklist *ngIf="!(loading$ | async)" [isReadOnly]="isReadOnly"
+  [isOpen]="isChecklistPopupOpen"></mtbls-study-submission-checklist>
 <!--main study component container start-->
 <div class="container">
   <div id="status-board" *ngIf="studyError">
@@ -120,11 +125,10 @@
           <div class="control" *ngIf="requestedStudy">
             <div class="tags has-addons">
               <span class="tag is-dark">Accession</span>
-              <span class="tag" 
-                [class.is-primary]="status == 'In Review' || status == 'Private'"
-                [class.is-warning]="status == 'Provisional'"
-                [class.is-success]="status == 'Public'">
-                {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession : requestedStudy }}
+              <span class="tag" [class.is-primary]="status == 'In Review' || status == 'Private'"
+                [class.is-warning]="status == 'Provisional'" [class.is-success]="status == 'Public'">
+                {{ (mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy) ? mhdAccession :
+                requestedStudy }}
               </span>
             </div>
           </div>&emsp;
@@ -141,10 +145,8 @@
           <div class="control" *ngIf="mhdAccession && mhdAccession !== '' && mhdAccession !== requestedStudy">
             <div class="tags has-addons">
               <span class="tag is-dark">MTBLS Accession</span>
-              <span class="tag"
-                [class.is-primary]="status == 'In Review' || status == 'Private'"
-                [class.is-warning]="status == 'Provisional'"
-                [class.is-success]="status == 'Public'">
+              <span class="tag" [class.is-primary]="status == 'In Review' || status == 'Private'"
+                [class.is-warning]="status == 'Provisional'" [class.is-success]="status == 'Public'">
                 {{ requestedStudy }}
               </span>
             </div>
@@ -173,7 +175,7 @@
             </div>
           </span>
         </div>
-      
+
 
         <!--Start of validation label-->
         <!-- <div *ngIf="validationStatus !== null">
@@ -316,9 +318,8 @@
           </div>
         </div>
       </div>
-      <quick-link path="guide/info" icon="view_carousel" text="Guided submission"></quick-link>
-    </span>
-  </div>
+      </span>
+    </div>
 </div>
 <!--main study component container end-->
 <span class="second-bottom-right">

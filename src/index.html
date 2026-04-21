@@ -16,6 +16,7 @@
 
   <link rel="stylesheet"
     href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="https://docbot-64c680.gitdocs.ebi.ac.uk/dist/Chatbot-Modal.css">
   <script type="text/javascript" src="//code.jquery.com/jquery-1.11.3.js"></script>
   <script type="text/javascript" src="//code.jquery.com/ui/1.9.2/jquery-ui.min.js" charset="utf-8"></script>
 
@@ -26,6 +27,7 @@
   <script type="text/javascript" src="assets/aspera/ml-aspera-config.js" charset="utf-8"></script>
   <script type="text/javascript" src="assets/aspera/ml-aspera.js" charset="utf-8"></script>
   <script type="text/javascript" src="assets/aspera/install.js" charset="utf-8"></script>
+  <script src="https://docbot-64c680.gitdocs.ebi.ac.uk/Chatbot-Modal.web.js" type="module"></script>
   <!--google material icon styles-->
   <style>
     .material-symbols-outlined {
@@ -163,6 +165,8 @@
       </div>
     </div>
   </app-root>
+  <docbot-modal selectedteam="metabolights" backendurl="https://ebi.ac.uk/docbot/api"
+    enableselector="false"></docbot-modal>
 </body>
 
 </html>
