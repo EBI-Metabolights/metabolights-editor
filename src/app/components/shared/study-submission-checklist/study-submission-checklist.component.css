@@ -1,27 +1,6 @@
-#checklistbutton {
-  height: 40px;
-  border: solid 1px #d3d3d3;
-  background: #ffffff;
-  padding-right: 10px;
-  padding-left: 10px;
-  font-weight: 300;
-  line-height: 38px;
-  color: #626262;
-  transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  -moz-transform: rotate(-90deg);
-  -webkit-transform: rotate(-90deg);
-  text-align: center;
-  font-size: 17px;
-  position: fixed;
-      right: -57px;
-    top: 400px;
-  font-family: "Roboto", helvetica, arial, sans-serif;
-  z-index: 999;
-  cursor: pointer;
-}
-
+/* Sidebar buttons are now handled globally in styles.css */
 .checklist-popup-overlay {
+
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.2);
