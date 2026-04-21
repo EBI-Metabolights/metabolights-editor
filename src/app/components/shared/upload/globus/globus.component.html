@@ -32,13 +32,13 @@
                         <mat-icon style="font-size: 20px; width: 20px; height: 20px;" class="mr-1">
                             {{ permissionStatus === 'enabled' ? 'check_circle' : 'cancel' }}
                         </mat-icon>
-                        {{ permissionStatus === 'enabled' ? 'Activated' : 'Deactivated' }}
+                        {{ permissionStatus === 'enabled' ? 'Linked to MetaboLights' : 'Not Linked to MetaboLights' }}
                     </span>
 
                     <!-- Single Action Button (hidden if no username) -->
                     <button *ngIf="user?.globus_username" (click)="togglePermission()"
                         class="button is-primary is-small is-flex is-align-items-center px-4">
-                        {{ permissionStatus === 'enabled' ? 'Deactivate' : 'Activate' }}
+                        {{ permissionStatus === 'enabled' ? 'Unlink' : 'Link' }}
                     </button>
                 </div>
             </ng-container>
