@@ -2,18 +2,6 @@ import { BaseOverride, FullOverride, ValidationHistoryRecord, Ws3ValidationRepor
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types"
 import { ValidationTask } from "./validation.state"
 
-
-export namespace EditorValidationRules {
-    export class Get {
-        static readonly type = '[validation] Get Validation Rules'
-        constructor() {}
-    }
-    export class Set {
-        static readonly type = '[validation] Set Validation Rules'
-        constructor(public rules: any) {}
-    }
-}
-
 export namespace ValidationReport {
 
     export class Refresh {

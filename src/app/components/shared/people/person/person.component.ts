@@ -22,7 +22,6 @@ import { OntologyComponent } from "../../ontology/ontology.component";
 import { Observable, of, Subscription } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import {Store } from "@ngxs/store";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { People } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 import { MTBLSComment } from "src/app/models/mtbl/mtbls/common/mtbls-comment";
@@ -58,7 +57,6 @@ export class PersonComponent implements OnInit {
   
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studySubmitters$: Observable<any[]> = inject(Store).select(state => state.general?.submitters);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   
@@ -73,7 +71,7 @@ export class PersonComponent implements OnInit {
   );
 
   isReadOnly = false;
-  validations: any = {};
+  fieldValidations: Record<string, any> = {};
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
   defaultControlListName = "Study Person Roles";
   requestedStudy: string = null;
@@ -93,7 +91,6 @@ export class PersonComponent implements OnInit {
 
   options: string[] = ["One", "Two", "Three"];
   private legacyControlLists: Record<string, any[]> | null = null;
-  validationsId = "people.person";
   showError = false;
 
   
@@ -124,10 +121,6 @@ export class PersonComponent implements OnInit {
 
   setUpSubscriptionsNgxs() {
     this.toastrSettings$.subscribe((value) => {this.toastrSettings = value})
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
-      this.cdr.markForCheck();
-    });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         if (value) {
@@ -144,12 +137,15 @@ export class PersonComponent implements OnInit {
        
         this.studyCategory$.subscribe((value) => {
           this.studyCategory = value as StudyCategoryStr;
+          this.refreshFieldValidations();
         });
         this.templateVersion$.subscribe((value) => {
           this.templateVersion = value;
+          this.refreshFieldValidations();
         });
         this.studyCreatedAt$.subscribe((value) => {
           this.studyCreatedAt = value;
+          this.refreshFieldValidations();
         });
         this.studySubmitters$.subscribe((value) => {
           this.studySubmitters = value || [];
@@ -188,6 +184,7 @@ export class PersonComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.refreshFieldValidations();
     if (this.person == null) {
       this.addNewPerson = true;
     }
@@ -459,21 +456,58 @@ export class PersonComponent implements OnInit {
     });
   }
 
-  get validation() {
-    if (!this.validations) {
-      return {};
-    }
-    if (this.validationsId.includes(".")) {
-      const arr = this.validationsId.split(".");
-      let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
-      return tempValidations;
-    }
-    return this.validations ? this.validations[this.validationsId] : {};
+  private getFieldName(fieldId: string): string {
+    const fieldMapping = {
+      lastName: "Study Person Last Name",
+      firstName: "Study Person First Name",
+      midInitials: "Study Person Mid Initials",
+      email: "Study Person Email",
+      phone: "Study Person Phone",
+      fax: "Study Person Fax",
+      address: "Study Person Address",
+      affiliation: "Study Person Affiliation",
+      roles: "Study Person Roles",
+      orcid: "Study Person ORCID",
+      rorid: "Study Person Affiliation ROR ID",
+      alternativeEmail: "Study Person Alternative Email",
+    };
+
+    return fieldMapping[fieldId] || fieldId;
+  }
+
+  private refreshFieldValidations() {
+    const fieldIds = [
+      "lastName",
+      "firstName",
+      "midInitials",
+      "email",
+      "alternativeEmail",
+      "phone",
+      "fax",
+      "address",
+      "affiliation",
+      "roles",
+      "orcid",
+      "rorid",
+    ];
+
+    this.fieldValidations = fieldIds.reduce((acc, fieldId) => {
+      acc[fieldId] = this.editorService.getInvestigationFieldValidation(this.getFieldName(fieldId), {
+        studyCategory: this.studyCategory,
+        studyCreatedAt: this.studyCreatedAt,
+        templateVersion: this.templateVersion,
+      });
+      return acc;
+    }, {} as Record<string, any>);
+    this.cdr.markForCheck();
   }
 
   fieldValidation(fieldId) {
-    return this.validation[fieldId];
+    return this.fieldValidations[fieldId] || this.editorService.getInvestigationFieldValidation(this.getFieldName(fieldId), {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      templateVersion: this.templateVersion,
+    });
   }
  isFieldRequired(fieldId: string): boolean {
   const fieldValidation = this.fieldValidation(fieldId);
@@ -903,22 +937,7 @@ private markRequiredFieldsAsTouched(): void {
   }
 
   getFieldMetadata(fieldId: string) {
-    const fieldMapping = {
-      'lastName': 'Study Person Last Name',
-      'firstName': 'Study Person First Name',
-      'midInitials': 'Study Person Mid Initials',
-      'email': 'Study Person Email',
-      'phone': 'Study Person Phone',
-      'fax': 'Study Person Fax',
-      'address': 'Study Person Address',
-      'affiliation': 'Study Person Affiliation',
-      'roles': 'Study Person Roles',
-      'orcid': 'Study Person ORCID',
-      'rorid': 'Study Person Affiliation ROR ID',
-      'alternativeEmail': 'Study Person Alternative Email'
-    };
-    const fieldName = fieldMapping[fieldId] || fieldId;
-    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+    return this.fieldValidation(fieldId);
   }
 
   getFieldHint(fieldId: string): string {

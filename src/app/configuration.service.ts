@@ -1,8 +1,7 @@
 import { PlatformLocation } from "@angular/common";
 import { HttpClient, HttpBackend } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Environment } from "src/environment.interface";
-import { environment } from "src/environments/environment";
+import { EditorConfiguration, Environment } from "src/environment.interface";
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -29,7 +28,25 @@ export class ConfigurationService {
       const response = await this.http
         .get(`${this.configPath + "config.json"}`)
         .toPromise();
-      this.configData = response as Environment;
+      const baseConfig = response as Environment;
+      let editorConfiguration = baseConfig.editorConfiguration;
+
+      try {
+        const runtimeResponse = await this.http
+          .get(`${this.configPath + "editor-runtime.json"}`)
+          .toPromise();
+        editorConfiguration = this.mergeEditorConfiguration(
+          editorConfiguration,
+          runtimeResponse as EditorConfiguration
+        );
+      } catch (runtimeConfigError) {
+        // Optional tracked editor configuration; continue with base config when absent.
+      }
+
+      this.configData = {
+        ...baseConfig,
+        ...(editorConfiguration ? { editorConfiguration } : {})
+      };
       this.configLoadedSubject.next(true)
     } catch (err) {
       return Promise.reject(err);
@@ -38,5 +55,23 @@ export class ConfigurationService {
 
   get config(): Environment | undefined {
     return this.configData;
+  }
+
+  private mergeEditorConfiguration(
+    currentConfig?: EditorConfiguration,
+    incomingConfig?: EditorConfiguration
+  ): EditorConfiguration | undefined {
+    if (!incomingConfig) {
+      return currentConfig;
+    }
+
+    return {
+      ...currentConfig,
+      ...incomingConfig,
+      upload: {
+        ...(currentConfig?.upload || {}),
+        ...(incomingConfig?.upload || {})
+      }
+    };
   }
 }

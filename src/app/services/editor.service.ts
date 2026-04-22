@@ -15,27 +15,25 @@ import { Observable, of, asapScheduler, firstValueFrom } from "rxjs";
 import { PlatformLocation } from "@angular/common";
 import { Ontology } from "../models/mtbl/mtbls/common/mtbls-ontology";
 import { Store } from "@ngxs/store";
-import { Loading, SetLoadingInfo } from "../ngxs-store/non-study/transitions/transitions.actions";
+import { Loading } from "../ngxs-store/non-study/transitions/transitions.actions";
 import { Owner, User } from "../ngxs-store/non-study/user/user.actions";
 import { GetGeneralMetadata, Identifier, ResetGeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.actions";
 import { GeneralMetadataState } from "../ngxs-store/study/general-metadata/general-metadata.state";
 import { AssayState } from "../ngxs-store/study/assay/assay.state";
 import { FilesState } from "../ngxs-store/study/files/files.state";
 import { IStudyFiles } from "../models/mtbl/mtbls/interfaces/study-files.interface";
-import { ValidationState } from "../ngxs-store/study/validation/validation.state";
 import { BackendVersion, BannerMessage, DefaultControlLists, EditorVersion, MaintenanceMode, SetProtocolExpand } from "../ngxs-store/non-study/application/application.actions";
 import { ApplicationState } from "../ngxs-store/non-study/application/application.state";
 import { SampleState } from "../ngxs-store/study/samples/samples.state";
 import { MAFState } from "../ngxs-store/study/maf/maf.state";
-import { EditorValidationRules, ResetValidationState } from "../ngxs-store/study/validation/validation.actions";
+import { ResetValidationState } from "../ngxs-store/study/validation/validation.actions";
 import { Operations, ResetFilesState } from "../ngxs-store/study/files/files.actions";
 import { ResetAssayState } from "../ngxs-store/study/assay/assay.actions";
 import { ResetSamplesState, Samples } from "../ngxs-store/study/samples/samples.actions";
-import { ValidationService } from "./decomposed/validation.service";
 import { ResetDescriptorsState } from "../ngxs-store/study/descriptors/descriptors.action";
 import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
-import { getValidationRuleForField, MetabolightsFieldControls, IsaTabFileType } from "../models/mtbl/mtbls/control-list";
+import { FieldValueValidation, getValidationRuleForField, IsaTabFileType, MetabolightsFieldControls, ValidationRuleSelectionInput } from "../models/mtbl/mtbls/control-list";
 import { KeycloakService } from "keycloak-angular";
 import { shouldSkipDefaultControlListsForPath } from "../utils/default-control-lists-route.util";
 
@@ -56,6 +54,503 @@ export function disambiguateUserObj(user) {
   return user.owner ? user.owner.apiToken : user.apiToken;
 }
 
+type EditorValidationRuleDefinition = {
+  condition: "min" | "pattern" | "array_min" | "required";
+  value: number | string;
+  error: string;
+  type?: string;
+};
+
+type EditorValidationDefinition = {
+  label?: string;
+  description?: string;
+  placeholder?: string;
+  "is-required"?: string;
+  "recommended-ontologies"?: {
+    "is-forced-ontology": string;
+    ontology: {
+      url: string;
+      allowFreeText: boolean;
+    };
+  };
+  rules: EditorValidationRuleDefinition[];
+};
+
+type InvestigationFieldContext = {
+  assayTemplate?: string | null;
+  protocolName?: string | null;
+  sampleTemplate?: string | null;
+  studyCategory?: string | null;
+  studyCreatedAt?: string | Date | null;
+  templateVersion?: string | null;
+};
+
+const DEFAULT_PROTOCOL_TITLES = [
+  "Sample collection",
+  "Extraction",
+  "Chromatography",
+  "Mass spectrometry",
+  "NMR sample",
+  "NMR spectroscopy",
+  "NMR assay",
+  "Data transformation",
+  "Metabolite identification",
+];
+
+const INVESTIGATION_FIELD_OVERRIDES: Record<string, Partial<EditorValidationDefinition>> = {
+  "Study Title": {
+    description: "A title for the Study. Please use the same title as the first publication",
+    placeholder: "Example: Metabolic study of Diabetes in Homo sapiens...",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 25,
+        error: "Study title must be at least 25 characters long. Please use the same title as the first publication.",
+        type: "string",
+      },
+    ],
+  },
+  "Study Description": {
+    description: "A brief description of the study aims. Please use the abstract of the publication",
+    placeholder: "Please provide a description of your experiment, why not use the abstract of your paper",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 200,
+        error: "Study description must be at least 200 characters long. Please use the abstract of the publication.",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Last Name": {
+    label: "Last Name",
+    description: "The last name/surname of the contact. e.g. Smith",
+    placeholder: "Doe",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 2,
+        error: "The last name/surname of the contact. This should be a minimum of 2 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person First Name": {
+    label: "First Name",
+    description: "The first name of the contact. e.g. Emma",
+    placeholder: "Joe",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 2,
+        error: "The first name of the contact. This should be a minimum of 2 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Mid Initials": {
+    label: "Middle Initials",
+    description: "The middle names or initials of the contact. e.g. Anna, A.",
+    placeholder: "M.",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "min",
+        value: 1,
+        error: "The middle names or initials of the contact. This should be a minimum of 1 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Roles": {
+    label: "Roles",
+    description: "The role of the contact in this Study.",
+    placeholder: "Primary investigator",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "array_min",
+        value: 1,
+        error: "Please provide a role for this contact.",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person ORCID": {
+    label: "ORCID",
+    description: "The ORCID identifier for this contact e.g. 0000-0001-8604-1732",
+    placeholder: "ORCID",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "pattern",
+        value: "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[X0-9]$",
+        error: "Please provide a valid ORCID for the contact. Format: '0000-0001-8604-1732'",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Email": {
+    label: "Email",
+    description: "The (primary) email for this contact. e.g. emma.smith@university.ac.uk",
+    placeholder: "joe.doe@gmail.com, joe.doe@university.ac.uk",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "pattern",
+        value: "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$",
+        error: "Please provide a valid email address for the contact. eg:'name@something.somewhere'",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Alternative Email": {
+    label: "Alternative Email",
+    description: "The alternative email for this contact. e.g. emma.smith@gmail.com",
+    placeholder: "joe.doe@gmail.com, joe.doe@university.ac.uk",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "pattern",
+        value: "^(([^<>()\\[\\]\\\\.,;:\\s@\\\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\\\"]+)*)|(\\\".+\\\"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$",
+        error: "Please provide a valid email address for the contact. eg:'name@something.somewhere'",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Phone": {
+    label: "Phone",
+    description: "An international phone number for this contact, if available.",
+    placeholder: "+44 01223 494400, +1-202-555-0130",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "min",
+        value: 10,
+        error: "Please provide an international phone number for this contact. This should be a minimum of 10 numbers long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Fax": {
+    label: "Fax",
+    description: "A fax number for this contact, if available.",
+    placeholder: "+44 01223 494444, +1-202-555-0130",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "min",
+        value: 10,
+        error: "Please provide an international Fax number for this contact. This should be a minimum of 10 numbers long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Address": {
+    label: "Address",
+    description: "The (primary) address for this contact. e.g. 12 Street, Place, Postcode, Country",
+    placeholder: "12 Street, Place, postcode, Country",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "min",
+        value: 30,
+        error: "Please provide a primary address for this contact. This should be a minimum of 30 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Affiliation": {
+    label: "Affiliation",
+    description: "The (primary) affiliation, institution or organisation for this contact. e.g. European Bioinformatics Institute",
+    placeholder: "Institute or Company Name",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "min",
+        value: 10,
+        error: "Please provide an institutional affiliation for this contact. This should be a minimum of 10 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Person Affiliation ROR ID": {
+    label: "ROR ID",
+    description: "The ROR identifier of affiliation for this contact e.g. https://ror.org/02catss52",
+    placeholder: "eg: https://ror.org/02catss52",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "pattern",
+        value: "^(https:\\/\\/ror\\.org\\/[0-9a-z]{9}|https:\\/\\/www\\.wikidata\\.org\\/wiki\\/Q[1-9][0-9]{0,19})$",
+        error: "Please provide a valid affiliation Research Organization Registry (ROR) Id. Format: 'https://ror.org/02catss52'",
+        type: "string",
+      },
+    ],
+  },
+  "Study Publication Title": {
+    label: "Publication Title",
+    description: "The title of the publication",
+    placeholder: "The multifunctional enzyme ....",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 20,
+        error: "Please provide the (tentative) title of your publication. This should be a minimum of 20 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Publication Author List": {
+    label: "Author List",
+    description: "The authors who contributed to this publication. As appears in the publication, do not include affiliation",
+    placeholder: "Joe Doe, Jane Doe,....",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "min",
+        value: 10,
+        error: "Please provide a list of authors, separated by commas. As appears in the publication, do not include affiliation",
+        type: "string",
+      },
+    ],
+  },
+  "Study Publication DOI": {
+    label: "Publication DOI",
+    description: "The DOI related to this publication if available (eg. 10.1111/111111)",
+    placeholder: "10.1105/tpc.109.066670",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "pattern",
+        value: "^10[.].+/.+$",
+        error: "Please only provide the DOI, not the URL/http address",
+        type: "string",
+      },
+    ],
+  },
+  "Study PubMed ID": {
+    label: "PubMed ID",
+    description: "The PubMed ID related to this publication if available (eg.18181111)",
+    placeholder: "19567706",
+    "is-required": "false",
+    rules: [
+      {
+        condition: "pattern",
+        value: "^[1-9]([0-9]{1,8})?$",
+        error: "Please only provide the id number, not prefixed with PMID:",
+        type: "integer",
+      },
+    ],
+  },
+  "Study Publication Status": {
+    label: "Publication Status",
+    description: "The status of this publication (e.g. published, in preparation)",
+    placeholder: "in preparation, published, etc",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "array_min",
+        value: 1,
+        error: "Please provide the publication status of your publication.",
+        type: "string",
+      },
+    ],
+  },
+  "Study Protocol Name": {
+    label: "Protocol Name",
+    description: "The descriptive name of the protocol.",
+    placeholder: "Protocol name",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 8,
+        error: "Please provide the name of your protocol. This should be a minimum of 8 characters long",
+        type: "string",
+      },
+    ],
+  },
+  "Study Protocol Description": {
+    label: "Protocol Description",
+    description: "A brief description of the protocol. Please use the protocol reported in the publication",
+    placeholder: "Protocol description",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "min",
+        value: 40,
+        error: "Study protocol description should be at least 40 characters long. Please use the protocol reported in the publication",
+        type: "string",
+      },
+    ],
+  },
+  "Study Protocol URI": {
+    label: "Protocol URI",
+    description: "The URI for the protocol if available.",
+    placeholder: "https://...",
+    "is-required": "false",
+    rules: [],
+  },
+  "Study Protocol Version": {
+    label: "Protocol Version",
+    description: "The version of the protocol if available.",
+    placeholder: "1.0",
+    "is-required": "false",
+    rules: [],
+  },
+  "Study Protocol Parameter Name": {
+    label: "Protocol Parameter Name",
+    description: "Add a parameter name for this protocol.",
+    placeholder: "Post Extraction / Derivatization",
+    "is-required": "true",
+    rules: [
+      {
+        condition: "array_min",
+        value: 1,
+        error: "Please provide a protocol parameter name.",
+        type: "string",
+      },
+    ],
+  },
+};
+
+const LEGACY_UI_FIELD_OVERRIDES: Record<string, Record<string, any>> = {
+  "__root__": {
+    studyDesignDescriptors: {
+      label: "Study Design Descriptors",
+      "is-required": "true",
+      description:
+        "Add keywords describing study design, biological context, analytical approach e.g., Celiac disease, ultra-performance liquid chromatography-mass spectrometry, targeted or untargeted metabolites",
+      placeholder: "Metabolomics, Lipidomics",
+      rules: [
+        {
+          condition: "min",
+          value: 5,
+          error:
+            "Please provide a valid ontology term for the factor. This should be a minimum of 5 characters long",
+          type: "string",
+        },
+      ],
+      "recommended-ontologies": {
+        "is-forced-ontology": "false",
+        ontology: {
+          url: "/ebi-internal/ontology?branch=Study%20Design%20Type&term=",
+          allowFreeText: true,
+        },
+      },
+    },
+    assayDesignDescriptors: {
+      label: "Assay Design Descriptors",
+      "is-required": "false",
+      description:
+        "Add keywords describing assay design, instrument settings, analysis approach e.g., data-independent acquisition, collision-induced dissociation, ion mobility, profile spectrum",
+      placeholder: "Metabolomics, Lipidomics",
+      rules: [
+        {
+          condition: "min",
+          value: 5,
+          error:
+            "Please provide a valid ontology term for the factor. This should be a minimum of 5 characters long",
+          type: "string",
+        },
+      ],
+      "recommended-ontologies": {
+        "is-forced-ontology": "false",
+        ontology: {
+          url: "/ebi-internal/ontology?branch=Study%20Design%20Type&term=",
+          allowFreeText: true,
+        },
+      },
+    },
+  },
+  "factors.factor": {
+    "Study Factor Name": {
+      label: "Factor Name",
+      "is-required": "false",
+      description:
+        "The name of the Factor driving this study, e.g. (Factor name: BMI and factor type: EFO:body mass index), (Factor name: Biological replicate, Factor type EFO:biological replicate) so forth",
+      placeholder: "Dose, Genotype, Collection time point",
+      rules: [
+        {
+          condition: "min",
+          value: 5,
+          error:
+            "Please provide an descrition of the factor. This should be a minimum of 5 characters long",
+          type: "string",
+        },
+      ],
+    },
+    "Study Factor Type": {
+      label: "Factor Type",
+      "is-required": "true",
+      description:
+        "The type of the Factor driving this study, e.g. EFO:Dose (from Ontology), etc.",
+      placeholder: "EFO:Dose",
+      rules: [
+        {
+          condition: "min",
+          value: 5,
+          error:
+            "Please provide a valid ontology term for the factor. This should be a minimum of 5 characters long",
+          type: "string",
+        },
+      ],
+      "recommended-ontologies": {
+        "is-forced-ontology": "false",
+        ontology: {
+          url: "/ebi-internal/ontology?branch=Study%20Factor%20Type&term=",
+          allowFreeText: true,
+        },
+      },
+    },
+  },
+  samples: {
+    category: {
+      label: "Characteristic",
+      "is-required": "true",
+      description:
+        "Characteristic category type other than Organism, Organism part, Variant and Sample type. ",
+      placeholder: "Example: Organism, Organism part, Variant",
+      rules: [],
+      "recommended-ontologies": {
+        "is-forced-ontology": "false",
+        ontology: {
+          url: "/ebi-internal/ontology?branch=Characteristics&term=",
+          allowFreeText: true,
+        },
+      },
+    },
+    unit: {
+      label: "Add unit (if applicable)",
+      "is-required": "false",
+      description: "Example: hour, percent, microliter etc.",
+      placeholder: "hour, percent, UO:microliter etc.",
+      rules: [],
+      "recommended-ontologies": {
+        "is-forced-ontology": "false",
+        ontology: {
+          url: "/ebi-internal/ontology?branch=unit&term=",
+          allowFreeText: true,
+        },
+      },
+    },
+    samples: {
+      label: "New sample names",
+      "is-required": "true",
+      description:
+        "Please add sample names one per each line or add coma separated values",
+      placeholder: "Sample1, Sample2 ...",
+      rules: [],
+    },
+  },
+};
+
 @Injectable({
   providedIn: "root",
 })
@@ -63,7 +558,6 @@ export class EditorService {
 
   studyIdentifier$: Observable<string> = this.store.select(GeneralMetadataState.id);
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   controlLists$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.controlLists);
 
   assays$: Observable<Record<string, any>> = inject(Store).select(AssayState.assays);
@@ -82,7 +576,6 @@ export class EditorService {
   private _redirectUrl = "";
 
   currentStudyIdentifier: string = null;
-  validations: any = {};
   defaultControlLists: any = {};
   files: any = [];
   samples_columns_order: any = {
@@ -106,7 +599,6 @@ export class EditorService {
     private router: Router,
     private authService: AuthService,
     private dataService: MetabolightsService,
-    private validationService: ValidationService, // this is an antipattern, dont repeat
     public configService: ConfigurationService,
     private platformLocation: PlatformLocation,
     private http: HttpClient,
@@ -178,9 +670,6 @@ export class EditorService {
     this.toastrSettings$.subscribe((settings) => { this.toastrSettings = settings });
     this.studyIdentifier$.subscribe((value) => {
       this.currentStudyIdentifier = value;
-    });
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
     });
     this.studyFiles$.subscribe((value) => {
       this.files = value;
@@ -501,8 +990,6 @@ export class EditorService {
     this.store.dispatch(new MaintenanceMode.Get());
     void this.loadDefaultControlLists();
     this.store.dispatch(new User.Studies.Set(null))
-
-    this.loadValidations();
     return false;
 
   }
@@ -534,30 +1021,6 @@ export class EditorService {
       location
     );
   }
-
-
-  /**
-   * This method circumvents the state, but it is wired closely to app init and didn't want
-   * anything to break.
-   * @returns
-   */
-  loadValidations() {
-    if (this.validations) {
-      return;
-    }
-
-    this.validationService.getValidationRules().subscribe({
-      next: (validations) => {
-        this.store.dispatch(new SetLoadingInfo("Loading study validations"))
-        this.store.dispatch(new EditorValidationRules.Set(validations))
-      },
-      error: (err) => {
-        console.log(err);
-      }
-    }
-    );
-  }
-
   loadStudyId(id) {
     if (id === null) {
       if (isDevMode()) console.trace();
@@ -980,6 +1443,335 @@ export class EditorService {
       })
     );
   }
+
+  private cloneValidationRules(rules: EditorValidationRuleDefinition[] = []): EditorValidationRuleDefinition[] {
+    return rules.map((rule) => ({ ...rule }));
+  }
+
+  private cloneValidationDefinition(validation?: Partial<EditorValidationDefinition> | null): EditorValidationDefinition {
+    return {
+      label: validation?.label || "",
+      description: validation?.description || "",
+      placeholder: validation?.placeholder || "",
+      "is-required": validation?.["is-required"] || "false",
+      "recommended-ontologies": validation?.["recommended-ontologies"]
+        ? JSON.parse(JSON.stringify(validation["recommended-ontologies"]))
+        : undefined,
+      rules: this.cloneValidationRules(validation?.rules || []),
+    };
+  }
+
+  private normalizeLookupKey(value: string | null | undefined): string {
+    return (value || "").replace(/[^a-z0-9]/gi, "").toLowerCase();
+  }
+
+  private resolveTemplateVersion(templateVersion?: string | null): string | null {
+    const templateConfiguration = this.store.selectSnapshot(ApplicationState.templateConfiguration) as any;
+    return (
+      templateVersion ||
+      this.store.selectSnapshot(GeneralMetadataState.templateVersion) ||
+      templateConfiguration?.defaultTemplateVersion ||
+      null
+    );
+  }
+
+  private getInvestigationSelectionInput(context: InvestigationFieldContext = {}): ValidationRuleSelectionInput {
+    const studyCreatedAt = context.studyCreatedAt
+      ? new Date(context.studyCreatedAt)
+      : null;
+
+    return {
+      studyCategory: (context.studyCategory as any) || null,
+      studyCreatedAt,
+      isaFileType: "investigation",
+      isaFileTemplateName: null,
+      templateVersion: this.resolveTemplateVersion(context.templateVersion),
+    };
+  }
+
+  private getControlMapKey(fileType: IsaTabFileType): "assayFileControls" | "sampleFileControls" | "investigationFileControls" | "assignmentFileControls" {
+    switch (fileType) {
+      case "assay":
+        return "assayFileControls";
+      case "sample":
+        return "sampleFileControls";
+      case "investigation":
+        return "investigationFileControls";
+      case "maf":
+      default:
+        return "assignmentFileControls";
+    }
+  }
+
+  private getFieldCandidates(fieldName: string): string[] {
+    const formattedFieldName = (fieldName || "").replace(/\.[0-9]+$/, "").trim();
+    let innerName = formattedFieldName;
+    const match = formattedFieldName.match(/\[(.*?)\]/);
+    if (match) {
+      innerName = match[1]?.trim() || formattedFieldName;
+    }
+
+    return Array.from(
+      new Set(
+        [fieldName, formattedFieldName, innerName]
+          .map((candidate) => (candidate || "").trim())
+          .filter((candidate) => candidate.length > 0)
+      )
+    );
+  }
+
+  private getFileSelectionInput(
+    fileType: IsaTabFileType,
+    templateName?: string | null,
+    context: InvestigationFieldContext = {}
+  ): ValidationRuleSelectionInput {
+    const resolvedTemplateName =
+      templateName ||
+      (fileType === "sample"
+        ? context.sampleTemplate || this.store.selectSnapshot(GeneralMetadataState.sampleTemplate)
+        : context.assayTemplate || null);
+
+    return {
+      studyCategory: (context.studyCategory as any) || null,
+      studyCreatedAt: context.studyCreatedAt ? new Date(context.studyCreatedAt) : null,
+      isaFileType: fileType,
+      isaFileTemplateName: resolvedTemplateName,
+      templateVersion: this.resolveTemplateVersion(context.templateVersion),
+    };
+  }
+
+  getFieldControlRule(
+    fieldName: string,
+    fileType: IsaTabFileType,
+    templateName?: string | null,
+    context: InvestigationFieldContext = {}
+  ): FieldValueValidation | null {
+    const controlLists = this.store.selectSnapshot(ApplicationState.controlLists);
+    const controlMapKey = this.getControlMapKey(fileType);
+    const controlMap = controlLists?.controls?.[controlMapKey] || {};
+
+    if (!controlLists?.controls) {
+      return null;
+    }
+
+    const selectionInput = this.getFileSelectionInput(fileType, templateName, context);
+    const candidates = this.getFieldCandidates(fieldName);
+
+    try {
+      for (const candidate of candidates) {
+        const rule = getValidationRuleForField(
+          { controlLists } as MetabolightsFieldControls,
+          candidate,
+          selectionInput
+        );
+        if (rule) {
+          return rule;
+        }
+      }
+    } catch (error) {
+      console.warn(`Unable to resolve ${fileType} control rule for ${fieldName}`, error);
+    }
+
+    for (const candidate of candidates) {
+      const rules = controlMap?.[candidate];
+      if (Array.isArray(rules) && rules.length > 0) {
+        return rules[0];
+      }
+    }
+
+    return null;
+  }
+
+  getFieldValidation(
+    fieldName: string,
+    fileType: IsaTabFileType,
+    templateName?: string | null,
+    context: InvestigationFieldContext = {},
+    fallbackToLegacyStore: boolean = false,
+    validationsId?: string
+  ): EditorValidationDefinition {
+    const metadata =
+      this.getFieldMetadata(
+        fieldName,
+        fileType,
+        templateName,
+        validationsId,
+        fallbackToLegacyStore
+      ) || {};
+    const rule = this.getFieldControlRule(fieldName, fileType, templateName, context);
+
+    const validation = this.cloneValidationDefinition({
+      label: metadata.label || metadata.columnHeader || metadata.fieldName || fieldName,
+      description: metadata.combinedDescription || metadata.description || "",
+      placeholder: metadata.placeholder || metadata.columnHeader || metadata.fieldName || fieldName,
+      "recommended-ontologies": metadata["recommended-ontologies"],
+      "is-required":
+        metadata.required === true || rule?.termEnforcementLevel === "required"
+          ? "true"
+          : "false",
+      rules: Array.isArray(metadata.rules) ? metadata.rules : [],
+    });
+
+    if (rule) {
+      validation["recommended-ontologies"] = this.buildOntologyValidationConfig(fieldName, rule);
+    }
+
+    return validation;
+  }
+
+  private getInvestigationControlRule(fieldName: string, context: InvestigationFieldContext = {}): FieldValueValidation | null {
+    const controlLists = this.store.selectSnapshot(ApplicationState.controlLists);
+    if (!controlLists?.controls) {
+      return null;
+    }
+
+    try {
+      return getValidationRuleForField(
+        { controlLists } as MetabolightsFieldControls,
+        fieldName,
+        this.getInvestigationSelectionInput(context)
+      );
+    } catch (error) {
+      console.warn(`Unable to resolve investigation control rule for ${fieldName}`, error);
+      return null;
+    }
+  }
+
+  private buildOntologyValidationConfig(fieldName: string, controlRule: FieldValueValidation | null) {
+    if (!controlRule) {
+      return undefined;
+    }
+
+    const forcedOntology = controlRule.termEnforcementLevel === "required";
+    const branchUrl = controlRule.validationType === "selected-ontology-term"
+      ? `/ebi-internal/ontology?branch=${encodeURIComponent(fieldName)}&term=`
+      : "/ebi-internal/ontology?term=";
+
+    return {
+      "is-forced-ontology": forcedOntology ? "true" : "false",
+      ontology: {
+        url: branchUrl,
+        allowFreeText: !forcedOntology,
+      },
+    };
+  }
+
+  private getProtocolTemplates(): Record<string, any[]> {
+    return ((this.store.selectSnapshot(ApplicationState.protocolTemplates) as unknown) as Record<string, any[]>) || {};
+  }
+
+  private resolveProtocolTemplateKeys(assayTemplate?: string | null): string[] {
+    const protocolTemplates = this.getProtocolTemplates();
+    const keys = Object.keys(protocolTemplates);
+
+    if (!assayTemplate) {
+      return keys;
+    }
+
+    const normalizedTemplate = this.normalizeLookupKey(assayTemplate);
+    const matchingKey = keys.find((key) => this.normalizeLookupKey(key) === normalizedTemplate);
+
+    return matchingKey ? [matchingKey] : keys;
+  }
+
+  private getProtocolTemplateDefinition(templateName: string): any | null {
+    const protocolTemplates = this.getProtocolTemplates();
+    const templates = protocolTemplates[templateName];
+    if (!Array.isArray(templates) || templates.length === 0) {
+      return null;
+    }
+
+    const templateVersion = this.resolveTemplateVersion();
+    return templates.find((template) => String(template.version) === String(templateVersion)) || templates[0] || null;
+  }
+
+  getDefaultProtocolNames(assayTemplate?: string | null): string[] {
+    const orderedNames: string[] = [];
+    const seen = new Set<string>();
+
+    const pushName = (name: string) => {
+      const normalized = this.normalizeLookupKey(name);
+      if (!normalized || seen.has(normalized)) {
+        return;
+      }
+      seen.add(normalized);
+      orderedNames.push(name);
+    };
+
+    if (assayTemplate) {
+      const templateKey = this.resolveProtocolTemplateKeys(assayTemplate)[0];
+      const template = templateKey ? this.getProtocolTemplateDefinition(templateKey) : null;
+      (template?.protocols || []).forEach((name: string) => pushName(name));
+      if (orderedNames.length > 0) {
+        return orderedNames;
+      }
+    }
+
+    DEFAULT_PROTOCOL_TITLES.forEach((name) => pushName(name));
+    this.resolveProtocolTemplateKeys().forEach((templateKey) => {
+      const template = this.getProtocolTemplateDefinition(templateKey);
+      (template?.protocols || []).forEach((name: string) => pushName(name));
+    });
+
+    return orderedNames;
+  }
+
+  private getProtocolDefinition(protocolName?: string | null, assayTemplate?: string | null): any | null {
+    if (!protocolName) {
+      return null;
+    }
+
+    const normalizedProtocolName = this.normalizeLookupKey(protocolName);
+    for (const templateKey of this.resolveProtocolTemplateKeys(assayTemplate)) {
+      const template = this.getProtocolTemplateDefinition(templateKey);
+      const definitions = template?.protocolDefinitions || {};
+      const matchingKey = Object.keys(definitions).find(
+        (definitionKey) => this.normalizeLookupKey(definitionKey) === normalizedProtocolName
+      );
+
+      if (matchingKey) {
+        return definitions[matchingKey];
+      }
+    }
+
+    return null;
+  }
+
+  getInvestigationFieldValidation(fieldName: string, context: InvestigationFieldContext = {}): EditorValidationDefinition {
+    const override = this.cloneValidationDefinition(INVESTIGATION_FIELD_OVERRIDES[fieldName]);
+    const controlRule = this.getInvestigationControlRule(fieldName, context);
+    const metadata = this.getFieldMetadata(fieldName, "investigation", null, undefined, false) || {};
+    const protocolDefinition = fieldName === "Study Protocol Description"
+      ? this.getProtocolDefinition(context.protocolName, context.assayTemplate)
+      : null;
+
+    const validation = this.cloneValidationDefinition({
+      label: override.label || metadata.label || fieldName,
+      description: protocolDefinition?.description || override.description || metadata.combinedDescription || metadata.description || "",
+      placeholder: override.placeholder || metadata.placeholder || fieldName,
+      "is-required": override["is-required"] || (metadata.required ? "true" : "false"),
+      rules: override.rules || [],
+      "recommended-ontologies": override["recommended-ontologies"],
+    });
+
+    if (controlRule) {
+      validation["recommended-ontologies"] = validation["recommended-ontologies"] || this.buildOntologyValidationConfig(fieldName, controlRule);
+      if (validation["is-required"] !== "true" && controlRule.termEnforcementLevel === "required") {
+        validation["is-required"] = "true";
+      }
+    }
+
+    if (validation.rules.length === 0 && typeof metadata.minLength === "number" && metadata.minLength > 0) {
+      validation.rules.push({
+        condition: "min",
+        value: metadata.minLength,
+        error: `${validation.label || fieldName} must be at least ${metadata.minLength} characters long.`,
+        type: "string",
+      });
+    }
+
+    return validation;
+  }
   /**
    * Fetches field metadata from templateConfiguration, combining description and examples,
    * and capturing other properties like required, columnStructure, etc.
@@ -988,7 +1780,7 @@ export class EditorService {
    * @param fileType The type of file (assay, sample, investigation, maf)
    * @param templateName Optional template name (e.g., assay type or investigation template)
    */
-  getFieldMetadata(fieldName: string, type?: IsaTabFileType, templateName?: string, validationsId?: string) {
+  getFieldMetadata(fieldName: string, type?: IsaTabFileType, templateName?: string, validationsId?: string, fallbackToLegacyStore: boolean = true) {
     const applicationTemplates = this.store.selectSnapshot(ApplicationState.applicationTemplates);
     const config = this.store.selectSnapshot(ApplicationState.templateConfiguration) as any;
     const version = this.store.selectSnapshot(GeneralMetadataState.templateVersion);
@@ -1107,9 +1899,9 @@ export class EditorService {
       }
     }
 
-    // 4. Fallback to validations.json if still not found
-    if (!fieldDef) {
-      fieldDef = this.getValidationDefinitionFromStore(fieldName, validationsId);
+    // 4. Fallback to small frontend legacy definitions if still not found
+    if (!fieldDef && fallbackToLegacyStore) {
+      fieldDef = this.getLegacyUiValidationDefinition(fieldName, validationsId);
     }
 
     if (!fieldDef) return null;
@@ -1158,55 +1950,26 @@ export class EditorService {
     };
   }
 
+  private getLegacyUiFieldDefinition(fieldName: string, validationsId?: string) {
+    const legacySection = validationsId
+      ? LEGACY_UI_FIELD_OVERRIDES[validationsId]
+      : LEGACY_UI_FIELD_OVERRIDES["__root__"];
+
+    if (!legacySection) {
+      return null;
+    }
+
+    return legacySection[fieldName] || null;
+  }
+
   /**
-   * Retrieves validation definition from the store (validations.json)
+   * Retrieves a legacy UI validation definition from the small built-in fallback map.
    * @param fieldName The field name or column header to search for
-   * @param validationsId Optional path in the validations object (e.g., 'assays.assay')
+   * @param validationsId Optional legacy section path (e.g., 'factors.factor')
    * @returns The validation definition if found, null otherwise
    */
-  getValidationDefinitionFromStore(fieldName: string, validationsId?: string) {
-    if (!this.validations) return null;
-    let validationsRoot = this.validations;
-    if (validationsId) {
-      const keys = validationsId.split('.');
-      for (const key of keys) {
-        if (validationsRoot[key]) {
-          validationsRoot = validationsRoot[key];
-        } else {
-          break;
-        }
-      }
-    }
-
-    if (!validationsRoot) return null;
-
-    // If it's a flat object (like 'study'), just return the field if it exists
-    if (validationsRoot[fieldName]) {
-      return validationsRoot[fieldName];
-    }
-
-    // Common column stripping for matching
-    const formatted = fieldName.replace(/\.[0-9]+$/, "");
-    let innerName = formatted;
-    const match = formatted.match(/\[(.*?)\]/);
-    if (match) {
-      innerName = match[1];
-    }
-    const targetHeaders = [fieldName, formatted, innerName].map(h => h.toLowerCase());
-
-    // If it has 'default_order' (like assays.assay), search there
-    if (validationsRoot.default_order && Array.isArray(validationsRoot.default_order)) {
-      return validationsRoot.default_order.find(col => {
-        const entryHeader = (col.header || "").toLowerCase();
-        const entryColDef = (col.columnDef || "").toLowerCase();
-        return targetHeaders.includes(entryHeader) || targetHeaders.includes(entryColDef);
-      });
-    }
-
-    // Recursive search if not found in root or default_order? 
-    // Usually for study.people.person we need the specific path.
-
-    return null;
+  getLegacyUiValidationDefinition(fieldName: string, validationsId?: string) {
+    return this.getLegacyUiFieldDefinition(fieldName, validationsId);
   }
 
 

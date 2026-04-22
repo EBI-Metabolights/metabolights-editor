@@ -13,7 +13,6 @@ import { DatasetLicenseNS, GetGeneralMetadata } from "src/app/ngxs-store/study/g
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from "@angular/forms";
 import { getValidationRuleForField, MetabolightsFieldControls } from 'src/app/models/mtbl/mtbls/control-list';
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { StudyCreation } from "src/app/ngxs-store/non-study/study-creation/study-creation.actions";
 import { StudyCreationState } from "src/app/ngxs-store/non-study/study-creation/study-creation.state";
 import { Operations } from "src/app/ngxs-store/study/files/files.actions";
@@ -39,7 +38,6 @@ export class CreateComponent implements OnInit {
   requestedStudy: string = null;
   title$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
   description$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
   sampleFileHeaderTemplates$: Observable<any> = inject(Store).select(ApplicationState.sampleFileHeaderTemplates);
   controlLists$: Observable<any> = inject(Store).select(ApplicationState.controlLists);
@@ -47,7 +45,6 @@ export class CreateComponent implements OnInit {
   currentUser: Owner = null;
   studyTitle: string = "";
   studyDescription: string = "";
-  validations: any = {};
   templateConfiguration: any = null;
   sampleFileHeaderTemplates: any = null;
   // Study Creation Data
@@ -155,12 +152,6 @@ export class CreateComponent implements OnInit {
         this.initializePrimaryContact();
       }
     });
-    this.store.select(ValidationState.studyRules).subscribe((value) => {
-      if (value) {
-        this.validations = value;
-      }
-    });
-
 
     // Subscribe to sampleFileHeaderTemplates BEFORE templateConfiguration
     // to ensure it's available when initConfiguration calls loadDynamicHeaders
@@ -247,17 +238,36 @@ export class CreateComponent implements OnInit {
     return { ...defaultList, rule, renderAsDropdown, defaultOntologies };
   }
   fieldValidation(fieldPath: string) {
-    if (!this.validations) return {};
-    const parts = fieldPath.split('.');
-    let slice = this.validations;
-    for (const part of parts) {
-      if (slice && slice[part]) {
-        slice = slice[part];
-      } else {
-        return {};
-      }
+    const fieldPathMap = {
+      title: "Study Title",
+      description: "Study Description",
+      "publications.publication.title": "Study Publication Title",
+      "publications.publication.authorlist": "Study Publication Author List",
+      "publications.publication.doi": "Study Publication DOI",
+      "publications.publication.pubmedid": "Study PubMed ID",
+      "publications.publication.status": "Study Publication Status",
+    };
+
+    const fieldName = fieldPathMap[(fieldPath || "").toLowerCase()];
+    if (!fieldName) {
+      return {
+        description: "",
+        placeholder: "",
+        "is-required": "false",
+        rules: [],
+      };
     }
-    return slice;
+
+    return this.editorService.getInvestigationFieldValidation(fieldName, {
+      templateVersion: this.templateConfiguration?.defaultTemplateVersion,
+      studyCreatedAt: new Date(),
+    });
+  }
+
+  private getMinRuleValue(fieldPath: string, fallback: number): number {
+    const validation = this.fieldValidation(fieldPath);
+    const minRule = (validation?.rules || []).find((rule) => rule.condition === "min");
+    return Number(minRule?.value || fallback);
   }
   initConfiguration() {
     if (!this.templateConfiguration) return;
@@ -520,11 +530,13 @@ export class CreateComponent implements OnInit {
 
   // Validation Getters
   get isTitleValid(): boolean {
-    return this.studyTitle && this.studyTitle.trim().length >= 25;
+    const minLength = this.getMinRuleValue("title", 25);
+    return !!(this.studyTitle && this.studyTitle.trim().length >= minLength);
   }
 
   get isDescriptionValid(): boolean {
-    return this.studyDescription && this.studyDescription.trim().length >= 60;
+    const minLength = this.getMinRuleValue("description", 200);
+    return !!(this.studyDescription && this.studyDescription.trim().length >= minLength);
   }
 
   get isDoiRequired(): boolean {
@@ -547,7 +559,7 @@ export class CreateComponent implements OnInit {
     const validation = this.fieldValidation('publications.publication.doi');
     const patternRule = (validation?.rules || []).find(r => r.condition === 'pattern');
     if (patternRule) {
-      const re = new RegExp(patternRule.value, 'i');
+      const re = new RegExp(String(patternRule.value), 'i');
       return re.test(doi);
     }
 
@@ -595,8 +607,8 @@ export class CreateComponent implements OnInit {
       return true;
     });
 
-    const isTitleOk = !!(this.studyTitle && this.studyTitle.trim().length >= 25);
-    const isDescriptionOk = !!(this.studyDescription && this.studyDescription.trim().length >= 60);
+    const isTitleOk = this.isTitleValid;
+    const isDescriptionOk = this.isDescriptionValid;
 
     return isTitleOk && isDescriptionOk && mandatoryCategoriesSatisfied;
   }
@@ -715,7 +727,7 @@ export class CreateComponent implements OnInit {
       isValid: this.isTitleValid,
       isRequired: true,
       section: 2,
-      error: !this.isTitleValid ? "Title must be at least 25 characters" : null
+      error: !this.isTitleValid ? `Title must be at least ${this.getMinRuleValue("title", 25)} characters` : null
     });
 
     items.push({
@@ -724,7 +736,7 @@ export class CreateComponent implements OnInit {
       isValid: this.isDescriptionValid,
       isRequired: true,
       section: 2,
-      error: !this.isDescriptionValid ? "Description must be at least 60 characters" : null
+      error: !this.isDescriptionValid ? `Description must be at least ${this.getMinRuleValue("description", 200)} characters` : null
     });
 
     const activeCategories = this.activeDesignDescriptorCategories || [];

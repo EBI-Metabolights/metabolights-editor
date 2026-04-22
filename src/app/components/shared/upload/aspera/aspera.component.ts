@@ -6,7 +6,6 @@ import { ConfigurationService } from "src/app/configuration.service";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { filter, Observable } from "rxjs";
 import { Store } from "@ngxs/store";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 declare let AW4: any;
 
@@ -27,7 +26,6 @@ declare let AW4: any;
 export class AsperaUploadComponent implements OnInit {
 
   uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   studyId$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
 
 
@@ -45,7 +43,6 @@ export class AsperaUploadComponent implements OnInit {
   selectedTab = "plugin";
   displayHelpModal = false;
   currentTransferId = null;
-  validationsId = "upload";
   MIN_CONNECT_VERSION = "3.6.0.0";
   CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
   uploadPath = "";
@@ -65,11 +62,6 @@ export class AsperaUploadComponent implements OnInit {
     this.uploadLocation$.subscribe((value) => {
       this.uploadPath = value;
     });
-    this.editorValidationRules$.subscribe((value) => {
-      if (value) {
-        this.validation = value[this.validationsId];
-      }
-    });
     this.studyId$.pipe(filter(val => val !== null)).subscribe((value) => {
       this.studyId = value;
     });
@@ -77,6 +69,7 @@ export class AsperaUploadComponent implements OnInit {
 
   ngOnInit() {
     this.videoURL = this.configService.config.videoURL.aspera;
+    this.validation = this.configService.config?.editorConfiguration?.upload || null;
     this.setUpSubscriptionsNgxs();
   }
 
@@ -223,7 +216,11 @@ export class AsperaUploadComponent implements OnInit {
       },
     ];
 
-    const i = this.validation.aspera;
+    const i = this.validation?.aspera;
+    if (!i) {
+      console.error("Missing Aspera upload configuration");
+      return;
+    }
 
     const l = {};
     l["remote_user"] = i.user;

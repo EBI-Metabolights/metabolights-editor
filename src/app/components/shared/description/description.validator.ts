@@ -9,6 +9,9 @@ function strip(html) {
 
 export function validateStudyDescription(validation: any): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
+    if (!validation || !Array.isArray(validation.rules)) {
+      return null;
+    }
     const value = control.value;
     let invalid = false;
     let errorMessage = "";

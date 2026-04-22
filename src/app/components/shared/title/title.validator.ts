@@ -3,6 +3,9 @@ import { AbstractControl, ValidatorFn } from "@angular/forms";
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 export function ValidateStudyTitle(validation: any): ValidatorFn {
   return (control: AbstractControl): { [key: string]: any } | null => {
+    if (!validation || !Array.isArray(validation.rules)) {
+      return null;
+    }
     const value = control.value;
     let invalid = false;
     let errorMessage = "";

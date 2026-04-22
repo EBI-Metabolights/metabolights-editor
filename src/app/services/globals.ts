@@ -31,7 +31,6 @@ MetaboLightsWSURL["domain"] = metaboLightsDomain + "/";
 MetaboLightsWSURL["baseURL"] = metaboLightsWSDomain + "/ws";
 MetaboLightsWSURL["studiesList"] = MetaboLightsWSURL["baseURL"] + "/studies";
 MetaboLightsWSURL["study"] = MetaboLightsWSURL["baseURL"] + "/studies";
-MetaboLightsWSURL["validations"] = "assets/configs/validations.json";
 MetaboLightsWSURL["guides"] =
   "https://raw.githubusercontent.com/EBI-Metabolights/guides/" + branch + "/";
 

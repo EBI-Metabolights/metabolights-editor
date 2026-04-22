@@ -62,7 +62,6 @@ export class FilesComponent implements OnInit,  OnChanges, AfterViewInit {
   ftpLocation = "upload";
   filesLoading = false;
   rawFilesLoading = false;
-  validationsId = "upload";
   filteredMetaFiles: any[] = [];
   filteredResultFiles: any[] = [];
   filteredRawFiles: any[] = [];
@@ -826,10 +825,6 @@ closeGlobusModal() {
     return file.directory;
   }
 
-  get validation() {
-    return this.validations[this.validationsId];
-  }
-
   onFilesSynchronized($event: SyncEvent): void {
     this.loadFiles(true, $event);
   }
@@ -909,5 +904,3 @@ closeGlobusModal() {
   this.rawFilesLoading = false;
 }
 }
-
-

@@ -17,23 +17,10 @@ export class ValidationService extends BaseConfigDependentService {
     message_filter: 'NONE',
     summary_messages: false
   } // default new validation task params
-  public loadingRulesMessage: string = "Loading study validation rules."
 
   constructor(http: HttpClient, configService: ConfigurationService, store: Store) {
       super(http, configService, store);
 
-    }
-
-    /**
-   * Get our validation config file.
-   *
-   * @returns Our validations config file via the Observable.
-   */
-    getValidationRules(): Observable<any> {
-      return this.http.get("assets/configs/validations.json").pipe(
-        map((res) => res),
-        catchError(this.handleError)
-      );
     }
 
     createStudyValidationTask(proxy: boolean = false, studyId: string): Observable<Ws3ValidationTaskResponse> {

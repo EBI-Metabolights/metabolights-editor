@@ -1,17 +1,14 @@
 import { Component, inject, Input, OnChanges, OnInit, SimpleChanges } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
 import { UntypedFormBuilder, Validators } from "@angular/forms";
 import { EditorService } from "../../../services/editor.service";
 import Swal from "sweetalert2";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
-import { BehaviorSubject, combineLatest, Observable } from "rxjs";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
+import { combineLatest, Observable } from "rxjs";
 import { Assay, AssayList } from "src/app/ngxs-store/study/assay/assay.actions";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
-import { MetabolightsFieldControls, getValidationRuleForField, ValidationRuleSelectionInput } from "src/app/models/mtbl/mtbls/control-list";
 import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions";
 
 
@@ -22,7 +19,6 @@ import { Protocols } from "src/app/ngxs-store/study/protocols/protocols.actions"
 })
 export class AddAssayComponent implements OnInit, OnChanges {
     studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-    editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
     studyCategory$: Observable<string> = inject(Store).select(GeneralMetadataState.studyCategory);
     templateVersion$: Observable<string> = inject(Store).select(GeneralMetadataState.templateVersion);
     templateConfiguration$: Observable<any> = inject(Store).select(ApplicationState.templateConfiguration);
@@ -33,7 +29,6 @@ export class AddAssayComponent implements OnInit, OnChanges {
     @Input() assayData: any = null;
 
     requestedStudy: string = null;
-    validations: any = null;
     studyCreatedAt: any = null;
 
     isAddAssayModalOpen = false;
@@ -61,8 +56,6 @@ export class AddAssayComponent implements OnInit, OnChanges {
     dynamicSections: any[] = [];
     assayHeaderTemplates: any = null;
 
-    assaySetup: any = null;
-
     assayForm = this.fb.group({
         assayType: ["", Validators.required],
         measurementType: ["", Validators.required],
@@ -75,8 +68,6 @@ export class AddAssayComponent implements OnInit, OnChanges {
     constructor(
         private fb: UntypedFormBuilder,
         private editorService: EditorService,
-        private route: ActivatedRoute,
-        private router: Router,
         private store: Store
     ) {
         this.initDefaultDescriptors();
@@ -229,30 +220,23 @@ export class AddAssayComponent implements OnInit, OnChanges {
 
         combineLatest([
             this.studyIdentifier$,
-            this.editorValidationRules$,
             this.studyCategory$,
             this.templateVersion$,
             this.templateConfiguration$,
             this.assayFileHeaderTemplates$,
             this.controlLists$
-        ]).subscribe(([studyId, rules, studyCategoryVal, version, config, headerTemplates, controlLists]) => {
+        ]).subscribe(([studyId, studyCategoryVal, version, config, headerTemplates, controlLists]) => {
 
             // 1. Study Identifier
             if (studyId) {
                 this.requestedStudy = studyId;
             }
 
-            // 2. Validation Rules
-            if (rules) {
-                this.validations = rules;
-                this.assaySetup = rules.assays?.assaySetup;
-            }
-
-            // 3. Header Templates & Control Lists (Dependencies for Dynamic Sections)
+            // 2. Header Templates & Control Lists (Dependencies for Dynamic Sections)
             this.assayHeaderTemplates = headerTemplates;
             this.controlLists = controlLists;
 
-            // 4. Configuration & Defaults
+            // 3. Configuration & Defaults
             if (config && config.versions) {
                 this.templateConfiguration = config;
                 this.currentTemplateVersion = version || config.defaultTemplateVersion;
@@ -524,66 +508,35 @@ export class AddAssayComponent implements OnInit, OnChanges {
                     }
 
                     // Resolve Description and Validation Object using centralized service
-                    const fieldMetadata = this.editorService.getFieldMetadata(colDef.columnHeader, 'assay', assayType);
-                    let description = fieldMetadata?.combinedDescription || colDef.description;
-                    let validationObj: any = {
-                        description: description,
-                        'is-required': isRequired ? 'true' : 'false'
-                    };
-
-                    if (this.validations) {
-                        const validationEntry = this.getValidationDefinition(colDef.columnHeader, assayType);
-                        if (validationEntry) {
-                            // Prioritize configuration description (from fieldMetadata) over validation entry
-                            description = description || validationEntry['ontology-details']?.description || validationEntry.description;
-                            if (validationEntry['ontology-details']) {
-                                validationObj = { ...validationEntry['ontology-details'] };
-                                if (fieldMetadata?.combinedDescription) {
-                                  validationObj.description = fieldMetadata.combinedDescription;
-                                }
-                            } else {
-                                validationObj.description = description;
-                            }
-                        }
-                    }
-
-                    // START: ValidationObj Cleanup
-                    // Ensure description is set in the object if not present
-                    if (!validationObj.description) validationObj.description = description;
-                    // Force is-required to follow the configuration (colDef)
+                    const fieldMetadata = this.editorService.getFieldMetadata(colDef.columnHeader, 'assay', assayType, undefined, false);
+                    const validationObj = this.editorService.getFieldValidation(
+                        colDef.columnHeader,
+                        'assay',
+                        assayType,
+                        {
+                            assayTemplate: assayType,
+                            studyCategory: this.studyCategory,
+                            studyCreatedAt: this.studyCreatedAt,
+                            templateVersion: this.currentTemplateVersion,
+                        },
+                        false
+                    );
+                    const description = validationObj.description || fieldMetadata?.combinedDescription || colDef.description;
+                    validationObj.description = description;
                     validationObj['is-required'] = isRequired ? 'true' : 'false';
-                    // END: ValidationObj Cleanup
 
                     // Resolve Rule with proper selection input
-                    let mainRule = null;
-                    if (this.controlLists && this.controlLists.controls) {
-                        const selectionInput: ValidationRuleSelectionInput = {
-                            studyCategory: this.studyCategory as any,
+                    const mainRule = this.editorService.getFieldControlRule(
+                        colDef.columnHeader,
+                        'assay',
+                        assayType,
+                        {
+                            assayTemplate: assayType,
+                            studyCategory: this.studyCategory,
                             studyCreatedAt: this.studyCreatedAt,
-                            isaFileType: "assay" as any,
-                            isaFileTemplateName: assayType,
                             templateVersion: this.currentTemplateVersion,
-                        };
-                        try {
-                            const namesToTry = [colName, colDef.columnHeader];
-                            for (const name of namesToTry) {
-                                mainRule = getValidationRuleForField({ controlLists: this.controlLists } as MetabolightsFieldControls, name, selectionInput);
-                                if (mainRule) break;
-                            }
-
-                            // Robust Fallback: If no rule found with strict selection criteria,
-                            // check if ANY rule exists for this field name in the control list.
-                            if (!mainRule) {
-                                for (const name of namesToTry) {
-                                    const allRules = this.controlLists.controls.assayFileControls?.[name];
-                                    if (allRules && allRules.length > 0) {
-                                        mainRule = allRules[0]; // Take first available rule
-                                        break;
-                                    }
-                                }
-                            }
-                        } catch (e) { }
-                    }
+                        }
+                    );
 
                     let renderAsDropdown = false;
                     if (mainRule) {
@@ -600,17 +553,18 @@ export class AddAssayComponent implements OnInit, OnChanges {
                     }
 
                     let unitRule = null;
-                    if (fieldType === 'TEXT_AND_ONTOLOGY' && this.controlLists && this.controlLists.controls) {
-                        const selectionInput: ValidationRuleSelectionInput = {
-                            studyCategory: this.studyCategory as any,
-                            studyCreatedAt: this.studyCreatedAt,
-                            isaFileType: "assay" as any,
-                            isaFileTemplateName: assayType ? assayType.split(';')[0] : null,
-                            templateVersion: this.currentTemplateVersion,
-                        };
-                        try {
-                            unitRule = getValidationRuleForField({ controlLists: this.controlLists } as MetabolightsFieldControls, 'unit', selectionInput);
-                        } catch (e) { }
+                    if (fieldType === 'TEXT_AND_ONTOLOGY') {
+                        unitRule = this.editorService.getFieldControlRule(
+                            'unit',
+                            'assay',
+                            assayType ? assayType.split(';')[0] : null,
+                            {
+                                assayTemplate: assayType ? assayType.split(';')[0] : null,
+                                studyCategory: this.studyCategory,
+                                studyCreatedAt: this.studyCreatedAt,
+                                templateVersion: this.currentTemplateVersion,
+                            }
+                        );
                     }
 
                     return {
@@ -672,70 +626,6 @@ export class AddAssayComponent implements OnInit, OnChanges {
     get resultFileName() {
         const id = this.requestedStudy || 'MTBLSxxx';
         return `m_${id}-${this.assayForm.value.assayId}_LC-MS.maf.tsv`;
-    }
-
-    getValidationDefinition(header: string, technique: string) {
-        if (!header) return null;
-
-        let selectedColumn = null;
-        let techniqueSpecificColumn = null;
-
-        const currentTechnique = technique;
-        const techniquePrefix = currentTechnique
-            ? (currentTechnique.replace(/-/g, "_").toUpperCase() + "_")
-            : "";
-
-        // Prepare target headers (current header, stripped header, inner Parameter Value)
-        const formattedColumnName = header.replace(/\.[0-9]+$/, "");
-        let innerName = formattedColumnName;
-        const match = formattedColumnName.match(/\[(.*?)\]/);
-        if (match) {
-            innerName = match[1];
-        }
-        // Comparison set: original, formatted, inner (all lowercased)
-        const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
-
-        // Iterate through validations
-        if (this.validations && this.validations.assays && this.validations.assays.default_order) {
-            this.validations.assays.default_order.forEach((col) => {
-                const entryHeader = (col.header || "").toLowerCase();
-                const entryColDef = (col.columnDef || "").toUpperCase();
-
-                // 1. Check if this entry matches our column header
-                const isHeaderMatch = targetHeaders.includes(entryHeader);
-
-                // 2. Check if this entry is intended for our specific technique
-                const isTechniqueMatch = techniquePrefix && entryColDef.startsWith(techniquePrefix);
-
-                // 3. Fallback: check if columnDef matches our header (sometimes used in validations.json)
-                const isColDefMatch = targetHeaders.includes((col.columnDef || "").toLowerCase());
-
-                if (isHeaderMatch || isColDefMatch) {
-                    // If we already have a technique-specific match, don't overwrite it with a generic one
-                    if (techniqueSpecificColumn) return;
-
-                    // If this validation entry has specific technique names listed
-                    if (
-                        currentTechnique &&
-                        col["techniqueNames"] &&
-                        col["techniqueNames"].length > 0
-                    ) {
-                        if (col["techniqueNames"].indexOf(currentTechnique) > -1) {
-                            // Strict technique match found in list
-                            techniqueSpecificColumn = col;
-                        }
-                    } else if (isTechniqueMatch) {
-                        // Implicit technique match via columnDef prefix
-                        techniqueSpecificColumn = col;
-                    } else {
-                        // Generic match
-                        selectedColumn = col;
-                    }
-                }
-            });
-        }
-
-        return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
     }
 
     saveAssay() {

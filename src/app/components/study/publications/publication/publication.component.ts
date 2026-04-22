@@ -18,7 +18,6 @@ import { JsonConvert } from "json2typescript";
 import * as toastr from "toastr";
 import { MTBLSPerson } from "./../../../../models/mtbl/mtbls/mtbls-person";
 import { Store } from "@ngxs/store";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
@@ -37,9 +36,6 @@ export class PublicationComponent implements OnInit {
 
   @ViewChild(OntologyComponent) statusComponent: OntologyComponent;
 
-  editorValidationRules$: Observable<Record<string, any>> = inject(
-    Store
-  ).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(
     ApplicationState.readonly
   );
@@ -73,8 +69,7 @@ export class PublicationComponent implements OnInit {
   isFormBusy = false;
   addNewPublication = false;
 
-  validations: any;
-  validationsId = "publications.publication";
+  fieldValidations: Record<string, any> = {};
   defaultControlList: { name: string; values: any[] } = {
     name: "",
     values: [],
@@ -117,9 +112,6 @@ export class PublicationComponent implements OnInit {
     this.toastrSettings$.subscribe((settings) => {
       this.toastrSettings = settings;
     });
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
-    });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isReadOnly = value;
@@ -130,12 +122,15 @@ export class PublicationComponent implements OnInit {
     
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
+      this.refreshFieldValidations();
     });
     this.templateVersion$.subscribe((value) => {
       this.templateVersion = value;
+      this.refreshFieldValidations();
     });
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
+      this.refreshFieldValidations();
     });
   }
 
@@ -220,6 +215,7 @@ export class PublicationComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.refreshFieldValidations();
     if (this.publication === null) {
       this.addNewPublication = true;
     }
@@ -802,18 +798,36 @@ export class PublicationComponent implements OnInit {
         this.showOntology = false;
   }
 
-  get validation() {
-    if (this.validationsId.includes(".")) {
-      const arr = this.validationsId.split(".");
-      let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
-      return tempValidations;
-    }
-    return this.validations[this.validationsId];
+  private getFieldName(fieldId: string): string {
+    const fieldMapping = {
+      title: "Study Publication Title",
+      authorList: "Study Publication Author List",
+      doi: "Study Publication DOI",
+      pubMedID: "Study PubMed ID",
+      status: "Study Publication Status",
+    };
+
+    return fieldMapping[fieldId] || fieldId;
+  }
+
+  private refreshFieldValidations() {
+    const fieldIds = ["title", "authorList", "doi", "pubMedID", "status"];
+    this.fieldValidations = fieldIds.reduce((acc, fieldId) => {
+      acc[fieldId] = this.editorService.getInvestigationFieldValidation(this.getFieldName(fieldId), {
+        studyCategory: this.studyCategory,
+        studyCreatedAt: this.studyCreatedAt,
+        templateVersion: this.templateVersion,
+      });
+      return acc;
+    }, {} as Record<string, any>);
   }
 
   fieldValidation(fieldId) {
-    return this.validation[fieldId];
+    return this.fieldValidations[fieldId] || this.editorService.getInvestigationFieldValidation(this.getFieldName(fieldId), {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      templateVersion: this.templateVersion,
+    });
   }
 
   getFieldValue(name) {
@@ -821,15 +835,7 @@ export class PublicationComponent implements OnInit {
   }
 
   getFieldMetadata(fieldId: string) {
-    const fieldMapping = {
-      'title': 'Study Publication Title',
-      'authorList': 'Study Publication Author List',
-      'doi': 'Study Publication DOI',
-      'pubMedID': 'Study PubMed ID',
-      'status': 'Study Publication Status'
-    };
-    const fieldName = fieldMapping[fieldId] || fieldId;
-    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+    return this.fieldValidation(fieldId);
   }
 
   getFieldHint(fieldId: string): string {
@@ -864,8 +870,8 @@ export class PublicationComponent implements OnInit {
   }
 
   isFieldRequired(field: string): boolean {
-    const metadata = this.getFieldMetadata(field);
-    const cfgRequired = metadata?.required === true;
+    const validation = this.fieldValidation(field);
+    const cfgRequired = validation?.["is-required"] === "true";
     if (field === "doi") {
       if (cfgRequired) return true;
       const statusVal = this.form?.controls?.status?.value;
