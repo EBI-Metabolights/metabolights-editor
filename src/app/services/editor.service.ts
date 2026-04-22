@@ -37,6 +37,7 @@ import { ResetMAFState } from "../ngxs-store/study/maf/maf.actions";
 import { ResetProtocolsState } from "../ngxs-store/study/protocols/protocols.actions";
 import { getValidationRuleForField, MetabolightsFieldControls, IsaTabFileType } from "../models/mtbl/mtbls/control-list";
 import { KeycloakService } from "keycloak-angular";
+import { shouldSkipDefaultControlListsForPath } from "../utils/default-control-lists-route.util";
 
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 /* eslint-disable  @typescript-eslint/no-unused-expressions */
@@ -498,7 +499,7 @@ export class EditorService {
     this.store.dispatch(new EditorVersion.Get());
     this.store.dispatch(new BannerMessage.Get());
     this.store.dispatch(new MaintenanceMode.Get());
-    this.store.dispatch(new DefaultControlLists.Get());
+    void this.loadDefaultControlLists();
     this.store.dispatch(new User.Studies.Set(null))
 
     this.loadValidations();
@@ -592,6 +593,12 @@ export class EditorService {
   }
 
   loadDefaultControlLists() {
+    const currentPath = typeof window !== "undefined" ? window.location.pathname : this.router.url;
+
+    if (shouldSkipDefaultControlListsForPath(currentPath)) {
+      return Promise.resolve();
+    }
+
     return this.store.dispatch(new DefaultControlLists.Get()).toPromise();
   }
 
