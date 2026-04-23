@@ -13,7 +13,6 @@ import * as toastr from "toastr";
 import { EditorService } from "../../../services/editor.service";
 import { Store } from "@ngxs/store";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { Observable } from "rxjs";
 import { ProtocolsState } from "src/app/ngxs-store/study/protocols/protocols.state";
 import { MTBLSProtocol } from "src/app/models/mtbl/mtbls/mtbls-protocol";
@@ -30,11 +29,11 @@ import { Ontology } from "src/app/models/mtbl/mtbls/common/mtbls-ontology";
 export class ProtocolsComponent implements OnInit, OnChanges {
   @Input("assay") assay: any;
 
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   isProtocolsExpanded$: Observable<boolean> = inject(Store).select(ApplicationState.isProtocolsExpanded);
   studyProtocols$: Observable<MTBLSProtocol[]> = inject(Store).select(ProtocolsState.protocols);
   protocolGuides$: Observable<Record<string, any>> = inject(Store).select(ProtocolsState.protocolGuides);
+  protocolTemplates$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.protocolTemplates);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
   actionStackFn = inject(Store).selectSignal(TransitionsState.actionStack);
@@ -45,7 +44,7 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   
   isStudyReadOnly = false;
 
-  validations: any;
+  validations: Record<string, any> = {};
 
   protocols: any[] = [];
   allProtocols: any[] = [];
@@ -59,7 +58,6 @@ export class ProtocolsComponent implements OnInit, OnChanges {
   showRefreshPrompt = computed(() => this.actionStack().length > 0)
   debounceTimeout: any;
 
-  validationsId = "protocols";
   expand = true;
   private toastrSettings: Record<string, any> = {};
 
@@ -80,31 +78,14 @@ export class ProtocolsComponent implements OnInit, OnChanges {
       }
     });
 
-    this.editorValidationRules$.subscribe((value) => {
-      if (value) {
-        this.validations = value;
-    
-        // Create a sorted copy of the array using slice() to clone and sort() for sorting
-        const sortedDefault = this.validationRulesGetter.default.slice().sort(
-          (a, b) => a['sort-order'] - b['sort-order']
-        );
-    
-        // Use the sorted array for mapping
-        this.defaultProtocols = sortedDefault.map(protocol => protocol.title);
-      }
+    this.protocolTemplates$.subscribe(() => {
+      this.refreshProtocolConfig();
     });
 
     this.studyProtocols$.subscribe((value) => {
       this.initialiseProtocols(value);
       this.allProtocols = value;
-      this.protocols.forEach((p) => {
-        if (
-          this.defaultProtocols.length > 0 &&
-          this.defaultProtocols.indexOf(p.name) < 0
-        ) {
-          this.customProtocols.push(p.name);
-        }
-      });
+      this.rebuildCustomProtocols();
     });
 
     this.isProtocolsExpanded$.subscribe((value) => {
@@ -129,7 +110,9 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.refreshProtocolConfig();
+  }
 
   initialiseProtocols(value) {
     this.protocols = [];
@@ -170,13 +153,35 @@ export class ProtocolsComponent implements OnInit, OnChanges {
     return selectedProtocol;
   }
 
-  get validationRulesGetter() {
-    return this.validations ? this.validations[this.validationsId] : null;
+  private refreshProtocolConfig() {
+    const assayTemplate = this.assay?.meta?.template || null;
+    this.defaultProtocols = this.editorService.getDefaultProtocolNames(assayTemplate);
+    this.validations = {
+      name: this.editorService.getInvestigationFieldValidation("Study Protocol Name"),
+      description: this.editorService.getInvestigationFieldValidation("Study Protocol Description", { assayTemplate }),
+      uri: this.editorService.getInvestigationFieldValidation("Study Protocol URI"),
+      version: this.editorService.getInvestigationFieldValidation("Study Protocol Version"),
+      parameterName: this.editorService.getInvestigationFieldValidation("Study Protocol Parameter Name", { assayTemplate }),
+    };
+    this.rebuildCustomProtocols();
+  }
+
+  private rebuildCustomProtocols() {
+    this.customProtocols = [];
+    this.protocols.forEach((protocol) => {
+      if (
+        this.defaultProtocols.length > 0 &&
+        this.defaultProtocols.indexOf(protocol.name) < 0
+      ) {
+        this.customProtocols.push(protocol.name);
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.assay) {
       this.initialiseProtocols(this.allProtocols);
+      this.refreshProtocolConfig();
     }
   }
 

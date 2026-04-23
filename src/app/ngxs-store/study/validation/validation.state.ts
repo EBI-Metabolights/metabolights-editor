@@ -1,8 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext, Store, createSelector } from "@ngxs/store";
-import { EditorValidationRules, ResetValidationState, SetInitialLoad, SetValidationRunNeeded, ValidationReportV2 } from "./validation.actions";
+import { Action, Selector, State, StateContext, createSelector } from "@ngxs/store";
+import { ResetValidationState, SetInitialLoad, SetValidationRunNeeded, ValidationReportV2 } from "./validation.actions";
 import { ValidationService } from "src/app/services/decomposed/validation.service";
-import { SetLoadingInfo } from "../../non-study/transitions/transitions.actions";
 
 import { timer } from "rxjs";
 import { ViolationType } from "src/app/components/study/validations-v2/interfaces/validation-report.types";
@@ -46,32 +45,7 @@ const defaultState: ValidationStateModel = {
 @Injectable()
 export class ValidationState {
 
-    constructor(private validationService: ValidationService, private store: Store, private toastrService: ToastrService) {}
-
-
-    @Action(EditorValidationRules.Get)
-    GetValidationRules(ctx: StateContext<ValidationStateModel>) {
-        this.validationService.getValidationRules().subscribe({
-            next: (rules) => {
-                this.store.dispatch(new SetLoadingInfo(this.validationService.loadingRulesMessage));
-                ctx.dispatch(new EditorValidationRules.Set(rules));
-            },
-            error: (error) => {
-                console.error(`Unable to retrieve the validations.json rules file for the editor: ${error}`)
-            }
-        })
-    }
-
-    @Action(EditorValidationRules.Set)
-    SetValidationRules(ctx: StateContext<ValidationStateModel>, action: EditorValidationRules.Set) {
-        const state = ctx.getState();
-
-        ctx.setState({
-            ...state,
-            rules: action.rules
-        });
-    }
-
+    constructor(private validationService: ValidationService, private toastrService: ToastrService) {}
 
     @Action(ValidationReportV2.Get)
     GetNewValidationReport(ctx: StateContext<ValidationStateModel>, action: ValidationReportV2.Get) {
@@ -291,11 +265,7 @@ export class ValidationState {
 
     @Action(ResetValidationState)
     Reset(ctx: StateContext<ValidationStateModel>, action: ResetValidationState) {
-        const state = ctx.getState();
-        ctx.setState({
-            ...defaultState,
-            rules: state.rules
-        });
+        ctx.setState(defaultState);
     }
 
     @Selector()

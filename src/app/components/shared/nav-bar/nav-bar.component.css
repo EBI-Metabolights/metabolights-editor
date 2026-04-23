@@ -1,6 +1,31 @@
 .navbar {
   min-height: 1.25rem !important;
+  overflow: visible;
 }
+
+.navbar-menu,
+.navbar-end,
+.navbar-item.has-dropdown,
+.navbar-item.has-dropdown.is-hoverable {
+  overflow: visible;
+}
+
+.navbar-link {
+  white-space: nowrap;
+}
+
+.navbar-dropdown.is-right {
+  left: auto;
+  right: 0;
+  min-width: 14rem;
+  white-space: nowrap;
+  z-index: 40;
+}
+
+.navbar-dropdown .navbar-item {
+  white-space: nowrap;
+}
+
 .version {
   display: grid;
   align-items: center;

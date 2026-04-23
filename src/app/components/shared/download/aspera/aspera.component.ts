@@ -3,7 +3,6 @@ import { PlatformLocation } from "@angular/common";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
 import { Store } from "@ngxs/store";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 declare let AW4: any;
 /* eslint-disable @typescript-eslint/naming-convention */
 @Component({
@@ -14,7 +13,6 @@ declare let AW4: any;
 export class AsperaDownloadComponent implements OnInit {
 
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.rules);
   publicAsperaPath$: Observable<string> = inject(Store).select(GeneralMetadataState.publicAsperaPath);
 
 
@@ -32,11 +30,9 @@ export class AsperaDownloadComponent implements OnInit {
   requestedStudy = null;
   fileTypes = null;
   currentTransferId = null;
-  validationsId = "download";
   MIN_CONNECT_VERSION = "3.6.0.0";
   CONNECT_AUTOINSTALL_LOCATION = "//d3gcli72yxqn2z.cloudfront.net/connect/v4";
   downloadPath = "";
-  validation: any = null;
   asperaWeb: any = null;
   baseHref: any;
 
@@ -52,9 +48,6 @@ export class AsperaDownloadComponent implements OnInit {
       if (value != null) {
         this.requestedStudy = value;
       }
-    });
-    this.editorValidationRules$.subscribe((value) => {
-      this.validation = value[this.validationsId];
     });
     this.publicAsperaPath$.subscribe((value) => {
       if (value != null) {

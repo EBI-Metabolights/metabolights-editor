@@ -17,14 +17,11 @@ import { OntologyComponent } from "../../../shared/ontology/ontology.component";
 import { MTBLSFactor } from "./../../../../models/mtbl/mtbls/mtbls-factor";
 import { MTBLSComment } from "./../../../../models/mtbl/mtbls/common/mtbls-comment";
 import { Store } from "@ngxs/store";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { filter, Observable } from "rxjs";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Factors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
-import { Router } from "@angular/router";
-import { OntologyComponentTrackerService } from "src/app/services/tracking/ontology-component-tracker.service";
-import { getValidationRuleForField, MetabolightsFieldControls, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
+import { IsaTabFileType, StudyCategoryStr } from "src/app/models/mtbl/mtbls/control-list";
 import { OntologySourceReference } from "src/app/models/mtbl/mtbls/common/mtbls-ontology-reference";
 
 @Component({
@@ -46,7 +43,6 @@ export class FactorComponent implements OnInit {
   @Output() saved = new EventEmitter<MTBLSFactor>();
   @Output() deleted = new EventEmitter<MTBLSFactor>();
 
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
@@ -72,10 +68,6 @@ export class FactorComponent implements OnInit {
   defaultControlList: {name: string; values: any[]} = {name: "", values: []};
   defaultControlListName = "Study Factor Type";
 
-  unitSampleValidations = null;
-  factorTypeValidations = null;
-  factorNameValidations =  null;
-
   isModalOpen = false;
   isTimeLineModalOpen = false;
   isDeleteModalOpen = false;
@@ -93,7 +85,6 @@ export class FactorComponent implements OnInit {
   isFormBusy = false;
   addNewFactor = false;
   baseHref: string;
-  validationRules: any = null;
   private legacyControlLists: Record<string, any[]> | null = null;
   studyCategory: any;
   templateVersion: any;
@@ -148,13 +139,6 @@ export class FactorComponent implements OnInit {
     this.toastrSettings$.subscribe((value) => {
       this.toastrSettings;
     });
-
-    this.editorValidationRules$.subscribe((value) => {
-      this.validationRules = value;
-      this.unitSampleValidations = this.fieldValidation('unit', true);
-      this.factorTypeValidations = this.fieldValidation('factorType');
-      this.factorNameValidations = this.fieldValidation('factorName');
-    });
     this.readonly$.subscribe((value) => {
       if (value !== null) {
         this.isStudyReadOnly = value;
@@ -163,11 +147,6 @@ export class FactorComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.editorService.loadValidations();
-    
-    this.unitSampleValidations = this.fieldValidation('unit', true);
-    this.factorTypeValidations = this.fieldValidation('factorType');
-    this.factorNameValidations = this.fieldValidation('factorName');
     if (this.factor == null) {
       this.addNewFactor = true;
       if (this.factorTypeComponent) {
@@ -377,23 +356,50 @@ export class FactorComponent implements OnInit {
       : this.factor.factorName;
   }
 
-  get validation() {
-    if (this.validationsId.includes(".")) {
-      const arr = this.validationsId.split(".");
-      let tempValidations = JSON.parse(JSON.stringify(this.validationRules));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) {}
-      return tempValidations;
-    }
-    return this.validationRules[this.validationsId];
+  private getFieldContext(fileType: IsaTabFileType = "investigation") {
+    return {
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      templateVersion: this.templateVersion,
+      sampleTemplate: fileType === "sample" ? this.sampleTemplate : null,
+    };
   }
 
-  fieldValidation(fieldId, setToSamples: boolean = false) {
-    if (this.validationRules != null) {
-      if (setToSamples) return this.validationRules['samples'][fieldId]
-      return this.validation[fieldId];
-    }
-    return {name: '', values: []};
+  private getValidationFieldName(fieldId: string): string {
+    const fieldMapping = {
+      factorName: "Study Factor Name",
+      factorType: "Study Factor Type",
+      unit: "Unit",
+    };
+    return fieldMapping[fieldId] || fieldId;
+  }
 
+  private getValidationConfig(fieldId: string) {
+    const isSampleField = fieldId === "unit";
+    const fileType: IsaTabFileType = isSampleField ? "sample" : "investigation";
+    const validationsId = isSampleField ? "samples" : this.validationsId;
+    const templateName = isSampleField ? this.sampleTemplate : null;
+
+    return this.editorService.getFieldValidation(
+      this.getValidationFieldName(fieldId),
+      fileType,
+      templateName,
+      this.getFieldContext(fileType),
+      true,
+      validationsId
+    );
+  }
+
+  get unitSampleValidations() {
+    return this.getValidationConfig("unit");
+  }
+
+  get factorTypeValidations() {
+    return this.getValidationConfig("factorType");
+  }
+
+  get factorNameValidations() {
+    return this.getValidationConfig("factorName");
   }
 
   getFieldValue(name) {
@@ -417,36 +423,17 @@ export class FactorComponent implements OnInit {
           defaultOntologies =  defaultRule;
         }
   
-        const selectionInput = {
-          studyCategory: this.studyCategory,
-          studyCreatedAt: this.studyCreatedAt,
-          isaFileType: "investigation" as any,
-          isaFileTemplateName: null,
-          templateVersion: this.templateVersion,
-        };
-  
-        let rule = null;
-        try {
-          if (
-            this.legacyControlLists &&
-            Object.keys(this.legacyControlLists).length > 0
-          ) {
-            rule = getValidationRuleForField(
-              {
-                controlLists: this.legacyControlLists,
-              } as MetabolightsFieldControls,
-              this.defaultControlListName,  
-              selectionInput
-            );
-          }
-        } catch (e) {
-          rule = null;
-        }
+        const rule = this.editorService.getFieldControlRule(
+          this.defaultControlListName,
+          "investigation",
+          null,
+          this.getFieldContext()
+        );
   
         let renderAsDropdown = false;
         
         if (rule) {
-          if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+          if (rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required") {
             renderAsDropdown = true;
             if (rule.terms && rule.terms.length > 0) {
               const ontologiesValues = rule.terms.map((t: any) => {
@@ -492,35 +479,16 @@ export class FactorComponent implements OnInit {
           defaultOntologies = defaultRule;
         }
   
-        const selectionInput = {
-          studyCategory: this.studyCategory,
-          studyCreatedAt: new Date(),
-          isaFileType: "sample" as any,
-          isaFileTemplateName: this.sampleTemplate,
-          templateVersion: this.templateVersion,
-        };
-  
-        let rule = null;
-        try {
-          if (
-            this.legacyControlLists &&
-            Object.keys(this.legacyControlLists).length > 0
-          ) {
-            rule = getValidationRuleForField(
-              {
-                controlLists: this.legacyControlLists,
-              } as MetabolightsFieldControls,
-              controlListName,  
-              selectionInput
-            );
-          }
-        } catch (e) {
-          rule = null;
-        }
+        const rule = this.editorService.getFieldControlRule(
+          controlListName,
+          "sample",
+          this.sampleTemplate,
+          this.getFieldContext("sample")
+        );
          let renderAsDropdown = false;
                  
         if (rule) {
-          if (rule.validationType === "selected-ontologies" && rule.termEnforcementLevel === "required") {
+          if (rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required") {
             renderAsDropdown = true;
             if (rule.terms && rule.terms.length > 0) {
               const ontologiesValues = rule.terms.map((t: any) => {
@@ -565,13 +533,17 @@ export class FactorComponent implements OnInit {
   }
 
   getFieldMetadata(fieldId: string) {
-    const fieldMapping = {
-      'factorName': 'Study Factor Name',
-      'factorType': 'Study Factor Type',
-      'unit': 'Unit'
-    };
-    const fieldName = fieldMapping[fieldId] || fieldId;
-    return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+    const isSampleField = fieldId === "unit";
+    const fileType: IsaTabFileType = isSampleField ? "sample" : "investigation";
+    const validationsId = isSampleField ? "samples" : this.validationsId;
+    const templateName = isSampleField ? this.sampleTemplate : null;
+    return this.editorService.getFieldMetadata(
+      this.getValidationFieldName(fieldId),
+      fileType,
+      templateName,
+      validationsId,
+      true
+    );
   }
 
   getFieldHint(fieldId: string): string {
@@ -579,7 +551,7 @@ export class FactorComponent implements OnInit {
     if (metadata && metadata.combinedDescription) {
       return metadata.combinedDescription;
     }
-    const validation = this.fieldValidation(fieldId);
+    const validation = this.getValidationConfig(fieldId);
     return validation?.description || '';
   }
 
@@ -588,7 +560,7 @@ export class FactorComponent implements OnInit {
     if (metadata && metadata.placeholder) {
       return metadata.placeholder;
     }
-    const validation = this.fieldValidation(fieldId);
+    const validation = this.getValidationConfig(fieldId);
     return validation?.placeholder || '';
   }
 

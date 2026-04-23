@@ -1,0 +1,14 @@
+{
+    "upload": {
+        "aspera": {
+            "user": "mtblight",
+            "secret": "gs4qYabh",
+            "server": "hx-fasp-1.ebi.ac.uk"
+        },
+        "ftp": {
+            "user": "mtblight",
+            "secret": "gs4qYabh",
+            "server": "ftp-private.ebi.ac.uk"
+        }
+    }
+}

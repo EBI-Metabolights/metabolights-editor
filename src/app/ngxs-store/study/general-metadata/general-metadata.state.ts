@@ -14,7 +14,7 @@ import { AssayList } from "../assay/assay.actions";
 import { Protocols } from "../protocols/protocols.actions"
 import { Descriptors, Factors } from "../descriptors/descriptors.action";
 import { ObfuscationCode, Operations, UploadLocation } from "../files/files.actions";
-import { EditorValidationRules, ValidationReport } from "../validation/validation.actions";
+import { ValidationReport } from "../validation/validation.actions";
 import { JsonConvert } from "json2typescript";
 import { take } from "rxjs/operators";
 import { User } from "../../non-study/user/user.actions";
@@ -122,7 +122,6 @@ export class GeneralMetadataState {
                 this.store.dispatch(new Descriptors.Set(gm_response.isaInvestigation.studies[0].studyDesignDescriptors));
                 this.store.dispatch(new Factors.Set(gm_response.isaInvestigation.studies[0].factors))
                 //this.store.dispatch(new SetConfiguration());
-                this.store.dispatch(new EditorValidationRules.Get());
                 // this.store.dispatch(new DatasetLicenseNS.GetDatasetLicense(action.studyId))
 
                 // TODO fix, commenting this out for demo purpose

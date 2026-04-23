@@ -11,7 +11,7 @@
             <i class="material-icons"> list </i> Collapse all
           </ng-template>
         </a>
-        <mtbls-protocol *ngIf="!isStudyReadOnly" [value]="null" [validations]="validations"></mtbls-protocol>&nbsp;
+        <mtbls-protocol *ngIf="!isStudyReadOnly" [value]="null" [validations]="validations" [assayTemplate]="assay?.meta?.template"></mtbls-protocol>&nbsp;
       </h6>
     </div>
   </div>
@@ -21,14 +21,14 @@
 
   <div *ngFor="let protocol of defaultProtocols">
     <span *ngIf="getProtocol(protocol) != null">
-      <mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations"
+      <mtbls-protocol [value]="getProtocol(protocol)" [required]="true" [validations]="validations" [assayTemplate]="assay?.meta?.template"
         [guides]="protocolGuides"></mtbls-protocol>
     </span>
   </div>
 
   <div *ngFor="let protocol of customProtocols">
     <span *ngIf="getProtocol(protocol) != null">
-      <mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations"></mtbls-protocol>
+      <mtbls-protocol [value]="getProtocol(protocol)" [validations]="validations" [assayTemplate]="assay?.meta?.template"></mtbls-protocol>
     </span>
   </div>
 </span>

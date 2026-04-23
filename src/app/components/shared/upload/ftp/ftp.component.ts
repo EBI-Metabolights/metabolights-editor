@@ -4,8 +4,8 @@ import { UntypedFormBuilder } from "@angular/forms";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { Store } from "@ngxs/store";
 import { Observable } from "rxjs";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { EditorService } from "../../../../services/editor.service";
+import { ConfigurationService } from "src/app/configuration.service";
 
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Operations } from "src/app/ngxs-store/study/files/files.actions";
@@ -27,9 +27,7 @@ export class FTPUploadComponent implements OnInit {
   @Input() hideButton: boolean = false;
 
   uploadLocation$: Observable<string> = inject(Store).select(FilesState.uploadLocation);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
 
-  rules: Record<string, any> = null;
   details: FtpDetails = {
     user: "",
     secret: "",
@@ -38,7 +36,6 @@ export class FTPUploadComponent implements OnInit {
 
   isFTPUploadModalOpen = false;
 
-  validationsId = "upload";
   displayHelpModal = false;
 
   uploadPath = "";
@@ -48,6 +45,7 @@ export class FTPUploadComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private metabolightsService: MetabolightsService,
     private editorService: EditorService,
+    private configService: ConfigurationService,
     private store: Store
   ) {
     this.setUpSubscriptionsNgxs();
@@ -58,15 +56,14 @@ export class FTPUploadComponent implements OnInit {
     this.uploadLocation$.subscribe((value) => {
       this.uploadPath = value;
     });
-    this.editorValidationRules$.subscribe((rules) => {
-      if (rules !== null && rules !== undefined) {
-        this.details = {
-          user: rules[this.validationsId]["ftp"]["user"],
-          secret: rules[this.validationsId]["ftp"]["secret"],
-          server: rules[this.validationsId]["ftp"]["server"]
-        }
-      }
-    })
+    const ftpDetails = this.configService.config?.editorConfiguration?.upload?.ftp;
+    if (ftpDetails) {
+      this.details = {
+        user: ftpDetails.user,
+        secret: ftpDetails.secret,
+        server: ftpDetails.server
+      };
+    }
   }
 
   refresh() {

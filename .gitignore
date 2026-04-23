@@ -9,6 +9,7 @@ nginx.conf
 
 # Don't expose configs
 /src/assets/configs/*config.json
+!src/assets/configs/editor-ui-config.json
 
 # Only exists if Bazel was run
 /bazel-out

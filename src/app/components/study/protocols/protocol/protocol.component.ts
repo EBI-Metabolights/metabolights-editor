@@ -28,6 +28,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   @Input("value") protocol: any;
   @Input("required") required = false;
   @Input("validations") validations: any;
+  @Input() assayTemplate: string = null;
   @Input("guides") guides: Record<string, any> = {};
   @Input("rule") rule: any = null;
   @Input("defaultOntologies") defaultOntologies: string[] = [];
@@ -77,8 +78,8 @@ export class ProtocolComponent implements OnInit, OnChanges {
 
   form: UntypedFormGroup;
 
-  validationsId = "protocols.protocol";
   _controlList: any = null;
+  fieldValidations: Record<string, any> = {};
 
   protocolInGuides: boolean = false;
   guideText: string = "";
@@ -104,6 +105,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
   ngOnInit() {
 
     this.setUpSubscriptionsNgxs();
+    this.refreshFieldValidations();
     
     if (this.protocol == null) {
       this.addNewProtocol = true;
@@ -113,8 +115,9 @@ export class ProtocolComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    //this.isProtocolInGuides();
-    
+    if (changes.protocol || changes.assayTemplate) {
+      this.refreshFieldValidations();
+    }
   }
 
   setUpSubscriptionsNgxs() {
@@ -124,12 +127,15 @@ export class ProtocolComponent implements OnInit, OnChanges {
     
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
+      this.refreshFieldValidations();
     });
     this.templateVersion$.subscribe((value) => {
       this.templateVersion = value;
+      this.refreshFieldValidations();
     });
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
+      this.refreshFieldValidations();
     });
     // subscribe to controlLists stored in application state (legacy flat payload)
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
@@ -154,6 +160,32 @@ export class ProtocolComponent implements OnInit, OnChanges {
     this.toastrSettings$.subscribe((settings) => {
       this.toastrSettings = settings;
     })
+  }
+
+  private getFieldName(fieldId: string): string {
+    const fieldMapping = {
+      name: "Study Protocol Name",
+      description: "Study Protocol Description",
+      uri: "Study Protocol URI",
+      version: "Study Protocol Version",
+      parameterName: "Study Protocol Parameter Name",
+    };
+
+    return fieldMapping[fieldId] || fieldId;
+  }
+
+  private refreshFieldValidations() {
+    const fieldIds = ["name", "description", "uri", "version", "parameterName"];
+    this.fieldValidations = fieldIds.reduce((acc, fieldId) => {
+      acc[fieldId] = this.editorService.getInvestigationFieldValidation(this.getFieldName(fieldId), {
+        assayTemplate: this.assayTemplate,
+        protocolName: this.protocol?.name,
+        studyCategory: this.studyCategory,
+        studyCreatedAt: this.studyCreatedAt,
+        templateVersion: this.templateVersion,
+      });
+      return acc;
+    }, {} as Record<string, any>);
   }
 
 
@@ -448,32 +480,10 @@ export class ProtocolComponent implements OnInit, OnChanges {
       this.protocol = mtblsProtocol;
     }
 
-    let descriptionValidation = this.fieldValidation("description");
-    if (!descriptionValidation) {
-      descriptionValidation = { rules: [] };
-    } else {
-      descriptionValidation = { ...descriptionValidation };
-      if (!descriptionValidation.rules) {
-        descriptionValidation.rules = [];
-      } else {
-        descriptionValidation.rules = [...descriptionValidation.rules];
-      }
-    }
-    
-    let minRule = descriptionValidation.rules.find((r) => r.condition === "min");
-    if (!minRule) {
-      descriptionValidation.rules.push({
-        condition: "min",
-        value: 40,
-        error: "Protocol description must be at least 40 characters long",
-      });
-    } else {
-      if (minRule.value === 0 || minRule.value === 1) {
-        minRule.value = 40;
-      }
-      minRule.error = `Protocol description must be at least ${minRule.value} characters long`;
-    }
-    descriptionValidation["is-required"] = "true";
+    const descriptionValidation = {
+      ...this.fieldValidation("description"),
+      rules: [...(this.fieldValidation("description")?.rules || [])],
+    };
 
     this.form = this.fb.group({
       name: [
@@ -552,23 +562,14 @@ export class ProtocolComponent implements OnInit, OnChanges {
     return { protocol: mtblProtocol.toJSON() };
   }
 
-  get validation() {
-    if (this.validations) {
-      if (this.validationsId.includes(".")) {
-        const arr = this.validationsId.split(".");
-        let tempValidations = JSON.parse(JSON.stringify(this.validations));
-        while (
-          arr.length &&
-          (tempValidations = tempValidations[arr.shift()])
-        ) {}
-        return tempValidations;
-      }
-      return this.validations[this.validationsId];
-    }
-  }
-
   fieldValidation(fieldId) {
-    return this.validation ? this.validation[fieldId] : false;
+    return this.fieldValidations[fieldId] || this.validations?.[fieldId] || this.editorService.getInvestigationFieldValidation(this.getFieldName(fieldId), {
+      assayTemplate: this.assayTemplate,
+      protocolName: this.protocol?.name,
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      templateVersion: this.templateVersion,
+    });
   }
 
   getFieldValue(name) {
@@ -686,15 +687,7 @@ export class ProtocolComponent implements OnInit, OnChanges {
       }
 
       getFieldMetadata(fieldId: string) {
-        const fieldMapping = {
-          'name': 'Study Protocol Name',
-          'description': 'Study Protocol Description',
-          'uri': 'Study Protocol URI',
-          'version': 'Study Protocol Version',
-          'parameterName': 'Study Protocol Parameter Name'
-        };
-        const fieldName = fieldMapping[fieldId] || fieldId;
-        return this.editorService.getFieldMetadata(fieldName, 'investigation', null, this.validationsId);
+        return this.fieldValidation(fieldId);
       }
 
       getFieldHint(fieldId: string): string {

@@ -14,7 +14,6 @@ import * as toastr from "toastr";
 import { Store } from "@ngxs/store";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Observable } from "rxjs";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { StudyAbstract } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
@@ -29,7 +28,6 @@ export class DescriptionComponent implements OnChanges, OnInit {
   @ViewChild("descriptionToCopy") descriptionToCopy!: ElementRef;
   
   studyDescription$: Observable<string> = inject(Store).select(GeneralMetadataState.description);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
@@ -38,11 +36,8 @@ export class DescriptionComponent implements OnChanges, OnInit {
   form: UntypedFormGroup;
   isFormBusy = false;
   description = "";
-  validations: any;
   isSymbolDropdownActive = false;
   editor: any;
-
-  validationsId = "description";
 
   isModalOpen = false;
   hasChanges = false;
@@ -67,9 +62,6 @@ export class DescriptionComponent implements OnChanges, OnInit {
     this.toastrSettings$.subscribe((value) => {
       this.toastrSettings = value;
     })
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
-    });
     this.studyDescription$.subscribe((value) => {
       if (value === "") {
         this.description = "Please add your study title here";
@@ -122,16 +114,6 @@ export class DescriptionComponent implements OnChanges, OnInit {
 
   initialiseForm() {
     if (!this.isReadOnly) {
-      // Enforce 200 character minimum if not set or lower in validation rules
-      if (this.validation && this.validation.rules) {
-        let minRule = this.validation.rules.find(r => r.condition === 'min');
-        if (!minRule) {
-          this.validation.rules.push({ condition: 'min', value: 200, error: 'Description must be at least 200 characters.' });
-        } else if (minRule.value < 200) {
-          minRule.value = 200;
-          minRule.error = 'Description must be at least 200 characters.';
-        }
-      }
       this.isFormBusy = false;
       this.form = this.fb.group({
         description: [
@@ -195,7 +177,7 @@ export class DescriptionComponent implements OnChanges, OnInit {
   }
 
   get validation() {
-    return this.validations[this.validationsId];
+    return this.editorService.getInvestigationFieldValidation("Study Description");
   }
 
   ngOnChanges(changes: SimpleChanges) {

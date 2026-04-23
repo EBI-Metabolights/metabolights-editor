@@ -15,6 +15,22 @@ export interface Environment {
   videoURL: VideoURL; // Object containing links to all help videos.
   ws3URL: string;
   auth: AuthSettings;
+  editorConfiguration?: EditorConfiguration;
+}
+
+export interface EditorConfiguration {
+  upload?: EditorUploadConfiguration;
+}
+
+export interface EditorUploadConfiguration {
+  aspera?: RemoteTransferConfiguration;
+  ftp?: RemoteTransferConfiguration;
+}
+
+export interface RemoteTransferConfiguration {
+  user: string;
+  secret: string;
+  server: string;
 }
 
 export interface AuthSettings {

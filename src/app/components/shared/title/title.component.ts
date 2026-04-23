@@ -12,7 +12,6 @@ import * as toastr from "toastr";
 import { filter, Observable } from "rxjs";
 import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/general-metadata.state";
 import { Store } from "@ngxs/store";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { Title } from "src/app/ngxs-store/study/general-metadata/general-metadata.actions";
 
@@ -28,7 +27,6 @@ export class TitleComponent implements OnInit {
   studyIdentifier$: Observable<string> = inject(Store).select(GeneralMetadataState.id);
   studyTitle$: Observable<string> = inject(Store).select(GeneralMetadataState.title);
   mhdAccession$: Observable<string> = inject(Store).select(GeneralMetadataState.mhdAccession);
-  editorValidationRules$: Observable<Record<string, any>> = inject(Store).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(ApplicationState.readonly);
   toastrSettings$: Observable<Record<string, any>> = inject(Store).select(ApplicationState.toastrSettings);
 
@@ -38,11 +36,8 @@ export class TitleComponent implements OnInit {
   requestedStudy: string = null;
   mhdAccession: string = null;
   title = "";
-  validations: any;
   form: UntypedFormGroup;
   isFormBusy = false;
-
-  validationsId = "title";
 
   isModalOpen = false;
 
@@ -79,9 +74,6 @@ export class TitleComponent implements OnInit {
 
       }
     });
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
-    });
     this.studyIdentifier$.subscribe((value) => {
       if (value != null) {
         this.requestedStudy = value;
@@ -110,16 +102,6 @@ export class TitleComponent implements OnInit {
 
   initialiseForm() {
     this.isFormBusy = false;
-    // Enforce 25 character minimum if not set or lower in validation rules
-    if (this.validation && this.validation.rules) {
-      let minRule = this.validation.rules.find(r => r.condition === 'min');
-      if (!minRule) {
-        this.validation.rules.push({ condition: 'min', value: 25, error: 'Title must be at least 25 characters.' });
-      } else if (minRule.value < 25) {
-        minRule.value = 25;
-        minRule.error = 'Title must be at least 25 characters.';
-      }
-    }
     this.form = this.fb.group({
       title: [this.title, ValidateStudyTitle(this.validation)],
     });
@@ -162,7 +144,7 @@ export class TitleComponent implements OnInit {
   }
 
   get validation() {
-    return this.validations[this.validationsId];
+    return this.editorService.getInvestigationFieldValidation("Study Title");
   }
   copyTitle() {
     const text = this.contentToCopy.nativeElement.innerText;

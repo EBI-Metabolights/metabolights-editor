@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, ViewChild, inject, Output, EventEmitter, ChangeDetectorRef } from "@angular/core";
+import { Component, OnInit, Input, ViewChild, inject, Output, EventEmitter } from "@angular/core";
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -18,7 +18,6 @@ import { GeneralMetadataState } from "src/app/ngxs-store/study/general-metadata/
 import { Observable, timer } from "rxjs";
 import { IPublication } from "src/app/models/mtbl/mtbls/interfaces/publication.interface";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import { DescriptorsState } from "src/app/ngxs-store/study/descriptors/descriptors.state";
 import { Descriptors } from "src/app/ngxs-store/study/descriptors/descriptors.action";
 import { UserState } from "src/app/ngxs-store/non-study/user/user.state";
@@ -46,9 +45,6 @@ export class DesignDescriptorComponent implements OnInit {
   identifier$: Observable<string> = inject(Store).select(
     GeneralMetadataState.id
   );
-  editorValidationRules$: Observable<Record<string, any>> = inject(
-    Store
-  ).select(ValidationState.studyRules);
   descriptors$: Observable<Ontology[]> = inject(Store).select(
     DescriptorsState.studyDesignDescriptors
   );
@@ -111,7 +107,6 @@ export class DesignDescriptorComponent implements OnInit {
     name: "",
     values: [],
   };
-  validations: any = {};
   validationsId = "studyDesignDescriptors";
   selectedPublication = new UntypedFormControl("", [Validators.required]);
   isModalOpen = false;
@@ -143,8 +138,7 @@ export class DesignDescriptorComponent implements OnInit {
     private fb: UntypedFormBuilder,
     private editorService: EditorService,
     private store: Store,
-    private europePMCService: EuropePMCService,
-    private cdr: ChangeDetectorRef
+    private europePMCService: EuropePMCService
   ) {
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
       this.legacyControlLists = lists || {};
@@ -159,10 +153,6 @@ export class DesignDescriptorComponent implements OnInit {
     });
     this.toastrSettings$.subscribe((settings) => {
       this.toastrSettings = settings;
-    });
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
-      this.cdr.markForCheck();
     });
     this.studyPublications$.subscribe((value) => {
       this.publications = value;
@@ -776,10 +766,6 @@ export class DesignDescriptorComponent implements OnInit {
     return null;
   }
 
-  fieldValidation(fieldId) {
-    return this.validation[fieldId];
-  }
-
   getFieldValue(name) {
     return this.form.get(name).value;
   }
@@ -789,13 +775,26 @@ export class DesignDescriptorComponent implements OnInit {
   }
 
   get validation() {
-    if (this.validationsId.includes(".")) {
-      const arr = this.validationsId.split(".");
-      let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) { }
-      return tempValidations;
-    }
-    return this.validations ? this.validations[this.validationsId] : {};
+    const selectedStudyCategory =
+      Array.isArray(this.selectedStudyCategories) && this.selectedStudyCategories.length > 0
+        ? this.selectedStudyCategories[0]
+        : (typeof this.selectedStudyCategories === "string"
+          ? this.selectedStudyCategories
+          : this.studyCategory);
+
+    return this.editorService.getFieldValidation(
+      this.validationsId,
+      (this.isaFileType as any) || "investigation",
+      this.isaFileTemplateName,
+      {
+        assayTemplate: this.isaFileType === "assay" ? this.isaFileTemplateName : null,
+        sampleTemplate: this.sampleTemplate,
+        studyCategory: selectedStudyCategory,
+        studyCreatedAt: this.studyCreatedAt,
+        templateVersion: this.templateVersion || this.store.selectSnapshot(GeneralMetadataState.templateVersion),
+      },
+      true
+    );
   }
 
   controlList() {

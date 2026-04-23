@@ -34,7 +34,6 @@ import { Store } from "@ngxs/store";
 import { FilesState } from "src/app/ngxs-store/study/files/files.state";
 import { ApplicationState } from "src/app/ngxs-store/non-study/application/application.state";
 import { IStudyFiles } from "src/app/models/mtbl/mtbls/interfaces/study-files.interface";
-import { ValidationState } from "src/app/ngxs-store/study/validation/validation.state";
 import {
   TableColumnAction,
   TableRowAction,
@@ -52,10 +51,6 @@ import {
   notANumberValidator,
 } from "../../shared/ontology/ontology.validator";
 import {
-  FieldValueValidation,
-  getValidationRuleForField,
-  MetabolightsFieldControls,
-  ValidationRuleSelectionInput,
   StudyCategoryStr,
   IsaTabFileType,
 } from "src/app/models/mtbl/mtbls/control-list";
@@ -95,9 +90,6 @@ export class TableComponent
   @Output() addSampleClick = new EventEmitter<void>();
 
   studyFiles$: Observable<IStudyFiles> = inject(Store).select(FilesState.files);
-  editorValidationRules$: Observable<Record<string, any>> = inject(
-    Store
-  ).select(ValidationState.studyRules);
   readonly$: Observable<boolean> = inject(Store).select(
     ApplicationState.readonly
   );
@@ -141,8 +133,6 @@ export class TableComponent
 
   rowsToAdd: any = 1;
   isReadOnly = true;
-
-  validations: any = {};
   mlPageSizeOptions: any = [10, 100];
 
   dataSource: MatTableDataSource<any> = new MatTableDataSource();
@@ -262,9 +252,7 @@ export class TableComponent
     this.baseHref = this.editorService.configService.baseHref;
     this.store.select(ApplicationState.controlLists).subscribe((lists) => {
       this.legacyControlLists = lists || {};
-      if (this.data && this.data.header && this.controlListColumns.size === 0) {
-        this.detectControlListColumns();
-      }
+      this.refreshRuntimeColumnState();
     });
   }
 
@@ -312,27 +300,25 @@ export class TableComponent
     });
     this.sampleTemplate$.subscribe((value) => {
       this.sampleTemplate = value;
+      this.refreshRuntimeColumnState();
     });
     this.studyCategory$.subscribe((value) => {
       this.studyCategory = value as StudyCategoryStr;
+      this.refreshRuntimeColumnState();
     });
     this.templateVersion$.subscribe((value) => {
       this.templateVersion = value;
+      this.refreshRuntimeColumnState();
     });
     this.studyCreatedAt$.subscribe((value) => {
       this.studyCreatedAt = value;
+      this.refreshRuntimeColumnState();
     });
     this.statusMessage$.subscribe((message) => {
       this.statusMessage = message;
     });
     this.statusType$.subscribe((type) => {
       this.statusType = type;
-    });
-    this.editorValidationRules$.subscribe((value) => {
-      this.validations = value;
-      if (this.data && this.data.header && this.controlListColumns.size === 0) {
-        this.detectControlListColumns();
-      }
     });
     this.studyFiles$.subscribe((value) => {
       if (value) {
@@ -509,6 +495,7 @@ export class TableComponent
       }
 
       this.validateTableOntologyColumns();
+      this.detectControlListColumns();
       this.refreshDisplayedColumns();
     }
   }
@@ -786,8 +773,80 @@ export class TableComponent
     });
   }
 
+  private refreshRuntimeColumnState() {
+    if (this.data && this.data.header) {
+      this._columnMetadataCache.clear();
+      this.detectControlListColumns();
+    }
+  }
+
+  private ensureAssayTechniqueResolved(): void {
+    if (
+      this.tableData?.data?.file &&
+      this.tableData.data.file.startsWith("a_") &&
+      this.assayTechnique.template === null
+    ) {
+      const result =
+        this.tableData.meta ||
+        this.assayService.extractAssayDetails(this.tableData, this.studyId);
+      if (result) {
+        this.assayTechnique.name = result.assayTechnique?.name;
+        this.assayTechnique.sub = result.assaySubTechnique?.name;
+        this.assayTechnique.main = result.assayMainTechnique?.name;
+        this.assayTechnique.template =
+          result.template || result.assaySubTechnique?.template;
+      }
+    }
+  }
+
+  private getCurrentTemplateName(fileType: IsaTabFileType): string | null {
+    if (fileType === "sample") {
+      return this.sampleTemplate || null;
+    }
+
+    if (fileType === "assay") {
+      this.ensureAssayTechniqueResolved();
+      return this.assayTechnique?.template || this.assayTechnique?.name || null;
+    }
+
+    return null;
+  }
+
+  private getCurrentFieldContext(fileType: IsaTabFileType) {
+    const templateName = this.getCurrentTemplateName(fileType);
+    return {
+      assayTemplate: fileType === "assay" ? templateName : null,
+      sampleTemplate: fileType === "sample" ? templateName : this.sampleTemplate,
+      studyCategory: this.studyCategory,
+      studyCreatedAt: this.studyCreatedAt,
+      templateVersion: this.templateVersion,
+    };
+  }
+
+  private getRuntimeColumnValidation(header: string): any {
+    if (!header || !this.data?.file) {
+      return {};
+    }
+
+    const fileType = this.getIsaFileType(this.data.file);
+    if (!fileType) {
+      return {};
+    }
+
+    return this.editorService.getFieldValidation(
+      header,
+      fileType,
+      this.getCurrentTemplateName(fileType),
+      this.getCurrentFieldContext(fileType),
+      false
+    );
+  }
+
   detectControlListColumns() {
     // Clear caches as validations are being re-evaluated
+    this.controlListColumns.clear();
+    this.controlListNames.clear();
+    this.controlLists.clear();
     this._columnControlListCache.clear();
     this._columnValidationsCache.clear();
     this._defaultOntologiesCache.clear();
@@ -795,59 +854,28 @@ export class TableComponent
     Object.keys(this.data.header).forEach((col) => {
       const formattedColumnName = col.replace(/\.[0-9]+$/, "");
 
-      // Overlay new rule-based logic for search/API first
       const isaFileType = this.getIsaFileType(this.data.file);
-      let isaFileTemplateName: string | null = null;
-      if (isaFileType === "sample") {
-        isaFileTemplateName = this.sampleTemplate || null;
-      } else if (isaFileType === "assay") {
-        const filename = this.data?.file || "";
-        const parts = filename.split("_");
-        isaFileTemplateName = parts.length >= 3 ? parts[2] : null;
-      } else if (isaFileType === "investigation") {
-        isaFileTemplateName = null;
-      } else {
-        isaFileTemplateName = this.sampleTemplate || null;
+      if (!isaFileType) {
+        return;
       }
-
-      const selectionInput: ValidationRuleSelectionInput = {
-        studyCategory: this.studyCategory,
-        studyCreatedAt: this.studyCreatedAt,
+      const isaFileTemplateName = this.getCurrentTemplateName(isaFileType);
+      const fieldContext = this.getCurrentFieldContext(isaFileType);
+      const validation = this.editorService.getFieldValidation(
+        formattedColumnName,
         isaFileType,
         isaFileTemplateName,
-        templateVersion: this.templateVersion,
-      };
+        fieldContext,
+        false
+      );
+      const rule = this.editorService.getFieldControlRule(
+        formattedColumnName,
+        isaFileType,
+        isaFileTemplateName,
+        fieldContext
+      );
 
-      let rule: FieldValueValidation | null = null;
-      try {
-        if (
-          this.legacyControlLists &&
-          Object.keys(this.legacyControlLists).length > 0
-        ) {
-          rule = getValidationRuleForField(
-            {
-              controlLists: this.legacyControlLists,
-            } as MetabolightsFieldControls,
-            formattedColumnName,
-            selectionInput
-          );
-        }
-      } catch (e) {
-        rule = null;
-      }
-
-      if (this.controlListColumns.has(col) && !rule) return;
-
-      const definition = this.getValidationDefinition(formattedColumnName);
-      if (
-        definition &&
-        "ontology-details" in definition &&
-        "recommended-ontologies" in definition["ontology-details"] &&
-        definition["ontology-details"]["recommended-ontologies"]
-      ) {
-        const prefix =
-          definition["ontology-details"]["recommended-ontologies"].ontology
-            ?.url;
+      if (rule) {
+        const prefix = validation?.["recommended-ontologies"]?.ontology?.url || "";
         let branch = "";
         const branchParam = prefix.split("branch=");
         if (branchParam.length > 1) {
@@ -855,12 +883,8 @@ export class TableComponent
         }
         if (branch.length > 0) {
           this.controlListNames.set(col, branch);
-          this.controlListColumns.set(col, Object.freeze(definition)); // Keep old validations for display
         }
-      }
 
-      if (rule) {
-        const existing = this.controlListColumns.get(col) || {};
         const isOntologyType = [
           "selected-ontology-term",
           "ontology-term-in-selected-ontologies",
@@ -869,9 +893,12 @@ export class TableComponent
         this.controlListColumns.set(
           col,
           Object.freeze({
-            ...existing, // Keep old validations for display
+            ...validation,
             rule,
-            // "data-type": isOntologyType ? "ontology" : rule.validationType,
+            "data-type":
+              this.ontologyColumns.indexOf(col) > -1 || isOntologyType
+                ? "ontology"
+                : "string",
             renderAsDropdown: rule.validationType === "selected-ontology-term" && rule.termEnforcementLevel === "required"
           })
         );
@@ -883,7 +910,7 @@ export class TableComponent
             o.termAccession = t.termAccessionNumber || "";
             o.termSource = new OntologySourceReference();
             o.termSource.name = t.termSourceRef || "";
-            o.termSource.description = existing?.description || "";
+            o.termSource.description = "";
             o.termSource.file = "";
             o.termSource.version = "";
             o.termSource.provenance_name = "";
@@ -943,68 +970,10 @@ export class TableComponent
       return this._columnValidationsCache.get(header);
     }
 
-    let result: any = {};
-
-    if (
-      this.enableControlList &&
-      this.controlListColumns.has(header)
-    ) {
-      const colVal = this.controlListColumns.get(header);
-      let colData = colVal?.["ontology-details"];
-
-      // If we have a validation rule but no description in colData, look it up in global validations
-      if (!colData?.description && this.validation?.default_order) {
-        const formattedColumnName = header.replace(/\.[0-9]+$/, "");
-        // Extract the part inside Parameter Value[...] if applicable
-        let innerName = formattedColumnName;
-        const match = formattedColumnName.match(/\[(.*?)\]/);
-        if (match) {
-          innerName = match[1];
-        }
-
-        const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
-
-        const techniquePrefix = (this.technique || "").replace("-", "_").toUpperCase() + "_";
-
-        // 1. Try to find an entry that matches both technique and header in columnDef
-        let validationEntry = this.validation.default_order.find(entry => {
-          const entryColDef = (entry.columnDef || "").toUpperCase();
-          const entryHeader = (entry.header || "").toLowerCase();
-          return entryColDef.startsWith(techniquePrefix) && targetHeaders.includes(entryHeader);
-        });
-
-        // 2. Fallback
-        if (!validationEntry) {
-          validationEntry = this.validation.default_order.find(entry =>
-            targetHeaders.includes((entry.header || "").toLowerCase()) ||
-            targetHeaders.includes((entry.columnDef || "").toLowerCase())
-          );
-        }
-
-        if (validationEntry) {
-          const ruleDesc = validationEntry['ontology-details']?.description || validationEntry.description;
-          if (ruleDesc) {
-            colData = { ...(colData || {}), description: ruleDesc };
-          }
-        }
-      }
-      // Note: Removed side-effect setting this.isRequiredField here. it is handled in editCell/editColumn
-      result = colData || {};
-    } else if (this.enableControlList) {
-      result = this.validations?.default_ontology_validation?.["ontology-details"] || {};
-    }
-
-    // Add prioritized metadata (Configuration over validations.json)
-    const metadata = this.getColumnMetadata(header);
-    if (metadata) {
-      result = { ...result };
-      if (metadata.combinedDescription) {
-        result.description = (result.description || "") + (result.description ? " " : "") + metadata.combinedDescription;
-      }
-      if (metadata.required !== undefined) {
-        result["is-required"] = metadata.required;
-      }
-    }
+    const result: any =
+      this.enableControlList && this.controlListColumns.has(header)
+        ? { ...this.controlListColumns.get(header) }
+        : this.getRuntimeColumnValidation(header);
 
     // Cache the result
     this._columnValidationsCache.set(header, result);
@@ -1188,6 +1157,21 @@ export class TableComponent
     return s;
   }
 
+  formatCellPlaceholder(term: string): string {
+    const compactColumnName = this.getBracketedColumnName(term);
+    return compactColumnName || this.formatHeader(term);
+  }
+
+  private getBracketedColumnName(term: string): string {
+    if (!term) {
+      return "";
+    }
+
+    const normalizedTerm = String(term).replace(/\.[0-9]+$/, "");
+    const match = normalizedTerm.match(/^(Parameter Value|Parameter|Characteristics|Factor Value)\s*\[([^\]]+)\]$/i);
+    return match ? match[2].trim() : "";
+  }
+
   getColumnMetadata(header: string) {
     if (!header || !this.data || !this.data.file) {
       return null;
@@ -1198,17 +1182,18 @@ export class TableComponent
       return this._columnMetadataCache.get(header);
     }
 
-    const fileTypeRaw = this.getTableType(this.data.file);
-    const fileType: IsaTabFileType = fileTypeRaw === 'samples' ? 'sample' : fileTypeRaw as IsaTabFileType;
-
-    // For assay files, attempt to resolve the assay type (templateName)
-    let templateName = null;
-    if (fileType === 'assay') {
-      // Prioritize template (e.g. "LC-MS") over tech name (e.g. "LCMS")
-      templateName = this.assayTechnique?.template || this.assayTechnique?.name || null;
+    const fileType = this.getIsaFileType(this.data.file);
+    if (!fileType) {
+      return null;
     }
 
-    const metadata = this.editorService.getFieldMetadata(header, fileType, templateName, this.validationsId);
+    const metadata = this.editorService.getFieldMetadata(
+      header,
+      fileType,
+      this.getCurrentTemplateName(fileType),
+      undefined,
+      false
+    );
     this._columnMetadataCache.set(header, metadata);
     return metadata;
   }
@@ -1372,6 +1357,7 @@ export class TableComponent
   getIsaFileType(filename: string): IsaTabFileType {
     if (filename.startsWith("a_")) return "assay";
     if (filename.startsWith("i_")) return "investigation";
+    if (filename.startsWith("m_")) return "maf";
     if (filename.startsWith("s_")) return "sample";
   }
 
@@ -1486,8 +1472,6 @@ export class TableComponent
     if (
       this.enableControlList &&
       this.controlListColumns.size === 0 &&
-      this.validations &&
-      this.validation &&
       this.data &&
       this.data.header
     ) {
@@ -1681,8 +1665,6 @@ export class TableComponent
       if (this.enableControlList) {
         if (
           this.controlListColumns.size === 0 &&
-          this.validations &&
-          this.validation &&
           this.data &&
           this.data.header
         ) {
@@ -1690,7 +1672,7 @@ export class TableComponent
         }
         if (
           this.controlListColumns.has(column.header) &&
-          (this.controlListColumns.get(column.header)?.["data-type"] === "string")
+          this.ontologyColumns.indexOf(column.header) === -1
         ) {
           this.isCellTypeControlList = true;
           this.cellControlListValue();
@@ -2130,88 +2112,6 @@ export class TableComponent
     }
   }
 
-  getValidationDefinition(header) {
-    if (!header) return null;
-
-    let selectedColumn = null;
-    let techniqueSpecificColumn = null;
-
-    // Resolve technique if likely an assay file
-    if (
-      this.tableData?.data?.file &&
-      this.tableData.data.file.startsWith("a_") &&
-      this.assayTechnique.name === null
-    ) {
-      const result = this.tableData.meta || this.assayService.extractAssayDetails(
-        this.tableData,
-        this.studyId
-      );
-      if (result) {
-        this.assayTechnique.name = result.assayTechnique?.name;
-        this.assayTechnique.sub = result.assaySubTechnique?.name;
-        this.assayTechnique.main = result.assayMainTechnique?.name;
-        this.assayTechnique.template = result.template || result.assaySubTechnique?.template;
-      }
-    }
-
-    const currentTechnique = this.assayTechnique.name;
-    const techniquePrefix = currentTechnique
-      ? (currentTechnique.replace(/-/g, "_").toUpperCase() + "_")
-      : "";
-
-    // Prepare target headers (current header, stripped header, inner Parameter Value)
-    const formattedColumnName = header.replace(/\.[0-9]+$/, "");
-    let innerName = formattedColumnName;
-    const match = formattedColumnName.match(/\[(.*?)\]/);
-    if (match) {
-      innerName = match[1];
-    }
-    // Comparison set: original, formatted, inner (all lowercased)
-    const targetHeaders = [header, formattedColumnName, innerName].map(h => h ? h.toLowerCase() : "");
-
-    // Iterate through validations
-    if (this.validation && this.validation.default_order) {
-      this.validation.default_order.forEach((col) => {
-        const entryHeader = (col.header || "").toLowerCase();
-        const entryColDef = (col.columnDef || "").toUpperCase();
-
-        // 1. Check if this entry matches our column header
-        const isHeaderMatch = targetHeaders.includes(entryHeader);
-
-        // 2. Check if this entry is intended for our specific technique
-        const isTechniqueMatch = techniquePrefix && entryColDef.startsWith(techniquePrefix);
-
-        // 3. Fallback: check if columnDef matches our header (sometimes used)
-        const isColDefMatch = targetHeaders.includes((col.columnDef || "").toLowerCase());
-
-        if (isHeaderMatch || isColDefMatch) {
-          // If we already have a technique-specific match, don't overwrite it with a generic one
-          if (techniqueSpecificColumn) return;
-
-          // If this validation entry has specific technique names listed
-          if (
-            currentTechnique &&
-            col["techniqueNames"] &&
-            col["techniqueNames"].length > 0
-          ) {
-            if (col["techniqueNames"].indexOf(currentTechnique) > -1) {
-              // Strict technique match found in list
-              techniqueSpecificColumn = col;
-            }
-          } else if (isTechniqueMatch) {
-            // Implicit technique match via columnDef prefix
-            techniqueSpecificColumn = col;
-          } else {
-            // Generic match
-            selectedColumn = col;
-          }
-        }
-      });
-    }
-
-    return techniqueSpecificColumn ? techniqueSpecificColumn : selectedColumn;
-  }
-
   closeEditModal() {
     this.isEditModalOpen = false;
   }
@@ -2329,25 +2229,6 @@ export class TableComponent
           this.isFormBusy = false;
         }
       );
-  }
-
-  get technique(): string {
-    const filename = this.data?.file || "";
-    const parts = filename.split("_");
-    if (parts.length >= 3 && parts[0] === 'a') {
-      return parts[2];
-    }
-    return null;
-  }
-
-  get validation() {
-    if (this.validationsId.includes(".")) {
-      const arr = this.validationsId.split(".");
-      let tempValidations = JSON.parse(JSON.stringify(this.validations));
-      while (arr.length && (tempValidations = tempValidations[arr.shift()])) { }
-      return tempValidations;
-    }
-    return this.validations[this.validationsId];
   }
 
   getOntologyObject() {

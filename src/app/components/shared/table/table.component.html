@@ -157,12 +157,12 @@
   </span>
 </div>
 <div class="columns is-vcentered nmrl fadeIn">
-  <span class="column is-6">
+  <span class="column is-4">
     <small class="has-text-grey">
       An asterisk (<span class="required-asterisk">*</span>) denotes a mandatory field
     </small>
   </span>
-  <span class="column is-6 has-text-right">
+  <span class="column is-8 has-text-right">
     <mat-paginator [pageSizeOptions]="mlPageSizeOptions" showFirstLastButtons></mat-paginator>
   </span>
 </div>
@@ -358,7 +358,7 @@
                 <div class="control">
                   <div
                     *ngIf="isCellTypeOntology && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
-                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <label>{{ formatCellPlaceholder(selectedCell["column"]["header"]) }}</label>
                     <mtbls-ontology [id]="'editOntologyCell'"
                       [validations]="columnValidations(selectedCell['column']['header'])"
                       [controlList]="columnControlList(selectedCell['column']['header'])"
@@ -371,7 +371,7 @@
                   <div *ngIf="isCellTypeFile">
                     <mat-form-field class="full-width" appearance="outline">
                       <mat-select formControlName="cell"
-                        placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
+                        [placeholder]="formatCellPlaceholder(selectedCell['column']['header'])">
                         <mat-option *ngFor="let file of getFiles(selectedCell['column']['header'])" [value]="file.file">
                           {{ file.file }}
                         </mat-option>
@@ -384,7 +384,7 @@
                   </div>
                   <div
                     *ngIf="isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
-                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <label>{{ formatCellPlaceholder(selectedCell["column"]["header"]) }}</label>
                     <mtbls-ontology [id]="'editControlListCell'"
                       [validations]="columnValidations(selectedCell['column']['header'])"
                       [controlList]="columnControlList(selectedCell['column']['header'])"
@@ -395,10 +395,10 @@
                       (emptyError)="onEmptyError($event)"></mtbls-ontology>
                   </div>
                   <div *ngIf="columnControlList(selectedCell['column']['header']).renderAsDropdown">
-                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <label>{{ formatCellPlaceholder(selectedCell["column"]["header"]) }}</label>
                     <mat-form-field class="full-width" appearance="outline">
                       <mat-select formControlName="cell"
-                        placeholder="{{ formatHeader(selectedCell['column']['columnDef']) }}">
+                        [placeholder]="formatCellPlaceholder(selectedCell['column']['header'])">
                         <mat-option *ngFor="let option of columnControlList(selectedCell['column']['header']).values"
                           [value]="option.annotationValue">
                           {{ option.annotationValue }}
@@ -412,9 +412,10 @@
                   </div>
                   <div
                     *ngIf="!isCellTypeFile && !isCellTypeOntology && !isCellTypeControlList && !columnControlList(selectedCell['column']['header']).renderAsDropdown">
-                    <label>{{ formatHeader(selectedCell["column"]["columnDef"]) }}</label>
+                    <label>{{ formatCellPlaceholder(selectedCell["column"]["header"]) }}</label>
                     <mat-form-field class="full-width" appearance="outline">
-                      <input class="no-scroll" formControlName="cell" matInput />
+                      <input class="no-scroll" formControlName="cell" matInput
+                        [placeholder]="formatCellPlaceholder(selectedCell['column']['header'])" />
                       <mat-hint>
                         {{ getColumnTooltip(selectedCell['column']['header']) }}
                         <b *ngIf="isFieldRequired(selectedCell['column']['header'])">&nbsp;(required)</b>
