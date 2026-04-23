@@ -1157,6 +1157,21 @@ export class TableComponent
     return s;
   }
 
+  formatCellPlaceholder(term: string): string {
+    const compactColumnName = this.getBracketedColumnName(term);
+    return compactColumnName || this.formatHeader(term);
+  }
+
+  private getBracketedColumnName(term: string): string {
+    if (!term) {
+      return "";
+    }
+
+    const normalizedTerm = String(term).replace(/\.[0-9]+$/, "");
+    const match = normalizedTerm.match(/^(Parameter Value|Parameter|Characteristics|Factor Value)\s*\[([^\]]+)\]$/i);
+    return match ? match[2].trim() : "";
+  }
+
   getColumnMetadata(header: string) {
     if (!header || !this.data || !this.data.file) {
       return null;

@@ -65,6 +65,7 @@ export class OntologyComponent implements OnInit, OnChanges {
   @Input() id: string;
   @Input() unitId: string;
   @Input("label") label: string;
+  @Input() searchPlaceholder = "Search for ontology terms";
   @Input() rule: FieldValueValidation | null = null;
   @Input() isRequired: boolean = false;
   @Input() hasError: boolean = false;
